@@ -10,8 +10,8 @@ class MatchResult(models.Model):
         null=True,
         blank=True,
     )
-    position = models.IntegerField(blank=True, null=True)
-    points = models.IntegerField(blank=True, null=True)
-    league = models.IntegerField(blank=True, null=True)
-    season = models.IntegerField(blank=True, null=True)
-    year = models.IntegerField(blank=True, null=True)
+    position = models.IntegerField()
+    points = models.IntegerField()
+    league = models.IntegerField()
+    season = models.IntegerField()
+    year = models.IntegerField()
