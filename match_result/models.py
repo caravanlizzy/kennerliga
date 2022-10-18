@@ -15,3 +15,6 @@ class MatchResult(models.Model):
     league = models.IntegerField()
     season = models.IntegerField()
     year = models.IntegerField()
+
+    def __str__(self):
+        return self.player.username + '_' + str(self.year) + '_' + 'S' +  str(self.season) + '_' + 'L' + str(self.league)

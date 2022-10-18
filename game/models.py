@@ -22,6 +22,7 @@ class GameOptionCategory(models.Model):
     def __str__(self):
         return str(self.category)
 
+
 class GameOption(models.Model):
     category = models.ForeignKey(
         GameOptionCategory,
@@ -33,4 +34,3 @@ class GameOption(models.Model):
 
     def __str__(self):
         return str(self.option)
-
