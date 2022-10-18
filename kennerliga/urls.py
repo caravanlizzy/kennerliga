@@ -15,6 +15,7 @@ Including another URLconf
 """
 from django.contrib import admin
 
+from game.views import CreateResultView
 from home.views import HomeView
 from user.views import LoginView
 from django.urls import path
@@ -23,4 +24,5 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('login/', LoginView.as_view(), name='login'),
     path('home/', HomeView.as_view(), name='home'),
+    path('post_result/', CreateResultView.as_view(), name='create-match-result')
 ]
