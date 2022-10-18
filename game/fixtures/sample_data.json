@@ -1,0 +1,35 @@
+[
+  {
+    "model": "game.game",
+    "pk": 1,
+    "fields": {
+      "name": "Terra Mystica"
+    }
+  },
+  {
+    "model": "game.gameoptioncategory",
+    "pk": 1,
+    "fields": {
+      "game": 1,
+      "category": "Map",
+      "is_bool": false
+    }
+  },
+  {
+    "model": "game.gameoptioncategory",
+    "pk": 2,
+    "fields": {
+      "game": 1,
+      "category": "Fire and Ice - Factions",
+      "is_bool": true
+    }
+  },
+  {
+    "model": "game.gameoption",
+    "pk": 1,
+    "fields": {
+      "category": 1,
+      "option": "Base"
+    }
+  }
+]
