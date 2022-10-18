@@ -5,6 +5,9 @@ from django.db import models
 class Game(models.Model):
     name = models.CharField(max_length=88)
 
+    def __str__(self):
+        return str(self.name)
+
 
 class GameOptionCategory(models.Model):
     game = models.ForeignKey(
@@ -14,8 +17,10 @@ class GameOptionCategory(models.Model):
         blank=True,
     )
     category = models.CharField(max_length=88)
-    type = models.BooleanField()  # booleanOption or MultipleOptions
+    is_bool = models.BooleanField()  # booleanOption or MultipleOptions
 
+    def __str__(self):
+        return str(self.category)
 
 class GameOption(models.Model):
     category = models.ForeignKey(
@@ -25,4 +30,7 @@ class GameOption(models.Model):
         blank=True,
     )
     option = models.CharField(max_length=139)
+
+    def __str__(self):
+        return str(self.option)
 
