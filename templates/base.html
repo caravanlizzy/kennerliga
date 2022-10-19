@@ -19,9 +19,15 @@
 </head>
 
 <body>
-<div class="content">
-    {% block content %}
-    {% endblock %}
+
+<div class="layout-container">
+    <div class="layout-navbar"></div>
+    <div class="layout-menu"></div>
+    <div class="layout-main">
+        {% block content %}
+        {% endblock %}
+    </div>
+    <div class="layout-footer"> Footer </div>
 </div>
 
 
