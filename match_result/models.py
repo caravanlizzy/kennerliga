@@ -1,5 +1,6 @@
 from django.db import models
 from user.models import User
+from season.models import Season
 
 
 # Create your models here.
@@ -13,7 +14,12 @@ class MatchResult(models.Model):
     position = models.IntegerField()
     points = models.IntegerField()
     league = models.IntegerField()
-    season = models.IntegerField()
+    season = models.ForeignKey(
+        Season,
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+    )
     year = models.IntegerField()
 
     def __str__(self):
