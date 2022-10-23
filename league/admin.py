@@ -1,8 +1,8 @@
 from django.contrib import admin
 
 # Register your models here.
-from season.models import Season
+from league.models import League
 
-@admin.register(Season)
+@admin.register(League)
 class AuthorAdmin(admin.ModelAdmin):
     pass

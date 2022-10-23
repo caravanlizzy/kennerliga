@@ -4,11 +4,17 @@ from user.models import User
 
 # Create your models here.
 class Season(models.Model):
-    participants = models.ManyToManyField(User)
-    year = models.DateField()
-    number = models.IntegerField(
-        'number between 1 and 12 - month of the current season'
+    participants = models.ManyToManyField(User,
+        blank=True,
+        null=True,
     )
+    year = models.IntegerField()
+    number = models.IntegerField(
+        'month in the current year'
+    )
+
+    def __str__(self):
+        return f' Season {self.number}'
 
     def create_leagues(self, season_pk):
         self.objects.filter(pk=season_number)

@@ -33,7 +33,8 @@ LOCAL_APPS = [
     'match_result',
     'game',
     'home',
-    'season'
+    'season',
+    'league',
 ]
 
 DJANGO_APPS = [
