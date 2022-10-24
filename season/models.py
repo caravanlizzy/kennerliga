@@ -14,7 +14,7 @@ class Season(models.Model):
     )
 
     def __str__(self):
-        return f' Season {self.number}'
+        return f'S{self.number}'
 
     def create_leagues(self, season_pk):
         self.objects.filter(pk=season_number)

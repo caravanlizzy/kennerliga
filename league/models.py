@@ -12,3 +12,6 @@ class League(models.Model):
     )
     number = models.IntegerField('1 for the top league L1, 2 for L2 etc.')
     members = models.ManyToManyField(User)
+
+    def __str__(self):
+        return f'{self.season}L{self.number}'
