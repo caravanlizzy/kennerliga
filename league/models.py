@@ -10,7 +10,7 @@ class League(models.Model):
         blank=True,
         null=True,
     )
-    number = models.IntegerField('1 for the top league L1, 2 for L2 etc.')
+    number = models.IntegerField('1 for L1, 2 for L2 etc.')
     members = models.ManyToManyField(User)
 
     def __str__(self):

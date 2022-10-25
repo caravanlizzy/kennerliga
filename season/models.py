@@ -12,6 +12,7 @@ class Season(models.Model):
     number = models.IntegerField(
         'month in the current year'
     )
+    registration_open = models.BooleanField()
 
     def __str__(self):
         return f'S{self.number}'
