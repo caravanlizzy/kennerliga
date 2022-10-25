@@ -1,3 +1,13 @@
+a:link{
+	text-decoration: none;
+}
+
+a:hover{
+	color:orange !important;
+}
+
+
+/* Create Form */
 .create-form-container {
     padding: 30px;
 }
@@ -13,10 +23,18 @@
     flex-wrap: wrap;
 }
 
-.content {
-    padding: 50px;
+/* Main content */
+.layout-main{
+	padding: 30px;
 }
 
+
+/* Layout container */
+.layout-container{
+	padding: 20px;
+}
+
+/* Login */
 .login-form-container {
 	margin: auto;
 	display: flex;
@@ -30,3 +48,28 @@
 	min-width: 500px;
 }
 
+/* Navbar */
+.layout-navbar{
+	display: flex;
+	flex-direction: row;
+	height: 50px;
+}
+
+.nav-element{
+	min-width: 100px;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	font-weight: 600;
+	font-size: 25px;
+	cursor: pointer;
+	color: #641bf6;
+}
+
+.nav-login{
+	background-color: #ffab0f;
+}
+
+.nav-element:hover{
+	opacity: 0.8;
+}

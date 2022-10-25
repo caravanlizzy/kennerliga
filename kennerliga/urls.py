@@ -23,6 +23,6 @@ from django.urls import path
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('login/', LoginView.as_view(), name='login'),
-    path('home/', HomeView.as_view(), name='home'),
+    path('', HomeView.as_view(), name='home'),
     path('post_result/', CreateResultView.as_view(), name='create-match-result')
 ]
