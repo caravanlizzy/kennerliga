@@ -6,9 +6,12 @@
 	</div>
 	<div class="nav-right">		
 		{% if request.user.is_authenticated %}
-		<a class="nav-element" href="{% url 'profile' pk=request.user.pk  %} "><i class="bi bi-person-fill"></i></a>
+			<a class="nav-element" href="{% url 'profile' pk=request.user.pk  %} ">
+				<span class="nav-username">{{ request.user.username }}</span><i class="bi bi-person-fill"></i>
+			</a>
+			<a class="btn btn-light btn-sm" href="{% url 'logout' %}"> Logout </a>
 		{% else %}
-			<a class="nav-element" href="{% url 'login' %}">Login</a>
+			<a class="nav-element btn btn-sm btn-info" href="{% url 'login' %}">Login</a>
 		{% endif %}
 	</div>
 </div>

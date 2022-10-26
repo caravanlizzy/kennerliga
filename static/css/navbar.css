@@ -25,17 +25,12 @@
 	display: flex;
 	justify-content: center;
 	align-items: center;
-	font-weight: 600;
 	font-size: 25px;
 	cursor: pointer;
 	color: white;
 	margin: 0 10px;
 }
 
-.nav-login{
-	background-color: #ffab0f;
-}
-
-.nav-element:hover{
-	opacity: 0.8;
+.nav-username{
+	font-size: 18px;
 }

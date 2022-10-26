@@ -18,11 +18,12 @@ from django.contrib import admin
 from django.urls import path
 from game.views import CreateResultView
 from home.views import HomeView
-from user.views import LoginView, UserProfileView
+from user.views import LoginView, LogoutView, UserProfileView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('login/', LoginView.as_view(), name='login'),
+    path('logout/', LogoutView.as_view(), name='logout'),
     path('', HomeView.as_view(), name='home'),
     path('post-result/', CreateResultView.as_view(), name='post-result'),
     path('user/profile/<int:pk>', UserProfileView.as_view(), name='profile'),
