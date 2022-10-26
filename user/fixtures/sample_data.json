@@ -14,5 +14,53 @@
       "groups": [],
       "user_permissions": []
     }
+  },
+  {
+    "model": "user.user",
+    "pk": 2,
+    "fields": {
+      "password": "",
+      "last_login": null,
+      "is_superuser": false,
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2022-10-26T20:31:46.829Z",
+      "username": "isiundossi",
+      "email": "wird.kurz.gehn@gmail.com",
+      "groups": [],
+      "user_permissions": []
+    }
+  },
+  {
+    "model": "user.user",
+    "pk": 3,
+    "fields": {
+      "password": "",
+      "last_login": null,
+      "is_superuser": false,
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2022-10-26T20:31:55.715Z",
+      "username": "haligh",
+      "email": "marc.lambrecht@gmx.de",
+      "groups": [],
+      "user_permissions": []
+    }
+  },
+  {
+    "model": "user.user",
+    "pk": 4,
+    "fields": {
+      "password": "",
+      "last_login": null,
+      "is_superuser": false,
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2022-10-26T20:32:28.091Z",
+      "username": "marc2",
+      "email": "e.koston3@web.de",
+      "groups": [],
+      "user_permissions": []
+    }
   }
 ]

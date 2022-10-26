@@ -1,7 +1,14 @@
 {% load static %}
 
-<div class="layout-navbar">
-	<a class="nav-element" href="{% url 'home' %}">Home</a>
-	<a class="nav-element" href="">Profil</a>
-	<a class="nav-element ms-auto" href="{% url 'login' %}">Login</a>
+<div class="navbar">
+	<div class="nav-main">
+		<a class="nav-element" href="{% url 'home' %}"><i class="bi bi-house-fill"></i></a>
+	</div>
+	<div class="nav-right">		
+		{% if request.user.is_authenticated %}
+		<a class="nav-element" href="{% url 'profile' pk=request.user.pk  %} "><i class="bi bi-person-fill"></i></a>
+		{% else %}
+			<a class="nav-element" href="{% url 'login' %}">Login</a>
+		{% endif %}
+	</div>
 </div>

@@ -2,8 +2,8 @@
 .home{
 	display: grid;
 	grid-column-template: repeat(4, 1fr);
-	gap: 30px;
-	padding: 30px;
+	gap: 33px;
+	padding: 33px;
 }
 
 .home div { 

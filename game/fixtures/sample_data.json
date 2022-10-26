@@ -7,7 +7,7 @@
     }
   },
   {
-    "model": "game.gameoptioncategory",
+    "model": "game.gamesettingscategory",
     "pk": 1,
     "fields": {
       "game": 1,
@@ -16,7 +16,7 @@
     }
   },
   {
-    "model": "game.gameoptioncategory",
+    "model": "game.gamesettingscategory",
     "pk": 2,
     "fields": {
       "game": 1,
@@ -25,7 +25,7 @@
     }
   },
   {
-    "model": "game.gameoption",
+    "model": "game.gamesettingsoption",
     "pk": 1,
     "fields": {
       "category": 1,

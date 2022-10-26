@@ -15,21 +15,8 @@ a:hover{
     min-width: 150px;
 }
 
-.centered-flex-container {
-    margin: auto;
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-}
-
 /* Main content */
-.layout-main{
-}
-
-
-/* Layout container */
-.layout-container{
-	padding: 20px;
+.main{
 }
 
 /* Login */
