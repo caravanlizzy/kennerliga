@@ -1,0 +1,36 @@
+/* Homepage */
+.home{
+	display: grid;
+	grid-column-template: repeat(4, 1fr);
+	gap: 30px;
+	padding: 30px;
+}
+
+.home div { 
+	padding: 20px;
+	box-shadow: rgba(0, 0, 0, 0.16) 0px 3px 6px, rgba(0, 0, 0, 0.23) 0px 3px 6px;
+}
+
+.home #announcements{
+	background-color: #f60f61; 
+	color: white;
+	grid-column: 1/4;
+}
+
+.home #main-content{
+	padding:20px;
+	grid-column: 1/3;
+	background-color: pink;
+}
+
+.home #second-content{
+	background-color: #abcdef; 
+	color: white;
+	grid-column: 3;
+}
+
+.home #third-content{
+	grid-column: 1/4;
+	background-color: #19ff7e; 
+	color: green;
+}

@@ -1,0 +1,29 @@
+/* Navbar */
+.layout-navbar{
+	padding: 15px;
+	margin: 0 30px;
+	display: flex;
+	flex-direction: row;
+	background-color: #3d4849;
+	box-shadow: rgba(0, 0, 0, 0.16) 0px 3px 6px, rgba(0, 0, 0, 0.23) 0px 3px 6px;
+}
+
+.nav-element{
+	min-width: 100px;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	font-weight: 600;
+	font-size: 25px;
+	cursor: pointer;
+	color: white;
+	margin: 0 10px;
+}
+
+.nav-login{
+	background-color: #ffab0f;
+}
+
+.nav-element:hover{
+	opacity: 0.8;
+}
