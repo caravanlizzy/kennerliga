@@ -9,7 +9,7 @@ class Game(models.Model):
         return str(self.name)
 
 
-class GameOptionCategory(models.Model):
+class GameSettingsCategory(models.Model):
     game = models.ForeignKey(
         Game,
         on_delete=models.CASCADE,
@@ -23,9 +23,9 @@ class GameOptionCategory(models.Model):
         return str(self.category)
 
 
-class GameOption(models.Model):
+class GameSettingsOption(models.Model):
     category = models.ForeignKey(
-        GameOptionCategory,
+        GameSettingsCategory,
         on_delete=models.CASCADE,
         null=True,
         blank=True,

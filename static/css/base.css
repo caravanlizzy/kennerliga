@@ -5,7 +5,42 @@ a:link{
 a:hover{
 	color:orange !important;
 }
+/* Homepage */
+.home{
+	display: grid;
+	grid-column-template: repeat(4, 1fr);
+	gap: 30px;
+	padding: 30px;
+}
 
+.home div { 
+	padding: 20px;
+	box-shadow: rgba(0, 0, 0, 0.16) 0px 3px 6px, rgba(0, 0, 0, 0.23) 0px 3px 6px;
+}
+
+.home #announcements{
+	background-color: #f60f61; 
+	color: white;
+	grid-column: 1/4;
+}
+
+.home #main-content{
+	padding:20px;
+	grid-column: 1/3;
+	background-color: pink;
+}
+
+.home #second-content{
+	background-color: #abcdef; 
+	color: white;
+	grid-column: 3;
+}
+
+.home #third-content{
+	grid-column: 1/4;
+	background-color: #19ff7e; 
+	color: green;
+}
 
 /* Create Form */
 .create-form-container {
@@ -25,7 +60,6 @@ a:hover{
 
 /* Main content */
 .layout-main{
-	padding: 30px;
 }
 
 
@@ -50,9 +84,13 @@ a:hover{
 
 /* Navbar */
 .layout-navbar{
+	padding: 15px;
+	margin: 0 30px;
 	display: flex;
 	flex-direction: row;
-	height: 50px;
+	/* height: 50px; */
+	background-color: #3d4849;
+	box-shadow: rgba(0, 0, 0, 0.16) 0px 3px 6px, rgba(0, 0, 0, 0.23) 0px 3px 6px;
 }
 
 .nav-element{
@@ -63,7 +101,8 @@ a:hover{
 	font-weight: 600;
 	font-size: 25px;
 	cursor: pointer;
-	color: #641bf6;
+	color: white;
+	margin: 0 10px;
 }
 
 .nav-login{
