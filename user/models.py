@@ -8,8 +8,10 @@ class User(AbstractUser):
     last_name = None
     username = models.CharField(
         max_length=44,
+        unique=True,
         blank=False,
         null=False,
+        help_text='Username is used to login'
     )
     bga_name = models.CharField(
             max_length=88,
@@ -21,11 +23,11 @@ class User(AbstractUser):
         'Email address',
         max_length=40,
         unique=True,
-        help_text='Email address is used to login and to contact the User'
+        help_text='Email address is used to contact the player'
     )
 
-    USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['username']
+    USERNAME_FIELD = 'username'
+    # REQUIRED_FIELDS = ['username']
 
     def __str__(self):
         return str(self.username)
