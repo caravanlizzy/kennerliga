@@ -4,9 +4,8 @@ from user.models import User
 
 # Create your models here.
 class Season(models.Model):
-    participants = models.ManyToManyField(User,
-        blank=True,
-        null=True,
+    participants = models.ManyToManyField(
+        User
     )
     year = models.IntegerField()
     number = models.IntegerField(
@@ -41,8 +40,6 @@ class Season(models.Model):
 class Registration(models.Model):
     player = models.ManyToManyField(
         User,
-        blank=True,
-        null=True,
     )
     season = models.ForeignKey(
         Season,

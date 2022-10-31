@@ -11,6 +11,11 @@ class User(AbstractUser):
         blank=False,
         null=False,
     )
+    bga_name = models.CharField(
+            max_length=88,
+            blank=True,
+            null=True
+    )
 
     email = models.EmailField(
         'Email address',

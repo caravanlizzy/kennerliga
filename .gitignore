@@ -4,6 +4,7 @@ __pycache__/
 
 # swap files
 *.swp
+*.ipynb*
 
 # virtual environments
 /.venv*
