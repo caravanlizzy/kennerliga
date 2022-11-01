@@ -21,6 +21,13 @@ class ExcelImporter:
         season_key = f'{self.year}_S{number}'
         return self.df[season_key]
 
+    def cell_isna(self, cell):
+        return pandas.isna(cell)
+
+
+    def get_cell(self, sheet, row, col):
+        return sheet.iloc[row][col]
+
     def get_keyword_locations(self, month,  keywords):
         locations = []
         sheet = self.get_sheet(month)
@@ -28,11 +35,11 @@ class ExcelImporter:
         for col in range(cols):
             for row in range(rows):
                 for keyword in keywords:
-                    cell_content = sheet.iloc[row][col]
-                    if (isinstance(cell_content, float)) or isinstance(cell_content, int):
+                    cell = self.get_cell(sheet, row, col)
+                    if (isinstance(cell, float)) or isinstance(cell, int):
                         continue
                     else:
-                        if keyword in cell_content:
+                        if keyword in cell:
                             locations.append({"keyword":keyword, "row": row, "col": col})
         return locations
 
@@ -43,19 +50,19 @@ class ExcelImporter:
         end_row = sheet.shape[0];
         col =  3
         for row in range(start_row, end_row):
-            cell_content =  sheet.iloc[row][col]
-            if pandas.isna(cell_content):
+            cell =  self.get_cell(sheet, row, col)
+            if pandas.isna(cell):
                 return
             else:
-                self.data['bga_names'].add(cell_content)
+                self.data['bga_names'].add(cell)
 
     def iterate_all_cells(self, sheet_number,  callback):
         sheet = self.get_sheet(sheet_number)
         rows, cols = sheet.shape
         for row in range(rows):
             for col in range(cols):
-                cell_content = sheet.iloc[row][col]
-                callback(cell_content, row, col)
+                cell = self.get_cell(sheet, row, col)
+                callback(cell, row, col)
 
     def iterate_all_sheets(self, *callbacks):
         for month in range(1, len(self.df) -1 ): # dont consider last 2 sheets, gesamtwertung and definitonen
@@ -69,42 +76,50 @@ class ExcelImporter:
             keywords.append(f'Liga {liga}')
         return keywords
 
-    def get_games_from_leagues(self, month):
-        games = []
-        sheet = self.get_sheet(month)
+    def get_games_locations(self, month):
         keywords = self.generate_liga_keywords(5)
         locations = self.get_keyword_locations(month, keywords)
-        for location in locations:
+        return locations
+
+    def store_game(self, game):
+        if not game in self.data['games'].keys():
+            self.data['games'][game] = []
+
+    def store_game_option(self, game, options):
+        if options == '-':
+            return
+        options = options.split('\n')
+        for option in options:
+            option = option[2:]
+            option, value = option.split(':')
+            option_object = {'option':option, 'value':value}
+            self.data['games'][game].append(option_object)
+
+
+
+    def get_games_from_leagues(self, month):
+        sheet = self.get_sheet(month)
+        for location in self.get_games_locations(month):
             start_row = location['row'] + 4
             game_col = location['col'] + 5
             option_col = game_col + 1
             row = start_row
-            game = sheet.iloc[row][game_col]
-            self.add_game(game)
-            while not pandas.isna(sheet.iloc[row][option_col]):
-                if not self.game_exists(game):
-                    self.add_game(game)
-                option = sheet.iloc[row][option_col]
-                self.add_game_option(game, option)
-                print(self.data['games'])
+            game = self.get_cell(sheet, row, game_col)
+            option = self.get_cell(sheet, row, option_col)
+            while not self.cell_isna(game):
+                self.store_game(game)
+                self.store_game_option(game, option)
                 row += 1
+                game = self.get_cell(sheet, row, game_col)
+                option = self.get_cell(sheet, row, option_col)
 
-    def game_exists(self, game):
-        return game in self.data['games'][game]
 
-    def add_game(self, game):
-        self.data['games'][game] = []
-
-    def add_game_option(self, game, option):
-        self.data['games'][game].append(option)
-
+    def get_match_results(self, month):
+        pass
 
 I = ExcelImporter()
 I.read_file()
-# I.iterate_all_sheets(I.get_bga_names_from_anmeldung)
 I.get_bga_names_from_gesamtwertung()
-# print(I.bga_names)
-# print(len(I.bga_names))
 I.iterate_all_sheets(I.get_games_from_leagues)
 print(I.data)
 
@@ -114,9 +129,9 @@ print(I.data)
 #     col = 4
 #     sheet = self.get_sheet(month)
 #     for row in range(start_row, sheet.shape[0] - start_row -1):
-#         cell_content =  sheet.iloc[row][col]
-#         if pandas.isna(cell_content):
+#         cell =  self.get_cell(sheet, row, col)
+#         if pandas.isna(cell):
 #             return
 #         else:
 
-#             self.bga_names.add(cell_content)
+#             self.bga_names.add(cell)
