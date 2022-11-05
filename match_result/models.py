@@ -21,6 +21,20 @@ class MatchResult(models.Model):
         blank=True,
     )
     year = models.IntegerField()
+    starting_position = models.IntegerField()
+    starting_points = models.IntegerField()
+    league_points = models.IntegerField()
+    percentage_of_winner = models.FloatField()
+    character = models.CharField(
+        max_length=144,
+        blank=True,
+        null=True
+    )
+    tie_breaker = models.CharField(
+        max_length=144,
+        blank=True,
+        null=True
+    )
 
     def __str__(self):
         return self.player.username + '_' + str(self.year) + '_' + 'S' +  str(self.season) + '_' + 'L' + str(self.league)

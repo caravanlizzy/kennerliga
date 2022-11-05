@@ -73,7 +73,7 @@ class ExcelImporter:
     def iterate_all_sheets(self, year, *callbacks):
         file = self.get_file(year)
         for month in range(1, len(file) -1 ): # dont consider last 2 sheets, gesamtwertung and definitonen
-            print(f'season: {month}')
+            print(f'Importing {year}S{month}')
             for callback in callbacks:
                 callback(year, month)
 
@@ -96,7 +96,6 @@ class ExcelImporter:
         if options == '-':
             return
         options = options.split('\n')
-        print(options)
         for option in options:
             option = option[2:]
             option, value = option.split(':')
@@ -123,8 +122,7 @@ class ExcelImporter:
                 game = self.get_cell(sheet, row, game_col)
                 option = self.get_cell(sheet, row, option_col)
             except IndexError:
-                print('index error - is caught: if year not 2021, check in detail')
-            print(game, option)
+                print('Index Error - If not 2021S5: check for problems!')
             while not self.cell_isna(game):
                 self.store_game(game)
                 self.store_game_option(game, option)
@@ -154,7 +152,7 @@ class ExcelImporter:
         starting_position = self.get_cell(sheet, row, 6)
         character = self.get_cell(sheet, row, 7)
         starting_points = self.get_cell(sheet, row, 8)
-        final_points = self.get_cell(sheet, row, 9)
+        points = self.get_cell(sheet, row, 9)
         tie_breaker = self.get_cell(sheet, row, 10)
         percentage_of_winner = self.get_cell(sheet, row, 11)
         position = self.get_cell(sheet, row, 12)
@@ -166,7 +164,7 @@ class ExcelImporter:
                 "starting_position":starting_position,
                 "character":character,
                 "starting_points":starting_points,
-                "final_points":final_points,
+                "points":points,
                 "tie_breaker":tie_breaker,
                 "percentage_of_winner":percentage_of_winner,
                 "position":position,
@@ -177,27 +175,13 @@ class ExcelImporter:
          }
         self.data['results'].append(result)
 
-
-
-
-
 I = ExcelImporter()
 years = [2021, 2022]
 for year in years:
     I.read_file(year)
     I.get_bga_names_from_gesamtwertung(year)
     I.iterate_all_sheets(year, I.get_games_from_leagues, I.get_match_results)
-print(I.data)
 
-# def get_bga_names_from_anmeldung(self, month):
-#     # dont need anymore - keep for other monthly auswertungen
-#     start_row = 4
-#     col = 4
-#     sheet = self.get_sheet(month)
-#     for row in range(start_row, sheet.shape[0] - start_row -1):
-#         cell =  self.get_cell(sheet, row, col)
-#         if pandas.isna(cell):
-#             return
-#         else:
+results, players, games = I.data['results'], I.data['bga_names'], I.data['games']
 
-#             self.bga_names.add(cell)
+
