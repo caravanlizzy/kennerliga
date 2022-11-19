@@ -1,3 +1,4 @@
+from user.models import User
 import pandas
 
 class ExcelImporter:
@@ -184,4 +185,15 @@ for year in years:
 
 results, players, games = I.data['results'], I.data['bga_names'], I.data['games']
 
+def create_player(name):
+    import user
+    new_player = user.models.User.objects.create(username=name, email=f'{name}.{name}@test.de')
+    new_player.save()
+    print(new_player)
 
+
+# print(f'results: {results}')
+print(f'players: {players}')
+# print(f'games: {games}')
+for player in players:
+    create_player(player)

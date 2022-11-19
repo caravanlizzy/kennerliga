@@ -37,4 +37,4 @@ class MatchResult(models.Model):
     )
 
     def __str__(self):
-        return self.player.username + '_' + str(self.year) + '_' + 'S' +  str(self.season) + '_' + 'L' + str(self.league)
+        return self.player.username + '_' + str(self.year) + '_' + 'S' + str(self.season) + '_' + 'L' + str(self.league)
