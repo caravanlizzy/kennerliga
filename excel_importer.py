@@ -1,5 +1,7 @@
 import pandas
 import django
+import os
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "kennerliga.settings")
 django.setup()
 from user.models import User
 
