@@ -1,4 +1,5 @@
 from django.db import models
+
 from user.models import User
 
 
@@ -8,20 +9,23 @@ class Season(models.Model):
         User
     )
     year = models.IntegerField()
-    number = models.IntegerField(
+    month = models.IntegerField(
         'month in the current year'
     )
-    registration_open = models.BooleanField()
+    registration_open = models.BooleanField(
+        default=False
+    )
 
     def __str__(self):
-        return f'S{self.number}'
+        return f'{self.year}_S{self.month}'
 
-    def create_leagues(self, season_pk):
-        self.objects.filter(pk=season_number)
+    def create_leagues(self):
+        pass
 
     def get_player_order(self, season_number):
         participants = self.objects.filter(number=season_number).participants.all()
 
+    @staticmethod
     def get_players_per_league(self, participants_amount):
         rest_players = participants_amount % 4
         league_amount = participants_amount // 4 + 1 if rest_players > 0 else participants_amount // 4
