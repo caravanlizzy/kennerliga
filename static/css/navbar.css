@@ -1,6 +1,6 @@
 /* Navbar */
 .navbar{
-	padding: 8px 30px;
+	padding: 16px 10px;
 	display: flex;
 	flex-direction: row;
 	/* justify-content: center; */
@@ -21,14 +21,14 @@
 }
 
 .nav-element{
-	min-width: 100px;
+/* 	min-width: 100px; */
 	display: flex;
 	justify-content: center;
 	align-items: center;
 	font-size: 25px;
 	cursor: pointer;
 	color: white;
-	margin: 0 10px;
+	margin: 0 15px;
 }
 
 .nav-username{

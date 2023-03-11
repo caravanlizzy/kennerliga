@@ -1,9 +1,14 @@
+:root {
+  --kennerliga-red: #f60f61;
+  --background-white: #ededed;
+}
+
 a:link{
 	text-decoration: none;
 }
 
 a:hover{
-	color:#f60f61 !important;
+	color:var(--kennerliga-red) !important;
 }
 
 /* Create Form */
@@ -17,7 +22,6 @@ a:hover{
 
 /* Main content */
 .main{
-	padding: 33px;
 }
 
 /* Login */

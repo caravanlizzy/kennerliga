@@ -9,7 +9,7 @@
 			<a class="nav-element" href="{% url 'profile' pk=request.user.pk  %} ">
 				<span class="nav-username">{{ request.user.username }}</span><i class="bi bi-person-fill"></i>
 			</a>
-			<a class="btn btn-light btn-sm d-flex align-items-center" href="{% url 'logout' %}"> Logout </a>
+			<a class="d-flex align-items-center" href="{% url 'logout' %}"> <i class="bi bi-box-arrow-right"></i> </a>
 		{% else %}
 			<a class="nav-element btn btn-sm btn-info" href="{% url 'login' %}">Login</a>
 		{% endif %}
