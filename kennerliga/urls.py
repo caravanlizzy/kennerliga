@@ -27,6 +27,7 @@ urlpatterns = [
     path('login/', LoginView.as_view(), name='login'),
     path('logout/', LogoutView.as_view(), name='logout'),
     path('', HomeView.as_view(), name='home'),
+    path('management/', include('management.urls')),
     path('post-result/', CreateResultView.as_view(), name='post-result'),
     path('user/', include('user.urls')),
     path('game/', include('game.urls')),

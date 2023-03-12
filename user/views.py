@@ -27,3 +27,4 @@ class RegisterUserView(FormView):
     form_class = RegisterUserForm
     template_name = 'user/register.html'
     success_url = '/'
+

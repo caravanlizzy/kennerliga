@@ -1,7 +1,7 @@
 /* Homepage */
 .home-content{
 	display: grid;
-	gap: 10px;
+	gap: 15px;
     /*background-color: var(--kennerliga-red);*/
 }   
 

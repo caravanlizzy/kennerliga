@@ -4,7 +4,7 @@
 {% block content %}
   <div class="create-form-container">
     <h1>Erstelle neues Spiel</h1>
-    <form action=""> {% csrf_token %}
+    <form method="post"> {% csrf_token %}
       {{ form|crispy }}
       <button class="btn btn-success btn-md"> Erstellen</button>
     </form>

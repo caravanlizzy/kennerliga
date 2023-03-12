@@ -26,16 +26,11 @@
 }
 
 .nav-element {
-    /* 	min-width: 100px; */
     display: flex;
     justify-content: center;
     align-items: center;
-    font-size: 20px;
+    font-size: 23px;
     cursor: pointer;
     color: white;
     margin: 0 15px;
-}
-
-.nav-username {
-    font-size: 18px;
 }

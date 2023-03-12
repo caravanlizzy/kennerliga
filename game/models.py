@@ -3,7 +3,17 @@ from django.db import models
 
 # Create your models here.
 class Game(models.Model):
-    name = models.CharField(max_length=88)
+    name = models.CharField(max_length=88, unique=True)
+
+    class Platform(models.TextChoices):
+        BGA = 'BGA', 'BGA'
+        Yucata = 'Yucata', "Yucata"
+
+    platform = models.CharField(
+        max_length=6,
+        choices=Platform.choices,
+        default=Platform.BGA
+    )
 
     def __str__(self):
         return str(self.name)
