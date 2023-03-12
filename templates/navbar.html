@@ -2,9 +2,9 @@
 
 <div id='navbar' class="navbar">
   <div class="nav-main">
-    <a class="nav-element" href="{% url 'home' %}"><i class="bi bi-house-fill"></i></a>
+    <a class="nav-element" href="{% url 'home' %}"><i class="bi bi-grid-3x3-gap-fill"></i></a>
     {% if request.user.is_superuser %}
-      <a href="{% url 'management:manage' %}" class="nav-element"> <i class="bi bi-grid-3x3-gap-fill"></i></a>
+      <a href="{% url 'management:manage' %}" class="nav-element"> <i class="bi bi-gear-fill"></i></a>
     {% endif %}
   </div>
   <div class='nav-title fs-3'>

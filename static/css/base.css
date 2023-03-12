@@ -1,6 +1,6 @@
 :root {
     --kennerliga-red: #f60f61;
-    --background-white: #eee;
+    --background-white: #fafafa;
 }
 
 /* Create Form */
@@ -39,12 +39,4 @@ a:hover {
     color: var(--kennerliga-red) !important;
 }
 
-table th, td {
-    padding: 8px;
-}
-
-
-table tr:nth-child(even) {
-    background-color: var(--background-white);
-}
 

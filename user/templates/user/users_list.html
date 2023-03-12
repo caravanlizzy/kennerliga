@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <h1> Spielerliste </h1>
+  <table class="table table-hover">
+    <th> Username</th>
+    <th> BGA Name</th>
+    <th> Email</th>
+    {% for user in object_list %}
+      <tr>
+        <td><a href="{% url 'user:profile' user.id %}"> {{ user.username }} </a> </td>
+        <td> {{ user.bga_name }}</td>
+        <td> {{ user.email }}</td>
+        {% empty %}
+        Keine Personen registriert.
+      </tr>
+    {% endfor %}
+  </table>
+{% endblock %}

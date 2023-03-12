@@ -1,14 +1,16 @@
 {% extends 'base.html' %}
 
 {% block content %}
-  <table>
-    <th> Name</th>
-    <th> Plattform</th>
-    {% for game in object_list %}
-      <tr>
-        <td><a href="{% url 'game:game-detail' game.id %}"> {{ game.name }} </a></td>
-        <td> {{ game.platform }} </td>
-      </tr>
-    {% endfor %}
-  </table>
+  <div class="table-responsive">
+    <table class="table table-hover">
+      <th> Name</th>
+      <th> Plattform</th>
+      {% for game in object_list %}
+        <tr>
+          <td><a href="{% url 'game:game-detail' game.id %}"> {{ game.name }} </a></td>
+          <td> {{ game.platform }} </td>
+        </tr>
+      {% endfor %}
+    </table>
+  </div>
 {% endblock %}

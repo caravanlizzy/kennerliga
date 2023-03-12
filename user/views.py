@@ -1,4 +1,5 @@
 from django.contrib.auth.views import LoginView, LogoutView
+from django.views.generic import ListView
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import FormView
 from user.forms import RegisterUserForm
@@ -20,6 +21,11 @@ class LogoutView(LogoutView):
 
 class UserProfileView(DetailView):
     template_name = 'user/profile.html'
+    model = User
+
+
+class UserListView(ListView):
+    template_name = 'user/users_list.html'
     model = User
 
 

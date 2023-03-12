@@ -1,17 +1,19 @@
 {% extends 'base.html' %}
+{% load static %}
 
+{% block head_extra_imports %}
+    <link rel="stylesheet" href="{% static 'management/css/style.css' %}"/>
+{% endblock %}
 
 {% block content %}
 <h1> Verwaltung </h1>
 
-Diese Seite ist die zentrale Verwaltung für die Ligabetreibenden. Neben Nutzer und Spieleverwaltung können hier auch Ligen
-und Seasons manuell konfiguriert werden.
+Diese Seite ist die zentrale Verwaltung für die Ligabetreibenden.
 
-<div class="management">
-  <div class="management-item"> Spiele </div>
-  <div class="management-item"> Spielende </div>
-  <div class="management-item"> Seasons </div>
-  <div class="management-item"> Ligen </div>
+<div class="management-content">
+  <a href="{% url 'game:games' %}"><div class="management-item"> Spiele </div></a>
+  <a href="{% url 'user:users' %}"><div class="management-item"> Spieler </div></a>
+  <a href=""><div class="management-item"> Saison </div></a>
 </div>
 
 {% endblock %}
