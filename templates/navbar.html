@@ -4,12 +4,15 @@
 	<div class="nav-main">
 		<a class="nav-element" href="{% url 'home' %}"><i class="bi bi-house-fill"></i></a>
 	</div>
+	<div class='nav-center fs-3'>
+		Kennerliga
+	</div>
 	<div class="nav-right">		
 		{% if request.user.is_authenticated %}
 			<a class="nav-element" href="{% url 'profile' pk=request.user.pk  %} ">
-				<span class="nav-username">{{ request.user.username }}</span><i class="bi bi-person-fill"></i>
+				<span class="nav-username">{{ request.user.username }}</span>
 			</a>
-			<a class="d-flex align-items-center" href="{% url 'logout' %}"> <i class="bi bi-box-arrow-right"></i> </a>
+			<a class="d-flex align-items-center me-2" href="{% url 'logout' %}"> <i class="bi bi-box-arrow-right"></i> </a>
 		{% else %}
 			<a class="nav-element btn btn-sm btn-info" href="{% url 'login' %}">Login</a>
 		{% endif %}
