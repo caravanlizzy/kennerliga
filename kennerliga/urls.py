@@ -15,9 +15,11 @@ Including another URLconf
 """
 from django.contrib import admin
 
-from django.urls import path
-from game.views import CreateResultView
+from django.urls import include, path
+
+from game.views import NewGameView
 from home.views import HomeView
+from match_result.views import CreateResultView
 from user.views import LoginView, LogoutView, UserProfileView, RegisterUserView
 
 urlpatterns = [
@@ -26,7 +28,7 @@ urlpatterns = [
     path('logout/', LogoutView.as_view(), name='logout'),
     path('', HomeView.as_view(), name='home'),
     path('post-result/', CreateResultView.as_view(), name='post-result'),
-    path('user/profile/<int:pk>', UserProfileView.as_view(), name='profile'),
-    path('user/register', RegisterUserView.as_view(), name='register'),
-
+    path('user/', include('user.urls')),
+    path('game/', include('game.urls')),
 ]
+

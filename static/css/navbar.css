@@ -1,40 +1,41 @@
 /* Navbar */
-.navbar{
-	padding: 16px 10px;
-	display: flex;
-	flex-direction: row;
-	/* justify-content: center; */
-	background-color: #3d4849;
-	box-shadow: rgba(0, 0, 0, 0.16) 0px 3px 6px, rgba(0, 0, 0, 0.23) 0px 3px 6px;
-	color: white;
+.navbar {
+    padding: 16px 10px;
+    display: flex;
+    flex-direction: row;
+    /* justify-content: center; */
+    background-color: #3d4849;
+    box-shadow: rgba(0, 0, 0, 0.16) 0 3px 6px, rgba(0, 0, 0, 0.23) 0 3px 6px;
+    color: white;
 }
 
-.nav-right{
-	display: flex;
-	flex-direction: row;
+.nav-right {
+    display: flex;
+    flex-direction: row;
 }
 
-.nav-center {
-	width: 1fr;
+.nav-title {
+    /* 	width: 1fr; */
+    /*     align-self: center; */
 }
 
-.nav-main{
-	display: flex;
-	flex-direction: row;
-	justify-content: center:
+.nav-main {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
 }
 
-.nav-element{
-/* 	min-width: 100px; */
-	display: flex;
-	justify-content: center;
-	align-items: center;
-	font-size: 25px;
-	cursor: pointer;
-	color: white;
-	margin: 0 15px;
+.nav-element {
+    /* 	min-width: 100px; */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 20px;
+    cursor: pointer;
+    color: white;
+    margin: 0 15px;
 }
 
-.nav-username{
-	font-size: 18px;
+.nav-username {
+    font-size: 18px;
 }
