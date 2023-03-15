@@ -1,0 +1,10 @@
+.game-category {
+    min-width: 15rem;
+    margin: 20px;
+    /*padding: 15px 25px ;*/
+    box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+}
+
+.game-option {
+
+}

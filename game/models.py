@@ -25,12 +25,13 @@ class GameSettingsCategory(models.Model):
         on_delete=models.CASCADE,
         null=True,
         blank=True,
+        related_name='categories'
     )
-    category = models.CharField(max_length=88)
+    name = models.CharField(max_length=88)
     is_bool = models.BooleanField()  # booleanOption or MultipleOptions
 
     def __str__(self):
-        return str(self.category)
+        return str(self.name)
 
 
 class GameSettingsOption(models.Model):
@@ -39,8 +40,19 @@ class GameSettingsOption(models.Model):
         on_delete=models.CASCADE,
         null=True,
         blank=True,
+        related_name='options'
     )
     option = models.CharField(max_length=139)
 
     def __str__(self):
         return str(self.option)
+
+
+class GameSettingsOptionBool(models.Model):
+    category = models.ForeignKey(
+        GameSettingsCategory,
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+    )
+    option = models.BooleanField()

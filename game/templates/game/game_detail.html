@@ -1,5 +1,30 @@
 {% extends 'base.html' %}
+{% load static %}
+
+{% block head_extra_imports %}
+  <link rel="stylesheet" href="{% static 'game/css/style.css' %}"/>
+{% endblock %}
 
 {% block content %}
-  {{ object }}
+  <h1> {{ game }} </h1>
+  <div class="d-flex flex-wrap">
+    {% for category in game.categories.all %}
+      {% if not category.is_bool %}
+      <div class="card game-category">
+        <div class="card-header fw-bold">
+          {{ category }}
+        </div>
+        <ul class="list-group list-group-flush">
+          {% for option in category.options.all %}
+            <li class="list-group-item game-option"> {{ option }}</li>
+          {% endfor %}
+        </ul>
+      </div>
+      {% endif %}
+    {% endfor %}
+
+  </div>
+
+
+
 {% endblock %}

@@ -6,7 +6,6 @@ from django.views.generic import CreateView, DetailView, ListView
 from game.models import Game
 
 
-
 class NewGameView(CreateView):
     model = Game
     fields = '__all__'
