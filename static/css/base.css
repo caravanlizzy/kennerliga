@@ -1,6 +1,7 @@
 :root {
     --kennerliga-red: #f60f61;
     --background-white: #fcfdfc;
+    --kennerliga-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
 }
 
 /* Create Form */
@@ -8,14 +9,24 @@
     padding: 30px;
 }
 
-.create-form select, input {
-    min-width: 150px;
-}
-
 /* Main content */
 .main {
-    padding: 25px;
+    padding: 55px;
 }
+
+
+a {
+    text-decoration: none !important;
+}
+
+a:hover {
+    color: var(--kennerliga-red) !important;
+}
+
+.kennerliga-box-shadow {
+    box-shadow: var(--kennerliga-shadow);
+}
+
 
 /* Login */
 .login-form-container {
@@ -31,12 +42,8 @@
     min-width: 500px;
 }
 
-a {
-    text-decoration: none !important;
-}
-
-a:hover {
-    color: var(--kennerliga-red) !important;
+.create-form select, input {
+    min-width: 150px;
 }
 
 

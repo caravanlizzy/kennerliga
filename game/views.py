@@ -1,9 +1,9 @@
 from django.urls import reverse_lazy
 
 # Create your views here.
-from django.views.generic import CreateView, DetailView, ListView
+from django.views.generic import CreateView, DetailView, ListView, UpdateView
 
-from game.models import Game
+from game.models import Game, GameSettingsCategory
 
 
 class NewGameView(CreateView):
@@ -15,9 +15,16 @@ class NewGameView(CreateView):
 
 class GameDetailView(DetailView):
     model = Game
+    fields = '__all__'
     template_name = 'game/game_detail.html'
 
 
 class GameListView(ListView):
     model = Game
     template_name = 'game/games_list.html'
+
+
+class NewGameOption(CreateView):
+    model = GameSettingsCategory
+    fields = '__all__'
+    template_name = 'game/new_game_option.html'

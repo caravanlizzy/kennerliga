@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load crispy_forms_filters %}
+
+{% block head_extra_imports %}
+  <link rel="stylesheet" href="{% static 'game/css/style.css' %}"/>
+{% endblock %}
+
+{% block content %}
+  <h1></h1>
+  <div class="p-3 mt-3">
+    <h2> Spieloptionen </h2>
+  </div>
+  <form method="post" class="ps-5 pt-3">
+    <div class="mb-3">
+      <label for="name" class="form-label requiredField"> Name der Spieloption </label>
+      <input type="text" class="form-control" required id="name">
+    </div>
+
+    <div class="mt-5">
+      <p class="text-muted"> Auswahloptionen: </p>
+      <div id="game_options"></div>
+      <input type="text" class="form-control" id="option_input">
+    </div>
+    <div class="new-category-box medium mt-3" title="Auswahloption hinzufügen" id="add_option"><i
+        class="bi bi-plus-lg"></i></div>
+    <div class="">
+      <p class="mt-5 mb-0">Vorschau der Konfiguration</p>
+      <div class="d-flex">
+        <div class="card game-category">
+          <div class="card-header fw-bold" id="summary_title">
+            Beispieloption
+          </div>
+          <ul class="list-group list-group-flush" id="summary_list">
+          </ul>
+        </div>
+      </div>
+    </div>
+  </form>
+
+
+
+
+
+  <script src="{% static 'game/js/createGameOption.js' %}"></script>
+{% endblock %}

@@ -7,24 +7,28 @@
 
 {% block content %}
   <h1> {{ game }} </h1>
-  <div class="d-flex flex-wrap">
-    {% for category in game.categories.all %}
-      {% if not category.is_bool %}
-      <div class="card game-category">
-        <div class="card-header fw-bold">
-          {{ category }}
+  <div class="p-3 mt-3">
+    <h2> Spieloptionen </h2>
+    <div class="d-flex flex-wrap align-items-center">
+      {% for category in game.categories.all %}
+        {% if not category.is_bool %}
+          <div class="card game-category">
+            <div class="card-header fw-bold">
+              {{ category }}
+            </div>
+            <ul class="list-group list-group-flush">
+              {% for option in category.options.all %}
+                <li class="list-group-item game-option"> {{ option }}</li>
+              {% endfor %}
+            </ul>
+          </div>
+        {% endif %}
+      {% endfor %}
+      <a href="{% url 'game:new-option' game.id %}">
+        <div class="card new-category-box big d-flex align-items-center justify-content-center"
+             title="Spieloption hinzufügen"><i class="bi bi-plus-lg"></i>
         </div>
-        <ul class="list-group list-group-flush">
-          {% for option in category.options.all %}
-            <li class="list-group-item game-option"> {{ option }}</li>
-          {% endfor %}
-        </ul>
-      </div>
-      {% endif %}
-    {% endfor %}
-
+      </a>
+    </div>
   </div>
-
-
-
 {% endblock %}

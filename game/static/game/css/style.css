@@ -1,10 +1,38 @@
 .game-category {
     min-width: 15rem;
     margin: 20px;
-    /*padding: 15px 25px ;*/
-    box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+    box-shadow: var(--kennerliga-shadow);
 }
 
-.game-option {
+.new-category-box {
+    box-shadow: var(--kennerliga-shadow);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 5px;
+    color: black;
+}
 
+.new-category-box:hover {
+    background-color: var(--kennerliga-red);
+    color: white;
+    cursor: pointer;
+}
+
+.big {
+    width: 100px;
+    height: 100px;
+    font-size: 70px;
+}
+
+.medium {
+    width: 50px;
+    height: 50px;
+    font-size: 35px;
+}
+
+.small {
+    width: 25px;
+    height: 25px;
+    font-size: 15px;
 }
