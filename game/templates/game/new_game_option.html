@@ -11,21 +11,35 @@
   <div class="p-3 mt-3">
     <h2> Spieloptionen </h2>
   </div>
-  <form method="post" class="ps-5 pt-3">
+  <form method="post" class="ps-5 pt-3"> {% csrf_token %}
     <div class="mb-3">
-      <label for="name" class="form-label requiredField"> Name der Spieloption </label>
-      <input type="text" class="form-control" required id="name">
+      <label for="option" class="form-label requiredField"> Name </label>
+      <input type="text" class="form-control" required id="option" placeholder="Name der Spieloption">
+    </div>
+    <div class="mb-3">
+      <label for="is_bool" class=""> Ja/Nein Option? </label>
+      <input type="checkbox" id="is_bool">
     </div>
 
-    <div class="mt-5">
-      <p class="text-muted"> Auswahloptionen: </p>
-      <div id="game_options"></div>
-      <input type="text" class="form-control" id="option_input">
+
+    <div id="option_choices">
+      <div class="mt-5">
+        <p class="text-muted mb-2"> Auswahloptionen: </p>
+        <div id="game_options">
+          <div class="d-none" id="empty_form">
+            <div class="form-template">
+              {{ newOptionForm.empty_form }}
+            </div>
+          </div>
+          {{ newOptionForm }}
+        </div>
+      </div>
+      <div class="new-category-box medium mt-3" title="Auswahloption hinzufügen" id="add_option"><i
+          class="bi bi-plus-lg"></i></div>
     </div>
-    <div class="new-category-box medium mt-3" title="Auswahloption hinzufügen" id="add_option"><i
-        class="bi bi-plus-lg"></i></div>
+
     <div class="">
-      <p class="mt-5 mb-0">Vorschau der Konfiguration</p>
+      <p class="mt-5 mb-0 fst-italic">Vorschau der Konfiguration</p>
       <div class="d-flex">
         <div class="card game-category">
           <div class="card-header fw-bold" id="summary_title">
@@ -36,6 +50,7 @@
         </div>
       </div>
     </div>
+    <button> Submit</button>
   </form>
 
 

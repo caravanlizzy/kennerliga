@@ -1,8 +1,10 @@
+from django.forms import formset_factory
 from django.urls import reverse_lazy
 
 # Create your views here.
 from django.views.generic import CreateView, DetailView, ListView, UpdateView
 
+from game.forms import NewOptionForm
 from game.models import Game, GameSettingsCategory
 
 
@@ -24,7 +26,18 @@ class GameListView(ListView):
     template_name = 'game/games_list.html'
 
 
-class NewGameOption(CreateView):
+class NewGameSettingsCategory(CreateView):
     model = GameSettingsCategory
-    fields = '__all__'
     template_name = 'game/new_game_option.html'
+    fields = '__all__'
+
+    def get_context_data(self, **kwargs):
+        context_data = super().get_context_data(**kwargs)
+        context_data['newOptionForm'] = formset_factory(NewOptionForm)()
+        return context_data
+
+    def form_valid(self, form):
+        print(form)
+
+    def form_invalid(self, form):
+        print(form.errors)

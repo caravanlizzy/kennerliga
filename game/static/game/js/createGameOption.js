@@ -1,9 +1,9 @@
-const addOption = (text) => {
-  let newItem = document.createElement('div');
-  newItem.classList.add('p-2');
-  newItem.innerHTML = '- ' + text;
-  document.getElementById('game_options').append(newItem);
-};
+// const addOption = (text) => {
+//   let newItem = document.createElement('div');
+//   newItem.classList.add('p-2');
+//   newItem.innerHTML = '- ' + text;
+//   document.getElementById('game_options').append(newItem);
+// };
 
 const addSummaryItem = (text) => {
   let newItem = document.createElement('li');
@@ -13,15 +13,19 @@ const addSummaryItem = (text) => {
 };
 
 const onAddClick = () => {
-  let inputField = document.getElementById('option_input');
-  const text = inputField.value;
-  addOption(text);
-  addSummaryItem(text);
-  inputField.value = "";
+  const formCount = document.getElementById('id_form-TOTAL_FORMS').value;
+  const newForm = document.getElementById('empty_form').innerHTML.replace(/__prefix__/g, formCount);
+  document.getElementById('game_options').innerHTML += newForm;
+  document.getElementById('id_form-TOTAL_FORMS').value = (parseInt(formCount) + 1);
+  const text = document.getElementById('id_form-'+(formCount-1)+'-option').value;
+  if (text) {
+    // addOption(text);
+    addSummaryItem(text);
+  }
 };
 
 const updateSummaryTitle = () => {
-  let newTitle = document.querySelector("input#name").value;
+  let newTitle = document.querySelector("input#option").value;
   console.log(newTitle);
   document.getElementById('summary_title').innerHTML = newTitle;
 };
@@ -30,7 +34,14 @@ const submit = () => {
 
 };
 
-document.getElementById('add_option').addEventListener('click', onAddClick);
-document.querySelector("input#name").addEventListener('change', updateSummaryTitle);
-document.querySelector("input#name").addEventListener('input', updateSummaryTitle);
 
+document.getElementById('add_option').addEventListener('click', onAddClick);
+document.querySelector("input#option").addEventListener('change', updateSummaryTitle);
+document.querySelector("input#option").addEventListener('input', updateSummaryTitle);
+document.querySelector('input#is_bool').addEventListener('click', () => {
+  if (document.querySelector('input#is_bool').checked) {
+    document.getElementById('option_choices').classList.add("d-none");
+  } else {
+    document.getElementById('option_choices').classList.remove("d-none");
+  }
+});
