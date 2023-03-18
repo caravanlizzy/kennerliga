@@ -2,10 +2,11 @@ from django.forms import formset_factory
 from django.urls import reverse_lazy, reverse
 
 # Create your views here.
-from django.views.generic import CreateView, DetailView, ListView, UpdateView
+from django.views.generic import CreateView, DetailView, ListView, FormView
+from betterforms.multiform import MultiForm
 
-from game.forms import NewOptionForm
-from game.models import Game, GameSettingsCategory
+from game.forms import GameSettingsForm
+from game.models import Game, GameSettingsCategory, GameSettingsOption
 
 
 class NewGameView(CreateView):
@@ -26,22 +27,24 @@ class GameListView(ListView):
     template_name = 'game/games_list.html'
 
 
-class NewGameSettingsCategory(CreateView):
-    model = GameSettingsCategory
+class GameSettingsView(FormView):
     template_name = 'game/new_game_option.html'
-    fields = '__all__'
-
-    def get_success_url(self):
-        return reverse('game:game-detail', kwargs={'pk': 1})
+    form_class = GameSettingsForm
 
     def get_context_data(self, **kwargs):
-        context_data = super().get_context_data(**kwargs)
-        context_data['newOptionForm'] = formset_factory(NewOptionForm)()
-        return context_data
+        context = super().get_context_data(**kwargs)
+        context['game'] = Game.objects.get(pk=self.kwargs.get('pk'))
+        return context
+
+    def get_success_url(self):
+        return reverse('game:game-detail', kwargs={'pk': self.kwargs.get('pk')})
 
     def form_valid(self, form):
-        print('valid!')
+        if form.data['options-0-option']:
+            is_bool = True
+        category = GameSettingsCategory(game_id=self.kwargs.get('pk'), name=form.data['category-name'], is_bool=is_bool)
+        category.save()
+        if not is_bool:
+            for i in range(form.data['options-TOTAL_FORMS']):
+                option = GameSettingsOption(category_id=category.id, option=form.data[f'options-{i}-option'])
         return super().form_valid(form)
-
-    def form_invalid(self, form):
-        return super().form_invalid(form)

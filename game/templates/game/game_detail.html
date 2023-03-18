@@ -7,9 +7,9 @@
 
 {% block content %}
   <h1> {{ game }} </h1>
-  <div class="p-3 mt-3">
+  <div class="pt-3 mt-3">
     <h2> Spieloptionen </h2>
-    <div class="d-flex flex-wrap align-items-center">
+    <div class="d-flex flex-wrap align-items-center mt-3">
       {% for category in game.categories.all %}
         {% if not category.is_bool %}
           <div class="card game-category">
@@ -25,7 +25,7 @@
         {% endif %}
       {% endfor %}
       <a href="{% url 'game:new-option' game.id %}">
-        <div class="card new-category-box big d-flex align-items-center justify-content-center"
+        <div class="card new-category-box medium d-flex align-items-center justify-content-center"
              title="Spieloption hinzufügen"><i class="bi bi-plus-lg"></i>
         </div>
       </a>

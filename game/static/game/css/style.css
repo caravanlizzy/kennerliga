@@ -1,6 +1,6 @@
 .game-category {
     min-width: 15rem;
-    margin: 20px;
+    margin-right: 20px;
     box-shadow: var(--kennerliga-shadow);
 }
 

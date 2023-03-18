@@ -45,8 +45,9 @@ DJANGO_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    "crispy_forms",
-    "crispy_bootstrap5",
+    'crispy_forms',
+    'crispy_bootstrap5',
+    'betterforms',
 ]
 
 INSTALLED_APPS = DJANGO_APPS + LOCAL_APPS
@@ -131,7 +132,6 @@ STATICFILES_DIRS = [
 ]
 STATIC_URL = 'static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'collect_static')
-
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
