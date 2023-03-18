@@ -11,13 +11,18 @@ const addSummaryItem = (text) => {
   newItem.innerHTML = text;
   document.getElementById('summary_list').append(newItem);
 };
+const getFormInputValue = (formId) => {
+  console.log(document.getElementById('id_form-' + formId + '-option').value);
+  return document.getElementById('id_form-' + formId + '-option').value;
+};
 
 const onAddClick = () => {
   const formCount = document.getElementById('id_form-TOTAL_FORMS').value;
+  if (!getFormInputValue(formCount - 1)) return;
   const newForm = document.getElementById('empty_form').innerHTML.replace(/__prefix__/g, formCount);
   document.getElementById('game_options').innerHTML += newForm;
   document.getElementById('id_form-TOTAL_FORMS').value = (parseInt(formCount) + 1);
-  const text = document.getElementById('id_form-'+(formCount-1)+'-option').value;
+  const text = document.getElementById('id_form-' + (formCount - 1) + '-option').value;
   if (text) {
     // addOption(text);
     addSummaryItem(text);

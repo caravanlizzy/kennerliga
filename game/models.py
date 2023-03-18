@@ -27,7 +27,7 @@ class GameSettingsCategory(models.Model):
         blank=True,
         related_name='categories'
     )
-    name = models.CharField(max_length=88)
+    name = models.CharField(max_length=88, unique=True)
     is_bool = models.BooleanField()  # booleanOption or MultipleOptions
 
     def __str__(self):

@@ -38,5 +38,9 @@
 }
 
 .form-template {
-    margin: 7px 0;
+    margin: 15px 0;
+}
+
+#game_options label {
+    margin-bottom: 5px;
 }
