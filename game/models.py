@@ -55,4 +55,10 @@ class GameSettingsOptionBool(models.Model):
         null=True,
         blank=True,
     )
-    option = models.BooleanField()
+    active = models.BooleanField()
+
+    def __str__(self):
+        if self.active:
+            return 'aktiv'
+        else:
+            return 'inaktiv'
