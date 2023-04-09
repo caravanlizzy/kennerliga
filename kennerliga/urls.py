@@ -20,7 +20,7 @@ from django.urls import include, path
 from game.views import NewGameView
 from home.views import HomeView
 from match_result.views import CreateResultView
-from user.views import LoginView, LogoutView, UserProfileView, RegisterUserView
+from user.views import LoginView, LogoutView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -29,7 +29,7 @@ urlpatterns = [
     path('', HomeView.as_view(), name='home'),
     path('management/', include('management.urls')),
     path('post-result/', CreateResultView.as_view(), name='post-result'),
-    path('user/', include('user.urls')),
-    path('game/', include('game.urls')),
+    path('users/', include('user.urls')),
+    path('games/', include('game.urls')),
+    path('seasons/', include('season.urls')),
 ]
-

@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <h1> Saisons </h1>
+  <table class="table table-hover">
+    <th> Saison</th>
+    <th> Status</th>
+    {% for season in object_list %}
+      <tr>
+        <td><a href="{% url 'season:detail' season.id %}"> {{ season }} </a></td>
+        <td>    {{ season.status }}    </td>
+      </tr>
+    {% endfor %}
+  </table>
+{% endblock %}
