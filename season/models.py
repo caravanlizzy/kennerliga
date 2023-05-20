@@ -1,3 +1,4 @@
+from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
 
 from user.models import User
@@ -5,15 +6,27 @@ from user.models import User
 
 # Create your models here.
 class Season(models.Model):
+    class SeasonStatus(models.TextChoices):
+        NEXT = 'Nächste'
+        OPEN = 'Anmeldung offen'
+        RUNNING = 'Laufend'
+        DONE = 'Beendet'
+
     participants = models.ManyToManyField(
-        User
+        User,
+        blank=True,
+        null=True,
+        related_name='seasons_participating'
     )
     year = models.IntegerField()
     month = models.IntegerField(
-        'month in the current year'
+        'month in the current year',
+        validators=[MinValueValidator(1), MaxValueValidator(12)]
     )
-    registration_open = models.BooleanField(
-        default=False
+    status = models.CharField(
+        max_length=15,
+        choices=SeasonStatus.choices,
+        default=SeasonStatus.NEXT
     )
 
     def __str__(self):
@@ -40,13 +53,12 @@ class Season(models.Model):
             players_per_league[-1] = 3
         return players_per_league
 
-
-class Registration(models.Model):
-    player = models.ManyToManyField(
-        User,
-    )
-    season = models.ForeignKey(
-        Season,
-        on_delete=models.CASCADE,
-    )
-    datetime = models.DateTimeField(auto_now_add=True, editable=False)
+# class Registration(models.Model):
+#     player = models.ManyToManyField(
+#         User,
+#     )
+#     season = models.ForeignKey(
+#         Season,
+#         on_delete=models.CASCADE,
+#     )
+#     datetime = models.DateTimeField(auto_now_add=True, editable=False)

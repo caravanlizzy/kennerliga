@@ -35,7 +35,7 @@ LOCAL_APPS = [
     'home',
     'season',
     'league',
-    'management'
+    'administration'
 ]
 
 DJANGO_APPS = [

@@ -5,8 +5,8 @@
     "fields": {
       "year": 2021,
       "month": 1,
-      "registration_open": false,
-      "participants": []
+      "participants": [],
+      "status": "Beendet"
     }
   },
   {
@@ -15,8 +15,8 @@
     "fields": {
       "year": 2021,
       "month": 2,
-      "registration_open": false,
-      "participants": []
+      "participants": [],
+      "status": "Beendet"
     }
   },
   {
@@ -25,8 +25,8 @@
     "fields": {
       "year": 2021,
       "month": 3,
-      "registration_open": false,
-      "participants": []
+      "participants": [],
+      "status": "Beendet"
     }
   },
   {
@@ -35,8 +35,8 @@
     "fields": {
       "year": 2021,
       "month": 4,
-      "registration_open": false,
-      "participants": []
+      "participants": [],
+      "status": "Beendet"
     }
   },
   {
@@ -45,8 +45,8 @@
     "fields": {
       "year": 2021,
       "month": 5,
-      "registration_open": false,
-      "participants": []
+      "participants": [],
+      "status": "Beendet"
     }
   },
   {
@@ -55,8 +55,8 @@
     "fields": {
       "year": 2021,
       "month": 6,
-      "registration_open": false,
-      "participants": []
+      "participants": [],
+      "status": "Beendet"
     }
   },
   {
@@ -65,8 +65,8 @@
     "fields": {
       "year": 2021,
       "month": 7,
-      "registration_open": false,
-      "participants": []
+      "participants": [],
+      "status": "Beendet"
     }
   },
   {
@@ -75,8 +75,8 @@
     "fields": {
       "year": 2021,
       "month": 8,
-      "registration_open": false,
-      "participants": []
+      "participants": [],
+      "status": "Beendet"
     }
   },
   {
@@ -85,8 +85,8 @@
     "fields": {
       "year": 2021,
       "month": 9,
-      "registration_open": false,
-      "participants": []
+      "participants": [],
+      "status": "Beendet"
     }
   },
   {
@@ -95,8 +95,8 @@
     "fields": {
       "year": 2021,
       "month": 10,
-      "registration_open": false,
-      "participants": []
+      "participants": [],
+      "status": "Beendet"
     }
   },
   {
@@ -105,8 +105,8 @@
     "fields": {
       "year": 2021,
       "month": 11,
-      "registration_open": false,
-      "participants": []
+      "participants": [],
+      "status": "Beendet"
     }
   },
   {
@@ -115,8 +115,8 @@
     "fields": {
       "year": 2021,
       "month": 12,
-      "registration_open": false,
-      "participants": []
+      "participants": [],
+      "status": "Beendet"
     }
   },
   {
@@ -125,8 +125,8 @@
     "fields": {
       "year": 2022,
       "month": 1,
-      "registration_open": false,
-      "participants": []
+      "participants": [],
+      "status": "Beendet"
     }
   },
   {
@@ -135,8 +135,8 @@
     "fields": {
       "year": 2022,
       "month": 2,
-      "registration_open": false,
-      "participants": []
+      "participants": [],
+      "status": "Beendet"
     }
   },
   {
@@ -145,8 +145,8 @@
     "fields": {
       "year": 2022,
       "month": 3,
-      "registration_open": false,
-      "participants": []
+      "participants": [],
+      "status": "Beendet"
     }
   },
   {
@@ -155,8 +155,8 @@
     "fields": {
       "year": 2022,
       "month": 4,
-      "registration_open": false,
-      "participants": []
+      "participants": [],
+      "status": "Beendet"
     }
   },
   {
@@ -165,8 +165,8 @@
     "fields": {
       "year": 2022,
       "month": 5,
-      "registration_open": false,
-      "participants": []
+      "participants": [],
+      "status": "Beendet"
     }
   },
   {
@@ -175,8 +175,8 @@
     "fields": {
       "year": 2022,
       "month": 6,
-      "registration_open": false,
-      "participants": []
+      "participants": [],
+      "status": "Beendet"
     }
   },
   {
@@ -185,8 +185,8 @@
     "fields": {
       "year": 2022,
       "month": 7,
-      "registration_open": false,
-      "participants": []
+      "participants": [],
+      "status": "Beendet"
     }
   },
   {
@@ -195,8 +195,8 @@
     "fields": {
       "year": 2022,
       "month": 8,
-      "registration_open": false,
-      "participants": []
+      "participants": [],
+      "status": "Beendet"
     }
   },
   {
@@ -205,8 +205,8 @@
     "fields": {
       "year": 2022,
       "month": 9,
-      "registration_open": false,
-      "participants": []
+      "participants": [],
+      "status": "Beendet"
     }
   },
   {
@@ -215,8 +215,8 @@
     "fields": {
       "year": 2022,
       "month": 10,
-      "registration_open": false,
-      "participants": []
+      "participants": [],
+      "status": "Beendet"
     }
   },
   {
@@ -225,8 +225,8 @@
     "fields": {
       "year": 2022,
       "month": 11,
-      "registration_open": false,
-      "participants": []
+      "participants": [],
+      "status": "Beendet"
     }
   },
   {
@@ -235,8 +235,8 @@
     "fields": {
       "year": 2022,
       "month": 12,
-      "registration_open": false,
-      "participants": []
+      "participants": [],
+      "status": "Laufend"
     }
   }
 ]

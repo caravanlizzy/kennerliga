@@ -13,7 +13,7 @@ Hier lässt sich die Kennerliga konfigurieren.
 <div class="management-content">
   <a href="{% url 'game:games' %}"><div class="management-item"> Spiele </div></a>
   <a href="{% url 'user:users' %}"><div class="management-item"> Spieler </div></a>
-  <a href=""><div class="management-item"> Saison </div></a>
+  <a href="{% url 'season:list' %}"><div class="management-item"> Saisons </div></a>
 </div>
 
 {% endblock %}
