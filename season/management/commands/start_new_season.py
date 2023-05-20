@@ -21,7 +21,7 @@ class Command(BaseCommand):
             return False
         if len(self.get_running_season()) > 1:
             return False
-        if len(open_season[0].participants) < 2:
+        if len(open_season[0].participants) < 6:
             return False
 
     @staticmethod
