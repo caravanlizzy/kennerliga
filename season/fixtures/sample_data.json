@@ -5,7 +5,8 @@
     "fields": {
       "year": 2021,
       "month": 1,
-      "participants": []
+      "participants": [],
+      "status": "Beendet"
     }
   },
   {
@@ -14,7 +15,8 @@
     "fields": {
       "year": 2021,
       "month": 2,
-      "participants": []
+      "participants": [],
+      "status": "Beendet"
     }
   },
   {
@@ -23,7 +25,8 @@
     "fields": {
       "year": 2021,
       "month": 3,
-      "participants": []
+      "participants": [],
+      "status": "Beendet"
     }
   },
   {
@@ -32,7 +35,8 @@
     "fields": {
       "year": 2021,
       "month": 4,
-      "participants": []
+      "participants": [],
+      "status": "Beendet"
     }
   },
   {
@@ -41,7 +45,8 @@
     "fields": {
       "year": 2021,
       "month": 5,
-      "participants": []
+      "participants": [],
+      "status": "Beendet"
     }
   },
   {
@@ -50,7 +55,8 @@
     "fields": {
       "year": 2021,
       "month": 6,
-      "participants": []
+      "participants": [],
+      "status": "Beendet"
     }
   },
   {
@@ -59,7 +65,8 @@
     "fields": {
       "year": 2021,
       "month": 7,
-      "participants": []
+      "participants": [],
+      "status": "Beendet"
     }
   },
   {
@@ -68,7 +75,8 @@
     "fields": {
       "year": 2021,
       "month": 8,
-      "participants": []
+      "participants": [],
+      "status": "Beendet"
     }
   },
   {
@@ -77,7 +85,8 @@
     "fields": {
       "year": 2021,
       "month": 9,
-      "participants": []
+      "participants": [],
+      "status": "Beendet"
     }
   },
   {
@@ -86,7 +95,8 @@
     "fields": {
       "year": 2021,
       "month": 10,
-      "participants": []
+      "participants": [],
+      "status": "Beendet"
     }
   },
   {
@@ -95,7 +105,8 @@
     "fields": {
       "year": 2021,
       "month": 11,
-      "participants": []
+      "participants": [],
+      "status": "Beendet"
     }
   },
   {
@@ -104,7 +115,8 @@
     "fields": {
       "year": 2021,
       "month": 12,
-      "participants": []
+      "participants": [],
+      "status": "Beendet"
     }
   },
   {
@@ -113,7 +125,8 @@
     "fields": {
       "year": 2022,
       "month": 1,
-      "participants": []
+      "participants": [],
+      "status": "Beendet"
     }
   },
   {
@@ -122,7 +135,8 @@
     "fields": {
       "year": 2022,
       "month": 2,
-      "participants": []
+      "participants": [],
+      "status": "Beendet"
     }
   },
   {
@@ -131,7 +145,8 @@
     "fields": {
       "year": 2022,
       "month": 3,
-      "participants": []
+      "participants": [],
+      "status": "Beendet"
     }
   },
   {
@@ -140,7 +155,8 @@
     "fields": {
       "year": 2022,
       "month": 4,
-      "participants": []
+      "participants": [],
+      "status": "Beendet"
     }
   },
   {
@@ -149,7 +165,8 @@
     "fields": {
       "year": 2022,
       "month": 5,
-      "participants": []
+      "participants": [],
+      "status": "Beendet"
     }
   },
   {
@@ -158,7 +175,8 @@
     "fields": {
       "year": 2022,
       "month": 6,
-      "participants": []
+      "participants": [],
+      "status": "Beendet"
     }
   },
   {
@@ -167,7 +185,8 @@
     "fields": {
       "year": 2022,
       "month": 7,
-      "participants": []
+      "participants": [],
+      "status": "Beendet"
     }
   },
   {
@@ -176,7 +195,8 @@
     "fields": {
       "year": 2022,
       "month": 8,
-      "participants": []
+      "participants": [],
+      "status": "Beendet"
     }
   },
   {
@@ -185,7 +205,8 @@
     "fields": {
       "year": 2022,
       "month": 9,
-      "participants": []
+      "participants": [],
+      "status": "Beendet"
     }
   },
   {
@@ -194,7 +215,8 @@
     "fields": {
       "year": 2022,
       "month": 10,
-      "participants": []
+      "participants": [],
+      "status": "Beendet"
     }
   },
   {
@@ -203,7 +225,8 @@
     "fields": {
       "year": 2022,
       "month": 11,
-      "participants": []
+      "participants": [],
+      "status": "Beendet"
     }
   },
   {
@@ -212,7 +235,8 @@
     "fields": {
       "year": 2022,
       "month": 12,
-      "participants": []
+      "participants": [],
+      "status": "Laufend"
     }
   }
 ]

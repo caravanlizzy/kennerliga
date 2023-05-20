@@ -1,3 +1,4 @@
+from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
 
 from user.models import User
@@ -8,7 +9,7 @@ class Season(models.Model):
     class SeasonStatus(models.TextChoices):
         NEXT = 'Nächste'
         OPEN = 'Anmeldung offen'
-        RUNNING = 'Läuft'
+        RUNNING = 'Laufend'
         DONE = 'Beendet'
 
     participants = models.ManyToManyField(
@@ -19,7 +20,8 @@ class Season(models.Model):
     )
     year = models.IntegerField()
     month = models.IntegerField(
-        'month in the current year'
+        'month in the current year',
+        validators=[MinValueValidator(1), MaxValueValidator(12)]
     )
     status = models.CharField(
         max_length=15,
