@@ -6,7 +6,7 @@ from user.models import User
 # Create your models here.
 class Season(models.Model):
     class SeasonStatus(models.TextChoices):
-        ANNOUNCED = 'Angekündigt'
+        NEXT = 'Nächste'
         OPEN = 'Anmeldung offen'
         RUNNING = 'Läuft'
         DONE = 'Beendet'
@@ -24,7 +24,7 @@ class Season(models.Model):
     status = models.CharField(
         max_length=15,
         choices=SeasonStatus.choices,
-        default=SeasonStatus.DONE
+        default=SeasonStatus.NEXT
     )
 
     def __str__(self):
