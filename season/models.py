@@ -8,6 +8,7 @@ class Season(models.Model):
     class SeasonStatus(models.TextChoices):
         ANNOUNCED = 'Angekündigt'
         OPEN = 'Anmeldung offen'
+        RUNNING = 'Läuft'
         DONE = 'Beendet'
 
     participants = models.ManyToManyField(
