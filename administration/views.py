@@ -3,5 +3,5 @@ from django.views.generic import TemplateView
 
 
 # Create your views here.
-class ManagementView(TemplateView):
-    template_name = 'management/manage.html'
+class AdministrationView(TemplateView):
+    template_name = 'administration/manage.html'
