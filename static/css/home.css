@@ -13,19 +13,25 @@
     box-shadow: rgba(0, 0, 0, 0.16) 0px 3px 6px, rgba(0, 0, 0, 0.23) 0px 3px 6px;
 }
 
+.announce-content {
+    grid-column: 1 / span 5;
+    grid-row: 1;
+    background: aquamarine;
+}
+
 .center-content {
     grid-column: 1 / span 4;
-    grid-row: 1/8
+    grid-row: 2/9
 }
 
 .bottom-content {
     grid-column: 1/6;
-    grid-row: 8 / 11;
+    grid-row: 9 / 12;
 }
 
 .sidebar-right {
     grid-column: 5;
-    grid-row: 1 / 8;
+    grid-row: 2 / 9;
 }
 
 .home div { 
