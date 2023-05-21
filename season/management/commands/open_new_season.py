@@ -11,8 +11,10 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         next_seasons = Season.objects.filter(status=Season.SeasonStatus.NEXT)
-        if not len(next_seasons) == 1:
+        if len(next_seasons) > 1:
             logger.error('More than 1 NEXT seasons found')
+        elif len(next_seasons) == 0:
+            logger.error('No NEXT season found.')
         else:
             next_season = next_seasons[0]
             next_season.status = Season.SeasonStatus.OPEN
