@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
 
@@ -28,6 +30,14 @@ class Season(models.Model):
         choices=SeasonStatus.choices,
         default=SeasonStatus.NEXT
     )
+
+    @property
+    def season_start_time(self):
+        return datetime(self.year, self.month, 1, 0, 0)
+
+    @property
+    def time_to_start(self):
+        return self.season_start_time - datetime.now()
 
     def __str__(self):
         return f'{self.year}_S{self.month}'
