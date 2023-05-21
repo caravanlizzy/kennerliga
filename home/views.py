@@ -12,5 +12,5 @@ class HomeView(TemplateView):
         context = super().get_context_data(**kwargs)
         open_season = Season.objects.filter(status=Season.SeasonStatus.OPEN)
         if open_season:
-            context['open_season'] = open_season
+            context['open_season'] = open_season[0]
         return context

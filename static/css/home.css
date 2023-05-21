@@ -16,7 +16,8 @@
 .announce-content {
     grid-column: 1 / span 5;
     grid-row: 1;
-    background: aquamarine;
+    background: #a4f8c3;
+    padding: 25px 35px;
 }
 
 .center-content {
@@ -38,3 +39,8 @@
 	padding: 20px;
 	box-shadow: rgba(0, 0, 0, 0.16) 0px 3px 6px, rgba(0, 0, 0, 0.23) 0px 3px 6px;
 }
+
+.bolder{
+    font-weight: 600;
+}
+
