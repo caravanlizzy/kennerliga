@@ -142,3 +142,7 @@ AUTH_USER_MODEL = 'user.User'
 
 # URL redirecting after a successful authentication
 LOGIN_REDIRECT_URL = '/'
+
+# League configuration
+MINIMUM_PLAYERS = 6
+OPEN_SEASON_DAYS_BEFORE_START = 7

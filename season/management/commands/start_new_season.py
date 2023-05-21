@@ -1,5 +1,6 @@
 from django.core.management import BaseCommand
 
+from kennerliga.settings import MINIMUM_PLAYERS
 from season.models import Season
 
 
@@ -21,7 +22,7 @@ class Command(BaseCommand):
             return False
         if len(self.get_running_season()) > 1:
             return False
-        if len(open_season[0].participants) < 6:
+        if len(open_season[0].participants) < MINIMUM_PLAYERS:
             return False
 
     @staticmethod
