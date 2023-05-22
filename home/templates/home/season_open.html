@@ -1,7 +1,23 @@
-<form action="">
-  <div> Die neue Saison <span class="bolder">{{ open_season }}</span> beginnt bald. Melde dich an, grinde dich hoch an
-    die
-    Spitze und vielleicht hältst du bald den Pokal als SiegerIn der prestigeträchtigen Kennerliga. Die Anmeldung endet
-    in {{ open_season.time_to_start }}.</div>
-  <button type="submit" class="btn btn-outline-dark btn-md mt-4">Jetzt anmelden</button>
-</form>
+{% if user_is_registered %}
+  <form action="{% url 'remove-participant' %}" method="POST"> {% csrf_token %}
+    Die neue Saison <span class="bolder">{{ open_season }}</span> beginnt in {{ open_season.time_to_start }}. Du bist
+    angemeldet - beste Entscheidung. Falls dir doch was dazwischen kommt, kannst du dich hier
+    <div>
+      <button class="btn btn-medium btn-danger mt-3"> Abmelden</button>
+    </div>
+  </form>
+{% else %}
+  <form action="{% url 'add-participant' %}" method="POST"> {% csrf_token %}
+    <div> Die neue Saison <span class="bolder">{{ open_season }}</span> beginnt bald. Melde dich an, grinde dich hoch an
+      die
+      Spitze und vielleicht hältst du bald den Pokal als SiegerIn der prestigeträchtigen Kennerliga. Die Anmeldung endet
+      in {{ open_season.time_to_start }}.
+    </div>
+    <button type="submit" class="btn btn-outline-dark btn-md mt-3">Anmelden</button>
+  </form>
+{% endif %}
+
+
+
+
+

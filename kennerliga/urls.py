@@ -18,7 +18,7 @@ from django.contrib import admin
 from django.urls import include, path
 
 from game.views import NewGameView
-from home.views import HomeView
+from home.views import HomeView, AddSeasonParticipantView, RemoveSeasonParticipantView
 from match_result.views import CreateResultView
 from user.views import LoginView, LogoutView
 
@@ -27,6 +27,8 @@ urlpatterns = [
     path('login/', LoginView.as_view(), name='login'),
     path('logout/', LogoutView.as_view(), name='logout'),
     path('', HomeView.as_view(), name='home'),
+    path('add-participant', AddSeasonParticipantView.as_view(), name='add-participant'),
+    path('remove-participant', RemoveSeasonParticipantView.as_view(), name='remove-participant'),
     path('administration/', include('administration.urls')),
     path('post-result/', CreateResultView.as_view(), name='post-result'),
     path('users/', include('user.urls')),
