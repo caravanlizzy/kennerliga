@@ -15,7 +15,8 @@ class HomeView(TemplateView):
 
     def get(self, request, *args, **kwargs):
         context = self.get_context_data(**kwargs)
-        context['user_is_registered'] = request.user in context['open_season'].participants.all()
+        if 'open_season' in context:
+            context['user_is_registered'] = request.user in context['open_season'].participants.all()
         return self.render_to_response(context)
 
     def get_context_data(self, **kwargs):
