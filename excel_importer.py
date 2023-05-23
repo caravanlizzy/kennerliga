@@ -201,8 +201,8 @@ def name_unused(name):
     return not User.objects.filter(username=name).exists()
 
 # print(f'results: {results}')
-print(f'players: {players}')
-# print(f'games: {games}')
+# print(f'players: {players}')
+print(f'games: {games}')
 
 
 
