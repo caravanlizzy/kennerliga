@@ -3,10 +3,9 @@ from django.urls import reverse_lazy, reverse
 
 # Create your views here.
 from django.views.generic import CreateView, DetailView, ListView, FormView
-from betterforms.multiform import MultiForm
 
 from game.forms import GameSettingsForm
-from game.models import Game, GameSettingsCategory, GameSettingsOption
+from game.models import Game, GameSettingsCategory, GameSettingsOptionChoice
 
 
 class NewGameView(CreateView):
@@ -47,6 +46,6 @@ class GameSettingsView(FormView):
         category.save()
         if not is_bool:
             for i in range(int(form.data['options-TOTAL_FORMS'])):
-                option = GameSettingsOption(category_id=category.id, option=form.data[f'options-{str(i)}-option'])
+                option = GameSettingsOptionChoice(category_id=category.id, option=form.data[f'options-{str(i)}-option'])
                 option.save()
         return super().form_valid(form)

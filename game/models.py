@@ -27,14 +27,18 @@ class GameSettingsCategory(models.Model):
         blank=True,
         related_name='categories'
     )
-    name = models.CharField(max_length=88, unique=True)
-    is_bool = models.BooleanField()  # booleanOption or MultipleOptions
+    name = models.CharField(max_length=88)
+    value = models.BooleanField(
+        blank=True,
+        null=True,
+        default=None
+    )
 
     def __str__(self):
         return str(self.name)
 
 
-class GameSettingsOption(models.Model):
+class GameSettingsOptionChoice(models.Model):
     category = models.ForeignKey(
         GameSettingsCategory,
         on_delete=models.CASCADE,
@@ -42,23 +46,7 @@ class GameSettingsOption(models.Model):
         blank=True,
         related_name='options'
     )
-    option = models.CharField(max_length=139)
+    choice = models.CharField(max_length=139, blank=True, null=True)
 
     def __str__(self):
-        return str(self.option)
-
-
-class GameSettingsOptionBool(models.Model):
-    category = models.ForeignKey(
-        GameSettingsCategory,
-        on_delete=models.CASCADE,
-        null=True,
-        blank=True,
-    )
-    active = models.BooleanField()
-
-    def __str__(self):
-        if self.active:
-            return 'aktiv'
-        else:
-            return 'inaktiv'
+        return str(self.choice)

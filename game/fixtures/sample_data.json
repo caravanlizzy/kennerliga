@@ -1,1 +1,0 @@
-[{"model": "game.game", "pk": 1, "fields": {"name": "Terra Mystica", "platform": "BGA"}}, {"model": "game.gamesettingscategory", "pk": 1, "fields": {"game": 1, "name": "Karte", "is_bool": false}}, {"model": "game.gamesettingsoption", "pk": 1, "fields": {"category": 1, "option": "Loon Lakes"}}]

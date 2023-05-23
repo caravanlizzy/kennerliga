@@ -1,27 +1,30 @@
 import pandas
 import django
 import os
+
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "kennerliga.settings")
 django.setup()
 from user.models import User
+from game.models import Game, GameSettingsCategory, GameSettingsOptionChoice
+
 
 class ExcelImporter:
     """ Read and export the kennerliga excel file to the django database """
 
     def __init__(self):
-        self.df = {} # store dataframes with year as their key
+        self.df = {}  # store dataframes with year as their key
         self.bga_names = set()
         self.data = {
-            'games':{},
-            'bga_names':set(),
-            'results':[],
+            'games': {},
+            'bga_names': set(),
+            'results': [],
         }
 
     def read_file(self, year):
         path = 'data_migration/'
         file_end = '.xlsm'
         file_name = str(year) + file_end
-        self.df[year] = pandas.read_excel(path+file_name, None)
+        self.df[year] = pandas.read_excel(path + file_name, None)
 
     def get_file(self, year):
         return self.df[year]
@@ -33,11 +36,10 @@ class ExcelImporter:
     def cell_isna(self, cell):
         return pandas.isna(cell)
 
-
     def get_cell(self, sheet, row, col):
         return sheet.iloc[row][col]
 
-    def get_keyword_locations(self, year,  month,  keywords, exact=False):
+    def get_keyword_locations(self, year, month, keywords, exact=False):
         locations = []
         sheet = self.get_sheet(year, month)
         rows, cols = sheet.shape
@@ -52,7 +54,7 @@ class ExcelImporter:
                     else:
                         condition = keyword in cell
                     if condition:
-                        locations.append({"keyword":keyword, "row": row, "col": col})
+                        locations.append({"keyword": keyword, "row": row, "col": col})
         return locations
 
     def get_bga_names_from_gesamtwertung(self, year):
@@ -60,9 +62,9 @@ class ExcelImporter:
         sheet = self.get_file(year)[sheet_key]
         start_row = 4
         end_row = sheet.shape[0];
-        col =  3
+        col = 3
         for row in range(start_row, end_row):
-            cell =  self.get_cell(sheet, row, col)
+            cell = self.get_cell(sheet, row, col)
             if self.cell_isna(cell):
                 return
             else:
@@ -78,7 +80,7 @@ class ExcelImporter:
 
     def iterate_all_sheets(self, year, *callbacks):
         file = self.get_file(year)
-        for month in range(1, len(file) -1 ): # dont consider last 2 sheets, gesamtwertung and definitonen
+        for month in range(1, len(file) - 1):  # dont consider last 2 sheets, gesamtwertung and definitonen
             print(f'Importing {year}S{month}')
             for callback in callbacks:
                 callback(year, month)
@@ -105,12 +107,10 @@ class ExcelImporter:
         for option in options:
             option = option[2:]
             option, value = option.split(':')
-            option_object = {'option':option, 'value':value}
+            option_object = {'option': option, 'value': value}
             self.data['games'][game].append(option_object)
 
-
-
-    def get_games_from_leagues(self, year,  month):
+    def get_games_from_leagues(self, year, month):
         sheet = self.get_sheet(year, month)
         rows_down_to_value = 4
         cols_right_to_value = 5
@@ -140,12 +140,12 @@ class ExcelImporter:
         keywords = ['Platzierung']
         locations = self.get_keyword_locations(year, month, keywords, True)
         for location in locations:
-            self.store_match_results(location, year,  month)
+            self.store_match_results(location, year, month)
 
     def store_match_results(self, location, year, month):
         sheet = self.get_sheet(year, month)
         row = location['row']
-        game = self.get_cell(sheet, row-1, 4)
+        game = self.get_cell(sheet, row - 1, 4)
         next_row = row + 1
         while self.store_match_result(next_row, year, month, game, sheet):
             self.store_match_result(next_row, month, game, sheet)
@@ -166,29 +166,21 @@ class ExcelImporter:
         year = year
         season = month
         result = {
-                "player":player,
-                "starting_position":starting_position,
-                "character":character,
-                "starting_points":starting_points,
-                "points":points,
-                "tie_breaker":tie_breaker,
-                "percentage_of_winner":percentage_of_winner,
-                "position":position,
-                "league_points":league_points,
-                "year":year,
-                "season":season,
-                "game":game,
-         }
+            "player": player,
+            "starting_position": starting_position,
+            "character": character,
+            "starting_points": starting_points,
+            "points": points,
+            "tie_breaker": tie_breaker,
+            "percentage_of_winner": percentage_of_winner,
+            "position": position,
+            "league_points": league_points,
+            "year": year,
+            "season": season,
+            "game": game,
+        }
         self.data['results'].append(result)
 
-I = ExcelImporter()
-years = [2021, 2022]
-for year in years:
-    I.read_file(year)
-    I.get_bga_names_from_gesamtwertung(year)
-    I.iterate_all_sheets(year, I.get_games_from_leagues, I.get_match_results)
-
-results, players, games = I.data['results'], I.data['bga_names'], I.data['games']
 
 def create_player(name):
     if name_unused(name):
@@ -200,11 +192,58 @@ def create_player(name):
 def name_unused(name):
     return not User.objects.filter(username=name).exists()
 
+
 # print(f'results: {results}')
 # print(f'players: {players}')
-print(f'games: {games}')
+# print(f'games: {games}')
+
+# create actual players
+def store_players():
+    for player in players:
+        create_player(player)
 
 
+def game_exists(game_name):
+    return Game.objects.filter(name=game_name).exists()
 
-for player in players:
-    create_player(player)
+
+def store_games():
+    for game in games:
+        if game_exists(game):
+            continue
+        else:
+            new_game = Game(name=game)
+            new_game.save()
+            for option in games[game]:
+                game_settings_names = []
+                game_settings = {}
+                new_settings_name = option['option']
+                if new_settings_name not in game_settings_names:
+                    new_setting_category = GameSettingsCategory(game=new_game, name=new_settings_name)
+                    new_setting_category.save()
+                    game_settings[new_settings_name] = new_setting_category
+                    game_settings_names.append(new_settings_name)
+                new_settings_option_name = option['value']
+                true_keywords = ['an', 'ja', 'aktiviert']
+                false_keywords = ['aus', 'nein', 'deaktiviert']
+                if new_settings_option_name.lower().strip() in true_keywords:
+                    new_setting_category.value = True
+                    new_setting_category.save()
+                elif new_settings_option_name.lower().strip() in false_keywords:
+                    new_setting_category.value = False
+                    new_setting_category.save()
+                else:
+                    new_settings_option = GameSettingsOptionChoice(category=game_settings[new_settings_name],
+                                                                   choice=option['value'])
+                    new_settings_option.save()
+
+
+I = ExcelImporter()
+years = [2021, 2022]
+for year in years:
+    I.read_file(year)
+    I.get_bga_names_from_gesamtwertung(year)
+    I.iterate_all_sheets(year, I.get_games_from_leagues, I.get_match_results)
+
+results, players, games = I.data['results'], I.data['bga_names'], I.data['games']
+store_games()

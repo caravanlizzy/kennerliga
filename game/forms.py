@@ -2,7 +2,7 @@ from betterforms.multiform import MultiForm
 from django.forms import Form, CharField, TextInput, formset_factory
 
 
-class GameSettingsOptionForm(Form):
+class GameSettingsOptionChoiceForm(Form):
     option = CharField(
         max_length=188,
         widget=TextInput(attrs={'class': 'form-control p-2 mt-2', 'placeholder': 'Name der Auswahloption'})
@@ -19,5 +19,5 @@ class GameSettingsCategoryForm(Form):
 class GameSettingsForm(MultiForm):
     form_classes = {
         'category': GameSettingsCategoryForm,
-        'options': formset_factory(GameSettingsOptionForm),
+        'options': formset_factory(GameSettingsOptionChoiceForm),
     }

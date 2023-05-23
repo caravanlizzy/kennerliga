@@ -1,7 +1,7 @@
 from django.contrib import admin
 
 # Register your models here.
-from game.models import Game, GameSettingsOption, GameSettingsCategory
+from game.models import Game, GameSettingsOptionChoice, GameSettingsCategory
 
 
 @admin.register(Game)
@@ -14,6 +14,6 @@ class AuthorAdmin(admin.ModelAdmin):
     pass
 
 
-@admin.register(GameSettingsOption)
+@admin.register(GameSettingsOptionChoice)
 class AuthorAdmin(admin.ModelAdmin):
     pass
