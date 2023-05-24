@@ -5,7 +5,7 @@ import os
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "kennerliga.settings")
 django.setup()
 from user.models import User
-from game.models import Game, GameSettingsCategory, GameSettingsOptionChoice
+from game.models import Game, GameOption, GameOptionChoice
 
 
 class ExcelImporter:
@@ -106,8 +106,8 @@ class ExcelImporter:
         options = options.split('\n')
         for option in options:
             option = option[2:]
-            option, value = option.split(':')
-            option_object = {'option': option, 'value': value}
+            option, choice = option.split(':')
+            option_object = {'option': option, 'choice': choice}
             self.data['games'][game].append(option_object)
 
     def get_games_from_leagues(self, year, month):
@@ -207,35 +207,69 @@ def game_exists(game_name):
     return Game.objects.filter(name=game_name).exists()
 
 
-def store_games():
-    for game in games:
-        if game_exists(game):
-            continue
+def game_option_exists(option):
+    return GameOption.objects.filter(name=option).exists()
+
+
+def game_option_choice_exists(choice):
+    return GameOptionChoice.objects.filter(name=choice).exists()
+
+
+def create_game(game_name):
+    if not game_exists(game_name):
+        new_game = Game(name=game_name)
+        new_game.save()
+
+
+def create_game_option(option_name, game_name, bool_value):
+    if not game_option_exists(option_name):
+        game = Game.objects.filter(name=game_name)[0]
+        if game:
+            new_option = GameOption(name=option_name, game=game)
+            if isinstance(bool_value, bool):
+                new_option.value = bool_value
+            new_option.save()
+            return new_option
         else:
-            new_game = Game(name=game)
-            new_game.save()
-            for option in games[game]:
-                game_settings_names = []
-                game_settings = {}
-                new_settings_name = option['option']
-                if new_settings_name not in game_settings_names:
-                    new_setting_category = GameSettingsCategory(game=new_game, name=new_settings_name)
-                    new_setting_category.save()
-                    game_settings[new_settings_name] = new_setting_category
-                    game_settings_names.append(new_settings_name)
-                new_settings_option_name = option['value']
-                true_keywords = ['an', 'ja', 'aktiviert']
-                false_keywords = ['aus', 'nein', 'deaktiviert']
-                if new_settings_option_name.lower().strip() in true_keywords:
-                    new_setting_category.value = True
-                    new_setting_category.save()
-                elif new_settings_option_name.lower().strip() in false_keywords:
-                    new_setting_category.value = False
-                    new_setting_category.save()
-                else:
-                    new_settings_option = GameSettingsOptionChoice(category=game_settings[new_settings_name],
-                                                                   choice=option['value'])
-                    new_settings_option.save()
+            print(f'No game {game_name} for given option {option_name}')
+    else:
+        return GameOption.objects.filter(name=option_name)[0]
+
+
+# def add_choice(option, choice):
+#     game_option = GameOption.objects.filter(name=option)[0]
+#     game_choice = GameOptionChoice.objects.filter(name=choice)[0]
+#     game_option.choices.add(game_choice)
+
+
+def create_option_choice(choice_name, option):
+    if not game_option_choice_exists(choice_name):
+        new_choice = GameOptionChoice(name=choice_name, option=option)
+        new_choice.save()
+
+
+def get_boolean_option_value(choice_name):
+    option_value = None
+    true_option_values = ['ja', 'aktiviert', 'aktiv', 'an']
+    false_option_values = ['nein', 'deaktiviert', 'inaktiv', 'aus']
+    choice_to_check = choice_name.lower().strip()
+    if choice_to_check in true_option_values:
+        option_value = True
+    elif choice_to_check in false_option_values:
+        option_value = False
+    return option_value
+
+
+def store_games():
+    for game_name in games:
+        create_game(game_name)
+        for settings in games[game_name]:
+            option_name = settings['option']
+            choice_name = settings['choice']
+            boolean_value = get_boolean_option_value(choice_name)
+            option = create_game_option(option_name, game_name, boolean_value)
+            if not isinstance(boolean_value, bool):
+                create_option_choice(choice_name, option)
 
 
 I = ExcelImporter()

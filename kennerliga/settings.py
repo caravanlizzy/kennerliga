@@ -48,6 +48,7 @@ DJANGO_APPS = [
     'crispy_forms',
     'crispy_bootstrap5',
     'betterforms',
+    'nested_admin'
 ]
 
 INSTALLED_APPS = DJANGO_APPS + LOCAL_APPS

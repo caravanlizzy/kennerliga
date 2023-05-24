@@ -9,20 +9,21 @@
   <h1> {{ game }} </h1>
   <div class="pt-3 mt-3">
     <h2> Spieloptionen </h2>
-
     <div class="d-flex flex-wrap mt-3">
-      {% for category in game.categories.all %}
-        {% if not category.is_bool %}
+      {% for option in game.options.all %}
+        {% if not option.value %}
           <div class="card game-category">
             <div class="card-header fw-bold">
-              {{ category }}
+              {{ option }}
             </div>
             <ul class="list-group list-group-flush">
-              {% for option in category.options.all %}
-                <li class="list-group-item game-option"> {{ option }}</li>
+              {% for choice in option.choices.all %}
+                <li class="list-group-item game-option"> {{ choice }}</li>
               {% endfor %}
             </ul>
           </div>
+        {% else %}
+          huhu {{ option }} {{ option.value }}
         {% endif %}
       {% endfor %}
     </div>
