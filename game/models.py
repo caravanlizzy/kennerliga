@@ -1,7 +1,6 @@
 from django.db import models
 
 
-# Create your models here.
 class Game(models.Model):
     name = models.CharField(max_length=88, unique=True)
 
@@ -19,46 +18,28 @@ class Game(models.Model):
         return str(self.name)
 
 
-class GameSettingsCategory(models.Model):
-    game = models.ForeignKey(
-        Game,
-        on_delete=models.CASCADE,
+class GameOption(models.Model):
+    name = models.CharField(max_length=88)
+    game = models.ForeignKey(Game, null=True, blank=True, on_delete=models.CASCADE, related_name='options')
+    value = models.BooleanField(
         null=True,
-        blank=True,
-        related_name='categories'
+        default=None
     )
-    name = models.CharField(max_length=88, unique=True)
-    is_bool = models.BooleanField()  # booleanOption or MultipleOptions
 
     def __str__(self):
         return str(self.name)
 
 
-class GameSettingsOption(models.Model):
-    category = models.ForeignKey(
-        GameSettingsCategory,
-        on_delete=models.CASCADE,
-        null=True,
-        blank=True,
-        related_name='options'
+class GameOptionChoice(models.Model):
+    name = models.CharField(max_length=139, blank=True, null=True)
+    is_active = models.BooleanField(
+        default=False
     )
-    option = models.CharField(max_length=139)
+    option = models.ForeignKey(
+        GameOption,
+        on_delete=models.CASCADE,
+        related_name='choices'
+    )
 
     def __str__(self):
-        return str(self.option)
-
-
-class GameSettingsOptionBool(models.Model):
-    category = models.ForeignKey(
-        GameSettingsCategory,
-        on_delete=models.CASCADE,
-        null=True,
-        blank=True,
-    )
-    active = models.BooleanField()
-
-    def __str__(self):
-        if self.active:
-            return 'aktiv'
-        else:
-            return 'inaktiv'
+        return str(self.name)

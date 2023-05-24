@@ -29,13 +29,13 @@ ALLOWED_HOSTS = ['haligh.pythonanywhere.com', 'localhost']
 # Application definition
 
 LOCAL_APPS = [
-    'user',
-    'match_result',
+    'administration',
     'game',
     'home',
-    'season',
     'league',
-    'administration'
+    'match_result',
+    'season',
+    'user',
 ]
 
 DJANGO_APPS = [
@@ -48,6 +48,7 @@ DJANGO_APPS = [
     'crispy_forms',
     'crispy_bootstrap5',
     'betterforms',
+    'nested_admin'
 ]
 
 INSTALLED_APPS = DJANGO_APPS + LOCAL_APPS

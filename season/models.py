@@ -17,7 +17,6 @@ class Season(models.Model):
     participants = models.ManyToManyField(
         User,
         blank=True,
-        null=True,
         related_name='seasons_participating'
     )
     year = models.IntegerField()
