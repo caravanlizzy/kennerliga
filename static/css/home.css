@@ -1,14 +1,13 @@
 /* Homepage */
 .home-content{
 	display: grid;
-	gap: 15px;
+	gap: 25px;
     /*background-color: var(--kennerliga-red);*/
 }   
 
 .grid-item {
     background-color: var(--background-white);
-    text-align: center;
-    padding: 15px;
+    padding: 20px 30px;
     margin: 2px;
     box-shadow: rgba(0, 0, 0, 0.16) 0px 3px 6px, rgba(0, 0, 0, 0.23) 0px 3px 6px;
 }
@@ -22,7 +21,7 @@
 
 .center-content {
     grid-column: 1 / span 4;
-    grid-row: 2/9
+    grid-row: 2/9;
 }
 
 .bottom-content {

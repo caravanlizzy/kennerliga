@@ -186,16 +186,10 @@ def create_player(name):
     if name_unused(name):
         new_player = User.objects.create(username=name, email=f'{name}.{name}@test.de')
         new_player.save()
-        print(new_player)
-
 
 def name_unused(name):
     return not User.objects.filter(username=name).exists()
 
-
-# print(f'results: {results}')
-# print(f'players: {players}')
-# print(f'games: {games}')
 
 # create actual players
 def store_players():
@@ -234,12 +228,6 @@ def create_game_option(option_name, game_name, bool_value):
             print(f'No game {game_name} for given option {option_name}')
     else:
         return GameOption.objects.filter(name=option_name)[0]
-
-
-# def add_choice(option, choice):
-#     game_option = GameOption.objects.filter(name=option)[0]
-#     game_choice = GameOptionChoice.objects.filter(name=choice)[0]
-#     game_option.choices.add(game_choice)
 
 
 def create_option_choice(choice_name, option):

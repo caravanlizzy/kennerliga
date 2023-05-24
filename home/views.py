@@ -1,4 +1,6 @@
 # Create your views here.
+from datetime import datetime
+
 from django.http import HttpResponse
 from django.shortcuts import redirect
 from django.views import View
@@ -24,6 +26,7 @@ class HomeView(TemplateView):
         open_season = get_open_season()
         if open_season:
             context['open_season'] = open_season
+        context['current_year'] = datetime.today().year
         return context
 
 
