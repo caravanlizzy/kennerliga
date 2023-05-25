@@ -6,31 +6,51 @@
 {% endblock %}
 
 {% block content %}
+  <a href="{% url 'game:games' %}">
+    <button class="btn btn-md btn-outline-secondary mb-3"><i class="bi bi-arrow-left"></i>
+      Zurück zur Spieleübersicht
+    </button>
+  </a>
   <h1> {{ game }} </h1>
   <div class="pt-3 mt-3">
     <h2> Spieloptionen </h2>
-    <div class="d-flex flex-wrap mt-3">
-      {% for option in game.options.all %}
-        {% if not option.value %}
-          <div class="card game-category">
-            <div class="card-header fw-bold">
-              {{ option }}
-            </div>
-            <ul class="list-group list-group-flush">
-              {% for choice in option.choices.all %}
-                <li class="list-group-item game-option"> {{ choice }}</li>
-              {% endfor %}
-            </ul>
+    <div class="d-flex">
+      <div>
+        <div class="card game-category">
+          <div class="card-header fw-bold">
+            An/Aus Kategorien
           </div>
-        {% else %}
-          huhu {{ option }} {{ option.value }}
-        {% endif %}
-      {% endfor %}
-    </div>
-    <a href="{% url 'game:new-option' game.id %}">
-      <div class="card new-category-box big d-flex align-items-center justify-content-center mt-5"
-           title="Spieloption hinzufügen"><i class="bi bi-plus-lg"></i>
+          {% for option in game.options.all %}
+            {% if not option.value == None %}
+              <ul class="list-group list-group-flush">
+                <li class="list-group-item game-option"> {{ option }}</li>
+              </ul>
+            {% endif %}
+          {% endfor %}
+        </div>
       </div>
-    </a>
+      <div class="d-flex flex-wrap ">
+        {% for option in game.options.all %}
+          {% if option.value == None %}
+            <div class="card game-category">
+              <div class="card-header fw-bold">
+                {{ option }}
+              </div>
+              <ul class="list-group list-group-flush">
+                {% for choice in option.choices.all %}
+                  <li class="list-group-item game-option"> {{ choice }}</li>
+                {% endfor %}
+              </ul>
+            </div>
+          {% endif %}
+        {% endfor %}
+      </div>
+
+    </div>
+{#    <a href="{% url 'game:new-option' game.id %}">#}
+{#      <div class="card new-category-box big d-flex align-items-center justify-content-center mt-5"#}
+{#           title="Spieloption hinzufügen"><i class="bi bi-plus-lg"></i>#}
+{#      </div>#}
+{#    </a>#}
   </div>
 {% endblock %}
