@@ -2,18 +2,29 @@
 {% load static %}
 
 {% block head_extra_imports %}
-    <link rel="stylesheet" href="{% static 'management/css/style.css' %}"/>
+  <link rel="stylesheet" href="{% static 'management/css/style.css' %}"/>
 {% endblock %}
 
 {% block content %}
-<h1> Verwaltung </h1>
+  <a href="{% url 'home' %}">
+    <button class="btn btn-md btn-outline-secondary mb-3"><i class="bi bi-arrow-left"></i>
+      Zurück zur Startseite
+    </button>
+  </a>
+  <h1> Verwaltung </h1>
 
-Hier lässt sich die Kennerliga konfigurieren.
+  Hier lässt sich die Kennerliga konfigurieren.
 
-<div class="management-content">
-  <a href="{% url 'game:games' %}"><div class="management-item"> Spiele </div></a>
-  <a href="{% url 'user:users' %}"><div class="management-item"> Spieler </div></a>
-  <a href="{% url 'season:list' %}"><div class="management-item"> Saisons </div></a>
-</div>
+  <div class="management-content">
+    <a href="{% url 'game:games' %}">
+      <div class="management-item"> Spiele</div>
+    </a>
+    <a href="{% url 'user:users' %}">
+      <div class="management-item"> Spieler</div>
+    </a>
+    <a href="{% url 'season:list' %}">
+      <div class="management-item"> Saisons</div>
+    </a>
+  </div>
 
 {% endblock %}
