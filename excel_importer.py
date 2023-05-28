@@ -9,7 +9,7 @@ from game.models import Game, GameOption, GameOptionChoice
 
 
 class ExcelImporter:
-    """ Read and export the kennerliga excel file to the django database """
+    """ Read and export the kennerliga Excel file to the django database """
 
     def __init__(self):
         self.df = {}  # store dataframes with year as their key
@@ -21,7 +21,7 @@ class ExcelImporter:
         }
 
     def read_file(self, year):
-        path = 'data_migration/'
+        path = 'data_migration/data/'
         file_end = '.xlsm'
         file_name = str(year) + file_end
         self.df[year] = pandas.read_excel(path + file_name, None)
@@ -61,7 +61,7 @@ class ExcelImporter:
         sheet_key = f'{year}_GESAMTWERTUNG'
         sheet = self.get_file(year)[sheet_key]
         start_row = 4
-        end_row = sheet.shape[0];
+        end_row = sheet.shape[0]
         col = 3
         for row in range(start_row, end_row):
             cell = self.get_cell(sheet, row, col)
@@ -78,14 +78,25 @@ class ExcelImporter:
                 cell = self.get_cell(sheet, row, col)
                 callback(cell, row, col)
 
+    @staticmethod
+    def remove_extra_sheets(year):
+        extra = 0
+        if year == 2020:
+            extra = 1
+        elif year == 2022:
+            extra = 2
+        return extra
+
     def iterate_all_sheets(self, year, *callbacks):
         file = self.get_file(year)
-        for month in range(1, len(file) - 1):  # dont consider last 2 sheets, gesamtwertung and definitonen
+        start_index = 0 if year == 2020 else 1
+        for month in range(start_index, len(file) - self.remove_extra_sheets(year)):  # dont consider last 2 sheets, gesamtwertung and definitonen
             print(f'Importing {year}S{month}')
             for callback in callbacks:
                 callback(year, month)
 
-    def generate_liga_keywords(self, max_ligen):
+    @staticmethod
+    def generate_liga_keywords(max_ligen):
         keywords = []
         for liga in range(1, max_ligen + 1):
             keywords.append(f'Liga {liga}')
@@ -187,6 +198,7 @@ def create_player(name):
         new_player = User.objects.create(username=name, email=f'{name}.{name}@test.de')
         new_player.save()
 
+
 def name_unused(name):
     return not User.objects.filter(username=name).exists()
 
@@ -261,11 +273,12 @@ def store_games():
 
 
 I = ExcelImporter()
-years = [2021, 2022]
-for year in years:
-    I.read_file(year)
-    I.get_bga_names_from_gesamtwertung(year)
-    I.iterate_all_sheets(year, I.get_games_from_leagues, I.get_match_results)
+years = [2020, 2021, 2022]
+
+for y in years:
+    I.read_file(y)
+    I.get_bga_names_from_gesamtwertung(y)
+    I.iterate_all_sheets(y, I.get_games_from_leagues, I.get_match_results)
 
 results, players, games = I.data['results'], I.data['bga_names'], I.data['games']
 store_games()
