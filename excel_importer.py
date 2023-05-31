@@ -2,10 +2,12 @@ import pandas
 import django
 import os
 
+
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "kennerliga.settings")
 django.setup()
 from user.models import User
 from game.models import Game, GameOption, GameOptionChoice
+from season.models import Season
 
 
 class ExcelImporter:
@@ -19,6 +21,8 @@ class ExcelImporter:
             'bga_names': set(),
             'results': [],
         }
+
+        self.years = [2020, 2021, 2022]
 
     def read_file(self, year):
         path = 'data_migration/data/'
@@ -90,7 +94,8 @@ class ExcelImporter:
     def iterate_all_sheets(self, year, *callbacks):
         file = self.get_file(year)
         start_index = 0 if year == 2020 else 1
-        for month in range(start_index, len(file) - self.remove_extra_sheets(year)):  # dont consider last 2 sheets, gesamtwertung and definitonen
+        for month in range(start_index, len(file) - self.remove_extra_sheets(
+                year)):  # dont consider last 2 sheets, gesamtwertung and definitonen
             print(f'Importing {year}S{month}')
             for callback in callbacks:
                 callback(year, month)
@@ -192,93 +197,93 @@ class ExcelImporter:
         }
         self.data['results'].append(result)
 
+    def create_player(self, name):
+        if self.name_unused(name):
+            new_player = User.objects.create(username=name, email=f'{name}.{name}@test.de')
+            new_player.save()
 
-def create_player(name):
-    if name_unused(name):
-        new_player = User.objects.create(username=name, email=f'{name}.{name}@test.de')
-        new_player.save()
+    @staticmethod
+    def name_unused(self, name):
+        return not User.objects.filter(username=name).exists()
 
+    # create actual players
+    def write_players_to_db(self):
+        for player in self.data['bga_names']:
+            self.create_player(player)
 
-def name_unused(name):
-    return not User.objects.filter(username=name).exists()
+    @staticmethod
+    def game_exists(game_name):
+        return Game.objects.filter(name=game_name).exists()
 
+    @staticmethod
+    def game_option_exists(option):
+        return GameOption.objects.filter(name=option).exists()
 
-# create actual players
-def store_players():
-    for player in players:
-        create_player(player)
+    @staticmethod
+    def game_option_choice_exists(choice):
+        return GameOptionChoice.objects.filter(name=choice).exists()
 
+    def create_game(self, game_name):
+        if not self.game_exists(game_name):
+            new_game = Game(name=game_name)
+            new_game.save()
 
-def game_exists(game_name):
-    return Game.objects.filter(name=game_name).exists()
-
-
-def game_option_exists(option):
-    return GameOption.objects.filter(name=option).exists()
-
-
-def game_option_choice_exists(choice):
-    return GameOptionChoice.objects.filter(name=choice).exists()
-
-
-def create_game(game_name):
-    if not game_exists(game_name):
-        new_game = Game(name=game_name)
-        new_game.save()
-
-
-def create_game_option(option_name, game_name, bool_value):
-    if not game_option_exists(option_name):
-        game = Game.objects.filter(name=game_name)[0]
-        if game:
-            new_option = GameOption(name=option_name, game=game)
-            if isinstance(bool_value, bool):
-                new_option.value = bool_value
-            new_option.save()
-            return new_option
+    def create_game_option(self, option_name, game_name, bool_value):
+        if not self.game_option_exists(option_name):
+            game = Game.objects.filter(name=game_name)[0]
+            if game:
+                new_option = GameOption(name=option_name, game=game)
+                if isinstance(bool_value, bool):
+                    new_option.value = bool_value
+                new_option.save()
+                return new_option
+            else:
+                print(f'No game {game_name} for given option {option_name}')
         else:
-            print(f'No game {game_name} for given option {option_name}')
-    else:
-        return GameOption.objects.filter(name=option_name)[0]
+            return GameOption.objects.filter(name=option_name)[0]
+
+    def create_option_choice(self, choice_name, option):
+        if not self.game_option_choice_exists(choice_name):
+            new_choice = GameOptionChoice(name=choice_name, option=option)
+            new_choice.save()
+
+    @staticmethod
+    def get_boolean_option_value(choice_name):
+        option_value = None
+        true_option_values = ['ja', 'aktiviert', 'aktiv', 'an']
+        false_option_values = ['nein', 'deaktiviert', 'inaktiv', 'aus']
+        choice_to_check = choice_name.lower().strip()
+        if choice_to_check in true_option_values:
+            option_value = True
+        elif choice_to_check in false_option_values:
+            option_value = False
+        return option_value
+
+    def write_games_to_db(self):
+        games = self.data['games']
+        for game_name in games:
+            self.create_game(game_name)
+            for settings in games[game_name]:
+                option_name = settings['option']
+                choice_name = settings['choice']
+                boolean_value = self.get_boolean_option_value(choice_name)
+                option = self.create_game_option(option_name, game_name, boolean_value)
+                if not isinstance(boolean_value, bool):
+                    self.create_option_choice(choice_name, option)
+
+    @staticmethod
+    def create_season(year, season):
+        if not Season.objects.filter(year=year, month=season).exists():
+            new_season = Season(year=year, month=season)
+            new_season.save()
+
+    def import_files(self):
+        for year in self.years:
+            self.read_file(year)
+            self.get_bga_names_from_gesamtwertung(year)
+            self.iterate_all_sheets(year, self.get_games_from_leagues, self.get_match_results)
 
 
-def create_option_choice(choice_name, option):
-    if not game_option_choice_exists(choice_name):
-        new_choice = GameOptionChoice(name=choice_name, option=option)
-        new_choice.save()
-
-
-def get_boolean_option_value(choice_name):
-    option_value = None
-    true_option_values = ['ja', 'aktiviert', 'aktiv', 'an']
-    false_option_values = ['nein', 'deaktiviert', 'inaktiv', 'aus']
-    choice_to_check = choice_name.lower().strip()
-    if choice_to_check in true_option_values:
-        option_value = True
-    elif choice_to_check in false_option_values:
-        option_value = False
-    return option_value
-
-
-def store_games():
-    for game_name in games:
-        create_game(game_name)
-        for settings in games[game_name]:
-            option_name = settings['option']
-            choice_name = settings['choice']
-            boolean_value = get_boolean_option_value(choice_name)
-            option = create_game_option(option_name, game_name, boolean_value)
-            if not isinstance(boolean_value, bool):
-                create_option_choice(choice_name, option)
-
-
-I = ExcelImporter()
-years = [2020, 2021, 2022]
-
-for y in years:
-    I.read_file(y)
-    I.get_bga_names_from_gesamtwertung(y)
-    I.iterate_all_sheets(y, I.get_games_from_leagues, I.get_match_results)
-
-results, players, games = I.data['results'], I.data['bga_names'], I.data['games']
-store_games()
+importer = ExcelImporter()
+importer.import_files()
+importer.write_games_to_db()
