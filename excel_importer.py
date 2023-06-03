@@ -2,7 +2,6 @@ import pandas
 import django
 import os
 
-
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "kennerliga.settings")
 django.setup()
 from user.models import User
@@ -21,8 +20,10 @@ class ExcelImporter:
             'bga_names': set(),
             'results': [],
         }
-
         self.years = [2020, 2021, 2022]
+        # self.years = [2022]
+        self.write_season_to_db = True
+        self.temp_league = 0
 
     def read_file(self, year):
         path = 'data_migration/data/'
@@ -97,6 +98,7 @@ class ExcelImporter:
         for month in range(start_index, len(file) - self.remove_extra_sheets(
                 year)):  # dont consider last 2 sheets, gesamtwertung and definitonen
             print(f'Importing {year}S{month}')
+            self.create_season(year, month)
             for callback in callbacks:
                 callback(year, month)
 
@@ -113,7 +115,8 @@ class ExcelImporter:
         return locations
 
     def store_game(self, game):
-        if not game in self.data['games'].keys():
+        if game not in self.data['games'].keys():
+            # create a game entry with empty options
             self.data['games'][game] = []
 
     def store_game_option(self, game, options):
@@ -155,19 +158,53 @@ class ExcelImporter:
     def get_match_results(self, year, month):
         keywords = ['Platzierung']
         locations = self.get_keyword_locations(year, month, keywords, True)
-        for location in locations:
+        for location_index, location in enumerate(locations):
             self.store_match_results(location, year, month)
+
+    def get_league_from_location(self, month, year, location, sheet):
+        col = 2
+        row = location['row'] - 10
+        if year == 2020 and month in [0, 1]:
+            col = 3
+        elif year == 2022:
+            if not month == 1:
+                row = location['row'] - 30
+        league = self.get_cell(sheet, row, col)
+        for r in range(1,20):
+            if pandas.isna(league):
+                row = row + 1
+                col = 2
+                league = self.get_cell(sheet, row, col)
+                if not pandas.isna(league):
+                    # print(league)
+                    if not league[-1] == ':':
+                        league = None
+        if pandas.isna(league):
+            return False
+        elif league[-1] == ':':
+            # print(league)
+            print(league.split(' ')[1][0])
+            return league.split(' ')[1][0]
+        else:
+            # print('elsing')
+            return False
 
     def store_match_results(self, location, year, month):
         sheet = self.get_sheet(year, month)
         row = location['row']
         game = self.get_cell(sheet, row - 1, 4)
+        if year == 2020 and month in [0, 1]:
+            game = self.get_cell(sheet, row - 1, 3)
+            # league = self.get_cell(sheet, row - 10, 3)
         next_row = row + 1
-        while self.store_match_result(next_row, year, month, game, sheet):
-            self.store_match_result(next_row, month, game, sheet)
+        league_check = self.get_league_from_location(month, year, location, sheet)
+        if league_check:
+            self.temp_league = league_check
+        while self.store_match_result(next_row, year, month, self.temp_league, game, sheet):
+            self.store_match_result(next_row, year, month, game, self.temp_league, sheet)
             next_row += 1
 
-    def store_match_result(self, row, year, month, game, sheet):
+    def store_match_result(self, row, year, month, league, game, sheet):
         player = self.get_cell(sheet, row, 5)
         if self.cell_isna(player):
             return False
@@ -181,6 +218,8 @@ class ExcelImporter:
         league_points = self.get_cell(sheet, row, 13)
         year = year
         season = month
+        league = league
+        game = game
         result = {
             "player": player,
             "starting_position": starting_position,
@@ -193,6 +232,7 @@ class ExcelImporter:
             "league_points": league_points,
             "year": year,
             "season": season,
+            "league": league,
             "game": game,
         }
         self.data['results'].append(result)
@@ -203,7 +243,7 @@ class ExcelImporter:
             new_player.save()
 
     @staticmethod
-    def name_unused(self, name):
+    def name_unused(name):
         return not User.objects.filter(username=name).exists()
 
     # create actual players
@@ -277,6 +317,11 @@ class ExcelImporter:
             new_season = Season(year=year, month=season)
             new_season.save()
 
+    @staticmethod
+    def add_season_participant(season, participant):
+        season.participants.add(participant)
+        season.save()
+
     def import_files(self):
         for year in self.years:
             self.read_file(year)
@@ -287,3 +332,5 @@ class ExcelImporter:
 importer = ExcelImporter()
 importer.import_files()
 importer.write_games_to_db()
+importer.write_players_to_db()
+# print(importer.data)
