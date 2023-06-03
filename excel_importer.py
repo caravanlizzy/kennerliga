@@ -20,8 +20,7 @@ class ExcelImporter:
             'bga_names': set(),
             'results': [],
         }
-        self.years = [2020, 2021, 2022]
-        # self.years = [2022]
+        self.years = [2020, 2021, 2022, 2023]
         self.write_season_to_db = True
         self.temp_league = 0
 
@@ -38,10 +37,12 @@ class ExcelImporter:
         season_key = f'{year}_S{number}'
         return self.get_file(year)[season_key]
 
-    def cell_isna(self, cell):
+    @staticmethod
+    def cell_isna(cell):
         return pandas.isna(cell)
 
-    def get_cell(self, sheet, row, col):
+    @staticmethod
+    def get_cell(sheet, row, col):
         return sheet.iloc[row][col]
 
     def get_keyword_locations(self, year, month, keywords, exact=False):
@@ -88,7 +89,7 @@ class ExcelImporter:
         extra = 0
         if year == 2020:
             extra = 1
-        elif year == 2022:
+        elif year == 2022 or year == 2023:
             extra = 2
         return extra
 
@@ -170,7 +171,7 @@ class ExcelImporter:
             if not month == 1:
                 row = location['row'] - 30
         league = self.get_cell(sheet, row, col)
-        for r in range(1,20):
+        for r in range(1, 20):
             if pandas.isna(league):
                 row = row + 1
                 col = 2
