@@ -176,17 +176,13 @@ class ExcelImporter:
                 col = 2
                 league = self.get_cell(sheet, row, col)
                 if not pandas.isna(league):
-                    # print(league)
                     if not league[-1] == ':':
                         league = None
         if pandas.isna(league):
             return False
         elif league[-1] == ':':
-            # print(league)
-            print(league.split(' ')[1][0])
             return league.split(' ')[1][0]
         else:
-            # print('elsing')
             return False
 
     def store_match_results(self, location, year, month):
