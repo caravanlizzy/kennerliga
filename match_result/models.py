@@ -21,10 +21,10 @@ class MatchResult(models.Model):
         blank=True,
     )
     year = models.IntegerField()
-    starting_position = models.IntegerField()
-    starting_points = models.IntegerField()
+    starting_position = models.IntegerField(blank=True, null=True)
+    starting_points = models.IntegerField(blank=True, null=True)
     league_points = models.IntegerField()
-    percentage_of_winner = models.FloatField()
+    percentage_of_winner = models.FloatField(blank=True, null=True)
     character = models.CharField(
         max_length=144,
         blank=True,
