@@ -4,7 +4,7 @@ from season.models import Season
 
 
 # Create your models here.
-class MatchResult(models.Model):
+class Result(models.Model):
     player = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
@@ -27,7 +27,7 @@ class MatchResult(models.Model):
     percentage_of_winner = models.FloatField(blank=True, null=True)
     character = models.CharField(
         max_length=144,
-        blank=True,
+       blank=True,
         null=True
     )
     tie_breaker = models.CharField(
