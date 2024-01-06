@@ -7,8 +7,8 @@ __pycache__/
 *.ipynb*
 
 # virtual environments
-/.venv*
-/venv*
+.venv*
+venv*
 
 # database
 *.sqlite3

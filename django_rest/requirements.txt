@@ -1,0 +1,4 @@
+django
+djangorestframework
+django-nested-admin
+django-cors-headers
