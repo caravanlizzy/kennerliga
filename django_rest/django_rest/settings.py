@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-3=2$mgwx0)o1(d*%5!92x-oaa(+7c1%1=n!3plo2pg_$q7z)dd
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["*"]
 
 
 # Application definition
@@ -53,13 +53,13 @@ MY_APPS = [
 INSTALLED_APPS = DJANGO_APPS + MY_APPS
 
 MIDDLEWARE = [
-    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
 ]
 
@@ -138,14 +138,16 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 AUTH_USER_MODEL = 'user.User'
 
-CORS_ALLOW_ALL_ORIGINS = True
-CORS_ORIGIN_ALLOW_ALL = True
-ALLOWED_HOSTS=['*']
-CORS_ALLOW_HEADERS = [ "accept", "referer", "accept-encoding", "authorization", "content-type", "dnt", "origin", "user-agent", "x-csrftoken", "x-sessionid", "x-requested-with"]
 CSRF_TRUSTED_ORIGINS = [
-        'http://localhost:9000'
+    'http://localhost:9000',
 ]
 
-# CORS_ALLOWED_ORIGINS = [
-#     "http://localhost:9000",
-# ]
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:9000",
+]
+
+from corsheaders.defaults import default_methods
+
+CORS_ALLOW_METHODS = (
+    *default_methods,
+)
