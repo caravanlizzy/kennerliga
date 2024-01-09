@@ -20,13 +20,13 @@
 </template>
 
 <script setup lang="ts">
-export interface EssentialLinkProps {
+export interface AdminLinkProps {
   title: string;
   caption?: string;
   link?: string;
   icon?: string;
 }
-withDefaults(defineProps<EssentialLinkProps>(), {
+withDefaults(defineProps<AdminLinkProps>(), {
   caption: '',
   link: '#',
   icon: '',

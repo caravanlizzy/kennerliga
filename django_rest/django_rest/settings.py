@@ -151,3 +151,6 @@ from corsheaders.defaults import default_methods
 CORS_ALLOW_METHODS = (
     *default_methods,
 )
+
+SESSION_COOKIE_SECURE = True
+SESSION_COOKIE_SAMESITE = "Strict"

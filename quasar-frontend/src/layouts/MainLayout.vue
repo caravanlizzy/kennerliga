@@ -1,7 +1,7 @@
 <template>
-  <q-layout view="lHh Lpr lFf">
+  <q-layout view="hHh Lpr lFf">
     <q-header elevated>
-      <q-toolbar>
+      <q-toolbar class="bg-primary">
         <q-btn
           flat
           dense
@@ -12,10 +12,11 @@
         />
 
         <q-toolbar-title>
-          Quasar App
+          Kennerliga
         </q-toolbar-title>
 
-        <div>Quasar v{{ $q.version }}</div>
+        <ToolbarTop />
+<!--        <div>Kennerliga</div>-->
       </q-toolbar>
     </q-header>
 
@@ -28,11 +29,11 @@
         <q-item-label
           header
         >
-          Essential Links
+          Verwaltung
         </q-item-label>
 
-        <EssentialLink
-          v-for="link in essentialLinks"
+        <AdminSidebar
+          v-for="link in adminLinks"
           :key="link.title"
           v-bind="link"
         />
@@ -47,50 +48,33 @@
 
 <script setup lang="ts">
 import { ref } from 'vue';
-import EssentialLink, { EssentialLinkProps } from 'components/EssentialLink.vue';
+import AdminSidebar, { AdminLinkProps } from 'components/AdminSidebar.vue';
+import ToolbarTop from 'components/ToolbarTop.vue';
 
-const essentialLinks: EssentialLinkProps[] = [
+const adminLinks: AdminLinkProps[] = [
   {
-    title: 'Docs',
-    caption: 'quasar.dev',
-    icon: 'school',
-    link: 'https://quasar.dev'
+    title: 'Spieler',
+    caption: 'Accounts verwalten',
+    icon: 'manage_accounts',
+    link: ''
   },
   {
-    title: 'Github',
-    caption: 'github.com/quasarframework',
-    icon: 'code',
-    link: 'https://github.com/quasarframework'
+    title: 'Spiele',
+    caption: 'Spiele verwalten',
+    icon: 'casino',
+    link: '#/games'
   },
   {
-    title: 'Discord Chat Channel',
-    caption: 'chat.quasar.dev',
-    icon: 'chat',
-    link: 'https://chat.quasar.dev'
+    title: 'Seasons',
+    caption: 'Seasons/Ligen verwalten',
+    icon: 'calendar_month',
+    link: '#/season'
   },
   {
-    title: 'Forum',
-    caption: 'forum.quasar.dev',
-    icon: 'record_voice_over',
-    link: 'https://forum.quasar.dev'
-  },
-  {
-    title: 'Twitter',
-    caption: '@quasarframework',
-    icon: 'rss_feed',
-    link: 'https://twitter.quasar.dev'
-  },
-  {
-    title: 'Facebook',
-    caption: '@QuasarFramework',
-    icon: 'public',
-    link: 'https://facebook.quasar.dev'
-  },
-  {
-    title: 'Quasar Awesome',
-    caption: 'Community Quasar projects',
-    icon: 'favorite',
-    link: 'https://awesome.quasar.dev'
+    title: 'Kommunikation',
+    caption: 'Öffentliche verwalten',
+    icon: 'feed',
+    link: '#/feeds'
   }
 ];
 

@@ -1,7 +1,8 @@
 <template>
-  <q-page>
-    <div v-for="game in data" :key="game.id"> {{game.name}}</div>
-  </q-page>
+  <div class="q-pa-md">
+    <!--  <div v-for="game in data" :key="game.id"> {{game.name}}</div> -->
+    <q-table flat title="Spiele" :rows="data" :columns="columns"/>
+  </div>
 </template>
 
 
@@ -21,6 +22,25 @@ const getData = async() => {
 }
 
 onMounted(async() => getData())
+
+const columns = [
+  {
+    name: "game",
+    required: true,
+    align: 'left',
+    label: "Spiel",
+    field: data => data.name,
+    sortable: true,
+  },
+  {
+    name: "platform",
+    label: "Plattform",
+    required: false,
+    align: 'center',
+    field: x => x.platform,
+    sortable: true,
+  }
+]
 
 
 
