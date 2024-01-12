@@ -40,8 +40,8 @@
       </q-list>
     </q-drawer>
 
-    <q-page-container>
-      <router-view />
+    <q-page-container >
+        <router-view class="q-pa-md" />
     </q-page-container>
   </q-layout>
 </template>
@@ -56,25 +56,25 @@ const adminLinks: AdminLinkProps[] = [
     title: 'Spieler',
     caption: 'Accounts verwalten',
     icon: 'manage_accounts',
-    link: ''
+    routeName: ''
   },
   {
     title: 'Spiele',
     caption: 'Spiele verwalten',
     icon: 'casino',
-    link: '#/games'
+    routeName: 'games'
   },
   {
     title: 'Seasons',
     caption: 'Seasons/Ligen verwalten',
     icon: 'calendar_month',
-    link: '#/season'
+    routeName: 'season'
   },
   {
     title: 'Kommunikation',
     caption: 'Öffentliche verwalten',
     icon: 'feed',
-    link: '#/feeds'
+    routeName: 'feeds'
   }
 ];
 

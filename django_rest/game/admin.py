@@ -5,9 +5,9 @@ from nested_admin.nested import NestedModelAdmin, NestedStackedInline, NestedTab
 from game.models import Game, GameOption, GameOptionChoice
 
 
-@admin.register(GameOption)
-class Options(admin.ModelAdmin):
-    pass
+# @admin.register(GameOption)
+# class Options(admin.ModelAdmin):
+#     pass
 
 
 class ChoicesAdmin(NestedTabularInline):

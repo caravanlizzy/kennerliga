@@ -1,9 +1,7 @@
 <template>
   <q-item
     clickable
-    tag="a"
-    target="_blank"
-    :href="link"
+    :to="routeName"
   >
     <q-item-section
       v-if="icon"
@@ -23,12 +21,12 @@
 export interface AdminLinkProps {
   title: string;
   caption?: string;
-  link?: string;
+  routeName?: string;
   icon?: string;
 }
 withDefaults(defineProps<AdminLinkProps>(), {
   caption: '',
-  link: '#',
+  routeName: '',
   icon: '',
 });
 </script>

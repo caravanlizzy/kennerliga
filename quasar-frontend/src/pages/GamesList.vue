@@ -1,8 +1,5 @@
 <template>
-  <div class="q-pa-md">
-    <!--  <div v-for="game in data" :key="game.id"> {{game.name}}</div> -->
-    <q-table flat title="Spiele" :rows="data" :columns="columns"/>
-  </div>
+    <q-table flat title="Spiele" :rows="data" :columns="columns" :rows-per-page-options="[10, 20, 50]"/>
 </template>
 
 
@@ -12,36 +9,35 @@ import { ref, onMounted } from 'vue';
 
 
 const data = ref([]);
-const getData = async() => {
+const getData = async () => {
   const response = await axios({
-      method: 'get',
-      url: 'http://localhost:8000/games',
+    method: 'get',
+    url: 'http://localhost:8000/games',
   })
   console.log({ response });
   data.value = response.data;
 }
 
-onMounted(async() => getData())
+onMounted(async () => getData())
 
 const columns = [
   {
-    name: "game",
+    name: 'game',
     required: true,
     align: 'left',
-    label: "Spiel",
+    label: 'Spiel',
     field: data => data.name,
     sortable: true,
   },
   {
-    name: "platform",
-    label: "Plattform",
+    name: 'platform',
+    label: 'Plattform',
     required: false,
     align: 'center',
     field: x => x.platform,
     sortable: true,
   }
 ]
-
 
 
 </script>
