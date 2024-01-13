@@ -56,7 +56,7 @@ const adminLinks: AdminLinkProps[] = [
     title: 'Spieler',
     caption: 'Accounts verwalten',
     icon: 'manage_accounts',
-    routeName: ''
+    routeName: 'users'
   },
   {
     title: 'Spiele',
