@@ -1,7 +1,7 @@
 <template>
   <q-item
     clickable
-    :to="routeName"
+    :to="{ name: routeName }"
   >
     <q-item-section
       v-if="icon"

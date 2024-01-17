@@ -1,6 +1,5 @@
 <template>
     <div>
-
    {{ data }} 
     </div>
 </template>
@@ -12,9 +11,5 @@ import { useRoute } from 'vue-router';
 
 const route = useRoute();
 
-const { data , isFinished } = useAxios(`games/${route.params.id}`, api);
+const { data , isFinished } = useAxios(`users/${route.params.id}`, api);
 </script>
-
-<style scoped>
-
-</style>
