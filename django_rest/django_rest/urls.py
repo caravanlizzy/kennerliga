@@ -22,8 +22,8 @@ from user.views import UserViewSet
 from rest_framework import routers
 
 router = routers.SimpleRouter()
-router.register(r'games', GameViewSet, basename='games')
-router.register(r'users', UserViewSet, basename='users')
+router.register('games', GameViewSet, basename='games')
+router.register('users', UserViewSet, basename='users')
 
 
 urlpatterns = [

@@ -1,23 +1,14 @@
 <template>
-  <KennerligaTable flat title="SpielerInnen" :rows="data" :columns="columns" :rows-per-page-options="[10, 20, 50]"/>
+
+  <KennerligaTable v-if="isFinished" flat title="SpielerInnen" :rows="data" :columns="columns" :rows-per-page-options="[10, 20, 50]"/>
 </template>
 
 <script setup lang="ts">
-import axios from'axios';
-import {ref, onMounted} from 'vue';
 import KennerligaTable from 'components/KennerligaTable.vue';
+import { useAxios } from '@vueuse/integrations/useAxios';
+import { api } from 'boot/axios';
 
-const data = ref([]);
-const getData = async () => {
-  const response = await axios({
-    method:'get',
-    url: `${process.env.API_URL}users/`,
-  })
-  data.value = response.data;
-}
-
-onMounted(async () => getData())
-
+const { data , isFinished } = useAxios('users', api);
 
 const columns = [
   {
@@ -40,7 +31,7 @@ const columns = [
     name: 'email',
     label: 'Email',
     required: false,
-    align: 'center',
+    align: 'enter',
     field: x => x.email,
     sortable: true,
   }

@@ -57,7 +57,7 @@ module.exports = configure(function (/* ctx */) {
     build: {
       // env: require('dotenv').config().parsed,
       env: {
-        API_URL: 'http://localhost:8000/',
+        API_URL: 'http://localhost:8000',
       },
       target: {
         browser: [ 'es2019', 'edge88', 'firefox78', 'chrome87', 'safari13.1' ],
