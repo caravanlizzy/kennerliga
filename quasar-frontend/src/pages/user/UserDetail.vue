@@ -1,6 +1,6 @@
 <template>
-    <div>
-   {{ data }} 
+    <div v-if="isFinished">
+   {{ data.username }}
     </div>
 </template>
 
