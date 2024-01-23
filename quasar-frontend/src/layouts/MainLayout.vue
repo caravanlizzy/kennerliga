@@ -16,14 +16,13 @@
         </q-toolbar-title>
 
         <ToolbarTop />
-<!--        <div>Kennerliga</div>-->
       </q-toolbar>
     </q-header>
 
     <q-drawer
       v-model="leftDrawerOpen"
-      show-if-above
       bordered
+      elevated
     >
       <q-list>
         <q-item-label
@@ -41,6 +40,7 @@
     </q-drawer>
 
     <q-page-container >
+      <NavbarTop/>
         <router-view class="q-pa-md" />
     </q-page-container>
   </q-layout>
@@ -50,6 +50,7 @@
 import { ref } from 'vue';
 import AdminSidebar, { AdminLinkProps } from 'components/AdminSidebar.vue';
 import ToolbarTop from 'components/ToolbarTop.vue';
+import NavbarTop from 'components/NavbarTop.vue';
 
 const adminLinks: AdminLinkProps[] = [
   {
@@ -79,7 +80,6 @@ const adminLinks: AdminLinkProps[] = [
 ];
 
 const leftDrawerOpen = ref(false)
-
 function toggleLeftDrawer() {
   leftDrawerOpen.value = !leftDrawerOpen.value
 }
