@@ -1,6 +1,6 @@
 <template>
-  <div class="q-px-md q-py-xs q-gutter-sm bg-indigo-2">
-    <q-breadcrumbs separator="-->" class="text-accent" active-color="primary">
+  <div class="q-px-md q-py-xs q-gutter-sm bg-black">
+    <q-breadcrumbs separator="-->" class="text-secondary" active-color="secondary">
       <template v-slot:separator>
         <q-icon
           aize="1.2em"

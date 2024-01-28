@@ -1,17 +1,10 @@
 <template>
-  <q-layout view="hHh Lpr lFf">
+  <q-layout class="bg-primary" view="hHh Lpr lFf">
     <q-header elevated>
       <q-toolbar class="bg-primary">
-        <q-btn
-          flat
-          dense
-          round
-          icon="menu"
-          aria-label="Menu"
-          @click="toggleLeftDrawer"
-        />
+        <q-btn flat dense round icon="menu" aria-label="Menu" class="text-white" @click="toggleDrawer" />
 
-        <q-toolbar-title>
+        <q-toolbar-title class="text-secondary">
           Kennerliga
         </q-toolbar-title>
 
@@ -19,68 +12,24 @@
       </q-toolbar>
     </q-header>
 
-    <q-drawer
-      v-model="leftDrawerOpen"
-      bordered
-      elevated
-    >
-      <q-list>
-        <q-item-label
-          header
-        >
-          Verwaltung
-        </q-item-label>
+    <AdminSidebar :drawer-open="drawerOpen"/>
 
-        <AdminSidebar
-          v-for="link in adminLinks"
-          :key="link.title"
-          v-bind="link"
-        />
-      </q-list>
-    </q-drawer>
-
-    <q-page-container >
-      <NavbarTop/>
-        <router-view class="q-pa-md" />
+    <q-page-container>
+      <NavbarTop />
+      <q-separator color="info" />
+      <router-view class="q-pa-lg" />
     </q-page-container>
   </q-layout>
 </template>
 
 <script setup lang="ts">
+import ToolbarTop from 'components/nav/ToolbarTop.vue';
+import NavbarTop from 'components/nav/NavbarTop.vue';
+import AdminSidebar from 'components/nav/AdminSidebar.vue';
 import { ref } from 'vue';
-import AdminSidebar, { AdminLinkProps } from 'components/AdminSidebar.vue';
-import ToolbarTop from 'components/ToolbarTop.vue';
-import NavbarTop from 'components/NavbarTop.vue';
 
-const adminLinks: AdminLinkProps[] = [
-  {
-    title: 'Spieler',
-    caption: 'Accounts verwalten',
-    icon: 'manage_accounts',
-    routeName: 'users'
-  },
-  {
-    title: 'Spiele',
-    caption: 'Spiele verwalten',
-    icon: 'casino',
-    routeName: 'games'
-  },
-  {
-    title: 'Seasons',
-    caption: 'Seasons/Ligen verwalten',
-    icon: 'calendar_month',
-    routeName: 'season'
-  },
-  {
-    title: 'Kommunikation',
-    caption: 'Öffentliche verwalten',
-    icon: 'feed',
-    routeName: 'feeds'
-  }
-];
-
-const leftDrawerOpen = ref(false)
-function toggleLeftDrawer() {
-  leftDrawerOpen.value = !leftDrawerOpen.value
+const drawerOpen = ref(false)
+const toggleDrawer = () => {
+  drawerOpen.value = !drawerOpen.value
 }
 </script>
