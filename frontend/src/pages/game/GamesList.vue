@@ -1,5 +1,6 @@
 <template>
-    <KennerligaTable v-if="isFinished" flat title="Spiele" @row-click="onRowClick" :rows="data" :columns="columns" :rows-per-page-options="[10, 20, 50]"/>
+  <KennerligaTable v-if="isFinished" :create-button="button" flat title="Spiele" @row-click="onRowClick" :rows="data"
+                   :columns="columns" :rows-per-page-options="[10, 20, 50]" />
 </template>
 
 
@@ -9,32 +10,35 @@ import { useAxios } from '@vueuse/integrations/useAxios';
 
 import { api } from 'boot/axios';
 import { useRouter } from 'vue-router';
+import { CreateButton } from 'components/models';
 
-const { data , isFinished } = useAxios('games', api);
+const { data, isFinished } = useAxios('games', api);
 
 const router = useRouter();
 
-const onRowClick = (_event, row) => {
-  router.push({name: 'game-detail', params: { id: row.id }});
-}
+const onRowClick = (_event: any, row: { id: any; }) => {
+  router.push({ name: 'game-detail', params: { id: row.id } });
+};
+
+const button: CreateButton = { color: 'secondary', label: 'Spiel', icon: 'add_circle' };
 const columns = [
   {
     name: 'game',
     required: true,
     align: 'left',
     label: 'Spiel',
-    field: x => x.name,
-    sortable: true,
+    field: (x: { name: any; }) => x.name,
+    sortable: true
   },
   {
     name: 'platform',
     label: 'Plattform',
     required: false,
     align: 'center',
-    field: x => x.platform,
-    sortable: true,
+    field: (x: { platform: any; }) => x.platform,
+    sortable: true
   }
-]
+];
 
 
 </script>

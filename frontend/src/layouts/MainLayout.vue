@@ -15,8 +15,7 @@
     <AdminSidebar :drawer-open="drawerOpen"/>
 
     <q-page-container>
-      <NavbarTop />
-      <q-separator color="info" />
+      <BreadCrumbs />
       <router-view class="q-pa-lg" />
     </q-page-container>
   </q-layout>
@@ -24,9 +23,9 @@
 
 <script setup lang="ts">
 import ToolbarTop from 'components/nav/ToolbarTop.vue';
-import NavbarTop from 'components/nav/NavbarTop.vue';
 import AdminSidebar from 'components/nav/AdminSidebar.vue';
 import { ref } from 'vue';
+import BreadCrumbs from 'components/nav/BreadCrumbs.vue';
 
 const drawerOpen = ref(false)
 const toggleDrawer = () => {
