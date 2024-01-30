@@ -1,11 +1,11 @@
 <template>
-  <q-drawer :model-value="drawerOpen" bordered mini dark class="bg-primary">
+  <q-drawer side="right" :model-value="drawerOpen" bordered mini class="bg-primary">
     <q-list>
       <q-item-label header>
         Verwaltung
       </q-item-label>
 
-      <AdminSidebarEntry v-for="link in adminLinks" :key="link.title" v-bind="link" />
+      <AdminSidebarEntry class="text-info" v-for="link in adminLinks" :key="link.title" v-bind="link" />
     </q-list>
   </q-drawer>
 </template>

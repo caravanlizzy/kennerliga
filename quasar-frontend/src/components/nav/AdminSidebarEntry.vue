@@ -22,6 +22,7 @@ export interface AdminLinkProps {
   icon?: string;
 }
 withDefaults(defineProps<AdminLinkProps>(), {
+  title: '',
   caption: '',
   routeName: '',
   icon: '',

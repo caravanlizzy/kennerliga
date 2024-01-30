@@ -2,13 +2,13 @@
   <q-layout class="bg-primary" view="hHh Lpr lFf">
     <q-header elevated>
       <q-toolbar class="bg-primary">
-        <q-btn flat dense round icon="menu" aria-label="Menu" class="text-white" @click="toggleDrawer" />
 
         <q-toolbar-title class="text-secondary">
           Kennerliga
         </q-toolbar-title>
 
         <ToolbarTop />
+        <q-btn flat dense round icon="menu" aria-label="Menu" class="text-info" @click="toggleDrawer" />
       </q-toolbar>
     </q-header>
 
