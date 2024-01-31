@@ -10,7 +10,7 @@
             color="secondary"
           />
         </template>
-        <q-breadcrumbs-el v-for="segment in segments" :key="segment" :label="segment" icon="widgets" />
+        <q-breadcrumbs-el :to="crumb.forwardRoute" v-for="crumb in breadCrumbs" :key="crumb.label" :label="crumb.label" :icon="crumb.icon" />
       </q-breadcrumbs>
     </div>
     <q-separator color="info" />
@@ -20,20 +20,42 @@
 <script setup lang="ts">
 
 import { useRoute } from 'vue-router';
-import { computed, ref, watch } from 'vue';
+import { Ref, ref, watch } from 'vue';
+import { BreadCrumb } from 'components/models';
+import BreadCrumbs from 'components/nav/BreadCrumbs.vue';
 
 const route = useRoute();
-const segments = ref(['home']);
+const homeBread:BreadCrumb = {
+  label: '',
+  icon:'home',
+  forwardRoute: { name: 'home'}
+}
+const breadCrumbs:Ref<BreadCrumb[]> = ref([homeBread]);
+const getBreadcrumb = (part: string): BreadCrumb =>  {
+  switch(part) {
+    case 'games':
+      return {
+        label: 'Spiele',
+        icon: 'sports_esports',
+        forwardRoute: {name: 'games'}
+      }
+    default:
+      return homeBread;
+  }
+}
 watch(
   () => route.fullPath,
   () => {
-    segments.value = ['home'];
+    breadCrumbs.value = [homeBread];
     for (const part of route.fullPath.split('/')) {
       if(part !== ""){
-        segments.value.push(part);
+        const crumb = getBreadcrumb(part)
+        breadCrumbs.value.push(crumb);
       }
     }
-  }
+  },
+  {immediate: true}
 )
+
 
 </script>

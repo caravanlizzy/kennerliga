@@ -12,3 +12,9 @@ export type CreateButton = {
 export interface Meta {
   totalCount: number;
 }
+
+export type BreadCrumb = {
+  label: string;
+  icon: string;
+  forwardRoute: {name: string};
+}
