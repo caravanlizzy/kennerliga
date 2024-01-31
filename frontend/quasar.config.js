@@ -12,7 +12,7 @@
 const { configure } = require('quasar/wrappers');
 
 
-module.exports = configure(function (/* ctx */) {
+module.exports = configure(function (ctx) {
   return {
     eslint: {
       // fix: true,
@@ -56,7 +56,9 @@ module.exports = configure(function (/* ctx */) {
     build: {
       // env: require('dotenv').config().parsed,
       env: {
-        API_URL: 'http://localhost:8000',
+        API_URL: ctx.dev
+          ? 'http://localhost:8000'
+          : 'https://haligh.pythonanywhere.com/api/'
       },
       target: {
         browser: [ 'es2019', 'edge88', 'firefox78', 'chrome87', 'safari13.1' ],
