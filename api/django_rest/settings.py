@@ -135,7 +135,8 @@ STATIC_URL = 'static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'dist/spa'),
-#     os.path.join(BASE_DIR, 'dist/spa/assets'),
+    os.path.join(BASE_DIR, 'dist/spa/assets'),
+    os.path.join(BASE_DIR, 'dist/spa/icons'),
 ]
 
 # Default primary key field type
