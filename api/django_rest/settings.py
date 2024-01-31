@@ -148,10 +148,12 @@ AUTH_USER_MODEL = 'user.User'
 
 CSRF_TRUSTED_ORIGINS = [
     'http://localhost:9000',
+    "https://haligh.pythonanywhere.com/",
 ]
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:9000",
+    "https://haligh.pythonanywhere.com/",
 ]
 
 from corsheaders.defaults import default_methods
