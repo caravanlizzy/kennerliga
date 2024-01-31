@@ -16,5 +16,8 @@ venv*
 # idea files
 /.idea*
 
+#vscode files
+.vscode
+
 # env files
 .env
