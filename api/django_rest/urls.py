@@ -20,6 +20,7 @@ from django.conf.urls import include
 from game.views import GameViewSet
 from user.views import UserViewSet
 from rest_framework import routers
+from django.views.generic import TemplateView
 
 router = routers.SimpleRouter()
 router.register('api/games', GameViewSet, basename='games')
