@@ -25,10 +25,10 @@ router = routers.SimpleRouter()
 router.register('api/games', GameViewSet, basename='games')
 router.register('api/users', UserViewSet, basename='users')
 
-
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api-auth', include('rest_framework.urls')),
+    path('', TemplateView.as_view(template_name='index.html')),
 ]
 
 urlpatterns += router.urls
