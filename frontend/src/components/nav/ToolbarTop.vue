@@ -1,7 +1,9 @@
 <template>
-    <q-btn size="sm" icon="add_circle" label="Ergebnis" color="secondary" dense outline padding="5px 10px 5px 5px"/>
-    <q-btn size="md" dense flat icon="sports_esports"></q-btn>
-    <q-btn size="md" dense flat icon="person"></q-btn>
+  <div class="">
+    <q-btn size="lg" dense icon="add_circle" label="Ergebnis" color="secondary" />
+    <q-btn size="xl" flat icon="sports_esports"></q-btn>
+    <q-btn size="xl" flat icon="person"></q-btn>
+  </div>
 </template>
 <script setup lang="ts">
 </script>

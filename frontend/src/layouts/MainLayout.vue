@@ -1,18 +1,22 @@
 <template>
   <q-layout class="bg-primary" view="hHh Lpr lFf">
     <q-header elevated>
-      <q-toolbar class="bg-primary">
+      <q-toolbar class="bg-primary row justify-between items-center q-py-md">
 
-        <q-toolbar-title class="text-secondary">
-          Kennerliga
+        <q-toolbar-title shrink class="text-secondary">
+          <div class="row items-center" >
+            <q-btn flat outline class="q-mx-sm" size="xl" outlined icon="pets" />
+            <span class="text-italic text-h4">Kennerliga</span>
+          </div>
         </q-toolbar-title>
 
         <ToolbarTop />
-        <q-btn flat dense round icon="menu" aria-label="Menu" class="text-info" @click="toggleDrawer" />
+        <div>
+          <q-btn size="xl" flat icon="settings"></q-btn>
+          <q-btn size="lg" flat icon="logout" color="negative" />
+        </div>
       </q-toolbar>
     </q-header>
-
-    <AdminSidebar :drawer-open="drawerOpen"/>
 
     <q-page-container>
       <BreadCrumbs />
@@ -27,8 +31,8 @@ import AdminSidebar from 'components/nav/AdminSidebar.vue';
 import { ref } from 'vue';
 import BreadCrumbs from 'components/nav/BreadCrumbs.vue';
 
-const drawerOpen = ref(false)
+const drawerOpen = ref(false);
 const toggleDrawer = () => {
-  drawerOpen.value = !drawerOpen.value
-}
+  drawerOpen.value = !drawerOpen.value;
+};
 </script>
