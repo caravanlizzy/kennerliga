@@ -1,7 +1,7 @@
 <template>
   <q-layout class="bg-primary" view="hHh Lpr lFf">
     <q-header elevated>
-      <q-toolbar class="bg-primary row justify-between items-center q-py-md">
+      <q-toolbar class="bg-primary row justify-between items-center q-py-xs">
 
         <q-toolbar-title shrink class="text-secondary">
           <div class="row items-center" >
@@ -27,12 +27,6 @@
 
 <script setup lang="ts">
 import ToolbarTop from 'components/nav/ToolbarTop.vue';
-import AdminSidebar from 'components/nav/AdminSidebar.vue';
-import { ref } from 'vue';
 import BreadCrumbs from 'components/nav/BreadCrumbs.vue';
 
-const drawerOpen = ref(false);
-const toggleDrawer = () => {
-  drawerOpen.value = !drawerOpen.value;
-};
 </script>

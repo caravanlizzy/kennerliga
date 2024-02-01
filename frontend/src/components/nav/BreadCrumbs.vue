@@ -10,7 +10,8 @@
             color="secondary"
           />
         </template>
-        <q-breadcrumbs-el :to="crumb.forwardRoute" v-for="crumb in breadCrumbs" :key="crumb.label" :label="crumb.label"
+        <q-breadcrumbs-el :to="{ name:crumb.forwardRouteName }" v-for="crumb in breadCrumbs" :key="crumb.label"
+                          :label="crumb.label"
                           :icon="crumb.icon" />
       </q-breadcrumbs>
     </div>
@@ -46,7 +47,7 @@ const createBreadCrumb = (routeString: string, routeObject: RouteRecord): BreadC
   return <BreadCrumb>{
     label: getLabel(routeString, routeObject),
     icon: getIcon(routeString, routeObject),
-    forwardRouteName: routeObject.name,
+    forwardRouteName: routeObject.name
   };
 };
 
@@ -57,7 +58,7 @@ const getBreadCrumbs = (routeSplitRoute: RouteLocationNormalizedLoaded): BreadCr
   const breadCrumbs = [{
     label: 'Home',
     icon: 'home',
-    forwardRouteName: 'home',
+    forwardRouteName: 'home'
   }];
   const routeStrings = routeSplitRoute.fullPath.split('/').filter((e) => e !== '');
   let route = '';
