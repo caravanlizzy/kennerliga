@@ -4,16 +4,16 @@
       <q-toolbar class="bg-primary row justify-between items-center q-py-xs">
 
         <q-toolbar-title shrink class="text-secondary">
-          <div class="row items-center" >
-            <q-btn flat outline class="q-mx-sm" size="xl" outlined icon="pets" />
-            <span class="text-italic text-h4">Kennerliga</span>
+          <div class="row items-center ">
+            <q-btn :to="{ name: 'home' }" flat class="q-mr-md" size="xl" outlined icon="pets" />
+            <span class="text-bold text-h4" >Kennerliga</span>
           </div>
         </q-toolbar-title>
 
         <ToolbarTop />
-        <div>
-          <q-btn size="xl" flat icon="settings"></q-btn>
-          <q-btn size="lg" flat icon="logout" color="negative" />
+        <div class="row">
+          <q-btn stretch size="xl" flat icon="settings"></q-btn>
+          <q-btn stretch size="lg" flat icon="logout" color="negative" />
         </div>
       </q-toolbar>
     </q-header>
