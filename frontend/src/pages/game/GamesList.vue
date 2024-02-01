@@ -20,7 +20,7 @@ const onRowClick = (_event: any, row: { id: any; }) => {
   router.push({ name: 'game-detail', params: { id: row.id } });
 };
 
-const button: CreateButton = { color: 'secondary', label: 'Spiel', icon: 'add_circle' };
+const button: CreateButton = { color: 'secondary', label: 'Spiel', icon: 'add_circle', forwardTo: 'game-create' };
 const columns = [
   {
     name: 'game',

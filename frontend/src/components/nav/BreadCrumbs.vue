@@ -7,7 +7,7 @@
           <q-icon
             aize="1.2em"
             name="arrow_right"
-            color="secondary"
+            color="white"
           />
         </template>
         <q-breadcrumbs-el :to="{ name:crumb.forwardRouteName }" v-for="crumb in breadCrumbs" :key="crumb.label"
@@ -33,13 +33,14 @@ const breadCrumbs: Ref<BreadCrumb[]> = ref([]);
 const getIcon = (routeString: string, routeObject: RouteRecord): string => {
   if (routeObject.meta.icon) return routeObject.meta.icon;
   else if (routeString === 'edit') return 'edit';
-  else if (routeString === 'new') return 'add_circle';
+  else if (routeString === 'create') return 'add_circle';
   else return '';
 };
 
 const getLabel = (routeString: string, routeObject: RouteRecord): string => {
   if (routeObject.meta.label) return routeObject.meta.label;
   else if (routeString === 'edit') return 'bearbeiten';
+  else if (routeString === 'create') return 'erstellen';
   else return '';
 };
 
