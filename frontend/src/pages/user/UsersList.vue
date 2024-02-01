@@ -14,6 +14,7 @@ const { data , isFinished } = useAxios('users', api);
 const router = useRouter();
 
 const onRowClick = (_event: any, row: { id: any; }) => {
+  console.log(row.id);
   router.push({name: 'user-detail', params: { id: row.id }});
 }
 

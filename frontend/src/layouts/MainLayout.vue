@@ -16,7 +16,7 @@
 
     <q-page-container>
       <BreadCrumbs />
-      <router-view class="q-pa-lg" />
+      <router-view class="q-pa-lg text-white" />
     </q-page-container>
   </q-layout>
 </template>

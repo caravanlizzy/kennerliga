@@ -1,15 +1,4 @@
 <template>
-<!--    <div>-->
-<!--      <q-card class="game-card"  flat>-->
-<!--        <q-card-section>-->
-<!--          <div class="text-h6" v-if="isFinished"> {{ data.name }}</div>-->
-<!--        </q-card-section>-->
-<!--        <q-separator inset/>-->
-<!--        <q-card-section>-->
-<!--          <div class="text-subtitle2" v-if="isFinished"> {{ data.platform }}</div>-->
-<!--        </q-card-section>-->
-<!--      </q-card>-->
-<!--    </div>-->
   <div>
     <div v-if="isFinished" class="text-h6">
       {{ data.name }}

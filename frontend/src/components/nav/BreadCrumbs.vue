@@ -10,7 +10,8 @@
             color="secondary"
           />
         </template>
-        <q-breadcrumbs-el :to="crumb.forwardRoute" v-for="crumb in breadCrumbs" :key="crumb.label" :label="crumb.label" :icon="crumb.icon" />
+        <q-breadcrumbs-el :to="crumb.forwardRoute" v-for="crumb in breadCrumbs" :key="crumb.label" :label="crumb.label"
+                          :icon="crumb.icon" />
       </q-breadcrumbs>
     </div>
     <q-separator color="info" />
@@ -18,44 +19,65 @@
 </template>
 
 <script setup lang="ts">
-
-import { useRoute } from 'vue-router';
-import { Ref, ref, watch } from 'vue';
+import { useRoute, RouteLocationNormalizedLoaded, useRouter, RouteRecord } from 'vue-router';
 import { BreadCrumb } from 'components/models';
-import BreadCrumbs from 'components/nav/BreadCrumbs.vue';
+import { ref, Ref, watch } from 'vue';
 
-const route = useRoute();
-const homeBread:BreadCrumb = {
-  label: '',
-  icon:'home',
-  forwardRoute: { name: 'home'}
-}
-const breadCrumbs:Ref<BreadCrumb[]> = ref([homeBread]);
-const getBreadcrumb = (part: string): BreadCrumb =>  {
-  switch(part) {
-    case 'games':
-      return {
-        label: 'Spiele',
-        icon: 'sports_esports',
-        forwardRoute: {name: 'games'}
-      }
-    default:
-      return homeBread;
-  }
-}
-watch(
-  () => route.fullPath,
-  () => {
-    breadCrumbs.value = [homeBread];
-    for (const part of route.fullPath.split('/')) {
-      if(part !== ""){
-        const crumb = getBreadcrumb(part)
-        breadCrumbs.value.push(crumb);
-      }
+const router = useRouter();
+const routeSplitRoute = useRoute();
+
+const allRoutes = router.getRoutes();
+const breadCrumbs: Ref<BreadCrumb[]> = ref([]);
+
+const getIcon = (routeString: string, routeObject: RouteRecord): string => {
+  if (routeObject.meta.icon) return routeObject.meta.icon;
+  else if (routeString === 'edit') return 'edit';
+  else if (routeString === 'new') return 'add_circle';
+  else return '';
+};
+
+const getLabel = (routeString: string, routeObject: RouteRecord): string => {
+  if (routeObject.meta.label) return routeObject.meta.label;
+  else if (routeString === 'edit') return 'bearbeiten';
+  else return '';
+};
+
+const createBreadCrumb = (routeString: string, routeObject: RouteRecord): BreadCrumb => {
+  return <BreadCrumb>{
+    label: getLabel(routeString, routeObject),
+    icon: getIcon(routeString, routeObject),
+    forwardRouteName: routeObject.name,
+  };
+};
+
+const getRouteObject = (allRoutes: RouteRecord[], currentRouteString: string): RouteRecord | undefined => {
+  return allRoutes.find((r) => r.path.replaceAll('/', '') === currentRouteString);
+};
+const getBreadCrumbs = (routeSplitRoute: RouteLocationNormalizedLoaded): BreadCrumb[] => {
+  const breadCrumbs = [{
+    label: 'Home',
+    icon: 'home',
+    forwardRouteName: 'home',
+  }];
+  const routeStrings = routeSplitRoute.fullPath.split('/').filter((e) => e !== '');
+  let route = '';
+  for (let routeString of routeStrings) {
+    route += routeString;
+    const routeObject: RouteRecord | undefined = getRouteObject(allRoutes, route);
+    if (routeObject) {
+      breadCrumbs.push(createBreadCrumb(routeString, routeObject));
     }
-  },
-  {immediate: true}
-)
+  }
+  return breadCrumbs;
+};
 
+
+watch(
+  () => routeSplitRoute.fullPath,
+  () => {
+    breadCrumbs.value = getBreadCrumbs(routeSplitRoute);
+  },
+  { immediate: true }
+);
 
 </script>

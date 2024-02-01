@@ -57,8 +57,8 @@ module.exports = configure(function (ctx) {
       // env: require('dotenv').config().parsed,
       env: {
         API_URL: ctx.dev
-          ? 'http://localhost:8000'
-          : 'https://haligh.pythonanywhere.com/api/'
+          ? 'http://localhost:8000/api'
+          : 'https://haligh.pythonanywhere.com/api'
       },
       target: {
         browser: [ 'es2019', 'edge88', 'firefox78', 'chrome87', 'safari13.1' ],

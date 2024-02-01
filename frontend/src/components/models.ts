@@ -9,6 +9,7 @@ export type CreateButton = {
   color: string;
   forwardTo?: string;
 }
+
 export interface Meta {
   totalCount: number;
 }
@@ -16,5 +17,9 @@ export interface Meta {
 export type BreadCrumb = {
   label: string;
   icon: string;
-  forwardRoute: {name: string};
+  forwardRouteName: string;
+}
+
+export type ObjPool<T> = {
+  [key: string]: T;
 }

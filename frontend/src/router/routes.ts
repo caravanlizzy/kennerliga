@@ -1,13 +1,30 @@
 import { RouteRecordRaw } from 'vue-router';
-import gameRoutes from "src/router/gameRoutes";
-import userRoutes from "src/router/userRoutes";
+import gameRoutes from 'src/router/gameRoutes';
+import userRoutes from 'src/router/userRoutes';
+// This can be directly added to any of your `.ts` files like `router.ts`
+// It can also be added to a `.d.ts` file. Make sure it's included in
+// project's tsconfig.json "files"
+import 'vue-router'
+
+// To ensure it is treated as a module, add at least one `export` statement
+export {}
+
+declare module 'vue-router' {
+  interface RouteMeta {
+    // is optional
+    label?: string
+    // must be declared by every route
+    icon?: string
+  }
+}
+
 
 const routes: RouteRecordRaw[] = [
   {
     path: '/',
     component: () => import('layouts/MainLayout.vue'),
     children: [
-      { path: '', name: 'home', component: () => import('pages/IndexPage.vue') },
+      { path: '', name: 'home', component: () => import('pages/IndexPage.vue'), meta: { icon: 'home', label: 'Home' } },
       userRoutes,
       gameRoutes,
     ],
