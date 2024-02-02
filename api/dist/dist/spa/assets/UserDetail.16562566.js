@@ -1,1 +1,0 @@
-import{u as o}from"./useAxios.430102b4.js";import{a as r}from"./axios.9876f98e.js";import{L as n,a8 as e,A as i,B as m,aB as u,a9 as c,O as p}from"./index.5dac4226.js";const _={key:0},x=n({__name:"UserDetail",setup(d){const s=p(),{data:a,isFinished:t}=o(`users/${s.params.id}`,r);return(f,l)=>e(t)?(i(),m("div",_,u(e(a).username),1)):c("",!0)}});export{x as default};
