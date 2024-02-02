@@ -10,11 +10,8 @@
           </div>
         </q-toolbar-title>
 
-        <ToolbarTop />
-        <div class="row">
-          <q-btn stretch size="xl" flat icon="settings"></q-btn>
-          <q-btn stretch size="lg" flat icon="logout" color="negative" />
-        </div>
+        <ToolbarTopCenter />
+        <NewComponent />
       </q-toolbar>
     </q-header>
 
@@ -26,7 +23,7 @@
 </template>
 
 <script setup lang="ts">
-import ToolbarTop from 'components/nav/ToolbarTop.vue';
+import ToolbarTopCenter from 'components/nav/ToolbarTopCenter.vue';
 import BreadCrumbs from 'components/nav/BreadCrumbs.vue';
-
+import NewComponent from 'components/nav/ToolBarTopRight.vue';
 </script>
