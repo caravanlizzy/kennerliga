@@ -5,8 +5,8 @@
 
         <q-toolbar-title shrink class="text-secondary">
           <div class="row items-center ">
-            <q-btn :to="{ name: 'home' }" flat class="q-mr-md" size="xl" outlined icon="pets" />
-            <span class="text-bold text-h4" >Kennerliga</span>
+            <q-btn :to="{ name: 'home' }"  flat class="q-mr-md" :size="iconSize" outlined icon="pets" />
+            <span v-if="!isMobile" class="text-bold text-h4" >Kennerliga</span>
           </div>
         </q-toolbar-title>
 
@@ -26,4 +26,7 @@
 import ToolbarTopCenter from 'components/nav/ToolbarTopCenter.vue';
 import BreadCrumbs from 'components/nav/BreadCrumbs.vue';
 import NewComponent from 'components/nav/ToolBarTopRight.vue';
+import { useResponsive } from 'src/composables/reponsive';
+
+const { isMobile, iconSize } = useResponsive()
 </script>

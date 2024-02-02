@@ -1,13 +1,17 @@
 <template>
-  <div class="row">
-    <q-btn size="lg" stretch flat color="secondary" icon="add_circle">
+  <div class="row no-wrap">
+    <q-btn :size="iconSize" stretch flat color="secondary" :dense="isMobile" icon="add_circle">
       <q-tooltip class="bg-secondary text-primary" delay="50" hide-delay="50" > Ergebnis eintragen</q-tooltip>
     </q-btn>
-    <q-btn size="lg" :to="{ name:'games' }" stretch flat icon="casino"></q-btn>
-    <q-btn size="lg" :to="{ name: 'users' }" stretch flat icon="person"></q-btn>
+    <q-btn :size="iconSize" :to="{ name:'games' }" :dense="isMobile" stretch flat icon="casino"></q-btn>
+    <q-btn :size="iconSize" :to="{ name: 'users' }" stretch :dense="isMobile" flat icon="person"></q-btn>
   </div>
 </template>
 <script setup lang="ts">
+import { useResponsive } from 'src/composables/reponsive';
+
+const { iconSize, isMobile } = useResponsive()
+
 </script>
 
 
