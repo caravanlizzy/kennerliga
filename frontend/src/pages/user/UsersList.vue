@@ -3,7 +3,7 @@
 </template>
 
 <script setup lang="ts">
-import KennerligaTable from 'components/KennerligaTable.vue';
+import KennerligaTable from 'components/KennerTable.vue';
 import { useAxios } from '@vueuse/integrations/useAxios';
 import { api } from 'boot/axios';
 import { useRouter } from 'vue-router';

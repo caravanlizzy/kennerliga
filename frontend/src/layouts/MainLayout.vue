@@ -10,8 +10,8 @@
           </div>
         </q-toolbar-title>
 
-        <ToolbarTopCenter />
-        <NewComponent />
+        <NavTopCenter  />
+        <NavTopRight />
       </q-toolbar>
     </q-header>
 
@@ -23,9 +23,9 @@
 </template>
 
 <script setup lang="ts">
-import ToolbarTopCenter from 'components/nav/ToolbarTopCenter.vue';
 import BreadCrumbs from 'components/nav/BreadCrumbs.vue';
-import NewComponent from 'components/nav/ToolBarTopRight.vue';
+import NavTopCenter from 'components/nav/ToolbarTopCenter.vue';
+import NavTopRight from 'components/nav/ToolBarTopRight.vue';
 import { useResponsive } from 'src/composables/reponsive';
 
 const { isMobile, iconSize } = useResponsive()

@@ -4,17 +4,17 @@ import userRoutes from 'src/router/userRoutes';
 // This can be directly added to any of your `.ts` files like `router.ts`
 // It can also be added to a `.d.ts` file. Make sure it's included in
 // project's tsconfig.json "files"
-import 'vue-router'
+import 'vue-router';
 
 // To ensure it is treated as a module, add at least one `export` statement
-export {}
+export {};
 
 declare module 'vue-router' {
   interface RouteMeta {
     // is optional
-    label?: string
+    label?: string;
     // must be declared by every route
-    icon?: string
+    icon?: string;
   }
 }
 
@@ -25,17 +25,18 @@ const routes: RouteRecordRaw[] = [
     component: () => import('layouts/MainLayout.vue'),
     children: [
       { path: '', name: 'home', component: () => import('pages/IndexPage.vue'), meta: { icon: 'home', label: 'Home' } },
+      { path: 'login', name: 'login', component: () => import ('pages/TheLogin.vue') },
       userRoutes,
-      gameRoutes,
-    ],
+      gameRoutes
+    ]
   },
 
   // Always leave this as last one,
   // but you can also remove it
   {
     path: '/:catchAll(.*)*',
-    component: () => import('pages/ErrorNotFound.vue'),
-  },
+    component: () => import('pages/ErrorNotFound.vue')
+  }
 ];
 
 export default routes;

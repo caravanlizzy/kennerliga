@@ -1,16 +1,14 @@
 <template>
-  <div class="row no-wrap">
-    <q-btn :size="iconSize" stretch flat color="secondary" :dense="isMobile" icon="add_circle">
-      <q-tooltip class="bg-secondary text-primary" delay="50" hide-delay="50" > Ergebnis eintragen</q-tooltip>
-    </q-btn>
-    <q-btn :size="iconSize" :to="{ name:'games' }" :dense="isMobile" stretch flat icon="casino"></q-btn>
-    <q-btn :size="iconSize" :to="{ name: 'users' }" stretch :dense="isMobile" flat icon="person"></q-btn>
-  </div>
+  <q-toolbar-title shrink class="row no-wrap">
+    <kenner-button stretch flat color="secondary" icon="add_circle">
+      <q-tooltip class="bg-secondary text-primary" delay="50" hide-delay="250"> Ergebnis eintragen</q-tooltip>
+    </kenner-button>
+    <kenner-button forward-name="games" stretch flat icon="casino" />
+    <kenner-button forward-name="users" stretch flat icon="person" />
+  </q-toolbar-title>
 </template>
 <script setup lang="ts">
-import { useResponsive } from 'src/composables/reponsive';
-
-const { iconSize, isMobile } = useResponsive()
+import KennerButton from 'components/KennerButton.vue';
 
 </script>
 

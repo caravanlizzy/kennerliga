@@ -3,11 +3,11 @@ export interface Todo {
   content: string;
 }
 
-export type CreateButton = {
-  label: string;
-  icon: string;
-  color: string;
-  forwardTo?: string;
+export type TKennerButton = {
+  label?: string;
+  icon?: string;
+  color?: string;
+  forwardName?: string;
 }
 
 export interface Meta {

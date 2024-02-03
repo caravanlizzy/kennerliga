@@ -1,15 +1,16 @@
 <template>
-  <q-input dark square outlined color="secondary" v-model="modelValue" :label="label" lazy-rules :rules="rules" />
+  <q-input :dark="dark" square outlined color="secondary" v-model="modelValue" :label="label" lazy-rules :rules="rules" />
 </template>
 
 <script setup lang="ts">
 type Rule = () => string
-defineProps<{
+withDefaults(defineProps<{
   rules: Rule[],
   label: string,
-}>()
+  dark?: boolean,
+}>(), { dark: true });
 
-const modelValue = defineModel()
+const modelValue = defineModel();
 
 </script>
 

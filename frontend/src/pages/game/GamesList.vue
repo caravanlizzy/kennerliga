@@ -5,12 +5,12 @@
 
 
 <script setup lang="ts">
-import KennerligaTable from 'components/KennerligaTable.vue';
+import KennerligaTable from 'components/KennerTable.vue';
 import { useAxios } from '@vueuse/integrations/useAxios';
 
 import { api } from 'boot/axios';
 import { useRouter } from 'vue-router';
-import { CreateButton } from 'components/models';
+import { TKennerButton } from 'components/models';
 
 const { data, isFinished } = useAxios('games', api);
 
@@ -20,7 +20,7 @@ const onRowClick = (_event: any, row: { id: any; }) => {
   router.push({ name: 'game-detail', params: { id: row.id } });
 };
 
-const button: CreateButton = { color: 'secondary', label: 'Spiel', icon: 'add_circle', forwardTo: 'game-create' };
+const button: TKennerButton = { color: 'secondary', label: 'Spiel', icon: 'add_circle', forwardName: 'game-create' };
 const columns = [
   {
     name: 'game',

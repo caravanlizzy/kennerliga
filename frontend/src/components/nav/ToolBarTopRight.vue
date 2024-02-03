@@ -1,13 +1,11 @@
 <template>
-  <div class="row no-wrap">
-    <q-btn stretch :size="iconSize" flat icon="settings"></q-btn>
-    <q-btn stretch :size="iconSize" flat icon="logout" color="negative" />
-  </div>
+  <q-toolbar-title shrink class="row no-wrap">
+    <kenner-button stretch flat icon="settings"/>
+    <kenner-button stretch flat icon="logout" color="negative" />
+  </q-toolbar-title>
 </template>
 <script setup lang="ts">
 
-import { useResponsive } from 'src/composables/reponsive';
-
-const { iconSize } = useResponsive();
+import KennerButton from 'components/KennerButton.vue';
 
 </script>
