@@ -1,26 +1,29 @@
 <template>
-  <q-page class="q-gutter-lg">
-   <div class="text-h3 text-secondary">
-     Willkommen zur Kennerliga!
-   </div>
+  <q-page class="q-gutter-lg q-pa-xl">
+    <q-card dark flat :class="{'q-pa-xl': !isMobile}">
+      <q-card-section class="text-h4 text-secondary">
+        Willkommen zur Kennerliga...
+      </q-card-section>
 
-    <div>
-      Hallo und herzlich willkommen zur Kennerliga! Wir feiern die Kunst des Gaming und ehren den großen Ginooo.
-    </div>
+      <q-separator class="q-mb-lg" color="secondary" />
 
-    <div>
-      Möchtest du Teil dieser einzigartigen Gemeinschaft werden? Melde dich jetzt bei Ginooo an und tauche ein in die Welt der Kennerliga!
-    </div>
+      <q-card-section class="text-h6">
+        ...wo Ginooo unser großer Chief ist und Judith derzeit unschlagbar! Es sei denn, du mischst dich ein. Hier treffen
+        die besten Zockerhirne aufeinander. Na, angefixt? Melde dich doch hier an:
+      </q-card-section>
 
-    <div>
-      Bist du bereit, dein Können unter Beweis zu stellen und dich mit anderen Gaming-Enthusiasten zu messen? Melde dich noch heute an und werde Teil unserer spannenden Turniere.
-    </div>
+      <q-card-section>
+        <q-icon name="pets" size="xl" color=secondary></q-icon>
+      </q-card-section>
 
-    <div>
-      Wir sehen uns in der Kennerliga!
-    </div>
+    </q-card>
   </q-page>
 </template>
 
 <script setup lang="ts">
+
+import { useResponsive } from 'src/composables/reponsive';
+
+const { isMobile } = useResponsive();
+
 </script>
