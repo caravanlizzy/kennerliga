@@ -5,7 +5,7 @@
 
 
 <script setup lang="ts">
-import KennerligaTable from 'components/KennerTable.vue';
+import KennerligaTable from 'components/tables/KennerTable.vue';
 import { useAxios } from '@vueuse/integrations/useAxios';
 
 import { api } from 'boot/axios';
@@ -16,7 +16,7 @@ const { data, isFinished } = useAxios('games', api);
 
 const router = useRouter();
 
-const onRowClick = (_event: any, row: { id: any; }) => {
+const onRowClick = (_event: never, row: { id: never; }) => {
   router.push({ name: 'game-detail', params: { id: row.id } });
 };
 
@@ -27,7 +27,7 @@ const columns = [
     required: true,
     align: 'left',
     label: 'Spiel',
-    field: (x: { name: any; }) => x.name,
+    field: (x: { name: never; }) => x.name,
     sortable: true
   },
   {
@@ -35,7 +35,7 @@ const columns = [
     label: 'Plattform',
     required: false,
     align: 'center',
-    field: (x: { platform: any; }) => x.platform,
+    field: (x: { platform: never; }) => x.platform,
     sortable: true
   }
 ];

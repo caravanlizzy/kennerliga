@@ -1,5 +1,5 @@
 <template>
-  <q-page class="q-gutter-lg q-pa-xl">
+  <q-page class="q-pa-xl">
     <q-card dark flat :class="{'q-pa-xl': !isMobile}">
       <q-card-section class="text-h4 text-secondary">
         Willkommen zur Kennerliga...

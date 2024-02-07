@@ -19,7 +19,6 @@ class LoginApiView(APIView):
         if user is not None:
             # If authentication successful, return user data or token
             # For example, you can return user data or JWT token here
-            print(user)
             return Response({'message': 'Login successful' , "user": get_user_information(user)}, status=status.HTTP_200_OK)
         else:
             # If authentication failed, return error message
