@@ -15,7 +15,6 @@
       <q-card-section>
         <q-icon name="pets" size="xl" color=secondary></q-icon>
       </q-card-section>
-
     </q-card>
   </q-page>
 </template>
