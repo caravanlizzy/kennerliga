@@ -9,17 +9,20 @@ type User = {
   email: string;
   username: string;
   bga?: string;
+  token: string;
 }
 export const useUserStore = defineStore('userStore', () => {
   const router = useRouter();
   const user: Ref<User | null> = ref(null);
-  const loggedIn: Ref<boolean> = ref(true);
+  const loggedIn: Ref<boolean> = ref(false);
    async function login(email: string, password: string):Promise<void> {
     const { data, error, isFinished  } = await useAxios('login/', { method: 'POST', data: {username: email, password } }, api);
     if(isFinished.value && !error.value) {
+      api.defaults.headers.common['Authorization'] = 'Token ' + data.value.user.token;
+      console.log(data.value.user);
       loggedIn.value = true;
       user.value = data.value.user;
-      router.push({ name: 'home' })
+      await router.push({name: 'home'})
     }
   }
   return { user, loggedIn, login };
