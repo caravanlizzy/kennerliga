@@ -21,11 +21,17 @@ declare module 'vue-router' {
 
 const routes: RouteRecordRaw[] = [
   {
+    path: '/login',
+    component: () => import('layouts/LoginLayout.vue'),
+    children: [
+      { path: '', name: 'login', component: () => import ('pages/TheLogin.vue') }
+    ]
+  },
+  {
     path: '/',
     component: () => import('layouts/MainLayout.vue'),
     children: [
       { path: '', name: 'home', component: () => import('pages/IndexPage.vue'), meta: { icon: 'home', label: 'Home' } },
-      { path: 'login', name: 'login', component: () => import ('pages/TheLogin.vue') },
       userRoutes,
       gameRoutes
     ]

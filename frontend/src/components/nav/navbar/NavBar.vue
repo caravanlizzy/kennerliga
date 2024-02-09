@@ -1,8 +1,8 @@
 <template>
   <q-toolbar-title class="row no-wrap items-center justify-between">
     <nav-top-left />
-    <nav-top-center :logged-in="loggedIn" />
-    <nav-top-right :logged-in="loggedIn" />
+    <nav-top-center />
+    <nav-top-right />
   </q-toolbar-title>
 </template>
 <script setup lang="ts">

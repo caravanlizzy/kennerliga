@@ -8,7 +8,7 @@
 
     <q-page-container class="flex column justify-center">
       <BreadCrumbs />
-      <router-view class="q-pa-lg full-height text-white " />
+      <router-view class="text-white" />
     </q-page-container>
   </q-layout>
 </template>
