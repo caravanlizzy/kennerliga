@@ -159,6 +159,7 @@ CSRF_TRUSTED_ORIGINS = [
     "http://haligh.pythonanywhere.com",
     "http://www.kennerliga.de",
     "https://www.kennerliga.de",
+    "https://kennerliga.de",
 ]
 
 CORS_ALLOWED_ORIGINS = [
@@ -167,6 +168,7 @@ CORS_ALLOWED_ORIGINS = [
     "http://haligh.pythonanywhere.com",
     "http://www.kennerliga.de",
     "https://www.kennerliga.de",
+    "https://kennerliga.de",
 ]
 
 from corsheaders.defaults import default_methods
