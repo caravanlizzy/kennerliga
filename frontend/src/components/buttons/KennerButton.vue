@@ -11,7 +11,9 @@
 
 import { useResponsive } from 'src/composables/reponsive';
 import { TKennerButton } from 'components/models';
-defineProps<TKennerButton>();
+withDefaults(defineProps<TKennerButton>(), {
+  color: 'secondary'
+});
 const { isMobile, iconSize } = useResponsive();
 
 </script>

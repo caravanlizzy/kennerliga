@@ -1,21 +1,26 @@
 <template>
-  <div class="bg-black">
-    <q-separator color="info" />
-    <div class="q-px-md q-my-xs q-gutter-sm ">
-      <q-breadcrumbs separator="-->" class="text-secondary" active-color="secondary">
-        <template v-slot:separator>
-          <q-icon
-            aize="1.2em"
-            name="arrow_right"
-            color="white"
+  <div class="" style="background-color: #3a3e53">
+<!--    <q-separator color="secondary" size="3px" />-->
+    <div class="q-pa-xs row items-center justify-between">
+      <kenner-button flat color="white" size="small" icon="arrow_back" />
+      <div>
+        <q-breadcrumbs separator="-->" class="text-secondary" active-color="secondary">
+          <template v-slot:separator>
+            <q-icon
+              size="1.5em"
+              name="arrow_right"
+              color="secondary"
+            />
+          </template>
+          <q-breadcrumbs-el :to="{ name:crumb.forwardRouteName }" v-for="crumb in breadCrumbs" :key="crumb.label"
+                            :label="crumb.label"
+                            :icon="crumb.icon"
           />
-        </template>
-        <q-breadcrumbs-el :to="{ name:crumb.forwardRouteName }" v-for="crumb in breadCrumbs" :key="crumb.label"
-                          :label="crumb.label"
-                          :icon="crumb.icon" />
-      </q-breadcrumbs>
+        </q-breadcrumbs>
+      </div>
+      <kenner-button flat color="white" size="small" icon="arrow_forward" />
     </div>
-    <q-separator color="info" />
+<!--    <q-separator color="secondary" size="3px" />-->
   </div>
 </template>
 
@@ -23,6 +28,7 @@
 import { useRoute, RouteLocationNormalizedLoaded, useRouter, RouteRecord } from 'vue-router';
 import { BreadCrumb } from 'components/models';
 import { ref, Ref, watch } from 'vue';
+import KennerButton from 'components/buttons/KennerButton.vue';
 
 const router = useRouter();
 const routeSplitRoute = useRoute();

@@ -4,8 +4,8 @@
     <div class="q-py-md" style="max-width: 400px">
       <q-form @submit="onSubmit" class="q-gutter-md">
         <kenner-input rules="" label="Spielname" v-model="form.name"/>
-        <kenner-select label="Plattform" :options="['BGA', 'Yucata']" v-model="form.platform"/>
-        <q-btn class="q-my-xl" type="submit" push color="positive" label="Speichern" />
+        <kenner-select label="Plattform" :options="options" v-model="form.platform"/>
+        <kenner-button class="q-my-xl" type="submit" push color="positive" label="Speichern" />
       </q-form>
     </div>
   </div>
@@ -18,6 +18,7 @@ import { api } from 'boot/axios';
 import { useAxios } from '@vueuse/integrations/useAxios';
 import KennerInput from 'components/inputs/KennerInput.vue';
 import KennerSelect from 'components/inputs/KennerSelect.vue';
+import KennerButton from 'components/buttons/KennerButton.vue';
 
 const $q = useQuasar();
 const form = ref({
@@ -25,11 +26,10 @@ const form = ref({
   platform: null
 });
 
-const p = ref(null)
-const options = ref(['BGA', 'yucata']);
+const options = ref(['BGA', 'Yucata']);
 
 const onSubmit = async () => {
-  const { response, error, isFinished } = await useAxios('games/', {
+  const { error, isFinished } = await useAxios('games/', {
     method: 'POST',
     data: { name: form.value.name, platform: form.value.platform }
   }, api);

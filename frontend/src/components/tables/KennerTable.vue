@@ -1,5 +1,5 @@
 <template>
-  <q-table card-class="bg-primary text-grey-3" table-header-class="text-info" dark flat :rows-per-page-options="[10, 20, 50]">
+  <q-table table-header-class="text-info" flat :rows-per-page-options="[10, 20, 50]">
   <template v-if="createButton" v-slot:top-right>
     <kenner-button :color="createButton.color" :icon="createButton.icon" :label="createButton.label" :forward-name="createButton.forwardName" />
   </template>

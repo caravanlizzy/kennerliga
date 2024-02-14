@@ -1,6 +1,6 @@
 <template>
   <div class="">
-      <kenner-button :to="{ name: 'home' }" flat :size="iconSize" outlined icon="pets" />
+      <kenner-button :to="{ name: 'home' }" flat color="accent" :size="iconSize" icon="pets" />
   </div>
 </template>
 

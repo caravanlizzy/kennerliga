@@ -14,7 +14,7 @@ type User = {
 export const useUserStore = defineStore('userStore', () => {
   const router = useRouter();
   const user: Ref<User | null> = ref(null);
-  const loggedIn: Ref<boolean> = ref(false);
+  const loggedIn: Ref<boolean> = ref(true);
 
   async function login(email: string, password: string): Promise<void> {
     const { data, error, isFinished } = await useAxios('login/', {
