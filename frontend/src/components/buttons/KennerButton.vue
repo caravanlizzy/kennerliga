@@ -1,11 +1,11 @@
 <template>
-  <q-btn outline
+  <q-btn filled
          :dense="isMobile"
          :class="{ 'q-mx-xs' : isMobile }"
          :color="color"
          :to="{ name:forwardName}"
          :icon="icon"
-         :size="iconSize"
+         size="md"
          :label="label">
     <slot></slot>
   </q-btn>
@@ -18,6 +18,6 @@ import { TKennerButton } from 'components/models';
 withDefaults(defineProps<TKennerButton>(), {
   color: 'primary'
 });
-const { isMobile, iconSize } = useResponsive();
+const { isMobile  } = useResponsive();
 
 </script>

@@ -1,24 +1,25 @@
 <template>
-  <div class="" style="background-color: #3a3e53">
+  <div class="bg-white" style="background-color: #3a3e53">
 <!--    <q-separator color="secondary" size="3px" />-->
     <div class="q-pa-xs row items-center justify-between">
-      <kenner-button flat color="white" size="small" icon="arrow_back" />
+      <kenner-button flat color="primary" size="small" icon="arrow_back" />
       <div>
-        <q-breadcrumbs separator="-->" class="text-secondary" active-color="secondary">
+        <q-breadcrumbs separator="-->" class="  text-primary"  active-color="primary">
           <template v-slot:separator>
             <q-icon
               size="1.5em"
               name="arrow_right"
-              color="secondary"
+              color="primary"
             />
           </template>
           <q-breadcrumbs-el :to="{ name:crumb.forwardRouteName }" v-for="crumb in breadCrumbs" :key="crumb.label"
                             :label="crumb.label"
                             :icon="crumb.icon"
+                            class="q-pa-xs"
           />
         </q-breadcrumbs>
       </div>
-      <kenner-button flat color="white" size="small" icon="arrow_forward" />
+      <kenner-button flat color="primary" size="small" icon="arrow_forward" />
     </div>
 <!--    <q-separator color="secondary" size="3px" />-->
   </div>

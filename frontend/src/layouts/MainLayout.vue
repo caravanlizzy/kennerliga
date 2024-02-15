@@ -1,7 +1,7 @@
 <template>
   <q-layout class="column" view="hHh Lpr lFf">
     <q-header bordered elevated>
-      <q-toolbar class="bg-white ">
+      <q-toolbar  class="bg-white ">
         <nav-bar :onToggle="toggleDrawer" />
       </q-toolbar>
     </q-header>

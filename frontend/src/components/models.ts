@@ -1,8 +1,3 @@
-export interface Todo {
-  id: number;
-  content: string;
-}
-
 export type TKennerButton = {
   label?: string;
   icon?: string;

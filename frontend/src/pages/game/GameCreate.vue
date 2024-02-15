@@ -1,10 +1,26 @@
 <template>
-  <div class="q-pa-md bg-primary text-white">
+  <div class="q-pa-md">
     <p class="text-h5">Neues Spiel</p>
     <div class="q-py-md" style="max-width: 400px">
       <q-form @submit="onSubmit" class="q-gutter-md">
-        <kenner-input rules="" label="Spielname" v-model="form.name"/>
-        <kenner-select label="Plattform" :options="options" v-model="form.platform"/>
+        <kenner-input label="Spielname" v-model="form.name" />
+        <kenner-select label="Plattform" :options="platforms" v-model="form.platform" />
+        <div class="q-mt-xl">
+          <div>
+            <span class="text-h6">Spieloptionen</span>
+            <kenner-button class="q-ml-lg" color="primary" label="Spieloption" icon="add" @click="addEmptyOption" />
+          </div>
+          <GameOption
+            v-for="{ id, title, isBoolean } of gameOptions"
+            :key="id"
+            :is-boolean="isBoolean"
+            @changeTitle="updateTitle($event, id)"
+            @deleteOption="deleteOption(id)"
+            @updateBoolean="updateBoolean($event, id)"
+            :title="title"
+            :id="id"
+          />
+        </div>
         <kenner-button class="q-my-xl" type="submit" push color="positive" label="Speichern" />
       </q-form>
     </div>
@@ -12,13 +28,15 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { Ref, ref } from 'vue';
 import { useQuasar } from 'quasar';
 import { api } from 'boot/axios';
 import { useAxios } from '@vueuse/integrations/useAxios';
 import KennerInput from 'components/inputs/KennerInput.vue';
 import KennerSelect from 'components/inputs/KennerSelect.vue';
 import KennerButton from 'components/buttons/KennerButton.vue';
+import { TGameOption } from 'pages/game/models';
+import GameOption from 'pages/game/GameOption.vue';
 
 const $q = useQuasar();
 const form = ref({
@@ -26,7 +44,36 @@ const form = ref({
   platform: null
 });
 
-const options = ref(['BGA', 'Yucata']);
+const platforms = ref(['BGA', 'Yucata']);
+const gameOptions: Ref<TGameOption[]> = ref([]);
+let optionCounter = 0;
+
+function addEmptyOption(): void {
+  gameOptions.value.push({ title: '', isBoolean: true, id: optionCounter });
+  optionCounter++;
+}
+
+function findOption(id: number): TGameOption | undefined {
+  return gameOptions.value.find((item) => item.id === id);
+}
+
+function updateTitle(newTitle: string, id: number) {
+  const option = findOption(id);
+  if (option) {
+    option.title = newTitle;
+  }
+}
+
+function updateBoolean(isBoolean: boolean, id: number) {
+  const option = findOption(id);
+  if (option) {
+    option.isBoolean = isBoolean;
+  }
+}
+
+function deleteOption(id: number): void {
+  gameOptions.value = gameOptions.value.filter((o) => o.id !== id);
+}
 
 const onSubmit = async () => {
   const { error, isFinished } = await useAxios('games/', {
@@ -40,7 +87,7 @@ const onSubmit = async () => {
       icon: 'save',
       message: 'Gespeichert'
     });
-  } else if (error.value){
+  } else if (error.value) {
     $q.notify({
       color: 'negative',
       textColor: 'white',
