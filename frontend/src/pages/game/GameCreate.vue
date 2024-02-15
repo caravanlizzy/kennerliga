@@ -1,25 +1,27 @@
 <template>
   <div class="q-pa-md">
     <p class="text-h5">Neues Spiel</p>
-    <div class="q-py-md" style="max-width: 400px">
+    <div class="q-py-md" >
       <q-form @submit="onSubmit" class="q-gutter-md">
-        <kenner-input label="Spielname" v-model="form.name" />
-        <kenner-select label="Plattform" :options="platforms" v-model="form.platform" />
+        <kenner-input class="max-w-500" label="Spielname" v-model="form.name" />
+        <kenner-select class="max-w-500" label="Plattform" :options="platforms" v-model="form.platform" />
         <div class="q-mt-xl">
           <div>
             <span class="text-h6">Spieloptionen</span>
             <kenner-button class="q-ml-lg" color="primary" label="Spieloption" icon="add" @click="addEmptyOption" />
           </div>
-          <GameOption
-            v-for="{ id, title, isBoolean } of gameOptions"
-            :key="id"
-            :is-boolean="isBoolean"
-            @changeTitle="updateTitle($event, id)"
-            @deleteOption="deleteOption(id)"
-            @updateBoolean="updateBoolean($event, id)"
-            :title="title"
-            :id="id"
-          />
+          <div class="flex row ">
+            <GameOption
+              v-for="{ id, title, isBoolean } of gameOptions"
+              :key="id"
+              :is-boolean="isBoolean"
+              @changeTitle="updateTitle($event, id)"
+              @deleteOption="deleteOption(id)"
+              @updateBoolean="updateBoolean($event, id)"
+              :title="title"
+              :id="id"
+            />
+          </div>
         </div>
         <kenner-button class="q-my-xl" type="submit" push color="positive" label="Speichern" />
       </q-form>
@@ -28,7 +30,7 @@
 </template>
 
 <script setup lang="ts">
-import { Ref, ref } from 'vue';
+import { computed, Ref, ref } from 'vue';
 import { useQuasar } from 'quasar';
 import { api } from 'boot/axios';
 import { useAxios } from '@vueuse/integrations/useAxios';
@@ -48,7 +50,13 @@ const platforms = ref(['BGA', 'Yucata']);
 const gameOptions: Ref<TGameOption[]> = ref([]);
 let optionCounter = 0;
 
+const canAdd = computed(() => {
+  const lastAdded = findOption(optionCounter-1);
+  return lastAdded?.title !== '';
+})
+
 function addEmptyOption(): void {
+  if(!canAdd.value) return;
   gameOptions.value.push({ title: '', isBoolean: true, id: optionCounter });
   optionCounter++;
 }
@@ -96,5 +104,10 @@ const onSubmit = async () => {
     });
   }
 };
-
 </script>
+
+<style scoped>
+.max-w-500{
+  max-width: 500px;
+}
+</style>

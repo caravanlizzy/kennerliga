@@ -1,9 +1,11 @@
 <template>
-    <q-card class=" q-mt-lg column">
-      <kenner-button class="self-end q-mr-xs q-mt-xs" flat  icon="close" @click="deleteOption"></kenner-button>
+  <q-card class=" q-mt-lg column q-mx-md">
+
+    <kenner-button class="self-end q-mr-xs q-mt-xs" flat icon="close" @click="deleteOption"></kenner-button>
     <div class="col q-mx-md q-my-xs">
       <q-checkbox :model-value="isBoolean" @update:model-value="emitIsBoolean" color="primary" label="Ja/Nein Option" />
-      <kenner-input :model-value="title" @update:modelValue="emitTitle" label="Spieloption Titel" class="q-mb-md q-mx-xs" />
+      <kenner-input :model-value="title" @update:modelValue="emitTitle" label="Spieloption Titel"
+                    class="q-mb-md q-mx-xs" />
     </div>
   </q-card>
 </template>
@@ -18,18 +20,19 @@ const emits = defineEmits<{
   changeTitle: [title: string]
   updateBoolean: [isBoolean: boolean]
   deleteOption: [id: number]
-}>()
+}>();
 
-function emitTitle(title: string){
+function emitTitle(title: string) {
   emits('changeTitle', title);
 }
 
-function emitIsBoolean(isBoolean: boolean){
+function emitIsBoolean(isBoolean: boolean) {
   emits('updateBoolean', isBoolean);
 }
- function deleteOption(id: number){
+
+function deleteOption(id: number) {
   emits('deleteOption', id);
- }
+}
 
 </script>
 
