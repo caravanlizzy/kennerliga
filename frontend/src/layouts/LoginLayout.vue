@@ -1,5 +1,5 @@
 <template>
-  <q-layout class="bg-primary column flex-center">
+  <q-layout class="column flex-center">
       <router-view />
   </q-layout>
 </template>

@@ -1,12 +1,11 @@
 <template>
   <div>
     <q-drawer
-      elevated
+      bordered
       side="right"
       v-model="drawerState"
       :mini="isMobile"
-      :width="250"
-      :mini-width="70"
+      :width="220"
     >
       <q-list>
         <kenner-item icon="settings" label="Einstellungen" forward-name="settings" />
@@ -20,12 +19,14 @@
 </template>
 
 <script setup lang="ts">
-import KennerItem from 'components/KennerItem.vue';
+import KennerItem from 'components/items/KennerItem.vue';
 import { useUserStore } from 'stores/userStore';
 import { storeToRefs } from 'pinia';
+import { useResponsive } from 'src/composables/reponsive';
+
 const drawerState = defineModel();
 
-const userStore = useUserStore()
+const responsive = useResponsive();
 
-const { isMobile } = storeToRefs(userStore);
+const { isMobile } = responsive;
 </script>

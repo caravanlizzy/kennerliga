@@ -1,10 +1,10 @@
 <template>
-  <q-item clickable>
+  <q-item :to="{name: forwardName}" clickable>
     <q-item-section>
-      <kenner-button  color="primary" flat :icon="icon" :to="{name: forwardName}" />
+      <kenner-button  color="primary" flat :icon="icon" />
     </q-item-section>
     <q-item-section >
-      <q-item-label caption> {{label}} </q-item-label>
+      <q-item-label class="text-primary" caption> {{label}} </q-item-label>
     </q-item-section>
   </q-item>
 </template>

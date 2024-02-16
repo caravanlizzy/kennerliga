@@ -1,5 +1,5 @@
 export default {
-  path: 'users/', children: [
+  path: 'users/', meta:{requiresAuth:true, requiresAdmin: true },  children: [
     {
       path: '',
       name: 'users',

@@ -8,7 +8,8 @@
       eintragen
     </q-tooltip>
   </kenner-button>
-  <kenner-button flat icon="menu" @click="onToggle" />
+  <kenner-button v-if="loggedIn" flat icon="menu" @click="onToggle" />
+  <kenner-button v-else flat icon="login"  forward-name="login"/>
 </template>
 
 <script setup lang="ts">

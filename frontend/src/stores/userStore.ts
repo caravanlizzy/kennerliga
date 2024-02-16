@@ -4,8 +4,7 @@ import { useAxios } from '@vueuse/integrations/useAxios';
 import { api } from 'boot/axios';
 import { useRouter } from 'vue-router';
 
-type User = {
-  id: string;
+type TUser = {
   email: string;
   username: string;
   bga?: string;
@@ -13,8 +12,8 @@ type User = {
 }
 export const useUserStore = defineStore('userStore', () => {
   const router = useRouter();
-  const user: Ref<User | null> = ref(null);
-  const loggedIn: Ref<boolean> = ref(true);
+  const user: Ref<TUser | null> = ref(null);
+  const loggedIn: Ref<boolean> = ref(false);
 
   async function login(email: string, password: string): Promise<void> {
     const { data, error, isFinished } = await useAxios('login/', {
@@ -22,17 +21,27 @@ export const useUserStore = defineStore('userStore', () => {
       data: { username: email, password }
     }, api);
     if (isFinished.value && !error.value) {
-      api.defaults.headers.common['Authorization'] = 'Token ' + data.value.user.token;
-      loggedIn.value = true;
-      user.value = data.value.user;
+      const userData = data.value.user;
+      persistAuthentication(userData);
+      applyLogin(userData);
       await router.push({ name: 'home' });
     }
   }
 
-  async function logout(): Promise<void> {
-      user.value = null;
-      loggedIn.value  = false;
+  function applyLogin(userData: TUser): void {
+    loggedIn.value = true;
+    user.value = userData;
   }
 
-  return { user, loggedIn, login, logout };
+  function persistAuthentication(userData: TUser) {
+    api.defaults.headers.common['Authorization'] = 'Token ' + userData.token;
+    localStorage.setItem('user', JSON.stringify(userData));
+  }
+
+  async function logout(): Promise<void> {
+    user.value = null;
+    loggedIn.value = false;
+  }
+
+  return { user, loggedIn, login, logout, applyLogin };
 });

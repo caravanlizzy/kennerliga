@@ -31,7 +31,7 @@ const routes: RouteRecordRaw[] = [
     path: '/',
     component: () => import('layouts/MainLayout.vue'),
     children: [
-      { path: '', name: 'home', component: () => import('pages/IndexPage.vue'), meta: { icon: 'home', label: 'Home' } },
+      { path: '', name: 'home', component: () => import('pages/index/IndexPage.vue'), meta: { icon: 'home', label: 'Home' } },
       userRoutes,
       gameRoutes
     ]

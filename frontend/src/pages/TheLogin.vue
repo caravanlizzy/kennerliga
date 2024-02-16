@@ -1,7 +1,7 @@
 <template>
-  <div class="column q-px-xl" :style="[isMobile? 'max-width:400px' : 'max-width: 550px']">
-    <q-card :bordered="!isMobile" :flat="isMobile" :class="['bg-primary', isMobile? '':'q-pa-xl']">
-      <q-form @submit="doLogin" @keyup.enter="doLogin" class="q-pa-lg">
+  <div class="column " :style="[isMobile? 'min-width: 280px; max-width:500px' : 'min-width: 450px']">
+    <q-card :bordered="!isMobile" :flat="isMobile" :class="{'q-pa-xl':!isMobile}">
+      <q-form @submit="doLogin" @keyup.enter="doLogin">
         <q-card-section class="q-mb-md">
         <span class="text-h4 text-accent ">
           Login
@@ -12,7 +12,7 @@
           <kenner-input v-model="password" :rules="[]" label="Passwort" type="password" class="q-pt-md" />
         </q-card-section>
         <q-card-section>
-          <kenner-button type="submit" size="lg" class="full-width q-mt-md" label="Anmelden" color="positive" />
+          <kenner-button type="submit" size="lg" class="full-width q-mt-md" label="Anmelden" icon="pets" color="positive" />
         </q-card-section>
       </q-form>
     </q-card>
@@ -35,9 +35,3 @@ function doLogin(): void {
   login(email.value, password.value);
 }
 </script>
-
-<style scoped>
-.bg-login {
-  background-color: #f6f7ff;
-}
-</style>

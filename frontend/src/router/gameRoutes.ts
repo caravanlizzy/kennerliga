@@ -1,5 +1,5 @@
 export default {
-  path: 'games/', children: [
+  path: 'games/', meta: { requiresAuth: true, requiresAdmin: true }, children: [
     {
       path: '',
       name: 'games',
@@ -9,7 +9,7 @@ export default {
     {
       path: ':id',
       name: 'game-detail',
-      component: () => import('pages/game/GameDetail.vue'),
+      component: () => import('pages/game/GameDetail.vue')
     },
     { path: 'create', name: 'game-create', component: () => import('pages/game/GameCreate.vue') }
   ]
