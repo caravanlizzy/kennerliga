@@ -3,12 +3,12 @@
   <q-toolbar-title class="text-primary">
     Kennerliga
   </q-toolbar-title>
-  <kenner-button v-if="loggedIn" flat color="secondary" icon="add_circle">
+  <kenner-button v-if="isAuthenticated" flat color="secondary" icon="add_circle">
     <q-tooltip class="bg-primary text-white" :delay="50" :hide-delay="450" anchor="center left"> Ergebnis
       eintragen
     </q-tooltip>
   </kenner-button>
-  <kenner-button v-if="loggedIn" flat icon="menu" @click="onToggle" />
+  <kenner-button v-if="isAuthenticated" flat icon="menu" @click="onToggle" />
   <kenner-button v-else flat icon="login"  forward-name="login"/>
 </template>
 
@@ -23,5 +23,5 @@ defineProps<{
 }>()
 
 const store = useUserStore();
-const { loggedIn } = storeToRefs(store);
+const { isAuthenticated } = storeToRefs(store);
 </script>

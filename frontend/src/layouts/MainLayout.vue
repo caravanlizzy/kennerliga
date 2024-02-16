@@ -9,7 +9,7 @@
     <KennerDrawer v-model="drawerState"/>
 
     <q-page-container class="flex column justify-center ">
-      <BreadCrumbs v-if="loggedIn" />
+      <BreadCrumbs v-if="isAuthenticated" />
       <div :class="{'q-pa-lg': !isMobile}">
         <router-view class=" text-primary" />
       </div>
@@ -29,7 +29,7 @@ import { useResponsive } from 'src/composables/reponsive';
 
 const store = useUserStore();
 const { isMobile } = useResponsive();
-const { loggedIn } = storeToRefs(store);
+const { isAuthenticated } = storeToRefs(store);
 const drawerState:Ref<boolean> = ref(false);
 function toggleDrawer():void {
   drawerState.value = !drawerState.value;
