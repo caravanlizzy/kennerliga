@@ -12,7 +12,7 @@
         <kenner-item icon="account_circle" label="Profil" forward-name="profile" />
         <kenner-item icon="casino" label="Spiele verwalten" forward-name="games" />
         <kenner-item icon="group" label="SpielerInnen verwalten" forward-name="users" />
-        <kenner-item icon="logout" label="Logout" />
+        <kenner-item icon="logout" label="Logout" @click="logout" />
       </q-list>
     </q-drawer>
   </div>
@@ -27,6 +27,7 @@ import { useResponsive } from 'src/composables/reponsive';
 const drawerState = defineModel();
 
 const responsive = useResponsive();
+const { logout } = useUserStore();
 
 const { isMobile } = responsive;
 </script>

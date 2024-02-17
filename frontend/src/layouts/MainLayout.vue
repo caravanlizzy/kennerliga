@@ -4,12 +4,12 @@
       <q-toolbar  class="bg-white ">
         <nav-bar :onToggle="toggleDrawer" />
       </q-toolbar>
+      <BreadCrumbs color="secondary" v-if="isAuthenticated" />
     </q-header>
 
     <KennerDrawer v-model="drawerState"/>
 
     <q-page-container class="flex column justify-center ">
-      <BreadCrumbs v-if="isAuthenticated" />
       <div :class="{'q-pa-lg': !isMobile}">
         <router-view class=" text-primary" />
       </div>

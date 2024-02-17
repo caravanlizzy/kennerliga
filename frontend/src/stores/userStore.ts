@@ -10,6 +10,8 @@ export type TUser = {
   bga?: string;
   token: string;
 }
+
+
 export const useUserStore = defineStore('userStore', () => {
   const router = useRouter();
   const user: Ref<TUser | null> = ref(null);
@@ -41,8 +43,7 @@ export const useUserStore = defineStore('userStore', () => {
   async function logout(): Promise<void> {
     user.value = null;
     isAuthenticated.value = false;
-    localStorage.removeItem('user');
   }
 
-  return { user, isAuthenticated, login, logout, applyLogin };
-});
+  return { user, isAuthenticated, login, logout  };
+}, {persist: {enabled: true}});

@@ -1,17 +1,16 @@
 <template>
-  <div class="bg-white" style="background-color: #3a3e53">
-<!--    <q-separator color="secondary" size="3px" />-->
+  <q-toolbar class="text-secondary bg-primary" >
     <div class="q-pa-xs row items-center justify-between">
-      <kenner-button flat color="primary" size="small" icon="arrow_back" />
+      <kenner-button flat color="white" size="small" icon="arrow_back" />
       <div>
-        <q-breadcrumbs separator="-->" class="  text-primary"  active-color="primary">
-          <template v-slot:separator>
-            <q-icon
-              size="1.5em"
-              name="arrow_right"
-              color="primary"
-            />
-          </template>
+        <q-breadcrumbs separator="/" :class="`text-white`" :active-color="color">
+<!--          <template v-slot:separator>-->
+<!--            <q-icon-->
+<!--              size="1.5em"-->
+<!--              name=""-->
+<!--              :color="color"-->
+<!--            />-->
+<!--          </template>-->
           <q-breadcrumbs-el :to="{ name:crumb.forwardRouteName }" v-for="crumb in breadCrumbs" :key="crumb.label"
                             :label="crumb.label"
                             :icon="crumb.icon"
@@ -19,10 +18,8 @@
           />
         </q-breadcrumbs>
       </div>
-      <kenner-button flat color="primary" size="small" icon="arrow_forward" />
     </div>
-<!--    <q-separator color="secondary" size="3px" />-->
-  </div>
+  </q-toolbar>
 </template>
 
 <script setup lang="ts">
@@ -30,6 +27,8 @@ import { useRoute, RouteLocationNormalizedLoaded, useRouter, RouteRecord } from 
 import { BreadCrumb } from 'components/models';
 import { ref, Ref, watch } from 'vue';
 import KennerButton from 'components/buttons/KennerButton.vue';
+
+defineProps<{ color: string }>();
 
 const router = useRouter();
 const routeSplitRoute = useRoute();

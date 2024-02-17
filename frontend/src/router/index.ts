@@ -3,11 +3,11 @@ import {
   createMemoryHistory,
   createRouter,
   createWebHashHistory,
-  createWebHistory,
+  createWebHistory
 } from 'vue-router';
 
 import routes from './routes';
-import { applyGuards } from 'src/router/guards';
+import { useUserStore } from 'stores/userStore';
 
 /*
  * If not building with SSR mode, you can
@@ -18,7 +18,7 @@ import { applyGuards } from 'src/router/guards';
  * with the Router instance.
  */
 
-export default route(async function (/* { store, ssrContext } */) {
+export default route(async function(/* { store, ssrContext } */) {
   const createHistory = process.env.SERVER
     ? createMemoryHistory
     : (process.env.VUE_ROUTER_MODE === 'history' ? createWebHistory : createWebHashHistory);
@@ -30,10 +30,15 @@ export default route(async function (/* { store, ssrContext } */) {
     // Leave this as is and make changes in quasar.conf.js instead!
     // quasar.conf.js -> build -> vueRouterMode
     // quasar.conf.js -> build -> publicPath
-    history: createHistory(process.env.VUE_ROUTER_BASE),
+    history: createHistory(process.env.VUE_ROUTER_BASE)
   });
-  await applyGuards(Router);
-  Router.beforeEach()
-
+  Router.beforeEach(function(to, from, next) {
+    if(!to.meta.requiresAuth) return next();
+      const userStore = useUserStore();
+      const { user } = userStore;
+      if (user) return next();
+      return next({ name: 'login' });
+    }
+  );
   return Router;
 });

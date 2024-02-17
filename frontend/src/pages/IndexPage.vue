@@ -1,7 +1,8 @@
 <template>
-  <q-page :class="{'q-pa-lg': !isMobile}">
-    <the-welcome-box class=""/>
-    <kenner-chat class="" />
+  <q-page :class="{'row items-start': !isMobile}">
+    <the-welcome-box class="col-12" />
+      <kenner-chat class="col-9" />
+    <year-standings class="col-3" />
   </q-page>
 </template>
 
@@ -11,6 +12,7 @@ import { useResponsive } from 'src/composables/reponsive';
 import { useUserStore } from 'stores/userStore';
 import KennerChat from 'components/chats/KennerChat.vue';
 import TheWelcomeBox from 'components/TheWelcomeBox.vue';
+import YearStandings from 'components/YearStandings.vue';
 
 const { isMobile } = useResponsive();
 const store = useUserStore();
