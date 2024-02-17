@@ -27,23 +27,26 @@ export const useUserStore = defineStore('userStore', () => {
       applyLogin(userData);
       await router.push({ name: 'home' });
     }
+
   }
 
+  function storeToken():void {
+    if(user.value){
+      api.defaults.headers.common['Authorization'] = 'Token ' + user.value.token;
+    }
+  }
   function applyLogin(userData: TUser): void {
     isAuthenticated.value = true;
     user.value = userData;
-    persistAuthentication(userData);
+    storeToken();
   }
 
-  function persistAuthentication(userData: TUser) {
-    api.defaults.headers.common['Authorization'] = 'Token ' + userData.token;
-    localStorage.setItem('user', JSON.stringify(userData));
-  }
+
 
   async function logout(): Promise<void> {
     user.value = null;
     isAuthenticated.value = false;
   }
 
-  return { user, isAuthenticated, login, logout  };
-}, {persist: {enabled: true}});
+  return { user, isAuthenticated, login, logout, storeToken };
+}, { persist: { enabled: true }});
