@@ -1,6 +1,6 @@
 from django.urls import path, include
 from rest_framework import routers
-from game.views import GameViewSet
+from game.views import GameViewSet, GameOptionViewSet, GameOptionChoiceViewSet
 from user.views import UserViewSet
 from api.views import LoginApiView
 from rest_framework.authtoken import views
@@ -8,6 +8,8 @@ from rest_framework.authtoken import views
 router = routers.SimpleRouter()
 
 router.register('games', GameViewSet, basename='games')
+router.register('game-options', GameOptionViewSet, basename='game-options')
+router.register('game-options', GameOptionChoiceViewSet, basename='game-option-choices')
 router.register('users', UserViewSet, basename='users')
 
 urlpatterns = [
