@@ -3,12 +3,12 @@
     <p class="text-h5">Neues Spiel</p>
     <div class="q-py-md">
       <q-form @submit="onSubmit" class="q-gutter-md">
-        <kenner-input class="max-w-500" label="Spielname" v-model="form.name" />
-        <kenner-select class="max-w-500" label="Plattform" :options="platforms" v-model="form.platform" />
+        <kenner-input class="max-w-500" label="Spielname" v-model="form.name"/>
+        <kenner-select class="max-w-500" label="Plattform" :options="platforms" v-model="form.platform"/>
         <div class="q-mt-xl">
           <div>
             <span class="text-h6">Spieloptionen</span>
-            <kenner-button class="q-ml-lg" color="primary" label="" icon="add" @click="addEmptyOption" />
+            <kenner-button class="q-ml-lg" color="primary" label="" icon="add" @click="addEmptyOption"/>
           </div>
           <div class="flex row ">
             <GameOption
@@ -19,7 +19,7 @@
           </div>
           {{ form }}
         </div>
-        <kenner-button class="q-my-xl" type="submit" push color="positive" label="Speichern" />
+        <kenner-button class="q-my-xl" type="submit" push color="positive" label="Speichern"/>
       </q-form>
     </div>
   </div>
@@ -39,7 +39,7 @@ import { useCrud } from 'src/composables/crud';
 
 const $q = useQuasar();
 
-const platforms = ref(['BGA', 'Yucata']);
+const platforms = ref([ 'BGA', 'Yucata' ]);
 
 const useGameOptions = useCrud<TGameOption>();
 const { addItem: addOption, items: gameOptions } = useGameOptions;
@@ -59,10 +59,9 @@ function addEmptyOption(): void {
 }
 
 const onSubmit = async () => {
-  const { error, isFinished } = await useAxios('games/', {
-    method: 'POST',
-    data: { name: form.value.name, platform: form.value.platform }
-  }, api);
+  const { error, isFinished } = await createGame();
+
+
   if (isFinished.value) {
     $q.notify({
       color: 'positive',
@@ -79,6 +78,17 @@ const onSubmit = async () => {
     });
   }
 };
+
+async function createGame() {
+  return useAxios('games/', {
+    method: 'POST',
+    data: { name: form.value.name, platform: form.value.platform }
+  }, api);
+}
+
+async function createOption(option: any) {
+  return await option;
+}
 </script>
 
 <style scoped>
