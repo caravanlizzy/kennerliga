@@ -21,7 +21,14 @@ class Game(models.Model):
 class GameOption(models.Model):
     name = models.CharField(max_length=88)
     game = models.ForeignKey(Game, null=True, blank=True, on_delete=models.CASCADE, related_name='options')
-    value = models.BooleanField(
+    has_choices = models.BooleanField(default=False)
+    only_if_option = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True, related_name='only_if_options')
+    only_if_choice = models.ForeignKey('GameOptionChoice', on_delete=models.CASCADE, null=True, blank=True, related_name='only_if_options')
+    only_if_value = models.BooleanField(
+        null=True,
+        default=None
+    )
+    is_activated = models.BooleanField(
         null=True,
         default=None
     )
@@ -32,7 +39,7 @@ class GameOption(models.Model):
 
 class GameOptionChoice(models.Model):
     name = models.CharField(max_length=139, blank=True, null=True)
-    is_active = models.BooleanField(
+    is_selected = models.BooleanField(
         default=False
     )
     option = models.ForeignKey(

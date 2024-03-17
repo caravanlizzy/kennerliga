@@ -533,7 +533,7 @@
     "fields": {
       "name": "unlisted",
       "game": 1,
-      "value": false
+      "is_activated": false
     }
   },
   {
@@ -542,7 +542,7 @@
     "fields": {
       "name": "random player order",
       "game": 1,
-      "value": true
+      "is_activated": true
     }
   },
   {
@@ -551,7 +551,7 @@
     "fields": {
       "name": "last player rotates sectors",
       "game": 1,
-      "value": true
+      "is_activated": true
     }
   },
   {
@@ -560,7 +560,7 @@
     "fields": {
       "name": "auction factions at the beginning",
       "game": 1,
-      "value": false
+      "is_activated": false
     }
   },
   {
@@ -569,7 +569,7 @@
     "fields": {
       "name": "Map layout",
       "game": 1,
-      "value": null
+      "is_activated": null
     }
   },
   {
@@ -578,7 +578,7 @@
     "fields": {
       "name": "Unlisted",
       "game": 1,
-      "value": true
+      "is_activated": true
     }
   },
   {
@@ -587,7 +587,7 @@
     "fields": {
       "name": "Random player order",
       "game": 1,
-      "value": true
+      "is_activated": true
     }
   },
   {
@@ -596,7 +596,7 @@
     "fields": {
       "name": "Last player rotates sectors",
       "game": 1,
-      "value": true
+      "is_activated": true
     }
   },
   {
@@ -605,7 +605,7 @@
     "fields": {
       "name": "Random factions",
       "game": 1,
-      "value": false
+      "is_activated": false
     }
   },
   {
@@ -614,7 +614,7 @@
     "fields": {
       "name": "Auction mode",
       "game": 1,
-      "value": null
+      "is_activated": null
     }
   },
   {
@@ -623,7 +623,7 @@
     "fields": {
       "name": "Factions variants",
       "game": 1,
-      "value": null
+      "is_activated": null
     }
   },
   {
@@ -632,7 +632,7 @@
     "fields": {
       "name": "Expansions \"Frontiers\"",
       "game": 1,
-      "value": false
+      "is_activated": false
     }
   },
   {
@@ -641,7 +641,7 @@
     "fields": {
       "name": "Plättchen aus der Kickstarter-Kampagne verwenden",
       "game": 2,
-      "value": true
+      "is_activated": true
     }
   },
   {
@@ -650,7 +650,7 @@
     "fields": {
       "name": "Ohne Clan",
       "game": 2,
-      "value": false
+      "is_activated": false
     }
   },
   {
@@ -659,7 +659,7 @@
     "fields": {
       "name": "Statische Importgüter (jeweils 4 SP)",
       "game": 2,
-      "value": false
+      "is_activated": false
     }
   },
   {
@@ -668,7 +668,7 @@
     "fields": {
       "name": "Ohne Hafenplättchen",
       "game": 2,
-      "value": false
+      "is_activated": false
     }
   },
   {
@@ -677,7 +677,7 @@
     "fields": {
       "name": "Ohne Wertungsplättchen",
       "game": 2,
-      "value": false
+      "is_activated": false
     }
   },
   {
@@ -686,7 +686,7 @@
     "fields": {
       "name": "Clan-Auktion (Empfohlen nur für erfahrene Clan-Chiefs!)",
       "game": 2,
-      "value": false
+      "is_activated": false
     }
   },
   {
@@ -695,7 +695,7 @@
     "fields": {
       "name": "Statische Importgüter",
       "game": 2,
-      "value": false
+      "is_activated": false
     }
   },
   {
@@ -704,7 +704,7 @@
     "fields": {
       "name": "Clan-Auktion",
       "game": 2,
-      "value": false
+      "is_activated": false
     }
   },
   {
@@ -713,7 +713,7 @@
     "fields": {
       "name": "Spielvariante",
       "game": 3,
-      "value": null
+      "is_activated": null
     }
   },
   {
@@ -722,7 +722,7 @@
     "fields": {
       "name": "Spielaufbau (Spieler-Tableaus)",
       "game": 3,
-      "value": null
+      "is_activated": null
     }
   },
   {
@@ -731,7 +731,7 @@
     "fields": {
       "name": "Ausgabe",
       "game": 3,
-      "value": null
+      "is_activated": null
     }
   },
   {
@@ -740,7 +740,7 @@
     "fields": {
       "name": "Nur bestätigte Züge sehen",
       "game": 3,
-      "value": true
+      "is_activated": true
     }
   },
   {
@@ -749,7 +749,7 @@
     "fields": {
       "name": "Spielaufbau (Spieler-Tableau)",
       "game": 3,
-      "value": null
+      "is_activated": null
     }
   },
   {
@@ -758,7 +758,7 @@
     "fields": {
       "name": "Spielversion",
       "game": 4,
-      "value": null
+      "is_activated": null
     }
   },
   {
@@ -767,7 +767,7 @@
     "fields": {
       "name": "Friedliche Variante",
       "game": 4,
-      "value": false
+      "is_activated": false
     }
   },
   {
@@ -776,7 +776,7 @@
     "fields": {
       "name": "Variante schwarze Würfel",
       "game": 5,
-      "value": false
+      "is_activated": false
     }
   },
   {
@@ -785,7 +785,7 @@
     "fields": {
       "name": "Die Karawanen-Erweiterung",
       "game": 5,
-      "value": true
+      "is_activated": true
     }
   },
   {
@@ -794,7 +794,7 @@
     "fields": {
       "name": "Alle Charaktere aufnehmen",
       "game": 5,
-      "value": false
+      "is_activated": false
     }
   },
   {
@@ -803,7 +803,7 @@
     "fields": {
       "name": "Karte",
       "game": 6,
-      "value": null
+      "is_activated": null
     }
   },
   {
@@ -812,7 +812,7 @@
     "fields": {
       "name": "Schiffsplättchen Verteilung",
       "game": 6,
-      "value": null
+      "is_activated": null
     }
   },
   {
@@ -821,7 +821,7 @@
     "fields": {
       "name": "Spieldauer",
       "game": 6,
-      "value": null
+      "is_activated": null
     }
   },
   {
@@ -830,7 +830,7 @@
     "fields": {
       "name": "Weierspielen",
       "game": 6,
-      "value": true
+      "is_activated": true
     }
   },
   {
@@ -839,7 +839,7 @@
     "fields": {
       "name": "Weiterspielen",
       "game": 6,
-      "value": true
+      "is_activated": true
     }
   },
   {
@@ -848,7 +848,7 @@
     "fields": {
       "name": "Aufbau erstes Spiel",
       "game": 7,
-      "value": false
+      "is_activated": false
     }
   },
   {
@@ -857,7 +857,7 @@
     "fields": {
       "name": "Eklipse Option",
       "game": 7,
-      "value": null
+      "is_activated": null
     }
   },
   {
@@ -866,7 +866,7 @@
     "fields": {
       "name": "Startplättchen",
       "game": 7,
-      "value": null
+      "is_activated": null
     }
   },
   {
@@ -875,7 +875,7 @@
     "fields": {
       "name": "Pyramidenaufbau",
       "game": 7,
-      "value": null
+      "is_activated": null
     }
   },
   {
@@ -884,7 +884,7 @@
     "fields": {
       "name": "Option \"Erweiterte Regeln\"",
       "game": 8,
-      "value": true
+      "is_activated": true
     }
   },
   {
@@ -893,7 +893,7 @@
     "fields": {
       "name": "Variante \"gemischte Runde\"",
       "game": 9,
-      "value": false
+      "is_activated": false
     }
   },
   {
@@ -902,7 +902,7 @@
     "fields": {
       "name": "Variante \"Navaratnas-Variante\"",
       "game": 9,
-      "value": false
+      "is_activated": false
     }
   },
   {
@@ -911,7 +911,7 @@
     "fields": {
       "name": "Variante \"Ganga Modul\"",
       "game": 9,
-      "value": false
+      "is_activated": false
     }
   },
   {
@@ -920,7 +920,7 @@
     "fields": {
       "name": "Variante \"Mango-Dorf\"",
       "game": 9,
-      "value": false
+      "is_activated": false
     }
   },
   {
@@ -929,7 +929,7 @@
     "fields": {
       "name": "Option \"Einsteigerspiel\"",
       "game": 10,
-      "value": false
+      "is_activated": false
     }
   },
   {
@@ -938,7 +938,7 @@
     "fields": {
       "name": "Expertenvariante",
       "game": 10,
-      "value": true
+      "is_activated": true
     }
   },
   {
@@ -947,7 +947,7 @@
     "fields": {
       "name": "Variante schwarzer Würfel",
       "game": 11,
-      "value": false
+      "is_activated": false
     }
   },
   {
@@ -956,7 +956,7 @@
     "fields": {
       "name": "Spielbrett",
       "game": 12,
-      "value": null
+      "is_activated": null
     }
   },
   {
@@ -965,7 +965,7 @@
     "fields": {
       "name": "Völkertableau",
       "game": 12,
-      "value": null
+      "is_activated": null
     }
   },
   {
@@ -974,7 +974,7 @@
     "fields": {
       "name": "Zugreihenfolge",
       "game": 12,
-      "value": null
+      "is_activated": null
     }
   },
   {
@@ -983,7 +983,7 @@
     "fields": {
       "name": "Mini-Erweiterung",
       "game": 12,
-      "value": true
+      "is_activated": true
     }
   },
   {
@@ -992,7 +992,7 @@
     "fields": {
       "name": "Landschaften Erweiterung",
       "game": 12,
-      "value": true
+      "is_activated": true
     }
   },
   {
@@ -1001,7 +1001,7 @@
     "fields": {
       "name": "Mini-erweiterung",
       "game": 12,
-      "value": true
+      "is_activated": true
     }
   },
   {
@@ -1010,7 +1010,7 @@
     "fields": {
       "name": "Lanschaften-Erweiterung",
       "game": 12,
-      "value": false
+      "is_activated": false
     }
   },
   {
@@ -1019,7 +1019,7 @@
     "fields": {
       "name": "Feuer und Eis - Endwertungskärtchen",
       "game": 12,
-      "value": true
+      "is_activated": true
     }
   },
   {
@@ -1028,7 +1028,7 @@
     "fields": {
       "name": "Feuer und Eis - Völker",
       "game": 12,
-      "value": true
+      "is_activated": true
     }
   },
   {
@@ -1037,7 +1037,7 @@
     "fields": {
       "name": "Startsiegpunkte",
       "game": 12,
-      "value": null
+      "is_activated": null
     }
   },
   {
@@ -1046,7 +1046,7 @@
     "fields": {
       "name": "Mini-Erweiterungen",
       "game": 12,
-      "value": false
+      "is_activated": false
     }
   },
   {
@@ -1055,7 +1055,7 @@
     "fields": {
       "name": "Landschaften-Erweiterung",
       "game": 12,
-      "value": false
+      "is_activated": false
     }
   },
   {
@@ -1064,7 +1064,7 @@
     "fields": {
       "name": "Marienkäfer",
       "game": 16,
-      "value": false
+      "is_activated": false
     }
   },
   {
@@ -1073,7 +1073,7 @@
     "fields": {
       "name": "Moskito",
       "game": 16,
-      "value": false
+      "is_activated": false
     }
   },
   {
@@ -1082,7 +1082,7 @@
     "fields": {
       "name": "Kellerassel",
       "game": 16,
-      "value": false
+      "is_activated": false
     }
   },
   {
@@ -1091,7 +1091,7 @@
     "fields": {
       "name": "Eröffnung",
       "game": 16,
-      "value": null
+      "is_activated": null
     }
   },
   {
@@ -1100,7 +1100,7 @@
     "fields": {
       "name": "Erweiterungen \"Privat-Boote\"",
       "game": 17,
-      "value": false
+      "is_activated": false
     }
   },
   {
@@ -1109,7 +1109,7 @@
     "fields": {
       "name": "Erweiterungen \"Die Wetten\"",
       "game": 17,
-      "value": false
+      "is_activated": false
     }
   },
   {
@@ -1118,7 +1118,7 @@
     "fields": {
       "name": "Erweiterungen \"Die Gunst des Pharaoh\"",
       "game": 17,
-      "value": false
+      "is_activated": false
     }
   },
   {
@@ -1127,7 +1127,7 @@
     "fields": {
       "name": "Erweiterungen \"Götterprophezeiungen\"",
       "game": 17,
-      "value": false
+      "is_activated": false
     }
   },
   {
@@ -1136,7 +1136,7 @@
     "fields": {
       "name": "Erweiterungen \"Zusätzliche Marktkarten\"",
       "game": 17,
-      "value": false
+      "is_activated": false
     }
   },
   {
@@ -1145,7 +1145,7 @@
     "fields": {
       "name": "Varianten \"Zorn des Pharao\"",
       "game": 17,
-      "value": false
+      "is_activated": false
     }
   },
   {
@@ -1154,7 +1154,7 @@
     "fields": {
       "name": "Varianten \"Unbegrenzte Steine\"",
       "game": 17,
-      "value": false
+      "is_activated": false
     }
   },
   {
@@ -1163,7 +1163,7 @@
     "fields": {
       "name": "Seiten der Orte wählen \"Markt\"",
       "game": 17,
-      "value": null
+      "is_activated": null
     }
   },
   {
@@ -1172,7 +1172,7 @@
     "fields": {
       "name": "Seiten der Orte wählen \"Pyramide\"",
       "game": 17,
-      "value": null
+      "is_activated": null
     }
   },
   {
@@ -1181,7 +1181,7 @@
     "fields": {
       "name": "Seiten der Orte wählen \"Tempel\"",
       "game": 17,
-      "value": null
+      "is_activated": null
     }
   },
   {
@@ -1190,7 +1190,7 @@
     "fields": {
       "name": "Seiten der Orte wählen \"Grabkammer\"",
       "game": 17,
-      "value": null
+      "is_activated": null
     }
   },
   {
@@ -1199,7 +1199,7 @@
     "fields": {
       "name": "Seiten der Orte wählen \"Obelisken\"",
       "game": 17,
-      "value": null
+      "is_activated": null
     }
   },
   {
@@ -1208,7 +1208,7 @@
     "fields": {
       "name": "Das Reich der Mitte",
       "game": 18,
-      "value": false
+      "is_activated": false
     }
   },
   {
@@ -1217,7 +1217,7 @@
     "fields": {
       "name": "Harmonie",
       "game": 18,
-      "value": false
+      "is_activated": false
     }
   },
   {
@@ -1226,7 +1226,7 @@
     "fields": {
       "name": "Das große Duell",
       "game": 18,
-      "value": null
+      "is_activated": null
     }
   },
   {
@@ -1235,7 +1235,7 @@
     "fields": {
       "name": "Spielregeln",
       "game": 19,
-      "value": null
+      "is_activated": null
     }
   },
   {
@@ -1244,7 +1244,7 @@
     "fields": {
       "name": "Erweiterung 1 Lux & Tenebrae",
       "game": 19,
-      "value": false
+      "is_activated": false
     }
   },
   {
@@ -1253,7 +1253,7 @@
     "fields": {
       "name": "Erweiterung",
       "game": 20,
-      "value": null
+      "is_activated": null
     }
   },
   {
@@ -1262,7 +1262,7 @@
     "fields": {
       "name": "Ziele",
       "game": 20,
-      "value": null
+      "is_activated": null
     }
   },
   {
@@ -1271,7 +1271,7 @@
     "fields": {
       "name": "Übernahme",
       "game": 20,
-      "value": null
+      "is_activated": null
     }
   },
   {
@@ -1280,7 +1280,7 @@
     "fields": {
       "name": "Neue Waffen",
       "game": 20,
-      "value": true
+      "is_activated": true
     }
   },
   {
@@ -1289,7 +1289,7 @@
     "fields": {
       "name": "Draft-Variante",
       "game": 20,
-      "value": null
+      "is_activated": null
     }
   },
   {
@@ -1298,7 +1298,7 @@
     "fields": {
       "name": "Neue Welten",
       "game": 20,
-      "value": true
+      "is_activated": true
     }
   },
   {
@@ -1307,7 +1307,7 @@
     "fields": {
       "name": "Variante",
       "game": 21,
-      "value": null
+      "is_activated": null
     }
   },
   {
@@ -1316,7 +1316,7 @@
     "fields": {
       "name": "Verteilung",
       "game": 21,
-      "value": null
+      "is_activated": null
     }
   },
   {
@@ -1325,7 +1325,7 @@
     "fields": {
       "name": "Kompetitives Level",
       "game": 21,
-      "value": null
+      "is_activated": null
     }
   },
   {
@@ -1334,7 +1334,7 @@
     "fields": {
       "name": "Öffentliche Ziele",
       "game": 23,
-      "value": true
+      "is_activated": true
     }
   },
   {
@@ -1343,7 +1343,7 @@
     "fields": {
       "name": "Erweiterte Regeln",
       "game": 23,
-      "value": true
+      "is_activated": true
     }
   },
   {
@@ -1352,7 +1352,7 @@
     "fields": {
       "name": "freundlicher Aktienverkauf",
       "game": 23,
-      "value": false
+      "is_activated": false
     }
   },
   {
@@ -1361,7 +1361,7 @@
     "fields": {
       "name": "Option",
       "game": 24,
-      "value": null
+      "is_activated": null
     }
   },
   {
@@ -1370,7 +1370,7 @@
     "fields": {
       "name": "Option \"Regierungsaufträge\"",
       "game": 24,
-      "value": true
+      "is_activated": true
     }
   },
   {
@@ -1379,7 +1379,7 @@
     "fields": {
       "name": "Spielerbogen für erfahrene Spieler ",
       "game": 24,
-      "value": true
+      "is_activated": true
     }
   },
   {
@@ -1388,7 +1388,7 @@
     "fields": {
       "name": "Regierungsaufträge",
       "game": 24,
-      "value": true
+      "is_activated": true
     }
   },
   {
@@ -1397,7 +1397,7 @@
     "fields": {
       "name": "Erweiterte Spielregeln",
       "game": 25,
-      "value": true
+      "is_activated": true
     }
   },
   {
@@ -1406,7 +1406,7 @@
     "fields": {
       "name": "Freundlicher Aktienverkauf",
       "game": 25,
-      "value": true
+      "is_activated": true
     }
   },
   {
@@ -1415,7 +1415,7 @@
     "fields": {
       "name": "Strecke",
       "game": 27,
-      "value": null
+      "is_activated": null
     }
   },
   {
@@ -1424,7 +1424,7 @@
     "fields": {
       "name": "Runden",
       "game": 27,
-      "value": null
+      "is_activated": null
     }
   },
   {
@@ -1433,7 +1433,7 @@
     "fields": {
       "name": "Kartenset",
       "game": 27,
-      "value": null
+      "is_activated": null
     }
   },
   {
@@ -1442,7 +1442,7 @@
     "fields": {
       "name": "Variante \"beschleunigter Ablauf\"",
       "game": 27,
-      "value": true
+      "is_activated": true
     }
   },
   {
@@ -1451,7 +1451,7 @@
     "fields": {
       "name": "Variante \"Einfädeln erlaubt\"",
       "game": 27,
-      "value": false
+      "is_activated": false
     }
   },
   {
@@ -1460,7 +1460,7 @@
     "fields": {
       "name": "Doppelsymbolkarten",
       "game": 30,
-      "value": null
+      "is_activated": null
     }
   },
   {
@@ -1469,7 +1469,7 @@
     "fields": {
       "name": "Mehr Vorausschau",
       "game": 30,
-      "value": null
+      "is_activated": null
     }
   },
   {
@@ -1478,7 +1478,7 @@
     "fields": {
       "name": "Mehr Vorschau",
       "game": 30,
-      "value": null
+      "is_activated": null
     }
   },
   {
@@ -1487,7 +1487,7 @@
     "fields": {
       "name": "ppelsymbolkarten",
       "game": 30,
-      "value": null
+      "is_activated": null
     }
   },
   {
@@ -1496,7 +1496,7 @@
     "fields": {
       "name": "hr Vorausschau",
       "game": 30,
-      "value": null
+      "is_activated": null
     }
   },
   {
@@ -1505,7 +1505,7 @@
     "fields": {
       "name": "Spielversion \"Artefakte\"",
       "game": 32,
-      "value": false
+      "is_activated": false
     }
   },
   {
@@ -1514,7 +1514,7 @@
     "fields": {
       "name": "Volksgruppe \"Basis\"",
       "game": 32,
-      "value": true
+      "is_activated": true
     }
   },
   {
@@ -1523,7 +1523,7 @@
     "fields": {
       "name": "Volksgruppe \"Erweiterung\"",
       "game": 32,
-      "value": false
+      "is_activated": false
     }
   },
   {
@@ -1532,7 +1532,7 @@
     "fields": {
       "name": "Volksgruppe \"Promo\"",
       "game": 32,
-      "value": false
+      "is_activated": false
     }
   },
   {
@@ -1541,7 +1541,7 @@
     "fields": {
       "name": "Zuordnung der Völker",
       "game": 32,
-      "value": null
+      "is_activated": null
     }
   },
   {
@@ -1550,7 +1550,7 @@
     "fields": {
       "name": "Spielplananordnung",
       "game": 32,
-      "value": null
+      "is_activated": null
     }
   },
   {
@@ -1559,7 +1559,7 @@
     "fields": {
       "name": "ielversion",
       "game": 32,
-      "value": null
+      "is_activated": null
     }
   },
   {
@@ -1568,7 +1568,7 @@
     "fields": {
       "name": "ielversion \"Artefakte\"",
       "game": 32,
-      "value": false
+      "is_activated": false
     }
   },
   {
@@ -1577,7 +1577,7 @@
     "fields": {
       "name": "lksgruppe \"Basis\"",
       "game": 32,
-      "value": null
+      "is_activated": null
     }
   },
   {
@@ -1586,7 +1586,7 @@
     "fields": {
       "name": "lksgruppe \"Erweiterung\"",
       "game": 32,
-      "value": false
+      "is_activated": false
     }
   },
   {
@@ -1595,7 +1595,7 @@
     "fields": {
       "name": "lksgruppe \"Promo\"",
       "game": 32,
-      "value": false
+      "is_activated": false
     }
   },
   {
@@ -1604,7 +1604,7 @@
     "fields": {
       "name": "ordnung der Völker",
       "game": 32,
-      "value": null
+      "is_activated": null
     }
   },
   {
@@ -1613,7 +1613,7 @@
     "fields": {
       "name": "ielplananordung",
       "game": 32,
-      "value": null
+      "is_activated": null
     }
   },
   {
@@ -1622,7 +1622,7 @@
     "fields": {
       "name": "Voraussage",
       "game": 33,
-      "value": true
+      "is_activated": true
     }
   },
   {
@@ -1631,7 +1631,7 @@
     "fields": {
       "name": "Uxmal-Begrenzung der Maismenge",
       "game": 35,
-      "value": null
+      "is_activated": null
     }
   },
   {
@@ -1640,7 +1640,7 @@
     "fields": {
       "name": "ufbau erstes Spiel",
       "game": 36,
-      "value": false
+      "is_activated": false
     }
   },
   {
@@ -1649,7 +1649,7 @@
     "fields": {
       "name": "klipse Option",
       "game": 36,
-      "value": null
+      "is_activated": null
     }
   },
   {
@@ -1658,7 +1658,7 @@
     "fields": {
       "name": "tartplättchen",
       "game": 36,
-      "value": null
+      "is_activated": null
     }
   },
   {
@@ -1667,7 +1667,7 @@
     "fields": {
       "name": "yramidenaufbau",
       "game": 36,
-      "value": null
+      "is_activated": null
     }
   },
   {
@@ -1676,7 +1676,7 @@
     "fields": {
       "name": "Startplätchen",
       "game": 36,
-      "value": null
+      "is_activated": null
     }
   },
   {
@@ -1685,7 +1685,7 @@
     "fields": {
       "name": "Option \"mit Schrein\"",
       "game": 37,
-      "value": false
+      "is_activated": false
     }
   },
   {
@@ -1694,7 +1694,7 @@
     "fields": {
       "name": "Hofschritte",
       "game": 38,
-      "value": null
+      "is_activated": null
     }
   },
   {
@@ -1703,7 +1703,7 @@
     "fields": {
       "name": "Hofphasenschritte",
       "game": 38,
-      "value": null
+      "is_activated": null
     }
   },
   {
@@ -1712,7 +1712,7 @@
     "fields": {
       "name": "ofphasenschritte",
       "game": 38,
-      "value": null
+      "is_activated": null
     }
   },
   {
@@ -1721,7 +1721,7 @@
     "fields": {
       "name": "Variante Schwarze Würfel",
       "game": 39,
-      "value": false
+      "is_activated": false
     }
   },
   {
@@ -1730,7 +1730,7 @@
     "fields": {
       "name": "Freundliche Variante",
       "game": 41,
-      "value": false
+      "is_activated": false
     }
   },
   {
@@ -1739,7 +1739,7 @@
     "fields": {
       "name": "Mama & Papa-Auswahl",
       "game": 41,
-      "value": false
+      "is_activated": false
     }
   },
   {
@@ -1748,7 +1748,7 @@
     "fields": {
       "name": "Harter Winter",
       "game": 42,
-      "value": true
+      "is_activated": true
     }
   },
   {
@@ -1757,7 +1757,7 @@
     "fields": {
       "name": "Wilde Tiere",
       "game": 42,
-      "value": true
+      "is_activated": true
     }
   },
   {
@@ -1766,7 +1766,7 @@
     "fields": {
       "name": "Iglus",
       "game": 42,
-      "value": true
+      "is_activated": true
     }
   },
   {
@@ -1775,7 +1775,7 @@
     "fields": {
       "name": "Die neuen Hütten",
       "game": 42,
-      "value": true
+      "is_activated": true
     }
   },
   {
@@ -1784,7 +1784,7 @@
     "fields": {
       "name": "Mammutherde",
       "game": 42,
-      "value": true
+      "is_activated": true
     }
   },
   {
@@ -1793,7 +1793,7 @@
     "fields": {
       "name": "Die Erweiterung",
       "game": 42,
-      "value": false
+      "is_activated": false
     }
   },
   {
@@ -1802,7 +1802,7 @@
     "fields": {
       "name": "Abteilungen",
       "game": 43,
-      "value": null
+      "is_activated": null
     }
   },
   {
@@ -1811,7 +1811,7 @@
     "fields": {
       "name": "Warten Option",
       "game": 43,
-      "value": false
+      "is_activated": false
     }
   },
   {
@@ -1820,7 +1820,7 @@
     "fields": {
       "name": "Geheime Spende",
       "game": 43,
-      "value": false
+      "is_activated": false
     }
   },
   {
@@ -1829,7 +1829,7 @@
     "fields": {
       "name": "Erweiterung Goldenes Flies",
       "game": 44,
-      "value": false
+      "is_activated": false
     }
   },
   {
@@ -1838,7 +1838,7 @@
     "fields": {
       "name": "Einfache Götter",
       "game": 44,
-      "value": true
+      "is_activated": true
     }
   },
   {
@@ -1847,7 +1847,7 @@
     "fields": {
       "name": "Heldenkräfte",
       "game": 44,
-      "value": false
+      "is_activated": false
     }
   },
   {
@@ -1856,7 +1856,7 @@
     "fields": {
       "name": "Fortgeschrittene Götter",
       "game": 44,
-      "value": false
+      "is_activated": false
     }
   },
   {
@@ -1865,7 +1865,7 @@
     "fields": {
       "name": "Aufbau",
       "game": 44,
-      "value": null
+      "is_activated": null
     }
   },
   {
@@ -1874,7 +1874,7 @@
     "fields": {
       "name": "Erweiterung Goldenes Vlies",
       "game": 44,
-      "value": false
+      "is_activated": false
     }
   },
   {
@@ -1883,7 +1883,7 @@
     "fields": {
       "name": "Helden",
       "game": 45,
-      "value": null
+      "is_activated": null
     }
   },
   {
@@ -1892,7 +1892,7 @@
     "fields": {
       "name": "Preis des großen Privilegs",
       "game": 46,
-      "value": null
+      "is_activated": null
     }
   },
   {
@@ -1901,7 +1901,7 @@
     "fields": {
       "name": "pielaufbau",
       "game": 48,
-      "value": null
+      "is_activated": null
     }
   },
   {
@@ -1910,7 +1910,7 @@
     "fields": {
       "name": "chwieriger Modus",
       "game": 48,
-      "value": false
+      "is_activated": false
     }
   },
   {
@@ -1919,7 +1919,7 @@
     "fields": {
       "name": "Option \"Random donjon setup\"",
       "game": 49,
-      "value": false
+      "is_activated": false
     }
   },
   {
@@ -1928,7 +1928,7 @@
     "fields": {
       "name": "Option \"Start-Personalkarten\"",
       "game": 50,
-      "value": null
+      "is_activated": null
     }
   },
   {
@@ -1937,7 +1937,7 @@
     "fields": {
       "name": "Option \"Hotels \"",
       "game": 50,
-      "value": null
+      "is_activated": null
     }
   },
   {
@@ -1946,7 +1946,7 @@
     "fields": {
       "name": "Variante \"ohne Küchenhilfe\"",
       "game": 50,
-      "value": false
+      "is_activated": false
     }
   },
   {
@@ -1955,7 +1955,7 @@
     "fields": {
       "name": "Variante \"Kostenlose Kunden austauschen\"",
       "game": 50,
-      "value": false
+      "is_activated": false
     }
   },
   {
@@ -1964,7 +1964,7 @@
     "fields": {
       "name": "Start-Personalkarten ",
       "game": 50,
-      "value": null
+      "is_activated": null
     }
   },
   {
@@ -1973,7 +1973,7 @@
     "fields": {
       "name": "Spielaufbau",
       "game": 53,
-      "value": null
+      "is_activated": null
     }
   },
   {
@@ -1982,7 +1982,7 @@
     "fields": {
       "name": "Option \"Keine Anzeige der verbleibenden Stationskarten\"",
       "game": 54,
-      "value": false
+      "is_activated": false
     }
   },
   {
@@ -1991,7 +1991,7 @@
     "fields": {
       "name": "Variantenoption",
       "game": 55,
-      "value": false
+      "is_activated": false
     }
   },
   {
@@ -2000,7 +2000,7 @@
     "fields": {
       "name": "Rückgängig/Bestätigen erlaubt",
       "game": 55,
-      "value": true
+      "is_activated": true
     }
   },
   {
@@ -2009,7 +2009,7 @@
     "fields": {
       "name": "Schnellwertung",
       "game": 55,
-      "value": true
+      "is_activated": true
     }
   },
   {
@@ -2018,7 +2018,7 @@
     "fields": {
       "name": "Sojasoße",
       "game": 56,
-      "value": true
+      "is_activated": true
     }
   },
   {
@@ -2027,7 +2027,7 @@
     "fields": {
       "name": "In beide Richtungen weitergeben",
       "game": 56,
-      "value": true
+      "is_activated": true
     }
   },
   {
@@ -2036,7 +2036,7 @@
     "fields": {
       "name": "Variante für 2 Spieler",
       "game": 56,
-      "value": false
+      "is_activated": false
     }
   },
   {
@@ -2045,7 +2045,7 @@
     "fields": {
       "name": "Edition",
       "game": 58,
-      "value": null
+      "is_activated": null
     }
   },
   {
@@ -2054,7 +2054,7 @@
     "fields": {
       "name": "Railroads",
       "game": 62,
-      "value": null
+      "is_activated": null
     }
   },
   {
@@ -2063,7 +2063,7 @@
     "fields": {
       "name": "Fortgeschrittene Variante",
       "game": 66,
-      "value": true
+      "is_activated": true
     }
   },
   {
@@ -2071,7 +2071,7 @@
     "pk": 1,
     "fields": {
       "name": " standard",
-      "is_active": false,
+      "is_selected": false,
       "option": 5
     }
   },
@@ -2080,7 +2080,7 @@
     "pk": 2,
     "fields": {
       "name": " Standard",
-      "is_active": false,
+      "is_selected": false,
       "option": 5
     }
   },
@@ -2089,7 +2089,7 @@
     "pk": 3,
     "fields": {
       "name": " No auction",
-      "is_active": false,
+      "is_selected": false,
       "option": 10
     }
   },
@@ -2098,7 +2098,7 @@
     "pk": 4,
     "fields": {
       "name": " Balanced",
-      "is_active": false,
+      "is_selected": false,
       "option": 11
     }
   },
@@ -2107,7 +2107,7 @@
     "pk": 5,
     "fields": {
       "name": " Choose faction, then bid",
-      "is_active": false,
+      "is_selected": false,
       "option": 10
     }
   },
@@ -2116,7 +2116,7 @@
     "pk": 6,
     "fields": {
       "name": " Alternative Auktion (Spielerreihenfolge hängt vom gewählten Clan ab)",
-      "is_active": false,
+      "is_selected": false,
       "option": 18
     }
   },
@@ -2125,7 +2125,7 @@
     "pk": 7,
     "fields": {
       "name": " Fortgeschrittene Variante",
-      "is_active": false,
+      "is_selected": false,
       "option": 21
     }
   },
@@ -2134,7 +2134,7 @@
     "pk": 8,
     "fields": {
       "name": " Fortgeschrittene Regeln",
-      "is_active": false,
+      "is_selected": false,
       "option": 21
     }
   },
@@ -2143,7 +2143,7 @@
     "pk": 9,
     "fields": {
       "name": " Identisches (zufälliges) Tableau für alle Spieler/Spielerinnen",
-      "is_active": false,
+      "is_selected": false,
       "option": 22
     }
   },
@@ -2152,7 +2152,7 @@
     "pk": 10,
     "fields": {
       "name": " Ausgabe von 2019",
-      "is_active": false,
+      "is_selected": false,
       "option": 23
     }
   },
@@ -2161,7 +2161,7 @@
     "pk": 11,
     "fields": {
       "name": " Zufälliges Tableau ohne Tableau 8",
-      "is_active": false,
+      "is_selected": false,
       "option": 22
     }
   },
@@ -2170,7 +2170,7 @@
     "pk": 12,
     "fields": {
       "name": " Erste Ausgabe",
-      "is_active": false,
+      "is_selected": false,
       "option": 23
     }
   },
@@ -2179,7 +2179,7 @@
     "pk": 13,
     "fields": {
       "name": " zufälliges Tableau ohne Tableau 8",
-      "is_active": false,
+      "is_selected": false,
       "option": 25
     }
   },
@@ -2188,7 +2188,7 @@
     "pk": 14,
     "fields": {
       "name": " Klassischer Spielaufbau (Wähle aus zwei Spielertableaus eines aus)",
-      "is_active": false,
+      "is_selected": false,
       "option": 22
     }
   },
@@ -2197,7 +2197,7 @@
     "pk": 15,
     "fields": {
       "name": " Zufälliges Spielertableau ohne Spielertableau 8",
-      "is_active": false,
+      "is_selected": false,
       "option": 22
     }
   },
@@ -2206,7 +2206,7 @@
     "pk": 16,
     "fields": {
       "name": " Expertenspiel",
-      "is_active": false,
+      "is_selected": false,
       "option": 26
     }
   },
@@ -2215,7 +2215,7 @@
     "pk": 17,
     "fields": {
       "name": " Für Fortgeschrittene (mehr Variation und Untiefen)",
-      "is_active": false,
+      "is_selected": false,
       "option": 31
     }
   },
@@ -2224,7 +2224,7 @@
     "pk": 18,
     "fields": {
       "name": " Auswählen",
-      "is_active": false,
+      "is_selected": false,
       "option": 32
     }
   },
@@ -2233,7 +2233,7 @@
     "pk": 19,
     "fields": {
       "name": " Normal (12 Zeusplättchen)",
-      "is_active": false,
+      "is_selected": false,
       "option": 33
     }
   },
@@ -2242,7 +2242,7 @@
     "pk": 20,
     "fields": {
       "name": " für Fortgeschrittene (mehr Variation und Untiefen)",
-      "is_active": false,
+      "is_selected": false,
       "option": 31
     }
   },
@@ -2251,7 +2251,7 @@
     "pk": 21,
     "fields": {
       "name": " Für Fortgeschrittene (mehr Variation und Untiefen) ",
-      "is_active": false,
+      "is_selected": false,
       "option": 31
     }
   },
@@ -2260,7 +2260,7 @@
     "pk": 22,
     "fields": {
       "name": " normal",
-      "is_active": false,
+      "is_selected": false,
       "option": 37
     }
   },
@@ -2269,7 +2269,7 @@
     "pk": 23,
     "fields": {
       "name": " Fjorde",
-      "is_active": false,
+      "is_selected": false,
       "option": 48
     }
   },
@@ -2278,7 +2278,7 @@
     "pk": 24,
     "fields": {
       "name": " Völker werden in Auktion ausgewählt",
-      "is_active": false,
+      "is_selected": false,
       "option": 49
     }
   },
@@ -2287,7 +2287,7 @@
     "pk": 25,
     "fields": {
       "name": " Variable Zugreihenfolge",
-      "is_active": false,
+      "is_selected": false,
       "option": 50
     }
   },
@@ -2296,7 +2296,7 @@
     "pk": 26,
     "fields": {
       "name": " Grundspiel",
-      "is_active": false,
+      "is_selected": false,
       "option": 48
     }
   },
@@ -2305,7 +2305,7 @@
     "pk": 27,
     "fields": {
       "name": " Feuer & Eis",
-      "is_active": false,
+      "is_selected": false,
       "option": 48
     }
   },
@@ -2314,7 +2314,7 @@
     "pk": 28,
     "fields": {
       "name": " Völker werden in Spielerreihenfolge ausgewählt",
-      "is_active": false,
+      "is_selected": false,
       "option": 49
     }
   },
@@ -2323,7 +2323,7 @@
     "pk": 29,
     "fields": {
       "name": " Nach Völkern angepasst",
-      "is_active": false,
+      "is_selected": false,
       "option": 57
     }
   },
@@ -2332,7 +2332,7 @@
     "pk": 30,
     "fields": {
       "name": " variable Zugreihenfolge",
-      "is_active": false,
+      "is_selected": false,
       "option": 50
     }
   },
@@ -2341,7 +2341,7 @@
     "pk": 31,
     "fields": {
       "name": " Turnier",
-      "is_active": false,
+      "is_selected": false,
       "option": 63
     }
   },
@@ -2350,7 +2350,7 @@
     "pk": 32,
     "fields": {
       "name": " Seite A",
-      "is_active": false,
+      "is_selected": false,
       "option": 71
     }
   },
@@ -2359,7 +2359,7 @@
     "pk": 33,
     "fields": {
       "name": " Seite B",
-      "is_active": false,
+      "is_selected": false,
       "option": 72
     }
   },
@@ -2368,7 +2368,7 @@
     "pk": 34,
     "fields": {
       "name": " (7x7-Feld)",
-      "is_active": false,
+      "is_selected": false,
       "option": 78
     }
   },
@@ -2377,7 +2377,7 @@
     "pk": 35,
     "fields": {
       "name": " Normales Spiel mit Draft",
-      "is_active": false,
+      "is_selected": false,
       "option": 79
     }
   },
@@ -2386,7 +2386,7 @@
     "pk": 36,
     "fields": {
       "name": " Auf der Schwelle zum Krieg + Rebellen vs. Imperium + Aufziehender Sturm",
-      "is_active": false,
+      "is_selected": false,
       "option": 81
     }
   },
@@ -2395,7 +2395,7 @@
     "pk": 37,
     "fields": {
       "name": " Ein",
-      "is_active": false,
+      "is_selected": false,
       "option": 82
     }
   },
@@ -2404,7 +2404,7 @@
     "pk": 38,
     "fields": {
       "name": " Zufällig",
-      "is_active": false,
+      "is_selected": false,
       "option": 83
     }
   },
@@ -2413,7 +2413,7 @@
     "pk": 39,
     "fields": {
       "name": " Kein Ziehen ",
-      "is_active": false,
+      "is_selected": false,
       "option": 85
     }
   },
@@ -2422,7 +2422,7 @@
     "pk": 40,
     "fields": {
       "name": " Rebellen vs Imperium + Aufziehender Sturm",
-      "is_active": false,
+      "is_selected": false,
       "option": 81
     }
   },
@@ -2431,7 +2431,7 @@
     "pk": 41,
     "fields": {
       "name": " Keine Übernahme",
-      "is_active": false,
+      "is_selected": false,
       "option": 83
     }
   },
@@ -2440,7 +2440,7 @@
     "pk": 42,
     "fields": {
       "name": " Kein Ziehen",
-      "is_active": false,
+      "is_selected": false,
       "option": 85
     }
   },
@@ -2449,7 +2449,7 @@
     "pk": 43,
     "fields": {
       "name": " Turnier-modus",
-      "is_active": false,
+      "is_selected": false,
       "option": 87
     }
   },
@@ -2458,7 +2458,7 @@
     "pk": 44,
     "fields": {
       "name": " Auswahl - 7 von 9 (Draft)",
-      "is_active": false,
+      "is_selected": false,
       "option": 88
     }
   },
@@ -2467,7 +2467,7 @@
     "pk": 45,
     "fields": {
       "name": " Kompetitiv",
-      "is_active": false,
+      "is_selected": false,
       "option": 89
     }
   },
@@ -2476,7 +2476,7 @@
     "pk": 46,
     "fields": {
       "name": " Normal",
-      "is_active": false,
+      "is_selected": false,
       "option": 89
     }
   },
@@ -2485,7 +2485,7 @@
     "pk": 47,
     "fields": {
       "name": " Klassisch",
-      "is_active": false,
+      "is_selected": false,
       "option": 87
     }
   },
@@ -2494,7 +2494,7 @@
     "pk": 48,
     "fields": {
       "name": " Spielerbogen für erfahrene Spieler",
-      "is_active": false,
+      "is_selected": false,
       "option": 93
     }
   },
@@ -2503,7 +2503,7 @@
     "pk": 49,
     "fields": {
       "name": " Regierungsaufträge",
-      "is_active": false,
+      "is_selected": false,
       "option": 93
     }
   },
@@ -2512,7 +2512,7 @@
     "pk": 50,
     "fields": {
       "name": " An (+5 Punkte für ein komplettes Königreich)",
-      "is_active": false,
+      "is_selected": false,
       "option": 77
     }
   },
@@ -2521,7 +2521,7 @@
     "pk": 51,
     "fields": {
       "name": " zufällig",
-      "is_active": false,
+      "is_selected": false,
       "option": 99
     }
   },
@@ -2530,7 +2530,7 @@
     "pk": 52,
     "fields": {
       "name": " 3",
-      "is_active": false,
+      "is_selected": false,
       "option": 100
     }
   },
@@ -2539,7 +2539,7 @@
     "pk": 53,
     "fields": {
       "name": " 5",
-      "is_active": false,
+      "is_selected": false,
       "option": 100
     }
   },
@@ -2548,7 +2548,7 @@
     "pk": 54,
     "fields": {
       "name": " Doppelsymbolkarten",
-      "is_active": false,
+      "is_selected": false,
       "option": 104
     }
   },
@@ -2557,7 +2557,7 @@
     "pk": 55,
     "fields": {
       "name": " Reguläre Vorschau",
-      "is_active": false,
+      "is_selected": false,
       "option": 105
     }
   },
@@ -2566,7 +2566,7 @@
     "pk": 56,
     "fields": {
       "name": " Mehr Vorausschau",
-      "is_active": false,
+      "is_selected": false,
       "option": 105
     }
   },
@@ -2575,7 +2575,7 @@
     "pk": 57,
     "fields": {
       "name": " Reguläre Vorausschau",
-      "is_active": false,
+      "is_selected": false,
       "option": 105
     }
   },
@@ -2584,7 +2584,7 @@
     "pk": 58,
     "fields": {
       "name": " zufällig, einzigartig",
-      "is_active": false,
+      "is_selected": false,
       "option": 113
     }
   },
@@ -2593,7 +2593,7 @@
     "pk": 59,
     "fields": {
       "name": " Plus/minus Eins",
-      "is_active": false,
+      "is_selected": false,
       "option": 87
     }
   },
@@ -2602,7 +2602,7 @@
     "pk": 60,
     "fields": {
       "name": " Keine Begrenzung",
-      "is_active": false,
+      "is_selected": false,
       "option": 123
     }
   },
@@ -2611,7 +2611,7 @@
     "pk": 61,
     "fields": {
       "name": " Draft",
-      "is_active": false,
+      "is_selected": false,
       "option": 38
     }
   },
@@ -2620,7 +2620,7 @@
     "pk": 62,
     "fields": {
       "name": " Gleichzeitig",
-      "is_active": false,
+      "is_selected": false,
       "option": 130
     }
   },
@@ -2629,7 +2629,7 @@
     "pk": 63,
     "fields": {
       "name": " gleichzeitig",
-      "is_active": false,
+      "is_selected": false,
       "option": 132
     }
   },
@@ -2638,7 +2638,7 @@
     "pk": 64,
     "fields": {
       "name": " Nur das Basisspiel",
-      "is_active": false,
+      "is_selected": false,
       "option": 142
     }
   },
@@ -2647,7 +2647,7 @@
     "pk": 65,
     "fields": {
       "name": " Abteilungen aus Grundspiel und Erweiterung",
-      "is_active": false,
+      "is_selected": false,
       "option": 142
     }
   },
@@ -2656,7 +2656,7 @@
     "pk": 66,
     "fields": {
       "name": " Schneller Aufbau",
-      "is_active": false,
+      "is_selected": false,
       "option": 149
     }
   },
@@ -2665,7 +2665,7 @@
     "pk": 67,
     "fields": {
       "name": " alle Helden",
-      "is_active": false,
+      "is_selected": false,
       "option": 151
     }
   },
@@ -2674,7 +2674,7 @@
     "pk": 68,
     "fields": {
       "name": " Keine",
-      "is_active": false,
+      "is_selected": false,
       "option": 81
     }
   },
@@ -2683,7 +2683,7 @@
     "pk": 69,
     "fields": {
       "name": " Alte Version 6",
-      "is_active": false,
+      "is_selected": false,
       "option": 152
     }
   },
@@ -2692,7 +2692,7 @@
     "pk": 70,
     "fields": {
       "name": " Neue Version 7",
-      "is_active": false,
+      "is_selected": false,
       "option": 152
     }
   },
@@ -2701,7 +2701,7 @@
     "pk": 71,
     "fields": {
       "name": " Dice Hospital",
-      "is_active": false,
+      "is_selected": false,
       "option": 153
     }
   },
@@ -2710,7 +2710,7 @@
     "pk": 72,
     "fields": {
       "name": " Base game",
-      "is_active": false,
+      "is_selected": false,
       "option": 87
     }
   },
@@ -2719,7 +2719,7 @@
     "pk": 73,
     "fields": {
       "name": " einfacher",
-      "is_active": false,
+      "is_selected": false,
       "option": 157
     }
   },
@@ -2728,7 +2728,7 @@
     "pk": 74,
     "fields": {
       "name": " Profivariante",
-      "is_active": false,
+      "is_selected": false,
       "option": 160
     }
   },
@@ -2737,7 +2737,7 @@
     "pk": 75,
     "fields": {
       "name": " Erstes Spiel",
-      "is_active": false,
+      "is_selected": false,
       "option": 161
     }
   },
@@ -2746,7 +2746,7 @@
     "pk": 76,
     "fields": {
       "name": " Polnische Folklore",
-      "is_active": false,
+      "is_selected": false,
       "option": 169
     }
   },
@@ -2755,7 +2755,7 @@
     "pk": 77,
     "fields": {
       "name": " Halloween",
-      "is_active": false,
+      "is_selected": false,
       "option": 169
     }
   },
@@ -2764,7 +2764,7 @@
     "pk": 78,
     "fields": {
       "name": " Kurzes Spiel",
-      "is_active": false,
+      "is_selected": false,
       "option": 33
     }
   },
@@ -2773,7 +2773,7 @@
     "pk": 79,
     "fields": {
       "name": " Russian",
-      "is_active": false,
+      "is_selected": false,
       "option": 170
     }
   }
