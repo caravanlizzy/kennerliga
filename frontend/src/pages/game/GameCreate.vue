@@ -3,12 +3,12 @@
     <p class="text-h5">Neues Spiel</p>
     <div class="q-py-md">
       <q-form @submit="onSubmit" class="q-gutter-md">
-        <kenner-input class="max-w-500" label="Spielname" v-model="form.name"/>
-        <kenner-select class="max-w-500" label="Plattform" :options="platforms" v-model="form.platform"/>
+        <kenner-input class="max-w-500" label="Spielname" v-model="name" />
+        <kenner-select class="max-w-500" label="Plattform" :options="platforms" v-model="platform" />
         <div class="q-mt-xl">
           <div>
             <span class="text-h6">Spieloptionen</span>
-            <kenner-button class="q-ml-lg" color="primary" label="" icon="add" @click="addEmptyOption"/>
+            <kenner-button class="q-ml-lg" color="primary" label="" icon="add" @click="addEmptyOption" />
           </div>
           <div class="flex row ">
             <GameOption
@@ -46,11 +46,8 @@ const { addItem: addOption, items: gameOptions } = useGameOptions;
 provide('useGameOptions', useGameOptions);
 let optionCounter = 0;
 
-const form = ref({
-  name: '',
-  platform: null,
-  gameOptions: gameOptions
-});
+const name = ref('');
+const platform = ref(null);
 
 function addEmptyOption(): void {
   const emptyOption: TGameOption = { title: '', isBoolean: true, id: optionCounter, choices: [] };
@@ -82,7 +79,7 @@ const onSubmit = async () => {
 async function createGame() {
   return useAxios('games/', {
     method: 'POST',
-    data: { name: form.value.name, platform: form.value.platform }
+    data: { name: name.value, platform: platform.value }
   }, api);
 }
 

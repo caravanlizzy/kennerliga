@@ -20,16 +20,10 @@ export function useCrud<TItem extends BaseItem>(initialItems?: TItem[]) {
     items.value = items.value.filter(item => item[uniqueProperty] !== itemToRemove[uniqueProperty]);
   }
 
-  function getItem(id: TItem[keyof TItem], { uniqueProperty }: {
-    uniqueProperty: keyof TItem
-  } = { uniqueProperty: 'id' }): TItem | undefined {
-    return items.value.find(item => item[uniqueProperty] === id);
-  }
-
-  function updateItem(id: TItem[keyof TItem], propertyToChange: keyof TItem, newValue: TItem[keyof TItem], { uniqueProperty }: {
+  function updateItem(updateItem: TItem, propertyToChange: keyof TItem, newValue: TItem[keyof TItem], { uniqueProperty }: {
     uniqueProperty: keyof TItem
   } = { uniqueProperty: 'id' }) {
-    const item = getItem(id, { uniqueProperty });
+    const item = items.value.find(item => item[uniqueProperty] === updateItem.id);
     if (item) {
       item[propertyToChange] = newValue;
     }
@@ -39,5 +33,5 @@ export function useCrud<TItem extends BaseItem>(initialItems?: TItem[]) {
     return Math.floor(Math.random() * 10 ** length);
   }
 
-  return { items, addItem, deleteItem, getItem, updateItem, createRandomNumber };
+  return { items, addItem, deleteItem, updateItem, createRandomNumber };
 }

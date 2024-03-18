@@ -5,8 +5,8 @@
       <kenner-button color="accent" size="md" class="close-button q-pa-none" icon="close" @click="deleteOption"></kenner-button>
     </q-card-section>
     <div class="col q-mx-md q-my-xs">
-      <q-checkbox color="accent" :model-value="gameOption.isBoolean" @update:model-value="updateBoolean"
-                  label="Ja/Nein Option" />
+      <q-checkbox color="secondary" :model-value="gameOption.isBoolean" @update:model-value="updateBoolean"
+                  label="Ja/Nein Option" size="lg" />
       <kenner-input :model-value="gameOption.title" @update:modelValue="updateTitle" label="Spieloption Titel"
                     class="q-mb-md q-mx-xs" />
       <div v-if="!gameOption.isBoolean" class="column q-pa-xs q-mt-lg">
@@ -34,14 +34,14 @@ import KennerButton from 'components/buttons/KennerButton.vue';
 import { inject } from 'vue';
 
 const props = defineProps<{ gameOption: TGameOption }>();
-const { id: gameId } = props.gameOption;
+const { gameOption } = props;
 
 const { updateItem, deleteItem, createRandomNumber } = inject('useGameOptions');
 
 addChoice();
 
 function updateBoolean(isBoolean) {
-  updateItem(gameId, 'isBoolean', isBoolean);
+  updateItem(gameOption, 'isBoolean', isBoolean);
 }
 
 function deleteOption() {
@@ -49,16 +49,16 @@ function deleteOption() {
 }
 
 function updateTitle(newTitle: string) {
-  updateItem(gameId, 'title', newTitle);
+  updateItem(gameOption, 'title', newTitle);
 }
 
 function addChoice() {
   const emptyChoice: TGameOption['choices'] = { id: createRandomNumber(), value: '' };
-  updateItem(gameId, 'choices', [...props.gameOption.choices, emptyChoice]);
+  updateItem(gameOption, 'choices', [...props.gameOption.choices, emptyChoice]);
 }
 
 function getChoice(choiceId: number) {
-  return props.gameOption.choices.find(choice => choice.id === choiceId);
+  return gameOption.choices.find(choice => choice.id === choiceId);
 }
 
 function updateChoice(choiceId: number, newValue: string) {
@@ -69,7 +69,7 @@ function updateChoice(choiceId: number, newValue: string) {
 }
 
 function removeChoice(choiceId: number) {
-  updateItem(gameId, 'choices', [...props.gameOption.choices.filter(choice => choice.id !== choiceId)]);
+  updateItem(gameOption, 'choices', [...props.gameOption.choices.filter(choice => choice.id !== choiceId)]);
 }
 
 
