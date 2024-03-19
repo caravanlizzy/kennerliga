@@ -15,10 +15,10 @@
           <kenner-button icon="add" color="primary" @click="addChoice" dense></kenner-button>
         </div>
         <q-separator class="q-mt-md q-mb-xs" />
-        <div v-for="{id, value} of gameOption.choices" :key="id" class="row items-center justify-around">
-          <kenner-input :model-value="value" @update:modelValue="updateChoice(id, $event)" label="Auswahloption"
+        <div v-for="{internalId, value} of gameOption.choices" :key="internalId" class="row items-center justify-around">
+          <kenner-input :model-value="value" @update:modelValue="updateChoice(internalId, $event)" label="Auswahloption"
                         class="q-my-md" />
-          <kenner-button flat color="accent" icon="delete" class="" @click="removeChoice(id)"></kenner-button>
+          <kenner-button flat color="accent" icon="delete" class="" @click="removeChoice(internalId)"></kenner-button>
         </div>
 
       </div>
@@ -29,7 +29,7 @@
 
 <script setup lang="ts">
 import KennerInput from 'components/inputs/KennerInput.vue';
-import { TGameOption } from 'pages/game/models';
+import { TGameOption, TGameOptionChoice } from 'pages/game/models';
 import KennerButton from 'components/buttons/KennerButton.vue';
 import { inject } from 'vue';
 
@@ -53,12 +53,13 @@ function updateTitle(newTitle: string) {
 }
 
 function addChoice() {
-  const emptyChoice: TGameOption['choices'] = { id: createRandomNumber(), value: '' };
+  const emptyChoice: TGameOption['choices'] = { internalId: createRandomNumber(), value: '' };
   updateItem(gameOption, 'choices', [...props.gameOption.choices, emptyChoice]);
 }
 
-function getChoice(choiceId: number) {
-  return gameOption.choices.find(choice => choice.id === choiceId);
+
+function getChoice(choiceId: number):TGameOptionChoice {
+  return gameOption.choices.find(choice => choice.internalId === choiceId);
 }
 
 function updateChoice(choiceId: number, newValue: string) {
@@ -69,7 +70,7 @@ function updateChoice(choiceId: number, newValue: string) {
 }
 
 function removeChoice(choiceId: number) {
-  updateItem(gameOption, 'choices', [...props.gameOption.choices.filter(choice => choice.id !== choiceId)]);
+  updateItem(gameOption, 'choices', [...props.gameOption.choices.filter(choice => choice.internalId !== choiceId)]);
 }
 
 
