@@ -6,7 +6,7 @@ export type TGameOptionChoice = {
 export type TGameOption = {
   internalId: number;
   title: string;
-  isBoolean: boolean;
+  hasChoices: boolean;
   choices: TGameOptionChoice[];
 }
 

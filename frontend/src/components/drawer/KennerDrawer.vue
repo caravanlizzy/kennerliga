@@ -21,7 +21,6 @@
 <script setup lang="ts">
 import KennerItem from 'components/items/KennerItem.vue';
 import { useUserStore } from 'stores/userStore';
-import { storeToRefs } from 'pinia';
 import { useResponsive } from 'src/composables/reponsive';
 
 const drawerState = defineModel();

@@ -32,10 +32,12 @@ import { useAxios } from '@vueuse/integrations/useAxios';
 import KennerInput from 'components/inputs/KennerInput.vue';
 import KennerSelect from 'components/inputs/KennerSelect.vue';
 import KennerButton from 'components/buttons/KennerButton.vue';
-import { TGameOption, TGameOptionChoice } from 'pages/game/models';
-import GameOption from 'pages/game/GameOption.vue';
+import { TGameOption } from 'pages/game/models';
+import GameOption from 'pages/game/createGame/GameOptionCreate.vue';
 import { useCrud } from 'src/composables/crud';
+import { useRouter } from 'vue-router';
 
+const router = useRouter()
 const $q = useQuasar();
 
 const platforms = ref(['BGA', 'Yucata']);
@@ -49,59 +51,71 @@ const name = ref('');
 const platform = ref(null);
 
 function addEmptyOption(): void {
-  const emptyOption: TGameOption = { title: '', isBoolean: true, internalId: optionCounter, choices: [] };
+  const emptyOption: TGameOption = { title: '', hasChoices: false, internalId: optionCounter, choices: [] };
   addOption(emptyOption);
   optionCounter++;
 }
 
 const onSubmit = async () => {
-  const gameId = await createGame();
-  console.log({ gameId });
-  // if (isFinished.value) {
-  //   $q.notify({
-  //     color: 'positive',
-  //     textColor: 'white',
-  //     icon: 'save',
-  //     message: 'Gespeichert'
-  //   });
-  // } else if (error.value) {
-  //   $q.notify({
-  //     color: 'negative',
-  //     textColor: 'white',
-  //     icon: 'warning',
-  //     message: 'Fehler'
-  //   });
-// };
+  try {
+    const gameId = await createGame();
+    await createOptions(gameId);
+    $q.notify({
+      color: 'positive',
+      textColor: 'white',
+      icon: 'save',
+      message: 'Gespeichert'
+    });
+    await router.push({name: 'games'})
+  } catch (e) {
+    $q.notify({
+      color: 'negative',
+      textColor: 'white',
+      icon: 'warning',
+      message: 'Fehler'
+    });
+  }
 };
 
 async function createGame(): Promise<number> {
-  const { response } = await useAxios('games/', {
-    method: 'POST',
-    data: { name: name.value, platform: platform.value }
-  }, api);
-  return response.value.data.id;
+  try {
+    const { data } = await api('games/', {
+      method: 'POST',
+      data: { name: name.value, platform: platform.value }
+    });
+    return data.id;
+  } catch (e) {
+    console.log('Error while creating a new game', e);
+    throw new Error('Could not create new game because of following error: ' + e);
+  }
 }
 
-async function createOption(option: TGameOption, gameId: number): Promise<any> {
-  return useAxios('game-options/', {
-    method: 'POST',
-    data: {
-      name: option.title,
-      game: gameId
+async function createOptions(gameId: number): Promise<void> {
+  for (const option of gameOptions.value) {
+    try {
+      const { data: newOption } = await api('game-options/', {
+        method: 'POST',
+        data: {
+          name: option.title,
+          has_choices: option.hasChoices,
+          game: gameId,
+        }
+      });
+      for (const choice of option.choices) {
+        api('game-option-choices/', {
+          method: 'POST',
+          data: {
+            name: choice.value,
+            option: newOption.id
+          }
+        });
+      }
+    } catch (e) {
+      console.log('Error creating game options', e);
+      throw new Error('Error creating game options: \n'+ e);
     }
-  }, api);
+  }
 }
-
-async function createOptionChoice(choice: TGameOptionChoice, optionId: number): Promise<any> {
-  return useAxios('game-option-choices/', {
-    method: 'POST',
-    data: {
-      name: choice.value,
-      option: optionId
-    }
-  }, api);
-}
-
 </script>
 
 <style scoped>

@@ -43,6 +43,7 @@ DJANGO_APPS = [
     'rest_framework.authtoken',
     'corsheaders',
     'nested_admin',
+    'django_filters',
 ]
 
 MY_APPS = [
@@ -87,6 +88,9 @@ TEMPLATES = [
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.TokenAuthentication',
+    ],
+    'DEFAULT_FILTER_BACKENDS': [
+        'django_filters.rest_framework.DjangoFilterBackend'
     ]
 }
 

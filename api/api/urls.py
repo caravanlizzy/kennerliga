@@ -9,7 +9,7 @@ router = routers.SimpleRouter()
 
 router.register('games', GameViewSet, basename='games')
 router.register('game-options', GameOptionViewSet, basename='game-options')
-router.register('game-options', GameOptionChoiceViewSet, basename='game-option-choices')
+router.register('game-option-choices', GameOptionChoiceViewSet, basename='game-option-choices')
 router.register('users', UserViewSet, basename='users')
 
 urlpatterns = [

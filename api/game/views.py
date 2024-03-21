@@ -12,10 +12,12 @@ class GameViewSet(ModelViewSet):
 class GameOptionViewSet(ModelViewSet):
     queryset = GameOption.objects.all()
     serializer_class = GameOptionSerializer
+    filterset_fields = ['game']
     # permission_classes = [ IsAuthenticated ]
 
 
 class GameOptionChoiceViewSet(ModelViewSet):
     queryset = GameOptionChoice.objects.all()
     serializer_class = GameOptionChoiceSerializer
+    filterset_fields = ['option']
     # permission_classes = [ IsAuthenticated ]
