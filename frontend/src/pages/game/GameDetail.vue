@@ -10,7 +10,7 @@
     <div class="row">
       <game-option-card v-for="option in options" :key="option.id" class="col-3">
         <template #cardHeader>
-          <span class="text-secondary text-h6">
+          <span class="text-secondary">
           {{ option.name }}
           </span>
         </template>
