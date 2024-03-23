@@ -1,26 +1,34 @@
 <template>
   <gameOptionCard>
     <template #cardHeader>
-      <div class="">{{gameOption.title}}</div>
-      <kenner-button color="accent" size="md" class="close-button q-pa-none" icon="close" @click="deleteOption"></kenner-button>
+      <div class="">{{ gameOption.title }}</div>
+      <kenner-button color="accent" size="md" class="close-button q-pa-none" icon="close"
+                     @click="deleteOption"></kenner-button>
     </template>
     <template #cardBody>
       <div class="col">
-        <q-toggle  color="secondary" :model-value="gameOption.hasChoices" @update:model-value="updateHasChoices"
-                   label="Auswahloptionen"/>
+        <q-toggle color="secondary" :model-value="gameOption.hasChoices" @update:model-value="updateHasChoices"
+                  label="Auswahloptionen"/>
+        <q-toggle color="accent" label="Bedingungen" :model-value="hasRestrictions"
+                  @update:model-value="hasRestrictions = !hasRestrictions"/>
         <kenner-input :model-value="gameOption.title" @update:modelValue="updateTitle" label="Spieloption Titel"
-                      class="q-mb-md q-mx-xs" />
+                      class="q-mb-md q-mx-xs"/>
         <div v-if="gameOption.hasChoices" class="column q-pa-xs q-mt-lg">
           <div class="row items-center justify-between ">
             <div class="q-mx-xs text-bold">Auswahloptionen</div>
             <kenner-button icon="add" color="primary" @click="addChoice" dense></kenner-button>
           </div>
-          <q-separator class="q-mt-md q-mb-xs" />
-          <div v-for="{internalId, value} of gameOption.choices" :key="internalId" class="row items-center justify-around">
-            <kenner-input :model-value="value" @update:modelValue="updateChoice(internalId, $event)" label="Auswahloption"
-                          class="q-my-md" />
+          <q-separator class="q-mt-md q-mb-xs"/>
+          <div v-for="{internalId, value} of gameOption.choices" :key="internalId"
+               class="row items-center justify-around">
+            <kenner-input :model-value="value" @update:modelValue="updateChoice(internalId, $event)"
+                          label="Auswahloption"
+                          class="q-my-md"/>
             <kenner-button flat color="accent" icon="delete" class="" @click="removeChoice(internalId)"></kenner-button>
           </div>
+        </div>
+        <div v-if="hasRestrictions">
+          <kenner-select v-model="currentSel" :options="items" option-value="title" option-label="title" label="Optionen" emit-value map-options />
         </div>
       </div>
     </template>
@@ -31,17 +39,22 @@
 import KennerInput from 'components/inputs/KennerInput.vue';
 import { TGameOption, TGameOptionChoice } from 'pages/game/models';
 import KennerButton from 'components/buttons/KennerButton.vue';
-import { inject } from 'vue';
+import { inject, ref } from 'vue';
 import GameOptionCard from 'components/cards/gameOptionCard.vue';
+import KennerSelect from 'components/inputs/KennerSelect.vue';
 
 const props = defineProps<{ gameOption: TGameOption }>();
 const { gameOption } = props;
+const hasRestrictions = ref(false);
 
-const { updateItem, deleteItem, createRandomNumber } = inject('useGameOptions');
+const { updateItem, deleteItem, createRandomNumber, items } = inject('useGameOptions');
+
+const it = [{title:"rew"}, {title:"marc"}];
+const currentSel = ref(null);
 
 addChoice();
 
-function updateHasChoices(hasChoices) {
+function updateHasChoices(hasChoices: boolean) {
   updateItem(gameOption, 'hasChoices', hasChoices);
 }
 
@@ -55,11 +68,11 @@ function updateTitle(newTitle: string) {
 
 function addChoice() {
   const emptyChoice: TGameOption['choices'] = { internalId: createRandomNumber(), value: '' };
-  updateItem(gameOption, 'choices', [...props.gameOption.choices, emptyChoice]);
+  updateItem(gameOption, 'choices', [ ...props.gameOption.choices, emptyChoice ]);
 }
 
 
-function getChoice(choiceId: number):TGameOptionChoice {
+function getChoice(choiceId: number): TGameOptionChoice | undefined {
   return gameOption.choices.find(choice => choice.internalId === choiceId);
 }
 
@@ -71,7 +84,7 @@ function updateChoice(choiceId: number, newValue: string) {
 }
 
 function removeChoice(choiceId: number) {
-  updateItem(gameOption, 'choices', [...props.gameOption.choices.filter(choice => choice.internalId !== choiceId)]);
+  updateItem(gameOption, 'choices', [ ...props.gameOption.choices.filter(choice => choice.internalId !== choiceId) ]);
 }
 
 
@@ -81,6 +94,7 @@ function removeChoice(choiceId: number) {
 .bordered {
   border: 1px solid $primary;
 }
+
 .close-button {
   min-width: 22px;
   min-height: 22px;

@@ -3,12 +3,12 @@
     <p class="text-h5">Neues Spiel</p>
     <div class="q-py-md">
       <q-form class="q-gutter-md">
-        <kenner-input class="max-w-500" label="Spielname" v-model="name" />
-        <kenner-select class="max-w-500" label="Plattform" :options="platforms" v-model="platform" />
+        <kenner-input class="max-w-500" label="Spielname" v-model="name"/>
+        <kenner-select class="max-w-500" label="Plattform" :options="platforms" v-model="platform"/>
         <div class="q-mt-xl">
           <div>
             <span class="text-h6">Spieloptionen</span>
-            <kenner-button class="q-ml-lg" color="primary" label="" icon="add" @click="addEmptyOption" />
+            <kenner-button class="q-ml-lg" color="primary" label="" icon="add" @click="addEmptyOption"/>
           </div>
           <div class="flex row ">
             <GameOption
@@ -18,7 +18,7 @@
             />
           </div>
         </div>
-        <kenner-button @click="onSubmit" class="q-my-xl" type="submit" push color="positive" label="Speichern" />
+        <kenner-button @click="onSubmit" class="q-my-xl" type="submit" push color="positive" label="Speichern"/>
       </q-form>
     </div>
   </div>
@@ -28,7 +28,6 @@
 import { provide, ref } from 'vue';
 import { useQuasar } from 'quasar';
 import { api } from 'boot/axios';
-import { useAxios } from '@vueuse/integrations/useAxios';
 import KennerInput from 'components/inputs/KennerInput.vue';
 import KennerSelect from 'components/inputs/KennerSelect.vue';
 import KennerButton from 'components/buttons/KennerButton.vue';
@@ -40,7 +39,7 @@ import { useRouter } from 'vue-router';
 const router = useRouter()
 const $q = useQuasar();
 
-const platforms = ref(['BGA', 'Yucata']);
+const platforms = ref([ 'BGA', 'Yucata' ]);
 
 const useGameOptions = useCrud<TGameOption>();
 const { addItem: addOption, items: gameOptions } = useGameOptions;
@@ -66,7 +65,7 @@ const onSubmit = async () => {
       icon: 'save',
       message: 'Gespeichert'
     });
-    await router.push({name: 'games'})
+    await router.push({ name: 'games' })
   } catch (e) {
     $q.notify({
       color: 'negative',
@@ -112,7 +111,7 @@ async function createOptions(gameId: number): Promise<void> {
       }
     } catch (e) {
       console.log('Error creating game options', e);
-      throw new Error('Error creating game options: \n'+ e);
+      throw new Error('Error creating game options: \n' + e);
     }
   }
 }
