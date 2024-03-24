@@ -2,7 +2,7 @@
   <div class="q-pa-md">
     <p class="text-h5">Neues Spiel</p>
     <div class="q-py-md">
-      <q-form class="q-gutter-md">
+      <q-form class="q-gutter-md" >
         <kenner-input class="max-w-500" label="Spielname" v-model="name"/>
         <kenner-select class="max-w-500" label="Plattform" :options="platforms" v-model="platform"/>
         <div class="q-mt-xl">

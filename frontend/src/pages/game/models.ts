@@ -8,6 +8,9 @@ export type TGameOption = {
   title: string;
   hasChoices: boolean;
   choices: TGameOptionChoice[];
+  onlyIfOption?: number;
+  onlyIfChoice?: number;
+  onlyIfValue?: boolean;
 }
 
 export type GameDto = {
