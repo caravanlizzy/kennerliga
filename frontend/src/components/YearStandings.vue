@@ -1,6 +1,6 @@
 <template>
   <div class="q-pa-md">
-    <q-table></q-table>
+    <q-table>{{columns}}</q-table>
   </div>
 </template>
 

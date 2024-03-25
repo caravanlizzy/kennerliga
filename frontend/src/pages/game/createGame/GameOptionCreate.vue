@@ -8,11 +8,11 @@
     <template #cardBody>
       <div class="col">
         <kenner-input :model-value="gameOption.title" @update:modelValue="updateTitle" label="Spieloption Titel"
-                      class="q-mb-md q-mx-xs" />
+                      class="q-mb-md q-mx-xs" :rules="[val => !!val || 'Titel erforderlich']" />
         <q-toggle color="secondary" :model-value="gameOption.hasChoices" @update:model-value="updateHasChoices"
                   label="Auswahloptionen" />
         <q-toggle color="accent" label="Bedingungen" :model-value="hasRestrictions"
-                  @update:model-value="hasRestrictions = !hasRestrictions" />
+                  @update:model-value="hasRestrictions = !hasRestrictions; updateRestriction()" />
         <div v-if="gameOption.hasChoices" class="column q-pa-xs q-mt-lg">
           <div class="row items-center justify-between ">
             <div class="q-mx-xs text-bold">Auswahloptionen</div>
@@ -23,7 +23,9 @@
                class="row items-center justify-around">
             <kenner-input :model-value="value" @update:modelValue="updateChoice(internalId, $event)"
                           label="Auswahloption"
-                          class="q-my-md" />
+                          class="q-my-md"
+                          :rules="[val => !!val || 'Auswahl erforderlich']" />
+
             <kenner-button flat color="accent" icon="delete" class="" @click="removeChoice(internalId)"></kenner-button>
           </div>
         </div>
@@ -34,15 +36,20 @@
           <q-separator class="q-mt-md q-mb-xs" />
           <kenner-select v-model="restrictToOption" :options="items.filter(item => item.title !== gameOption.title )"
                          class="q-my-md" option-value="title" option-label="title"
-                         label="Option" map-options @change="updateRestriction" />
+                         label="Option" map-options @update:model-value="updateRestriction"
+                         :rules="[val => !!val || 'Auswahl erforderlich']"
+          />
+
+
           <template v-if="restrictToOption && restrictToOption.hasChoices">
             <kenner-select v-model="restrictionChoice.choiceSelection" :options="restrictToOption.choices"
                            class="q-my-md" option-value="value" option-label="value"
-                           label="Bedingter Wert" @change="updateRestriction" />
+                           label="Bedingter Wert" @update:model-value="updateRestriction"
+                           :rules="[val => !!val|| 'Auswahl erforderlich']" />
           </template>
           <template v-else-if="restrictToOption && !restrictToOption.hasChoices">
             <q-toggle color="accent" :model-value="restrictionChoice.booleanActive"
-                      @update:model-value="restrictionChoice.booleanActive = !restrictionChoice.booleanActive" @change="updateRestriction"
+                      @update:model-value="restrictionChoice.booleanActive = !restrictionChoice.booleanActive; updateRestriction()"
                       label="Bedingte Option muss aktiv sein" />
           </template>
         </div>
@@ -75,11 +82,13 @@ function updateHasChoices(hasChoices: boolean) {
 }
 
 function updateRestriction() {
-  if(hasRestrictions.value){
+  if (hasRestrictions.value) {
     updateItem(gameOption, 'onlyIfOption', restrictToOption.value?.internalId);
     if (restrictToOption.value?.hasChoices) {
+      updateItem(gameOption, 'onlyIfValue', undefined);
       updateItem(gameOption, 'onlyIfChoice', restrictionChoice.value?.choiceSelection.internalId);
     } else {
+      updateItem(gameOption, 'onlyIfChoice', undefined);
       updateItem(gameOption, 'onlyIfValue', restrictionChoice.value?.booleanActive);
     }
   } else {

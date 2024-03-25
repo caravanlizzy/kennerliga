@@ -1,8 +1,9 @@
 <template>
   <q-table table-header-class="text-info" flat :rows-per-page-options="[10, 20, 50]">
-  <template v-if="createButton" v-slot:top-right>
-    <kenner-button :color="createButton.color" :icon="createButton.icon" :label="createButton.label" :forward-name="createButton.forwardName" />
-  </template>
+    <template v-if="createButton" v-slot:top-right>
+      <kenner-button :color="createButton.color" :icon="createButton.icon" :label="createButton.label"
+                     :to="{name: createButton.forwardName}" />
+    </template>
   </q-table>
 </template>
 
@@ -13,5 +14,5 @@ import KennerButton from 'components/buttons/KennerButton.vue';
 
 defineProps<{
   createButton?: TKennerButton;
-}>()
+}>();
 </script>

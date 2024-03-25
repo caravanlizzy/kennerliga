@@ -3,7 +3,6 @@
          :dense="isMobile"
          :class="{ 'q-mx-xs' : isMobile }"
          :color="color"
-         :to="{ name:forwardName}"
          :icon="icon"
          size="md"
          :label="label">
