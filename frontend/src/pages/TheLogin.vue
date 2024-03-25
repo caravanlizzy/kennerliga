@@ -1,7 +1,7 @@
 <template>
   <div class="column " :style="[isMobile? 'min-width: 280px; max-width:500px' : 'min-width: 450px']">
     <q-card :bordered="!isMobile" :flat="isMobile" :class="{'q-pa-xl':!isMobile}">
-      <q-form @click="doLogin" @keyup.enter="doLogin">
+      <q-form @submit="doLogin" @keyup.enter="doLogin">
         <q-card-section class="q-mb-md">
         <span class="text-h4 text-accent ">
           Login
@@ -32,7 +32,6 @@ const { login } = useUserStore();
 const { isMobile } = useResponsive();
 
 function doLogin(): void {
-  console.log('login');
   login(email.value, password.value);
 }
 </script>
