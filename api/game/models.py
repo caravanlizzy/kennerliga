@@ -2,7 +2,7 @@ from django.db import models
 
 
 class Game(models.Model):
-    name = models.CharField(max_length=88, unique=True)
+    name = models.CharField(max_length=88)
 
     class Platform(models.TextChoices):
         BGA = 'BGA', 'BGA'
@@ -13,6 +13,8 @@ class Game(models.Model):
         choices=Platform.choices,
         default=Platform.BGA
     )
+
+    unique_together = ('name', 'platform')
 
     def __str__(self):
         return str(self.name)
