@@ -5,7 +5,7 @@ import { api } from 'boot/axios';
 import { useRouter } from 'vue-router';
 
 export type TUser = {
-  email: string;
+  email?: string;
   username: string;
   bga?: string;
   token: string;
@@ -17,10 +17,10 @@ export const useUserStore = defineStore('userStore', () => {
   const user: Ref<TUser | null> = ref(null);
   const isAuthenticated: Ref<boolean> = ref(false);
 
-  async function login(email: string, password: string): Promise<void> {
+  async function login(username: string, password: string): Promise<void> {
     const { data, error, isFinished } = await useAxios('login/', {
       method: 'POST',
-      data: { username: email, password }
+      data: { username: username, password }
     }, api);
     if (isFinished.value && !error.value) {
       const userData = data.value.user;

@@ -8,7 +8,7 @@
         </span>
         </q-card-section>
         <q-card-section>
-          <kenner-input v-model="email" :rules="[]" label="Email" />
+          <kenner-input v-model="username" :rules="[]" label="Nickname" />
           <kenner-input v-model="password" :rules="[]" label="Passwort" type="password" class="q-pt-md" />
         </q-card-section>
         <q-card-section>
@@ -26,12 +26,12 @@ import { useUserStore } from 'stores/userStore';
 import { useResponsive } from 'src/composables/reponsive';
 import { ref } from 'vue';
 
-const email = ref('');
+const username = ref('');
 const password = ref('');
 const { login } = useUserStore();
 const { isMobile } = useResponsive();
 
 function doLogin(): void {
-  login(email.value, password.value);
+  login(username.value, password.value);
 }
 </script>
