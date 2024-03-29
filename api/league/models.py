@@ -11,7 +11,7 @@ class League(models.Model):
         blank=True,
         null=True,
     )
-    number = models.IntegerField('1 for L1, 2 for L2 etc.')
+    level = models.IntegerField('1 for L1, 2 for L2 etc.')
     members = models.ManyToManyField(User, related_name='leagues_member')
 
     def __str__(self):
