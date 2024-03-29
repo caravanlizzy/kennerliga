@@ -21,7 +21,6 @@ export type GameDto = {
 export type GameOptionDto = {
   name: string;
   game: number;
-  is_activated?: boolean;
   has_choices?: boolean;
   only_if_option?: number;
   only_if_choice?: number;
@@ -30,6 +29,5 @@ export type GameOptionDto = {
 
 export type GameOptionChoiceDtp = {
   name: string;
-  is_selected: boolean;
   option: number;
 }

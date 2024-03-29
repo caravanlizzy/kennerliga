@@ -30,10 +30,6 @@ class GameOption(models.Model):
         null=True,
         default=None
     )
-    is_activated = models.BooleanField(
-        null=True,
-        default=None
-    )
 
     def __str__(self):
         return str(self.name)
@@ -41,9 +37,6 @@ class GameOption(models.Model):
 
 class GameOptionChoice(models.Model):
     name = models.CharField(max_length=139, blank=True, null=True)
-    is_selected = models.BooleanField(
-        default=False
-    )
     option = models.ForeignKey(
         GameOption,
         on_delete=models.CASCADE,
