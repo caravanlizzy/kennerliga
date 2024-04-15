@@ -97,5 +97,4 @@ class TieBreaker(models.Model):
 
 class Faction(models.Model):
     game=models.ForeignKey(Game, on_delete=models.CASCADE)
-    result_shape=models.ForeignKey(ResultConfig, on_delete=models.CASCADE)
     name = models.CharField(max_length=255)
