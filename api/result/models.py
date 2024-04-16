@@ -1,40 +1,31 @@
 from django.db import models
 from user.models import User
 from season.models import Season
+from league.models import League
+from game.models import SelectedGame
 
-
-# Create your models here.
 class Result(models.Model):
-    player = models.ForeignKey(
+    user=models.ForeignKey(
         User,
         on_delete=models.CASCADE,
-        null=True,
-        blank=True,
     )
-    position = models.IntegerField()
-    points = models.IntegerField()
-    league = models.IntegerField()
-    season = models.ForeignKey(
-        Season,
-        on_delete=models.CASCADE,
-        null=True,
-        blank=True,
+    selected_game=models.ForeignKey(
+            SelectedGame,
+            on_delete=models.CASCADE,
     )
-    year = models.IntegerField()
-    starting_position = models.IntegerField(blank=True, null=True)
-    starting_points = models.IntegerField(blank=True, null=True)
-    league_points = models.IntegerField()
-    percentage_of_winner = models.FloatField(blank=True, null=True)
-    character = models.CharField(
-        max_length=144,
-       blank=True,
-        null=True
+    league=models.ForeignKey(
+            League,
+            on_delete=models.CASCADE
     )
-    tie_breaker = models.CharField(
-        max_length=144,
-        blank=True,
-        null=True
+    season=models.ForeignKey(
+            Season,
+            on_delete=models.CASCADE
     )
+    points=models.IntegerField(blank=True, null=True)
+    startin_position=models.IntegerField(blank=True, null=True)
+    decisive_tie_breaker=models.CharField(max_length=255, null=True, blank=True)
+    tie_breaker_value=models.CharField(max_length=255, null=True, blank=True)
 
-    def __str__(self):
-        return self.player.username + '_' + str(self.year) + '_' + 'S' + str(self.season) + '_' + 'L' + str(self.league)
+    def __string__(self):
+        return self.user.username + str(self.selected_game) + str(self.season) + str(self.league)
+
