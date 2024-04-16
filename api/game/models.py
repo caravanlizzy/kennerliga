@@ -47,26 +47,22 @@ class GameOptionChoice(models.Model):
         return str(self.name)
 
 
-
 class SelectedGame(models.Model):
-    game = models.ForeignKey(Game, on_delete=models.CASCADE)
-    option = models.ForeignKey(GameOption, on_delete=models.CASCADE)
-    boolean_value = models.BooleanField(null=True, blank=True)
-    choice_value = models.ForeignKey(GameOptionChoice, on_delete=models.CASCADE, null=True, blank=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='selected_games')
+    game = models.ForeignKey(Game, on_delete=models.CASCADE, related_name='user_selections')
+    created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"{self.game.name} - {self.option.name}"
+        return f"{self.user.username}'s selection for {self.game.name}"
 
-    @classmethod
-    def create_selected_game(cls, game, option, boolean_value=None, choice_value=None):
-        selected_game = cls(game=game, option=option)
-        if option.has_choices:
-            selected_game.choice_value = choice_value
-        else:
-            selected_game.boolean_value = boolean_value
-        selected_game.save()
-        return selected_game
+class SelectedOption(models.Model):
+    selected_game = models.ForeignKey(SelectedGame, on_delete=models.CASCADE, related_name='selected_options')
+    game_option = models.ForeignKey(GameOption, on_delete=models.CASCADE, related_name='selections')
+    choice = models.ForeignKey(GameOptionChoice, on_delete=models.CASCADE, null=True, blank=True, related_name='selections')
+    value = models.BooleanField(null=True, blank=True)
 
+    def __str__(self):
+        return f"Option: {self.game_option.name}, Choice: {self.choice.name if self.choice else 'No choice'}, Value: {self.value}"
 
 
 class ResultConfig(models.Model):
