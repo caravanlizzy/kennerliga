@@ -13,46 +13,8 @@
                   label="Auswahloptionen" />
         <q-toggle color="accent" label="Bedingungen" :model-value="hasRestrictions"
                   @update:model-value="hasRestrictions = !hasRestrictions; updateRestriction()" />
-        <div v-if="gameOption.hasChoices" class="column q-pa-xs q-mt-lg">
-          <div class="row items-center justify-between ">
-            <div class="q-mx-xs text-bold">Auswahloptionen</div>
-            <kenner-button icon="add" color="primary" @click="addChoice" dense></kenner-button>
-          </div>
-          <q-separator class="q-mt-md q-mb-xs" />
-          <div v-for="{internalId, value} of gameOption.choices" :key="internalId"
-               class="row items-center justify-around">
-            <kenner-input :model-value="value" @update:modelValue="updateChoice(internalId, $event)"
-                          label="Auswahloption"
-                          class="q-my-md"
-                          :rules="[val => !!val || 'Auswahl erforderlich']" />
-
-            <kenner-button flat color="accent" icon="delete" class="" @click="removeChoice(internalId)"></kenner-button>
-          </div>
-        </div>
-        <div v-if="hasRestrictions" class="column q-pa-xs q-mt-lg bg-brown-1 q-pa-md">
-          <div class="row items-center justify-between ">
-            <div class="q-mx-xs text-bold">Bedingung</div>
-          </div>
-          <q-separator class="q-mt-md q-mb-xs" />
-          <kenner-select v-model="restrictToOption" :options="items.filter(item => item.title !== gameOption.title )"
-                         class="q-my-md" option-value="title" option-label="title"
-                         label="Option" map-options @update:model-value="updateRestriction"
-                         :rules="[val => !!val || 'Auswahl erforderlich']"
-          />
-
-
-          <template v-if="restrictToOption && restrictToOption.hasChoices">
-            <kenner-select v-model="restrictionChoice.choiceSelection" :options="restrictToOption.choices"
-                           class="q-my-md" option-value="value" option-label="value"
-                           label="Bedingter Wert" @update:model-value="updateRestriction"
-                           :rules="[val => !!val|| 'Auswahl erforderlich']" />
-          </template>
-          <template v-else-if="restrictToOption && !restrictToOption.hasChoices">
-            <q-toggle color="accent" :model-value="restrictionChoice.booleanActive"
-                      @update:model-value="restrictionChoice.booleanActive = !restrictionChoice.booleanActive; updateRestriction()"
-                      label="Bedingte Option muss aktiv sein" />
-          </template>
-        </div>
+        <GameOptionChoiceCreate :gameOption="gameOption" v-if="gameOption.hasChoices" />
+        <GameOptionRestrictionCreate :updateRestriction="updateRestriction" :gameOption="gameOption" v-if="hasRestrictions" />
       </div>
     </template>
   </gameOptionCard>
@@ -63,14 +25,37 @@ import KennerInput from 'components/inputs/KennerInput.vue';
 import { TGameOption, TGameOptionChoice } from 'pages/game/models';
 import KennerButton from 'components/buttons/KennerButton.vue';
 import { inject, Ref, ref } from 'vue';
-import GameOptionCard from 'components/cards/gameOptionCard.vue';
-import KennerSelect from 'components/inputs/KennerSelect.vue';
+import GameOptionChoiceCreate from 'pages/game/createGame/GameOptionChoiceCreate.vue';
+import GameOptionRestrictionCreate from 'pages/game/createGame/GameOptionRestrictionCreate.vue';
 
 const props = defineProps<{ gameOption: TGameOption }>();
 const { gameOption } = props;
 
 const { updateItem, deleteItem, createRandomNumber, items } = inject('useGameOptions');
 
+interface RestrictionData {
+  hasRestrictions: boolean;
+  restrictToOption: TGameOption | null;
+  restrictionChoice: {
+    booleanActive: boolean;
+    choiceSelection: {
+      value: string | null;
+      internalId: string | null;
+    };
+  };
+}
+
+const restrictionInfo: Ref<RestrictionData> = ref({
+  hasRestrictions: false,
+  restrictToOption: null,
+  restrictionChoice: {
+    booleanActive: true,
+    choiceSelection: {
+      value: null,
+      internalId: null,
+    }
+  }
+});
 const hasRestrictions = ref(false);
 const restrictToOption: Ref<TGameOption | null> = ref(null);
 const restrictionChoice = ref({ booleanActive: true, choiceSelection: { value: null, internalId: null } });
@@ -115,18 +100,6 @@ function addChoice() {
 function getChoice(choiceId: number): TGameOptionChoice | undefined {
   return gameOption.choices.find(choice => choice.internalId === choiceId);
 }
-
-function updateChoice(choiceId: number, newValue: string) {
-  const choice = getChoice(choiceId);
-  if (choice) {
-    choice.value = newValue;
-  }
-}
-
-function removeChoice(choiceId: number) {
-  updateItem(gameOption, 'choices', [...props.gameOption.choices.filter(choice => choice.internalId !== choiceId)]);
-}
-
 
 </script>
 
