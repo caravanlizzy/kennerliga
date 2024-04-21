@@ -28,5 +28,22 @@
 <script setup lang="ts">
 import KennerSelect from 'components/inputs/KennerSelect.vue';
 import { TGameOption } from 'pages/game/models';
-const props = defineProps<{ gameOption: TGameOption, updateRestriction: }>();
+import { inject, ref, Ref } from 'vue';
+const props = defineProps<{ gameOption: TGameOption }>();
+
+const { updateItem, items } = inject('useGameOptions');
+
+const restrictToOption: Ref<TGameOption | null> = ref(null);
+const restrictionChoice = ref({ booleanActive: true, choiceSelection: { value: null, internalId: null } });
+
+function updateRestriction() {
+  updateItem(props.gameOption, 'onlyIfOption', restrictToOption.value?.internalId);
+  if (restrictToOption.value?.hasChoices) {
+    updateItem(props.gameOption, 'onlyIfValue', undefined);
+    updateItem(props.gameOption, 'onlyIfChoice', restrictionChoice.value?.choiceSelection.internalId);
+  } else {
+    updateItem(props.gameOption, 'onlyIfChoice', undefined);
+    updateItem(props.gameOption, 'onlyIfValue', restrictionChoice.value?.booleanActive);
+  }
+}
 </script>
