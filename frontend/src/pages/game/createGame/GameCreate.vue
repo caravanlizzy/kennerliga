@@ -7,18 +7,22 @@
                       :rules="[val => !!val || 'Bitte wähle einen Spielnamen']" />
         <kenner-select class="max-w-500" label="Plattform" :options="platforms" v-model="platform"
                        :rules="[val => !!val || 'Bitte wähle eine Plattform']" />
-        <div class="q-mt-xl">
+        <div class="q-mt-xl q-pa-md">
           <div>
             <span class="text-h6">Spieloptionen</span>
             <kenner-button class="q-ml-lg" color="primary" label="" icon="add" @click="addEmptyOption" />
           </div>
           <div class="flex row ">
-            <GameOption
+            <game-option
               v-for="gameOption of gameOptions"
               :key="gameOption.internalId"
               :gameOption="gameOption"
             />
           </div>
+        </div>
+        <div class="q-mt-xl q-pa-md">
+          <div class="text-h6">Ergebnis konfigurieren</div>
+          <create-result-config />
         </div>
         <kenner-button class="q-my-xl" type="submit" push color="positive" label="Speichern" />
       </q-form>
@@ -37,6 +41,7 @@ import { TGameOption } from 'pages/game/models';
 import GameOption from 'pages/game/createGame/GameOptionCreate.vue';
 import { useCrud } from 'src/composables/crud';
 import { useRouter } from 'vue-router';
+import CreateResultConfig from "pages/game/createGame/CreateResultConfig.vue";
 
 const router = useRouter();
 const $q = useQuasar();

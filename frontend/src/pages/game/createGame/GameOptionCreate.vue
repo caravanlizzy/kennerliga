@@ -9,9 +9,9 @@
       <div class="col">
         <kenner-input :model-value="gameOption.title" @update:modelValue="updateTitle" label="Spieloption Titel"
                       class="q-mb-md q-mx-xs" :rules="[val => !!val || 'Titel erforderlich']" />
-        <q-toggle color="secondary" :model-value="gameOption.hasChoices" @update:model-value="updateHasChoices"
+        <q-toggle :model-value="gameOption.hasChoices" @update:model-value="updateHasChoices"
                   label="Auswahloptionen" />
-        <q-toggle color="accent" label="Bedingungen" :model-value="hasRestrictions"
+        <q-toggle label="Bedingungen" :model-value="hasRestrictions"
                   @update:model-value="hasRestrictions = !hasRestrictions; deleteRestriction()" />
         <GameOptionChoiceCreate :addChoice="addChoice" :gameOption="gameOption" v-if="gameOption.hasChoices" />
         <GameOptionRestrictionCreate :gameOption="gameOption" v-if="hasRestrictions" />
