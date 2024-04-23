@@ -41,7 +41,7 @@ import { TGameOption } from 'pages/game/models';
 import GameOption from 'pages/game/createGame/GameOptionCreate.vue';
 import { useCrud } from 'src/composables/crud';
 import { useRouter } from 'vue-router';
-import CreateResultConfig from "pages/game/createGame/CreateResultConfig.vue";
+import CreateResultConfig from 'pages/game/createGame/CreateResultConfig.vue';
 
 const router = useRouter();
 const $q = useQuasar();

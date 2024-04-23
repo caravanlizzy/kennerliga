@@ -12,7 +12,7 @@
                     class="q-my-md"
                     :rules="[val => !!val || 'Auswahl erforderlich']"/>
 
-      <kenner-button flat color="accent" icon="close" class="" @click="removeChoice(internalId)"></kenner-button>
+      <kenner-button flat dense rounded color="accent" icon="close" class="" @click="removeChoice(internalId)"></kenner-button>
     </div>
   </div>
 </template>
