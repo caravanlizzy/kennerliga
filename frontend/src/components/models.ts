@@ -15,6 +15,11 @@ export type BreadCrumb = {
   forwardRouteName: string;
 }
 
+export type TItem = {
+  id: number ;
+  name: string;
+  isEditable: boolean;
+}
 export type ObjPool<T> = {
   [key: string]: T;
 }

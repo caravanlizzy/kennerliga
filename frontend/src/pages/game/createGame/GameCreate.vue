@@ -3,10 +3,10 @@
     <p class="text-h5">Neues Spiel</p>
     <div class="q-py-md">
       <q-form @submit="onSubmit()" class="q-gutter-md">
-        <kenner-input class="max-w-500" label="Spielname" v-model="name"
-                      :rules="[val => !!val || 'Bitte wähle einen Spielnamen']"/>
-        <kenner-select class="max-w-500" label="Plattform" :options="platforms" v-model="platform"
-                       :rules="[val => !!val || 'Bitte wähle eine Plattform']"/>
+          <kenner-input class="max-w-500" label="Spielname" v-model="name"
+                        :rules="[val => !!val || 'Bitte wähle einen Spielnamen']"/>
+          <kenner-select class="max-w-500" label="Plattform" :options="platforms" v-model="platform"
+                         :rules="[val => !!val || 'Bitte wähle eine Plattform']"/>
         <div class="q-mt-xl q-pa-md">
           <div>
             <span class="text-h6">Spieloptionen</span>

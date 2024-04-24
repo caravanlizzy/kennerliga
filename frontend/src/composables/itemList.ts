@@ -29,13 +29,5 @@ export function useItemList<TItem extends BaseItem>(initialItems?: TItem[]) {
     return Math.floor(Math.random() * 10 ** length);
   }
 
-  function createUniqueId():number {
-    let id = createRandomNumber();
-    if(items.value.find(item => item.itemId === id)){
-      id = createUniqueId();
-    }
-    return id;
-  }
-
   return { items, addItem, deleteItem, updateItem, createRandomNumber };
 }

@@ -1,22 +1,22 @@
 <template>
   <div class="q-mt-xl q-pa-md">
-    <div class="text-h6">Ergebnis konfigurieren</div>
+    <div class="text-h6 q-mb-md">Ergebnis konfigurieren</div>
     <div>
-      <div class="flex">
-        <div>
-          <q-toggle label="Assymmentrisch" :model-value="isAssymmetric"
-                    @update:model-value="isAssymmetric = !isAssymmetric"/>
-          <list-creator v-if="isAssymmetric" button-label="Neue Faction" :initial-items="factions"
-                        @update-list="(updatedList: string[]) => factions = updatedList"></list-creator>
-        </div>
-        <div>
+      <q-card class="config-box q-pa-md" >
+        <div class="column ">
           <q-toggle label="Startspielerreihenfolge" :model-value="startingPlayerOrder"
                     @update:model-value="startingPlayerOrder = !startingPlayerOrder"/>
-        </div>
-        <div>
+          <q-separator />
           <q-toggle label="Punkte" :model-value="hasPoints" @update:model-value="hasPoints = !hasPoints"/>
+          <q-separator />
+          <q-toggle label="Assymmentrisch" :model-value="isAssymmetric"
+                    @update:model-value="isAssymmetric = !isAssymmetric"/>
+          <div class="q-pa-md">
+            <list-creator v-if="isAssymmetric" button-label="Neue Faction"
+                          @update-list="(updatedList: string[]) => factions = updatedList"></list-creator>
+          </div>
         </div>
-      </div>
+      </q-card>
     </div>
   </div>
 </template>
@@ -33,3 +33,10 @@ const hasPoints = ref(true);
 const factions = ref([]);
 
 </script>
+
+
+<style scoped>
+.config-box {
+  max-width: 300px;
+}
+</style>

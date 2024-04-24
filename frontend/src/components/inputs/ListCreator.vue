@@ -22,21 +22,20 @@
 
 import KennerButton from 'components/buttons/KennerButton.vue';
 import { Ref, ref } from 'vue';
-
-type TItem = {
-  id: number ;
-  name: string;
-  isEditable: boolean;
-}
+import { TItem } from 'components/models';
 
 defineProps<{ buttonLabel: string }>();
 const emit = defineEmits<{
-  (event: 'updateList', list: TItem[]): void;
+  (event: 'updateList', list: string[]): void;
 }>();
 
 let nextId = 0;
 const listItems: Ref<TItem[]> = ref([])
 const inputItem: Ref<TItem> = ref({ id: nextId, name: '', isEditable: false });
+
+function getItemNames(){
+  return listItems.value.map((item:TItem) => item.name)
+}
 
 function addItem() {
   inputItem.value.id = nextId;
@@ -45,13 +44,13 @@ function addItem() {
   listItems.value.sort((a:TItem, b:TItem) => {
     return a.name.localeCompare(b.name, undefined, { numeric: true, sensitivity: 'base' });
   });
-  emit('updateList', listItems.value);
   inputItem.value = { ...inputItem.value, isEditable: false, name: ''};
+  emit('updateList', getItemNames());
 }
 
 function removeItem(item: TItem): void {
   listItems.value = listItems.value.filter(i => i !== item);
-  emit('updateList', listItems.value);
+  emit('updateList', getItemNames());
 }
 </script>
 
