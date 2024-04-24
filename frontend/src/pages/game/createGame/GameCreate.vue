@@ -4,13 +4,13 @@
     <div class="q-py-md">
       <q-form @submit="onSubmit()" class="q-gutter-md">
         <kenner-input class="max-w-500" label="Spielname" v-model="name"
-                      :rules="[val => !!val || 'Bitte wähle einen Spielnamen']" />
+                      :rules="[val => !!val || 'Bitte wähle einen Spielnamen']"/>
         <kenner-select class="max-w-500" label="Plattform" :options="platforms" v-model="platform"
-                       :rules="[val => !!val || 'Bitte wähle eine Plattform']" />
+                       :rules="[val => !!val || 'Bitte wähle eine Plattform']"/>
         <div class="q-mt-xl q-pa-md">
           <div>
             <span class="text-h6">Spieloptionen</span>
-            <kenner-button class="q-ml-lg" color="primary" label="" icon="add" @click="addEmptyOption" />
+            <kenner-button class="q-ml-lg" color="primary" label="" icon="add" @click="addEmptyOption"/>
           </div>
           <div class="flex row ">
             <game-option
@@ -20,11 +20,8 @@
             />
           </div>
         </div>
-        <div class="q-mt-xl q-pa-md">
-          <div class="text-h6">Ergebnis konfigurieren</div>
-          <create-result-config />
-        </div>
-        <kenner-button class="q-my-xl" type="submit" push color="positive" label="Speichern" />
+        <create-result-config/>
+        <kenner-button class="q-my-xl" type="submit" push color="positive" label="Speichern"/>
       </q-form>
     </div>
   </div>
@@ -46,7 +43,7 @@ import CreateResultConfig from 'pages/game/createGame/CreateResultConfig.vue';
 const router = useRouter();
 const $q = useQuasar();
 
-const platforms = ref(['BGA', 'Yucata']);
+const platforms = ref([ 'BGA', 'Yucata' ]);
 
 const useGameOptions = useItemList<TGameOption>();
 const { addItem: addOption, items: gameOptions } = useGameOptions;
@@ -70,11 +67,11 @@ function addEmptyOption(): void {
 
 async function addRestrictions({ onlyIfOption, onlyIfValue, onlyIfChoice }: TGameOption): Promise<void> {
   const optionId = itemIdMap[onlyIfOption];
-  if(!optionId) {
+  if (!optionId) {
     console.log('No restriction option given');
     return;
   }
-  const choiceId:number|undefined = itemIdMap[onlyIfChoice];
+  const choiceId: number | undefined = itemIdMap[onlyIfChoice];
   const data = { only_if_option: optionId, only_if_value: onlyIfValue, only_if_choice: choiceId };
   if (onlyIfValue) {
     data.only_if_value = onlyIfValue;

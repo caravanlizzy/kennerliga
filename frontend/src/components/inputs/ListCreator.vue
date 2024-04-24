@@ -1,18 +1,18 @@
 <template>
-  <q-input filled bottom-slots :label="buttonLabel" v-model="inputItem.name">
+  <q-input filled bottom-slots hide-bottom-space :label="buttonLabel" v-model="inputItem.name">
     <template v-slot:append>
       <kenner-button round dense flat icon="add" @click="addItem"/>
     </template>
   </q-input>
-  <div v-for="item of listItems" :key="item.id">
+  <div v-for="(item, index) of listItems" :key="item.id">
     <div v-if="item.isEditable">
-      <q-input filled bottom-slots label="editieren" color="info" class="text-white" v-model="item.name">
+      <q-input filled bottom-slots hide-bottom-space label="editieren" color="info" class="text-white" v-model="item.name">
         <template v-slot:append>
           <kenner-button color="info" dense flat icon="check" @click="item.isEditable=false" @blur="item.isEditable=false"/>
         </template>
       </q-input>
     </div>
-    <div v-else @click="() => item.isEditable = true" class="flex justify-between q-mb-sm bg-grey-3 q-pa-sm rounded item-border">
+    <div v-else @click="() => item.isEditable = true" class="flex justify-between q-pa-sm rounded item-border" :class="{'border-bottom': index === listItems.length - 1}">
       <div class="column justify-center">{{ item.name }}</div>
       <kenner-button icon="close" @click="removeItem(item)" color="accent" flat dense />
     </div>
@@ -57,5 +57,12 @@ function removeItem(item: TItem): void {
 
 <style scoped>
 .item-border {
+  border-left: 1px solid #e8e8e8;
+  border-right: 1px solid #e8e8e8;
+}
+.border-bottom {
+  border-bottom: 1px solid #e8e8e8;
+  border-bottom-right-radius: 5px;
+  border-bottom-left-radius: 5px;
 }
 </style>
