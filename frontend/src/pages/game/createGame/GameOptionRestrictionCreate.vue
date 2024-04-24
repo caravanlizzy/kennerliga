@@ -34,13 +34,13 @@ const props = defineProps<{ gameOption: TGameOption }>();
 const { updateItem, items } = inject('useGameOptions');
 
 const restrictToOption: Ref<TGameOption | null> = ref(null);
-const restrictionChoice = ref({ booleanActive: true, choiceSelection: { value: null, internalId: null } });
+const restrictionChoice = ref({ booleanActive: true, choiceSelection: { value: null, itemId: null } });
 
 function updateRestriction() {
-  updateItem(props.gameOption, 'onlyIfOption', restrictToOption.value?.internalId);
+  updateItem(props.gameOption, 'onlyIfOption', restrictToOption.value?.itemId);
   if (restrictToOption.value?.hasChoices) {
     updateItem(props.gameOption, 'onlyIfValue', undefined);
-    updateItem(props.gameOption, 'onlyIfChoice', restrictionChoice.value?.choiceSelection.internalId);
+    updateItem(props.gameOption, 'onlyIfChoice', restrictionChoice.value?.choiceSelection.itemId);
   } else {
     updateItem(props.gameOption, 'onlyIfChoice', undefined);
     updateItem(props.gameOption, 'onlyIfValue', restrictionChoice.value?.booleanActive);

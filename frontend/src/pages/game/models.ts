@@ -1,10 +1,10 @@
 export type TGameOptionChoice = {
-  internalId: number;
+  itemId: number;
   value: string;
 }
 
 export type TGameOption = {
-  internalId: number;
+  itemId: number;
   title: string;
   hasChoices: boolean;
   choices: TGameOptionChoice[];

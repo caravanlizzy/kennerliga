@@ -5,14 +5,14 @@
       <kenner-button icon="add" color="primary" @click="addChoice" dense></kenner-button>
     </div>
     <q-separator class="q-mt-md q-mb-xs"/>
-    <div v-for="{internalId, value} of gameOption.choices" :key="internalId"
+    <div v-for="{itemId, value} of gameOption.choices" :key="itemId"
          class="row items-center justify-around">
-      <kenner-input :model-value="value" @update:modelValue="updateChoice(internalId, $event)"
+      <kenner-input :model-value="value" @update:modelValue="updateChoice(itemId, $event)"
                     label="Auswahloption"
                     class="q-my-md"
                     :rules="[val => !!val || 'Auswahl erforderlich']"/>
 
-      <kenner-button flat dense rounded color="accent" icon="close" class="" @click="removeChoice(internalId)"></kenner-button>
+      <kenner-button flat dense rounded color="accent" icon="close" class="" @click="removeChoice(itemId)"></kenner-button>
     </div>
   </div>
 </template>
@@ -27,7 +27,7 @@ const { updateItem } = inject('useGameOptions');
 const props = defineProps<{ gameOption: TGameOption, addChoice: () => void }>();
 
 function getChoice(choiceId: number): TGameOptionChoice | undefined {
-  return props.gameOption.choices.find(choice => choice.internalId === choiceId);
+  return props.gameOption.choices.find(choice => choice.itemId === choiceId);
 }
 
 function updateChoice(choiceId: number, newValue: string) {
@@ -38,6 +38,6 @@ function updateChoice(choiceId: number, newValue: string) {
 }
 
 function removeChoice(choiceId: number) {
-  updateItem(props.gameOption, 'choices', [ ...props.gameOption.choices.filter(choice => choice.internalId !== choiceId) ]);
+  updateItem(props.gameOption, 'choices', [ ...props.gameOption.choices.filter(choice => choice.itemId !== choiceId) ]);
 }
 </script>

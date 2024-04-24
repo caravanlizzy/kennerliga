@@ -60,7 +60,7 @@ function updateTitle(newTitle: string) {
 }
 
 function addChoice() {
-  const emptyChoice: TGameOption['choices'] = { internalId: createRandomNumber(), value: '' };
+  const emptyChoice: TGameOption['choices'] = { itemId: createRandomNumber(), value: '' };
   updateItem(gameOption, 'choices', [...props.gameOption.choices, emptyChoice]);
 }
 

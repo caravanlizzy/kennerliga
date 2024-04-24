@@ -15,7 +15,7 @@
           <div class="flex row ">
             <game-option
               v-for="gameOption of gameOptions"
-              :key="gameOption.internalId"
+              :key="gameOption.itemId"
               :gameOption="gameOption"
             />
           </div>
@@ -39,7 +39,7 @@ import KennerSelect from 'components/inputs/KennerSelect.vue';
 import KennerButton from 'components/buttons/KennerButton.vue';
 import { TGameOption } from 'pages/game/models';
 import GameOption from 'pages/game/createGame/GameOptionCreate.vue';
-import { useCrud } from 'src/composables/crud';
+import { useItemList } from 'src/composables/itemList';
 import { useRouter } from 'vue-router';
 import CreateResultConfig from 'pages/game/createGame/CreateResultConfig.vue';
 
@@ -48,7 +48,7 @@ const $q = useQuasar();
 
 const platforms = ref(['BGA', 'Yucata']);
 
-const useGameOptions = useCrud<TGameOption>();
+const useGameOptions = useItemList<TGameOption>();
 const { addItem: addOption, items: gameOptions } = useGameOptions;
 provide('useGameOptions', useGameOptions);
 let optionCounter = 0;
@@ -56,25 +56,25 @@ let optionCounter = 0;
 const name = ref('');
 const platform = ref(null);
 
-const internalIdMap: { [key: string]: number } = {};
+const itemIdMap: { [key: string]: number } = {};
 
-function addInternalId(internalId: number, id: number): void {
-  internalIdMap[internalId.toString()] = id;
+function additemId(itemId: number, id: number): void {
+  itemIdMap[itemId.toString()] = id;
 }
 
 function addEmptyOption(): void {
-  const emptyOption: TGameOption = { title: '', hasChoices: false, internalId: optionCounter, choices: [] };
+  const emptyOption: TGameOption = { title: '', hasChoices: false, itemId: optionCounter, choices: [] };
   addOption(emptyOption);
   optionCounter++;
 }
 
 async function addRestrictions({ onlyIfOption, onlyIfValue, onlyIfChoice }: TGameOption): Promise<void> {
-  const optionId = internalIdMap[onlyIfOption];
+  const optionId = itemIdMap[onlyIfOption];
   if(!optionId) {
     console.log('No restriction option given');
     return;
   }
-  const choiceId:number|undefined = internalIdMap[onlyIfChoice];
+  const choiceId:number|undefined = itemIdMap[onlyIfChoice];
   const data = { only_if_option: optionId, only_if_value: onlyIfValue, only_if_choice: choiceId };
   if (onlyIfValue) {
     data.only_if_value = onlyIfValue;
@@ -132,7 +132,7 @@ async function createOptions(gameId: number): Promise<void> {
           game: gameId
         }
       });
-      addInternalId(option.internalId, newOption.id);
+      additemId(option.itemId, newOption.id);
       for (const choice of option.choices) {
         const { data } = await api('game-option-choices/', {
           method: 'POST',
@@ -141,7 +141,7 @@ async function createOptions(gameId: number): Promise<void> {
             option: newOption.id
           }
         });
-        addInternalId(choice.internalId, data.id);
+        additemId(choice.itemId, data.id);
       }
       console.log(option);
       addRestrictions(option);
