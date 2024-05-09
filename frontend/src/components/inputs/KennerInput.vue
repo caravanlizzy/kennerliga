@@ -1,5 +1,5 @@
 <template>
-  <q-input hide-bottom-space :dark="dark" filled color="primary" v-model="modelValue" :label="label" lazy-rules :rules="rules" />
+  <q-input hide-bottom-space  :dark="dark"  color="primary" v-model="modelValue" :label="label" lazy-rules :rules="rules" />
 </template>
 
 <script setup lang="ts">

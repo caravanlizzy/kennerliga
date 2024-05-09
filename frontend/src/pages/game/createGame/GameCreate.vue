@@ -55,7 +55,7 @@ const platform = ref(null);
 
 const itemIdMap: { [key: string]: number } = {};
 
-function additemId(itemId: number, id: number): void {
+function addItemId(itemId: number, id: number): void {
   itemIdMap[itemId.toString()] = id;
 }
 
@@ -66,11 +66,11 @@ function addEmptyOption(): void {
 }
 
 async function addRestrictions({ onlyIfOption, onlyIfValue, onlyIfChoice }: TGameOption): Promise<void> {
-  const optionId = itemIdMap[onlyIfOption];
-  if (!optionId) {
+  if (onlyIfOption === undefined || onlyIfValue === undefined) {
     console.log('No restriction option given');
     return;
   }
+  const optionId = itemIdMap[onlyIfOption];
   const choiceId: number | undefined = itemIdMap[onlyIfChoice];
   const data = { only_if_option: optionId, only_if_value: onlyIfValue, only_if_choice: choiceId };
   if (onlyIfValue) {
@@ -107,7 +107,7 @@ const onSubmit = async () => {
 
 async function createGame(): Promise<number> {
   try {
-    const { data } = await api('games/', {
+    const { data } = await api('game/games/', {
       method: 'POST',
       data: { name: name.value, platform: platform.value }
     });
@@ -121,7 +121,7 @@ async function createGame(): Promise<number> {
 async function createOptions(gameId: number): Promise<void> {
   for (const option of gameOptions.value) {
     try {
-      const { data: newOption } = await api('game-options/', {
+      const { data: newOption } = await api('game/options/', {
         method: 'POST',
         data: {
           name: option.title,
@@ -129,19 +129,19 @@ async function createOptions(gameId: number): Promise<void> {
           game: gameId
         }
       });
-      additemId(option.itemId, newOption.id);
+      addItemId(option.itemId, newOption.id);
       for (const choice of option.choices) {
-        const { data } = await api('game-option-choices/', {
+        const { data } = await api('game/option-choices/', {
           method: 'POST',
           data: {
             name: choice.value,
             option: newOption.id
           }
         });
-        additemId(choice.itemId, data.id);
+        addItemId(choice.itemId, data.id);
       }
       console.log(option);
-      addRestrictions(option);
+      await addRestrictions(option);
     } catch (e) {
       console.log('Error creating game options', e);
       throw new Error('Error creating game options: \n' + e);

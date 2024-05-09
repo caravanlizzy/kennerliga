@@ -3,3 +3,4 @@ djangorestframework
 django-nested-admin
 django-cors-headers
 django-filter
+setuptools

@@ -11,6 +11,10 @@ export default {
       name: 'game-detail',
       component: () => import('pages/game/GameDetail.vue')
     },
-    { path: 'create', name: 'game-create', component: () => import('pages/game/createGame/GameCreate.vue') }
+    {
+      path: 'create',
+      name: 'game-create',
+      component: () => import('pages/game/createGame/GameCreate.vue')
+    }
   ]
 };

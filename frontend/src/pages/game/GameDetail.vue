@@ -34,15 +34,15 @@
 <script setup lang="ts">
 import { api } from 'boot/axios';
 import { useRoute } from 'vue-router';
-import GameOptionCard from 'components/cards/gameOptionCard.vue';
+import GameOptionCard from 'components/cards/GameOptionCard.vue';
 import { ref } from 'vue';
 
 const route = useRoute();
 const isLoading = ref(true);
-const { data: game } = await api(`games/${route.params.id}`);
-const { data: options } = await api(`game-options/?game=${game.id}`);
+const { data: game } = await api(`game/games/${route.params.id}`);
+const { data: options } = await api(`game/options/?game=${game.id}`);
 for (const [index, option] of options.entries()) {
-  const { data: choices } = await api(`game-option-choices/?option=${option.id}`);
+  const { data: choices } = await api(`game/option-choices/?option=${option.id}`);
   options[index]['choices'] = choices;
 }
 isLoading.value = true;

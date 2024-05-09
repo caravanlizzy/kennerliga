@@ -8,7 +8,7 @@
 <script setup lang="ts">
 import { TGameOption } from 'pages/game/models';
 import { inject } from 'vue';
-import ListCreator from 'components/inputs/ListCreator.vue';
+import ListCreator from 'components/lists/ListCreator.vue';
 
 const { updateItem } = inject('useGameOptions');
 const props = defineProps<{ gameOption: TGameOption, addChoice: () => void }>();

@@ -1,6 +1,13 @@
 <template>
-  <KennerligaTable v-if="isFinished" :create-button="button" flat title="Spiele" @row-click="onRowClick" :rows="data"
-                   :columns="columns" :rows-per-page-options="[10, 20, 50]" />
+  <KennerligaTable
+    v-if="isFinished"
+    :create-button="button"
+    flat
+    title="Spiele"
+    @row-click="onRowClick"
+    :rows="data"
+    :columns="columns"
+    :rows-per-page-options="[10, 20, 50]" />
 </template>
 
 
@@ -12,7 +19,7 @@ import { api } from 'boot/axios';
 import { useRouter } from 'vue-router';
 import { TKennerButton } from 'components/models';
 
-const { data, isFinished } = useAxios('games', api);
+const { data, isFinished } = useAxios('game/games', api);
 
 const router = useRouter();
 

@@ -29,7 +29,7 @@ import KennerButton from 'components/buttons/KennerButton.vue';
 import { inject, ref } from 'vue';
 import GameOptionChoiceCreate from 'pages/game/createGame/GameOptionChoiceCreate.vue';
 import GameOptionRestrictionCreate from 'pages/game/createGame/GameOptionRestrictionCreate.vue';
-import GameOptionCard from 'components/cards/gameOptionCard.vue';
+import GameOptionCard from 'components/cards/GameOptionCard.vue';
 
 const props = defineProps<{ gameOption: TGameOption }>();
 const { gameOption } = props;
