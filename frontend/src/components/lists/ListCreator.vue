@@ -21,9 +21,23 @@
       <div v-else @click="() => item.isEditable = true" class="flex justify-between q-pa-sm rounded item-border"
            :class="{'border-bottom': index === listItems.length - 1}">
         <div v-if="ranked" class="row">
-          <q-btn flat icon="array_drop_up" size="sm" @click.stop="moveItemUp(index)" />
-          <q-btn flat icon="array_drop_down" size="sm" @click.stop="moveItemDown(index)" />
-          <kenner-counter :content="index" />
+          <div class="column">
+            <q-btn
+              flat
+              v-if="index > 0"
+              icon="arrow_drop_up"
+              size="sm"
+              @click.stop="moveItemUp(index)"
+            />
+            <q-btn
+              flat
+              v-if="index<listItems.length -1"
+              icon="arrow_drop_down"
+              size="sm"
+              @click.stop="moveItemDown(index)"
+            />
+          </div>
+          <!--          <kenner-counter :content="index" />-->
         </div>
         <div class="column justify-center item-start">{{ item.name }}</div>
         <kenner-button icon="close" @click="removeItem(item)" color="accent" flat dense />
@@ -47,9 +61,6 @@ let nextId = 0;
 const listItems: Ref<TItem[]> = ref([]);
 const inputItem: Ref<TItem> = ref({ id: nextId, name: '', isEditable: false });
 
-function getItemNames() {
-  return listItems.value.map((item: TItem) => item.name);
-}
 
 function addItem() {
   inputItem.value.id = nextId;
@@ -59,7 +70,7 @@ function addItem() {
     return a.name.localeCompare(b.name, undefined, { numeric: true, sensitivity: 'base' });
   });
   inputItem.value = { ...inputItem.value, isEditable: false, name: '' };
-  emit('updateList', getItemNames());
+  updateList();
 }
 
 function moveItemUp(index: number): void {
@@ -67,6 +78,7 @@ function moveItemUp(index: number): void {
     // Swap the elements at index and index - 1
     [listItems.value[index], listItems.value[index - 1]] = [listItems.value[index - 1], listItems.value[index]];
   }
+  updateList();
 }
 
 function moveItemDown(index: number): void {
@@ -74,10 +86,19 @@ function moveItemDown(index: number): void {
     // Swap the elements at index and index - 1
     [listItems.value[index], listItems.value[index + 1]] = [listItems.value[index + 1], listItems.value[index]];
   }
+  updateList();
 }
 
 function removeItem(item: TItem): void {
   listItems.value = listItems.value.filter(i => i !== item);
+  updateList();
+}
+
+function updateList() {
+  function getItemNames() {
+    return listItems.value.map((item: TItem) => item.name);
+  }
+
   emit('updateList', getItemNames());
 }
 </script>

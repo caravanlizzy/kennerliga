@@ -15,12 +15,15 @@
             v-if="isAssymmetric"
             button-label="Neue Faction"
             @update-list="(updatedList: string[]) => factions = updatedList"
-            ranked
           ></list-creator>
           <q-separator />
           <q-toggle label="Tie Breaker" :model-value="hasTieBreaker"
                     @update:model-value="hasTieBreaker = !hasTieBreaker" />
-          <ranked-drag-n-drop-list v-if="hasTieBreaker" />
+          <list-creator
+            button-label="Neuer Tiebreaker"
+            v-if="hasTieBreaker"
+            ranked
+          />
         </div>
       </q-card>
     </div>
