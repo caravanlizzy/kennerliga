@@ -29,7 +29,7 @@
 </template>
 
 <script setup lang="ts">
-import { provide, ref } from 'vue';
+import { provide, Ref, ref } from 'vue';
 import { useQuasar } from 'quasar';
 import { api } from 'boot/axios';
 import KennerInput from 'components/inputs/KennerInput.vue';
@@ -53,6 +53,7 @@ let optionCounter = 0;
 
 const name = ref('');
 const platform = ref(null);
+const errorMessages: Ref<string[]> = ref([]);
 
 let resultConfig:TResultConfig|undefined = undefined;
 function updateResultConfig(newResultConfig:TResultConfig){
@@ -94,6 +95,7 @@ const onSubmit = async () => {
   try {
     const gameId = await createGame();
     await createOptions(gameId);
+    await createResultConfigData(gameId);
     $q.notify({
       color: 'positive',
       textColor: 'white',
@@ -102,24 +104,25 @@ const onSubmit = async () => {
     });
     await router.push({ name: 'games' });
   } catch (e) {
+    const message = 'Fehler ' + errorMessages.value;
     $q.notify({
       color: 'negative',
       textColor: 'white',
       icon: 'warning',
-      message: 'Fehler'
+      message: message,
     });
   }
 };
 
 async function createGame(): Promise<number> {
-  console.log('gaming');
   try {
     const { data } = await api('game/games/', {
       method: 'POST',
-      data: { name: name.value, platform: platform.value }
+      data: { name: name.value, platform: platform.value?.id }
     });
     return data.id;
   } catch (e) {
+    errorMessages.value.push('CreateGame');
     console.log('Error while creating a new game', e);
     throw new Error('Could not create new game because of following error: ' + e);
   }
@@ -138,17 +141,19 @@ async function createOptions(gameId: number): Promise<void> {
       });
       addItemId(option.itemId, newOption.id);
       for (const choice of option.choices) {
+        console.log(choice)
         const { data } = await api('game/option-choices/', {
           method: 'POST',
           data: {
-            name: choice.value,
+            name: choice,
             option: newOption.id
           }
         });
-        addItemId(choice.itemId, data.id);
+        // addItemId(choice.itemId, data.id);
       }
       await addRestrictions(option);
     } catch (e) {
+      errorMessages.value.push('CreateGameOption');
       console.log('Error creating game options', e);
       throw new Error('Error creating game options: \n' + e);
     }
@@ -156,9 +161,8 @@ async function createOptions(gameId: number): Promise<void> {
 }
 
 async function createResultConfigData(gameId: number): Promise<void> {
-  console.log({ resultConfig });
   try {
-    const { data: newResultConfig } = await api('game/result-configs/', {
+    const {data: resultConfigData} = await api('game/result-configs/', {
       method: 'POST',
       data: {
         game: gameId,
@@ -167,11 +171,51 @@ async function createResultConfigData(gameId: number): Promise<void> {
         has_points: resultConfig?.hasPoints,
         starting_points_system: resultConfig?.startingPointSystem
       }
-    })
-    console.log({ newResultConfig });
+    });
+    await createFactions(gameId);
+    await createTieBreakers(resultConfigData.id);
   } catch (e) {
+    errorMessages.value.push('CreateResultConfig');
     console.log('Error creating the result configuration', e);
     throw new Error('Error creating the result configuration: \n' + e);
+  }
+}
+
+async function createFactions(gameId: number): Promise<void> {
+  if(resultConfig === undefined) return;
+  if(resultConfig.factions === undefined) return;
+  for (const faction of resultConfig.factions){
+    try {
+      api('game/factions/', {
+        method:'POST',
+        data: {
+          game: gameId,
+          name: faction
+        }
+      })
+    } catch(e) {
+      console.log('Error creating faction', e)
+    }
+  }
+}
+
+async function createTieBreakers(resultConfigId: number): Promise<void> {
+  if(resultConfig === undefined) return;
+  if(resultConfig.tieBreakers === undefined) return;
+  if(!resultConfig.hasTieBreaker) return;
+  for (const [index, tieBreaker] of resultConfig.tieBreakers.entries()){
+    try {
+      api('game/tie-breakers/', {
+        method:'POST',
+        data: {
+          result_config: resultConfigId,
+          name: tieBreaker,
+          order: index * 10
+        }
+      })
+    } catch(e) {
+      console.log('Error creating tieBreaker', e)
+    }
   }
 }
 

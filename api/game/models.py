@@ -8,9 +8,7 @@ class Platform(models.Model):
 
 class Game(models.Model):
     name=models.CharField(max_length=88)
-    platform=models.CharField(
-        max_length=255
-    )
+    platform=models.ForeignKey(Platform, on_delete=models.CASCADE)
     unique_together=('name', 'platform')
 
     def __str__(self):
