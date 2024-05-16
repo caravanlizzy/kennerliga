@@ -2,19 +2,15 @@ from django.db import models
 from user.models import User
 
 
+class Platform(models.Model):
+    name=models.CharField(max_length=255)
+
+
 class Game(models.Model):
     name=models.CharField(max_length=88)
-
-    class Platform(models.TextChoices):
-        BGA='BGA', 'BGA'
-        Yucata='Yucata', "Yucata"
-
     platform=models.CharField(
-        max_length=6,
-        choices=Platform.choices,
-        default=Platform.BGA
+        max_length=255
     )
-
     unique_together=('name', 'platform')
 
     def __str__(self):
@@ -65,25 +61,20 @@ class SelectedOption(models.Model):
         return f"Option: {self.game_option.name}, Choice: {self.choice.name if self.choice else 'No choice'}, Value: {self.value}"
 
 
+class StartingPointSystem(models.Model):
+     code = models.CharField(max_length=10, unique=True)
+     description = models.CharField(max_length=255)
+
 class ResultConfig(models.Model):
-    game=models.ForeignKey(Game, on_delete=models.CASCADE)
-    class StartingPointSystems(models.TextChoices):
-        FIX='FIX', 'All players start with a specific amount of points. The amount is set per game'
-        STARTING_POSITION='SP', 'Starting points depend on starting position'
-        NONE='NONE', 'Game does not have any points'
-        DYNAMIC='DYNAMIC', 'Starting points vary in each game'
-    is_assymmetric=models.BooleanField(default=False)
-    starting_position=models.BooleanField(default=True)
-    starting_points=models.CharField(
-        max_length=7,
-        choices=StartingPointSystems.choices,
-        default=StartingPointSystems.FIX
-    )
-    scoring_points=models.BooleanField(default=True)
+    game = models.ForeignKey(Game, on_delete=models.CASCADE)
+    is_asymmetric = models.BooleanField(default=False)
+    has_starting_player_order = models.BooleanField(default=True)
+    starting_points_system = models.ForeignKey(StartingPointSystem, on_delete=models.SET_NULL, null=True, default=1)
+    has_points = models.BooleanField(default=True)
 
 
 class TieBreaker(models.Model):
-    result_shape=models.ForeignKey(ResultConfig, on_delete=models.CASCADE)
+    result_config=models.ForeignKey(ResultConfig, on_delete=models.CASCADE)
     name=models.CharField(max_length=255)
     order=models.PositiveIntegerField()
 

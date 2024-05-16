@@ -13,6 +13,17 @@ export type TGameOption = {
   onlyIfValue?: boolean;
 }
 
+export type TResultConfig = {
+  isAsymmetric: boolean;
+  hasPoints: boolean;
+  startingPointSystem: string;
+  hasStartingPlayerOrder: boolean; // Assuming it's a number for order/index
+  factions?: string[]; // Assuming it's an array of faction names or identifiers
+  hasTieBreaker: boolean;
+  tieBreakers?: string[]; // Assuming array of tie breaker rules or identifiers
+}
+
+
 export type GameDto = {
   name: string;
   platform: string;

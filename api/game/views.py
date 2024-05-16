@@ -1,7 +1,7 @@
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.permissions import IsAuthenticated
-from game.serializers import GameSerializer, GameOptionSerializer, GameOptionChoiceSerializer, FactionSerializer, TieBreakerSerializer
-from game.models import Game, GameOption, GameOptionChoice, Faction, TieBreaker
+from game.serializers import GameSerializer, GameOptionSerializer, GameOptionChoiceSerializer, FactionSerializer, TieBreakerSerializer, ResultConfigSerializer, StartingPointSystemSerializer, PlatformSerializer
+from game.models import Game, GameOption, GameOptionChoice, Faction, TieBreaker, ResultConfig, StartingPointSystem, Platform
 
 class GameViewSet(ModelViewSet):
     queryset = Game.objects.all()
@@ -33,3 +33,18 @@ class TieBreakerViewSet(ModelViewSet):
     queryset = TieBreaker.objects.all()
     serializer_class = TieBreakerSerializer
     filterset_fields = ['game']
+
+class ResultConfigViewSet(ModelViewSet):
+    queryset = ResultConfig.objects.all()
+    serializer_class = ResultConfigSerializer
+    filterset_fields = ['game']
+
+
+class StartingPointSystemViewSet(ModelViewSet):
+    queryset = StartingPointSystem.objects.all()
+    serializer_class = StartingPointSystemSerializer
+
+
+class PlatformViewSet(ModelViewSet):
+    queryset = Platform.objects.all()
+    serializer_class = PlatformSerializer

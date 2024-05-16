@@ -3,14 +3,15 @@
     <p class="text-h5">Neues Spiel</p>
     <div class="q-py-md">
       <q-form @submit="onSubmit()" class="q-gutter-md">
-          <kenner-input class="max-w-500" label="Spielname" v-model="name"
-                        :rules="[val => !!val || 'Bitte wähle einen Spielnamen']"/>
-          <kenner-select class="max-w-500" label="Plattform" :options="platforms" v-model="platform"
-                         :rules="[val => !!val || 'Bitte wähle eine Plattform']"/>
+        <kenner-input class="max-w-500" label="Spielname" v-model="name"
+                      :rules="[val => !!val || 'Bitte wähle einen Spielnamen']" />
+        <kenner-select class="max-w-500" label="Plattform" :options="platforms" v-model="platform" option-value="name"
+                       option-label="name"
+                       :rules="[val => !!val || 'Bitte wähle eine Plattform']" />
         <div class="q-mt-xl q-pa-md">
           <div>
             <span class="text-h6">Spieloptionen</span>
-            <kenner-button class="q-ml-lg" color="primary" label="" icon="add" @click="addEmptyOption"/>
+            <kenner-button class="q-ml-lg" color="primary" label="" icon="add" @click="addEmptyOption" />
           </div>
           <div class="flex row ">
             <game-option
@@ -20,8 +21,8 @@
             />
           </div>
         </div>
-        <create-result-config/>
-        <kenner-button class="q-my-xl" type="submit" push color="positive" label="Speichern"/>
+        <create-result-config @update-result-config="updateResultConfig" />
+        <kenner-button class="q-my-xl" type="submit" push color="positive" label="Speichern" />
       </q-form>
     </div>
   </div>
@@ -34,7 +35,7 @@ import { api } from 'boot/axios';
 import KennerInput from 'components/inputs/KennerInput.vue';
 import KennerSelect from 'components/inputs/KennerSelect.vue';
 import KennerButton from 'components/buttons/KennerButton.vue';
-import { TGameOption } from 'pages/game/models';
+import { TGameOption, TResultConfig } from 'pages/game/models';
 import GameOption from 'pages/game/createGame/GameOptionCreate.vue';
 import { useItemList } from 'src/composables/itemList';
 import { useRouter } from 'vue-router';
@@ -43,7 +44,7 @@ import CreateResultConfig from 'pages/game/createGame/CreateResultConfig.vue';
 const router = useRouter();
 const $q = useQuasar();
 
-const platforms = ref([ 'BGA', 'Yucata' ]);
+const { data: platforms } = await api('game/platforms/');
 
 const useGameOptions = useItemList<TGameOption>();
 const { addItem: addOption, items: gameOptions } = useGameOptions;
@@ -52,6 +53,11 @@ let optionCounter = 0;
 
 const name = ref('');
 const platform = ref(null);
+
+let resultConfig:TResultConfig|undefined = undefined;
+function updateResultConfig(newResultConfig:TResultConfig){
+  resultConfig = newResultConfig;
+}
 
 const itemIdMap: { [key: string]: number } = {};
 
@@ -106,6 +112,7 @@ const onSubmit = async () => {
 };
 
 async function createGame(): Promise<number> {
+  console.log('gaming');
   try {
     const { data } = await api('game/games/', {
       method: 'POST',
@@ -140,12 +147,31 @@ async function createOptions(gameId: number): Promise<void> {
         });
         addItemId(choice.itemId, data.id);
       }
-      console.log(option);
       await addRestrictions(option);
     } catch (e) {
       console.log('Error creating game options', e);
       throw new Error('Error creating game options: \n' + e);
     }
+  }
+}
+
+async function createResultConfigData(gameId: number): Promise<void> {
+  console.log({ resultConfig });
+  try {
+    const { data: newResultConfig } = await api('game/result-configs/', {
+      method: 'POST',
+      data: {
+        game: gameId,
+        is_asymmetric: resultConfig?.isAsymmetric,
+        has_starting_player_order: resultConfig?.hasStartingPlayerOrder,
+        has_points: resultConfig?.hasPoints,
+        starting_points_system: resultConfig?.startingPointSystem
+      }
+    })
+    console.log({ newResultConfig });
+  } catch (e) {
+    console.log('Error creating the result configuration', e);
+    throw new Error('Error creating the result configuration: \n' + e);
   }
 }
 

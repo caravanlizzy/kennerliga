@@ -4,15 +4,19 @@
     <div class="row">
       <q-card class="config-box q-pa-md">
         <div class="column ">
-          <q-toggle label="Startspielerreihenfolge" :model-value="startingPlayerOrder"
-                    @update:model-value="startingPlayerOrder = !startingPlayerOrder" />
+          <q-toggle label="Startspielerreihenfolge" :model-value="hasStartingPlayerOrder"
+                    @update:model-value="hasStartingPlayerOrder = !hasStartingPlayerOrder" />
           <q-separator />
           <q-toggle label="Punkte" :model-value="hasPoints" @update:model-value="hasPoints = !hasPoints" />
+
+          <kenner-select v-if="hasPoints" class="q-px-md q-pb-sm" v-model="startingPointSystem"
+                         :options="startingPointSystemOptions" option-value="code" option-label="code"
+                         label="Startsiegpunktesystem" />
           <q-separator />
-          <q-toggle label="Assymmentrisch" :model-value="isAssymmetric"
-                    @update:model-value="isAssymmetric = !isAssymmetric" />
+          <q-toggle label="Assymmentrisch" :model-value="isAsymmetric"
+                    @update:model-value="isAsymmetric = !isAsymmetric" />
           <list-creator
-            v-if="isAssymmetric"
+            v-if="isAsymmetric"
             button-label="Neue Faction"
             @update-list="(updatedList: string[]) => factions = updatedList"
           ></list-creator>
@@ -23,6 +27,7 @@
             button-label="Neuer Tiebreaker"
             v-if="hasTieBreaker"
             ranked
+            @update-list="(updatedList: string[]) => tieBreakers = updatedList"
           />
         </div>
       </q-card>
@@ -32,15 +37,45 @@
 
 <script setup lang="ts">
 
-import { Ref, ref } from 'vue';
+import { Ref, ref, watch } from 'vue';
 import ListCreator from 'components/lists/ListCreator.vue';
+import KennerSelect from 'components/inputs/KennerSelect.vue';
+import { api } from 'boot/axios';
+import { TResultConfig } from 'pages/game/models';
 
-const isAssymmetric = ref(false);
-const startingPlayerOrder = ref(true);
+const emit = defineEmits<{
+  (event: 'updateResultConfig', resultConfig: TResultConfig): void;
+}>();
+
+const isAsymmetric = ref(false);
+const hasStartingPlayerOrder = ref(true);
 const hasPoints = ref(true);
 const hasTieBreaker = ref(false);
+const tieBreakers: Ref<string[]> = ref([]);
 
+const { data: startingPointSystemOptions } = await api('game/starting-point-systems');
+const startingPointSystem = ref(startingPointSystemOptions[0]['code']);
 const factions: Ref<string[]> = ref([]);
+
+function getResultConfig(): TResultConfig {
+  return ({
+    isAsymmetric: isAsymmetric.value,
+    hasPoints: hasPoints.value,
+    startingPointSystem: startingPointSystem.value,
+    hasStartingPlayerOrder: hasStartingPlayerOrder.value,
+    factions: factions.value,
+    hasTieBreaker: hasTieBreaker.value,
+    tieBreakers: tieBreakers.value
+  });
+}
+
+function emitResultConfig() {
+  const resultConfig = getResultConfig();
+  emit('updateResultConfig', resultConfig);
+}
+
+watch([isAsymmetric, hasPoints, startingPointSystem, hasStartingPlayerOrder, factions, hasTieBreaker, tieBreakers],
+  () => emitResultConfig());
 
 </script>
 
