@@ -8,6 +8,7 @@
         <kenner-select class="max-w-500" label="Plattform" :options="platforms" v-model="platform" option-value="name"
                        option-label="name"
                        :rules="[val => !!val || 'Bitte wähle eine Plattform']" />
+        {{ gameOptions }}
         <div class="q-mt-xl q-pa-md">
           <div>
             <span class="text-h6">Spieloptionen</span>
@@ -60,10 +61,10 @@ function updateResultConfig(newResultConfig:TResultConfig){
   resultConfig = newResultConfig;
 }
 
-const itemIdMap: { [key: string]: number } = {};
+const optionIDStorage: { [key: string]: number } = {};
 
 function addItemId(itemId: number, id: number): void {
-  itemIdMap[itemId.toString()] = id;
+  optionIDStorage[itemId.toString()] = id;
 }
 
 function addEmptyOption(): void {
@@ -72,20 +73,22 @@ function addEmptyOption(): void {
   optionCounter++;
 }
 
-async function addRestrictions({ onlyIfOption, onlyIfValue, onlyIfChoice }: TGameOption): Promise<void> {
-  if (onlyIfOption === undefined || onlyIfValue === undefined) {
+async function addRestrictions(option: TGameOption): Promise<void> {
+  console.log({ option })
+  if (option.onlyIfOption === undefined || option.onlyIfValue === undefined) {
     console.log('No restriction option given');
     return;
   }
-  const optionId = itemIdMap[onlyIfOption];
-  const choiceId: number | undefined = itemIdMap[onlyIfChoice];
+  const { onlyIfOption, onlyIfChoice, onlyIfValue } = option;
+  const optionId = optionIDStorage[onlyIfOption];
+  const choiceId: number | undefined = optionIDStorage[onlyIfChoice];
   const data = { only_if_option: optionId, only_if_value: onlyIfValue, only_if_choice: choiceId };
   if (onlyIfValue) {
     data.only_if_value = onlyIfValue;
   } else {
     data['only_if_choice'] = choiceId;
   }
-  await api(`game-options/${optionId}/`, {
+  await api(`game/options/${optionId}/`, {
     method: 'PATCH',
     data
   });
@@ -141,14 +144,15 @@ async function createOptions(gameId: number): Promise<void> {
       });
       addItemId(option.itemId, newOption.id);
       for (const choice of option.choices) {
-        console.log(choice)
-        const { data } = await api('game/option-choices/', {
+        await api('game/option-choices/', {
           method: 'POST',
           data: {
             name: choice,
             option: newOption.id
           }
         });
+        console.log({ itemIdMap: optionIDStorage });
+        // currently not working since list logic has been outsourced
         // addItemId(choice.itemId, data.id);
       }
       await addRestrictions(option);

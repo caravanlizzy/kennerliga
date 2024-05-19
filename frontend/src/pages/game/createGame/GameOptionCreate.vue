@@ -29,7 +29,7 @@ import KennerButton from 'components/buttons/KennerButton.vue';
 import { inject, ref } from 'vue';
 import GameOptionChoiceCreate from 'pages/game/createGame/GameOptionChoiceCreate.vue';
 import GameOptionRestrictionCreate from 'pages/game/createGame/GameOptionRestrictionCreate.vue';
-import GameOptionCard from 'components/cards/GameOptionCard.vue';
+import GameOptionCard from 'components/cards/OverviewCard.vue';
 
 const props = defineProps<{ gameOption: TGameOption }>();
 const { gameOption } = props;
@@ -37,8 +37,6 @@ const { gameOption } = props;
 const { updateItem, deleteItem, createRandomNumber } = inject('useGameOptions');
 
 const hasRestrictions = ref(false);
-
-addChoice();
 
 function updateHasChoices(hasChoices: boolean) {
   updateItem(gameOption, 'hasChoices', hasChoices);
