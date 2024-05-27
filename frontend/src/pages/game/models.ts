@@ -23,6 +23,10 @@ export type TResultConfig = {
   tieBreakers?: string[]; // Assuming array of tie breaker rules or identifiers
 }
 
+export type TPlatform = {
+  id: number,
+  name: string
+}
 
 export type GameDto = {
   name: string;
