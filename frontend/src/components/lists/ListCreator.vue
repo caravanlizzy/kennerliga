@@ -54,7 +54,7 @@ import KennerCounter from 'components/items/KennerCounter.vue';
 
 defineProps<{ buttonLabel: string, ranked?: boolean }>();
 const emit = defineEmits<{
-  (event: 'updateList', list: string[]): void;
+  (event: 'updateList', list: Omit<TItem, 'isEditable'>[]): void;
 }>();
 
 let nextId = 0;
@@ -95,11 +95,7 @@ function removeItem(item: TItem): void {
 }
 
 function updateList() {
-  function getItemNames() {
-    return listItems.value.map((item: TItem) => item.name);
-  }
-
-  emit('updateList', getItemNames());
+  emit('updateList', listItems.value.map(({ isEditable, ...rest }) => rest));
 }
 </script>
 
