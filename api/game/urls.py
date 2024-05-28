@@ -1,7 +1,9 @@
 # game/urls.py
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from game.views import GameViewSet, GameOptionViewSet, GameOptionChoiceViewSet, FactionViewSet, TieBreakerViewSet, ResultConfigViewSet, StartingPointSystemViewSet, PlatformViewSet
+
+from game.views import GameViewSet, GameOptionViewSet, GameOptionChoiceViewSet, FactionViewSet, TieBreakerViewSet, \
+    ResultConfigViewSet, StartingPointSystemViewSet, PlatformViewSet
 
 router = DefaultRouter()
 router.register('games', GameViewSet, basename='games')
@@ -16,7 +18,3 @@ router.register('platforms', PlatformViewSet, basename='platforms')
 urlpatterns = [
     path('', include(router.urls)),
 ]
-
-
-
-

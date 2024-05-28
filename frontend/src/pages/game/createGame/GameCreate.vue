@@ -9,6 +9,7 @@
                        option-label="name"
                        :rules="[val => !!val || 'Bitte wähle eine Plattform']" />
         {{ gameOptions }}
+
         <div class="q-mt-xl q-pa-md">
           <div>
             <span class="text-h6">Spieloptionen</span>
@@ -36,12 +37,12 @@ import { api } from 'boot/axios';
 import KennerInput from 'components/inputs/KennerInput.vue';
 import KennerSelect from 'components/inputs/KennerSelect.vue';
 import KennerButton from 'components/buttons/KennerButton.vue';
-import {TGameOption, TPlatform, TResultConfig} from 'pages/game/models';
+import { TGameOption, TPlatform, TResultConfig } from 'pages/game/models';
 import GameOption from 'pages/game/createGame/GameOptionCreate.vue';
 import { useItemList } from 'src/composables/itemList';
 import { useRouter } from 'vue-router';
 import CreateResultConfig from 'pages/game/createGame/CreateResultConfig.vue';
-import {createGame, createOptions, createResultConfigData} from "src/services/gameService";
+import { createGame, createOptions, createResultConfigData } from 'src/services/gameService';
 
 const router = useRouter();
 const $q = useQuasar();
@@ -54,11 +55,12 @@ provide('useGameOptions', useGameOptions);
 let optionCounter = 0;
 
 const name = ref('');
-const platform: Ref<TPlatform|undefined> = ref(undefined);
+const platform: Ref<TPlatform | undefined> = ref(undefined);
 const errorMessages: Ref<string[]> = ref([]);
 
-let resultConfig:TResultConfig|undefined = undefined;
-function updateResultConfig(newResultConfig:TResultConfig){
+let resultConfig: TResultConfig | undefined = undefined;
+
+function updateResultConfig(newResultConfig: TResultConfig) {
   resultConfig = newResultConfig;
 }
 
@@ -71,9 +73,10 @@ function addEmptyOption(): void {
 
 const onSubmit = async () => {
   try {
-    const gameId = await createGame(name.value, platform.value!);
+    if (platform.value === undefined) return;
+    const gameId = await createGame(name.value, platform.value);
     await createOptions(gameId, gameOptions.value);
-    if(resultConfig !== undefined){
+    if (resultConfig !== undefined) {
       await createResultConfigData(gameId, resultConfig);
     } else {
       console.log('Missing result config');
@@ -92,7 +95,7 @@ const onSubmit = async () => {
       color: 'negative',
       textColor: 'white',
       icon: 'warning',
-      message: message,
+      message: message
     });
   }
 };

@@ -6,7 +6,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ('game', '0010_remove_selectedgame_boolean_value_and_more'),
         ('league', '0003_rename_number_league_level'),
@@ -71,7 +70,8 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='result',
             name='user',
-            field=models.ForeignKey(default=1, on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL),
+            field=models.ForeignKey(default=1, on_delete=django.db.models.deletion.CASCADE,
+                                    to=settings.AUTH_USER_MODEL),
             preserve_default=False,
         ),
         migrations.AlterField(

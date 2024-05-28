@@ -4,7 +4,6 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ('game', '0010_remove_selectedgame_boolean_value_and_more'),
     ]

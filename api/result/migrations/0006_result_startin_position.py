@@ -4,7 +4,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ('result', '0005_remove_result_character_remove_result_league_points_and_more'),
     ]

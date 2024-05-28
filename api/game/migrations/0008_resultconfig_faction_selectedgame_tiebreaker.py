@@ -5,7 +5,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ('game', '0007_remove_gameoption_is_activated_and_more'),
     ]
@@ -17,7 +16,11 @@ class Migration(migrations.Migration):
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('is_assymmetric', models.BooleanField(default=False)),
                 ('starting_position', models.BooleanField(default=True)),
-                ('starting_points', models.CharField(choices=[('FIX', 'All players start with a specific amount of points. The amount is set per game'), ('SP', 'Starting points depend on starting position'), ('NONE', 'Game does not have any points'), ('DYNAMIC', 'Starting points vary in each game')], default='FIX', max_length=7)),
+                ('starting_points', models.CharField(
+                    choices=[('FIX', 'All players start with a specific amount of points. The amount is set per game'),
+                             ('SP', 'Starting points depend on starting position'),
+                             ('NONE', 'Game does not have any points'),
+                             ('DYNAMIC', 'Starting points vary in each game')], default='FIX', max_length=7)),
                 ('scoring_points', models.BooleanField(default=True)),
                 ('game', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='game.game')),
             ],
@@ -28,7 +31,8 @@ class Migration(migrations.Migration):
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('name', models.CharField(max_length=255)),
                 ('game', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='game.game')),
-                ('result_shape', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='game.resultconfig')),
+                (
+                'result_shape', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='game.resultconfig')),
             ],
         ),
         migrations.CreateModel(
@@ -36,7 +40,8 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('boolean_value', models.BooleanField(blank=True, null=True)),
-                ('choice_value', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to='game.gameoptionchoice')),
+                ('choice_value', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE,
+                                                   to='game.gameoptionchoice')),
                 ('game', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='game.game')),
                 ('option', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='game.gameoption')),
             ],
@@ -47,7 +52,8 @@ class Migration(migrations.Migration):
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('name', models.CharField(max_length=255)),
                 ('order', models.PositiveIntegerField()),
-                ('result_shape', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='game.resultconfig')),
+                (
+                'result_shape', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='game.resultconfig')),
             ],
             options={
                 'ordering': ['order'],

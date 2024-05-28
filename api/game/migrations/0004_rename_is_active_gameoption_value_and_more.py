@@ -4,7 +4,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ('game', '0003_rename_enabled_gameoption_is_active_and_more'),
     ]

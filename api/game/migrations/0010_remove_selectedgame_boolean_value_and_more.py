@@ -6,7 +6,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ('game', '0009_remove_faction_result_shape'),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
@@ -28,22 +27,29 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='selectedgame',
             name='user',
-            field=models.ForeignKey(default=1, on_delete=django.db.models.deletion.CASCADE, related_name='selected_games', to=settings.AUTH_USER_MODEL),
+            field=models.ForeignKey(default=1, on_delete=django.db.models.deletion.CASCADE,
+                                    related_name='selected_games', to=settings.AUTH_USER_MODEL),
             preserve_default=False,
         ),
         migrations.AlterField(
             model_name='selectedgame',
             name='game',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='selected_games', to='game.game'),
+            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='selected_games',
+                                    to='game.game'),
         ),
         migrations.CreateModel(
             name='SelectedOption',
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('value', models.BooleanField(blank=True, null=True)),
-                ('choice', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='selections', to='game.gameoptionchoice')),
-                ('game_option', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='selections', to='game.gameoption')),
-                ('selected_game', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='selected_options', to='game.selectedgame')),
+                ('choice', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE,
+                                             related_name='selections', to='game.gameoptionchoice')),
+                ('game_option',
+                 models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='selections',
+                                   to='game.gameoption')),
+                ('selected_game',
+                 models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='selected_options',
+                                   to='game.selectedgame')),
             ],
         ),
     ]

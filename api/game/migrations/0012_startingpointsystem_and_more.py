@@ -5,7 +5,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ('game', '0011_rename_result_shape_tiebreaker_result_config'),
     ]
@@ -22,6 +21,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='resultconfig',
             name='starting_points',
-            field=models.ForeignKey(default=1, null=True, on_delete=django.db.models.deletion.SET_NULL, to='game.startingpointsystem'),
+            field=models.ForeignKey(default=1, null=True, on_delete=django.db.models.deletion.SET_NULL,
+                                    to='game.startingpointsystem'),
         ),
     ]

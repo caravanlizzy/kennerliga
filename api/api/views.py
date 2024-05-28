@@ -1,8 +1,9 @@
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from rest_framework import status
 from django.contrib.auth import authenticate
+from rest_framework import status
 from rest_framework.authtoken.models import Token
+from rest_framework.response import Response
+from rest_framework.views import APIView
+
 
 class LoginApiView(APIView):
     def post(self, request, *args, **kwargs):
@@ -21,7 +22,8 @@ class LoginApiView(APIView):
             # If authentication successful, return user data or token
             # For example, you can return user data or JWT token here
             print(get_token(user))
-            return Response({'message': 'Login successful' , "user": get_user_information(user)}, status=status.HTTP_200_OK)
+            return Response({'message': 'Login successful', "user": get_user_information(user)},
+                            status=status.HTTP_200_OK)
         else:
             # If authentication failed, return error message
             return Response({'error': 'Invalid username or password'}, status=status.HTTP_401_UNAUTHORIZED)
@@ -30,8 +32,10 @@ class LoginApiView(APIView):
 def create_token(user):
     return Token.objects.create(user=user)
 
+
 def has_token(user):
     return Token.objects.filter(user=user).exists()
+
 
 def get_token(user):
     if has_token(user):

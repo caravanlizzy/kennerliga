@@ -5,7 +5,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
     dependencies = [
@@ -17,8 +16,12 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('year', models.IntegerField()),
-                ('month', models.IntegerField(validators=[django.core.validators.MinValueValidator(1), django.core.validators.MaxValueValidator(12)], verbose_name='month in the current year')),
-                ('status', models.CharField(choices=[('Nächste', 'Next'), ('Anmeldung offen', 'Open'), ('Laufend', 'Running'), ('Beendet', 'Done')], default='Nächste', max_length=15)),
+                ('month', models.IntegerField(validators=[django.core.validators.MinValueValidator(1),
+                                                          django.core.validators.MaxValueValidator(12)],
+                                              verbose_name='month in the current year')),
+                ('status', models.CharField(
+                    choices=[('Nächste', 'Next'), ('Anmeldung offen', 'Open'), ('Laufend', 'Running'),
+                             ('Beendet', 'Done')], default='Nächste', max_length=15)),
             ],
         ),
     ]

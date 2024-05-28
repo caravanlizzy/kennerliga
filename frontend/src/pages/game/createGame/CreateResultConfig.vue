@@ -54,7 +54,7 @@ const hasTieBreaker = ref(false);
 const tieBreakers: Ref<string[]> = ref([]);
 
 const { data: startingPointSystemOptions } = await api('game/starting-point-systems');
-const startingPointSystem = ref(startingPointSystemOptions[0]['code']);
+const startingPointSystem = ref(startingPointSystemOptions[0]['id']);
 const factions: Ref<string[]> = ref([]);
 
 function getResultConfig(): TResultConfig {
@@ -75,7 +75,7 @@ function emitResultConfig() {
 }
 
 watch([isAsymmetric, hasPoints, startingPointSystem, hasStartingPlayerOrder, factions, hasTieBreaker, tieBreakers],
-  () => emitResultConfig());
+  () => emitResultConfig(), { immediate: true });
 
 </script>
 

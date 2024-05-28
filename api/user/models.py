@@ -1,5 +1,5 @@
-from django.db import models
 from django.contrib.auth.models import AbstractUser
+from django.db import models
 
 
 # Create your models here.
@@ -14,9 +14,9 @@ class User(AbstractUser):
         help_text='Username is used to login'
     )
     bga_name = models.CharField(
-            max_length=88,
-            blank=True,
-            null=True
+        max_length=88,
+        blank=True,
+        null=True
     )
 
     email = models.EmailField(
@@ -27,6 +27,7 @@ class User(AbstractUser):
     )
 
     USERNAME_FIELD = 'username'
+
     # REQUIRED_FIELDS = ['username']
 
     def __str__(self):

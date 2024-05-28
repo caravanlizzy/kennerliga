@@ -34,6 +34,7 @@ class StartingPointSystemAdmin(admin.ModelAdmin):
     ordering = ('code',)  # Orders the entries in the admin list by 'code'
     fields = ('code', 'description')  # Defines fields to be editable in the detail view
 
+
 @admin.register(Platform)
 class Platform(admin.ModelAdmin):
     list_display = ('name',)

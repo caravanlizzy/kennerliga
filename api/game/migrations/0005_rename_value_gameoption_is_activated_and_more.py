@@ -5,7 +5,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ('game', '0004_rename_is_active_gameoption_value_and_more'),
     ]
@@ -29,12 +28,14 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='gameoption',
             name='only_if_choice',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='only_if_options', to='game.gameoptionchoice'),
+            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE,
+                                    related_name='only_if_options', to='game.gameoptionchoice'),
         ),
         migrations.AddField(
             model_name='gameoption',
             name='only_if_option',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='only_if_options', to='game.gameoption'),
+            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE,
+                                    related_name='only_if_options', to='game.gameoption'),
         ),
         migrations.AddField(
             model_name='gameoption',
