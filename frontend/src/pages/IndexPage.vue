@@ -15,6 +15,5 @@ import TheWelcomeBox from 'components/TheWelcomeBox.vue';
 import YearStandings from 'components/YearStandings.vue';
 
 const { isMobile } = useResponsive();
-const store = useUserStore();
 
 </script>

@@ -10,6 +10,7 @@
   </kenner-button>
   <kenner-button v-if="isAuthenticated" flat icon="menu" @click="onToggle" />
   <kenner-button v-else flat icon="login"  :to="{name:'login'}"/>
+  <TheProfile />
 </template>
 
 <script setup lang="ts">
@@ -17,6 +18,7 @@ import KennerButton from 'components/buttons/KennerButton.vue';
 import { useUserStore } from 'stores/userStore';
 import { storeToRefs } from 'pinia';
 import {  } from 'src/composables/reponsive';
+import TheProfile from 'components/TheProfile.vue';
 
 defineProps<{
   onToggle: () => void,
