@@ -1,7 +1,7 @@
 <template>
   <q-toolbar class="text-secondary bg-primary" >
-    <div class="q-pa-xs row items-center justify-between">
-      <kenner-button flat color="white" size="small" icon="arrow_back" />
+    <div class="q-pa-xs row items-center justify-between " style="width: 100%">
+      <kenner-button flat color="white" size="small" icon="arrow_back" @click="()=>router.go(-1)" />
       <div>
         <q-breadcrumbs separator="/" :class="`text-white`" :active-color="color">
 <!--          <template v-slot:separator>-->
@@ -18,6 +18,7 @@
           />
         </q-breadcrumbs>
       </div>
+      <kenner-button class="self-end" flat color="white" size="small" icon="arrow_forward" @click="()=>router.go(1)" />
     </div>
   </q-toolbar>
 </template>
