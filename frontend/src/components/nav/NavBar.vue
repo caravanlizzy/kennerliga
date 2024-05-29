@@ -10,7 +10,7 @@
   </kenner-button>
   <kenner-button v-if="isAuthenticated" flat icon="menu" @click="onToggle" />
   <kenner-button v-else flat icon="login"  :to="{name:'login'}"/>
-  <TheProfile />
+  <TheProfile v-if="isAuthenticated" />
 </template>
 
 <script setup lang="ts">
