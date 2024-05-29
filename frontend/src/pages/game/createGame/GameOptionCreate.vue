@@ -24,17 +24,18 @@
 
 <script setup lang="ts">
 import KennerInput from 'components/inputs/KennerInput.vue';
-import { TGameOption } from 'pages/game/models';
+import { TGameOption, TGameOptionChoice } from 'pages/game/models';
 import KennerButton from 'components/buttons/KennerButton.vue';
 import { inject, ref } from 'vue';
 import GameOptionChoiceCreate from 'pages/game/createGame/GameOptionChoiceCreate.vue';
 import GameOptionRestrictionCreate from 'pages/game/createGame/GameOptionRestrictionCreate.vue';
 import GameOptionCard from 'components/cards/OverviewCard.vue';
+import { createRandomId } from 'src/helper';
 
 const props = defineProps<{ gameOption: TGameOption }>();
 const { gameOption } = props;
 
-const { updateItem, deleteItem, createRandomNumber } = inject('useGameOptions');
+const { updateItem, deleteItem } = inject('useGameOptions');
 
 const hasRestrictions = ref(false);
 
@@ -60,7 +61,7 @@ function updateTitle(newTitle: string) {
 }
 
 function addChoice() {
-  const emptyChoice: TGameOption['choices'] = { itemId: createRandomNumber(), value: '' };
+  const emptyChoice: TGameOptionChoice = { itemId: createRandomId(), name: '' };
   updateItem(gameOption, 'choices', [...props.gameOption.choices, emptyChoice]);
 }
 

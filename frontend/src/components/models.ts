@@ -16,7 +16,7 @@ export type BreadCrumb = {
 }
 
 export type TItem = {
-  id: number ;
+  itemId: number ;
   name: string;
   isEditable: boolean;
 }

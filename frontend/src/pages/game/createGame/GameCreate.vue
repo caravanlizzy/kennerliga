@@ -8,7 +8,6 @@
         <kenner-select class="max-w-500" label="Plattform" :options="platforms" v-model="platform" option-value="name"
                        option-label="name"
                        :rules="[val => !!val || 'Bitte wähle eine Plattform']" />
-        {{ gameOptions }}
 
         <div class="q-mt-xl q-pa-md">
           <div>
@@ -43,6 +42,7 @@ import { useItemList } from 'src/composables/itemList';
 import { useRouter } from 'vue-router';
 import CreateResultConfig from 'pages/game/createGame/CreateResultConfig.vue';
 import { createGame, createOptions, createResultConfigData } from 'src/services/gameService';
+import { createRandomId } from 'src/helper';
 
 const router = useRouter();
 const $q = useQuasar();
@@ -52,7 +52,6 @@ const { data: platforms } = await api('game/platforms/');
 const useGameOptions = useItemList<TGameOption>();
 const { addItem: addOption, items: gameOptions } = useGameOptions;
 provide('useGameOptions', useGameOptions);
-let optionCounter = 0;
 
 const name = ref('');
 const platform: Ref<TPlatform | undefined> = ref(undefined);
@@ -65,9 +64,8 @@ function updateResultConfig(newResultConfig: TResultConfig) {
 }
 
 function addEmptyOption(): void {
-  const emptyOption: TGameOption = { title: '', hasChoices: false, itemId: optionCounter, choices: [] };
+  const emptyOption: TGameOption = { title: '', hasChoices: false, itemId: createRandomId(), choices: [] };
   addOption(emptyOption);
-  optionCounter++;
 }
 
 

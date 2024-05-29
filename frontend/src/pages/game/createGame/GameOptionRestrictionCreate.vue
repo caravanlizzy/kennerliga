@@ -10,10 +10,9 @@
                    :rules="[val => !!val || 'Auswahl erforderlich']"
     />
 
-
     <template v-if="restrictToOption && restrictToOption.hasChoices">
       <kenner-select v-model="restrictionChoice.choiceSelection" :options="restrictToOption.choices"
-                     class="q-my-md" option-value="value" option-label="value"
+                     class="q-my-md" option-value="name" option-label="name"
                      label="Bedingter Wert" @update:model-value="updateRestriction"
                      :rules="[val => !!val|| 'Auswahl erforderlich']" />
     </template>
@@ -34,7 +33,7 @@ const props = defineProps<{ gameOption: TGameOption }>();
 const { updateItem, items } = inject('useGameOptions');
 
 const restrictToOption: Ref<TGameOption | null> = ref(null);
-const restrictionChoice = ref({ booleanActive: true, choiceSelection: { value: null, itemId: null } });
+const restrictionChoice = ref({ booleanActive: true, choiceSelection: { name: null, itemId: null } });
 
 function updateRestriction() {
   updateItem(props.gameOption, 'onlyIfOption', restrictToOption.value?.itemId);

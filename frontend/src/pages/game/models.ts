@@ -1,6 +1,6 @@
 export type TGameOptionChoice = {
   itemId: number;
-  value: string;
+  name: string;
 }
 
 export type TGameOption = {

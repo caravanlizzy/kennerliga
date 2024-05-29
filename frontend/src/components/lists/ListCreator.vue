@@ -51,20 +51,19 @@ import KennerButton from 'components/buttons/KennerButton.vue';
 import { Ref, ref } from 'vue';
 import { TItem } from 'components/models';
 import KennerCounter from 'components/items/KennerCounter.vue';
+import { createRandomId } from 'src/helper';
 
 defineProps<{ buttonLabel: string, ranked?: boolean }>();
 const emit = defineEmits<{
   (event: 'updateList', list: Omit<TItem, 'isEditable'>[]): void;
 }>();
 
-let nextId = 0;
 const listItems: Ref<TItem[]> = ref([]);
-const inputItem: Ref<TItem> = ref({ id: nextId, name: '', isEditable: false });
+const inputItem: Ref<TItem> = ref({ itemId: -1, name: '', isEditable: false });
 
 
 function addItem() {
-  inputItem.value.id = nextId;
-  nextId++;
+  inputItem.value.itemId = createRandomId();
   listItems.value.push(inputItem.value);
   listItems.value.sort((a: TItem, b: TItem) => {
     return a.name.localeCompare(b.name, undefined, { numeric: true, sensitivity: 'base' });

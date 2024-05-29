@@ -1,12 +1,6 @@
 import {api} from 'boot/axios';
 import {TGameOption, TPlatform, TResultConfig} from 'pages/game/models';
 
-export const optionIDStorage: { [key: string]: number } = {};
-
-
-export function addStorageItemId(itemId: number, id: number): void {
-  optionIDStorage[itemId.toString()] = id;
-}
 
 export async function createGame(name: string, platform: TPlatform): Promise<number> {
   try {
@@ -23,7 +17,7 @@ export async function createGame(name: string, platform: TPlatform): Promise<num
 
 export async function addRestrictions(option: TGameOption): Promise<void> {
   if (option.onlyIfOption === undefined) {
-    console.log('No restriction option given');
+    console.log('No restriction option given', { option });
     return;
   }
 
@@ -75,16 +69,14 @@ export async function createOptions(gameId: number, gameOptions: TGameOption[]):
       });
       addStorageItemId(option.itemId, newOption.id);
       for (const choice of option.choices) {
-        await api('game/option-choices/', {
+        const { data: newChoice } = await api('game/option-choices/', {
           method: 'POST',
           data: {
-            name: choice,
+            name: choice.name,
             option: newOption.id
           }
         });
-        console.log({ itemIdMap: optionIDStorage });
-        // currently not working since list logic has been outsourced
-        // addItemId(choice.itemId, data.id);
+        addStorageItemId(choice.itemId, newChoice.id);
       }
       await addRestrictions(option);
     } catch (e) {
@@ -153,4 +145,10 @@ export async function createTieBreakers(resultConfigId: number, resultConfig:TRe
       console.log('Error creating tieBreaker', e)
     }
   }
+}
+
+const optionIDStorage: Record<string, number> = {};
+
+function addStorageItemId(itemId: number, id: number): void {
+  optionIDStorage[itemId.toString()] = id;
 }

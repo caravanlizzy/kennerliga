@@ -3,6 +3,7 @@
     <div class="text-h6 q-mb-md">Ergebnis konfigurieren</div>
     <div class="row">
       <q-card class="config-box q-pa-md">
+        {{tieBreakers}}
         <div class="column ">
           <q-toggle label="Startspielerreihenfolge" :model-value="hasStartingPlayerOrder"
                     @update:model-value="hasStartingPlayerOrder = !hasStartingPlayerOrder" />

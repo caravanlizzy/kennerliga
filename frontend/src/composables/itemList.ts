@@ -25,9 +25,5 @@ export function useItemList<TItem extends BaseItem>(initialItems?: TItem[]) {
     }
   }
 
-  function createRandomNumber(length = 9): number {
-    return Math.floor(Math.random() * 10 ** length);
-  }
-
-  return { items, addItem, deleteItem, updateItem, createRandomNumber };
+  return { items, addItem, deleteItem, updateItem };
 }
