@@ -15,6 +15,11 @@ export default {
       path: 'create',
       name: 'game-create',
       component: () => import('pages/game/createGame/GameCreate.vue')
+    },
+    {
+      path: 'select',
+      name: 'game-select',
+      component: () => import('pages/game/SelectGame.vue')
     }
   ]
 };

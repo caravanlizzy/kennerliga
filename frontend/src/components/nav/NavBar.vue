@@ -1,8 +1,15 @@
 <template>
-  <kenner-button :to="{ name: 'home' }" flat color="primary" icon="pets" />
+<!--  <q-btn  style="height: 44px; width: 44px;">-->
+<!--    <img src="public/icons/kennericon.jpg" style="height: 44px; width: 44px;">-->
+<!--  </q-btn>-->
+  <kenner-button :to="{ name: 'home' }" flat color="primary" icon="pets"/>
   <q-toolbar-title class="text-primary">
     Kennerliga
   </q-toolbar-title>
+  <kenner-button :to="{name: 'game-select'}" v-if="isAuthenticated" flat color="primary" icon="sports_esports">
+    <q-tooltip class="bg-primary text-white" :delay="50" :hide-delay="450" anchor="center left"> Spielauswahl
+    </q-tooltip>
+  </kenner-button>
   <kenner-button v-if="isAuthenticated" flat color="secondary" icon="add_circle">
     <q-tooltip class="bg-primary text-white" :delay="50" :hide-delay="450" anchor="center left"> Ergebnis
       eintragen
