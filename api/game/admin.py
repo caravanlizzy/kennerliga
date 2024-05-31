@@ -2,7 +2,7 @@ from django.contrib import admin
 from nested_admin.nested import NestedModelAdmin, NestedStackedInline, NestedTabularInline
 
 # Register your models here.
-from game.models import Game, GameOption, GameOptionChoice, StartingPointSystem, Platform
+from game.models import Game, GameOption, GameOptionChoice, StartingPointSystem, Platform, Faction, TieBreaker
 
 
 # @admin.register(GameOption)
@@ -37,4 +37,14 @@ class StartingPointSystemAdmin(admin.ModelAdmin):
 
 @admin.register(Platform)
 class Platform(admin.ModelAdmin):
+    list_display = ('name',)
+
+
+@admin.register(Faction)
+class Faction(admin.ModelAdmin):
+    list_display = ('name',)
+
+
+@admin.register(TieBreaker)
+class TieBreaker(admin.ModelAdmin):
     list_display = ('name',)

@@ -30,17 +30,17 @@ export const useUserStore = defineStore('userStore', () => {
 
   }
 
-  function storeToken():void {
-    if(user.value){
+  function storeToken(): void {
+    if (user.value) {
       api.defaults.headers.common['Authorization'] = 'Token ' + user.value.token;
     }
   }
+
   function applyLogin(userData: TUser): void {
     isAuthenticated.value = true;
     user.value = userData;
     storeToken();
   }
-
 
 
   async function logout(): Promise<void> {
@@ -49,4 +49,15 @@ export const useUserStore = defineStore('userStore', () => {
   }
 
   return { user, isAuthenticated, login, logout, storeToken };
-}, { persist: { enabled: true }});
+}, {
+  persist: {
+    enabled: true,
+    strategies: [
+      {
+        key: 'userStore',
+        storage: localStorage,
+        paths: ['user', 'isAuthenticated']
+      }
+    ]
+  }
+});

@@ -12,6 +12,7 @@
           <kenner-select v-if="hasPoints" class="q-px-md q-pb-sm" v-model="startingPointSystem"
                          :options="startingPointSystemOptions" option-value="code" option-label="code"
                          label="Startsiegpunktesystem" />
+          <div class="text-italic text-caption">{{startingPointSystem.description}}</div>
           <q-separator />
           <q-toggle label="Assymmentrisch" :model-value="isAsymmetric"
                     @update:model-value="isAsymmetric = !isAsymmetric" />
@@ -54,14 +55,16 @@ const hasTieBreaker = ref(false);
 const tieBreakers: Ref<string[]> = ref([]);
 
 const { data: startingPointSystemOptions } = await api('game/starting-point-systems');
-const startingPointSystem = ref(startingPointSystemOptions[0]['id']);
+const startingPointSystem = ref(startingPointSystemOptions[0]);
+// const startingPointSystem = computed(() => startingPointSystemOptions.find(o => o.code === startingPointSystemCode.value));
 const factions: Ref<string[]> = ref([]);
+
 
 function getResultConfig(): TResultConfig {
   return ({
     isAsymmetric: isAsymmetric.value,
     hasPoints: hasPoints.value,
-    startingPointSystem: startingPointSystem.value,
+    startingPointSystem: startingPointSystem.value.id,
     hasStartingPlayerOrder: hasStartingPlayerOrder.value,
     factions: factions.value,
     hasTieBreaker: hasTieBreaker.value,
@@ -71,6 +74,7 @@ function getResultConfig(): TResultConfig {
 
 function emitResultConfig() {
   const resultConfig = getResultConfig();
+  console.log({ resultConfig });
   emit('updateResultConfig', resultConfig);
 }
 

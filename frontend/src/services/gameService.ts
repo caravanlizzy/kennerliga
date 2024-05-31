@@ -118,7 +118,7 @@ export async function createFactions(gameId: number, resultConfig:TResultConfig)
         method:'POST',
         data: {
           game: gameId,
-          name: faction
+          name: faction.name
         }
       })
     } catch(e) {
@@ -137,7 +137,7 @@ export async function createTieBreakers(resultConfigId: number, resultConfig:TRe
         method:'POST',
         data: {
           result_config: resultConfigId,
-          name: tieBreaker,
+          name: tieBreaker.name,
           order: index * 10
         }
       })

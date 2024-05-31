@@ -8,9 +8,9 @@
       eintragen
     </q-tooltip>
   </kenner-button>
+  <TheUsername v-if="isAuthenticated" />
   <kenner-button v-if="isAuthenticated" flat icon="menu" @click="onToggle" />
   <kenner-button v-else flat icon="login"  :to="{name:'login'}"/>
-  <TheProfile v-if="isAuthenticated" />
 </template>
 
 <script setup lang="ts">
@@ -18,7 +18,7 @@ import KennerButton from 'components/buttons/KennerButton.vue';
 import { useUserStore } from 'stores/userStore';
 import { storeToRefs } from 'pinia';
 import {  } from 'src/composables/reponsive';
-import TheProfile from 'components/TheProfile.vue';
+import TheUsername from 'components/TheUsername.vue';
 
 defineProps<{
   onToggle: () => void,

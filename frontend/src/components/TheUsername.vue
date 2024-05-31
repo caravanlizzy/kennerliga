@@ -1,12 +1,11 @@
 <template>
- <kenner-button flat icon="person" class="text-accent">
+ <div class="text-accent q-mx-md" style="text-transform: none;">
    {{ user?.username }}
- </kenner-button>
+ </div>
 </template>
 
 <script setup lang="ts">
 
 import { useUserStore } from 'stores/userStore';
-import KennerButton from 'components/buttons/KennerButton.vue';
 const { user } = useUserStore();
 </script>

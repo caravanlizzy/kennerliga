@@ -3,6 +3,16 @@ export type TGameOptionChoice = {
   name: string;
 }
 
+export type TFaction = {
+  itemId: number;
+  name: string;
+}
+
+export type TTieBreaker = {
+  itemId: number;
+  name: string;
+}
+
 export type TGameOption = {
   itemId: number;
   title: string;
@@ -18,9 +28,9 @@ export type TResultConfig = {
   hasPoints: boolean;
   startingPointSystem: string;
   hasStartingPlayerOrder: boolean; // Assuming it's a number for order/index
-  factions?: string[]; // Assuming it's an array of faction names or identifiers
+  factions?: TFaction[]; // Assuming it's an array of faction names or identifiers
   hasTieBreaker: boolean;
-  tieBreakers?: string[]; // Assuming array of tie breaker rules or identifiers
+  tieBreakers?: TTieBreaker[]; // Assuming array of tie breaker rules or identifiers
 }
 
 export type TPlatform = {

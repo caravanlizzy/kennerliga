@@ -35,7 +35,7 @@ class FactionViewSet(ModelViewSet):
 class TieBreakerViewSet(ModelViewSet):
     queryset = TieBreaker.objects.all()
     serializer_class = TieBreakerSerializer
-    filterset_fields = ['game']
+    filterset_fields = ['result_config']
 
 
 class ResultConfigViewSet(ModelViewSet):

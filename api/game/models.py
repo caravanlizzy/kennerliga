@@ -6,6 +6,9 @@ from user.models import User
 class Platform(models.Model):
     name = models.CharField(max_length=255)
 
+    def __str__(self):
+        return str(self.name)
+
 
 class Game(models.Model):
     name = models.CharField(max_length=88)
@@ -85,7 +88,13 @@ class TieBreaker(models.Model):
     class Meta:
         ordering = ['order']
 
+    def __str__(self):
+        return str(self.name)
+
 
 class Faction(models.Model):
     game = models.ForeignKey(Game, on_delete=models.CASCADE)
     name = models.CharField(max_length=255)
+
+    def __str__(self):
+        return str(self.name)
