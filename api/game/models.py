@@ -71,6 +71,9 @@ class StartingPointSystem(models.Model):
     code = models.CharField(max_length=10, unique=True)
     description = models.CharField(max_length=255)
 
+    def __str__(self):
+        return self.code
+
 
 class ResultConfig(models.Model):
     game = models.ForeignKey(Game, on_delete=models.CASCADE)
@@ -78,6 +81,9 @@ class ResultConfig(models.Model):
     has_starting_player_order = models.BooleanField(default=True)
     starting_points_system = models.ForeignKey(StartingPointSystem, on_delete=models.SET_NULL, null=True, default=1)
     has_points = models.BooleanField(default=True)
+
+    def __str__(self):
+        return f"ResultConfig for {self.game}"
 
 
 class TieBreaker(models.Model):

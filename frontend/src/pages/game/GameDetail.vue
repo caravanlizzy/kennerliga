@@ -46,7 +46,7 @@
               <YesNoItem :yes="resultConfig.has_points" />
               <div> {{ startingPointSystem.code }} <span
                 class="text-italic">{{ startingPointSystem.description }} </span></div>
-              <YesNoItem :yes="resultConfig.has_starting_player" />
+              <YesNoItem :yes="resultConfig.has_starting_player_order" />
               <YesNoItem :yes="resultConfig.is_asymmetric" />
               <div  v-if="resultConfig.is_asymmetric">
                 <div v-for="faction of factions" :key="faction.id" class="inline-block q-mx-xs">
