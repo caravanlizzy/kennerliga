@@ -19,13 +19,6 @@ class User(AbstractUser):
         null=True
     )
 
-    email = models.EmailField(
-        'Email address',
-        max_length=40,
-        unique=True,
-        help_text='Email address is used to contact the player'
-    )
-
     USERNAME_FIELD = 'username'
 
     # REQUIRED_FIELDS = ['username']

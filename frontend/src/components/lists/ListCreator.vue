@@ -64,7 +64,7 @@ const inputItem: Ref<TItem> = ref({ itemId: -1, name: '', isEditable: false });
 
 function addItem() {
   inputItem.value.itemId = createRandomId();
-  listItems.value.push(inputItem.value);
+  listItems.value.push({...inputItem.value});
   listItems.value.sort((a: TItem, b: TItem) => {
     return a.name.localeCompare(b.name, undefined, { numeric: true, sensitivity: 'base' });
   });

@@ -39,6 +39,7 @@ export type TPlatform = {
 }
 
 export type GameDto = {
+  id: number;
   name: string;
   platform: string;
 }

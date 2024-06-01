@@ -74,7 +74,6 @@ function getResultConfig(): TResultConfig {
 
 function emitResultConfig() {
   const resultConfig = getResultConfig();
-  console.log({ resultConfig });
   emit('updateResultConfig', resultConfig);
 }
 
