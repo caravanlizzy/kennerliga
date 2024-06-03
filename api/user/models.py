@@ -13,11 +13,6 @@ class User(AbstractUser):
         null=False,
         help_text='Username is used to login'
     )
-    bga_name = models.CharField(
-        max_length=88,
-        blank=True,
-        null=True
-    )
 
     USERNAME_FIELD = 'username'
 
