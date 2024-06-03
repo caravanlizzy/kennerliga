@@ -3,9 +3,9 @@
     <p class="text-h5">Neues Spiel</p>
     <div class="q-py-md">
       <q-form @submit="onSubmit()" class="q-gutter-md">
-        <kenner-input class="max-w-500" label="Spielname" v-model="name"
+        <kenner-input class="max-w" label="Spielname" v-model="name"
                       :rules="[val => !!val || 'Bitte wähle einen Spielnamen']" />
-        <kenner-select class="max-w-500" label="Plattform" :options="platforms" v-model="platform" option-value="name"
+        <kenner-select class="max-w" label="Plattform" :options="platforms" v-model="platform" option-value="name"
                        option-label="name"
                        :rules="[val => !!val || 'Bitte wähle eine Plattform']" />
 
@@ -102,7 +102,7 @@ const onSubmit = async () => {
 </script>
 
 <style scoped>
-.max-w-500 {
-  max-width: 500px;
+.max-w {
+  max-width: 300px;
 }
 </style>

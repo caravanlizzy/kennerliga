@@ -2,8 +2,10 @@
   <game-option-card>
     <template #cardHeader>
       <div class="">{{ gameOption.title }}</div>
-      <kenner-button color="accent" size="md" class="close-button q-pa-none" icon="close"
-                     @click="deleteOption"></kenner-button>
+      <div>
+        <kenner-button flat color="accent" size="md" class="close-button q-pa-none" icon="close"
+                       @click="deleteOption"></kenner-button>
+      </div>
     </template>
     <template #cardBody>
       <div class="col">
@@ -11,9 +13,9 @@
                       class="q-mb-md q-mx-xs" :rules="[val => !!val || 'Titel erforderlich']" />
         <div class="column">
           <q-toggle :model-value="gameOption.hasChoices" @update:model-value="updateHasChoices"
-                    label="Auswahloptionen"/>
+                    label="Auswahloptionen" />
           <q-toggle label="Bedingungen" :model-value="hasRestrictions"
-                    @update:model-value="hasRestrictions = !hasRestrictions; deleteRestriction()"/>
+                    @update:model-value="hasRestrictions = !hasRestrictions; deleteRestriction()" />
         </div>
         <GameOptionChoiceCreate :addChoice="addChoice" :gameOption="gameOption" v-if="gameOption.hasChoices" />
         <GameOptionRestrictionCreate :gameOption="gameOption" v-if="hasRestrictions" />
@@ -43,8 +45,8 @@ function updateHasChoices(hasChoices: boolean) {
   updateItem(gameOption, 'hasChoices', hasChoices);
 }
 
-function deleteRestriction(){
-  if(!hasRestrictions.value){
+function deleteRestriction() {
+  if (!hasRestrictions.value) {
     updateItem(gameOption, 'onlyIfOption', undefined);
     updateItem(gameOption, 'onlyIfChoice', undefined);
     updateItem(gameOption, 'onlyIfValue', undefined);
