@@ -14,12 +14,13 @@ export default {
     {
       path: 'create',
       name: 'game-create',
-      component: () => import('pages/game/createGame/GameCreate.vue')
+      component: () => import('pages/game/GameCreate.vue')
     },
     {
       path: 'select',
       name: 'game-select',
-      component: () => import('pages/game/SelectGame.vue')
+      component: () => import('pages/game/SelectGame.vue'),
+      meta: { icon: 'sports_esports', label: 'Spielauswahl' }
     }
   ]
 };

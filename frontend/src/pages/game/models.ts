@@ -45,6 +45,7 @@ export type GameDto = {
 }
 
 export type GameOptionDto = {
+  id: number;
   name: string;
   game: number;
   has_choices?: boolean;
@@ -54,6 +55,7 @@ export type GameOptionDto = {
 }
 
 export type GameOptionChoiceDtp = {
+  id:number;
   name: string;
   option: number;
 }
