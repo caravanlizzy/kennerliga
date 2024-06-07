@@ -27,7 +27,7 @@
         Optionen
       </div>
       <template v-else>
-        <div class="text-h6 q-py-md"> Spieloptionen</div>
+        <div class="text-h6 q-py-md"> Spieloptionen einstellen</div>
         <div v-for="option of fullGameInformation.options" :key="option.id" class="q-py-sm">
             <template v-if="option.has_choices">
               <kenner-select
@@ -48,6 +48,7 @@
         </div>
       </template>
     </div>
+    <kenner-button class="" type="submit" push color="positive" label="Speichern" />
   </div>
 </template>
 
@@ -56,7 +57,11 @@ import KennerSelect from 'components/inputs/KennerSelect.vue';
 import { api } from 'boot/axios';
 import { computed, Ref, ref, watch } from 'vue';
 import { GameDto, TPlatform } from 'pages/game/models';
+import KennerButton from 'components/buttons/KennerButton.vue';
+import { useUserStore } from 'stores/userStore';
 
+
+const { user } = useUserStore();
 const { data: platforms } = await api('game/platforms/');
 const { data: gameData } = await api('game/games/');
 

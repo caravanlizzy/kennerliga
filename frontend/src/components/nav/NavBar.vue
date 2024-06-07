@@ -7,11 +7,11 @@
     Kennerliga
   </q-toolbar-title>
   <kenner-button :to="{name: 'game-select'}" v-if="isAuthenticated" flat color="primary" icon="sports_esports">
-    <q-tooltip class="bg-primary text-white" :delay="50" :hide-delay="450" anchor="center left"> Spielauswahl
+    <q-tooltip class="bg-primary text-white" :delay="50" :hide-delay="170" anchor="top left"> Spielauswahl
     </q-tooltip>
   </kenner-button>
   <kenner-button v-if="isAuthenticated" flat color="secondary" icon="add_circle">
-    <q-tooltip class="bg-primary text-white" :delay="50" :hide-delay="450" anchor="center left"> Ergebnis
+    <q-tooltip class="bg-primary text-white" :delay="50" :hide-delay="170" anchor="top left"> Ergebnis
       eintragen
     </q-tooltip>
   </kenner-button>
