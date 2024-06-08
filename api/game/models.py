@@ -1,16 +1,7 @@
 from django.db import models
-
-from user.models import User
-
+from user.models import PlatformPlayer
+from user.models import Platform
 from league.models import League
-
-
-
-class Platform(models.Model):
-    name = models.CharField(max_length=255)
-
-    def __str__(self):
-        return str(self.name)
 
 
 class Game(models.Model):
@@ -52,12 +43,12 @@ class GameOptionChoice(models.Model):
 
 
 class SelectedGame(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='selected_games')
+    player = models.ForeignKey(PlatformPlayer, on_delete=models.CASCADE, related_name='selected_games')
     game = models.ForeignKey(Game, on_delete=models.CASCADE, related_name='selected_games')
     league = models.ForeignKey(League, on_delete=models.CASCADE, related_name='selected_games')
 
     def __str__(self):
-        return f"{self.user.username}'s selection for {self.game.name}"
+        return f"{self.player}'s selection for {self.game.name}"
 
 
 class SelectedOption(models.Model):
