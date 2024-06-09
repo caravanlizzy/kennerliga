@@ -36,9 +36,6 @@ class StartingPointSystemAdmin(admin.ModelAdmin):
     fields = ('code', 'description')  # Defines fields to be editable in the detail view
 
 
-
-
-
 @admin.register(Faction)
 class Faction(admin.ModelAdmin):
     list_display = ('name',)

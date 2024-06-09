@@ -29,18 +29,22 @@ class Platform(models.Model):
         return str(self.name)
 
 
-class Player(models.Model):
+class PlayerProfile(models.Model):
+    profile_name = models.CharField(max_length=100)
     user = models.OneToOneField(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='player')
     platforms = models.ManyToManyField(Platform, through='PlatformPlayer')
 
+    def __str__(self):
+        return self.profile_name
+
 
 class PlatformPlayer(models.Model):
-    player = models.ForeignKey(Player, on_delete=models.CASCADE)
+    player = models.ForeignKey(PlayerProfile, on_delete=models.CASCADE)
     platform = models.ForeignKey(Platform, on_delete=models.CASCADE)
-    playername = models.CharField(max_length=100)
+    name = models.CharField(max_length=100)
 
     class Meta:
         unique_together = ('player', 'platform')
 
     def __str__(self):
-        return f"{self.playername} on {self.platform.name}"
+        return f"{self.name} on {self.platform.name}"
