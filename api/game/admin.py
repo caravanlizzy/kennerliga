@@ -2,7 +2,7 @@ from django.contrib import admin
 from nested_admin.nested import NestedModelAdmin, NestedStackedInline, NestedTabularInline
 
 # Register your models here.
-from game.models import Game, GameOption, GameOptionChoice, StartingPointSystem, Platform, Faction, TieBreaker, \
+from game.models import Game, GameOption, GameOptionChoice, StartingPointSystem, Faction, TieBreaker, \
     ResultConfig
 
 
@@ -36,9 +36,7 @@ class StartingPointSystemAdmin(admin.ModelAdmin):
     fields = ('code', 'description')  # Defines fields to be editable in the detail view
 
 
-@admin.register(Platform)
-class Platform(admin.ModelAdmin):
-    list_display = ('name',)
+
 
 
 @admin.register(Faction)
@@ -49,6 +47,7 @@ class Faction(admin.ModelAdmin):
 @admin.register(TieBreaker)
 class TieBreaker(admin.ModelAdmin):
     list_display = ('name',)
+
 
 @admin.register(ResultConfig)
 class ResultConfig(admin.ModelAdmin):
