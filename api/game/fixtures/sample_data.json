@@ -1,0 +1,1 @@
+[{"model": "game.startingpointsystem", "pk": 1, "fields": {"code": "FIX", "description": "Gleiche Startpunkte für alle"}}, {"model": "game.startingpointsystem", "pk": 2, "fields": {"code": "DYNAMIC", "description": "Manuelle Eingabe der Startpunkte"}}]
