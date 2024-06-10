@@ -1,7 +1,7 @@
 from rest_framework.serializers import ModelSerializer
 
 from game.models import Game, GameOption, GameOptionChoice, Faction, TieBreaker, ResultConfig, StartingPointSystem, \
-    Platform
+    Platform, SelectedGame, SelectedOption
 
 
 class GameSerializer(ModelSerializer):
@@ -49,4 +49,16 @@ class StartingPointSystemSerializer(ModelSerializer):
 class PlatformSerializer(ModelSerializer):
     class Meta:
         model = Platform
+        fields = '__all__'
+
+
+class SelectedGameSerializer(ModelSerializer):
+    class Meta:
+        model = SelectedGame
+        fields = '__all__'
+
+
+class SelectedOptionSerializer(ModelSerializer):
+    class Meta:
+        model = SelectedOption
         fields = '__all__'

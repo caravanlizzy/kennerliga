@@ -3,7 +3,7 @@ from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 
 from game.views import GameViewSet, GameOptionViewSet, GameOptionChoiceViewSet, FactionViewSet, TieBreakerViewSet, \
-    ResultConfigViewSet, StartingPointSystemViewSet, PlatformViewSet
+    ResultConfigViewSet, StartingPointSystemViewSet, PlatformViewSet, SelectedGameViewSet, SelectedOptionViewSet
 
 router = DefaultRouter()
 router.register('games', GameViewSet, basename='games')
@@ -14,6 +14,8 @@ router.register('tie-breakers', TieBreakerViewSet, basename='tie-breakers')
 router.register('result-configs', ResultConfigViewSet, basename='result-configs')
 router.register('starting-point-systems', StartingPointSystemViewSet, basename='starting-point-systems')
 router.register('platforms', PlatformViewSet, basename='platforms')
+router.register('selected-games', SelectedGameViewSet, basename='selected-games')
+router.register('selected-game-options', SelectedOptionViewSet, basename='selected-game-options')
 
 urlpatterns = [
     path('', include(router.urls)),

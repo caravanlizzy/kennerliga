@@ -1,9 +1,10 @@
 from rest_framework.viewsets import ModelViewSet
 
 from game.models import Game, GameOption, GameOptionChoice, Faction, TieBreaker, ResultConfig, StartingPointSystem, \
-    Platform
+    Platform, SelectedGame, SelectedOption
 from game.serializers import GameSerializer, GameOptionSerializer, GameOptionChoiceSerializer, FactionSerializer, \
-    TieBreakerSerializer, ResultConfigSerializer, StartingPointSystemSerializer, PlatformSerializer
+    TieBreakerSerializer, ResultConfigSerializer, StartingPointSystemSerializer, PlatformSerializer, \
+    SelectedGameSerializer, SelectedOptionSerializer
 
 
 class GameViewSet(ModelViewSet):
@@ -52,3 +53,13 @@ class StartingPointSystemViewSet(ModelViewSet):
 class PlatformViewSet(ModelViewSet):
     queryset = Platform.objects.all()
     serializer_class = PlatformSerializer
+
+
+class SelectedGameViewSet(ModelViewSet):
+    queryset = SelectedGame.objects.all()
+    serializer_class = SelectedGameSerializer
+
+
+class SelectedOptionViewSet(ModelViewSet):
+    queryset = SelectedOption.objects.all()
+    serializer_class = SelectedOptionSerializer

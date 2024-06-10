@@ -1,6 +1,9 @@
 <template>
   <div class="q-pa-lg">
     <div class="text-h6"> Wähle dein Spiel</div>
+    <div>{{ fullGameInformation }}</div>
+    <div>{{ selectedGame }}</div>
+    <div>{{ selectedOptions }}</div>
     <div class="row q-gutter-md">
       <kenner-select class="select-width q-mr-md"
                      v-model="platform" option-value="name" option-label="name" :options="platforms"
