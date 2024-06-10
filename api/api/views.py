@@ -49,7 +49,6 @@ def get_user_information(user):
     token = get_token(user)
     user = {
         "username": user.username,
-        "bga_name": user.bga_name,
         "email": user.email,
         "token": token,
     }
