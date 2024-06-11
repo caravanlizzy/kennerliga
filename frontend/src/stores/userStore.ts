@@ -5,9 +5,7 @@ import { api } from 'boot/axios';
 import { useRouter } from 'vue-router';
 
 export type TUser = {
-  email?: string;
   username: string;
-  bga?: string;
   token: string;
 }
 
@@ -15,6 +13,7 @@ export type TUser = {
 export const useUserStore = defineStore('userStore', () => {
   const router = useRouter();
   const user: Ref<TUser | null> = ref(null);
+  const isAdminModeActive: Ref<boolean> = ref(false);
   const isAuthenticated: Ref<boolean> = ref(false);
 
   async function login(username: string, password: string): Promise<void> {
@@ -48,7 +47,7 @@ export const useUserStore = defineStore('userStore', () => {
     isAuthenticated.value = false;
   }
 
-  return { user, isAuthenticated, login, logout, storeToken };
+  return { user, isAuthenticated, isAdminModeActive, login, logout, storeToken };
 }, {
   persist: {
     enabled: true,
