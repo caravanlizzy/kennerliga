@@ -26,7 +26,6 @@ export const useUserStore = defineStore('userStore', () => {
       applyLogin(userData);
       await router.push({ name: 'home' });
     }
-
   }
 
   function storeToken(): void {
@@ -45,6 +44,10 @@ export const useUserStore = defineStore('userStore', () => {
   async function logout(): Promise<void> {
     user.value = null;
     isAuthenticated.value = false;
+  }
+
+  async function getPlatformPlayer(): Promise<string> {
+    return await api()
   }
 
   return { user, isAuthenticated, isAdminModeActive, login, logout, storeToken };

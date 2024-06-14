@@ -1,9 +1,6 @@
 <template>
   <div class="q-pa-lg">
     <div class="text-h6"> Wähle dein Spiel</div>
-    <div>{{ fullGameInformation }}</div>
-    <div>{{ selectedGame }}</div>
-    <div>{{ selectedOptions }}</div>
     <div class="row q-gutter-md">
       <kenner-select class="select-width q-mr-md"
                      v-model="platform" option-value="name" option-label="name" :options="platforms"
@@ -51,7 +48,7 @@
         </div>
       </template>
     </div>
-    <kenner-button class="" type="submit" push color="positive" label="Speichern" />
+    <kenner-button @click="createSelectedGame(selectedGame.value, selectedOptions.value, leagueId, playedId)" type="submit" push color="positive" label="Speichern" />
   </div>
 </template>
 
@@ -62,6 +59,7 @@ import { computed, Ref, ref, watch } from 'vue';
 import { GameDto, TPlatform } from 'pages/game/models';
 import KennerButton from 'components/buttons/KennerButton.vue';
 import { useUserStore } from 'stores/userStore';
+import {createSelectedGame} from "src/services/game/selectGameService";
 
 
 const { user } = useUserStore();
@@ -72,13 +70,13 @@ const { data: gameData } = await api('game/games/');
 const platform: Ref<TPlatform | undefined> = ref(undefined);
 const filter = ref('');
 const selectedGame: Ref<GameDto | undefined> = ref(undefined);
-const selectedOptions = ref({}); //key value store
+const selectedOptions = ref({});
 const fullGameInformation = ref({});
 
 const games = computed(() => filterGames());
-watch(selectedGame, updateGameInformation);
+watch(selectedGame, getGameInformation);
 
-async function updateGameInformation(): Promise<void> {
+async function getGameInformation(): Promise<void> {
   if (!selectedGame.value) return;
   const { data: options } = await api(`game/options/?game=${selectedGame.value.id}`);
   fullGameInformation.value['options'] = options;
