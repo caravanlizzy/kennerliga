@@ -3,12 +3,12 @@ from django.db import models
 from game.models import SelectedGame
 from league.models import League
 from season.models import Season
-from user.models import User
+from user.models import PlayerProfile
 
 
 class Result(models.Model):
-    user = models.ForeignKey(
-        User,
+    player_profile = models.ForeignKey(
+        PlayerProfile,
         on_delete=models.CASCADE,
     )
     selected_game = models.ForeignKey(
@@ -29,4 +29,4 @@ class Result(models.Model):
     tie_breaker_value = models.CharField(max_length=255, null=True, blank=True)
 
     def __string__(self):
-        return self.user.username + str(self.selected_game) + str(self.season) + str(self.league)
+        return self.player_profile.username + str(self.selected_game) + str(self.season) + str(self.league)

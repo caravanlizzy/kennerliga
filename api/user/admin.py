@@ -23,4 +23,4 @@ class PlatformAdmin(admin.ModelAdmin):
 
 @admin.register(PlatformPlayer)  # Assuming the model name you referred to as PlatformPlayer is actually PlatformPlayer
 class PlatformPlayerAdmin(admin.ModelAdmin):
-    list_display = ('player', 'platform', 'name')
+    list_display = ('player_profile', 'platform', 'name')

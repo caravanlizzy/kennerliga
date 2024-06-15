@@ -39,7 +39,7 @@ class PlayerProfile(models.Model):
 
 
 class PlatformPlayer(models.Model):
-    player = models.ForeignKey(PlayerProfile, on_delete=models.CASCADE)
+    player_profile = models.ForeignKey(PlayerProfile, on_delete=models.CASCADE)
     platform = models.ForeignKey(Platform, on_delete=models.CASCADE)
     name = models.CharField(max_length=100)
 

@@ -25,3 +25,6 @@ venv*
 
 # env files
 .env
+
+#pycharm
+api/.idea
