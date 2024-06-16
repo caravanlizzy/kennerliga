@@ -31,7 +31,7 @@ class Platform(models.Model):
 
 class PlayerProfile(models.Model):
     profile_name = models.CharField(max_length=100)
-    user = models.OneToOneField(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='player')
+    user = models.OneToOneField(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='profile')
     platforms = models.ManyToManyField(Platform, through='PlatformPlayer')
 
     def __str__(self):
@@ -44,7 +44,7 @@ class PlatformPlayer(models.Model):
     name = models.CharField(max_length=100)
 
     class Meta:
-        unique_together = ('player', 'platform')
+        unique_together = ('player_profile', 'platform')
 
     def __str__(self):
         return f"{self.name} on {self.platform.name}"

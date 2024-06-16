@@ -11,7 +11,7 @@ class PlayerAdmin(admin.ModelAdmin):
     list_display = ('profile_name', 'user', 'get_platforms')
 
     def get_platforms(self, obj):
-        return ", ".join([pp.platform.name for pp in PlatformPlayer.objects.filter(player=obj)])
+        return ", ".join([pp.platform.name for pp in PlatformPlayer.objects.filter(player_profile=obj)])
 
     get_platforms.short_description = 'Platforms'
 

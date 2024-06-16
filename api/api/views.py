@@ -1,8 +1,12 @@
+import json
+
 from django.contrib.auth import authenticate
 from rest_framework import status
 from rest_framework.authtoken.models import Token
 from rest_framework.response import Response
 from rest_framework.views import APIView
+
+from user.models import User, PlatformPlayer
 
 
 class LoginApiView(APIView):
@@ -21,7 +25,7 @@ class LoginApiView(APIView):
         if user is not None:
             # If authentication successful, return user data or token
             # For example, you can return user data or JWT token here
-            print(get_token(user))
+            # print(get_token(user))
             return Response({'message': 'Login successful', "user": get_user_information(user)},
                             status=status.HTTP_200_OK)
         else:
@@ -49,7 +53,14 @@ def get_user_information(user):
     token = get_token(user)
     user = {
         "username": user.username,
-        "email": user.email,
         "token": token,
+        "platform_players": get_platform_players(user)
     }
     return user
+
+
+def get_platform_players(user):
+    player_profile = user.profile
+    platform_players = PlatformPlayer.objects.filter(player_profile=player_profile)
+    platform_player_dict = {pp.platform.name: pp.name for pp in platform_players}
+    return platform_player_dict
