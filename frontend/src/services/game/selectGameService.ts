@@ -1,9 +1,9 @@
 import {GameDto} from 'pages/game/models';
 import {api} from 'boot/axios';
 
-export async function createSelectedGame(game: GameDto, options: {}, leagueId: number, playerId: number): Promise<void> {
+export async function createSelectedGame(game: GameDto, options: object[], leagueId: number, playerId: number): Promise<void> {
   try {
-    const {data: selectedGame} = await api('/games/selected-games', {
+    await api('/games/selected-games', {
       method: 'POST',
       data: {
         player: playerId,
@@ -23,9 +23,12 @@ export async function createSelectedGame(game: GameDto, options: {}, leagueId: n
         data: data
       })
     }
+  } catch (error) {
+    console.log('error creating the selected game: ', game.name, error);
+    throw new Error('Error creating the selected game: ' + error);
   }
 
-  function hasChoices(option) {
+  function hasChoices(option: object|boolean) {
     return typeof (option) !== 'boolean';
   }
 }

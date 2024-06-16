@@ -29,6 +29,10 @@ export const useUserStore = defineStore('userStore', () => {
     }
   }
 
+  function toggleAdminMode(): void {
+    isAdminModeActive.value = !isAdminModeActive.value;
+  }
+
   function storeToken(): void {
     if (user.value) {
       api.defaults.headers.common['Authorization'] = 'Token ' + user.value.token;
