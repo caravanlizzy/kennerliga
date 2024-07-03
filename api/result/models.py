@@ -29,4 +29,4 @@ class Result(models.Model):
     tie_breaker_value = models.CharField(max_length=255, null=True, blank=True)
 
     def __string__(self):
-        return self.player_profile.username + str(self.selected_game) + str(self.season) + str(self.league)
+        return self.player_profile.profile_name + str(self.selected_game) + str(self.season) + str(self.league)

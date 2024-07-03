@@ -3,7 +3,7 @@ from datetime import datetime
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
 
-from user.models import User
+from user.models import PlayerProfile
 
 
 # Create your models here.
@@ -15,7 +15,7 @@ class Season(models.Model):
         DONE = 'Beendet'
 
     participants = models.ManyToManyField(
-        User,
+        PlayerProfile,
         blank=True,
         related_name='seasons_participating'
     )
