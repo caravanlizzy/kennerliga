@@ -24,7 +24,7 @@ class Result(models.Model):
         on_delete=models.CASCADE
     )
     points = models.IntegerField(blank=True, null=True)
-    startin_position = models.IntegerField(blank=True, null=True)
+    starting_position = models.IntegerField(blank=True, null=True)
     decisive_tie_breaker = models.CharField(max_length=255, null=True, blank=True)
     tie_breaker_value = models.CharField(max_length=255, null=True, blank=True)
 
