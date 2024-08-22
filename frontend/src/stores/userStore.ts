@@ -36,7 +36,16 @@ export const useUserStore = defineStore('userStore', () => {
   function storeToken(): void {
     if (user.value) {
       api.defaults.headers.common['Authorization'] = 'Token ' + user.value.token;
+      api.defaults.headers['Authorization'] = 'Token ' + user.value.token;
     }
+  }
+
+  function loadToken(): void {
+    const userStore = localStorage.getItem('userStore');
+    if (userStore) {
+      const token = JSON.parse(userStore).user.token;
+      api.defaults.headers['Authorization'] = 'Token ' + token;
+    } else return;
   }
 
   function applyLogin(userData: TUser): void {
@@ -51,7 +60,7 @@ export const useUserStore = defineStore('userStore', () => {
     isAuthenticated.value = false;
   }
 
-  return {user, isAuthenticated, isAdminModeActive, login, logout, storeToken};
+  return {user, isAuthenticated, isAdminModeActive, login, logout, loadToken};
 }, {
   persist: {
     enabled: true,

@@ -41,7 +41,7 @@ DJANGO_APPS = [
     'rest_framework.authtoken',
     'corsheaders',
     'nested_admin',
-    'django_filters',
+    'django_filters'
 ]
 
 MY_APPS = [
@@ -57,11 +57,11 @@ INSTALLED_APPS = DJANGO_APPS + MY_APPS
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
 ]
 
@@ -149,7 +149,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 AUTH_USER_MODEL = 'user.User'
 
-CSRF_TRUSTED_ORIGINS = [
+ORIGIN_LIST = [
     'http://localhost:9000',
     "https://haligh.pythonanywhere.com",
     "http://haligh.pythonanywhere.com",
@@ -158,20 +158,20 @@ CSRF_TRUSTED_ORIGINS = [
     "https://kennerliga.de",
 ]
 
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:9000",
-    "https://haligh.pythonanywhere.com",
-    "http://haligh.pythonanywhere.com",
-    "http://www.kennerliga.de",
-    "https://www.kennerliga.de",
-    "https://kennerliga.de",
-]
+CSRF_TRUSTED_ORIGINS = ORIGIN_LIST
+
+CORS_ALLOWED_ORIGINS = ORIGIN_LIST
 
 from corsheaders.defaults import default_methods
 
 CORS_ALLOW_METHODS = (
     *default_methods,
 )
+
+CORS_ALLOWED_HEADERS = [
+    'Authorization',
+    'Content-Type'
+]
 
 SESSION_COOKIE_SECURE = True
 SESSION_COOKIE_SAMESITE = "Lax"

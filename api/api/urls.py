@@ -13,5 +13,6 @@ urlpatterns = [
     path('login/', LoginApiView.as_view()),
     path('', include(router.urls)),
     path('game/', include('game.urls')),
+    path('season/', include('season.urls')),
     path('api-token-auth/', views.obtain_auth_token)
 ]

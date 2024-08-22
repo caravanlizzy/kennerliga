@@ -10,6 +10,7 @@
     <q-tooltip class="bg-primary text-white" :delay="50" :hide-delay="170" anchor="top left"> Spielauswahl
     </q-tooltip>
   </kenner-button>
+  <kenner-button @click="registerForCurrentSeason()"> Register </kenner-button>
   <kenner-button v-if="isAuthenticated" flat color="secondary" icon="add_circle">
     <q-tooltip class="bg-primary text-white" :delay="50" :hide-delay="170" anchor="top left"> Ergebnis
       eintragen
@@ -26,6 +27,7 @@ import { useUserStore } from 'stores/userStore';
 import { storeToRefs } from 'pinia';
 import {  } from 'src/composables/reponsive';
 import TheUsername from 'components/TheUsername.vue';
+import {registerForCurrentSeason} from "src/services/season/seasonService";
 
 defineProps<{
   onToggle: () => void,
