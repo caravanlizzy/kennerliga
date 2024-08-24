@@ -1,8 +1,8 @@
-import {defineStore} from 'pinia';
-import {ref, Ref} from 'vue';
-import {useAxios} from '@vueuse/integrations/useAxios';
-import {api} from 'boot/axios';
-import {useRouter} from 'vue-router';
+import { defineStore } from 'pinia';
+import { ref, Ref } from 'vue';
+import { useAxios } from '@vueuse/integrations/useAxios';
+import { api } from 'boot/axios';
+import { useRouter } from "vue-router";
 
 export type TUser = {
   username: string;
@@ -40,14 +40,6 @@ export const useUserStore = defineStore('userStore', () => {
     }
   }
 
-  function loadToken(): void {
-    const userStore = localStorage.getItem('userStore');
-    if (userStore) {
-      const token = JSON.parse(userStore).user.token;
-      api.defaults.headers['Authorization'] = 'Token ' + token;
-    } else return;
-  }
-
   function applyLogin(userData: TUser): void {
     isAuthenticated.value = true;
     user.value = userData;
@@ -60,7 +52,7 @@ export const useUserStore = defineStore('userStore', () => {
     isAuthenticated.value = false;
   }
 
-  return {user, isAuthenticated, isAdminModeActive, login, logout, loadToken};
+  return {user, isAuthenticated, isAdminModeActive, login, logout };
 }, {
   persist: {
     enabled: true,

@@ -1,5 +1,3 @@
-from datetime import datetime
-
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
 
@@ -62,12 +60,4 @@ class Season(models.Model):
             players_per_league[-1] = 3
         return players_per_league
 
-# class Registration(models.Model):
-#     player = models.ManyToManyField(
-#         User,
-#     )
-#     season = models.ForeignKey(
-#         Season,
-#         on_delete=models.CASCADE,
-#     )
-#     datetime = models.DateTimeField(auto_now_add=True, editable=False)
+

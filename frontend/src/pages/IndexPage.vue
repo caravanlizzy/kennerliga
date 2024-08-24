@@ -9,7 +9,6 @@
 <script setup lang="ts">
 
 import { useResponsive } from 'src/composables/reponsive';
-import { useUserStore } from 'stores/userStore';
 import KennerChat from 'components/chats/KennerChat.vue';
 import TheWelcomeBox from 'components/TheWelcomeBox.vue';
 import YearStandings from 'components/YearStandings.vue';

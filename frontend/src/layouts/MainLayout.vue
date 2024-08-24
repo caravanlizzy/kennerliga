@@ -1,17 +1,18 @@
 <template>
   <q-layout class="column" view="hHh Lpr lFf">
-    <q-header bordered >
-      <q-toolbar  class="bg-white ">
-        <nav-bar :onToggle="toggleDrawer" />
+    <q-header bordered>
+      <q-toolbar class="bg-white ">
+        <nav-bar :onToggle="toggleDrawer"/>
       </q-toolbar>
-      <BreadCrumbs color="secondary" v-if="isAuthenticated" />
+      <BreadCrumbs color="secondary" v-if="isAuthenticated"/>
     </q-header>
 
     <KennerDrawer v-model="drawerState"/>
 
     <q-page-container class="flex column justify-center ">
+      <TheAccouncements />
       <div :class="{'q-pa-lg': !isMobile}">
-        <router-view class=" text-primary" />
+        <router-view class=" text-primary"/>
       </div>
     </q-page-container>
 
@@ -21,17 +22,20 @@
 <script setup lang="ts">
 import BreadCrumbs from 'components/nav/BreadCrumbs.vue';
 import NavBar from 'components/nav/NavBar.vue';
-import { useUserStore } from 'stores/userStore';
-import { storeToRefs } from 'pinia';
+import {useUserStore} from 'stores/userStore';
+import {storeToRefs} from 'pinia';
 import KennerDrawer from 'components/drawer/KennerDrawer.vue';
-import { ref, Ref } from 'vue';
-import { useResponsive } from 'src/composables/reponsive';
+import {ref, Ref} from 'vue';
+import {useResponsive} from 'src/composables/reponsive';
+import AnnouncementCard from "components/cards/AnnouncementCard.vue";
+import TheAccouncements from "components/TheAccouncements.vue";
 
 const store = useUserStore();
-const { isMobile } = useResponsive();
-const { isAuthenticated } = storeToRefs(store);
-const drawerState:Ref<boolean> = ref(false);
-function toggleDrawer():void {
+const {isMobile} = useResponsive();
+const {isAuthenticated} = storeToRefs(store);
+const drawerState: Ref<boolean> = ref(false);
+
+function toggleDrawer(): void {
   drawerState.value = !drawerState.value;
 }
 

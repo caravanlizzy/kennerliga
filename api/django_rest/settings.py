@@ -46,8 +46,10 @@ DJANGO_APPS = [
 
 MY_APPS = [
     'game',
+    'chat',
     'league',
     'season',
+    'organisation',
     'result',
     'user',
 ]

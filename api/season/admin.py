@@ -5,5 +5,5 @@ from season.models import Season
 
 
 @admin.register(Season)
-class AuthorAdmin(admin.ModelAdmin):
+class SeasonAdmin(admin.ModelAdmin):
     pass

@@ -1,6 +1,7 @@
 import { boot } from 'quasar/wrappers';
 import axios, { AxiosInstance } from 'axios';
 import {useUserStore} from "stores/userStore";
+import { loadToken } from "src/helper";
 
 declare module '@vue/runtime-core' {
   interface ComponentCustomProperties {
@@ -29,7 +30,7 @@ export default boot(({ app }) => {
   //       so you can easily perform requests against your app's API
 
   // guarantee the token the be set in headers if available.
-  const { loadToken } = useUserStore();
+
   loadToken();
 });
 

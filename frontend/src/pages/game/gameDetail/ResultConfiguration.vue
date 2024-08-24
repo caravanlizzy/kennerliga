@@ -1,9 +1,9 @@
 <template>
   <overview-card style="max-width: 500px">
-    <template #cardHeader>
+    <template #title>
       Ergebniskonfiguration
     </template>
-    <template #cardBody>
+    <template #content>
       <div class="q-gutter-md">
         <div class="row justify-between">
           <div>Spiel mit Punkten:</div>

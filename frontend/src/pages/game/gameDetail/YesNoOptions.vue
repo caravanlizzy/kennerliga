@@ -1,9 +1,9 @@
 <template>
   <overview-card>
-    <template #cardHeader>
+    <template #title>
       An/Aus Optionen
     </template>
-    <template #cardBody>
+    <template #content>
       <ul v-for="option of options" :key="option.id">
         <li v-if="option.has_choices">
           {{ option.name }}

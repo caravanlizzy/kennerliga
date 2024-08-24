@@ -5,5 +5,5 @@ from league.models import League
 
 
 @admin.register(League)
-class AuthorAdmin(admin.ModelAdmin):
+class LeagueAdmin(admin.ModelAdmin):
     pass

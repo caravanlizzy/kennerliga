@@ -1,11 +1,11 @@
 <template>
   <div v-for="option in options" :key="option.id">
     <overview-card v-bind="$attrs" v-if="option.has_choices">
-      <template #cardHeader>
+      <template #title>
 
         {{ option.name }}
       </template>
-      <template #cardBody>
+      <template #content>
         <div class="text-bold">Auswahl</div>
         <q-separator />
         <ul v-for="choice of option.choices" :key="JSON.stringify(choice)">

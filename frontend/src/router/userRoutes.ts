@@ -11,6 +11,5 @@ export default {
       name: 'user-detail',
       component: () => import('pages/user/UserDetail.vue'),
     }
-    // { path: 'new', name: 'gameCreate', component: () => import('pages/GamesList.vue') },
   ]
 };

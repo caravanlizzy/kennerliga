@@ -1,13 +1,13 @@
 <template>
   <game-option-card>
-    <template #cardHeader>
+    <template #title>
       <div class="">{{ gameOption.title }}</div>
       <div>
         <kenner-button flat color="accent" size="md" class="close-button q-pa-none" icon="close"
                        @click="deleteOption"></kenner-button>
       </div>
     </template>
-    <template #cardBody>
+    <template #content>
       <div class="col">
         <kenner-input :model-value="gameOption.title" @update:modelValue="updateTitle" label="Spieloption Titel"
                       class="q-mb-md q-mx-xs" :rules="[val => !!val || 'Titel erforderlich']" />
