@@ -1,4 +1,4 @@
-import { api } from "boot/axios";
+import { api } from 'boot/axios';
 
 export function createRandomId(power = 10) {
   return Math.floor(Math.random() * 10 ** power);

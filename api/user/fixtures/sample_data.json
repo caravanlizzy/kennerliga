@@ -1,1 +1,64 @@
-[{"model": "user.user", "pk": 1, "fields": {"password": "pbkdf2_sha256$600000$Yag5nP9bh994GthOSMF55F$S1WIiUnWsMW9Ndu3fT8oC3Nx+vzDD+hzpaESpv4sb4U=", "last_login": "2024-06-09T14:12:21.174Z", "is_superuser": true, "email": "asdf@sdfas.de", "is_staff": true, "is_active": true, "date_joined": "2024-06-09T14:10:58.000Z", "username": "haligh", "groups": [], "user_permissions": []}}, {"model": "user.user", "pk": 2, "fields": {"password": "haligh", "last_login": null, "is_superuser": true, "email": "", "is_staff": true, "is_active": true, "date_joined": "2024-06-09T14:12:25Z", "username": "ginooo", "groups": [], "user_permissions": []}}, {"model": "user.platform", "pk": 1, "fields": {"name": "BGA"}}, {"model": "user.platform", "pk": 2, "fields": {"name": "Yucata"}}]
+[
+  {
+    "model": "user.user",
+    "pk": 1,
+    "fields": {
+      "password": "pbkdf2_sha256$720000$6QgX2hGBfNP3P6kZyZJu3x$9D4fWI3W/UT8ytmHyZWcRxAiir1bleJvSYnyT2tbWwc=",
+      "last_login": "2024-08-26T09:56:41.668Z",
+      "is_superuser": true,
+      "email": "asdf@sdfas.de",
+      "is_staff": true,
+      "is_active": true,
+      "date_joined": "2024-06-09T14:10:58Z",
+      "username": "haligh",
+      "groups": [],
+      "user_permissions": []
+    }
+  },
+  {
+    "model": "user.user",
+    "pk": 2,
+    "fields": {
+      "password": "haligh",
+      "last_login": null,
+      "is_superuser": true,
+      "email": "",
+      "is_staff": true,
+      "is_active": true,
+      "date_joined": "2024-06-09T14:12:25Z",
+      "username": "ginooo",
+      "groups": [],
+      "user_permissions": []
+    }
+  },
+  {
+    "model": "user.platform",
+    "pk": 1,
+    "fields": {
+      "name": "BGA"
+    }
+  },
+  {
+    "model": "user.platform",
+    "pk": 2,
+    "fields": {
+      "name": "Yucata"
+    }
+  },
+  {
+    "model": "user.playerprofile",
+    "pk": 1,
+    "fields": {
+      "profile_name": "haligh profile",
+      "user": 1
+    }
+  },
+  {
+    "model": "user.playerprofile",
+    "pk": 2,
+    "fields": {
+      "profile_name": "Ginooo profile",
+      "user": 2
+    }
+  }
+]
