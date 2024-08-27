@@ -1,13 +1,22 @@
-import { api } from "boot/axios";
-import { AxiosPromise } from "axios";
+import { api } from 'boot/axios';
+import { AxiosPromise } from 'axios';
 
-export async function getMessages(): Promise<AxiosPromise> {
-  return await api('chat/messages/');
+export type TMessage = {
+  text: string;
+  datetime: string;
+  user: number;
+  type: string;
 }
 
-export async function addMessage(message: string): Promise<void> {
+export async function getMessages(lastDateTime: string|undefined): Promise<AxiosPromise> {
+  let url = 'chat/messages/';
+  if(lastDateTime) url += `?last_datetime=${lastDateTime}`;
+  return await api(url);
+}
+
+export async function addMessage(messageText: string): Promise<void> {
   await api('chat/messages/', {
     method: 'POST',
-    data: { text: message }
-  })
+    data: { text: messageText }
+  });
 }

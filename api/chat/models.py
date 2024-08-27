@@ -1,7 +1,9 @@
 from django.db import models
 
+from user.models import User
+
 
 class Chat(models.Model):
     text = models.TextField()
-    sender = models.CharField(max_length=88)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     datetime = models.DateTimeField(auto_now_add=True)

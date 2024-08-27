@@ -29,3 +29,4 @@ class Announcement(models.Model):
     )
 
     visible_until = models.DateTimeField()
+    visible_from = models.DateTimeField()

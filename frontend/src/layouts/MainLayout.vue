@@ -10,7 +10,7 @@
     <KennerDrawer v-model="drawerState"/>
 
     <q-page-container class="flex column justify-center ">
-      <TheAccouncements />
+      <Announcements />
       <div :class="{'q-pa-lg': !isMobile}">
         <router-view class=" text-primary"/>
       </div>
@@ -27,8 +27,7 @@ import {storeToRefs} from 'pinia';
 import KennerDrawer from 'components/drawer/KennerDrawer.vue';
 import {ref, Ref} from 'vue';
 import {useResponsive} from 'src/composables/reponsive';
-import AnnouncementCard from "components/cards/AnnouncementCard.vue";
-import TheAccouncements from "components/TheAccouncements.vue";
+import Announcements from 'components/TheAccouncements.vue';
 
 const store = useUserStore();
 const {isMobile} = useResponsive();

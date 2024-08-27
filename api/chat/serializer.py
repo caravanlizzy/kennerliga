@@ -4,11 +4,17 @@ from chat.models import Chat
 
 
 class ChatSerializer(serializers.ModelSerializer):
+    sender = serializers.SerializerMethodField(read_only=True)
+
     class Meta:
         model = Chat
-        fields = ['text', 'sender', 'datetime']
-        read_only_fields = ['sender', 'datetime']
+        fields = ['text', 'user', 'datetime', 'sender']
+        read_only_fields = ['user', 'datetime', 'sender']
+
+    def get_sender(self, obj):
+        # Assuming that the 'user' field in the Chat model is a ForeignKey to a User model
+        return obj.user.username if obj.user else None
 
     def create(self, validated_data):
-        validated_data['sender'] = self.context['request'].user
+        validated_data['user'] = self.context['request'].user
         return super().create(validated_data)

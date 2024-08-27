@@ -2,7 +2,7 @@ import { defineStore } from 'pinia';
 import { ref, Ref } from 'vue';
 import { useAxios } from '@vueuse/integrations/useAxios';
 import { api } from 'boot/axios';
-import { useRouter } from "vue-router";
+import { useRouter } from 'vue-router';
 
 export type TUser = {
   username: string;
@@ -18,14 +18,14 @@ export const useUserStore = defineStore('userStore', () => {
   const isAuthenticated: Ref<boolean> = ref(false);
 
   async function login(username: string, password: string): Promise<void> {
-    const {data, error, isFinished} = await useAxios('login/', {
+    const { data, error, isFinished } = await useAxios('login/', {
       method: 'POST',
-      data: {username: username, password}
+      data: { username: username, password }
     }, api);
     if (isFinished.value && !error.value) {
       const userData = data.value.user;
       applyLogin(userData);
-      await router.push({name: 'home'});
+      await router.push({ name: 'home' });
     }
   }
 
@@ -52,7 +52,7 @@ export const useUserStore = defineStore('userStore', () => {
     isAuthenticated.value = false;
   }
 
-  return {user, isAuthenticated, isAdminModeActive, login, logout };
+  return { user, isAuthenticated, isAdminModeActive, login, logout };
 }, {
   persist: {
     enabled: true,
