@@ -1,8 +1,12 @@
-from django.urls import path
+from django.urls import path, include
+from rest_framework.routers import DefaultRouter
+from season.views import SeasonRegistrationView, SeasonViewSet
 
-from season.views import SeasonRegistrationView
+router = DefaultRouter()
+
+router.register('seasons', SeasonViewSet, basename='season')
 
 urlpatterns = [
-    path('register/', SeasonRegistrationView.as_view())
+    path('', include(router.urls)),
+    path('register/', SeasonRegistrationView.as_view()),
 ]
-

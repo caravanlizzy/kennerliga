@@ -1,7 +1,9 @@
+from datetime import datetime, timedelta
+
 from season.models import Season
 
 
-class Kennerliga:
+class Organize:
 
     @staticmethod
     def get_current_season():
@@ -34,4 +36,10 @@ class Kennerliga:
         season.status = Season.SeasonStatus.OPEN
         season.save()
 
-
+    @staticmethod
+    def check_new_season():
+        today = datetime.today()
+        first_day_next_month = (today.replace(day=28) + timedelta(days=4)).replace(day=1)
+        last_day_this_month = first_day_next_month - timedelta(days=1)
+        days_left = (last_day_this_month - today).days
+        return days_left == 7

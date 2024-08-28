@@ -1,7 +1,6 @@
 import { boot } from 'quasar/wrappers';
 import axios, { AxiosInstance } from 'axios';
-import {useUserStore} from "stores/userStore";
-import { loadToken } from "src/helper";
+import { loadToken } from 'src/helper';
 
 declare module '@vue/runtime-core' {
   interface ComponentCustomProperties {

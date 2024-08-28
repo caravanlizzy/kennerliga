@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from django.utils.html import escape
 
 from chat.models import Chat
 
@@ -17,4 +18,5 @@ class ChatSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         validated_data['user'] = self.context['request'].user
+        validated_data['text'] = escape(validated_data['text'])
         return super().create(validated_data)

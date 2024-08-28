@@ -3,8 +3,11 @@ from django.http import HttpResponseNotFound
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework.viewsets import ModelViewSet
 
-from organisation.organize import Kennerliga
+from organisation.organize import Organize
+from season.models import Season
+from season.serializer import SeasonSerializer
 from user.models import PlayerProfile
 
 
@@ -17,9 +20,14 @@ class SeasonRegistrationView(APIView):
             player_profile = PlayerProfile.objects.get(user=self.request.user)
         except PlayerProfile.DoesNotExist:
             return HttpResponseNotFound("Player profile not found.")
-        current_season = Kennerliga.get_current_season()
+        current_season = Organize.get_current_season()
         if not player_profile in current_season.participants.all():
             current_season.participants.add(player_profile)
             current_season.save()
             return Response(f'Participant {player_profile.profile_name} has been added to the current season.')
         return Response(f'Player {player_profile.profile_name} is already registered')
+
+
+class SeasonViewSet(ModelViewSet):
+    queryset = Season.objects.all()
+    serializer_class = SeasonSerializer

@@ -19,6 +19,10 @@ class League(models.Model):
     )
     level = models.IntegerField('1 for L1, 2 for L2 etc.')
     members = models.ManyToManyField(PlayerProfile, related_name='leagues_member')
+    active_player = models.ForeignKey(PlayerProfile, on_delete=models.CASCADE, null=True, blank=True)
 
     def __str__(self):
         return f'{self.season}L{self.number}'
+
+
+

@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
 
@@ -29,6 +31,10 @@ class Season(models.Model):
     )
 
     @property
+    def name(self):
+        return str(self.year) + '_S' + str(self.month)
+
+    @property
     def season_start_time(self):
         return datetime(self.year, self.month, 1, 0, 0)
 
@@ -37,7 +43,7 @@ class Season(models.Model):
         return self.season_start_time - datetime.now()
 
     def __str__(self):
-        return f'{self.year}_S{self.month}'
+        return self.name
 
     def create_leagues(self):
         pass
@@ -59,5 +65,3 @@ class Season(models.Model):
         elif rest_players == 3:
             players_per_league[-1] = 3
         return players_per_league
-
-
