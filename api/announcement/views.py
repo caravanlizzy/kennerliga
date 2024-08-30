@@ -1,8 +1,8 @@
 from django.utils import timezone
 from rest_framework.viewsets import ModelViewSet
 
-from organisation.models import Announcement
-from organisation.serializers import AnnouncementSerializer
+from announcement.models import Announcement
+from announcement.serializers import AnnouncementSerializer
 
 
 class AnnouncementViewSet(ModelViewSet):

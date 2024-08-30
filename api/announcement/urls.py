@@ -1,7 +1,7 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 
-from organisation.views import AnnouncementViewSet
+from announcement.views import AnnouncementViewSet
 
 router = DefaultRouter()
 router.register('announcements', AnnouncementViewSet, basename='announcements')

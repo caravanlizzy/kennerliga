@@ -49,7 +49,7 @@ MY_APPS = [
     'chat',
     'league',
     'season',
-    'organisation',
+    'announcement',
     'result',
     'user',
 ]

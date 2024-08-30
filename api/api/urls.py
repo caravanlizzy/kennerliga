@@ -14,7 +14,7 @@ urlpatterns = [
     path('', include(router.urls)),
     path('game/', include('game.urls')),
     path('season/', include('season.urls')),
-    path('organisation/', include('organisation.urls')),
+    path('announcement/', include('announcement.urls')),
     path('chat/', include('chat.urls')),
     path('api-token-auth/', views.obtain_auth_token)
 ]

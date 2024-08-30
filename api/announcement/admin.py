@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from organisation.models import Announcement
+from announcement.models import Announcement
 
 
 @admin.register(Announcement)

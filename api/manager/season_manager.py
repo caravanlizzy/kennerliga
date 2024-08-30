@@ -3,7 +3,7 @@ from datetime import datetime, timedelta
 from season.models import Season
 
 
-class Organize:
+class SeasonManager:
 
     @staticmethod
     def get_current_season():
