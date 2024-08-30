@@ -1,0 +1,20 @@
+#!/bin/bash
+
+# Check if db.sqlite3 exists and remove it
+if [ -f "db.sqlite3" ]; then
+    echo "Removing existing database file db.sqlite3..."
+    rm db.sqlite3
+else
+    echo "Database file db.sqlite3 does not exist. Skipping removal."
+fi
+
+# Run Django migrations
+echo "Running Django migrations..."
+./manage.py migrate
+
+# Load sample data
+echo "Loading sample data..."
+./manage.py loaddata sample_data
+
+echo "Database reset and sample data loaded successfully."
+

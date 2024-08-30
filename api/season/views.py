@@ -5,7 +5,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet
 
-from manager.season_manager import Organize
+from manager.season_manager import SeasonManager
 from season.models import Season
 from season.serializer import SeasonSerializer
 from user.models import PlayerProfile
@@ -20,7 +20,7 @@ class SeasonRegistrationView(APIView):
             player_profile = PlayerProfile.objects.get(user=self.request.user)
         except PlayerProfile.DoesNotExist:
             return HttpResponseNotFound("Player profile not found.")
-        current_season = Organize.get_current_season()
+        current_season = SeasonManager.get_current_season()
         if not player_profile in current_season.participants.all():
             current_season.participants.add(player_profile)
             current_season.save()

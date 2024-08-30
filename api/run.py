@@ -1,4 +1,4 @@
-from manager.season_manager import SeasonManager
+from flow_control.season_manager import SeasonManager
 
 season_manager = SeasonManager()
 
