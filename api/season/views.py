@@ -5,7 +5,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet
 
-from manager.season_manager import SeasonManager
+from kenner_manager.season_manager import SeasonManager
 from season.models import Season
 from season.serializer import SeasonSerializer
 from user.models import PlayerProfile
