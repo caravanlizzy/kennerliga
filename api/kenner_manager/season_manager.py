@@ -1,6 +1,8 @@
 from datetime import datetime, timedelta
+from typing import List
 
 from season.models import Season
+from user.models import PlayerProfile
 
 
 class SeasonManager:
@@ -70,3 +72,10 @@ class SeasonManager:
         else:
             print("No open season found.")
             return []
+
+    # the distribution of the leagues can be obtained from this order
+    def order_participants(self) -> List[PlayerProfile]:
+        participants = self.get_registered_participants()
+        # order particpiants here...
+        ordered_participants = participants
+        return ordered_participants
