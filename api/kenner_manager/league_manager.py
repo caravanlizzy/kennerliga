@@ -30,7 +30,7 @@ class LeagueManager:
         return new_league
 
     def create_leagues(self):
-        league_amount, players_per_league = self.get_league_players_counts(participants_amount)
+        league_amount, players_per_league = SeasonManager.
         season = SeasonManager.get_open_season()
 
         if not season:
