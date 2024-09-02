@@ -59,6 +59,7 @@ class PlatformViewSet(ModelViewSet):
 class SelectedGameViewSet(ModelViewSet):
     queryset = SelectedGame.objects.all()
     serializer_class = SelectedGameSerializer
+    filterset_fields = ['league']
 
 
 class SelectedOptionViewSet(ModelViewSet):

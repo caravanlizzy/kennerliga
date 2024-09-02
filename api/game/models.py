@@ -1,5 +1,5 @@
 from django.db import models
-from user.models import PlatformPlayer
+from user.models import PlayerProfile
 from user.models import Platform
 from league.models import League
 
@@ -43,7 +43,7 @@ class GameOptionChoice(models.Model):
 
 
 class SelectedGame(models.Model):
-    player = models.ForeignKey(PlatformPlayer, on_delete=models.CASCADE, related_name='selected_games')
+    player = models.ForeignKey(PlayerProfile, on_delete=models.CASCADE, related_name='selected_games')
     game = models.ForeignKey(Game, on_delete=models.CASCADE, related_name='selected_games')
     league = models.ForeignKey(League, on_delete=models.CASCADE, related_name='selected_games')
 

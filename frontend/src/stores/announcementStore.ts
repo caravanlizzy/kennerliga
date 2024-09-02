@@ -1,6 +1,6 @@
-import { defineStore } from "pinia";
-import { ref, Ref } from "vue";
-import { api } from "boot/axios";
+import { defineStore } from 'pinia';
+import { ref, Ref } from 'vue';
+import { api } from 'boot/axios';
 
 type TAnnouncement = {
   title: string;

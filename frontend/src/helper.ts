@@ -17,6 +17,7 @@ export function formatDateTime(dateTime: string): string {
 
 export function loadToken(): void {
   const userStore = JSON.parse(<string>localStorage.getItem('userStore'));
+  if(!userStore) return;
   if(userStore.isAuthenticated){
     const token = userStore.user.token;
     if (token) {
