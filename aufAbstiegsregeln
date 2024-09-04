@@ -1,0 +1,14 @@
+L1
+A,B,C,D
+
+L2
+E,F,G,H
+
+L3
+I,J,K,L
+
+
+Fälle:
+
+1) alle bleiben => ABCE, DFGI, HJKL
+2) D, E, F, G setzen aus => steigt der 4. platzierte auf aus L2 oder der Gewinner aus L3?

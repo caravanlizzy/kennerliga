@@ -1,12 +1,10 @@
-import json
-
 from django.contrib.auth import authenticate
 from rest_framework import status
 from rest_framework.authtoken.models import Token
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from user.models import User, PlatformPlayer
+from user.models import PlatformPlayer
 
 
 class LoginApiView(APIView):
@@ -31,6 +29,23 @@ class LoginApiView(APIView):
         else:
             # If authentication failed, return error message
             return Response({'error': 'Invalid username or password'}, status=status.HTTP_401_UNAUTHORIZED)
+
+
+class LogoutApiView(APIView):
+    def post(self, request, *args, **kwargs):
+        # Check if the user is authenticated
+        token = request.auth  # The token is automatically attached to authenticated requests
+
+        if token:
+            # Find and delete the token to log the user out
+            try:
+                token_object = Token.objects.get(key=token)
+                token_object.delete()
+                return Response({'message': 'Logout successful'}, status=status.HTTP_200_OK)
+            except Token.DoesNotExist:
+                return Response({'error': 'Invalid token'}, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            return Response({'error': 'No token provided or invalid token'}, status=status.HTTP_400_BAD_REQUEST)
 
 
 def create_token(user):

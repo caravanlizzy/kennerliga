@@ -12,7 +12,7 @@ export const useAnnouncementStore = defineStore('announcementStore', () => {
   const announcements: Ref<TAnnouncement[]> = ref([]);
 
   async function getAnnouncements(): Promise<void> {
-    const { data } = await api('organisation/announcements', {
+    const { data } = await api('announcement/announcements', {
       method: 'GET'
     })
     for(const announcement of data) {

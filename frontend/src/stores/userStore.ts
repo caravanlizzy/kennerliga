@@ -1,6 +1,5 @@
 import { defineStore } from 'pinia';
 import { ref, Ref } from 'vue';
-import { useAxios } from '@vueuse/integrations/useAxios';
 import { api } from 'boot/axios';
 import { useRouter } from 'vue-router';
 
@@ -18,14 +17,16 @@ export const useUserStore = defineStore('userStore', () => {
   const isAuthenticated: Ref<boolean> = ref(false);
 
   async function login(username: string, password: string): Promise<void> {
-    const { data, error, isFinished } = await useAxios('login/', {
-      method: 'POST',
-      data: { username: username, password }
-    }, api);
-    if (isFinished.value && !error.value) {
-      const userData = data.value.user;
+    try {
+      const { data } = await api('login/', {
+        method: 'POST',
+        data: { username: username, password }
+      });
+      const userData = data.user;
       applyLogin(userData);
       await router.push({ name: 'home' });
+    } catch (error) {
+      console.log(error);
     }
   }
 
@@ -46,10 +47,26 @@ export const useUserStore = defineStore('userStore', () => {
     storeToken();
   }
 
-
   async function logout(): Promise<void> {
-    user.value = null;
-    isAuthenticated.value = false;
+    try {
+      await api('logout/', {
+        method: 'POST'
+      });
+
+    } catch (err) {
+      console.error('An error occurred during logout:', err);
+    } finally {
+      // Clear the local user data
+      user.value = null;
+      isAuthenticated.value = false;
+
+      // Remove token from Axios headers
+      delete api.defaults.headers.common['Authorization'];
+      delete api.defaults.headers['Authorization'];
+
+      // Optional: Redirect to login or home
+      await router.push({ name: 'login' });
+    }
   }
 
   return { user, isAuthenticated, isAdminModeActive, login, logout };
