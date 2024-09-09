@@ -23,6 +23,3 @@ class League(models.Model):
 
     def __str__(self):
         return f'{self.season}L{self.number}'
-
-
-

@@ -1,25 +1,11 @@
 from datetime import datetime, timedelta
 from typing import List
 
-from league.models import League
 from season.models import Season
 from user.models import PlayerProfile
 
 
 class SeasonManager:
-
-    @staticmethod
-    def get_running_season():
-        return Season.objects.filter(status=Season.SeasonStatus.RUNNING).first()
-        # return Season.objects.order_by('-year', '-month').first()
-
-    @staticmethod
-    def get_open_season():
-        return Season.objects.filter(status=Season.SeasonStatus.OPEN).first()
-
-    @staticmethod
-    def get_previous_season():
-        return Season.objects.filter(status=Season.SeasonStatus.DONE).last()
 
     @staticmethod
     def get_new_month_year(month, year):
@@ -57,26 +43,6 @@ class SeasonManager:
         last_day_this_month = first_day_next_month - timedelta(days=1)
         days_left = (last_day_this_month - today).days
         return days_left == 7
-
-    @staticmethod
-    def get_player_order(season_name):
-        participants = Season.objects.filter(year=season_name).participants.all()
-
-    def get_registered_participant_count(self):
-        season = self.get_open_season()
-        if season:
-            return season.participants.count()
-        else:
-            print("No open season found.")
-            return 0
-
-    def get_registered_participants(self):
-        season = self.get_open_season()
-        if season:
-            return season.participants.all()
-        else:
-            print("No open season found.")
-            return []
 
     # the distribution of the leagues can be obtained from this order
     def order_participants(self) -> List[PlayerProfile]:

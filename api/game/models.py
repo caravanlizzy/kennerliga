@@ -1,7 +1,7 @@
 from django.db import models
-from user.models import PlayerProfile
-from user.models import Platform
+
 from league.models import League
+from user.models import PlayerProfile, Platform
 
 
 class Game(models.Model):

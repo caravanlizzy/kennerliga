@@ -1,6 +1,7 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from season.views import SeasonRegistrationView, SeasonViewSet
+
+from season.views import SeasonViewSet, SeasonRegistrationView
 
 router = DefaultRouter()
 

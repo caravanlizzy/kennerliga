@@ -5,7 +5,7 @@ from season.models import Season
 
 class LeagueManager:
     @staticmethod
-    def get_league_players_counts(participants_amount: int):
+    def get_league_player_distribution(participants_amount: int):
         # Calculate the base number of leagues and the number of leftover players
         league_amount, rest_players = divmod(participants_amount, 4)
 
@@ -31,8 +31,8 @@ class LeagueManager:
 
     def create_leagues(self):
         participants_count = SeasonManager.get_registered_participant_count()
-        league_amount, _ = self.get_league_players_counts(participants_count)
-        season = SeasonManager.get_open_season()
+        league_amount, _ = self.get_league_player_distribution(participants_count)
+        season = Season.get_open_season()
 
         if not season:
             print("No open season found.")
@@ -41,4 +41,4 @@ class LeagueManager:
         for level in range(1, league_amount + 1):
             league = self.create_league(season, level)
             print(f"Created league at level {level} for season {season}")
-            season = SeasonManager.get_open_season()
+            season = Season.get_open_season()
