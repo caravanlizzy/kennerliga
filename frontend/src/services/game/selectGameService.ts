@@ -11,7 +11,7 @@ export async function createSelectedGame(game: GameDto, options: object[], leagu
         league: leagueId
       }
     })
-    for (const [option, selection] of Object.entries(options)) {
+    for (const [_, selection] of Object.entries(options)) {
       let data = null;
       if (hasChoices(selection)) {
         data = {value: selection};

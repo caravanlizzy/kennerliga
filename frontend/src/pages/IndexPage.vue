@@ -10,8 +10,8 @@
 
 import { useResponsive } from 'src/composables/reponsive';
 import KennerChat from 'components/chats/KennerChat.vue';
-import TheWelcomeBox from 'components/TheWelcomeBox.vue';
-import YearStandings from 'components/YearStandings.vue';
+import TheWelcomeBox from 'components/singles/TheWelcomeBox.vue';
+import YearStandings from 'components/singles/YearStandings.vue';
 
 const { isMobile } = useResponsive();
 

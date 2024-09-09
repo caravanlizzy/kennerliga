@@ -1,6 +1,7 @@
 from datetime import datetime, timedelta
 from typing import List
 
+from league.models import League
 from season.models import Season
 from user.models import PlayerProfile
 
@@ -15,6 +16,10 @@ class SeasonManager:
     @staticmethod
     def get_open_season():
         return Season.objects.filter(status=Season.SeasonStatus.OPEN).first()
+
+    @staticmethod
+    def get_previous_season():
+        return Season.objects.filter(status=Season.SeasonStatus.DONE).last()
 
     @staticmethod
     def get_new_month_year(month, year):

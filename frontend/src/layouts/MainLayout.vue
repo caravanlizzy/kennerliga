@@ -27,7 +27,7 @@ import {storeToRefs} from 'pinia';
 import KennerDrawer from 'components/drawer/KennerDrawer.vue';
 import {ref, Ref} from 'vue';
 import {useResponsive} from 'src/composables/reponsive';
-import Announcements from 'components/TheAccouncements.vue';
+import Announcements from 'components/singles/TheAccouncements.vue';
 
 const store = useUserStore();
 const {isMobile} = useResponsive();

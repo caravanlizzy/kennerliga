@@ -108,7 +108,6 @@ function filterGames() {
 
 
 <style lang="scss">
-@import 'src/css/quasar.variables.scss';
 
 .game-selection-element {
   outline: 6px solid white;
