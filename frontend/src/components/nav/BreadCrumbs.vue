@@ -25,7 +25,7 @@
 
 <script setup lang="ts">
 import { useRoute, RouteLocationNormalizedLoaded, useRouter, RouteRecord } from 'vue-router';
-import { BreadCrumb } from 'components/models';
+import { BreadCrumb } from 'src/models/models';
 import { ref, Ref, watch } from 'vue';
 import KennerButton from 'components/buttons/KennerButton.vue';
 

@@ -49,7 +49,7 @@
 
 import KennerButton from 'components/buttons/KennerButton.vue';
 import { Ref, ref } from 'vue';
-import { TItem } from 'components/models';
+import { TItem } from 'src/models/models';
 import KennerCounter from 'components/items/KennerCounter.vue';
 import { createRandomId } from 'src/helper';
 

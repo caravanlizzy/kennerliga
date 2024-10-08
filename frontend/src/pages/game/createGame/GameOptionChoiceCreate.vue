@@ -6,7 +6,7 @@
 </template>
 
 <script setup lang="ts">
-import { TGameOption } from 'pages/game/models';
+import { TGameOption } from 'src/models/gameModels';
 import { inject } from 'vue';
 import ListCreator from 'components/lists/ListCreator.vue';
 

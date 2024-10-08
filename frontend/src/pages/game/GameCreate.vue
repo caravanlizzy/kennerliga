@@ -36,7 +36,7 @@ import { api } from 'boot/axios';
 import KennerInput from 'components/inputs/KennerInput.vue';
 import KennerSelect from 'components/inputs/KennerSelect.vue';
 import KennerButton from 'components/buttons/KennerButton.vue';
-import { TGameOption, TPlatform, TResultConfig } from 'pages/game/models';
+import { TGameOption, TPlatform, TResultConfig } from 'src/models/gameModels';
 import GameOption from 'pages/game/createGame/GameOptionCreate.vue';
 import { useItemList } from 'src/composables/itemList';
 import { useRouter } from 'vue-router';

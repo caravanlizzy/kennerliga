@@ -56,7 +56,7 @@
 import KennerSelect from 'components/inputs/KennerSelect.vue';
 import { api } from 'boot/axios';
 import { computed, Ref, ref, watch } from 'vue';
-import { GameDto, TPlatform } from 'pages/game/models';
+import { GameDto, TPlatform } from 'src/models/gameModels';
 import KennerButton from 'components/buttons/KennerButton.vue';
 import { useUserStore } from 'stores/userStore';
 import {createSelectedGame} from "src/services/game/selectGameService";

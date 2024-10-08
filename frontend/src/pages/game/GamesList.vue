@@ -17,7 +17,7 @@ import { useAxios } from '@vueuse/integrations/useAxios';
 
 import { api } from 'boot/axios';
 import { useRouter } from 'vue-router';
-import { TKennerButton } from 'components/models';
+import { TKennerButton } from 'src/models/models';
 
 const { data, isFinished } = useAxios('game/games', api);
 

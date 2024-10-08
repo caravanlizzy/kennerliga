@@ -42,7 +42,7 @@ import { Ref, ref, watch } from 'vue';
 import ListCreator from 'components/lists/ListCreator.vue';
 import KennerSelect from 'components/inputs/KennerSelect.vue';
 import { api } from 'boot/axios';
-import { TResultConfig } from 'pages/game/models';
+import { TResultConfig } from 'src/models/gameModels';
 
 const emit = defineEmits<{
   (event: 'updateResultConfig', resultConfig: TResultConfig): void;

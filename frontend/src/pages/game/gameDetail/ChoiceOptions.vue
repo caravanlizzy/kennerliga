@@ -17,7 +17,7 @@
 </template>
 <script setup lang="ts">
 import OverviewCard from 'components/cards/OverviewCard.vue';
-import { GameOptionDto } from 'pages/game/models';
+import { GameOptionDto } from 'src/models/gameModels';
 
 defineProps<{
   options: GameOptionDto[];

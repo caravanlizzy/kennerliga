@@ -26,7 +26,7 @@
 
 <script setup lang="ts">
 import KennerInput from 'components/inputs/KennerInput.vue';
-import { TGameOption, TGameOptionChoice } from 'pages/game/models';
+import { TGameOption, TGameOptionChoice } from 'src/models/gameModels';
 import KennerButton from 'components/buttons/KennerButton.vue';
 import { inject, ref } from 'vue';
 import GameOptionChoiceCreate from 'pages/game/createGame/GameOptionChoiceCreate.vue';

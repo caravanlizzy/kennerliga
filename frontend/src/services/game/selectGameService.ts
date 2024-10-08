@@ -1,4 +1,4 @@
-import {GameDto} from 'pages/game/models';
+import {GameDto} from 'src/models/gameModels';
 import {api} from 'boot/axios';
 
 export async function createSelectedGame(game: GameDto, options: object[], leagueId: number, playerId: number): Promise<void> {
