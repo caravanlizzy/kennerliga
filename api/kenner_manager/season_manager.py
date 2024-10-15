@@ -44,6 +44,7 @@ class SeasonManager:
         days_left = (last_day_this_month - today).days
         return days_left == 7
 
+
     # the distribution of the leagues can be obtained from this order
     def order_participants(self) -> List[PlayerProfile]:
         participants = self.get_registered_participants()

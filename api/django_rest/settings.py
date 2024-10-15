@@ -41,7 +41,8 @@ DJANGO_APPS = [
     'rest_framework.authtoken',
     'corsheaders',
     'nested_admin',
-    'django_filters'
+    'django_filters',
+    'django_extensions'
 ]
 
 MY_APPS = [

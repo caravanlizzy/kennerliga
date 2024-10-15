@@ -244,7 +244,7 @@
     "pk": 25,
     "fields": {
       "year": 2020,
-      "month": 0,
+      "month": 1,
       "status": "Nächste",
       "participants": []
     }
@@ -254,7 +254,7 @@
     "pk": 26,
     "fields": {
       "year": 2020,
-      "month": 1,
+      "month": 2,
       "status": "Nächste",
       "participants": []
     }
@@ -264,7 +264,7 @@
     "pk": 27,
     "fields": {
       "year": 2020,
-      "month": 2,
+      "month": 3,
       "status": "Nächste",
       "participants": []
     }
@@ -274,7 +274,7 @@
     "pk": 28,
     "fields": {
       "year": 2020,
-      "month": 3,
+      "month": 4,
       "status": "Nächste",
       "participants": []
     }
@@ -284,7 +284,7 @@
     "pk": 29,
     "fields": {
       "year": 2020,
-      "month": 4,
+      "month": 5,
       "status": "Nächste",
       "participants": []
     }
@@ -294,7 +294,7 @@
     "pk": 30,
     "fields": {
       "year": 2020,
-      "month": 5,
+      "month": 6,
       "status": "Nächste",
       "participants": []
     }
@@ -304,7 +304,7 @@
     "pk": 31,
     "fields": {
       "year": 2020,
-      "month": 6,
+      "month": 7,
       "status": "Nächste",
       "participants": []
     }
@@ -314,7 +314,7 @@
     "pk": 32,
     "fields": {
       "year": 2020,
-      "month": 7,
+      "month": 8,
       "status": "Nächste",
       "participants": []
     }
@@ -324,7 +324,7 @@
     "pk": 33,
     "fields": {
       "year": 2020,
-      "month": 8,
+      "month": 9,
       "status": "Nächste",
       "participants": []
     }

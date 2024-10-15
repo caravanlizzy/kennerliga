@@ -1,7 +1,6 @@
 from django.db import models
 
 from season.models import Season
-from user.models import PlayerProfile
 
 
 # Create your models here.
@@ -18,8 +17,20 @@ class League(models.Model):
         null=True,
     )
     level = models.IntegerField('1 for L1, 2 for L2 etc.')
-    members = models.ManyToManyField(PlayerProfile, related_name='leagues_member')
-    active_player = models.ForeignKey(PlayerProfile, on_delete=models.CASCADE, null=True, blank=True)
+    members = models.ManyToManyField('user.PlayerProfile', related_name='leagues_member')
+    active_player = models.ForeignKey('user.PlayerProfile', on_delete=models.CASCADE, null=True, blank=True)
 
     def __str__(self):
-        return f'{self.season}L{self.number}'
+        return f'{self.season}L{self.level}'
+
+
+class LeagueResult(models.Model):
+    league = models.ForeignKey(
+        League,
+        on_delete=models.CASCADE
+    )
+    profile = models.ForeignKey(
+        'user.PlayerProfile',
+        on_delete=models.CASCADE
+    )
+    league_points = models.FloatField()

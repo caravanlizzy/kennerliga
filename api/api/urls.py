@@ -12,6 +12,7 @@ urlpatterns = [
     path('', include(router.urls)),
     path('game/', include('game.urls')),
     path('season/', include('season.urls')),
+    path('league/', include('league.urls')),
     path('user/', include('user.urls')),
     path('announcement/', include('announcement.urls')),
     path('chat/', include('chat.urls')),

@@ -3,8 +3,6 @@ from datetime import datetime
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
 
-from user.models import PlayerProfile
-
 
 # Create your models here.
 class Season(models.Model):
@@ -15,7 +13,7 @@ class Season(models.Model):
         DONE = 'Beendet'
 
     participants = models.ManyToManyField(
-        PlayerProfile,
+        'user.PlayerProfile',  # lazy reference to avoid circular imports
         blank=True,
         related_name='seasons_participating'
     )
@@ -43,16 +41,20 @@ class Season(models.Model):
         return self.season_start_time - datetime.now()
 
     def get_running_season(self):
-        return self.objects.filter(status=Season.SeasonStatus.RUNNING).first()
+        return Season.objects.filter(status=Season.SeasonStatus.RUNNING).first()
 
     def get_open_season(self):
-        return self.objects.filter(status=Season.SeasonStatus.OPEN).first()
+        return Season.objects.filter(status=Season.SeasonStatus.OPEN).first()
 
-    def get_previous_season(self):
-        return self.objects.filter(status=Season.SeasonStatus.DONE).last()
+    @staticmethod
+    def get_previous_season():
+        return Season.objects.filter(status=Season.SeasonStatus.DONE).last()
 
     def get_participants(self, season_name):
-        return self.objects.filter(year=season_name).participants.all()
+        return Season.objects.filter(year=season_name).participants.all()
+
+    def get_leagues(self):
+        return self.league_set.all()  # Reverse foreign key access
 
     def get_registered_participant_count(self):
         season = self.get_open_season()

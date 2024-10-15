@@ -1,5 +1,5 @@
 <template>
-  <div class="q-pa-lg">
+  <div class="">
     <div class="text-h6"> Wähle dein Spiel</div>
     <div class="row q-gutter-md">
       <kenner-select class="select-width q-mr-md"

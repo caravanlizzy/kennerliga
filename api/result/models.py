@@ -17,11 +17,13 @@ class Result(models.Model):
     )
     league = models.ForeignKey(
         League,
-        on_delete=models.CASCADE
+        on_delete=models.CASCADE,
+        related_name='results'
     )
     season = models.ForeignKey(
         Season,
-        on_delete=models.CASCADE
+        on_delete=models.CASCADE,
+        related_name='results'
     )
     points = models.IntegerField(blank=True, null=True)
     starting_position = models.IntegerField(blank=True, null=True)

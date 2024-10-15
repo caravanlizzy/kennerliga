@@ -30,6 +30,10 @@ export const useUserStore = defineStore('userStore', () => {
     }
   }
 
+  function isMe(someUsername): boolean {
+    return someUsername === user.value.username;
+  }
+
   function toggleAdminMode(): void {
     isAdminModeActive.value = !isAdminModeActive.value;
   }
@@ -69,7 +73,7 @@ export const useUserStore = defineStore('userStore', () => {
     }
   }
 
-  return { user, isAuthenticated, isAdminModeActive, login, logout };
+  return { user, isAuthenticated, isAdminModeActive, isMe, login, logout };
 }, {
   persist: {
     enabled: true,

@@ -1,8 +1,8 @@
 <template>
   <div class="row">
-    <div v-for="player of players" :key="player.name" class="q-mx-lg row">
+    <div v-for="player of players" :key="player.name" class="q-mr-lg row">
       <div :class="{ 'active-player' : activePlayer === player.name }">
-        <div>{{ player.name }}</div>
+        <div :class="{isMeClass: isMe(player.name)}">{{ player.name }}</div>
         <div>{{ player.game }}</div>
       </div>
     </div>
@@ -12,6 +12,9 @@
 <script setup lang="ts">
 
 import { ref } from 'vue';
+import { useUserStore } from 'stores/userStore';
+
+const { isMe } = useUserStore();
 
 const players = [
   { name: 'haligh', game: 'Terra Mystica' },
@@ -28,5 +31,9 @@ const activePlayer = ref('haligh');
 .active-player {
   border-bottom: 3px solid $accent;
   padding: 6px;
+}
+
+.isMeClass {
+  text-decoration: underline;
 }
 </style>
