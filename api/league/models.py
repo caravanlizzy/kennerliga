@@ -36,3 +36,4 @@ class LeagueResult(models.Model):
     )
     league_points = models.FloatField()
     position = models.IntegerField()
+    last = models.BooleanField()

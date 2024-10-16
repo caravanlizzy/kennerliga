@@ -4,6 +4,7 @@ from typing import List
 from season.models import Season
 from season.service import SeasonService
 from user.models import PlayerProfile
+from user.profile_service import ProfileService
 
 
 class SeasonManager:
@@ -48,9 +49,17 @@ class SeasonManager:
         return days_left == 7
 
         # the distribution of the leagues can be obtained from this order
+
+    @staticmethod
+    def get_league_score(participants):
+        for p in participants:
+            league, position = ProfileService.get_previous_season_result()
+            score = position * 10**league
+
     @staticmethod
     def order_participants() -> List[PlayerProfile]:
         participants = SeasonService.get_registered_participants()
         # order particpiants here...
+
         ordered_participants = participants
         return ordered_participants
