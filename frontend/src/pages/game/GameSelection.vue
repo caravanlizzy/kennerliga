@@ -1,8 +1,10 @@
 <template>
   <div class="q-pa-lg">
-    <StatusBar> Pending...</StatusBar>
-    <PlayerOrderList/>
-    <GameSelector v-if="isActive"/>
+    <div class="gradient">
+      <StatusBar> Pending...</StatusBar>
+      <PlayerOrderList class="bg-grey-2"/>
+    </div>
+    <GameSelector v-if="isActive" class="q-mt-md"/>
   </div>
 </template>
 
@@ -16,6 +18,3 @@ import StatusBar from "components/StatusBar.vue";
 const isActive = ref(true);
 </script>
 
-<style scoped>
-
-</style>

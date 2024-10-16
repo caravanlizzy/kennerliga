@@ -40,37 +40,6 @@ class Season(models.Model):
     def time_to_start(self):
         return self.season_start_time - datetime.now()
 
-    def get_running_season(self):
-        return Season.objects.filter(status=Season.SeasonStatus.RUNNING).first()
-
-    def get_open_season(self):
-        return Season.objects.filter(status=Season.SeasonStatus.OPEN).first()
-
-    @staticmethod
-    def get_previous_season():
-        return Season.objects.filter(status=Season.SeasonStatus.DONE).last()
-
-    def get_participants(self, season_name):
-        return Season.objects.filter(year=season_name).participants.all()
-
-    def get_leagues(self):
-        return self.league_set.all()  # Reverse foreign key access
-
-    def get_registered_participant_count(self):
-        season = self.get_open_season()
-        if season:
-            return season.participants.count()
-        else:
-            print("No open season found.")
-            return 0
-
-    def get_registered_participants(self):
-        season = self.get_open_season()
-        if season:
-            return season.participants.all()
-        else:
-            print("No open season found.")
-            return []
 
     def __str__(self):
         return self.name

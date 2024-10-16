@@ -2,6 +2,7 @@ from datetime import datetime, timedelta
 from typing import List
 
 from season.models import Season
+from season.service import SeasonService
 from user.models import PlayerProfile
 
 
@@ -17,7 +18,7 @@ class SeasonManager:
         return new_month, new_year
 
     def create_next_season(self):
-        current_season = self.get_running_season()
+        current_season = SeasonService.get_running_season()
         if not current_season:
             print("No seasons created so far.")
             return
@@ -26,13 +27,15 @@ class SeasonManager:
         new_season.save()
         print(f"Next season created: {new_season.year}-{new_season.month}")
 
-    def start_season(self):
-        season = self.get_running_season()
+    @staticmethod
+    def start_season():
+        season = SeasonService.get_running_season()
         season.status = Season.SeasonStatus.RUNNING
         season.save()
 
-    def open_registration(self):
-        season = self.get_running_season()
+    @staticmethod
+    def open_registration():
+        season = SeasonService.get_running_season()
         season.status = Season.SeasonStatus.OPEN
         season.save()
 
@@ -44,10 +47,10 @@ class SeasonManager:
         days_left = (last_day_this_month - today).days
         return days_left == 7
 
-
-    # the distribution of the leagues can be obtained from this order
-    def order_participants(self) -> List[PlayerProfile]:
-        participants = self.get_registered_participants()
+        # the distribution of the leagues can be obtained from this order
+    @staticmethod
+    def order_participants() -> List[PlayerProfile]:
+        participants = SeasonService.get_registered_participants()
         # order particpiants here...
         ordered_participants = participants
         return ordered_participants

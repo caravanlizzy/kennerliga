@@ -1,5 +1,5 @@
 <template>
-  <div class="row">
+  <div class="row justify-between q-px-md q-py-sm" >
     <div v-for="player of players" :key="player.name" class="q-mr-lg row">
       <div :class="{ 'active-player' : activePlayer === player.name }">
         <div :class="{isMeClass: isMe(player.name)}">{{ player.name }}</div>
@@ -23,7 +23,7 @@ const players = [
   { name: 'MissM', game: 'Automobiles' }
 ];
 
-const activePlayer = ref('haligh');
+const activePlayer = ref('isiundossi');
 
 </script>
 
