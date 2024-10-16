@@ -31,6 +31,8 @@ class LeagueResult(models.Model):
     )
     profile = models.ForeignKey(
         'user.PlayerProfile',
-        on_delete=models.CASCADE
+        on_delete=models.CASCADE,
+        related_name='league_results'
     )
     league_points = models.FloatField()
+    position = models.IntegerField()
