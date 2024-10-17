@@ -40,6 +40,5 @@ class Season(models.Model):
     def time_to_start(self):
         return self.season_start_time - datetime.now()
 
-
     def __str__(self):
         return self.name
