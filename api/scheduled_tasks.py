@@ -1,8 +1,9 @@
-from kenner_manager.season_manager import SeasonManager
+from season_manager import create_new_season, is_new_season_due, is_first_day_of_month
 
-season_manager = SeasonManager()
+# create a season if due which is open to registration
+if is_new_season_due():
+    create_new_season()
 
-# create new season if
-if season_manager.check_new_season():
-    season_manager.create_season()
+if is_first_day_of_month():
+    setup_leagues()
 
