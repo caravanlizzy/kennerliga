@@ -51,15 +51,45 @@ class SeasonManager:
         # the distribution of the leagues can be obtained from this order
 
     @staticmethod
-    def get_league_score(participants):
-        for p in participants:
-            league, position = ProfileService.get_previous_season_result()
-            score = position * 10**league
+    def get_previous_season_participants(participants: List[PlayerProfile]) -> List[PlayerProfile]:
+        previous_season = SeasonService.get_previous_season()
+        if not previous_season:
+            return []  # Return an empty list if no previous season exists
+
+        previous_participants = set(previous_season.participants.all())
+        return [p for p in participants if p in previous_participants]
 
     @staticmethod
-    def order_participants() -> List[PlayerProfile]:
-        participants = SeasonService.get_registered_participants()
-        # order particpiants here...
+    def apply_promotion(participants):
+        for (index, p) in enumerate(participants):
+            if index == 0:
+                continue
+            previous = participants[index - 1]
+            if previous['is_last'] and p.league - 1 == previous.league:
+                participants[index], participants[index - 1] = participants[index - 1], participants[index]
+        return participants
 
+    def order_previous_season_participants(self, participants: List[PlayerProfile]) -> List[Dict]:
+        default_list = []
+        for p in participants:
+            league_info = ProfileService.get_previous_season_result(p)
+            if league_info:
+                league = league_info[0]
+                position = league_info[1]
+                default_list.append({
+                    'name': p.profile_name,
+                    'league': league.level,
+                    'position': position,
+                    'is_last': ProfileService.is_last(p)
+                })
+
+        sorted_list = sorted(default_list, key=lambda x: (x['league'], x['position']))
+        promoted_list = self.apply_promotion(sorted_list)
+        return promoted_list
+
+    def order_participants(self) -> List[PlayerProfile]:
+        participants = SeasonService.get_registered_participants()
+        previously_registered = self.get_previous_season_participants(participants)
+        new_participants = set(participants) - set(previously_registered)
         ordered_participants = participants
         return ordered_participants
