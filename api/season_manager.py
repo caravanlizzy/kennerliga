@@ -46,14 +46,25 @@ class SeasonManager:
             logging.error(f"Failed to create league at level {level}: {e}")
             return None
 
-    def start_season(self):
-        """Start the current open season."""
+    def close_running_season(self):
+        if self.current_season:
+            self.current_season.status = Season.SeasonStatus.DONE
+            self.open_season.save()
+        else:
+            logging.warning("No running season found to start.")
+
+    def open_new_season(self):
         if self.open_season:
             self.open_season.status = Season.SeasonStatus.RUNNING
             self.open_season.save()
             logging.info(f"Season {self.open_season.year}-{self.open_season.month} started.")
         else:
             logging.warning("No open season found to start.")
+
+    def start_new_season(self):
+        self.close_running_season()
+        self.open_new_season()
+        self.populate_leagues()
 
     def open_registration(self):
         """Open registration for the current running season."""
@@ -97,17 +108,21 @@ class SeasonManager:
 
         self.populate_leagues(leagues, players_per_league, participants)
 
-    @staticmethod
-    def populate_leagues(leagues: List[League], players_per_league, participants: List[PlayerProfile]):
+    def populate_leagues(self, leagues: List[League], players_per_league: List[int]):
         """
         Populate leagues with participants based on their rankings.
+
+        leagues: A list of League instances.
+        players_per_league: A list where each element represents how many players will be in the corresponding league.
+        participants: A list of PlayerProfile instances representing the players to be assigned to leagues.
         """
-        league_index = 0
-        for participant in participants:
-            for member_count in len(players_per_league[league_index]):
-                leagues[league_index].members.add(participant)
-                logging.info(f"Added {participant.profile_name} to league {leagues[league_index].level}")
-                league_index = (league_index + 1) % len(leagues)
+        participant_counter = 0
+        for league_index, league in enumerate(leagues):
+            for _ in range(players_per_league[league_index]):
+                next_participant = self.participants[participant_counter]
+                league.members.add(next_participant)  # Assuming league.members is a ManyToManyField or similar
+                logging.info(f"Added {next_participant.profile_name} to league {league.level}")
+                participant_counter += 1
 
     def get_ranked_participants(self) -> List[dict]:
         """Order participants based on registration and previous participation."""
@@ -120,6 +135,10 @@ class SeasonManager:
 
         sorted_participants = self.order_previous_season_participants(previously_registered)
         return sorted_participants + new_participants
+
+    @property
+    def participants(self):
+        return self.current_season.participants
 
     @staticmethod
     def get_previous_season_participants(participants: List[PlayerProfile]) -> List[PlayerProfile]:
