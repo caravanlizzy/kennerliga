@@ -1,4 +1,5 @@
 import logging
+from random import shuffle
 from typing import List, Dict
 
 from django.db.models import QuerySet
@@ -74,4 +75,7 @@ def get_registered_participants() -> List[PlayerProfile]:
         return []
 
 
-
+def register_participant(user):
+    current_season = get_open_season()
+    if current_season:
+        current_season.participants.add(user.profile)

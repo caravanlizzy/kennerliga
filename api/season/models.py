@@ -28,6 +28,8 @@ class Season(models.Model):
         default=SeasonStatus.NEXT
     )
 
+
+
     @property
     def name(self):
         return str(self.year) + '_S' + str(self.month)
