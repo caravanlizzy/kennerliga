@@ -6,7 +6,7 @@ from league.models import League
 from season.models import Season
 from season.service import get_running_season, get_open_season, get_registered_participants, get_previous_season
 from user.models import PlayerProfile
-from user.profile_service import get_previous_season_result
+from user.service import get_previous_season_result
 
 
 class SeasonManager:

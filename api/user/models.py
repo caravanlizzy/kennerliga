@@ -37,7 +37,6 @@ class PlayerProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='profile')
     platforms = models.ManyToManyField(Platform, through='PlatformPlayer')
 
-
     def __str__(self):
         return self.profile_name
 

@@ -4,7 +4,7 @@ from typing import Union, Optional, Dict
 from league.models import League, LeagueResult
 from season.models import Season
 from season.service import get_previous_season, get_leagues
-from user.models import PlayerProfile
+from user.models import PlayerProfile, User
 
 
 def get_last_participation(player_profile: PlayerProfile) -> Season:
@@ -70,10 +70,25 @@ def get_previous_season_result(player_profile: PlayerProfile) -> Optional[Dict]:
 
     previous_league = find_player_profile_league(player_profile, previous_season)
     previous_position = get_league_position(player_profile, previous_league) if previous_league else None
-    previous_is_last = is_last(player_profile)
+    previous_is_last = is_last(player_profile, previous_league)
 
     return {
         "league": previous_league,
         "position": previous_position,
         "is_last": previous_is_last,
     }
+
+
+def create_profile_for_user(user):
+    profile_name = user.username + '_profile'
+    new_profile = PlayerProfile(user=user, profile_name=profile_name)
+    new_profile.save()
+
+
+def create_user(username):
+    if User.objects.filter(username=username).exists():
+        logging.error(f"User {username} already exists.")
+        return
+    new_user = User(username=username)
+    new_user.save()
+    create_profile_for_user(new_user)
