@@ -75,7 +75,4 @@ def get_registered_participants() -> List[PlayerProfile]:
         return []
 
 
-def register_participant(user):
-    current_season = get_open_season()
-    if current_season:
-        current_season.participants.add(user.profile)
+

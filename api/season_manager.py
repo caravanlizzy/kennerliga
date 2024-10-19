@@ -24,8 +24,27 @@ class SeasonManager:
         self.current_season = get_running_season()
         self.open_season = get_open_season()
 
-    # --- Season Management Functions ---
+    @staticmethod
+    def get_new_month_year(current_month: int, current_year: int) -> (int, int):
+        """
+        Calculate the next month and year based on the current month and year.
+        If the current month is December (12), the next month will be January (1) and the year will increment by 1.
+        Otherwise, the month will simply increment by 1, and the year will remain the same.
 
+        :param current_month: The current month of the season (1-12)
+        :param current_year: The current year of the season
+        :return: A tuple (new_month, new_year)
+        """
+        if current_month == 12:
+            new_month = 1
+            new_year = current_year + 1
+        else:
+            new_month = current_month + 1
+            new_year = current_year
+
+        return new_month, new_year
+
+    # --- Season Management Functions ---
     def refresh_season_data(self):
         """Refresh the current and open season data."""
         self.current_season = get_running_season()
@@ -50,9 +69,9 @@ class SeasonManager:
 
     def start_new_season(self):
         """Start a new season by closing the current one and opening a new one."""
+        self.create_leagues()
         self.close_running_season()
         self.open_new_season()
-        self.populate_leagues()
 
     def open_registration(self):
         """Open registration for the current running season."""
@@ -79,6 +98,12 @@ class SeasonManager:
             logging.error(f"Failed to create new season: {e}")
             return False
 
+    @staticmethod
+    def register_participant(user):
+        current_season = get_open_season()
+        if current_season:
+            current_season.participants.add(user.profile)
+
     # --- League Management Functions ---
 
     def create_league(self, level: int):
@@ -92,24 +117,27 @@ class SeasonManager:
             logging.error(f"Failed to create league at level {level}: {e}")
             return None
 
-    def create_leagues(self, participants_count: int):
+    def create_leagues(self):
         """Create leagues for the current open season and distribute participants."""
         if not self.open_season:
             logging.warning("No open season found.")
             return
 
-        participants = self.get_ranked_participants()
-        players_per_league = self.get_players_per_league(participants_count)
+        participants = get_registered_participants()
+        players_per_league = self.get_players_per_league(len(participants))
         leagues = [self.create_league(level) for level in range(1, len(players_per_league) + 1)]
+        print(leagues)
 
         self.populate_leagues(leagues, players_per_league)
 
-    def populate_leagues(self, leagues: List[League], players_per_league: List[int]):
+    @staticmethod
+    def populate_leagues(leagues: List[League], players_per_league: List[int]):
         """Populate leagues with participants based on their rankings."""
+        participants = get_registered_participants()
         participant_counter = 0
         for league_index, league in enumerate(leagues):
             for _ in range(players_per_league[league_index]):
-                next_participant = self.participants[participant_counter]
+                next_participant = participants[participant_counter]
                 league.members.add(next_participant)  # Assuming league.members is a ManyToManyField or similar
                 logging.info(f"Added {next_participant.profile_name} to league {league.level}")
                 participant_counter += 1
@@ -242,5 +270,5 @@ class SeasonManager:
             previous = participants_copy[index - 1]
             if previous['is_last'] and current['league'] - 1 == previous['league']:
                 participants_copy[index], participants_copy[index - 1] = participants_copy[index - 1], \
-                participants_copy[index]
+                    participants_copy[index]
         return participants_copy
