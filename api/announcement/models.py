@@ -1,9 +1,4 @@
-from datetime import timezone
-
 from django.db import models
-
-from user.models import User
-
 
 class Announcement(models.Model):
     class AnnouncementType(models.TextChoices):

@@ -1,6 +1,5 @@
 import logging
-from random import shuffle
-from typing import List, Dict
+from typing import List
 
 from django.db.models import QuerySet
 
@@ -73,6 +72,3 @@ def get_registered_participants() -> List[PlayerProfile]:
     else:
         logging.info("No open season found.")
         return []
-
-
-

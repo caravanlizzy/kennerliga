@@ -8,7 +8,8 @@ from user.models import PlatformPlayer
 
 
 class LoginApiView(APIView):
-    def post(self, request, *args, **kwargs):
+    @staticmethod
+    def post(request, *args, **kwargs):
         username = request.data.get('username')
         password = request.data.get('password')
 
@@ -32,7 +33,8 @@ class LoginApiView(APIView):
 
 
 class LogoutApiView(APIView):
-    def post(self, request, *args, **kwargs):
+    @staticmethod
+    def post(request, *args, **kwargs):
         # Check if the user is authenticated
         token = request.auth  # The token is automatically attached to authenticated requests
 

@@ -8,16 +8,6 @@ from season.service import get_running_season, get_open_season, get_leagues, get
     get_registered_participants
 from user.models import PlayerProfile
 
-import logging
-from random import shuffle
-from typing import List, Dict, Union, Optional
-
-from league.models import League, LeagueResult
-from season.models import Season
-from season.service import get_running_season, get_open_season, get_leagues, get_previous_season, \
-    get_registered_participants
-from user.models import PlayerProfile
-
 
 class SeasonManager:
     def __init__(self):

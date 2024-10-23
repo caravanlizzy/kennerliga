@@ -44,25 +44,6 @@ def create_platform_player(profile, platform):
         return None
 
     try:
-        name = f"{profile.name}_{platform.name}"
-        new_platform_player = PlatformPlayer(player_profile=profile, platform=platform, name=name)
-        new_platform_player.save()
-        return new_platform_player  # Return the created object
-    except Exception as e:
-        logging.error(f"Error creating PlatformPlayer: {e}")
-        return None
-
-
-def get_profile_by_username(username):
-    return get_user_by_username(username).profile
-
-
-def create_platform_player(profile, platform):
-    if not profile or not platform:
-        logging.error("Invalid profile or platform provided")
-        return None
-
-    try:
         name = f"{profile.profile_name}_{platform.name}"
         print(name)
         new_platform_player = PlatformPlayer(player_profile=profile, platform=platform, name=name)

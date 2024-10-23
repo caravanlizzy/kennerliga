@@ -12,7 +12,8 @@ class ChatSerializer(serializers.ModelSerializer):
         fields = ['text', 'user', 'datetime', 'sender']
         read_only_fields = ['user', 'datetime', 'sender']
 
-    def get_sender(self, obj):
+    @staticmethod
+    def get_sender(obj):
         # Assuming that the 'user' field in the Chat model is a ForeignKey to a User model
         return obj.user.username if obj.user else None
 
