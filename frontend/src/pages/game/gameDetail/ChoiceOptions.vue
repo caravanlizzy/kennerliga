@@ -1,8 +1,7 @@
 <template>
   <div v-for="option in options" :key="option.id">
-    <overview-card v-bind="$attrs" v-if="option.has_choices">
+    <OverviewCard v-bind="$attrs" v-if="option.has_choices">
       <template #title>
-
         {{ option.name }}
       </template>
       <template #content>
@@ -12,7 +11,7 @@
           <li>{{ choice.name }}</li>
         </ul>
       </template>
-    </overview-card>
+    </OverviewCard>
   </div>
 </template>
 <script setup lang="ts">

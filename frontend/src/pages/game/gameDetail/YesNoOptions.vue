@@ -1,5 +1,5 @@
 <template>
-  <overview-card>
+  <OverviewCard>
     <template #title>
       An/Aus Optionen
     </template>
@@ -10,7 +10,7 @@
         </li>
       </ul>
     </template>
-  </overview-card>
+  </OverviewCard>
 </template>
 
 <script setup lang="ts">
