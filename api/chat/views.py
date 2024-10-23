@@ -10,7 +10,6 @@ class ChatViewSet(ModelViewSet):
     def get_queryset(self):
         limit = self.request.query_params.get('limit', None)
         last_datetime = self.request.query_params.get('last_datetime')
-        print(self.request.query_params)
 
         if limit is not None:
             try:
@@ -24,9 +23,8 @@ class ChatViewSet(ModelViewSet):
 
         chat_queryset = Chat.objects.all()
         if last_datetime is not None:
-            parsed_last_Datetime = parse_datetime(last_datetime)
-            print(parsed_last_Datetime)
-            chat_queryset = chat_queryset.filter(datetime__gt=parsed_last_Datetime)
+            parsed_last_datetime = parse_datetime(last_datetime)
+            chat_queryset = chat_queryset.filter(datetime__gt=parsed_last_datetime)
 
         # Order by the DateTimeField in descending order to get the most recent items first
         return chat_queryset.order_by('-datetime')[:limit]

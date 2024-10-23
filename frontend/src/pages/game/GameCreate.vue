@@ -2,17 +2,17 @@
   <div class="q-pa-md">
     <p class="text-h5">Neues Spiel</p>
     <div class="q-py-md">
-      <q-form @submit="onSubmit()" class="q-gutter-md">
+      <q-form @submit="onSubmit()" @keydown.enter.stop.prevent class="q-gutter-md">
         <kenner-input class="max-w" label="Spielname" v-model="name"
-                      :rules="[val => !!val || 'Bitte wähle einen Spielnamen']" />
+                      :rules="[val => !!val || 'Bitte wähle einen Spielnamen']"/>
         <kenner-select class="max-w" label="Plattform" :options="platforms" v-model="platform" option-value="name"
                        option-label="name"
-                       :rules="[val => !!val || 'Bitte wähle eine Plattform']" />
+                       :rules="[val => !!val || 'Bitte wähle eine Plattform']"/>
 
         <div class="q-mt-xl q-pa-md">
           <div>
             <span class="text-h6">Spieloptionen</span>
-            <kenner-button class="q-ml-lg" color="primary" label="" icon="add" @click="addEmptyOption" />
+            <kenner-button class="q-ml-lg" color="primary" label="" icon="add" @click="addEmptyOption"/>
           </div>
           <div class="flex row ">
             <game-option
@@ -22,8 +22,8 @@
             />
           </div>
         </div>
-        <create-result-config @update-result-config="updateResultConfig" />
-        <kenner-button class="q-my-xl" type="submit" push color="positive" label="Speichern" />
+        <create-result-config @update-result-config="updateResultConfig"/>
+        <kenner-button class="q-my-xl" type="submit" push color="positive" label="Speichern"/>
       </q-form>
     </div>
   </div>
@@ -65,7 +65,7 @@ function updateResultConfig(newResultConfig: TResultConfig) {
 
 function addEmptyOption(): void {
   const emptyOption: TGameOption = { title: '', hasChoices: false, itemId: createRandomId(), choices: [] };
-  addOption(emptyOption);
+  addOption(emptyOption, { prepend: true });
 }
 
 

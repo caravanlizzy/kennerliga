@@ -1,8 +1,9 @@
 <template>
   <div class="q-px-md q-pb-sm">
-    <q-input filled square bottom-slots hide-bottom-space :label="buttonLabel" v-model="inputItem.name">
+    <q-input filled square bottom-slots hide-bottom-space :label="buttonLabel" v-model="inputItem.name"
+             @keyup.enter="addItem">
       <template v-slot:append>
-        <kenner-button round dense flat icon="add" @click="addItem" />
+        <kenner-button round dense flat icon="add" @click="addItem"/>
       </template>
     </q-input>
     <div v-for="(item, index) of listItems" :key="item.id">
@@ -10,11 +11,11 @@
         <q-input square bottom-slots hide-bottom-space label="editieren" color="info" class="text-white"
                  v-model="item.name">
           <template v-slot:prepend>
-            <kenner-counter v-if="ranked" :content="index" />
+            <kenner-counter v-if="ranked" :content="index"/>
           </template>
           <template v-slot:append>
             <kenner-button color="info" dense flat icon="check" @click="item.isEditable=false"
-                           @blur="item.isEditable=false" />
+                           @blur="item.isEditable=false"/>
           </template>
         </q-input>
       </div>
@@ -40,7 +41,7 @@
           <!--          <kenner-counter :content="index" />-->
         </div>
         <div class="column justify-center item-start">{{ item.name }}</div>
-        <kenner-button icon="close" @click="removeItem(item)" color="accent" flat dense />
+        <kenner-button icon="close" @click="removeItem(item)" color="accent" flat dense/>
       </div>
     </div>
   </div>
@@ -63,8 +64,9 @@ const inputItem: Ref<TItem> = ref({ itemId: -1, name: '', isEditable: false });
 
 
 function addItem() {
+  if(!inputItem.value.name) return;
   inputItem.value.itemId = createRandomId();
-  listItems.value.push({...inputItem.value});
+  listItems.value.push({ ...inputItem.value });
   listItems.value.sort((a: TItem, b: TItem) => {
     return a.name.localeCompare(b.name, undefined, { numeric: true, sensitivity: 'base' });
   });

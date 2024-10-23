@@ -1,5 +1,5 @@
 <template>
-  <overview-card style="max-width: 500px">
+  <OverviewCard style="max-width: 500px" >
     <template #title>
       Ergebniskonfiguration
     </template>
@@ -50,7 +50,7 @@
         </div>
       </div>
     </template>
-  </overview-card>
+  </OverviewCard>
 </template>
 
 <script setup lang="ts">

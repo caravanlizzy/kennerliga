@@ -19,7 +19,7 @@
     <template v-else-if="restrictToOption && !restrictToOption.hasChoices">
       <q-toggle color="accent" :model-value="restrictionChoice.booleanActive"
                 @update:model-value="restrictionChoice.booleanActive = !restrictionChoice.booleanActive; updateRestriction()"
-                label="Bedingte Option muss aktiv sein" />
+                :label=conditionalLabel />
     </template>
   </div>
 </template>
@@ -27,13 +27,15 @@
 <script setup lang="ts">
 import KennerSelect from 'components/inputs/KennerSelect.vue';
 import { TGameOption } from 'src/models/gameModels';
-import { inject, ref, Ref } from 'vue';
+import { computed, inject, ref, Ref } from 'vue';
 const props = defineProps<{ gameOption: TGameOption }>();
 
 const { updateItem, items } = inject('useGameOptions');
 
 const restrictToOption: Ref<TGameOption | null> = ref(null);
 const restrictionChoice = ref({ booleanActive: true, choiceSelection: { name: null, itemId: null } });
+
+const conditionalLabel = computed( () => restrictionChoice.value.booleanActive ? "Bedingte Option muss aktiv sein" : "Bedingte Option muss inaktiv sein")
 
 function updateRestriction() {
   updateItem(props.gameOption, 'onlyIfOption', restrictToOption.value?.itemId);

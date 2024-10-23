@@ -1,5 +1,5 @@
 <template>
-  <game-option-card>
+  <GameOptionCard>
     <template #title>
       <div class="">{{ gameOption.title }}</div>
       <div>
@@ -21,7 +21,7 @@
         <GameOptionRestrictionCreate :gameOption="gameOption" v-if="hasRestrictions" />
       </div>
     </template>
-  </game-option-card>
+  </GameOptionCard>
 </template>
 
 <script setup lang="ts">

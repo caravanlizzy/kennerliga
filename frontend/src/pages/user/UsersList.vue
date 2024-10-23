@@ -10,7 +10,7 @@ import { api } from 'boot/axios';
 import { useRouter } from 'vue-router';
 import { TKennerButton } from 'src/models/models';
 
-const { data, isFinished } = useAxios('users', api);
+const { data, isFinished } = useAxios('user/users', api);
 
 const router = useRouter();
 

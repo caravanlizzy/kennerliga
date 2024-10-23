@@ -11,5 +11,5 @@ import { useRoute } from 'vue-router';
 
 const route = useRoute();
 
-const { data , isFinished } = useAxios(`users/${route.params.id}`, api);
+const { data , isFinished } = useAxios(`user/users/${route.params.id}`, api);
 </script>

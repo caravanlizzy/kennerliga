@@ -1,7 +1,7 @@
 <template>
   <div class="column q-pa-xs q-mt-lg">
     <div class="q-mx-xs q-mb-xs text-bold">Auswahloptionen</div>
-    <list-creator button-label="Neue Option" @update-list="update"/>
+    <ListCreator button-label="Neue Option" @update-list="update"/>
   </div>
 </template>
 

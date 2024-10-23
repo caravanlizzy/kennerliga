@@ -10,8 +10,8 @@ export function useItemList<TItem extends BaseItem>(initialItems?: TItem[]) {
     items.value.push(...initialItems);
   }
 
-  function addItem(item: TItem) {
-    items.value.push(item);
+  function addItem(item: TItem, { prepend = false } = {}) {
+    prepend ? items.value.unshift(item) : items.value.push(item);
   }
 
   function deleteItem(itemToRemove: TItem) {
