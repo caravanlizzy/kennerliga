@@ -26,7 +26,7 @@
             Factions
           </div>
           <div v-if="isAsymmetric">
-            <div v-for="faction of factions" :key="faction.id" class="inline-block faction q-ma-xs">
+            <div v-for="faction of factions" :key="faction.id" class="inline-block faction">
               <div class="q-pa-xs ">{{ faction.name }}</div>
             </div>
           </div>
@@ -66,7 +66,6 @@ defineProps<{
 
 <style scoped>
 .faction {
-  border: 1px solid black;
-  border-radius: 3px;
+  //border: 1px solid grey;
 }
 </style>
