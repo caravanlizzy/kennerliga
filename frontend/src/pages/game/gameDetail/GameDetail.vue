@@ -49,13 +49,8 @@ import { computed, ref } from 'vue';
 const route = useRoute();
 const isLoading = ref(true);
 
-// Fetch all required data (game, options, etc.)
-const { data: game } = await api(`game/games/${route.params.id}`);
-const { data: options } = await api(`game/options/?game=${game.id}`);
-for (const [index, option] of options.entries()) {
-  const { data: choices } = await api(`game/option-choices/?option=${option.id}`);
-  options[index]['choices'] = choices;
-}
+const { data: game } = await api(`game/game-details/${route.params.id}`);
+
 const { data: [resultConfig] } = await api(`game/result-configs/?game=${route.params.id}`);
 const { data: tieBreakers } = await api(`game/tie-breakers/?game=${route.params.id}`);
 const { data: factions } = await api(`game/factions/?game=${route.params.id}`);
@@ -64,7 +59,8 @@ const { data: startingPointSystem } = await api(`game/starting-point-systems/${r
 isLoading.value = false;
 
 // Filter yesNoOptions (those without choices)
-const yesNoOptions = computed(() => options.filter(option => !option.has_choices));
+// const yesNoOptions = computed(() => options.filter(option => !option.has_choices));
+const yesNoOptions = computed(() => game.options.filter(option => !option.has_choices));
 
 // Create "An-/Aus Option" with all yesNoOption names as choices
 const anAusOption = computed(() => ({
@@ -74,7 +70,7 @@ const anAusOption = computed(() => ({
 }));
 
 // Filter the choiceOptions (those with existing choices)
-const choiceOptions = computed(() => options.filter(option => option.has_choices));
+const choiceOptions = computed(() => game.options.filter(option => option.has_choices));
 
 // Add the ResultConfiguration as an item in the grid
 const resultConfigItem = computed(() => ({
