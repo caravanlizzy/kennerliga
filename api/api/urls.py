@@ -16,5 +16,6 @@ urlpatterns = [
     path('user/', include('user.urls')),
     path('announcement/', include('announcement.urls')),
     path('chat/', include('chat.urls')),
+    path('result/', include('result.urls')),
     path('api-token-auth/', views.obtain_auth_token)
 ]

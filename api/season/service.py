@@ -13,6 +13,9 @@ def get_running_season() -> Season:
     """
     return Season.objects.filter(status=Season.SeasonStatus.RUNNING).first()
 
+def get_season_by_league(league):
+    return league.season
+
 
 def get_open_season() -> Season:
     """

@@ -15,6 +15,7 @@ class League(models.Model):
         on_delete=models.CASCADE,
         blank=True,
         null=True,
+        related_name='season',
     )
     level = models.IntegerField('1 for L1, 2 for L2 etc.')
     members = models.ManyToManyField('user.PlayerProfile', related_name='leagues_member')
