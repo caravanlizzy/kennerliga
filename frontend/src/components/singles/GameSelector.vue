@@ -4,11 +4,11 @@
     <div class="row q-gutter-md">
       <kenner-select class="select-width q-mr-md"
                      v-model="platform" option-value="name" option-label="name" :options="platforms"
-                     label="Platform" />
-      <q-input v-model="filter" label="Suche">
+                     label="Platform"/>
+      <q-input v-model="filter" label="Spiel">
         <template v-slot:append>
-          <q-icon v-if="filter !== ''" name="close" @click="filter = ''" class="cursor-pointer" />
-          <q-icon name="search" />
+          <q-icon v-if="filter !== ''" name="close" @click="filter = ''" class="cursor-pointer"/>
+          <q-icon name="search"/>
         </template>
       </q-input>
     </div>
@@ -29,26 +29,26 @@
       <template v-else>
         <div class="text-h6 q-py-md"> Spieloptionen einstellen</div>
         <div v-for="option of fullGameInformation.options" :key="option.id" class="q-py-sm">
-            <template v-if="option.has_choices">
-              <kenner-select
-                :options="fullGameInformation.options.find(o => o.id === option.id).choices"
-                :label="option.name"
-                option-label="name"
-                v-model="selectedOptions[option.id]"
-                class="select-width inline-block"
-              />
-            </template>
-            <template v-else>
-              <q-toggle
-                :model-value="selectedOptions[option.id]"
-                @update:model-value="selectedOptions[option.id] = !selectedOptions[option.id]"
-                :label="option.name"
-              />
-            </template>
+          <template v-if="option.has_choices">
+            <kenner-select
+              :options="fullGameInformation.options.find(o => o.id === option.id).choices"
+              :label="option.name"
+              option-label="name"
+              v-model="selectedOptions[option.id]"
+              class="select-width inline-block"
+            />
+          </template>
+          <template v-else>
+            <q-toggle
+              v-model="selectedOptions[option.id]"
+              :label="option.name"
+            />
+          </template>
         </div>
       </template>
     </div>
-    <KennerButton @click="createSelectedGame(selectedGame.value, selectedOptions.value, leagueId, playedId)" type="submit" push color="positive" label="Speichern" />
+    <KennerButton @click="createSelectedGame(selectedGame.value, selectedOptions.value, leagueId, playedId)"
+                  type="submit" push color="positive" label="Speichern"/>
   </div>
 </template>
 
@@ -58,11 +58,9 @@ import { api } from 'boot/axios';
 import { computed, Ref, ref, watch } from 'vue';
 import { GameDto, TPlatform } from 'src/models/gameModels';
 import KennerButton from 'components/buttons/KennerButton.vue';
-import { useUserStore } from 'stores/userStore';
-import {createSelectedGame} from "src/services/game/selectGameService";
+import { createSelectedGame } from 'src/services/game/selectGameService';
 
 
-const { user } = useUserStore();
 const { data: platforms } = await api('game/platforms/');
 const { data: gameData } = await api('game/games/');
 
@@ -70,39 +68,47 @@ const { data: gameData } = await api('game/games/');
 const platform: Ref<TPlatform | undefined> = ref(undefined);
 const filter = ref('');
 const selectedGame: Ref<GameDto | undefined> = ref(undefined);
-const selectedOptions = ref({});
-const fullGameInformation = ref({});
+const selectedOptions = ref<Record<number, boolean | null>>({});
+const fullGameInformation = ref<{ options: Array<any> }>({ options: [] });
 
-const games = computed(() => filterGames());
+const games = computed<GameDto[]>(() => filterGames());
+
 watch(selectedGame, getGameInformation);
 
 async function getGameInformation(): Promise<void> {
   if (!selectedGame.value) return;
-  const { data: options } = await api(`game/options/?game=${selectedGame.value.id}`);
-  fullGameInformation.value['options'] = options;
-  for (const option of options) {
-    if (option.has_choices) {
-      selectedOptions.value[option.id] = null;
-      const { data: choices } = await api(`game/option-choices/?option=${option.id}`);
-      fullGameInformation.value.options.find(o => o.id === option.id)['choices'] = choices;
-    } else {
-      selectedOptions.value[option.id] = false;
-
+  try {
+    const { data: options } = await api(`game/options/?game=${selectedGame.value.id}`);
+    fullGameInformation.value.options = options;
+    for (const option of options) {
+      if (option.has_choices) {
+        selectedOptions.value[option.id] = null;
+        const { data: choices } = await api(`game/option-choices/?option=${option.id}`);
+        const optionRef = fullGameInformation.value.options.find(o => o.id === option.id);
+        if (optionRef) {
+          optionRef.choices = choices;
+        }
+      } else {
+        selectedOptions.value[option.id] = false;
+      }
     }
+  } catch (error) {
+    console.error('Error fetching game information:', error);
   }
 }
 
+
 function filterGames() {
-  let games = gameData;
-  if (platform.value === undefined) return [];
-  else {
-    games = games.filter(game => game.platform === platform.value.id);
+  let games = gameData || [];
+  if (platform.value) {
+    games = games.filter(game => game.platform === platform.value?.id);
   }
-  if (filter.value !== '') {
-    games = games.filter((game) => game.name.toLowerCase().includes(filter.value.toLowerCase()));
+  if (filter.value) {
+    games = games.filter(game => game.name.toLowerCase().includes(filter.value.toLowerCase()));
   }
   return games;
 }
+
 
 </script>
 

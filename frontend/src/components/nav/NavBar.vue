@@ -1,7 +1,7 @@
 <template>
-<!--  <q-btn  style="height: 44px; width: 44px;">-->
-<!--    <img src="public/icons/kennericon.jpg" style="height: 44px; width: 44px;">-->
-<!--  </q-btn>-->
+  <!--  <q-btn  style="height: 44px; width: 44px;">-->
+  <!--    <img src="public/icons/kennericon.jpg" style="height: 44px; width: 44px;">-->
+  <!--  </q-btn>-->
   <KennerButton :to="{ name: 'home' }" flat color="primary" icon="pets"/>
   <q-toolbar-title class="text-primary">
     Kennerliga
@@ -15,16 +15,15 @@
       eintragen
     </q-tooltip>
   </KennerButton>
-  <TheUsername v-if="isAuthenticated" />
-  <KennerButton v-if="isAuthenticated" flat icon="menu" @click="onToggle" />
-  <KennerButton v-else flat icon="login"  :to="{name:'login'}"/>
+  <TheUsername v-if="isAuthenticated"/>
+  <KennerButton v-if="isAuthenticated" flat icon="menu" @click="onToggle"/>
+  <KennerButton v-else flat icon="login" :to="{name:'login'}"/>
 </template>
 
 <script setup lang="ts">
 import KennerButton from 'components/buttons/KennerButton.vue';
 import { useUserStore } from 'stores/userStore';
 import { storeToRefs } from 'pinia';
-import {  } from 'src/composables/reponsive';
 import TheUsername from 'components/singles/TheUsername.vue';
 
 defineProps<{

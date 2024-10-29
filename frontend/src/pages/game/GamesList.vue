@@ -25,17 +25,21 @@ const { data, isFinished } = useAxios('game/games', api);
 const platformMap = ref<{ [key: string]: string }>({});
 const { data: platformData, isFinished: isPlatformFinished } = useAxios('game/platforms', api);
 
+// Define a type for the platform map
+type TPlatformMap = { [key: string]: string };
+
 onMounted(() => {
   watch(() => isPlatformFinished.value, (newVal) => {
     if (newVal && platformData.value) {
       // Creating a map of platform IDs to platform names
-      platformMap.value = platformData.value.reduce((map: any, platform: { id: string, name: string }) => {
+      platformMap.value = platformData.value.reduce((map: TPlatformMap, platform: { id: string, name: string }) => {
         map[platform.id] = platform.name;
         return map;
-      }, {});
+      }, {} as TPlatformMap); // Use {} as PlatformMap for initial type
     }
   });
-});
+})
+;
 
 // Router for navigation on row click
 const router = useRouter();

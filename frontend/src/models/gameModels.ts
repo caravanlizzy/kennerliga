@@ -19,7 +19,7 @@ export type GameOptionDto = {
   only_if_value?: boolean;
 }
 
-export type GameOptionChoiceDtp = {
+export type GameOptionChoiceDto = {
   id:number;
   name: string;
   option: number;
