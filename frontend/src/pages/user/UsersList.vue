@@ -8,7 +8,7 @@ import KennerligaTable from 'components/tables/KennerTable.vue';
 import { useAxios } from '@vueuse/integrations/useAxios';
 import { api } from 'boot/axios';
 import { useRouter } from 'vue-router';
-import { TKennerButton } from 'src/models/models';
+import { TKennerButton } from 'src/types';
 
 const { data, isFinished } = useAxios('user/users', api);
 

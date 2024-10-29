@@ -3,7 +3,7 @@
     <q-input filled square bottom-slots hide-bottom-space :label="buttonLabel" v-model="inputItem.name"
              @keyup.enter="addItem">
       <template v-slot:append>
-        <kenner-button round dense flat icon="add" @click="addItem"/>
+        <KennerButton round dense flat icon="add" @click="addItem"/>
       </template>
     </q-input>
     <div v-for="(item, index) of listItems" :key="item.id">
@@ -14,7 +14,7 @@
             <kenner-counter v-if="ranked" :content="index"/>
           </template>
           <template v-slot:append>
-            <kenner-button color="info" dense flat icon="check" @click="item.isEditable=false"
+            <KennerButton color="info" dense flat icon="check" @click="item.isEditable=false"
                            @blur="item.isEditable=false"/>
           </template>
         </q-input>
@@ -41,7 +41,7 @@
           <!--          <kenner-counter :content="index" />-->
         </div>
         <div class="column justify-center item-start">{{ item.name }}</div>
-        <kenner-button icon="close" @click="removeItem(item)" color="accent" flat dense/>
+        <KennerButton icon="close" @click="removeItem(item)" color="accent" flat dense/>
       </div>
     </div>
   </div>
@@ -50,7 +50,7 @@
 
 import KennerButton from 'components/buttons/KennerButton.vue';
 import { Ref, ref } from 'vue';
-import { TItem } from 'src/models/models';
+import { TItem } from 'src/types';
 import KennerCounter from 'components/items/KennerCounter.vue';
 import { createRandomId } from 'src/helper';
 

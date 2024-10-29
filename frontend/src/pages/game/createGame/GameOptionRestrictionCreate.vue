@@ -26,8 +26,8 @@
 
 <script setup lang="ts">
 import KennerSelect from 'components/inputs/KennerSelect.vue';
-import { TGameOption } from 'src/models/gameModels';
 import { computed, inject, ref, Ref } from 'vue';
+import { TGameOption } from 'src/types';
 const props = defineProps<{ gameOption: TGameOption }>();
 
 const { updateItem, items } = inject('useGameOptions');

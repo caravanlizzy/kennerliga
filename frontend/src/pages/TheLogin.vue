@@ -8,11 +8,11 @@
         </span>
         </q-card-section>
         <q-card-section>
-          <kenner-input v-model="username" :rules="[]" label="Nickname" />
-          <kenner-input v-model="password" :rules="[]" label="Passwort" type="password" class="q-pt-md" />
+          <KennerInput v-model="username" :rules="[]" label="Nickname" />
+          <KennerInput v-model="password" :rules="[]" label="Passwort" type="password" class="q-pt-md" />
         </q-card-section>
         <q-card-section>
-          <kenner-button type="submit" size="lg" class="full-width q-mt-md" label="Anmelden" icon="pets" color="positive" />
+          <KennerButton type="submit" size="lg" class="full-width q-mt-md" label="Anmelden" icon="pets" color="positive" />
         </q-card-section>
       </q-form>
     </q-card>

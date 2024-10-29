@@ -48,7 +48,7 @@
         </div>
       </template>
     </div>
-    <kenner-button @click="createSelectedGame(selectedGame.value, selectedOptions.value, leagueId, playedId)" type="submit" push color="positive" label="Speichern" />
+    <KennerButton @click="createSelectedGame(selectedGame.value, selectedOptions.value, leagueId, playedId)" type="submit" push color="positive" label="Speichern" />
   </div>
 </template>
 

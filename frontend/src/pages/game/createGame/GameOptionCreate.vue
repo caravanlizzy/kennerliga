@@ -3,13 +3,13 @@
     <template #title>
       <div class="">{{ gameOption.title }}</div>
       <div>
-        <kenner-button flat color="accent" size="md" class="close-button q-pa-none" icon="close"
-                       @click="deleteOption"></kenner-button>
+        <KennerButton flat color="accent" size="md" class="close-button q-pa-none" icon="close"
+                       @click="deleteOption"></KennerButton>
       </div>
     </template>
     <template #content>
       <div class="col">
-        <kenner-input :model-value="gameOption.title" @update:modelValue="updateTitle" label="Spieloption Titel"
+        <KennerInput :model-value="gameOption.title" @update:modelValue="updateTitle" label="Spieloption Titel"
                       class="q-mb-md q-mx-xs" :rules="[val => !!val || 'Titel erforderlich']" />
         <div class="column">
           <q-toggle :model-value="gameOption.hasChoices" @update:model-value="updateHasChoices"
@@ -26,13 +26,13 @@
 
 <script setup lang="ts">
 import KennerInput from 'components/inputs/KennerInput.vue';
-import { TGameOption, TGameOptionChoice } from 'src/models/gameModels';
 import KennerButton from 'components/buttons/KennerButton.vue';
 import { inject, ref } from 'vue';
 import GameOptionChoiceCreate from 'pages/game/createGame/GameOptionChoiceCreate.vue';
 import GameOptionRestrictionCreate from 'pages/game/createGame/GameOptionRestrictionCreate.vue';
 import GameOptionCard from 'components/cards/OverviewCard.vue';
 import { createRandomId } from 'src/helper';
+import { TGameOption, TGameOptionChoice } from 'src/types';
 
 const props = defineProps<{ gameOption: TGameOption }>();
 const { gameOption } = props;

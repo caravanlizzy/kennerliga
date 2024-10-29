@@ -23,7 +23,7 @@
         </div>
       </q-card-section>
       <q-card-section class="text-h6 text-positive">
-        <kenner-button color="positive"><span class="text-overline"> Mach mit!</span></kenner-button>
+        <KennerButton color="positive"><span class="text-overline"> Mach mit!</span></KennerButton>
       </q-card-section>
     </q-card>
   </div>

@@ -14,7 +14,7 @@
 <script setup lang="ts">
 
 import { useResponsive } from 'src/composables/reponsive';
-import { TKennerButton } from 'src/models/models';
+import { TKennerButton } from 'src/types';
 withDefaults(defineProps<TKennerButton>(), {
   color: 'primary'
 });

@@ -1,5 +1,6 @@
 import {api} from 'boot/axios';
-import {TGameOption, TPlatform, TResultConfig} from 'src/models/gameModels';
+import {TPlatform} from 'src/models/gameModels';
+import { TGameOption, TResultConfig } from 'src/types';
 
 
 export async function createGame(name: string, platform: TPlatform): Promise<number> {

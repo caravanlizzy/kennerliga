@@ -1,7 +1,7 @@
 <template>
   <q-item :to="{name: forwardName}" clickable>
     <q-item-section>
-      <kenner-button  color="primary" flat :icon="icon" />
+      <KennerButton  color="primary" flat :icon="icon" />
     </q-item-section>
     <q-item-section >
       <q-item-label class="text-primary" caption> {{label}} </q-item-label>

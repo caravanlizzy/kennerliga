@@ -3,27 +3,27 @@
     <p class="text-h5">Neues Spiel</p>
     <div class="q-py-md">
       <q-form @submit="onSubmit()" @keydown.enter.stop.prevent class="q-gutter-md">
-        <kenner-input class="max-w" label="Spielname" v-model="name"
+        <KennerInput class="max-w" label="Spielname" v-model="name"
                       :rules="[val => !!val || 'Bitte wähle einen Spielnamen']"/>
-        <kenner-select class="max-w" label="Plattform" :options="platforms" v-model="platform" option-value="name"
+        <KennerSelect class="max-w" label="Plattform" :options="platforms" v-model="platform" option-value="name"
                        option-label="name"
                        :rules="[val => !!val || 'Bitte wähle eine Plattform']"/>
 
         <div class="q-mt-xl q-pa-md">
           <div>
             <span class="text-h6">Spieloptionen</span>
-            <kenner-button class="q-ml-lg" color="primary" label="" icon="add" @click="addEmptyOption"/>
+            <KennerButton class="q-ml-lg" color="primary" label="" icon="add" @click="addEmptyOption"/>
           </div>
           <div class="flex row ">
-            <game-option
+            <GameOption
               v-for="gameOption of gameOptions"
               :key="gameOption.itemId"
               :gameOption="gameOption"
             />
           </div>
         </div>
-        <create-result-config @update-result-config="updateResultConfig"/>
-        <kenner-button class="q-my-xl" type="submit" push color="positive" label="Speichern"/>
+        <CreateResultConfig @update-result-config="updateResultConfig"/>
+        <KennerButton class="q-my-xl" type="submit" push color="positive" label="Speichern"/>
       </q-form>
     </div>
   </div>
@@ -36,13 +36,14 @@ import { api } from 'boot/axios';
 import KennerInput from 'components/inputs/KennerInput.vue';
 import KennerSelect from 'components/inputs/KennerSelect.vue';
 import KennerButton from 'components/buttons/KennerButton.vue';
-import { TGameOption, TPlatform, TResultConfig } from 'src/models/gameModels';
+import { TPlatform } from 'src/models/gameModels';
 import GameOption from 'pages/game/createGame/GameOptionCreate.vue';
 import { useItemList } from 'src/composables/itemList';
 import { useRouter } from 'vue-router';
 import CreateResultConfig from 'pages/game/createGame/CreateResultConfig.vue';
 import { createGame, createOptions, createResultConfigData } from 'src/services/game/createGameService';
 import { createRandomId } from 'src/helper';
+import { TGameOption, TResultConfig } from 'src/types';
 
 const router = useRouter();
 const $q = useQuasar();
