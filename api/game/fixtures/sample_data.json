@@ -1,1 +1,1269 @@
-[{"model": "game.game", "pk": 1, "fields": {"name": "Arche Nova", "platform": 1}}, {"model": "game.game", "pk": 5, "fields": {"name": "Terra Mystica", "platform": 1}}, {"model": "game.gameoption", "pk": 1, "fields": {"name": "Wettbewerbsniveau", "game": 1, "has_choices": true, "only_if_option": null, "only_if_choice": null, "only_if_value": null}}, {"model": "game.gameoption", "pk": 2, "fields": {"name": "Friedlicher Modus", "game": 1, "has_choices": false, "only_if_option": null, "only_if_choice": null, "only_if_value": null}}, {"model": "game.gameoption", "pk": 3, "fields": {"name": "Map Pack", "game": 1, "has_choices": false, "only_if_option": null, "only_if_choice": null, "only_if_value": null}}, {"model": "game.gameoption", "pk": 4, "fields": {"name": "Zooplan der Spieler", "game": 1, "has_choices": true, "only_if_option": null, "only_if_choice": null, "only_if_value": null}}, {"model": "game.gameoption", "pk": 5, "fields": {"name": "Alternative Zoopläne", "game": 1, "has_choices": false, "only_if_option": null, "only_if_choice": null, "only_if_value": null}}, {"model": "game.gameoption", "pk": 9, "fields": {"name": "Spielbrett", "game": 5, "has_choices": true, "only_if_option": 9, "only_if_choice": 25, "only_if_value": null}}, {"model": "game.gameoption", "pk": 10, "fields": {"name": "Fluss-Vorlage", "game": 5, "has_choices": true, "only_if_option": 9, "only_if_choice": 25, "only_if_value": true}}, {"model": "game.gameoption", "pk": 11, "fields": {"name": "Start-Siegpunkte", "game": 5, "has_choices": true, "only_if_option": null, "only_if_choice": null, "only_if_value": null}}, {"model": "game.gameoption", "pk": 12, "fields": {"name": "Zugreihenfolge", "game": 5, "has_choices": true, "only_if_option": null, "only_if_choice": null, "only_if_value": null}}, {"model": "game.gameoption", "pk": 13, "fields": {"name": "Mini-Erweiterungen", "game": 5, "has_choices": false, "only_if_option": null, "only_if_choice": null, "only_if_value": null}}, {"model": "game.gameoption", "pk": 14, "fields": {"name": "Sonderlandschaften Erweiterung", "game": 5, "has_choices": false, "only_if_option": 14, "only_if_choice": null, "only_if_value": true}}, {"model": "game.gameoption", "pk": 15, "fields": {"name": "Feuer und Eis - Endwertungsplättchen", "game": 5, "has_choices": false, "only_if_option": null, "only_if_choice": null, "only_if_value": null}}, {"model": "game.gameoption", "pk": 16, "fields": {"name": "Feuer und Eis - Völker", "game": 5, "has_choices": false, "only_if_option": null, "only_if_choice": null, "only_if_value": null}}, {"model": "game.gameoption", "pk": 17, "fields": {"name": "Fan-Völker", "game": 5, "has_choices": false, "only_if_option": null, "only_if_choice": null, "only_if_value": null}}, {"model": "game.gameoptionchoice", "pk": 1, "fields": {"name": "Anfänger", "option": 1}}, {"model": "game.gameoptionchoice", "pk": 2, "fields": {"name": "Erstes Spiel", "option": 1}}, {"model": "game.gameoptionchoice", "pk": 3, "fields": {"name": "Freier Aufbau", "option": 1}}, {"model": "game.gameoptionchoice", "pk": 4, "fields": {"name": "Freier Aufbau ohne A und 0", "option": 1}}, {"model": "game.gameoptionchoice", "pk": 5, "fields": {"name": "Gleicher Zooplan für alle", "option": 1}}, {"model": "game.gameoptionchoice", "pk": 6, "fields": {"name": "Standard", "option": 1}}, {"model": "game.gameoptionchoice", "pk": 7, "fields": {"name": "Zooplan 1 (Aussichtsplattform)", "option": 4}}, {"model": "game.gameoptionchoice", "pk": 8, "fields": {"name": "Zooplan 2 (Freilaufflächen)", "option": 4}}, {"model": "game.gameoptionchoice", "pk": 9, "fields": {"name": "Zooplan 3 (Silbersee)", "option": 4}}, {"model": "game.gameoptionchoice", "pk": 10, "fields": {"name": "Zooplan 4 (Handelshafen)", "option": 4}}, {"model": "game.gameoptionchoice", "pk": 11, "fields": {"name": "Zooplan 5 (Parkrestaurant)", "option": 4}}, {"model": "game.gameoptionchoice", "pk": 12, "fields": {"name": "Zooplan 6 (Forschungsinstitut)", "option": 4}}, {"model": "game.gameoptionchoice", "pk": 13, "fields": {"name": "Zooplan 7 (Eisdielen)", "option": 4}}, {"model": "game.gameoptionchoice", "pk": 14, "fields": {"name": "Zooplan 8 (Hollywood Hills)", "option": 4}}, {"model": "game.gameoptionchoice", "pk": 15, "fields": {"name": "Zooplan 9 (Geozoo)", "option": 4}}, {"model": "game.gameoptionchoice", "pk": 16, "fields": {"name": "Zooplan 10 (Auffangstation)", "option": 4}}, {"model": "game.gameoptionchoice", "pk": 17, "fields": {"name": "Zufällig", "option": 4}}, {"model": "game.gameoptionchoice", "pk": 18, "fields": {"name": "Benutzerdefiniert", "option": 9}}, {"model": "game.gameoptionchoice", "pk": 19, "fields": {"name": "Feuer & Eis", "option": 9}}, {"model": "game.gameoptionchoice", "pk": 20, "fields": {"name": "Fjorde", "option": 9}}, {"model": "game.gameoptionchoice", "pk": 21, "fields": {"name": "Seen (von Jason Counihan)", "option": 9}}, {"model": "game.gameoptionchoice", "pk": 22, "fields": {"name": "Überarbeitetes Grundspiel", "option": 9}}, {"model": "game.gameoptionchoice", "pk": 24, "fields": {"name": "Zufällig", "option": 9}}, {"model": "game.gameoptionchoice", "pk": 25, "fields": {"name": "Zufällig generiert (von IKM)", "option": 9}}, {"model": "game.gameoptionchoice", "pk": 26, "fields": {"name": "Feuer & Eis", "option": 10}}, {"model": "game.gameoptionchoice", "pk": 27, "fields": {"name": "Fjorde", "option": 10}}, {"model": "game.gameoptionchoice", "pk": 28, "fields": {"name": "Grundspiel", "option": 10}}, {"model": "game.gameoptionchoice", "pk": 29, "fields": {"name": "Seen (von Jason Counihan)", "option": 10}}, {"model": "game.gameoptionchoice", "pk": 30, "fields": {"name": "Nach Völkern angepasst", "option": 11}}, {"model": "game.gameoptionchoice", "pk": 31, "fields": {"name": "Schnelle Versteigerung", "option": 11}}, {"model": "game.gameoptionchoice", "pk": 32, "fields": {"name": "Standard", "option": 11}}, {"model": "game.gameoptionchoice", "pk": 33, "fields": {"name": "Standard-Versteigerung", "option": 11}}, {"model": "game.gameoptionchoice", "pk": 34, "fields": {"name": "Im Uhrzeigersinn vom Startspieler", "option": 12}}, {"model": "game.gameoptionchoice", "pk": 35, "fields": {"name": "Variable Zugreihenfolge", "option": 12}}, {"model": "game.gameoptionchoice", "pk": 36, "fields": {"name": "An", "option": 15}}, {"model": "game.gameoptionchoice", "pk": 37, "fields": {"name": "Aus", "option": 15}}, {"model": "game.gameoptionchoice", "pk": 38, "fields": {"name": "Zufällig", "option": 15}}, {"model": "game.gameoptionchoice", "pk": 39, "fields": {"name": "An", "option": 16}}, {"model": "game.gameoptionchoice", "pk": 40, "fields": {"name": "Aus", "option": 16}}, {"model": "game.gameoptionchoice", "pk": 41, "fields": {"name": "Zufällig", "option": 16}}, {"model": "game.gameoptionchoice", "pk": 42, "fields": {"name": "An", "option": 17}}, {"model": "game.gameoptionchoice", "pk": 43, "fields": {"name": "Aus", "option": 17}}, {"model": "game.gameoptionchoice", "pk": 44, "fields": {"name": "Zufällig", "option": 17}}, {"model": "game.startingpointsystem", "pk": 1, "fields": {"code": "FIX", "description": "Gleiche Startpunkte für alle"}}, {"model": "game.startingpointsystem", "pk": 2, "fields": {"code": "DYNAMIC", "description": "Manuelle Eingabe der Startpunkte"}}, {"model": "game.resultconfig", "pk": 1, "fields": {"game": 1, "is_asymmetric": true, "has_starting_player_order": true, "starting_points_system": 1, "has_points": true}}, {"model": "game.resultconfig", "pk": 5, "fields": {"game": 5, "is_asymmetric": true, "has_starting_player_order": true, "starting_points_system": 2, "has_points": true}}, {"model": "game.tiebreaker", "pk": 1, "fields": {"result_config": 1, "name": "Geld", "order": 0}}, {"model": "game.tiebreaker", "pk": 2, "fields": {"result_config": 1, "name": "kartenziehen", "order": 10}}, {"model": "game.faction", "pk": 1, "fields": {"game": 1, "name": "Zooplan 2 (Freilaufflächen)"}}, {"model": "game.faction", "pk": 2, "fields": {"game": 1, "name": "Zooplan 3 (Silbersee)"}}, {"model": "game.faction", "pk": 3, "fields": {"game": 1, "name": "Zooplan 5 (Parkrestaurant)"}}, {"model": "game.faction", "pk": 4, "fields": {"game": 1, "name": "Zooplan 4 (Handelshafen)"}}, {"model": "game.faction", "pk": 5, "fields": {"game": 1, "name": "Zooplan 7 (Eisdielen)"}}, {"model": "game.faction", "pk": 6, "fields": {"game": 1, "name": "Zooplan 1 (Aussichtsplattform)"}}, {"model": "game.faction", "pk": 7, "fields": {"game": 1, "name": "Zooplan 8 (Hollywood Hills)"}}, {"model": "game.faction", "pk": 8, "fields": {"game": 1, "name": "Zooplan 10 (Auffangstation)"}}, {"model": "game.faction", "pk": 9, "fields": {"game": 1, "name": "Zooplan 6 (Forschungsinstitut)"}}, {"model": "game.faction", "pk": 10, "fields": {"game": 1, "name": "Zooplan 9 (Geozoo)"}}, {"model": "game.faction", "pk": 11, "fields": {"game": 5, "name": "Chaos Magiere"}}, {"model": "game.faction", "pk": 12, "fields": {"game": 5, "name": "Alchemisten"}}, {"model": "game.faction", "pk": 13, "fields": {"game": 5, "name": "Düsterlinge"}}, {"model": "game.faction", "pk": 14, "fields": {"game": 5, "name": "Fakire"}}, {"model": "game.faction", "pk": 15, "fields": {"game": 5, "name": "Hexen"}}, {"model": "game.faction", "pk": 16, "fields": {"game": 5, "name": "Ingenieure"}}, {"model": "game.faction", "pk": 17, "fields": {"game": 5, "name": "Kultisten"}}, {"model": "game.faction", "pk": 18, "fields": {"game": 5, "name": "Auren"}}, {"model": "game.faction", "pk": 19, "fields": {"game": 5, "name": "Halblinge"}}, {"model": "game.faction", "pk": 20, "fields": {"game": 5, "name": "Nixen"}}, {"model": "game.faction", "pk": 21, "fields": {"game": 5, "name": "Nomaden"}}, {"model": "game.faction", "pk": 22, "fields": {"game": 5, "name": "Riesen"}}, {"model": "game.faction", "pk": 23, "fields": {"game": 5, "name": "Schwarmlinge"}}, {"model": "game.faction", "pk": 24, "fields": {"game": 5, "name": "Zwerge"}}]
+[
+  {
+    "model": "game.game",
+    "pk": 1,
+    "fields": {
+      "name": "Arche Nova",
+      "platform": 1
+    }
+  },
+  {
+    "model": "game.game",
+    "pk": 5,
+    "fields": {
+      "name": "Terra Mystica",
+      "platform": 1
+    }
+  },
+  {
+    "model": "game.game",
+    "pk": 6,
+    "fields": {
+      "name": "Gaia Project",
+      "platform": 3
+    }
+  },
+  {
+    "model": "game.game",
+    "pk": 7,
+    "fields": {
+      "name": "Terraforming Mars",
+      "platform": 1
+    }
+  },
+  {
+    "model": "game.gameoption",
+    "pk": 1,
+    "fields": {
+      "name": "Wettbewerbsniveau",
+      "game": 1,
+      "has_choices": true,
+      "only_if_option": null,
+      "only_if_choice": null,
+      "only_if_value": null
+    }
+  },
+  {
+    "model": "game.gameoption",
+    "pk": 2,
+    "fields": {
+      "name": "Friedlicher Modus",
+      "game": 1,
+      "has_choices": false,
+      "only_if_option": null,
+      "only_if_choice": null,
+      "only_if_value": null
+    }
+  },
+  {
+    "model": "game.gameoption",
+    "pk": 3,
+    "fields": {
+      "name": "Map Pack",
+      "game": 1,
+      "has_choices": false,
+      "only_if_option": null,
+      "only_if_choice": null,
+      "only_if_value": null
+    }
+  },
+  {
+    "model": "game.gameoption",
+    "pk": 4,
+    "fields": {
+      "name": "Zooplan der Spieler",
+      "game": 1,
+      "has_choices": true,
+      "only_if_option": null,
+      "only_if_choice": null,
+      "only_if_value": null
+    }
+  },
+  {
+    "model": "game.gameoption",
+    "pk": 5,
+    "fields": {
+      "name": "Alternative Zoopläne",
+      "game": 1,
+      "has_choices": false,
+      "only_if_option": null,
+      "only_if_choice": null,
+      "only_if_value": null
+    }
+  },
+  {
+    "model": "game.gameoption",
+    "pk": 9,
+    "fields": {
+      "name": "Spielbrett",
+      "game": 5,
+      "has_choices": true,
+      "only_if_option": 9,
+      "only_if_choice": 25,
+      "only_if_value": null
+    }
+  },
+  {
+    "model": "game.gameoption",
+    "pk": 10,
+    "fields": {
+      "name": "Fluss-Vorlage",
+      "game": 5,
+      "has_choices": true,
+      "only_if_option": 9,
+      "only_if_choice": 25,
+      "only_if_value": true
+    }
+  },
+  {
+    "model": "game.gameoption",
+    "pk": 11,
+    "fields": {
+      "name": "Start-Siegpunkte",
+      "game": 5,
+      "has_choices": true,
+      "only_if_option": null,
+      "only_if_choice": null,
+      "only_if_value": null
+    }
+  },
+  {
+    "model": "game.gameoption",
+    "pk": 12,
+    "fields": {
+      "name": "Zugreihenfolge",
+      "game": 5,
+      "has_choices": true,
+      "only_if_option": null,
+      "only_if_choice": null,
+      "only_if_value": null
+    }
+  },
+  {
+    "model": "game.gameoption",
+    "pk": 13,
+    "fields": {
+      "name": "Mini-Erweiterungen",
+      "game": 5,
+      "has_choices": false,
+      "only_if_option": null,
+      "only_if_choice": null,
+      "only_if_value": null
+    }
+  },
+  {
+    "model": "game.gameoption",
+    "pk": 14,
+    "fields": {
+      "name": "Sonderlandschaften Erweiterung",
+      "game": 5,
+      "has_choices": false,
+      "only_if_option": 14,
+      "only_if_choice": null,
+      "only_if_value": true
+    }
+  },
+  {
+    "model": "game.gameoption",
+    "pk": 15,
+    "fields": {
+      "name": "Feuer und Eis - Endwertungsplättchen",
+      "game": 5,
+      "has_choices": false,
+      "only_if_option": null,
+      "only_if_choice": null,
+      "only_if_value": null
+    }
+  },
+  {
+    "model": "game.gameoption",
+    "pk": 16,
+    "fields": {
+      "name": "Feuer und Eis - Völker",
+      "game": 5,
+      "has_choices": false,
+      "only_if_option": null,
+      "only_if_choice": null,
+      "only_if_value": null
+    }
+  },
+  {
+    "model": "game.gameoption",
+    "pk": 17,
+    "fields": {
+      "name": "Fan-Völker",
+      "game": 5,
+      "has_choices": false,
+      "only_if_option": null,
+      "only_if_choice": null,
+      "only_if_value": null
+    }
+  },
+  {
+    "model": "game.gameoption",
+    "pk": 18,
+    "fields": {
+      "name": "Auction Mode",
+      "game": 6,
+      "has_choices": true,
+      "only_if_option": null,
+      "only_if_choice": null,
+      "only_if_value": null
+    }
+  },
+  {
+    "model": "game.gameoption",
+    "pk": 19,
+    "fields": {
+      "name": "Map Layout",
+      "game": 6,
+      "has_choices": true,
+      "only_if_option": null,
+      "only_if_choice": null,
+      "only_if_value": null
+    }
+  },
+  {
+    "model": "game.gameoption",
+    "pk": 20,
+    "fields": {
+      "name": "Player Order",
+      "game": 6,
+      "has_choices": true,
+      "only_if_option": null,
+      "only_if_choice": null,
+      "only_if_value": null
+    }
+  },
+  {
+    "model": "game.gameoption",
+    "pk": 21,
+    "fields": {
+      "name": "Host sets up the entire board (including rotation)",
+      "game": 6,
+      "has_choices": false,
+      "only_if_option": null,
+      "only_if_choice": null,
+      "only_if_value": null
+    }
+  },
+  {
+    "model": "game.gameoption",
+    "pk": 22,
+    "fields": {
+      "name": "Random factions",
+      "game": 6,
+      "has_choices": false,
+      "only_if_option": null,
+      "only_if_choice": null,
+      "only_if_value": null
+    }
+  },
+  {
+    "model": "game.gameoption",
+    "pk": 23,
+    "fields": {
+      "name": "Last player rotates sectors",
+      "game": 6,
+      "has_choices": false,
+      "only_if_option": null,
+      "only_if_choice": null,
+      "only_if_value": null
+    }
+  },
+  {
+    "model": "game.gameoption",
+    "pk": 24,
+    "fields": {
+      "name": "Expansions Frontiers",
+      "game": 6,
+      "has_choices": false,
+      "only_if_option": null,
+      "only_if_choice": null,
+      "only_if_value": null
+    }
+  },
+  {
+    "model": "game.gameoption",
+    "pk": 25,
+    "fields": {
+      "name": "Wertung in Echtzeit",
+      "game": 7,
+      "has_choices": false,
+      "only_if_option": null,
+      "only_if_choice": null,
+      "only_if_value": null
+    }
+  },
+  {
+    "model": "game.gameoption",
+    "pk": 26,
+    "fields": {
+      "name": "Draft",
+      "game": 7,
+      "has_choices": false,
+      "only_if_option": null,
+      "only_if_choice": null,
+      "only_if_value": null
+    }
+  },
+  {
+    "model": "game.gameoption",
+    "pk": 27,
+    "fields": {
+      "name": "Zeitalter der Konzerne",
+      "game": 7,
+      "has_choices": false,
+      "only_if_option": null,
+      "only_if_choice": null,
+      "only_if_value": null
+    }
+  },
+  {
+    "model": "game.gameoption",
+    "pk": 28,
+    "fields": {
+      "name": "Anfänger Konzerne",
+      "game": 7,
+      "has_choices": false,
+      "only_if_option": null,
+      "only_if_choice": null,
+      "only_if_value": null
+    }
+  },
+  {
+    "model": "game.gameoption",
+    "pk": 29,
+    "fields": {
+      "name": "Präludium",
+      "game": 7,
+      "has_choices": false,
+      "only_if_option": null,
+      "only_if_choice": null,
+      "only_if_value": null
+    }
+  },
+  {
+    "model": "game.gameoptionchoice",
+    "pk": 1,
+    "fields": {
+      "name": "Anfänger",
+      "option": 1
+    }
+  },
+  {
+    "model": "game.gameoptionchoice",
+    "pk": 2,
+    "fields": {
+      "name": "Erstes Spiel",
+      "option": 1
+    }
+  },
+  {
+    "model": "game.gameoptionchoice",
+    "pk": 3,
+    "fields": {
+      "name": "Freier Aufbau",
+      "option": 1
+    }
+  },
+  {
+    "model": "game.gameoptionchoice",
+    "pk": 4,
+    "fields": {
+      "name": "Freier Aufbau ohne A und 0",
+      "option": 1
+    }
+  },
+  {
+    "model": "game.gameoptionchoice",
+    "pk": 5,
+    "fields": {
+      "name": "Gleicher Zooplan für alle",
+      "option": 1
+    }
+  },
+  {
+    "model": "game.gameoptionchoice",
+    "pk": 6,
+    "fields": {
+      "name": "Standard",
+      "option": 1
+    }
+  },
+  {
+    "model": "game.gameoptionchoice",
+    "pk": 7,
+    "fields": {
+      "name": "Zooplan 1 (Aussichtsplattform)",
+      "option": 4
+    }
+  },
+  {
+    "model": "game.gameoptionchoice",
+    "pk": 8,
+    "fields": {
+      "name": "Zooplan 2 (Freilaufflächen)",
+      "option": 4
+    }
+  },
+  {
+    "model": "game.gameoptionchoice",
+    "pk": 9,
+    "fields": {
+      "name": "Zooplan 3 (Silbersee)",
+      "option": 4
+    }
+  },
+  {
+    "model": "game.gameoptionchoice",
+    "pk": 10,
+    "fields": {
+      "name": "Zooplan 4 (Handelshafen)",
+      "option": 4
+    }
+  },
+  {
+    "model": "game.gameoptionchoice",
+    "pk": 11,
+    "fields": {
+      "name": "Zooplan 5 (Parkrestaurant)",
+      "option": 4
+    }
+  },
+  {
+    "model": "game.gameoptionchoice",
+    "pk": 12,
+    "fields": {
+      "name": "Zooplan 6 (Forschungsinstitut)",
+      "option": 4
+    }
+  },
+  {
+    "model": "game.gameoptionchoice",
+    "pk": 13,
+    "fields": {
+      "name": "Zooplan 7 (Eisdielen)",
+      "option": 4
+    }
+  },
+  {
+    "model": "game.gameoptionchoice",
+    "pk": 14,
+    "fields": {
+      "name": "Zooplan 8 (Hollywood Hills)",
+      "option": 4
+    }
+  },
+  {
+    "model": "game.gameoptionchoice",
+    "pk": 15,
+    "fields": {
+      "name": "Zooplan 9 (Geozoo)",
+      "option": 4
+    }
+  },
+  {
+    "model": "game.gameoptionchoice",
+    "pk": 16,
+    "fields": {
+      "name": "Zooplan 10 (Auffangstation)",
+      "option": 4
+    }
+  },
+  {
+    "model": "game.gameoptionchoice",
+    "pk": 17,
+    "fields": {
+      "name": "Zufällig",
+      "option": 4
+    }
+  },
+  {
+    "model": "game.gameoptionchoice",
+    "pk": 18,
+    "fields": {
+      "name": "Benutzerdefiniert",
+      "option": 9
+    }
+  },
+  {
+    "model": "game.gameoptionchoice",
+    "pk": 19,
+    "fields": {
+      "name": "Feuer & Eis",
+      "option": 9
+    }
+  },
+  {
+    "model": "game.gameoptionchoice",
+    "pk": 20,
+    "fields": {
+      "name": "Fjorde",
+      "option": 9
+    }
+  },
+  {
+    "model": "game.gameoptionchoice",
+    "pk": 21,
+    "fields": {
+      "name": "Seen (von Jason Counihan)",
+      "option": 9
+    }
+  },
+  {
+    "model": "game.gameoptionchoice",
+    "pk": 22,
+    "fields": {
+      "name": "Überarbeitetes Grundspiel",
+      "option": 9
+    }
+  },
+  {
+    "model": "game.gameoptionchoice",
+    "pk": 23,
+    "fields": {
+      "name": "Zufällig",
+      "option": 9
+    }
+  },
+  {
+    "model": "game.gameoptionchoice",
+    "pk": 24,
+    "fields": {
+      "name": "Zufällig",
+      "option": 9
+    }
+  },
+  {
+    "model": "game.gameoptionchoice",
+    "pk": 25,
+    "fields": {
+      "name": "Zufällig generiert (von IKM)",
+      "option": 9
+    }
+  },
+  {
+    "model": "game.gameoptionchoice",
+    "pk": 26,
+    "fields": {
+      "name": "Feuer & Eis",
+      "option": 10
+    }
+  },
+  {
+    "model": "game.gameoptionchoice",
+    "pk": 27,
+    "fields": {
+      "name": "Fjorde",
+      "option": 10
+    }
+  },
+  {
+    "model": "game.gameoptionchoice",
+    "pk": 28,
+    "fields": {
+      "name": "Grundspiel",
+      "option": 10
+    }
+  },
+  {
+    "model": "game.gameoptionchoice",
+    "pk": 29,
+    "fields": {
+      "name": "Seen (von Jason Counihan)",
+      "option": 10
+    }
+  },
+  {
+    "model": "game.gameoptionchoice",
+    "pk": 30,
+    "fields": {
+      "name": "Nach Völkern angepasst",
+      "option": 11
+    }
+  },
+  {
+    "model": "game.gameoptionchoice",
+    "pk": 31,
+    "fields": {
+      "name": "Schnelle Versteigerung",
+      "option": 11
+    }
+  },
+  {
+    "model": "game.gameoptionchoice",
+    "pk": 32,
+    "fields": {
+      "name": "Standard",
+      "option": 11
+    }
+  },
+  {
+    "model": "game.gameoptionchoice",
+    "pk": 33,
+    "fields": {
+      "name": "Standard-Versteigerung",
+      "option": 11
+    }
+  },
+  {
+    "model": "game.gameoptionchoice",
+    "pk": 34,
+    "fields": {
+      "name": "Im Uhrzeigersinn vom Startspieler",
+      "option": 12
+    }
+  },
+  {
+    "model": "game.gameoptionchoice",
+    "pk": 35,
+    "fields": {
+      "name": "Variable Zugreihenfolge",
+      "option": 12
+    }
+  },
+  {
+    "model": "game.gameoptionchoice",
+    "pk": 36,
+    "fields": {
+      "name": "An",
+      "option": 15
+    }
+  },
+  {
+    "model": "game.gameoptionchoice",
+    "pk": 37,
+    "fields": {
+      "name": "Aus",
+      "option": 15
+    }
+  },
+  {
+    "model": "game.gameoptionchoice",
+    "pk": 38,
+    "fields": {
+      "name": "Zufällig",
+      "option": 15
+    }
+  },
+  {
+    "model": "game.gameoptionchoice",
+    "pk": 39,
+    "fields": {
+      "name": "An",
+      "option": 16
+    }
+  },
+  {
+    "model": "game.gameoptionchoice",
+    "pk": 40,
+    "fields": {
+      "name": "Aus",
+      "option": 16
+    }
+  },
+  {
+    "model": "game.gameoptionchoice",
+    "pk": 41,
+    "fields": {
+      "name": "Zufällig",
+      "option": 16
+    }
+  },
+  {
+    "model": "game.gameoptionchoice",
+    "pk": 42,
+    "fields": {
+      "name": "An",
+      "option": 17
+    }
+  },
+  {
+    "model": "game.gameoptionchoice",
+    "pk": 43,
+    "fields": {
+      "name": "Aus",
+      "option": 17
+    }
+  },
+  {
+    "model": "game.gameoptionchoice",
+    "pk": 44,
+    "fields": {
+      "name": "Zufällig",
+      "option": 17
+    }
+  },
+  {
+    "model": "game.gameoptionchoice",
+    "pk": 45,
+    "fields": {
+      "name": "Choose factions while bidding",
+      "option": 18
+    }
+  },
+  {
+    "model": "game.gameoptionchoice",
+    "pk": 46,
+    "fields": {
+      "name": "Choose factions, then bid",
+      "option": 18
+    }
+  },
+  {
+    "model": "game.gameoptionchoice",
+    "pk": 47,
+    "fields": {
+      "name": "No auction",
+      "option": 18
+    }
+  },
+  {
+    "model": "game.gameoptionchoice",
+    "pk": 48,
+    "fields": {
+      "name": "Standard",
+      "option": 19
+    }
+  },
+  {
+    "model": "game.gameoptionchoice",
+    "pk": 49,
+    "fields": {
+      "name": "X shape (8 sectors)",
+      "option": 19
+    }
+  },
+  {
+    "model": "game.gameoptionchoice",
+    "pk": 50,
+    "fields": {
+      "name": "Host decides order",
+      "option": 20
+    }
+  },
+  {
+    "model": "game.gameoptionchoice",
+    "pk": 51,
+    "fields": {
+      "name": "Join order",
+      "option": 20
+    }
+  },
+  {
+    "model": "game.gameoptionchoice",
+    "pk": 52,
+    "fields": {
+      "name": "Random player order",
+      "option": 20
+    }
+  },
+  {
+    "model": "game.selectedgame",
+    "pk": 1,
+    "fields": {
+      "player": 1,
+      "game": 1,
+      "league": 1
+    }
+  },
+  {
+    "model": "game.selectedoption",
+    "pk": 1,
+    "fields": {
+      "selected_game": 1,
+      "game_option": 1,
+      "choice": 2,
+      "value": null
+    }
+  },
+  {
+    "model": "game.selectedoption",
+    "pk": 2,
+    "fields": {
+      "selected_game": 1,
+      "game_option": 2,
+      "choice": null,
+      "value": false
+    }
+  },
+  {
+    "model": "game.startingpointsystem",
+    "pk": 1,
+    "fields": {
+      "code": "FIX",
+      "description": "Gleiche Startpunkte für alle"
+    }
+  },
+  {
+    "model": "game.startingpointsystem",
+    "pk": 2,
+    "fields": {
+      "code": "DYNAMIC",
+      "description": "Manuelle Eingabe der Startpunkte"
+    }
+  },
+  {
+    "model": "game.resultconfig",
+    "pk": 1,
+    "fields": {
+      "game": 1,
+      "is_asymmetric": true,
+      "has_starting_player_order": true,
+      "starting_points_system": 1,
+      "has_points": true
+    }
+  },
+  {
+    "model": "game.resultconfig",
+    "pk": 5,
+    "fields": {
+      "game": 5,
+      "is_asymmetric": true,
+      "has_starting_player_order": true,
+      "starting_points_system": 2,
+      "has_points": true
+    }
+  },
+  {
+    "model": "game.resultconfig",
+    "pk": 6,
+    "fields": {
+      "game": 6,
+      "is_asymmetric": true,
+      "has_starting_player_order": true,
+      "starting_points_system": 2,
+      "has_points": true
+    }
+  },
+  {
+    "model": "game.resultconfig",
+    "pk": 7,
+    "fields": {
+      "game": 7,
+      "is_asymmetric": true,
+      "has_starting_player_order": true,
+      "starting_points_system": 1,
+      "has_points": true
+    }
+  },
+  {
+    "model": "game.tiebreaker",
+    "pk": 1,
+    "fields": {
+      "result_config": 1,
+      "name": "Geld",
+      "order": 0
+    }
+  },
+  {
+    "model": "game.tiebreaker",
+    "pk": 2,
+    "fields": {
+      "result_config": 1,
+      "name": "kartenziehen",
+      "order": 10
+    }
+  },
+  {
+    "model": "game.faction",
+    "pk": 1,
+    "fields": {
+      "game": 1,
+      "name": "Zooplan 2 (Freilaufflächen)"
+    }
+  },
+  {
+    "model": "game.faction",
+    "pk": 2,
+    "fields": {
+      "game": 1,
+      "name": "Zooplan 3 (Silbersee)"
+    }
+  },
+  {
+    "model": "game.faction",
+    "pk": 3,
+    "fields": {
+      "game": 1,
+      "name": "Zooplan 5 (Parkrestaurant)"
+    }
+  },
+  {
+    "model": "game.faction",
+    "pk": 4,
+    "fields": {
+      "game": 1,
+      "name": "Zooplan 4 (Handelshafen)"
+    }
+  },
+  {
+    "model": "game.faction",
+    "pk": 5,
+    "fields": {
+      "game": 1,
+      "name": "Zooplan 7 (Eisdielen)"
+    }
+  },
+  {
+    "model": "game.faction",
+    "pk": 6,
+    "fields": {
+      "game": 1,
+      "name": "Zooplan 1 (Aussichtsplattform)"
+    }
+  },
+  {
+    "model": "game.faction",
+    "pk": 7,
+    "fields": {
+      "game": 1,
+      "name": "Zooplan 8 (Hollywood Hills)"
+    }
+  },
+  {
+    "model": "game.faction",
+    "pk": 8,
+    "fields": {
+      "game": 1,
+      "name": "Zooplan 10 (Auffangstation)"
+    }
+  },
+  {
+    "model": "game.faction",
+    "pk": 9,
+    "fields": {
+      "game": 1,
+      "name": "Zooplan 6 (Forschungsinstitut)"
+    }
+  },
+  {
+    "model": "game.faction",
+    "pk": 10,
+    "fields": {
+      "game": 1,
+      "name": "Zooplan 9 (Geozoo)"
+    }
+  },
+  {
+    "model": "game.faction",
+    "pk": 11,
+    "fields": {
+      "game": 5,
+      "name": "Chaos Magiere"
+    }
+  },
+  {
+    "model": "game.faction",
+    "pk": 12,
+    "fields": {
+      "game": 5,
+      "name": "Alchemisten"
+    }
+  },
+  {
+    "model": "game.faction",
+    "pk": 13,
+    "fields": {
+      "game": 5,
+      "name": "Düsterlinge"
+    }
+  },
+  {
+    "model": "game.faction",
+    "pk": 14,
+    "fields": {
+      "game": 5,
+      "name": "Fakire"
+    }
+  },
+  {
+    "model": "game.faction",
+    "pk": 15,
+    "fields": {
+      "game": 5,
+      "name": "Hexen"
+    }
+  },
+  {
+    "model": "game.faction",
+    "pk": 16,
+    "fields": {
+      "game": 5,
+      "name": "Ingenieure"
+    }
+  },
+  {
+    "model": "game.faction",
+    "pk": 17,
+    "fields": {
+      "game": 5,
+      "name": "Kultisten"
+    }
+  },
+  {
+    "model": "game.faction",
+    "pk": 18,
+    "fields": {
+      "game": 5,
+      "name": "Auren"
+    }
+  },
+  {
+    "model": "game.faction",
+    "pk": 19,
+    "fields": {
+      "game": 5,
+      "name": "Halblinge"
+    }
+  },
+  {
+    "model": "game.faction",
+    "pk": 20,
+    "fields": {
+      "game": 5,
+      "name": "Nixen"
+    }
+  },
+  {
+    "model": "game.faction",
+    "pk": 21,
+    "fields": {
+      "game": 5,
+      "name": "Nomaden"
+    }
+  },
+  {
+    "model": "game.faction",
+    "pk": 22,
+    "fields": {
+      "game": 5,
+      "name": "Riesen"
+    }
+  },
+  {
+    "model": "game.faction",
+    "pk": 23,
+    "fields": {
+      "game": 5,
+      "name": "Schwarmlinge"
+    }
+  },
+  {
+    "model": "game.faction",
+    "pk": 24,
+    "fields": {
+      "game": 5,
+      "name": "Zwerge"
+    }
+  },
+  {
+    "model": "game.faction",
+    "pk": 25,
+    "fields": {
+      "game": 6,
+      "name": "Bal T'aks"
+    }
+  },
+  {
+    "model": "game.faction",
+    "pk": 26,
+    "fields": {
+      "game": 6,
+      "name": "Itars"
+    }
+  },
+  {
+    "model": "game.faction",
+    "pk": 27,
+    "fields": {
+      "game": 6,
+      "name": "Gleens"
+    }
+  },
+  {
+    "model": "game.faction",
+    "pk": 28,
+    "fields": {
+      "game": 6,
+      "name": "Mad Androids"
+    }
+  },
+  {
+    "model": "game.faction",
+    "pk": 29,
+    "fields": {
+      "game": 6,
+      "name": "Hadsch Hallas"
+    }
+  },
+  {
+    "model": "game.faction",
+    "pk": 30,
+    "fields": {
+      "game": 6,
+      "name": "Lantida"
+    }
+  },
+  {
+    "model": "game.faction",
+    "pk": 31,
+    "fields": {
+      "game": 6,
+      "name": "Nevlas"
+    }
+  },
+  {
+    "model": "game.faction",
+    "pk": 32,
+    "fields": {
+      "game": 6,
+      "name": "Taklons"
+    }
+  },
+  {
+    "model": "game.faction",
+    "pk": 33,
+    "fields": {
+      "game": 6,
+      "name": "Terraner"
+    }
+  },
+  {
+    "model": "game.faction",
+    "pk": 34,
+    "fields": {
+      "game": 6,
+      "name": "Xenos"
+    }
+  },
+  {
+    "model": "game.faction",
+    "pk": 35,
+    "fields": {
+      "game": 6,
+      "name": "Firaks"
+    }
+  },
+  {
+    "model": "game.faction",
+    "pk": 36,
+    "fields": {
+      "game": 6,
+      "name": "Der Schwarm"
+    }
+  },
+  {
+    "model": "game.faction",
+    "pk": 37,
+    "fields": {
+      "game": 6,
+      "name": "Geoden"
+    }
+  },
+  {
+    "model": "game.faction",
+    "pk": 38,
+    "fields": {
+      "game": 6,
+      "name": "Ambas"
+    }
+  },
+  {
+    "model": "game.faction",
+    "pk": 39,
+    "fields": {
+      "game": 7,
+      "name": "Ecoline"
+    }
+  },
+  {
+    "model": "game.faction",
+    "pk": 40,
+    "fields": {
+      "game": 7,
+      "name": "Credicor"
+    }
+  },
+  {
+    "model": "game.faction",
+    "pk": 41,
+    "fields": {
+      "game": 7,
+      "name": "Republik Tharsis"
+    }
+  },
+  {
+    "model": "game.faction",
+    "pk": 42,
+    "fields": {
+      "game": 7,
+      "name": "Filmgesellschaft"
+    }
+  },
+  {
+    "model": "game.faction",
+    "pk": 43,
+    "fields": {
+      "game": 7,
+      "name": "Helion"
+    }
+  },
+  {
+    "model": "game.faction",
+    "pk": 44,
+    "fields": {
+      "game": 7,
+      "name": "Mining Guild"
+    }
+  },
+  {
+    "model": "game.faction",
+    "pk": 45,
+    "fields": {
+      "game": 7,
+      "name": "Inventrix"
+    }
+  },
+  {
+    "model": "game.faction",
+    "pk": 46,
+    "fields": {
+      "game": 7,
+      "name": "Phobolog"
+    }
+  },
+  {
+    "model": "game.faction",
+    "pk": 47,
+    "fields": {
+      "game": 7,
+      "name": "Saturn Systems"
+    }
+  },
+  {
+    "model": "game.faction",
+    "pk": 48,
+    "fields": {
+      "game": 7,
+      "name": "Teractor"
+    }
+  },
+  {
+    "model": "game.faction",
+    "pk": 49,
+    "fields": {
+      "game": 7,
+      "name": "Thorgate"
+    }
+  },
+  {
+    "model": "game.faction",
+    "pk": 50,
+    "fields": {
+      "game": 7,
+      "name": "UNMI"
+    }
+  }
+]

@@ -52,7 +52,7 @@ const isLoading = ref(true);
 const { data: game } = await api(`game/game-details/${route.params.id}`);
 
 const { data: [resultConfig] } = await api(`game/result-configs/?game=${route.params.id}`);
-const { data: tieBreakers } = await api(`game/tie-breakers/?game=${route.params.id}`);
+const { data: tieBreakers } = await api(`game/tie-breakers/?result_config=${resultConfig.id}`);
 const { data: factions } = await api(`game/factions/?game=${route.params.id}`);
 const { data: platform } = await api(`game/platforms/${game.platform}`);
 const { data: startingPointSystem } = await api(`game/starting-point-systems/${resultConfig.starting_points_system}`);
