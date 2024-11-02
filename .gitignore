@@ -29,4 +29,4 @@ venv*
 #pycharm
 api/.idea
 
-api/ergebnistabellen
+ergebnistabellen
