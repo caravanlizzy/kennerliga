@@ -37,7 +37,7 @@ const restrictToOption: Ref<TGameOption | null> = ref(null);
 const restrictionChoice = ref({ booleanActive: true, choiceSelection: { name: null, itemId: null } });
 
 const conditionalLabel = computed(() => restrictionChoice.value.booleanActive ? 'Bedingte Option muss aktiv sein' : 'Bedingte Option muss inaktiv sein')
-const filteredItems = computed(() => items.filter(item => item.title !== props.gameOption.title));
+const filteredItems = computed(() => items.value.filter(item => item.title !== props.gameOption.title));
 
 
 function updateRestriction() {

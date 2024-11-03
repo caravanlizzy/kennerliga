@@ -39,8 +39,6 @@ const { updateItem, deleteItem } = inject('useGameOptions');
 
 const hasRestrictions = ref(false);
 
- const gameOptionTitle = computed(() => gameOption.title || '...');
-
 function updateHasChoices(hasChoices: boolean) {
   updateItem(gameOption, 'hasChoices', hasChoices);
 }
