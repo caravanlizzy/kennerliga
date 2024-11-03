@@ -32,7 +32,7 @@
 
 <script setup lang="ts">
 
-import { formatDateTime } from 'src/helper';
+import { formatDateTime } from 'src/helpers';
 import { Ref, ref } from 'vue';
 import { addMessage, getMessages, TMessage } from 'src/services/chatService';
 

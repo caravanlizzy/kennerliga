@@ -42,7 +42,7 @@ import { useItemList } from 'src/composables/itemList';
 import { useRouter } from 'vue-router';
 import CreateResultConfig from 'pages/game/createGame/CreateResultConfig.vue';
 import { createGame, createOptions, createResultConfigData } from 'src/services/game/createGameService';
-import { createRandomId } from 'src/helper';
+import { createRandomId } from 'src/helpers';
 import { TGameOption, TResultConfig } from 'src/types';
 
 const router = useRouter();

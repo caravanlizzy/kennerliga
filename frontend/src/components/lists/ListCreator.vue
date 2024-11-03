@@ -52,7 +52,7 @@ import KennerButton from 'components/buttons/KennerButton.vue';
 import { Ref, ref } from 'vue';
 import { TItem } from 'src/types';
 import KennerCounter from 'components/items/KennerCounter.vue';
-import { createRandomId } from 'src/helper';
+import { createRandomId } from 'src/helpers';
 
 defineProps<{ buttonLabel: string, ranked?: boolean }>();
 const emit = defineEmits<{

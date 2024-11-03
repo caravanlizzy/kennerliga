@@ -29,7 +29,7 @@ import { computed, inject, ref } from 'vue';
 import GameOptionChoiceCreate from 'pages/game/createGame/GameOptionChoiceCreate.vue';
 import GameOptionRestrictionCreate from 'pages/game/createGame/GameOptionRestrictionCreate.vue';
 import GameOptionCard from 'components/cards/OverviewCard.vue';
-import { createRandomId } from 'src/helper';
+import { createRandomId } from 'src/helpers';
 import { TGameOption, TGameOptionChoice } from 'src/types';
 
 const props = defineProps<{ gameOption: TGameOption }>();

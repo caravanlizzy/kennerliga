@@ -1,7 +1,9 @@
-import {api} from 'boot/axios';
-import {TPlatform} from 'src/models/gameModels';
+import { api } from 'boot/axios';
+import { TPlatform } from 'src/models/gameModels';
 import { TGameOption, TResultConfig } from 'src/types';
+import { useIDStorage } from 'src/composables/IDStorage';
 
+const { IDStorage, addStorageItem, getStorageItem } = useIDStorage()
 
 export async function createGame(name: string, platform: TPlatform): Promise<number> {
   try {
@@ -17,13 +19,14 @@ export async function createGame(name: string, platform: TPlatform): Promise<num
 }
 
 export async function addRestrictions(option: TGameOption): Promise<void> {
+  console.log({ option })
   if (option.onlyIfOption === undefined) {
     console.log('No restriction option given', { option });
     return;
   }
 
   const { onlyIfOption, onlyIfChoice, onlyIfValue } = option;
-  const optionId = optionIDStorage[onlyIfOption];
+  const optionId = getStorageItem(onlyIfOption);
 
   if (optionId === undefined) {
     console.error(`Invalid option: ${onlyIfOption}. It does not exist in optionIDStorage.`);
@@ -35,9 +38,11 @@ export async function addRestrictions(option: TGameOption): Promise<void> {
   };
 
   if (onlyIfValue !== undefined) {
+    console.log({ onlyIfValue }, 'its a value')
     data.only_if_value = onlyIfValue;
   } else if (onlyIfChoice !== undefined) {
-    const choiceValue = optionIDStorage[onlyIfChoice];
+    console.log({ onlyIfChoice }, 'its a choice')
+    const choiceValue = getStorageItem(onlyIfChoice);
     if (choiceValue !== undefined) {
       data.only_if_choice = choiceValue;
     } else {
@@ -56,7 +61,6 @@ export async function addRestrictions(option: TGameOption): Promise<void> {
 }
 
 
-
 export async function createOptions(gameId: number, gameOptions: TGameOption[]): Promise<void> {
   for (const option of gameOptions) {
     try {
@@ -68,7 +72,7 @@ export async function createOptions(gameId: number, gameOptions: TGameOption[]):
           game: gameId
         }
       });
-      addStorageItemId(option.itemId, newOption.id);
+      addStorageItem(option.itemId, newOption.id);
       for (const choice of option.choices) {
         const { data: newChoice } = await api('game/option-choices/', {
           method: 'POST',
@@ -77,7 +81,7 @@ export async function createOptions(gameId: number, gameOptions: TGameOption[]):
             option: newOption.id
           }
         });
-        addStorageItemId(choice.itemId, newChoice.id);
+        addStorageItem(choice.itemId, newChoice.id);
       }
       await addRestrictions(option);
     } catch (e) {
@@ -91,7 +95,7 @@ export async function createOptions(gameId: number, gameOptions: TGameOption[]):
 
 export async function createResultConfigData(gameId: number, resultConfig: TResultConfig): Promise<void> {
   try {
-    const {data: resultConfigData} = await api('game/result-configs/', {
+    const { data: resultConfigData } = await api('game/result-configs/', {
       method: 'POST',
       data: {
         game: gameId,
@@ -110,46 +114,40 @@ export async function createResultConfigData(gameId: number, resultConfig: TResu
   }
 }
 
-export async function createFactions(gameId: number, resultConfig:TResultConfig): Promise<void> {
-  if(resultConfig === undefined) return;
-  if(resultConfig.factions === undefined) return;
-  for (const faction of resultConfig.factions){
+export async function createFactions(gameId: number, resultConfig: TResultConfig): Promise<void> {
+  if (resultConfig === undefined) return;
+  if (resultConfig.factions === undefined) return;
+  for (const faction of resultConfig.factions) {
     try {
       api('game/factions/', {
-        method:'POST',
+        method: 'POST',
         data: {
           game: gameId,
           name: faction.name
         }
       })
-    } catch(e) {
+    } catch (e) {
       console.log('Error creating faction', e)
     }
   }
 }
 
-export async function createTieBreakers(resultConfigId: number, resultConfig:TResultConfig): Promise<void> {
-  if(resultConfig === undefined) return;
-  if(resultConfig.tieBreakers === undefined) return;
-  if(!resultConfig.hasTieBreaker) return;
-  for (const [index, tieBreaker] of resultConfig.tieBreakers.entries()){
+export async function createTieBreakers(resultConfigId: number, resultConfig: TResultConfig): Promise<void> {
+  if (resultConfig === undefined) return;
+  if (resultConfig.tieBreakers === undefined) return;
+  if (!resultConfig.hasTieBreaker) return;
+  for (const [index, tieBreaker] of resultConfig.tieBreakers.entries()) {
     try {
       api('game/tie-breakers/', {
-        method:'POST',
+        method: 'POST',
         data: {
           result_config: resultConfigId,
           name: tieBreaker.name,
           order: index * 10
         }
       })
-    } catch(e) {
+    } catch (e) {
       console.log('Error creating tieBreaker', e)
     }
   }
-}
-
-const optionIDStorage: Record<string, number> = {};
-
-function addStorageItemId(itemId: number, id: number): void {
-  optionIDStorage[itemId.toString()] = id;
 }
