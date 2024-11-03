@@ -89,6 +89,7 @@ const onSubmit = async () => {
     });
     await router.push({ name: 'games' });
   } catch (e) {
+    console.log('Could not create game because ', e);
     const message = 'Fehler ' + errorMessages.value;
     $q.notify({
       color: 'negative',

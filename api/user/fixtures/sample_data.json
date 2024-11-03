@@ -206,6 +206,13 @@
     }
   },
   {
+    "model": "user.platform",
+    "pk": 3,
+    "fields": {
+      "name": "boardgamers.space"
+    }
+  },
+  {
     "model": "user.playerprofile",
     "pk": 1,
     "fields": {

@@ -55,7 +55,6 @@ async function loadMessages() {
   const { data } = await getMessages(lastDateTime);
   messages.value = [...messages.value, ...data.reverse()];
   lastDateTime = messages.value[messages.value.length - 1].datetime;
-  console.log(messages.value);
 }
 
 </script>

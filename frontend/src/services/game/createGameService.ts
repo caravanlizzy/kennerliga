@@ -1,9 +1,9 @@
 import { api } from 'boot/axios';
-import { TPlatform } from 'src/models/gameModels';
-import { TGameOption, TResultConfig } from 'src/types';
+import { GameOptionChoiceDto, GameOptionDto, TPlatform } from 'src/models/gameModels';
+import { TGameOption, TGameOptionChoice, TResultConfig } from 'src/types';
 import { useIDStorage } from 'src/composables/IDStorage';
 
-const { IDStorage, addStorageItem, getStorageItem } = useIDStorage()
+const { IDStorage, addStorageItem, getStorageItem } = useIDStorage();
 
 export async function createGame(name: string, platform: TPlatform): Promise<number> {
   try {
@@ -19,7 +19,6 @@ export async function createGame(name: string, platform: TPlatform): Promise<num
 }
 
 export async function addRestrictions(option: TGameOption): Promise<void> {
-  console.log({ option })
   if (option.onlyIfOption === undefined) {
     console.log('No restriction option given', { option });
     return;
@@ -38,10 +37,10 @@ export async function addRestrictions(option: TGameOption): Promise<void> {
   };
 
   if (onlyIfValue !== undefined) {
-    console.log({ onlyIfValue }, 'its a value')
+    console.log({ onlyIfValue }, 'its a value');
     data.only_if_value = onlyIfValue;
   } else if (onlyIfChoice !== undefined) {
-    console.log({ onlyIfChoice }, 'its a choice')
+    console.log({ onlyIfChoice }, 'its a choice');
     const choiceValue = getStorageItem(onlyIfChoice);
     if (choiceValue !== undefined) {
       data.only_if_choice = choiceValue;
@@ -60,35 +59,58 @@ export async function addRestrictions(option: TGameOption): Promise<void> {
   });
 }
 
+async function createOption(option: TGameOption, gameId): Promise<GameOptionDto> {
+  try {
+    const { data: newOption } = await api('game/options/', {
+      method: 'POST',
+      data: {
+        name: option.title,
+        has_choices: option.hasChoices,
+        game: gameId
+      }
+    });
+    addStorageItem(option.itemId, newOption.id);
+    return newOption;
+  } catch (e) {
+    // errorMessages.value.push('CreateGameOption');
+    console.log('Error creating game options', e);
+    throw new Error('Error creating game options: \n' + e);
+  }
+}
+
+async function createOptionChoice(choice: TGameOptionChoice, optionId): Promise<GameOptionChoiceDto> {
+  try {
+    const { data: newChoice } = await api('game/option-choices/', {
+      method: 'POST',
+      data: {
+        name: choice.name,
+        option: optionId
+      }
+    });
+    addStorageItem(choice.itemId, newChoice.id);
+  } catch (e) {
+    console.log('Error creating game option choice', e);
+    throw new Error('Error creating game option choice: \n' + e);
+  }
+}
+
+async function createOptionChoices(option: TGameOption): Promise<void> {
+  if (!option.hasChoices) return;
+  for (const choice of option.choices) {
+    const optionId = getStorageItem(option.itemId);
+    await createOptionChoice(choice, optionId);
+  }
+}
 
 export async function createOptions(gameId: number, gameOptions: TGameOption[]): Promise<void> {
   for (const option of gameOptions) {
-    try {
-      const { data: newOption } = await api('game/options/', {
-        method: 'POST',
-        data: {
-          name: option.title,
-          has_choices: option.hasChoices,
-          game: gameId
-        }
-      });
-      addStorageItem(option.itemId, newOption.id);
-      for (const choice of option.choices) {
-        const { data: newChoice } = await api('game/option-choices/', {
-          method: 'POST',
-          data: {
-            name: choice.name,
-            option: newOption.id
-          }
-        });
-        addStorageItem(choice.itemId, newChoice.id);
-      }
-      await addRestrictions(option);
-    } catch (e) {
-      // errorMessages.value.push('CreateGameOption');
-      console.log('Error creating game options', e);
-      throw new Error('Error creating game options: \n' + e);
-    }
+    await createOption(option, gameId);
+  }
+  for (const option of gameOptions) {
+    await createOptionChoices(option);
+  }
+  for (const option of gameOptions) {
+    await addRestrictions(option);
   }
 }
 
@@ -125,9 +147,9 @@ export async function createFactions(gameId: number, resultConfig: TResultConfig
           game: gameId,
           name: faction.name
         }
-      })
+      });
     } catch (e) {
-      console.log('Error creating faction', e)
+      console.log('Error creating faction', e);
     }
   }
 }
@@ -145,9 +167,9 @@ export async function createTieBreakers(resultConfigId: number, resultConfig: TR
           name: tieBreaker.name,
           order: index * 10
         }
-      })
+      });
     } catch (e) {
-      console.log('Error creating tieBreaker', e)
+      console.log('Error creating tieBreaker', e);
     }
   }
 }

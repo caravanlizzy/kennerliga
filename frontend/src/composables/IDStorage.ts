@@ -1,7 +1,7 @@
 // IDStorage.ts
-const IDStorage: Record<string, number> = {};
 
 export function useIDStorage() {
+  const IDStorage: Record<string, number> = {};
 
   function addStorageItem(itemId: number, id: number): void {
     IDStorage[itemId.toString()] = id;
