@@ -32,6 +32,22 @@
     }
   },
   {
+    "model": "game.game",
+    "pk": 8,
+    "fields": {
+      "name": "Underwater Cities",
+      "platform": 2
+    }
+  },
+  {
+    "model": "game.game",
+    "pk": 26,
+    "fields": {
+      "name": "Terra Nova",
+      "platform": 1
+    }
+  },
+  {
     "model": "game.gameoption",
     "pk": 1,
     "fields": {
@@ -338,6 +354,66 @@
       "name": "Präludium",
       "game": 7,
       "has_choices": false,
+      "only_if_option": null,
+      "only_if_choice": null,
+      "only_if_value": null
+    }
+  },
+  {
+    "model": "game.gameoption",
+    "pk": 30,
+    "fields": {
+      "name": "Regierungsaufträge",
+      "game": 8,
+      "has_choices": false,
+      "only_if_option": null,
+      "only_if_choice": null,
+      "only_if_value": null
+    }
+  },
+  {
+    "model": "game.gameoption",
+    "pk": 31,
+    "fields": {
+      "name": "Spielerbogen für erfahrene Spieler",
+      "game": 8,
+      "has_choices": false,
+      "only_if_option": null,
+      "only_if_choice": null,
+      "only_if_value": null
+    }
+  },
+  {
+    "model": "game.gameoption",
+    "pk": 73,
+    "fields": {
+      "name": "2-Spieler-Varianten",
+      "game": 26,
+      "has_choices": true,
+      "only_if_option": null,
+      "only_if_choice": null,
+      "only_if_value": null
+    }
+  },
+  {
+    "model": "game.gameoption",
+    "pk": 74,
+    "fields": {
+      "name": "Zugreihenfolge",
+      "game": 26,
+      "has_choices": true,
+      "only_if_option": null,
+      "only_if_choice": null,
+      "only_if_value": null
+    }
+  },
+  {
+    "model": "game.gameoption",
+    "pk": 75,
+    "fields": {
+      "name": "Völkertableau",
+      "game": 26,
+      "has_choices": true,
       "only_if_option": null,
       "only_if_choice": null,
       "only_if_value": null
@@ -760,6 +836,99 @@
     }
   },
   {
+    "model": "game.gameoptionchoice",
+    "pk": 83,
+    "fields": {
+      "name": "Glücksgräber-Variante",
+      "option": 73
+    }
+  },
+  {
+    "model": "game.gameoptionchoice",
+    "pk": 84,
+    "fields": {
+      "name": "Nein",
+      "option": 73
+    }
+  },
+  {
+    "model": "game.gameoptionchoice",
+    "pk": 85,
+    "fields": {
+      "name": "Planer-Variante",
+      "option": 73
+    }
+  },
+  {
+    "model": "game.gameoptionchoice",
+    "pk": 86,
+    "fields": {
+      "name": "Variable Zugreihenfolge",
+      "option": 74
+    }
+  },
+  {
+    "model": "game.gameoptionchoice",
+    "pk": 87,
+    "fields": {
+      "name": "Im Uhrzeigersinn weiter",
+      "option": 74
+    }
+  },
+  {
+    "model": "game.gameoptionchoice",
+    "pk": 88,
+    "fields": {
+      "name": "In Spielerreihenfolge ausgewählte Völker",
+      "option": 75
+    }
+  },
+  {
+    "model": "game.gameoptionchoice",
+    "pk": 89,
+    "fields": {
+      "name": "Zufällige Spielplanauswahl",
+      "option": 75
+    }
+  },
+  {
+    "model": "game.gameoptionchoice",
+    "pk": 90,
+    "fields": {
+      "name": "Zufällige Spielplanauswahl",
+      "option": 75
+    }
+  },
+  {
+    "model": "game.selectedgame",
+    "pk": 1,
+    "fields": {
+      "player": 1,
+      "game": 1,
+      "league": 1
+    }
+  },
+  {
+    "model": "game.selectedoption",
+    "pk": 1,
+    "fields": {
+      "selected_game": 1,
+      "game_option": 1,
+      "choice": 2,
+      "value": null
+    }
+  },
+  {
+    "model": "game.selectedoption",
+    "pk": 2,
+    "fields": {
+      "selected_game": 1,
+      "game_option": 2,
+      "choice": null,
+      "value": false
+    }
+  },
+  {
     "model": "game.startingpointsystem",
     "pk": 1,
     "fields": {
@@ -820,6 +989,28 @@
     }
   },
   {
+    "model": "game.resultconfig",
+    "pk": 8,
+    "fields": {
+      "game": 8,
+      "is_asymmetric": true,
+      "has_starting_player_order": true,
+      "starting_points_system": 1,
+      "has_points": true
+    }
+  },
+  {
+    "model": "game.resultconfig",
+    "pk": 23,
+    "fields": {
+      "game": 26,
+      "is_asymmetric": true,
+      "has_starting_player_order": true,
+      "starting_points_system": 2,
+      "has_points": true
+    }
+  },
+  {
     "model": "game.tiebreaker",
     "pk": 1,
     "fields": {
@@ -834,6 +1025,24 @@
     "fields": {
       "result_config": 1,
       "name": "kartenziehen",
+      "order": 10
+    }
+  },
+  {
+    "model": "game.tiebreaker",
+    "pk": 3,
+    "fields": {
+      "result_config": 8,
+      "name": "Gebäude",
+      "order": 0
+    }
+  },
+  {
+    "model": "game.tiebreaker",
+    "pk": 4,
+    "fields": {
+      "result_config": 8,
+      "name": "Credits",
       "order": 10
     }
   },
@@ -1235,6 +1444,150 @@
     "fields": {
       "game": 7,
       "name": "UNMI"
+    }
+  },
+  {
+    "model": "game.faction",
+    "pk": 51,
+    "fields": {
+      "game": 8,
+      "name": "Spielplan 3"
+    }
+  },
+  {
+    "model": "game.faction",
+    "pk": 52,
+    "fields": {
+      "game": 8,
+      "name": "Spielplan 2"
+    }
+  },
+  {
+    "model": "game.faction",
+    "pk": 53,
+    "fields": {
+      "game": 8,
+      "name": "Spielplan 5"
+    }
+  },
+  {
+    "model": "game.faction",
+    "pk": 54,
+    "fields": {
+      "game": 8,
+      "name": "Spielplan 4"
+    }
+  },
+  {
+    "model": "game.faction",
+    "pk": 55,
+    "fields": {
+      "game": 8,
+      "name": "Spielplan 1"
+    }
+  },
+  {
+    "model": "game.faction",
+    "pk": 56,
+    "fields": {
+      "game": 8,
+      "name": "Spielplan 6"
+    }
+  },
+  {
+    "model": "game.faction",
+    "pk": 57,
+    "fields": {
+      "game": 8,
+      "name": "Spielplan 8"
+    }
+  },
+  {
+    "model": "game.faction",
+    "pk": 58,
+    "fields": {
+      "game": 8,
+      "name": "Spielplan 7"
+    }
+  },
+  {
+    "model": "game.faction",
+    "pk": 59,
+    "fields": {
+      "game": 26,
+      "name": "Feline"
+    }
+  },
+  {
+    "model": "game.faction",
+    "pk": 60,
+    "fields": {
+      "game": 26,
+      "name": "Erfinderinnen"
+    }
+  },
+  {
+    "model": "game.faction",
+    "pk": 61,
+    "fields": {
+      "game": 26,
+      "name": "Ifrit"
+    }
+  },
+  {
+    "model": "game.faction",
+    "pk": 62,
+    "fields": {
+      "game": 26,
+      "name": "Golems"
+    }
+  },
+  {
+    "model": "game.faction",
+    "pk": 63,
+    "fields": {
+      "game": 26,
+      "name": "Wüstentöchter"
+    }
+  },
+  {
+    "model": "game.faction",
+    "pk": 64,
+    "fields": {
+      "game": 26,
+      "name": "Kobolde"
+    }
+  },
+  {
+    "model": "game.faction",
+    "pk": 65,
+    "fields": {
+      "game": 26,
+      "name": "Seebären"
+    }
+  },
+  {
+    "model": "game.faction",
+    "pk": 66,
+    "fields": {
+      "game": 26,
+      "name": "Druiden"
+    }
+  },
+  {
+    "model": "game.faction",
+    "pk": 67,
+    "fields": {
+      "game": 26,
+      "name": "Flaschengeister"
+    }
+  },
+  {
+    "model": "game.faction",
+    "pk": 68,
+    "fields": {
+      "game": 26,
+      "name": "Feen"
     }
   }
 ]
