@@ -108,8 +108,6 @@ export async function createOptions(gameId: number, gameOptions: TGameOption[]):
   }
   for (const option of gameOptions) {
     await createOptionChoices(option);
-  }
-  for (const option of gameOptions) {
     await addRestrictions(option);
   }
 }
