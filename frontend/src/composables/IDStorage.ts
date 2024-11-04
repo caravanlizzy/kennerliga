@@ -7,9 +7,8 @@ export function useIDStorage() {
     IDStorage[itemId.toString()] = id;
   }
 
-  function getStorageItem(itemId: number): number | undefined {
+  function getStorageItem(itemId: number): number  {
     const item = IDStorage[itemId.toString()];
-    console.log({item})
     return item;
   }
 

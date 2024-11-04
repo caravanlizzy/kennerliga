@@ -59,7 +59,7 @@ export async function addRestrictions(option: TGameOption): Promise<void> {
   });
 }
 
-async function createOption(option: TGameOption, gameId): Promise<GameOptionDto> {
+async function createOption(option: TGameOption, gameId: number): Promise<GameOptionDto> {
   try {
     const { data: newOption } = await api('game/options/', {
       method: 'POST',
@@ -78,7 +78,7 @@ async function createOption(option: TGameOption, gameId): Promise<GameOptionDto>
   }
 }
 
-async function createOptionChoice(choice: TGameOptionChoice, optionId): Promise<GameOptionChoiceDto> {
+async function createOptionChoice(choice: TGameOptionChoice, optionId: number): Promise<GameOptionChoiceDto> {
   try {
     const { data: newChoice } = await api('game/option-choices/', {
       method: 'POST',
@@ -88,6 +88,7 @@ async function createOptionChoice(choice: TGameOptionChoice, optionId): Promise<
       }
     });
     addStorageItem(choice.itemId, newChoice.id);
+    return newChoice;
   } catch (e) {
     console.log('Error creating game option choice', e);
     throw new Error('Error creating game option choice: \n' + e);
