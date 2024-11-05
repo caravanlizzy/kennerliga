@@ -72,6 +72,22 @@
     }
   },
   {
+    "model": "game.game",
+    "pk": 30,
+    "fields": {
+      "name": "Res Arcana",
+      "platform": 1
+    }
+  },
+  {
+    "model": "game.game",
+    "pk": 31,
+    "fields": {
+      "name": "Dice Hospital",
+      "platform": 1
+    }
+  },
+  {
     "model": "game.gameoption",
     "pk": 1,
     "fields": {
@@ -522,6 +538,54 @@
       "name": "Variante Schwarze Würfel",
       "game": 29,
       "has_choices": false,
+      "only_if_option": null,
+      "only_if_choice": null,
+      "only_if_value": null
+    }
+  },
+  {
+    "model": "game.gameoption",
+    "pk": 83,
+    "fields": {
+      "name": "Erweiterung 1: Lux & Tenebrae",
+      "game": 30,
+      "has_choices": false,
+      "only_if_option": null,
+      "only_if_choice": null,
+      "only_if_value": null
+    }
+  },
+  {
+    "model": "game.gameoption",
+    "pk": 84,
+    "fields": {
+      "name": "Spielregeln",
+      "game": 30,
+      "has_choices": true,
+      "only_if_option": null,
+      "only_if_choice": null,
+      "only_if_value": null
+    }
+  },
+  {
+    "model": "game.gameoption",
+    "pk": 85,
+    "fields": {
+      "name": "Hard mode",
+      "game": 31,
+      "has_choices": true,
+      "only_if_option": null,
+      "only_if_choice": null,
+      "only_if_value": null
+    }
+  },
+  {
+    "model": "game.gameoption",
+    "pk": 86,
+    "fields": {
+      "name": "Game setup",
+      "game": 31,
+      "has_choices": true,
       "only_if_option": null,
       "only_if_choice": null,
       "only_if_value": null
@@ -1048,6 +1112,110 @@
     }
   },
   {
+    "model": "game.gameoptionchoice",
+    "pk": 96,
+    "fields": {
+      "name": "Erste Partie",
+      "option": 84
+    }
+  },
+  {
+    "model": "game.gameoptionchoice",
+    "pk": 97,
+    "fields": {
+      "name": "Normales Spiel",
+      "option": 84
+    }
+  },
+  {
+    "model": "game.gameoptionchoice",
+    "pk": 98,
+    "fields": {
+      "name": "Normales Spiel mit Draft",
+      "option": 84
+    }
+  },
+  {
+    "model": "game.gameoptionchoice",
+    "pk": 99,
+    "fields": {
+      "name": "Nationwide Epidemic + Resistant Superbug",
+      "option": 85
+    }
+  },
+  {
+    "model": "game.gameoptionchoice",
+    "pk": 100,
+    "fields": {
+      "name": "Disabled",
+      "option": 85
+    }
+  },
+  {
+    "model": "game.gameoptionchoice",
+    "pk": 101,
+    "fields": {
+      "name": "Nationwide Epidemic",
+      "option": 85
+    }
+  },
+  {
+    "model": "game.gameoptionchoice",
+    "pk": 102,
+    "fields": {
+      "name": "Opening crisis",
+      "option": 85
+    }
+  },
+  {
+    "model": "game.gameoptionchoice",
+    "pk": 103,
+    "fields": {
+      "name": "Opening crisis + Nationwide Epidemic",
+      "option": 85
+    }
+  },
+  {
+    "model": "game.gameoptionchoice",
+    "pk": 104,
+    "fields": {
+      "name": "Opening crisis + Nationwide Epidemic + Resistant Superbug",
+      "option": 85
+    }
+  },
+  {
+    "model": "game.gameoptionchoice",
+    "pk": 105,
+    "fields": {
+      "name": "Opening crisis + Resistant Superbug",
+      "option": 85
+    }
+  },
+  {
+    "model": "game.gameoptionchoice",
+    "pk": 106,
+    "fields": {
+      "name": "Resistant Superbug",
+      "option": 85
+    }
+  },
+  {
+    "model": "game.gameoptionchoice",
+    "pk": 107,
+    "fields": {
+      "name": "Dice Hospital",
+      "option": 86
+    }
+  },
+  {
+    "model": "game.gameoptionchoice",
+    "pk": 108,
+    "fields": {
+      "name": "Dice Hospital + Experimental Medicine Mini-expansion",
+      "option": 86
+    }
+  },
+  {
     "model": "game.selectedgame",
     "pk": 1,
     "fields": {
@@ -1185,6 +1353,28 @@
     "pk": 26,
     "fields": {
       "game": 29,
+      "is_asymmetric": true,
+      "has_starting_player_order": true,
+      "starting_points_system": 1,
+      "has_points": true
+    }
+  },
+  {
+    "model": "game.resultconfig",
+    "pk": 27,
+    "fields": {
+      "game": 30,
+      "is_asymmetric": true,
+      "has_starting_player_order": true,
+      "starting_points_system": 1,
+      "has_points": true
+    }
+  },
+  {
+    "model": "game.resultconfig",
+    "pk": 28,
+    "fields": {
+      "game": 31,
       "is_asymmetric": true,
       "has_starting_player_order": true,
       "starting_points_system": 1,
@@ -1920,6 +2110,150 @@
     "fields": {
       "game": 29,
       "name": "Donata Badoer"
+    }
+  },
+  {
+    "model": "game.faction",
+    "pk": 80,
+    "fields": {
+      "game": 30,
+      "name": "Kleriker"
+    }
+  },
+  {
+    "model": "game.faction",
+    "pk": 81,
+    "fields": {
+      "game": 30,
+      "name": "Druide"
+    }
+  },
+  {
+    "model": "game.faction",
+    "pk": 82,
+    "fields": {
+      "game": 30,
+      "name": "Illusionist"
+    }
+  },
+  {
+    "model": "game.faction",
+    "pk": 83,
+    "fields": {
+      "game": 30,
+      "name": "Nekromant"
+    }
+  },
+  {
+    "model": "game.faction",
+    "pk": 84,
+    "fields": {
+      "game": 30,
+      "name": "Thaumaturg"
+    }
+  },
+  {
+    "model": "game.faction",
+    "pk": 85,
+    "fields": {
+      "game": 30,
+      "name": "Runenmeister"
+    }
+  },
+  {
+    "model": "game.faction",
+    "pk": 86,
+    "fields": {
+      "game": 30,
+      "name": "Verzauberer"
+    }
+  },
+  {
+    "model": "game.faction",
+    "pk": 87,
+    "fields": {
+      "game": 30,
+      "name": "Geisterbeschwörer"
+    }
+  },
+  {
+    "model": "game.faction",
+    "pk": 88,
+    "fields": {
+      "game": 30,
+      "name": "Alchemist"
+    }
+  },
+  {
+    "model": "game.faction",
+    "pk": 89,
+    "fields": {
+      "game": 30,
+      "name": "Hexenmeister"
+    }
+  },
+  {
+    "model": "game.faction",
+    "pk": 90,
+    "fields": {
+      "game": 31,
+      "name": "Alexander Fleming"
+    }
+  },
+  {
+    "model": "game.faction",
+    "pk": 91,
+    "fields": {
+      "game": 31,
+      "name": "Gertrude Elion"
+    }
+  },
+  {
+    "model": "game.faction",
+    "pk": 92,
+    "fields": {
+      "game": 31,
+      "name": "Elisabeth Garrett Anderson"
+    }
+  },
+  {
+    "model": "game.faction",
+    "pk": 93,
+    "fields": {
+      "game": 31,
+      "name": "Norman Shumway"
+    }
+  },
+  {
+    "model": "game.faction",
+    "pk": 94,
+    "fields": {
+      "game": 31,
+      "name": "Mary Eliza Mahoney"
+    }
+  },
+  {
+    "model": "game.faction",
+    "pk": 95,
+    "fields": {
+      "game": 31,
+      "name": "Robert G. Edwards"
+    }
+  },
+  {
+    "model": "game.faction",
+    "pk": 96,
+    "fields": {
+      "game": 31,
+      "name": "Rita Levi-Montalcini"
+    }
+  },
+  {
+    "model": "game.faction",
+    "pk": 97,
+    "fields": {
+      "game": 31,
+      "name": "Louis Pasteur"
     }
   }
 ]
