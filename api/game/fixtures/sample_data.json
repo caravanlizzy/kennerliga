@@ -48,6 +48,30 @@
     }
   },
   {
+    "model": "game.game",
+    "pk": 27,
+    "fields": {
+      "name": "Dungeon Petz",
+      "platform": 1
+    }
+  },
+  {
+    "model": "game.game",
+    "pk": 28,
+    "fields": {
+      "name": "Viticulture",
+      "platform": 1
+    }
+  },
+  {
+    "model": "game.game",
+    "pk": 29,
+    "fields": {
+      "name": "Marco Polo II: Im Auftrag des Khan",
+      "platform": 1
+    }
+  },
+  {
     "model": "game.gameoption",
     "pk": 1,
     "fields": {
@@ -414,6 +438,90 @@
       "name": "Völkertableau",
       "game": 26,
       "has_choices": true,
+      "only_if_option": null,
+      "only_if_choice": null,
+      "only_if_value": null
+    }
+  },
+  {
+    "model": "game.gameoption",
+    "pk": 76,
+    "fields": {
+      "name": "Mehr Vorausschau",
+      "game": 27,
+      "has_choices": true,
+      "only_if_option": null,
+      "only_if_choice": null,
+      "only_if_value": null
+    }
+  },
+  {
+    "model": "game.gameoption",
+    "pk": 77,
+    "fields": {
+      "name": "Doppelsymbolkarten",
+      "game": 27,
+      "has_choices": true,
+      "only_if_option": null,
+      "only_if_choice": null,
+      "only_if_value": null
+    }
+  },
+  {
+    "model": "game.gameoption",
+    "pk": 78,
+    "fields": {
+      "name": "Mama & Papa-Auswahl",
+      "game": 28,
+      "has_choices": false,
+      "only_if_option": null,
+      "only_if_choice": null,
+      "only_if_value": null
+    }
+  },
+  {
+    "model": "game.gameoption",
+    "pk": 79,
+    "fields": {
+      "name": "Freundliche Variante",
+      "game": 28,
+      "has_choices": false,
+      "only_if_option": null,
+      "only_if_choice": null,
+      "only_if_value": null
+    }
+  },
+  {
+    "model": "game.gameoption",
+    "pk": 80,
+    "fields": {
+      "name": "Alle Charaktere verwenden",
+      "game": 29,
+      "has_choices": false,
+      "only_if_option": null,
+      "only_if_choice": null,
+      "only_if_value": null
+    }
+  },
+  {
+    "model": "game.gameoption",
+    "pk": 81,
+    "fields": {
+      "name": "Die Karawanen-Erweiterung",
+      "game": 29,
+      "has_choices": false,
+      "only_if_option": null,
+      "only_if_choice": null,
+      "only_if_value": null
+    }
+  },
+  {
+    "model": "game.gameoption",
+    "pk": 82,
+    "fields": {
+      "name": "Variante Schwarze Würfel",
+      "game": 29,
+      "has_choices": false,
       "only_if_option": null,
       "only_if_choice": null,
       "only_if_value": null
@@ -900,6 +1008,46 @@
     }
   },
   {
+    "model": "game.gameoptionchoice",
+    "pk": 91,
+    "fields": {
+      "name": "Maximale Vorausschau",
+      "option": 76
+    }
+  },
+  {
+    "model": "game.gameoptionchoice",
+    "pk": 92,
+    "fields": {
+      "name": "Mehr Vorausschau",
+      "option": 76
+    }
+  },
+  {
+    "model": "game.gameoptionchoice",
+    "pk": 93,
+    "fields": {
+      "name": "Reguläre Vorausschau",
+      "option": 76
+    }
+  },
+  {
+    "model": "game.gameoptionchoice",
+    "pk": 94,
+    "fields": {
+      "name": "Doppelsymbolkarten",
+      "option": 77
+    }
+  },
+  {
+    "model": "game.gameoptionchoice",
+    "pk": 95,
+    "fields": {
+      "name": "Einzelsymbolkarten",
+      "option": 77
+    }
+  },
+  {
     "model": "game.selectedgame",
     "pk": 1,
     "fields": {
@@ -1011,6 +1159,39 @@
     }
   },
   {
+    "model": "game.resultconfig",
+    "pk": 24,
+    "fields": {
+      "game": 27,
+      "is_asymmetric": false,
+      "has_starting_player_order": true,
+      "starting_points_system": 1,
+      "has_points": true
+    }
+  },
+  {
+    "model": "game.resultconfig",
+    "pk": 25,
+    "fields": {
+      "game": 28,
+      "is_asymmetric": false,
+      "has_starting_player_order": true,
+      "starting_points_system": 1,
+      "has_points": true
+    }
+  },
+  {
+    "model": "game.resultconfig",
+    "pk": 26,
+    "fields": {
+      "game": 29,
+      "is_asymmetric": true,
+      "has_starting_player_order": true,
+      "starting_points_system": 1,
+      "has_points": true
+    }
+  },
+  {
     "model": "game.tiebreaker",
     "pk": 1,
     "fields": {
@@ -1043,6 +1224,69 @@
     "fields": {
       "result_config": 8,
       "name": "Credits",
+      "order": 10
+    }
+  },
+  {
+    "model": "game.tiebreaker",
+    "pk": 5,
+    "fields": {
+      "result_config": 24,
+      "name": "Gold",
+      "order": 10
+    }
+  },
+  {
+    "model": "game.tiebreaker",
+    "pk": 6,
+    "fields": {
+      "result_config": 24,
+      "name": "wenigste Pets",
+      "order": 0
+    }
+  },
+  {
+    "model": "game.tiebreaker",
+    "pk": 7,
+    "fields": {
+      "result_config": 25,
+      "name": "Weine",
+      "order": 10
+    }
+  },
+  {
+    "model": "game.tiebreaker",
+    "pk": 8,
+    "fields": {
+      "result_config": 25,
+      "name": "Trauben",
+      "order": 20
+    }
+  },
+  {
+    "model": "game.tiebreaker",
+    "pk": 9,
+    "fields": {
+      "result_config": 25,
+      "name": "Lira",
+      "order": 0
+    }
+  },
+  {
+    "model": "game.tiebreaker",
+    "pk": 10,
+    "fields": {
+      "result_config": 26,
+      "name": "Aufträge",
+      "order": 0
+    }
+  },
+  {
+    "model": "game.tiebreaker",
+    "pk": 11,
+    "fields": {
+      "result_config": 26,
+      "name": "Ressourcen",
       "order": 10
     }
   },
@@ -1588,6 +1832,94 @@
     "fields": {
       "game": 26,
       "name": "Feen"
+    }
+  },
+  {
+    "model": "game.faction",
+    "pk": 69,
+    "fields": {
+      "game": 29,
+      "name": "Gantulga Od"
+    }
+  },
+  {
+    "model": "game.faction",
+    "pk": 70,
+    "fields": {
+      "game": 29,
+      "name": "Filippo Vitello"
+    }
+  },
+  {
+    "model": "game.faction",
+    "pk": 71,
+    "fields": {
+      "game": 29,
+      "name": "Isabella Donati"
+    }
+  },
+  {
+    "model": "game.faction",
+    "pk": 72,
+    "fields": {
+      "game": 29,
+      "name": "De Wu"
+    }
+  },
+  {
+    "model": "game.faction",
+    "pk": 73,
+    "fields": {
+      "game": 29,
+      "name": "Mailin und Tian Chin"
+    }
+  },
+  {
+    "model": "game.faction",
+    "pk": 74,
+    "fields": {
+      "game": 29,
+      "name": "Vidal Badoer"
+    }
+  },
+  {
+    "model": "game.faction",
+    "pk": 75,
+    "fields": {
+      "game": 29,
+      "name": "Tebaldo Visconti da Piacenza"
+    }
+  },
+  {
+    "model": "game.faction",
+    "pk": 76,
+    "fields": {
+      "game": 29,
+      "name": "Pietro Tartarino"
+    }
+  },
+  {
+    "model": "game.faction",
+    "pk": 77,
+    "fields": {
+      "game": 29,
+      "name": "Möngke Khan"
+    }
+  },
+  {
+    "model": "game.faction",
+    "pk": 78,
+    "fields": {
+      "game": 29,
+      "name": "Abha Basu"
+    }
+  },
+  {
+    "model": "game.faction",
+    "pk": 79,
+    "fields": {
+      "game": 29,
+      "name": "Donata Badoer"
     }
   }
 ]
