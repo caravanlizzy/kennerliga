@@ -1,0 +1,18 @@
+[
+  {
+    "model": "league.league",
+    "pk": 1,
+    "fields": {
+      "season": 1,
+      "level": 1,
+      "active_player": 1,
+      "members": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ]
+    }
+  }
+]
