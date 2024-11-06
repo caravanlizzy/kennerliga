@@ -2164,7 +2164,7 @@
     "fields": {
       "result_config": 33,
       "name": "Siedlungen Größe 2",
-      "order": 50
+      "order": 20
     }
   },
   {
@@ -2173,7 +2173,7 @@
     "fields": {
       "result_config": 33,
       "name": "Siedlungen  Größe 6",
-      "order": 40
+      "order": 60
     }
   },
   {
@@ -2191,7 +2191,7 @@
     "fields": {
       "result_config": 33,
       "name": "Siedlungen  Größe 5",
-      "order": 30
+      "order": 50
     }
   },
   {
@@ -2200,7 +2200,7 @@
     "fields": {
       "result_config": 33,
       "name": "Siedlungen  Größe 4",
-      "order": 20
+      "order": 40
     }
   },
   {
@@ -2218,7 +2218,7 @@
     "fields": {
       "result_config": 33,
       "name": "Siedlungen Größe 3",
-      "order": 60
+      "order": 30
     }
   },
   {
