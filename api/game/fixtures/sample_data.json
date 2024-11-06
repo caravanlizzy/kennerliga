@@ -88,6 +88,46 @@
     }
   },
   {
+    "model": "game.game",
+    "pk": 32,
+    "fields": {
+      "name": "Orakel von Delphi",
+      "platform": 2
+    }
+  },
+  {
+    "model": "game.game",
+    "pk": 33,
+    "fields": {
+      "name": "Through the Ages: Eine neue Geschichte der Zivilisation",
+      "platform": 1
+    }
+  },
+  {
+    "model": "game.game",
+    "pk": 34,
+    "fields": {
+      "name": "7 Wonders Duel",
+      "platform": 1
+    }
+  },
+  {
+    "model": "game.game",
+    "pk": 35,
+    "fields": {
+      "name": "Agricola",
+      "platform": 1
+    }
+  },
+  {
+    "model": "game.game",
+    "pk": 36,
+    "fields": {
+      "name": "Welcome to...",
+      "platform": 1
+    }
+  },
+  {
     "model": "game.gameoption",
     "pk": 1,
     "fields": {
@@ -586,6 +626,282 @@
       "name": "Game setup",
       "game": 31,
       "has_choices": true,
+      "only_if_option": null,
+      "only_if_choice": null,
+      "only_if_value": null
+    }
+  },
+  {
+    "model": "game.gameoption",
+    "pk": 87,
+    "fields": {
+      "name": "Weiterspielen",
+      "game": 32,
+      "has_choices": false,
+      "only_if_option": null,
+      "only_if_choice": null,
+      "only_if_value": null
+    }
+  },
+  {
+    "model": "game.gameoption",
+    "pk": 88,
+    "fields": {
+      "name": "Spieldauer",
+      "game": 32,
+      "has_choices": true,
+      "only_if_option": null,
+      "only_if_choice": null,
+      "only_if_value": null
+    }
+  },
+  {
+    "model": "game.gameoption",
+    "pk": 89,
+    "fields": {
+      "name": "Schiffsplättchen Verteilung",
+      "game": 32,
+      "has_choices": true,
+      "only_if_option": null,
+      "only_if_choice": null,
+      "only_if_value": null
+    }
+  },
+  {
+    "model": "game.gameoption",
+    "pk": 90,
+    "fields": {
+      "name": "Karte",
+      "game": 32,
+      "has_choices": true,
+      "only_if_option": null,
+      "only_if_choice": null,
+      "only_if_value": null
+    }
+  },
+  {
+    "model": "game.gameoption",
+    "pk": 91,
+    "fields": {
+      "name": "Friedliche Variante",
+      "game": 33,
+      "has_choices": false,
+      "only_if_option": null,
+      "only_if_choice": null,
+      "only_if_value": null
+    }
+  },
+  {
+    "model": "game.gameoption",
+    "pk": 92,
+    "fields": {
+      "name": "Spielversion",
+      "game": 33,
+      "has_choices": true,
+      "only_if_option": null,
+      "only_if_choice": null,
+      "only_if_value": null
+    }
+  },
+  {
+    "model": "game.gameoption",
+    "pk": 93,
+    "fields": {
+      "name": "Erweiterung: Agora",
+      "game": 34,
+      "has_choices": false,
+      "only_if_option": null,
+      "only_if_choice": null,
+      "only_if_value": null
+    }
+  },
+  {
+    "model": "game.gameoption",
+    "pk": 94,
+    "fields": {
+      "name": "Erweiterung: Pantheon",
+      "game": 34,
+      "has_choices": false,
+      "only_if_option": null,
+      "only_if_choice": null,
+      "only_if_value": null
+    }
+  },
+  {
+    "model": "game.gameoption",
+    "pk": 95,
+    "fields": {
+      "name": "Konsul Dirigens",
+      "game": 35,
+      "has_choices": false,
+      "only_if_option": null,
+      "only_if_choice": null,
+      "only_if_value": null
+    }
+  },
+  {
+    "model": "game.gameoption",
+    "pk": 96,
+    "fields": {
+      "name": "Ephipparius",
+      "game": 35,
+      "has_choices": false,
+      "only_if_option": null,
+      "only_if_choice": null,
+      "only_if_value": null
+    }
+  },
+  {
+    "model": "game.gameoption",
+    "pk": 97,
+    "fields": {
+      "name": "Dulcinaria",
+      "game": 35,
+      "has_choices": false,
+      "only_if_option": null,
+      "only_if_choice": null,
+      "only_if_value": null
+    }
+  },
+  {
+    "model": "game.gameoption",
+    "pk": 98,
+    "fields": {
+      "name": "Corbarius",
+      "game": 35,
+      "has_choices": false,
+      "only_if_option": null,
+      "only_if_choice": null,
+      "only_if_value": null
+    }
+  },
+  {
+    "model": "game.gameoption",
+    "pk": 99,
+    "fields": {
+      "name": "Bubulcus",
+      "game": 35,
+      "has_choices": false,
+      "only_if_option": null,
+      "only_if_choice": null,
+      "only_if_value": null
+    }
+  },
+  {
+    "model": "game.gameoption",
+    "pk": 100,
+    "fields": {
+      "name": "Artifex",
+      "game": 35,
+      "has_choices": false,
+      "only_if_option": null,
+      "only_if_choice": null,
+      "only_if_value": null
+    }
+  },
+  {
+    "model": "game.gameoption",
+    "pk": 101,
+    "fields": {
+      "name": "Basis-Set",
+      "game": 35,
+      "has_choices": false,
+      "only_if_option": null,
+      "only_if_choice": null,
+      "only_if_value": null
+    }
+  },
+  {
+    "model": "game.gameoption",
+    "pk": 102,
+    "fields": {
+      "name": "Kartenset",
+      "game": 35,
+      "has_choices": true,
+      "only_if_option": null,
+      "only_if_choice": null,
+      "only_if_value": null
+    }
+  },
+  {
+    "model": "game.gameoption",
+    "pk": 103,
+    "fields": {
+      "name": "Live-Wertung",
+      "game": 35,
+      "has_choices": false,
+      "only_if_option": null,
+      "only_if_choice": null,
+      "only_if_value": null
+    }
+  },
+  {
+    "model": "game.gameoption",
+    "pk": 104,
+    "fields": {
+      "name": "Draftmodus",
+      "game": 35,
+      "has_choices": true,
+      "only_if_option": null,
+      "only_if_choice": null,
+      "only_if_value": null
+    }
+  },
+  {
+    "model": "game.gameoption",
+    "pk": 105,
+    "fields": {
+      "name": "Zusätzliche Aktionsfelder",
+      "game": 35,
+      "has_choices": false,
+      "only_if_option": null,
+      "only_if_choice": null,
+      "only_if_value": null
+    }
+  },
+  {
+    "model": "game.gameoption",
+    "pk": 106,
+    "fields": {
+      "name": "Kompetitives Level",
+      "game": 35,
+      "has_choices": true,
+      "only_if_option": null,
+      "only_if_choice": null,
+      "only_if_value": null
+    }
+  },
+  {
+    "model": "game.gameoption",
+    "pk": 107,
+    "fields": {
+      "name": "Brett/Erweiterung",
+      "game": 36,
+      "has_choices": true,
+      "only_if_option": null,
+      "only_if_choice": null,
+      "only_if_value": null
+    }
+  },
+  {
+    "model": "game.gameoption",
+    "pk": 108,
+    "fields": {
+      "name": "Expertenregeln",
+      "game": 36,
+      "has_choices": false,
+      "only_if_option": null,
+      "only_if_choice": null,
+      "only_if_value": null
+    }
+  },
+  {
+    "model": "game.gameoption",
+    "pk": 109,
+    "fields": {
+      "name": "Fortgeschrittene Variante",
+      "game": 36,
+      "has_choices": false,
       "only_if_option": null,
       "only_if_choice": null,
       "only_if_value": null
@@ -1216,6 +1532,286 @@
     }
   },
   {
+    "model": "game.gameoptionchoice",
+    "pk": 109,
+    "fields": {
+      "name": "2 Zeusplättchen weniger (1 Statue, 1 Kultstätte)",
+      "option": 88
+    }
+  },
+  {
+    "model": "game.gameoptionchoice",
+    "pk": 110,
+    "fields": {
+      "name": "3 Zeusplättchen weniger (1 Statue, 1 Kultstätte, 1 Monster)",
+      "option": 88
+    }
+  },
+  {
+    "model": "game.gameoptionchoice",
+    "pk": 111,
+    "fields": {
+      "name": "Am kürzesten: 4 Zeusplättchen weniger (1 Statue, 1 Kultstätte, 1 Monster, 1 Opfergabe)",
+      "option": 88
+    }
+  },
+  {
+    "model": "game.gameoptionchoice",
+    "pk": 112,
+    "fields": {
+      "name": "Kürzer: 1 Zeusplättchen weniger (Statue)",
+      "option": 88
+    }
+  },
+  {
+    "model": "game.gameoptionchoice",
+    "pk": 113,
+    "fields": {
+      "name": "Normal (12 Zeusplättchen)",
+      "option": 88
+    }
+  },
+  {
+    "model": "game.gameoptionchoice",
+    "pk": 114,
+    "fields": {
+      "name": "Auslosen",
+      "option": 89
+    }
+  },
+  {
+    "model": "game.gameoptionchoice",
+    "pk": 115,
+    "fields": {
+      "name": "Auswählen",
+      "option": 89
+    }
+  },
+  {
+    "model": "game.gameoptionchoice",
+    "pk": 116,
+    "fields": {
+      "name": "Für Anfänger (wenig Variation und Untiefen)",
+      "option": 90
+    }
+  },
+  {
+    "model": "game.gameoptionchoice",
+    "pk": 117,
+    "fields": {
+      "name": "Für Fortgeschrittene (mehr Variation und Untiefen)",
+      "option": 90
+    }
+  },
+  {
+    "model": "game.gameoptionchoice",
+    "pk": 118,
+    "fields": {
+      "name": "Expertenspiel",
+      "option": 92
+    }
+  },
+  {
+    "model": "game.gameoptionchoice",
+    "pk": 119,
+    "fields": {
+      "name": "Handbuch",
+      "option": 92
+    }
+  },
+  {
+    "model": "game.gameoptionchoice",
+    "pk": 120,
+    "fields": {
+      "name": "Alle Karten",
+      "option": 102
+    }
+  },
+  {
+    "model": "game.gameoptionchoice",
+    "pk": 121,
+    "fields": {
+      "name": "Basis-Set",
+      "option": 102
+    }
+  },
+  {
+    "model": "game.gameoptionchoice",
+    "pk": 122,
+    "fields": {
+      "name": "Benutzerdefiniert",
+      "option": 102
+    }
+  },
+  {
+    "model": "game.gameoptionchoice",
+    "pk": 123,
+    "fields": {
+      "name": "Behalte 7 der 10 ausgeteilten Karten",
+      "option": 104
+    }
+  },
+  {
+    "model": "game.gameoptionchoice",
+    "pk": 124,
+    "fields": {
+      "name": "Deaktiviert",
+      "option": 104
+    }
+  },
+  {
+    "model": "game.gameoptionchoice",
+    "pk": 125,
+    "fields": {
+      "name": "Drafte 7 aus 8 Karten, Ausbildungen mit Kleinen Anschaffungen",
+      "option": 104
+    }
+  },
+  {
+    "model": "game.gameoptionchoice",
+    "pk": 126,
+    "fields": {
+      "name": "Drafte 7 aus 8 Karten, Ausbildungen, dann Kleine Anschaffungen",
+      "option": 104
+    }
+  },
+  {
+    "model": "game.gameoptionchoice",
+    "pk": 127,
+    "fields": {
+      "name": "Drafte 7 aus 8 Karten, Kleine Anschaffungen, dann Ausbildungen",
+      "option": 104
+    }
+  },
+  {
+    "model": "game.gameoptionchoice",
+    "pk": 128,
+    "fields": {
+      "name": "Drafte 7 aus 9 Karten, Ausbildungen mit Kleinen Anschaffungen",
+      "option": 104
+    }
+  },
+  {
+    "model": "game.gameoptionchoice",
+    "pk": 129,
+    "fields": {
+      "name": "Drafte 7 aus 9 Karten, Ausbildungen, dann Kleine Anschaffungen",
+      "option": 104
+    }
+  },
+  {
+    "model": "game.gameoptionchoice",
+    "pk": 130,
+    "fields": {
+      "name": "Drafte 7 aus 9 Karten, Kleine Anschaffungen, dann Ausbildungen",
+      "option": 104
+    }
+  },
+  {
+    "model": "game.gameoptionchoice",
+    "pk": 131,
+    "fields": {
+      "name": "Drafte 7 aus 10 Karten, Ausbildungen mit Kleinen Anschaffungen",
+      "option": 104
+    }
+  },
+  {
+    "model": "game.gameoptionchoice",
+    "pk": 132,
+    "fields": {
+      "name": "Drafte 7 aus 10 Karten, Ausbildungen, dann Kleine Anschaffungen",
+      "option": 104
+    }
+  },
+  {
+    "model": "game.gameoptionchoice",
+    "pk": 133,
+    "fields": {
+      "name": "Drafte 7 aus 10 Karten, Kleine Anschaffungen, dann Ausbildungen",
+      "option": 104
+    }
+  },
+  {
+    "model": "game.gameoptionchoice",
+    "pk": 134,
+    "fields": {
+      "name": "Drafte 7 Karten, Ausbildungen mit Kleinen Anschaffungen",
+      "option": 104
+    }
+  },
+  {
+    "model": "game.gameoptionchoice",
+    "pk": 135,
+    "fields": {
+      "name": "Drafte 7 Karten, Ausbildungen, dann Kleine Anschaffungen",
+      "option": 104
+    }
+  },
+  {
+    "model": "game.gameoptionchoice",
+    "pk": 136,
+    "fields": {
+      "name": "Drafte 7 Karten, erst kleine Anschaffungen, dann Ausbildungen",
+      "option": 104
+    }
+  },
+  {
+    "model": "game.gameoptionchoice",
+    "pk": 137,
+    "fields": {
+      "name": "Anfänger",
+      "option": 106
+    }
+  },
+  {
+    "model": "game.gameoptionchoice",
+    "pk": 138,
+    "fields": {
+      "name": "Kompetitiv",
+      "option": 106
+    }
+  },
+  {
+    "model": "game.gameoptionchoice",
+    "pk": 139,
+    "fields": {
+      "name": "Normal",
+      "option": 106
+    }
+  },
+  {
+    "model": "game.gameoptionchoice",
+    "pk": 140,
+    "fields": {
+      "name": "Eiswagen",
+      "option": 107
+    }
+  },
+  {
+    "model": "game.gameoptionchoice",
+    "pk": 141,
+    "fields": {
+      "name": "Normale Variante",
+      "option": 107
+    }
+  },
+  {
+    "model": "game.gameoptionchoice",
+    "pk": 142,
+    "fields": {
+      "name": "Ostereier",
+      "option": 107
+    }
+  },
+  {
+    "model": "game.gameoptionchoice",
+    "pk": 143,
+    "fields": {
+      "name": "Weihnachtsbeleuchtung",
+      "option": 107
+    }
+  },
+  {
     "model": "game.selectedgame",
     "pk": 1,
     "fields": {
@@ -1382,6 +1978,61 @@
     }
   },
   {
+    "model": "game.resultconfig",
+    "pk": 29,
+    "fields": {
+      "game": 32,
+      "is_asymmetric": true,
+      "has_starting_player_order": true,
+      "starting_points_system": 1,
+      "has_points": false
+    }
+  },
+  {
+    "model": "game.resultconfig",
+    "pk": 30,
+    "fields": {
+      "game": 33,
+      "is_asymmetric": false,
+      "has_starting_player_order": true,
+      "starting_points_system": 1,
+      "has_points": true
+    }
+  },
+  {
+    "model": "game.resultconfig",
+    "pk": 31,
+    "fields": {
+      "game": 34,
+      "is_asymmetric": false,
+      "has_starting_player_order": true,
+      "starting_points_system": 1,
+      "has_points": false
+    }
+  },
+  {
+    "model": "game.resultconfig",
+    "pk": 32,
+    "fields": {
+      "game": 35,
+      "is_asymmetric": false,
+      "has_starting_player_order": true,
+      "starting_points_system": 1,
+      "has_points": true
+    }
+  },
+  {
+    "model": "game.resultconfig",
+    "pk": 33,
+    "fields": {
+      "game": 36,
+      "is_asymmetric": false,
+      "has_starting_player_order": false,
+      "starting_points_system": 1,
+      "has_points": true
+    }
+  },
+  {
     "model": "game.tiebreaker",
     "pk": 1,
     "fields": {
@@ -1478,6 +2129,96 @@
       "result_config": 26,
       "name": "Ressourcen",
       "order": 10
+    }
+  },
+  {
+    "model": "game.tiebreaker",
+    "pk": 12,
+    "fields": {
+      "result_config": 29,
+      "name": "Gunstplättchen",
+      "order": 10
+    }
+  },
+  {
+    "model": "game.tiebreaker",
+    "pk": 13,
+    "fields": {
+      "result_config": 29,
+      "name": "Orakelplättchen",
+      "order": 5
+    }
+  },
+  {
+    "model": "game.tiebreaker",
+    "pk": 14,
+    "fields": {
+      "result_config": 29,
+      "name": "Zurückgekehrt zu Zeus nach Runden",
+      "order": 0
+    }
+  },
+  {
+    "model": "game.tiebreaker",
+    "pk": 15,
+    "fields": {
+      "result_config": 33,
+      "name": "Siedlungen Größe 2",
+      "order": 50
+    }
+  },
+  {
+    "model": "game.tiebreaker",
+    "pk": 16,
+    "fields": {
+      "result_config": 33,
+      "name": "Siedlungen  Größe 6",
+      "order": 40
+    }
+  },
+  {
+    "model": "game.tiebreaker",
+    "pk": 17,
+    "fields": {
+      "result_config": 33,
+      "name": "Siedlungen  Größe 1",
+      "order": 10
+    }
+  },
+  {
+    "model": "game.tiebreaker",
+    "pk": 18,
+    "fields": {
+      "result_config": 33,
+      "name": "Siedlungen  Größe 5",
+      "order": 30
+    }
+  },
+  {
+    "model": "game.tiebreaker",
+    "pk": 19,
+    "fields": {
+      "result_config": 33,
+      "name": "Siedlungen  Größe 4",
+      "order": 20
+    }
+  },
+  {
+    "model": "game.tiebreaker",
+    "pk": 20,
+    "fields": {
+      "result_config": 33,
+      "name": "Siedlungen",
+      "order": 0
+    }
+  },
+  {
+    "model": "game.tiebreaker",
+    "pk": 21,
+    "fields": {
+      "result_config": 33,
+      "name": "Siedlungen Größe 3",
+      "order": 60
     }
   },
   {
@@ -2254,6 +2995,70 @@
     "fields": {
       "game": 31,
       "name": "Louis Pasteur"
+    }
+  },
+  {
+    "model": "game.faction",
+    "pk": 98,
+    "fields": {
+      "game": 32,
+      "name": "Schiffsplättchen 2"
+    }
+  },
+  {
+    "model": "game.faction",
+    "pk": 99,
+    "fields": {
+      "game": 32,
+      "name": "Schiffsplättchen 4"
+    }
+  },
+  {
+    "model": "game.faction",
+    "pk": 100,
+    "fields": {
+      "game": 32,
+      "name": "Schiffsplättchen 7"
+    }
+  },
+  {
+    "model": "game.faction",
+    "pk": 101,
+    "fields": {
+      "game": 32,
+      "name": "Schiffsplättchen 3"
+    }
+  },
+  {
+    "model": "game.faction",
+    "pk": 102,
+    "fields": {
+      "game": 32,
+      "name": "Schiffsplättchen 5"
+    }
+  },
+  {
+    "model": "game.faction",
+    "pk": 103,
+    "fields": {
+      "game": 32,
+      "name": "Schiffsplättchen 6"
+    }
+  },
+  {
+    "model": "game.faction",
+    "pk": 104,
+    "fields": {
+      "game": 32,
+      "name": "Schiffsplättchen 1"
+    }
+  },
+  {
+    "model": "game.faction",
+    "pk": 105,
+    "fields": {
+      "game": 32,
+      "name": "Schiffsplättchen 8"
     }
   }
 ]
