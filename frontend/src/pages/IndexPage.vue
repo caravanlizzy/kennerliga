@@ -1,8 +1,8 @@
 <template>
   <q-page :class="{'row items-start': !isMobile}">
-    <the-welcome-box class="col-12" />
-      <kenner-chat class="col-9" />
-    <year-standings class="col-3" />
+    <TheWelcomeBox class="col-12" />
+      <KennerChat class="col-9" />
+    <YearStandings class="col-3" />
   </q-page>
 </template>
 

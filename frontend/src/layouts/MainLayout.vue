@@ -1,7 +1,7 @@
 <template>
   <q-layout class="column" view="hHh Lpr lFf">
     <q-header bordered>
-      <q-toolbar class="bg-grey-3 ">
+      <q-toolbar class="background-navbar">
         <NavBar :onToggle="toggleDrawer"/>
       </q-toolbar>
       <BreadCrumbs color="secondary" v-if="isAuthenticated"/>
@@ -39,3 +39,9 @@ function toggleDrawer(): void {
 }
 
 </script>
+
+<style scoped>
+  .background-navbar {
+    background-color: #f2f2f2;
+  }
+</style>

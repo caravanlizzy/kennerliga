@@ -1,6 +1,6 @@
 <template>
   <div class="q-pa-md">
-    <q-card>
+    <q-card bordered flat>
       <q-card-section class="text-h6">
         Kennerchat
       </q-card-section>
@@ -53,17 +53,11 @@ async function send() {
 
 async function loadMessages() {
   const { data } = await getMessages(lastDateTime);
-  if(data.length === 0) return; 
+  if(data.length === 0) return;
   messages.value = [...messages.value, ...data.reverse()];
   lastDateTime = messages.value[messages.value.length - 1].datetime;
 }
 
 </script>
-
-<style scoped lang="scss">
-.chat-border {
-  border: 2px solid $primary;
-}
-</style>
 
 

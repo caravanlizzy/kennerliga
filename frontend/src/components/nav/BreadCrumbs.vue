@@ -1,5 +1,5 @@
 <template>
-  <q-toolbar class="text-secondary bg-primary" >
+  <q-toolbar class="text-secondary breadcrumbs-container" >
     <div class="q-pa-xs row items-center justify-between " style="width: 100%">
       <KennerButton flat color="white" size="small" icon="arrow_back" @click="()=>router.go(-1)" />
       <div>
@@ -90,3 +90,9 @@ watch(
 );
 
 </script>
+
+<style scoped>
+  .breadcrumbs-container {
+    background-color: #5c5c5c;
+  }
+</style>

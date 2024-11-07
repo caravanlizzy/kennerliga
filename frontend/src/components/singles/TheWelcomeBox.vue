@@ -1,6 +1,6 @@
 <template>
   <div class="q-pa-md">
-    <q-card bordered :class="['q-pa-lg', '']">
+    <q-card bordered flat :class="['q-pa-lg', '']">
       <q-card-section class="text-h5 text-secondary ">
         Kennerliga - eine Website. Aber warum denn nur?
       </q-card-section>
@@ -21,9 +21,6 @@
             </q-item>
           </q-list>
         </div>
-      </q-card-section>
-      <q-card-section class="text-h6 text-positive">
-        <KennerButton color="positive"><span class="text-overline"> Mach mit!</span></KennerButton>
       </q-card-section>
     </q-card>
   </div>
