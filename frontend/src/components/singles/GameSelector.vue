@@ -1,7 +1,7 @@
 <template>
   <div class="">
     <div class="text-h6"> Wähle dein Spiel</div>
-    <div class="row q-gutter-md">
+    <div class="row">
       <kenner-select class="select-width q-mr-md"
                      v-model="platform" option-value="name" option-label="name" :options="platforms"
                      label="Platform"/>
@@ -12,22 +12,21 @@
         </template>
       </q-input>
     </div>
-    <div class="row q-my-lg">
+    <div class="row games-container  q-mt-lg">
       <div @click="selectedGame = game" v-for="game of games" :key="game.id">
-        <div class="q-px-lg q-py-md text-bold game-selection-element cursor-pointer"
+        <div class="q-px-lg q-py-md game-selection-element cursor-pointer"
              :class="{'selected': selectedGame && game.id === selectedGame.id}">
           {{ game.name.toUpperCase() }}
         </div>
       </div>
     </div>
-    <div v-if="selectedGame" class="q-py-md">
-      <span class="text-h6"> {{ selectedGame.name.toUpperCase() }} </span>
+    <div v-if="selectedGame" class="q-py-md q-my-md">
+      <span class="text-h6"> {{ selectedGame.name }} </span>
       <div v-if="fullGameInformation.options && fullGameInformation.options.length === 0 " class="text-italic"> Spiel
         hat keine weiteren
         Optionen
       </div>
       <template v-else>
-        <div class="text-h6 q-py-md"> Spieloptionen einstellen</div>
         <div v-for="option of fullGameInformation.options" :key="option.id" class="q-py-sm">
           <template v-if="option.has_choices">
             <kenner-select
@@ -116,26 +115,33 @@ function filterGames() {
 <style lang="scss">
 
 .game-selection-element {
-  outline: 6px solid white;
-  background-color: $secondary;
+  outline: 0px solid $secondary;
+  background-color: white;
   transition: background-color 0.5s ease;
-  color: white;
+  flex: 1 1 150px;
+  color: $primary;
 
   &:hover {
-    color: $primary;
+    color: $info;
   }
 }
 
 .selected {
-  background-color: $primary;
+  color: $accent;
+  outline: $primary;
 
-  &:hover {
-    color: $accent;
-  }
+  //&:hover {
+  //  color: $accent;
+  //}
 }
 
 .select-width {
   width: 140px;
+}
+
+.games-container {
+  border-right: 2px solid $secondary;
+  border-left: 2px solid $secondary;
 }
 
 </style>

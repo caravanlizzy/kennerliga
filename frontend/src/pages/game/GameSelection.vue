@@ -4,7 +4,7 @@
       <StatusBar> Pending...</StatusBar>
       <PlayerOrderList class="bg-grey-2"/>
     </div>
-    <GameSelector v-if="isActive" class="q-mt-md"/>
+    <GameSelector v-if="isActive" class="q-mt-lg"/>
   </div>
 </template>
 
