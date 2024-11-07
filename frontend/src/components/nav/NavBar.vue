@@ -1,20 +1,18 @@
 <template>
-  <!--  <q-btn  style="height: 44px; width: 44px;">-->
-  <!--    <img src="public/icons/kennericon.jpg" style="height: 44px; width: 44px;">-->
-  <!--  </q-btn>-->
-  <KennerButton :to="{ name: 'home' }" flat color="primary" icon="pets"/>
+<!--  <q-btn :to="{ name: 'home' }" round color="secondary" class="glossy" icon="psychology"/>-->
+  <q-chip  square size="md" text-color="white" icon="psychology" color="secondary" class=" text-italic"> Kennerliga</q-chip>
   <q-toolbar-title class="text-primary">
-    Kennerliga
+    <!--      <h6 class="text-italic" > Kennerliga </h6>-->
   </q-toolbar-title>
   <KennerButton :to="{name: 'game-selection'}" v-if="isAuthenticated" flat color="primary" icon="sports_esports">
-    <q-tooltip class="bg-primary text-white" :delay="50" :hide-delay="170" anchor="top left"> Spielauswahl
+    <q-tooltip class="bg-primary text-white" :delay="50" :hide-delay="170" anchor="top left"> Aktive Liga
     </q-tooltip>
   </KennerButton>
-  <KennerButton v-if="isAuthenticated" flat color="secondary" icon="add_circle">
-    <q-tooltip class="bg-primary text-white" :delay="50" :hide-delay="170" anchor="top left"> Ergebnis
-      eintragen
-    </q-tooltip>
-  </KennerButton>
+<!--  <KennerButton v-if="isAuthenticated" flat color="secondary" icon="add_circle">-->
+<!--    <q-tooltip class="bg-primary text-white" :delay="50" :hide-delay="170" anchor="top left"> Ergebnis-->
+<!--      eintragen-->
+<!--    </q-tooltip>-->
+<!--  </KennerButton>-->
   <TheUsername v-if="isAuthenticated"/>
   <KennerButton v-if="isAuthenticated" flat icon="menu" @click="onToggle"/>
   <KennerButton v-else flat icon="login" :to="{name:'login'}"/>

@@ -1,8 +1,8 @@
 <template>
   <q-layout class="column" view="hHh Lpr lFf">
     <q-header bordered>
-      <q-toolbar class="bg-white ">
-        <nav-bar :onToggle="toggleDrawer"/>
+      <q-toolbar class="bg-grey-3 ">
+        <NavBar :onToggle="toggleDrawer"/>
       </q-toolbar>
       <BreadCrumbs color="secondary" v-if="isAuthenticated"/>
     </q-header>
