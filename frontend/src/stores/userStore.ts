@@ -30,12 +30,8 @@ export const useUserStore = defineStore('userStore', () => {
     }
   }
 
-  function isMe(someUsername): boolean {
-    return someUsername === user.value.username;
-  }
-
-  function toggleAdminMode(): void {
-    isAdminModeActive.value = !isAdminModeActive.value;
+  function isMe(someUsername: string): boolean {
+    return someUsername === user.value?.username;
   }
 
   function storeToken(): void {

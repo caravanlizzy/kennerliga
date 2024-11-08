@@ -51,7 +51,6 @@
 
 <script setup lang="ts">
 
-import OverviewCard from 'components/cards/OverviewCard.vue';
 import YesNoItem from 'components/items/YesNoItem.vue';
 
 defineProps<{

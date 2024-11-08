@@ -25,7 +25,7 @@
 <script setup lang="ts">
 import KennerInput from 'components/inputs/KennerInput.vue';
 import KennerButton from 'components/buttons/KennerButton.vue';
-import { computed, inject, ref } from 'vue';
+import { inject, ref } from 'vue';
 import GameOptionChoiceCreate from 'pages/game/createGame/GameOptionChoiceCreate.vue';
 import GameOptionRestrictionCreate from 'pages/game/createGame/GameOptionRestrictionCreate.vue';
 import GameOptionCard from 'components/cards/OverviewCard.vue';
