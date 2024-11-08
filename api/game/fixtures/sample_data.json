@@ -128,6 +128,22 @@
     }
   },
   {
+    "model": "game.game",
+    "pk": 37,
+    "fields": {
+      "name": "GOLDblivion",
+      "platform": 1
+    }
+  },
+  {
+    "model": "game.game",
+    "pk": 38,
+    "fields": {
+      "name": "Die verlorenen Ruinen von Arnak",
+      "platform": 1
+    }
+  },
+  {
     "model": "game.gameoption",
     "pk": 1,
     "fields": {
@@ -902,6 +918,18 @@
       "name": "Fortgeschrittene Variante",
       "game": 36,
       "has_choices": false,
+      "only_if_option": null,
+      "only_if_choice": null,
+      "only_if_value": null
+    }
+  },
+  {
+    "model": "game.gameoption",
+    "pk": 110,
+    "fields": {
+      "name": "Seite des Spielbretts",
+      "game": 38,
+      "has_choices": true,
       "only_if_option": null,
       "only_if_choice": null,
       "only_if_value": null
@@ -1812,6 +1840,22 @@
     }
   },
   {
+    "model": "game.gameoptionchoice",
+    "pk": 144,
+    "fields": {
+      "name": "Der Schlangentempel (Fortgeschrittene)",
+      "option": 110
+    }
+  },
+  {
+    "model": "game.gameoptionchoice",
+    "pk": 145,
+    "fields": {
+      "name": "Der Vogeltempel (Standard)",
+      "option": 110
+    }
+  },
+  {
     "model": "game.selectedgame",
     "pk": 1,
     "fields": {
@@ -2033,6 +2077,28 @@
     }
   },
   {
+    "model": "game.resultconfig",
+    "pk": 34,
+    "fields": {
+      "game": 37,
+      "is_asymmetric": false,
+      "has_starting_player_order": true,
+      "starting_points_system": 1,
+      "has_points": true
+    }
+  },
+  {
+    "model": "game.resultconfig",
+    "pk": 35,
+    "fields": {
+      "game": 38,
+      "is_asymmetric": false,
+      "has_starting_player_order": true,
+      "starting_points_system": 1,
+      "has_points": true
+    }
+  },
+  {
     "model": "game.tiebreaker",
     "pk": 1,
     "fields": {
@@ -2219,6 +2285,42 @@
       "result_config": 33,
       "name": "Siedlungen Größe 3",
       "order": 30
+    }
+  },
+  {
+    "model": "game.tiebreaker",
+    "pk": 22,
+    "fields": {
+      "result_config": 34,
+      "name": "bezwungene Monster",
+      "order": 10
+    }
+  },
+  {
+    "model": "game.tiebreaker",
+    "pk": 23,
+    "fields": {
+      "result_config": 34,
+      "name": "Nuggets",
+      "order": 0
+    }
+  },
+  {
+    "model": "game.tiebreaker",
+    "pk": 24,
+    "fields": {
+      "result_config": 35,
+      "name": "früher am verschollenen Tempel",
+      "order": 0
+    }
+  },
+  {
+    "model": "game.tiebreaker",
+    "pk": 25,
+    "fields": {
+      "result_config": 35,
+      "name": "Punkte für Forhscungsmarker",
+      "order": 10
     }
   },
   {
