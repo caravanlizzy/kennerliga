@@ -4,7 +4,7 @@
       <q-toolbar class="background-navbar">
         <NavBar :onToggle="toggleDrawer"/>
       </q-toolbar>
-      <BreadCrumbs color="secondary" v-if="isAuthenticated"/>
+      <BreadCrumbs v-if="isAuthenticated"/>
     </q-header>
 
     <KennerDrawer v-model="drawerState"/>
@@ -40,8 +40,8 @@ function toggleDrawer(): void {
 
 </script>
 
-<style scoped>
+<style scoped lang="scss">
   .background-navbar {
-    background-color: #f2f2f2;
+    background-color: #4d4949;
   }
 </style>

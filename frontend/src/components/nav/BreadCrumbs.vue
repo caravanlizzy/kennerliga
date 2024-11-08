@@ -1,9 +1,9 @@
 <template>
-  <q-toolbar class="text-secondary breadcrumbs-container" >
+  <q-toolbar class="breadcrumbs-container" >
     <div class="q-pa-xs row items-center justify-between " style="width: 100%">
-      <KennerButton flat color="white" size="small" icon="arrow_back" @click="()=>router.go(-1)" />
+      <KennerButton flat color="primary" size="small" icon="arrow_back" @click="()=>router.go(-1)" />
       <div>
-        <q-breadcrumbs separator="/" :class="`text-white`" :active-color="color">
+        <q-breadcrumbs separator="/" :class="`text-primary`" :active-color="color">
 <!--          <template v-slot:separator>-->
 <!--            <q-icon-->
 <!--              size="1.5em"-->
@@ -18,7 +18,7 @@
           />
         </q-breadcrumbs>
       </div>
-      <KennerButton class="self-end" flat color="white" size="small" icon="arrow_forward" @click="()=>router.go(1)" />
+      <KennerButton class="self-end" flat color="primary" size="small" icon="arrow_forward" @click="()=>router.go(1)" />
     </div>
   </q-toolbar>
 </template>
@@ -93,6 +93,6 @@ watch(
 
 <style scoped>
   .breadcrumbs-container {
-    background-color: #5c5c5c;
+    background-color: #fafafa;
   }
 </style>
