@@ -17,6 +17,7 @@ export type GameOptionDto = {
   only_if_option?: number;
   only_if_choice?: number;
   only_if_value?: boolean;
+  choices?: GameOptionChoiceDto[];
 }
 
 export type GameOptionChoiceDto = {
@@ -24,3 +25,23 @@ export type GameOptionChoiceDto = {
   name: string;
   option: number;
 }
+
+export type SelectedGameDto = {
+  id?: number;
+  player?: number;
+  game: number;
+  league?: number;
+  selected_options: SelectedGameOptionDto[];
+}
+
+export type SelectedGameOptionDto = {
+  id: number;
+  selected_game: number;
+  choice?: number;
+  value?: boolean;
+}
+
+// Define the type
+export type SelectedOptionsMap = {
+  [optionId: number]: SelectedGameOptionDto | boolean | null;
+};

@@ -1,5 +1,5 @@
 <template>
- <q-avatar color="accent" size="30px">
+ <q-avatar color="accent" size="27px">
    {{ user?.username[0] }}
    <KennerTooltip>{{ user?.username}}</KennerTooltip>
  </q-avatar>
