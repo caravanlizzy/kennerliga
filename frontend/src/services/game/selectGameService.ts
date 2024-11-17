@@ -7,7 +7,8 @@ export async function createSelectedGame(selectedGame: SelectedGameDto) {
     await api('/game/selected-games/', {
       method: 'POST',
       data: {
-        selectedGame,
+        game: selectedGame.game,
+        selected_options: selectedGame.selected_options
       },
     });
   } catch (error) {
@@ -15,7 +16,7 @@ export async function createSelectedGame(selectedGame: SelectedGameDto) {
   }
 }
 
-export async function getGameOptions(gameId: number) {
+export async function fetchGameOptions(gameId: number) {
   try {
     return await api(`/game/options/?game=${gameId}`);
   } catch (error) {
@@ -25,7 +26,7 @@ export async function getGameOptions(gameId: number) {
   }
 }
 
-export async function getGameOptionChoices(optionId: number) {
+export async function fetchGameOptionChoices(optionId: number) {
   try {
     return await api(`/game/option-choices/?option=${optionId}`);
   } catch (error) {

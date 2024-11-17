@@ -1,6 +1,10 @@
 import logging
 
-from user.models import User, PlayerProfile, PlatformPlayer
+from django.core.exceptions import ObjectDoesNotExist
+
+from league.models import League
+from season.models import Season
+from user.models import PlayerProfile, User, PlatformPlayer
 
 
 def create_profile_for_user(user):
@@ -70,3 +74,19 @@ def create_bga_platform_players_based_on_existing_users():
             [create_platform_player_by_user(user.username, bga) for user in usernames]
     except Platform.DoesNotExist:
         logging.error("Platform 'BGA' not found")
+
+
+def find_users_current_league(profile):
+    try:
+        # Get the league for the running season
+        league = League.objects.get(season__status=Season.SeasonStatus.RUNNING)
+        # Check if the profile is a member of the league
+        if profile in league.members.all():  # Adjust `members` to the actual related name
+            return league
+        return None
+    except PlayerProfile.DoesNotExist:
+        return None  # No matching profile found
+    except League.DoesNotExist:
+        return None  # No league found for the running season
+    except League.MultipleObjectsReturned:
+        raise ValueError("Multiple leagues found for the current running season.")

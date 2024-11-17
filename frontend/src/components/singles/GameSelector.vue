@@ -1,6 +1,7 @@
 <template>
   <div>
     <div class="text-h6">Wähle dein Spiel</div>
+    {{gameSelection}}
     <div class="row">
       <kenner-select
         class="select-width q-mr-md"
@@ -42,13 +43,13 @@
               :options="findChoicesByOption(option.id)"
               :label="option.name"
               option-label="name"
-              v-model="gameSelection.selected_options.find((o) => o.id == option.id).choice"
+              v-model="gameSelection.selectedOptions.find((o) => o.id == option.id).choice"
               class="select-width inline-block"
             />
           </template>
           <template v-else>
             <q-toggle
-              v-model="gameSelection.selected_options.find((o) => o.id == option.id).value"
+              v-model="gameSelection.selectedOptions.find((o) => o.id == option.id).value"
               :label="option.name"
             />
           </template>
@@ -65,6 +66,7 @@ import { ref, computed, onMounted } from 'vue';
 import KennerSelect from 'components/inputs/KennerSelect.vue';
 import KennerButton from 'components/buttons/KennerButton.vue';
 import { useGameSelection } from 'src/composables/gameSelection';
+import selectFile = chrome.fileBrowserHandler.selectFile;
 
 const { gameInformation, gameSelection, isLoading, setGameInformation, findChoicesByOption, fetchPlatforms, fetchGames, submitGame } = useGameSelection();
 

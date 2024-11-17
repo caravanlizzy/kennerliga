@@ -1,16 +1,21 @@
-import { ref, reactive, computed } from 'vue';
+import { ref, reactive } from 'vue';
 import {
   GameDto,
   GameOptionDto,
   SelectedGameDto,
-  SelectedGameOptionDto,
+  SelectedGameOptionDto
 } from 'src/models/gameModels';
 import {
   createSelectedGame,
-  getGameOptionChoices,
-  getGameOptions,
+  fetchGameOptionChoices,
+  fetchGameOptions
 } from 'src/services/game/selectGameService';
 import { api } from 'boot/axios';
+
+type TGameSelection = {
+  game: GameDto;
+  selectedOptions: GameOptionDto[];
+}
 
 export function useGameSelection() {
   const gameInformation = reactive<{
@@ -18,45 +23,54 @@ export function useGameSelection() {
     options: GameOptionDto[];
   }>({
     game: undefined,
-    options: [],
+    options: []
   });
 
   const isLoading = ref(false);
 
-  const gameSelection = reactive<SelectedGameDto>({
+  const gameSelection = reactive({
     game: 0,
-    selected_options: [],
+    selectedOptions: []
   });
 
   async function setGameInformation(game: GameDto) {
     if (gameInformation.game && gameInformation.game.id === game.id) return;
     isLoading.value = true;
-    loadGame(game);
+    resetGame(game);
     await loadOptions(game.id);
     await loadChoices();
     isLoading.value = false;
   }
 
-  function loadGame(game: GameDto) {
+  function resetGame(game: GameDto) {
+    resetGameInformation(game);
+    resetGameSelection(game);
+  }
+
+  function resetGameInformation(game: GameDto) {
     gameInformation.game = game;
-    gameSelection.game = game.id;
     gameInformation.options = [];
-    gameSelection.selected_options = [];
+  }
+
+  function resetGameSelection(game: GameDto) {
+    gameSelection.game = game;
+    gameSelection.selectedOptions = [];
   }
 
   function setSelectedOption(option: GameOptionDto) {
+    console.log(gameSelection.game.id);
     const selectedOption: SelectedGameOptionDto = {
       id: option.id,
-      selected_game: gameSelection.game,
+      selected_game: gameSelection.game.id,
       value: option.has_choices ? undefined : false,
-      choice: undefined,
+      choice: undefined
     };
-    gameSelection.selected_options.push(selectedOption);
+    gameSelection.selectedOptions.push(selectedOption);
   }
 
   async function loadOptions(gameId: number) {
     try {
-      const { data: options } = await getGameOptions(gameId);
+      const { data: options } = await fetchGameOptions(gameId);
       gameInformation.options = options;
       options.forEach(setSelectedOption);
     } catch (error) {
@@ -68,7 +82,7 @@ export function useGameSelection() {
   async function loadChoices() {
     for (const option of gameInformation.options) {
       if (!option.has_choices) continue;
-      const { data: newChoices } = await getGameOptionChoices(option.id);
+      const { data: newChoices } = await fetchGameOptionChoices(option.id);
       option.choices = [...(option.choices || []), ...newChoices];
     }
   }
@@ -90,9 +104,32 @@ export function useGameSelection() {
     return gameData;
   }
 
+  function transformSubmitData(selection: TGameSelection): SelectedGameDto {
+    const selectedOptions = selection.selectedOptions.map((option) => {
+      if (option.choice) {
+        console.log({ option });
+        return ({
+          game_option: option.id,
+          choice: option.choice.id
+        });
+      }
+      return ({
+        game_option: option.id,
+        value: option.value
+      });
+    });
+    console.log({ selectedOptions });
+    return ({
+      game: selection.game.id,
+      selected_options: selectedOptions
+    });
+  }
+
   function submitGame() {
     if (gameSelection) {
-      createSelectedGame(gameSelection);
+      const data = transformSubmitData(gameSelection);
+      console.log({ data });
+      createSelectedGame(data);
     } else {
       console.warn('No game selected');
     }
@@ -106,6 +143,6 @@ export function useGameSelection() {
     findChoicesByOption,
     fetchPlatforms,
     fetchGames,
-    submitGame,
+    submitGame
   };
 }

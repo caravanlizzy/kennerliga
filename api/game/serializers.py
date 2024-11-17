@@ -3,6 +3,7 @@ from rest_framework import serializers
 from game.models import Game, GameOption, GameOptionChoice, Faction, TieBreaker, ResultConfig, StartingPointSystem, \
     Platform, SelectedGame, SelectedOption
 from user.models import PlayerProfile
+from user.service import get_profile_by_username, find_users_current_league
 
 
 class GameSerializer(ModelSerializer):
@@ -64,25 +65,25 @@ class SelectedGameSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = SelectedGame
-        fields = ['id', 'player', 'game', 'league', 'selected_options']
+        fields = ['id', 'game', 'selected_options']
 
     def set_player_and_league(self, validated_data):
         # Set player
         profile_id = validated_data.pop('playerProfileId', None)
         validated_data['player'] = (PlayerProfile.objects.get(id=profile_id)
                                     if profile_id
-                                    else self.context['request'].user.profile)
+                                    else get_profile_by_username(self.context.get('request').user.username))
 
         # Set league if provided
         league_id = validated_data.pop('leagueId', None)
         if league_id:
             validated_data['league'] = league_id
-
+        else:
+            validated_data['league'] = find_users_current_league(validated_data['player'])
         return validated_data
 
     def create(self, validated_data):
         validated_data = self.set_player_and_league(validated_data)
-
         # Create SelectedGame and SelectedOption instances
         selected_options_data = validated_data.pop('selected_options')
         selected_game = SelectedGame.objects.create(**validated_data)
@@ -112,39 +113,39 @@ class SelectedGameSerializer(serializers.ModelSerializer):
         return instance
 
 
-class SelectedGameSerializer(serializers.ModelSerializer):
-    selected_options = SelectedOptionSerializer(many=True)
-
-    class Meta:
-        model = SelectedGame
-        fields = ['id', 'player', 'game', 'league', 'selected_options']
-
-    def create(self, validated_data):
-        selected_options_data = validated_data.pop('selected_options')
-        selected_game = SelectedGame.objects.create(**validated_data)
-        for option_data in selected_options_data:
-            SelectedOption.objects.create(selected_game=selected_game, **option_data)
-        return selected_game
-
-    def update(self, instance, validated_data):
-        selected_options_data = validated_data.pop('selected_options', None)
-        instance.player = validated_data.get('player', instance.player)
-        instance.game = validated_data.get('game', instance.game)
-        instance.league = validated_data.get('league', instance.league)
-        instance.save()
-
-        if selected_options_data:
-            for option_data in selected_options_data:
-                option_id = option_data.get('id')
-                if option_id:
-                    option_instance = SelectedOption.objects.get(id=option_id, selected_game=instance)
-                    option_instance.choice = option_data.get('choice', option_instance.choice)
-                    option_instance.value = option_data.get('value', option_instance.value)
-                    option_instance.save()
-                else:
-                    SelectedOption.objects.create(selected_game=instance, **option_data)
-
-        return instance
+# class SelectedGameSerializer(serializers.ModelSerializer):
+#     selected_options = SelectedOptionSerializer(many=True)
+#
+#     class Meta:
+#         model = SelectedGame
+#         fields = ['id', 'game', 'selected_options']
+#
+#     def create(self, validated_data):
+#         selected_options_data = validated_data.pop('selected_options')
+#         selected_game = SelectedGame.objects.create(**validated_data)
+#         for option_data in selected_options_data:
+#             SelectedOption.objects.create(selected_game=selected_game, **option_data)
+#         return selected_game
+#
+#     def update(self, instance, validated_data):
+#         selected_options_data = validated_data.pop('selected_options', None)
+#         instance.player = validated_data.get('player', instance.player)
+#         instance.game = validated_data.get('game', instance.game)
+#         instance.league = validated_data.get('league', instance.league)
+#         instance.save()
+#
+#         if selected_options_data:
+#             for option_data in selected_options_data:
+#                 option_id = option_data.get('id')
+#                 if option_id:
+#                     option_instance = SelectedOption.objects.get(id=option_id, selected_game=instance)
+#                     option_instance.choice = option_data.get('choice', option_instance.choice)
+#                     option_instance.value = option_data.get('value', option_instance.value)
+#                     option_instance.save()
+#                 else:
+#                     SelectedOption.objects.create(selected_game=instance, **option_data)
+#
+#         return instance
 
 
 class SelectedOptionSerializer(ModelSerializer):
