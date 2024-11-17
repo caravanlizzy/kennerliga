@@ -34,37 +34,3 @@ export async function getGameOptionChoices(optionId: number) {
     );
   }
 }
-
-// async function createSelectedGameOption(option) {
-//   if(hasChoices())
-// }
-
-// export async function createSelections(
-//   game: GameDto,
-//   options: SelectedOptionsMap,
-// ): Promise<void> {
-//   try {
-//     console.log({options});
-//     console.log({ game });
-//     await createSelectedGame(game.id);
-//     for (const [_, selection] of Object.entries(options)) {
-//       let data = null;
-//       if (hasChoices(selection)) {
-//         data = { value: selection };
-//       } else {
-//         data = { choice: selection.id };
-//       }
-//       await api('games/selected-game-options', {
-//         method: 'POST',
-//         data: data,
-//       });
-//     }
-//   } catch (error) {
-//     console.log('error creating the selected game: ', game.name, error);
-//     throw new Error('Error creating the selected game: ' + error);
-//   }
-//
-//   function hasChoices(option: object | boolean) {
-//     return typeof option !== 'boolean';
-//   }
-// }

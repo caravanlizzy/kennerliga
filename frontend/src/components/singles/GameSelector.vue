@@ -29,7 +29,10 @@
       </div>
     </div>
 
-    <div v-if="gameInformation.game" class="q-py-md q-my-md">
+    <div v-if="isLoading">
+      <q-spinner-orbit size="xl" />
+    </div>
+    <div v-else-if="gameInformation.game" class="q-py-md q-my-md">
       <span class="text-h6">{{ gameInformation.game.name }}</span>
       <div v-if="!gameInformation.options.length" class="text-italic">Spiel hat keine weiteren Optionen</div>
       <template v-else>
@@ -53,7 +56,7 @@
       </template>
     </div>
 
-    <KennerButton @click="submitGame" type="submit" push color="positive" label="Speichern" />
+    <KennerButton @click="submitGame" type="submit" push color="positive" label="Speichern" class="q-mt-md" />
   </div>
 </template>
 
@@ -63,7 +66,7 @@ import KennerSelect from 'components/inputs/KennerSelect.vue';
 import KennerButton from 'components/buttons/KennerButton.vue';
 import { useGameSelection } from 'src/composables/gameSelection';
 
-const { gameInformation, gameSelection, setGameInformation, findChoicesByOption, fetchPlatforms, fetchGames, submitGame } = useGameSelection();
+const { gameInformation, gameSelection, isLoading, setGameInformation, findChoicesByOption, fetchPlatforms, fetchGames, submitGame } = useGameSelection();
 
 const platform = ref();
 const filter = ref('');

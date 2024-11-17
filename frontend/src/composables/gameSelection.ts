@@ -21,6 +21,8 @@ export function useGameSelection() {
     options: [],
   });
 
+  const isLoading = ref(false);
+
   const gameSelection = reactive<SelectedGameDto>({
     game: 0,
     selected_options: [],
@@ -28,9 +30,11 @@ export function useGameSelection() {
 
   async function setGameInformation(game: GameDto) {
     if (gameInformation.game && gameInformation.game.id === game.id) return;
+    isLoading.value = true;
     loadGame(game);
     await loadOptions(game.id);
     await loadChoices();
+    isLoading.value = false;
   }
 
   function loadGame(game: GameDto) {
@@ -97,6 +101,7 @@ export function useGameSelection() {
   return {
     gameInformation,
     gameSelection,
+    isLoading,
     setGameInformation,
     findChoicesByOption,
     fetchPlatforms,
