@@ -1,6 +1,6 @@
 <template>
   <q-layout class="column" view="hHh Lpr lFf">
-    <q-header bordered>
+    <q-header >
       <q-toolbar class="background-navbar">
         <NavBar :onToggle="toggleDrawer"/>
       </q-toolbar>
