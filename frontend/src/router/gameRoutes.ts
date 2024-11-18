@@ -21,7 +21,7 @@ export default {
       path: 'select',
       name: 'game-selection',
       component: () => import('pages/game/GameSelection.vue'),
-      meta: { icon: 'sports_esports', label: 'Spielauswahl' }
+      meta: { icon: 'sports_esports', label: 'Auswahl' }
     }
   ]
 };
