@@ -1,16 +1,16 @@
 <template>
   <q-layout class="column" view="hHh Lpr lFf">
-    <q-header >
+    <q-header>
       <q-toolbar class="background-navbar">
         <NavBar :onToggle="toggleDrawer"/>
       </q-toolbar>
       <BreadCrumbs v-if="isAuthenticated"/>
+      <Announcements />
     </q-header>
 
     <KennerDrawer v-model="drawerState"/>
 
     <q-page-container class="flex column justify-center ">
-      <Announcements />
       <div :class="{'q-pa-lg': !isMobile}">
         <router-view class=" text-primary"/>
       </div>
@@ -27,7 +27,7 @@ import {storeToRefs} from 'pinia';
 import KennerDrawer from 'components/drawer/KennerDrawer.vue';
 import {ref, Ref} from 'vue';
 import {useResponsive} from 'src/composables/reponsive';
-import Announcements from 'components/singles/TheAccouncements.vue';
+import Announcements from 'components/ui/AnnouncementList.vue';
 
 const store = useUserStore();
 const {isMobile} = useResponsive();

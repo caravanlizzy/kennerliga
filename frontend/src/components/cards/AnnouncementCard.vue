@@ -1,13 +1,13 @@
 <template>
   <div
-    :class="`announcement announcement-border bg-${background} column q-pa-xs ${
+    :class="`announcement bg-${background} q-px-lg q-py-md column ${
       props.type === 'NEUTRAL' ? 'text-primary' : 'text-white'
     }`"
   >
-    <div class="flex-center row">
+    <div class="text-bold">
       <slot name="title" />
     </div>
-    <p class="flex-center row">
+    <p class="">
       <slot name="content" />
     </p>
   </div>
@@ -19,11 +19,19 @@ const props = defineProps<{ type: string }>();
 
 const typeToBackgroundMap: { [key: string]: string } = {
   WINNER: 'secondary',
-  INFO: 'info',
-  REGISTER: 'accent',
+  INFO: 'primary',
+  REGISTER: 'info',
   WARNING: 'negative',
   NEUTRAL: 'grey-2',
 };
+
+const typeToBorderMap: { [key: string]: string } = {
+  WINNER: 'secondary',
+  INFO: 'primary',
+  REGISTER: 'info',
+  WARNING: 'negative',
+  NEUTRAL: 'grey-2',
+}
 
 const background = computed(() => {
   return typeToBackgroundMap[props.type];
@@ -31,34 +39,15 @@ const background = computed(() => {
 </script>
 
 <style scoped lang="scss">
-.announcement-border {
-  border: 0px solid $secondary;
-}
 .announcement {
-  background-color: #f9f9f9; /* Light background for contrast */
-  color: #333; /* Neutral text color for readability */
-  border: 1px solid #ddd; /* Subtle border for structure */
-  border-radius: 5px; /* Soft corners */
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Light shadow for depth */
-  padding: 1rem 2rem; /* Spacious padding for comfort */
+  display: inline-flex;
+  border-radius: 3px; /* Soft corners */
   text-align: center; /* Center the text */
-  font-size: 1rem; /* Standard text size */
-  font-weight: 500; /* Slightly bold for emphasis */
+  margin: auto;
 }
 
 .announcement p {
   margin: 0; /* Remove default paragraph margins */
-}
-
-.announcement a {
-  color: #007bff; /* Accent color for links */
-  text-decoration: underline; /* Highlight links */
-  font-weight: 600; /* Emphasize links */
-}
-
-.announcement a:hover {
-  text-decoration: none; /* Subtle hover effect */
-  color: #0056b3; /* Darker shade on hover */
 }
 
 </style>

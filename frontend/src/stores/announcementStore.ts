@@ -11,7 +11,7 @@ type TAnnouncement = {
 export const useAnnouncementStore = defineStore('announcementStore', () => {
   const announcements: Ref<TAnnouncement[]> = ref([]);
 
-  async function getAnnouncements(): Promise<void> {
+  async function fetchAnnouncements(): Promise<void> {
     const { data } = await api('announcement/announcements', {
       method: 'GET'
     })
@@ -28,5 +28,5 @@ export const useAnnouncementStore = defineStore('announcementStore', () => {
     announcements.value.splice(announcements.value.indexOf(announcement), 1);
   }
 
-  return { announcements, addAnnouncement, removeAnnouncement, getAnnouncements }
+  return { announcements, addAnnouncement, removeAnnouncement, fetchAnnouncements }
 })

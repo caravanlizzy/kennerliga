@@ -10,7 +10,7 @@
 
 <script setup lang="ts">
 
-import GameSelector from 'components/singles/GameSelector.vue';
+import GameSelector from 'components/ui/GameSelector.vue';
 import { ref } from 'vue';
 import PlayerOrderList from 'components/lists/PlayerOrderList.vue';
 import StatusBar from 'components/StatusBar.vue';
