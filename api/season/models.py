@@ -1,7 +1,9 @@
 from datetime import datetime
-
+from django.utils.timezone import now  # Use timezone-aware datetime
 from django.core.validators import MinValueValidator, MaxValueValidator
+
 from django.db import models
+from user.models import PlayerProfile  # Assuming this is your participant model
 
 
 # Create your models here.
@@ -12,11 +14,6 @@ class Season(models.Model):
         RUNNING = 'Laufend'
         DONE = 'Beendet'
 
-    participants = models.ManyToManyField(
-        'user.PlayerProfile',  # lazy reference to avoid circular imports
-        blank=True,
-        related_name='seasons_participating'
-    )
     year = models.IntegerField()
     month = models.IntegerField(
         'month in the current year',
@@ -28,8 +25,6 @@ class Season(models.Model):
         default=SeasonStatus.NEXT
     )
 
-
-
     @property
     def name(self):
         return str(self.year) + '_S' + str(self.month)
@@ -40,7 +35,20 @@ class Season(models.Model):
 
     @property
     def time_to_start(self):
-        return self.season_start_time - datetime.now()
+        return self.season_start_time - now()
 
     def __str__(self):
         return self.name
+
+
+class SeasonParticipant(models.Model):
+    season = models.ForeignKey(Season, on_delete=models.CASCADE, related_name='participants')
+    participant = models.ForeignKey(PlayerProfile, on_delete=models.CASCADE, related_name='season_participants')
+    rank = models.IntegerField()
+
+    class Meta:
+        unique_together = ('season', 'participant')
+        ordering = ['rank']
+
+    def __str__(self):
+        return f"{self.participant} - {self.season} (Rank: {self.rank})"

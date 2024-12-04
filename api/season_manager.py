@@ -155,7 +155,7 @@ class SeasonManager:
 
         return players_per_league
 
-    def get_ranked_participants(self) -> List[dict]:
+    def rank_participants(self) -> List[dict]:
         """Order participants based on registration and previous participation."""
         participants = get_registered_participants()
         previously_registered = self.get_previous_season_participants(participants)
