@@ -9,5 +9,6 @@
 
 import { useUserStore } from 'stores/userStore';
 import KennerTooltip from 'components/KennerTooltip.vue';
-const { user } = useUserStore();
+import { storeToRefs } from 'pinia';
+const { user } = storeToRefs(useUserStore());
 </script>

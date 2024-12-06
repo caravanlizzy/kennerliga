@@ -11,6 +11,7 @@
     <KennerDrawer v-model="drawerState"/>
 
     <q-page-container class="flex column justify-center ">
+      <DevTools/>
       <div :class="{'q-pa-lg': !isMobile}">
         <router-view class=" text-primary"/>
       </div>
@@ -28,6 +29,7 @@ import KennerDrawer from 'components/drawer/KennerDrawer.vue';
 import {ref, Ref} from 'vue';
 import {useResponsive} from 'src/composables/reponsive';
 import Announcements from 'components/ui/AnnouncementList.vue';
+import DevTools from 'components/DevTools.vue';
 
 const store = useUserStore();
 const {isMobile} = useResponsive();

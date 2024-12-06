@@ -7,15 +7,14 @@ os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'django_rest.settings')
 # Initialize Django
 django.setup()
 
-
 from season_manager import SeasonManager
 
 manager = SeasonManager()
 
-print(manager.current_season)
-print(manager.open_season)
+selected_games = [
+    {'id': 't'}
+]
+
 
 def create_demo_season():
     return
-
-
