@@ -18,31 +18,45 @@ declare module 'vue-router' {
   }
 }
 
-
 const routes: RouteRecordRaw[] = [
   {
     path: '/login',
     component: () => import('layouts/LoginLayout.vue'),
     children: [
-      { path: '', name: 'login', component: () => import ('pages/TheLogin.vue') }
-    ]
+      {
+        path: '',
+        name: 'login',
+        component: () => import('pages/TheLogin.vue'),
+      },
+    ],
   },
   {
     path: '/',
     component: () => import('layouts/MainLayout.vue'),
     children: [
-      { path: '', name: 'home', component: () => import('pages/IndexPage.vue'), meta: { icon: 'home', label: 'Home' } },
+      {
+        path: '',
+        name: 'home',
+        component: () => import('pages/IndexPage.vue'),
+        meta: { icon: 'home', label: 'Home' },
+      },
       userRoutes,
-      gameRoutes
-    ]
+      gameRoutes,
+      {
+        path: 'league',
+        name: 'my-league',
+        component: () => import('pages/MyLeague.vue'),
+        meta: { icon: 'sports_esports', label: 'Meine Liga' },
+      },
+    ],
   },
 
   // Always leave this as last one,
   // but you can also remove it
   {
     path: '/:catchAll(.*)*',
-    component: () => import('pages/ErrorNotFound.vue')
-  }
+    component: () => import('pages/ErrorNotFound.vue'),
+  },
 ];
 
 export default routes;

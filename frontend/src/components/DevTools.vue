@@ -4,6 +4,7 @@
     <div style="max-width: 150px" class="q-pa-xs">
       <div>
         <kenner-button
+          :disabled="userSelection == null"
           color="accent"
           outline
           @click="loginAsUser"

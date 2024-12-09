@@ -14,7 +14,7 @@ export const useUserStore = defineStore(
   () => {
     const router = useRouter();
     const user: Ref<TUser | null> = ref(null);
-    const isAdminModeActive: Ref<boolean> = ref(false);
+    const isDev: Ref<boolean> = ref(false);
     const isAuthenticated: Ref<boolean> = ref(false);
 
     async function listUsers() {
@@ -79,7 +79,7 @@ export const useUserStore = defineStore(
       }
     }
 
-    return { user, isAuthenticated, isAdminModeActive, isMe, login, logout, listUsers };
+    return { user, isAuthenticated, isDev, isMe, login, logout, listUsers };
   },
   {
     persist: {

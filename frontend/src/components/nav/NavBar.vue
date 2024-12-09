@@ -8,7 +8,7 @@
   <q-toolbar-title class="text-primary">
     <!--      <h6 class="text-italic" > Kennerliga </h6>-->
   </q-toolbar-title>
-  <KennerButton :to="{name: 'game-selection'}" v-if="isAuthenticated" flat color="positive" icon="sports_esports">
+  <KennerButton :to="{name: 'my-league'}" v-if="isAuthenticated" flat color="positive" icon="sports_esports">
     <KennerTooltip> Meine Liga </KennerTooltip>
 
   </KennerButton>
