@@ -6,9 +6,7 @@ def get_active_player(league):
 
 
 def get_league_members_order(league):
-    """
-    get order based on season order
-    """
+    league.members
     return
 
 

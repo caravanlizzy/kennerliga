@@ -3,7 +3,7 @@ from random import shuffle
 from typing import List, Dict, Union, Optional
 
 from league.models import League, LeagueResult
-from season.models import Season
+from season.models import Season, SeasonParticipant
 from season.service import get_running_season, get_open_season, get_leagues, get_previous_season, \
     get_registered_participants
 from user.models import PlayerProfile
@@ -88,12 +88,6 @@ class SeasonManager:
             logging.error(f"Failed to create new season: {e}")
             return False
 
-    @staticmethod
-    def register_participant(user):
-        current_season = get_open_season()
-        if current_season:
-            current_season.participants.add(user.profile)
-
     # --- League Management Functions ---
 
     def create_league(self, level: int):
@@ -116,7 +110,6 @@ class SeasonManager:
         participants = get_registered_participants()
         players_per_league = self.get_players_per_league(len(participants))
         leagues = [self.create_league(level) for level in range(1, len(players_per_league) + 1)]
-        print(leagues)
 
         self.populate_leagues(leagues, players_per_league)
 

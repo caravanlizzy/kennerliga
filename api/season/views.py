@@ -5,6 +5,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet
 
+from season.service import is_profile_registered, register
 from season_manager import SeasonManager
 from season.models import Season
 from season.serializer import SeasonSerializer
@@ -21,9 +22,9 @@ class SeasonRegistrationView(APIView):
         except PlayerProfile.DoesNotExist:
             return HttpResponseNotFound("Player profile not found.")
         current_season = SeasonManager.get_current_season()
-        if not player_profile in current_season.participants.all():
-            current_season.participants.add(player_profile)
-            current_season.save()
+        # if not player_profile in current_season.participants.all():
+        if not is_profile_registered(player_profile, current_season):
+            register(player_profile)
             return Response(f'Participant {player_profile.profile_name} has been added to the current season.')
         return Response(f'Player {player_profile.profile_name} is already registered')
 

@@ -3,7 +3,7 @@ from typing import List
 
 from django.db.models import QuerySet
 
-from season.models import Season
+from season.models import Season, SeasonParticipant
 from user.models import PlayerProfile
 
 
@@ -12,6 +12,7 @@ def get_running_season() -> Season:
     Retrieves the currently running season, if any.
     """
     return Season.objects.filter(status=Season.SeasonStatus.RUNNING).first()
+
 
 def get_season_by_league(league):
     return league.season
@@ -38,7 +39,8 @@ def get_participants(season_name: str) -> List[PlayerProfile]:
     """
     try:
         season = Season.objects.get(year=season_name)
-        return season.participants.all()
+        participants = SeasonParticipant.objects.filter(season=season)
+        return list(participants)
     except Season.DoesNotExist:
         logging.warning(f"No season found with year: {season_name}")
         return []
@@ -56,22 +58,28 @@ def get_registered_participant_count() -> int:
     Returns the number of participants in the current open season.
     If no season is open, returns 0.
     """
-    season = get_open_season()
-    if season:
-        return season.participants.count()
-    else:
-        logging.info("No open season found.")
-        return 0
+    return len(get_registered_participants())
 
 
-def get_registered_participants() -> List[PlayerProfile]:
+def get_registered_participants() -> List[SeasonParticipant]:
     """
     Returns all participants registered in the current open season.
     If no season is open, returns an empty list.
     """
     season = get_open_season()
     if season:
-        return season.participants.all()
+        participants = SeasonParticipant.objects.filter(season=season)
+        return list(participants)
     else:
         logging.info("No open season found.")
         return []
+
+
+def register(profile):
+    open_season = get_open_season()
+    new_participant = SeasonParticipant(season=open_season, profile=profile)
+    new_participant.save()
+
+
+def is_profile_registered(profile, season):
+    return SeasonParticipant.objects.filter(season=season, profile=profile).exists()

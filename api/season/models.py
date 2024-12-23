@@ -43,8 +43,8 @@ class Season(models.Model):
 
 class SeasonParticipant(models.Model):
     season = models.ForeignKey(Season, on_delete=models.CASCADE, related_name='participants')
-    participant = models.ForeignKey(PlayerProfile, on_delete=models.CASCADE, related_name='season_participants')
-    rank = models.IntegerField()
+    profile = models.ForeignKey(PlayerProfile, on_delete=models.CASCADE, related_name='season_participants')
+    rank = models.IntegerField(null=True, blank=True)
 
     class Meta:
         unique_together = ('season', 'participant')
