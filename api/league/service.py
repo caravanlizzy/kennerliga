@@ -6,30 +6,38 @@ def get_active_player(league):
 
 
 def get_league_members_order(league):
-    league.members
-    return
+    # Use the related name to access members and order them by rank
+    members = league.members.all().order_by('rank')
+    return members
 
 
 def next_player(league):
     """
     Rotate to the next player in the league based on the defined order and set as active player.
     """
-    members = get_league_members_order(league)
+    # Get the ordered members as a list
+    members = list(get_league_members_order(league))
+
+    # Check if there are no members in the league
     if not members:
         return None  # No members in the league
 
-    # Find the index of the current active player
-    if league.active_player in members:
-        current_index = members.index(league.active_player)
-        next_index = (current_index + 1) % len(members)  # Circular rotation
+    # Handle the case where there is no active player set
+    active_player = league.active_player
+    if active_player not in members:
+        active_player_index = -1  # Start before the first player
     else:
-        next_index = 0  # Default to the first member if no active player
+        active_player_index = members.index(active_player)
 
-    # Update and save the active player
-    league.active_player = members[next_index]
+    # Rotate to the next player
+    next_player_index = (active_player_index + 1) % len(members)
+    next_player = members[next_player_index]
+
+    # Update the active player in the league
+    league.active_player = next_player
     league.save()
 
-    return league.active_player
+    return next_player  # Return the new active player
 
 
 def select_game(league, player, game):
