@@ -47,7 +47,7 @@ class SeasonParticipant(models.Model):
     rank = models.IntegerField(null=True, blank=True)
 
     class Meta:
-        unique_together = ('season', 'participant')
+        unique_together = ('season', 'profile')
         ordering = ['rank']
 
     def __str__(self):
