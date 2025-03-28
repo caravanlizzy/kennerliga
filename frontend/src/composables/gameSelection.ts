@@ -13,8 +13,8 @@ import {
 import { api } from 'boot/axios';
 
 type TGameSelection = {
-  game: GameDto;
-  selectedOptions: GameOptionDto[];
+  game: GameDto|null;
+  selectedOptions: SelectedGameOptionDto[];
 }
 
 export function useGameSelection() {
@@ -28,8 +28,8 @@ export function useGameSelection() {
 
   const isLoading = ref(false);
 
-  const gameSelection = reactive({
-    game: 0,
+  const gameSelection = reactive<TGameSelection>({
+    game: null,
     selectedOptions: []
   });
 
@@ -58,10 +58,9 @@ export function useGameSelection() {
   }
 
   function setSelectedOption(option: GameOptionDto) {
-    console.log(gameSelection.game.id);
     const selectedOption: SelectedGameOptionDto = {
       id: option.id,
-      selected_game: gameSelection.game.id,
+      selected_game: gameSelection.game!.id,
       value: option.has_choices ? undefined : false,
       choice: undefined
     };
@@ -107,7 +106,6 @@ export function useGameSelection() {
   function transformSubmitData(selection: TGameSelection): SelectedGameDto {
     const selectedOptions = selection.selectedOptions.map((option) => {
       if (option.choice) {
-        console.log({ option });
         return ({
           game_option: option.id,
           choice: option.choice.id
@@ -118,9 +116,8 @@ export function useGameSelection() {
         value: option.value
       });
     });
-    console.log({ selectedOptions });
     return ({
-      game: selection.game.id,
+      game: selection.game!.id,
       selected_options: selectedOptions
     });
   }
@@ -128,7 +125,6 @@ export function useGameSelection() {
   function submitGame() {
     if (gameSelection) {
       const data = transformSubmitData(gameSelection);
-      console.log({ data });
       createSelectedGame(data);
     } else {
       console.warn('No game selected');

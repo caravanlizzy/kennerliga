@@ -37,7 +37,7 @@ export type SelectedGameDto = {
 export type SelectedGameOptionDto = {
   id: number;
   selected_game: number;
-  choice?: number;
+  choice?: GameOptionChoiceDto;
   value?: boolean;
 }
 

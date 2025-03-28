@@ -51,4 +51,4 @@ class SeasonParticipant(models.Model):
         ordering = ['rank']
 
     def __str__(self):
-        return f"{self.participant} - {self.season} (Rank: {self.rank})"
+        return f"{self.profile} - {self.season} (Rank: {self.rank})"

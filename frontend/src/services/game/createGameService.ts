@@ -37,10 +37,8 @@ export async function addRestrictions(option: TGameOption): Promise<void> {
   };
 
   if (onlyIfValue !== undefined) {
-    console.log({ onlyIfValue }, 'its a value');
     data.only_if_value = onlyIfValue;
   } else if (onlyIfChoice !== undefined) {
-    console.log({ onlyIfChoice }, 'its a choice');
     const choiceValue = getStorageItem(onlyIfChoice);
     if (choiceValue !== undefined) {
       data.only_if_choice = choiceValue;
