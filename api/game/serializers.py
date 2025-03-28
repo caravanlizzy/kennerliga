@@ -2,6 +2,7 @@ from rest_framework.serializers import ModelSerializer
 from rest_framework import serializers
 from game.models import Game, GameOption, GameOptionChoice, Faction, TieBreaker, ResultConfig, StartingPointSystem, \
     Platform, SelectedGame, SelectedOption
+from league.models import League
 from user.models import PlayerProfile
 from user.service import get_profile_by_username, find_users_current_league
 
@@ -63,9 +64,13 @@ class SelectedOptionSerializer(serializers.ModelSerializer):
 class SelectedGameSerializer(serializers.ModelSerializer):
     selected_options = SelectedOptionSerializer(many=True)
 
+    # Optional write-only fields that aren't part of the model
+    leagueId = serializers.IntegerField(write_only=True, required=False)
+    playerProfileId = serializers.IntegerField(write_only=True, required=False)
+
     class Meta:
         model = SelectedGame
-        fields = ['id', 'game', 'selected_options']
+        fields = ['id', 'game', 'selected_options', 'leagueId', 'playerProfileId']
 
     def set_player_and_league(self, validated_data):
         # Set player
@@ -77,7 +82,7 @@ class SelectedGameSerializer(serializers.ModelSerializer):
         # Set league if provided
         league_id = validated_data.pop('leagueId', None)
         if league_id:
-            validated_data['league'] = league_id
+            validated_data['league'] =  League.objects.get(id=league_id)
         else:
             validated_data['league'] = find_users_current_league(validated_data['player'])
         return validated_data
@@ -148,7 +153,7 @@ class SelectedGameSerializer(serializers.ModelSerializer):
 #         return instance
 
 
-class SelectedOptionSerializer(ModelSerializer):
-    class Meta:
-        model = SelectedOption
-        fields = '__all__'
+# class SelectedOptionSerializer(ModelSerializer):
+#     class Meta:
+#         model = SelectedOption
+#         fields = '__all__'

@@ -44,8 +44,8 @@ class GameOptionChoice(models.Model):
 
 class SelectedGame(models.Model):
     player = models.ForeignKey(PlayerProfile, on_delete=models.CASCADE, related_name='selected_games')
-    game = models.ForeignKey(Game, on_delete=models.CASCADE, related_name='selected_games')
-    league = models.ForeignKey(League, on_delete=models.CASCADE, related_name='selected_games')
+    game = models.ForeignKey(Game, on_delete=models.CASCADE, related_name='game_selections')
+    league = models.ForeignKey(League, on_delete=models.CASCADE, related_name='game_selections')
 
     def __str__(self):
         return f"{self.player}'s selection for {self.game.name}"

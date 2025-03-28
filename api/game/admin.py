@@ -3,7 +3,7 @@ from nested_admin.nested import NestedModelAdmin, NestedStackedInline, NestedTab
 
 # Register your models here.
 from game.models import Game, GameOption, GameOptionChoice, StartingPointSystem, Faction, TieBreaker, \
-    ResultConfig
+    ResultConfig, SelectedGame
 
 
 # @admin.register(GameOption)
@@ -49,3 +49,7 @@ class TieBreaker(admin.ModelAdmin):
 @admin.register(ResultConfig)
 class ResultConfig(admin.ModelAdmin):
     list_display = ('game', 'is_asymmetric', 'has_starting_player_order', 'starting_points_system', 'has_points')
+
+@admin.register(SelectedGame)
+class SelectedGame(admin.ModelAdmin):
+    list_display = ('player', 'game', 'league')
