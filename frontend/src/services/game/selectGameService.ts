@@ -1,8 +1,8 @@
 import { api } from 'boot/axios';
-import { GameOptionDto, SelectedGameDto } from 'src/models/gameModels';
+import {  SelectedGameDtoPayload } from 'src/models/gameModels';
 
 export async function createSelectedGame(
-  selectedGame: SelectedGameDto,
+  selectedGame: SelectedGameDtoPayload,
   leagueId: number | null = null
 ) {
   const data: Record<string, any> = {

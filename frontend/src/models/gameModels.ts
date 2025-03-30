@@ -45,3 +45,16 @@ export type SelectedGameOptionDto = {
 export type SelectedOptionsMap = {
   [optionId: number]: SelectedGameOptionDto | boolean | null;
 };
+
+// API submission shape
+type SelectedGameOptionPayload = {
+  game_option: number;
+  selected_game: number;
+  value?: boolean;
+  choice?: number;
+};
+
+export type SelectedGameDtoPayload = {
+  game: number;
+  selected_options: SelectedGameOptionPayload[];
+};

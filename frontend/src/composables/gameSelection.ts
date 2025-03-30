@@ -1,21 +1,21 @@
-import { ref, reactive } from 'vue';
+import { ref, reactive, computed } from 'vue';
 import {
   GameDto,
   GameOptionDto,
-  SelectedGameDto,
+  SelectedGameDtoPayload,
   SelectedGameOptionDto
 } from 'src/models/gameModels';
 import {
   createSelectedGame,
   fetchGameOptionChoices,
-  fetchGameOptions
+  fetchGameOptions,
 } from 'src/services/game/selectGameService';
 import { api } from 'boot/axios';
 
 type TGameSelection = {
-  game: GameDto|null;
+  game: GameDto;
   selectedOptions: SelectedGameOptionDto[];
-}
+};
 
 export function useGameSelection() {
   const gameInformation = reactive<{
@@ -23,14 +23,39 @@ export function useGameSelection() {
     options: GameOptionDto[];
   }>({
     game: undefined,
-    options: []
+    options: [],
   });
 
   const isLoading = ref(false);
+  const platform = ref();
+  const filter = ref('');
+  const platforms = ref([]);
+  const gameData = ref([]);
+
+  const filteredGames = computed(() => {
+    return gameData.value.filter((game) => {
+      return (
+        (!platform.value || game.platform === platform.value.id) &&
+        (!filter.value || game.name.toLowerCase().includes(filter.value.toLowerCase()))
+      );
+    });
+  });
+
+  const loadPlatformsAndGames = async () => {
+    platforms.value = await fetchPlatforms();
+    gameData.value = await fetchGames();
+  };
+
+
+  const EMPTY_GAME: GameDto = {
+    id: -1,
+    name: '',
+    platform: '',
+  };
 
   const gameSelection = reactive<TGameSelection>({
-    game: null,
-    selectedOptions: []
+    game: EMPTY_GAME,
+    selectedOptions: [],
   });
 
   async function setGameInformation(game: GameDto) {
@@ -62,7 +87,7 @@ export function useGameSelection() {
       id: option.id,
       selected_game: gameSelection.game!.id,
       value: option.has_choices ? undefined : false,
-      choice: undefined
+      choice: undefined,
     };
     gameSelection.selectedOptions.push(selectedOption);
   }
@@ -103,26 +128,36 @@ export function useGameSelection() {
     return gameData;
   }
 
-  function transformSubmitData(selection: TGameSelection): SelectedGameDto {
-    const selectedOptions = selection.selectedOptions.map((option) => {
+
+  function transformSubmitData(selection: TGameSelection): SelectedGameDtoPayload {
+    const selected_options = selection.selectedOptions.map((option) => {
+      const base = {
+        selected_game: selection.game.id,
+        game_option: option.id, // transformed from 'id'
+      };
+
       if (option.choice) {
-        return ({
-          game_option: option.id,
-          choice: option.choice.id
-        });
+        return {
+          ...base,
+          choice: option.choice.id,
+        };
       }
-      return ({
-        game_option: option.id,
-        value: option.value
-      });
+
+      return {
+        ...base,
+        value: option.value,
+      };
     });
-    return ({
-      game: selection.game!.id,
-      selected_options: selectedOptions
-    });
+
+    return {
+      game: selection.game.id,
+      selected_options,
+    };
   }
 
+
   function submitGame() {
+    console.log('game selection: ', gameSelection);
     if (gameSelection) {
       const data = transformSubmitData(gameSelection);
       createSelectedGame(data);
@@ -137,8 +172,12 @@ export function useGameSelection() {
     isLoading,
     setGameInformation,
     findChoicesByOption,
-    fetchPlatforms,
-    fetchGames,
-    submitGame
+    submitGame,
+    platform,
+    filter,
+    platforms,
+    gameData,
+    filteredGames,
+    loadPlatformsAndGames
   };
 }

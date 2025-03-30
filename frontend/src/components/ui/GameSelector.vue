@@ -61,28 +61,26 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue';
+import { onMounted } from 'vue';
 import KennerSelect from 'components/inputs/KennerSelect.vue';
 import KennerButton from 'components/buttons/KennerButton.vue';
 import { useGameSelection } from 'src/composables/gameSelection';
 
-const { gameInformation, gameSelection, isLoading, setGameInformation, findChoicesByOption, fetchPlatforms, fetchGames, submitGame } = useGameSelection();
+const {
+  gameInformation,
+    gameSelection,
+    isLoading,
+    setGameInformation,
+    findChoicesByOption,
+    submitGame,
+    platform,
+    filter,
+    platforms,
+    filteredGames,
+    loadPlatformsAndGames
+} = useGameSelection();
 
-const platform = ref();
-const filter = ref('');
-const platforms = ref([]);
-const gameData = ref([]);
-
-onMounted(async () => {
-  platforms.value = await fetchPlatforms();
-  gameData.value = await fetchGames();
-});
-
-const filteredGames = computed(() => {
-  return gameData.value.filter((game) => {
-    return (!platform.value || game.platform === platform.value.id) && (!filter.value || game.name.toLowerCase().includes(filter.value.toLowerCase()));
-  });
-});
+onMounted(loadPlatformsAndGames);
 </script>
 
 <style lang="scss">
