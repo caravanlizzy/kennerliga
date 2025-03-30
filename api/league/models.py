@@ -9,6 +9,7 @@ class League(models.Model):
         PICKING = 'Spielwahl'
         BANNING = 'Bannen'
         PLAYING = 'Spielen'
+        DONE = 'Beendet'
 
     season = models.ForeignKey(
         Season,
@@ -20,6 +21,11 @@ class League(models.Model):
     level = models.IntegerField('1 for L1, 2 for L2 etc.')
     members = models.ManyToManyField('season.SeasonParticipant', related_name='leagues_member')
     active_player = models.ForeignKey('season.SeasonParticipant', on_delete=models.CASCADE, null=True, blank=True)
+    status = models.CharField(
+        max_length=20,
+        choices=LeagueStatus.choices,
+        default=LeagueStatus.PICKING
+    )
 
     def __str__(self):
         return f'{self.season}L{self.level}'

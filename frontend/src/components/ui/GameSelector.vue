@@ -12,16 +12,28 @@
       />
       <q-input v-model="filter" label="Spiel">
         <template v-slot:append>
-          <q-icon v-if="filter" name="close" @click="filter = ''" class="cursor-pointer" />
+          <q-icon
+            v-if="filter"
+            name="close"
+            @click="filter = ''"
+            class="cursor-pointer"
+          />
           <q-icon name="search" />
         </template>
       </q-input>
     </div>
 
     <div class="row games-container q-mt-lg">
-      <div v-for="game in filteredGames" :key="game.id" @click="setGameInformation(game)">
+      <div
+        v-for="game in filteredGames"
+        :key="game.id"
+        @click="setGameInformation(game)"
+      >
         <div
-          :class="{ selected: gameInformation.game && game.id === gameInformation.game.id }"
+          :class="{
+            selected:
+              gameInformation.game && game.id === gameInformation.game.id,
+          }"
           class="q-px-lg q-py-md game-selection-element cursor-pointer"
         >
           {{ game.name.toUpperCase() }}
@@ -34,21 +46,33 @@
     </div>
     <div v-else-if="gameInformation.game" class="q-py-md q-my-md">
       <span class="text-h6">{{ gameInformation.game.name }}</span>
-      <div v-if="!gameInformation.options.length" class="text-italic">Spiel hat keine weiteren Optionen</div>
+      <div v-if="!gameInformation.options.length" class="text-italic">
+        Spiel hat keine weiteren Optionen
+      </div>
       <template v-else>
-        <div v-for="option in gameInformation.options" :key="option.id" class="q-py-sm">
+        <div
+          v-for="option in gameInformation.options"
+          :key="option.id"
+          class="q-py-sm"
+        >
           <template v-if="option.has_choices">
             <kenner-select
               :options="findChoicesByOption(option.id)"
               :label="option.name"
               option-label="name"
-              v-model="gameSelection.selectedOptions.find((o) => o.id == option.id).choice"
+              v-model="
+                gameSelection.selectedOptions.find((o) => o.id == option.id)
+                  .choice
+              "
               class="select-width inline-block"
             />
           </template>
           <template v-else>
             <q-toggle
-              v-model="gameSelection.selectedOptions.find((o) => o.id == option.id).value"
+              v-model="
+                gameSelection.selectedOptions.find((o) => o.id == option.id)
+                  .value
+              "
               :label="option.name"
             />
           </template>
@@ -56,7 +80,14 @@
       </template>
     </div>
 
-    <KennerButton @click="submitGame" type="submit" push color="positive" label="Speichern" class="q-mt-md" />
+    <KennerButton
+      @click="submitGame"
+      type="submit"
+      push
+      color="positive"
+      label="Speichern"
+      class="q-mt-md"
+    />
   </div>
 </template>
 
@@ -68,17 +99,18 @@ import { useGameSelection } from 'src/composables/gameSelection';
 
 const {
   gameInformation,
-    gameSelection,
-    isLoading,
-    setGameInformation,
-    findChoicesByOption,
-    submitGame,
-    platform,
-    filter,
-    platforms,
-    filteredGames,
-    loadPlatformsAndGames
+  gameSelection,
+  isLoading,
+  setGameInformation,
+  findChoicesByOption,
+  submitGame,
+  platform,
+  filter,
+  platforms,
+  filteredGames,
+  loadPlatformsAndGames,
 } = useGameSelection();
+
 
 onMounted(loadPlatformsAndGames);
 </script>

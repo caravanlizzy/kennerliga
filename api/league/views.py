@@ -10,11 +10,10 @@ class LeagueViewSet(ModelViewSet):
     serializer_class = LeagueSerializer
 
 
-class SelectGameView(APIView):
+class NextPlayer(APIView):
     def post(self, request, league_id):
         league = get_object_or_404(League, id=league_id)
         new_active_player = next_player(league)
-
         if new_active_player is None:
             return Response({"detail": "No members in the league."}, status=status.HTTP_400_BAD_REQUEST)
 
