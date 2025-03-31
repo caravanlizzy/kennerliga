@@ -3,14 +3,15 @@ from django.db import models
 from season.models import Season
 
 
+class LeagueStatus(models.TextChoices):
+    PICKING = 'Spielwahl'
+    BANNING = 'Bannen'
+    PLAYING = 'Spielen'
+    DONE = 'Beendet'
+
+
 # Create your models here.
 class League(models.Model):
-    class LeagueStatus(models.TextChoices):
-        PICKING = 'Spielwahl'
-        BANNING = 'Bannen'
-        PLAYING = 'Spielen'
-        DONE = 'Beendet'
-
     season = models.ForeignKey(
         Season,
         on_delete=models.CASCADE,

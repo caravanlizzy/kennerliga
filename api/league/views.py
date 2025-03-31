@@ -2,7 +2,7 @@ from rest_framework.viewsets import ModelViewSet
 from league.models import League
 from league.serializer import LeagueSerializer
 from rest_framework.views import APIView, Response, status
-from league.service import next_player
+from league.service import rotate_active_player
 from django.shortcuts import get_object_or_404
 
 class LeagueViewSet(ModelViewSet):
@@ -13,7 +13,7 @@ class LeagueViewSet(ModelViewSet):
 class NextPlayer(APIView):
     def post(self, request, league_id):
         league = get_object_or_404(League, id=league_id)
-        new_active_player = next_player(league)
+        new_active_player = rotate_active_player(league)
         if new_active_player is None:
             return Response({"detail": "No members in the league."}, status=status.HTTP_400_BAD_REQUEST)
 

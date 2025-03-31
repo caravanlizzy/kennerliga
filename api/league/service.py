@@ -1,3 +1,6 @@
+from game.models import SelectedGame
+
+
 def get_active_player(league):
     """
     Get the currently active player for the given league.
@@ -11,33 +14,71 @@ def get_league_members_order(league):
     return members
 
 
-def next_player(league):
+def rotate_active_player(league, reverse_order=False):
     """
-    Rotate to the next player in the league based on the defined order and set as active player.
+    Rotate to the next player in the league and update the active player.
+    Players are ordered by rank unless reverse_order is True.
     """
-    # Get the ordered members as a list
-    members = list(get_league_members_order(league))
+    ordered_players = list(get_league_members_order(league))
+    if reverse_order:
+        ordered_players = ordered_players[::-1]
 
-    # Check if there are no members in the league
-    if not members:
-        return None  # No members in the league
+    if not ordered_players:
+        return None  # No players in the league
 
-    # Handle the case where there is no active player set
-    active_player = league.active_player
-    if active_player not in members:
-        active_player_index = -1  # Start before the first player
+    current_player = league.active_player
+    if current_player not in ordered_players:
+        current_index = -1  # Start before the first player
     else:
-        active_player_index = members.index(active_player)
+        current_index = ordered_players.index(current_player)
 
-    # Rotate to the next player
-    next_player_index = (active_player_index + 1) % len(members)
-    next_player = members[next_player_index]
+    next_index = (current_index + 1) % len(ordered_players)
+    next_player = ordered_players[next_index]
 
-    # Update the active player in the league
     league.active_player = next_player
     league.save()
 
-    return next_player  # Return the new active player
+    return next_player
+
+
+
+def have_all_players_picked(league):
+    """
+    Check if all players in the league have picked a game.
+    """
+    members = league.members.all()
+    for member in members:
+        if not SelectedGame.objects.filter(league=league, player=member).exists():
+            return False
+    return True
+
+
+def advance_league_turn(league):
+    from league.models import LeagueStatus
+
+    if league.status == LeagueStatus.PICKING:
+        if have_all_players_picked(league):
+            league.status = LeagueStatus.BANNING
+            league.save()
+        else:
+            rotate_active_player(league)
+
+    elif league.status == LeagueStatus.BANNING:
+        if have_all_players_banned(league):
+            league.status = LeagueStatus.PLAYING
+            league.save()
+        else:
+            rotate_active_player(league, reverse_order=True)
+
+    elif league.status == LeagueStatus.PLAYING:
+        rotate_active_player(league)
+
+    elif league.status == LeagueStatus.DONE:
+        rotate_active_player(league)
+
+    else:
+        raise RuntimeError(f"Unhandled league status: {league.status}")
+
 
 
 def select_game(league, player, game):
