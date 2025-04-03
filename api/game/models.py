@@ -7,7 +7,10 @@ from user.models import PlayerProfile, Platform
 class Game(models.Model):
     name = models.CharField(max_length=88)
     platform = models.ForeignKey(Platform, on_delete=models.CASCADE)
-    unique_together = ('name', 'platform')
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=['name', 'platform'], name='unique_game_per_platform')
+        ]
 
     def __str__(self):
         return str(self.name)
@@ -39,7 +42,7 @@ class GameOptionChoice(models.Model):
     )
 
     def __str__(self):
-        return str(self.name)
+        return f"{self.name or '(Unnamed)'} for {self.option.name}"
 
 
 class SelectedGame(models.Model):
@@ -60,6 +63,20 @@ class SelectedOption(models.Model):
 
     def __str__(self):
         return f"Option: {self.game_option.name}, Choice: {self.choice.name if self.choice else 'No choice'}, Value: {self.value}"
+
+
+class BanDecision(models.Model):
+    league = models.ForeignKey(League, on_delete=models.CASCADE, related_name='ban_decisions')
+    player = models.ForeignKey(PlayerProfile, on_delete=models.CASCADE, related_name='ban_decisions')
+    banned_game = models.ForeignKey(SelectedGame, null=True, blank=True, on_delete=models.SET_NULL)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('league', 'player')
+
+    def __str__(self):
+        return f"{self.player} {'banned ' + str(self.banned_game) if self.banned_game else 'skipped banning'} in {self.league}"
 
 
 class StartingPointSystem(models.Model):
@@ -98,4 +115,4 @@ class Faction(models.Model):
     name = models.CharField(max_length=255)
 
     def __str__(self):
-        return str(self.name)
+        return f"{self.name} ({self.game.name})"

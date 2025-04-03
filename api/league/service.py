@@ -66,18 +66,13 @@ def advance_league_turn(league):
     elif league.status == LeagueStatus.BANNING:
         if have_all_players_banned(league):
             league.status = LeagueStatus.PLAYING
+            league.active_player = None
             league.save()
         else:
             rotate_active_player(league, reverse_order=True)
 
-    elif league.status == LeagueStatus.PLAYING:
-        rotate_active_player(league)
-
-    elif league.status == LeagueStatus.DONE:
-        rotate_active_player(league)
-
     else:
-        raise RuntimeError(f"Unhandled league status: {league.status}")
+        print("No more rotation required since LeagueStatus is PLAYING or DONE. Current LeagueStatus: " + league.status)
 
 
 

@@ -90,6 +90,15 @@ class SelectedGameViewSet(ModelViewSet):
     serializer_class = SelectedGameSerializer
     filterset_fields = ['league']
 
+    def perform_create(self, serializer):
+        selected_game = serializer.save()
+
+        # Post-save logic:
+        league = selected_game.league
+
+        league.next_player()
+        league.check_state()
+
 
 class SelectedOptionViewSet(ModelViewSet):
     queryset = SelectedOption.objects.all()
