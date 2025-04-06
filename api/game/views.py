@@ -1,5 +1,5 @@
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.viewsets import ModelViewSet
+from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
 from rest_framework.response import Response
 from rest_framework import status
 
@@ -7,7 +7,7 @@ from game.models import Game, GameOption, GameOptionChoice, Faction, TieBreaker,
     Platform, SelectedGame, SelectedOption
 from game.serializers import GameSerializer, GameOptionSerializer, GameOptionChoiceSerializer, FactionSerializer, \
     TieBreakerSerializer, ResultConfigSerializer, StartingPointSystemSerializer, PlatformSerializer, \
-    SelectedGameSerializer, SelectedOptionSerializer
+    SelectedGameSerializer, SelectedOptionSerializer, FullGameSerializer
 
 
 class GameViewSet(ModelViewSet):
@@ -22,7 +22,7 @@ class GameDetailsViewSet(ModelViewSet):
     permission_classes = [IsAuthenticated]
 
     def retrieve(self, request, *args, **kwargs):
-        # Get the specific Game instance
+        # Get the specific Game instances
         game = self.get_object()
         print(game)
 
@@ -47,6 +47,12 @@ class GameOptionViewSet(ModelViewSet):
     queryset = GameOption.objects.all()
     serializer_class = GameOptionSerializer
     filterset_fields = ['game']
+    permission_classes = [IsAuthenticated]
+
+
+class FullGameViewSet(ReadOnlyModelViewSet):
+    queryset = Game.objects.all().prefetch_related('options__choices')
+    serializer_class = FullGameSerializer
     permission_classes = [IsAuthenticated]
 
 
