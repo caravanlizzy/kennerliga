@@ -15,44 +15,37 @@ class GameViewSet(ModelViewSet):
     serializer_class = GameSerializer
     permission_classes = [IsAuthenticated]
 
-
-class GameDetailsViewSet(ModelViewSet):
-    queryset = Game.objects.all()
-    serializer_class = GameSerializer
-    permission_classes = [IsAuthenticated]
-
-    def retrieve(self, request, *args, **kwargs):
-        # Get the specific Game instances
-        game = self.get_object()
-        print(game)
-
-        # Serialize the main game data
-        game_data = GameSerializer(game).data
-
-        # Serialize related GameOptions and their choices
-        options_data = []
-        for option in game.options.all():
-            option_data = GameOptionSerializer(option).data
-            choices_data = GameOptionChoiceSerializer(option.choices.all(), many=True).data
-            option_data['choices'] = choices_data  # Add choices data to each option
-            options_data.append(option_data)
-
-        # Add the options with choices to the main game data
-        game_data['options'] = options_data
-
-        return Response(game_data, status=status.HTTP_200_OK)
+# Not required since FullGameViewSet covers all of this automatically
+# class GameDetailsViewSet(ModelViewSet):
+#     queryset = Game.objects.all()
+#     serializer_class = GameSerializer
+#     permission_classes = [IsAuthenticated]
+#
+#     def retrieve(self, request, *args, **kwargs):
+#         # Get the specific Game instances
+#         game = self.get_object()
+#
+#         # Serialize the main game data
+#         game_data = GameSerializer(game).data
+#
+#         # Serialize related GameOptions and their choices
+#         options_data = []
+#         for option in game.options.all():
+#             option_data = GameOptionSerializer(option).data
+#             choices_data = GameOptionChoiceSerializer(option.choices.all(), many=True).data
+#             option_data['choices'] = choices_data  # Add choices data to each option
+#             options_data.append(option_data)
+#
+#         # Add the options with choices to the main game data
+#         game_data['options'] = options_data
+#         print(game_data)
+#         return Response(game_data, status=status.HTTP_200_OK)
 
 
 class GameOptionViewSet(ModelViewSet):
     queryset = GameOption.objects.all()
     serializer_class = GameOptionSerializer
     filterset_fields = ['game']
-    permission_classes = [IsAuthenticated]
-
-
-class FullGameViewSet(ReadOnlyModelViewSet):
-    queryset = Game.objects.all().prefetch_related('options__choices')
-    serializer_class = FullGameSerializer
     permission_classes = [IsAuthenticated]
 
 
@@ -109,3 +102,9 @@ class SelectedGameViewSet(ModelViewSet):
 class SelectedOptionViewSet(ModelViewSet):
     queryset = SelectedOption.objects.all()
     serializer_class = SelectedOptionSerializer
+
+
+class FullGameViewSet(ModelViewSet):
+    queryset = Game.objects.all().prefetch_related('options__choices')
+    serializer_class = FullGameSerializer
+    permission_classes = [IsAuthenticated]

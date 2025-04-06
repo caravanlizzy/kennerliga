@@ -8,7 +8,7 @@
       <Announcements v-if="announcements.length > 0" />
     </q-header>
 
-<!--    <KennerDrawer v-model="drawerState" />-->
+    <KennerDrawer v-model="drawerState" />
 
     <q-page-container class="flex column justify-center">
       <DevTools v-if="isDev"/>
@@ -28,6 +28,7 @@ import { useResponsive } from 'src/composables/reponsive';
 import Announcements from 'components/ui/AnnouncementList.vue';
 import DevTools from 'components/DevTools.vue';
 import { useAnnouncementStore } from 'stores/announcementStore';
+import KennerDrawer from 'components/drawer/KennerDrawer.vue';
 
 const store = useUserStore();
 const { announcements } = useAnnouncementStore();

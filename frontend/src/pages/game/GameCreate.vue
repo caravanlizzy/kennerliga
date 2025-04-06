@@ -70,32 +70,79 @@ function addEmptyOption(): void {
 }
 
 
+// const onSubmit = async () => {
+//   try {
+//     if (platform.value === undefined) return;
+//     const gameId = await createGame(name.value, platform.value);
+//     await createOptions(gameId, gameOptions.value);
+//     if (resultConfig !== undefined) {
+//       await createResultConfigData(gameId, resultConfig);
+//     } else {
+//       console.log('Missing result config');
+//       return;
+//     }
+//     $q.notify({
+//       color: 'positive',
+//       textColor: 'white',
+//       icon: 'save',
+//       message: 'Gespeichert'
+//     });
+//     await router.push({ name: 'games' });
+//   } catch (e) {
+//     console.log('Could not create game because ', e);
+//     const message = 'Fehler ' + errorMessages.value;
+//     $q.notify({
+//       color: 'negative',
+//       textColor: 'white',
+//       icon: 'warning',
+//       message: message
+//     });
+//   }
+// };
 const onSubmit = async () => {
   try {
-    if (platform.value === undefined) return;
-    const gameId = await createGame(name.value, platform.value);
-    await createOptions(gameId, gameOptions.value);
+    if (!platform.value) return;
+
+    const payload = {
+      name: name.value,
+      platform: platform.value.id,
+      options: gameOptions.value.map(option => ({
+        name: option.title,
+        has_choices: option.hasChoices,
+        only_if_option: option.onlyIfOptionId || null,
+        only_if_choice: option.onlyIfChoiceId || null,
+        only_if_value: option.onlyIfValue ?? null,
+        choices: option.choices.map(choice => ({
+          name: choice.name
+        }))
+      }))
+    };
+
+    const { data: game } = await api.post('/game/games-full/', payload);
+
     if (resultConfig !== undefined) {
-      await createResultConfigData(gameId, resultConfig);
+      await createResultConfigData(game.id, resultConfig); // keep this separate for now
     } else {
-      console.log('Missing result config');
+      console.warn('Missing result config');
       return;
     }
+
     $q.notify({
       color: 'positive',
       textColor: 'white',
       icon: 'save',
       message: 'Gespeichert'
     });
+
     await router.push({ name: 'games' });
+
   } catch (e) {
-    console.log('Could not create game because ', e);
-    const message = 'Fehler ' + errorMessages.value;
+    console.error('Could not create game because', e);
     $q.notify({
       color: 'negative',
       textColor: 'white',
       icon: 'warning',
-      message: message
+      message: 'Fehler beim Speichern'
     });
   }
 };

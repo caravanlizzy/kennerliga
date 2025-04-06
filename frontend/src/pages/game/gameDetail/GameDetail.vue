@@ -49,7 +49,7 @@ import { computed, ref } from 'vue';
 const route = useRoute();
 const isLoading = ref(true);
 
-const { data: game } = await api(`game/game-details/${route.params.id}`);
+const { data: game } = await api(`game/games-full/${route.params.id}`);
 
 const { data: [resultConfig] } = await api(`game/result-configs/?game=${route.params.id}`);
 const { data: tieBreakers } = await api(`game/tie-breakers/?result_config=${resultConfig.id}`);

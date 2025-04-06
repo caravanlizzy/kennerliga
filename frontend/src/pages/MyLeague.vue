@@ -66,7 +66,6 @@
 <script setup lang="ts">
 import GameSelector from 'components/ui/GameSelector.vue';
 import { computed, onMounted, ref } from 'vue';
-import KennerButton from 'components/buttons/KennerButton.vue';
 import { api } from 'boot/axios';
 
 const league = ref();
@@ -118,15 +117,6 @@ async function fetchLeagueMembers(leagueData: any) {
   );
   members.value = memberData;
   return memberData;
-}
-
-function next() {
-  api({
-    url: '/league/1/next-player/',
-    method: 'POST',
-  }).then(() => {
-    fetchLeague();
-  });
 }
 
 const isActive = ref(true);

@@ -128,7 +128,7 @@ class FullGameOptionChoiceSerializer(serializers.ModelSerializer):
         fields = ['id', 'name']
 
 class FullGameOptionSerializer(serializers.ModelSerializer):
-    choices = GameOptionChoiceSerializer(many=True, read_only=True)
+    choices = FullGameOptionChoiceSerializer(many=True)
 
     class Meta:
         model = GameOption
@@ -138,8 +138,38 @@ class FullGameOptionSerializer(serializers.ModelSerializer):
         ]
 
 class FullGameSerializer(serializers.ModelSerializer):
-    options = FullGameOptionSerializer(many=True, read_only=True)
+    options = FullGameOptionSerializer(many=True)
 
     class Meta:
         model = Game
         fields = ['id', 'name', 'platform', 'options']
+
+    def create(self, validated_data):
+        options_data = validated_data.pop('options', [])
+        game = Game.objects.create(**validated_data)
+
+        for option_data in options_data:
+            choices_data = option_data.pop('choices', [])
+            option = GameOption.objects.create(game=game, **option_data)
+            for choice_data in choices_data:
+                GameOptionChoice.objects.create(option=option, **choice_data)
+
+        return game
+
+    def update(self, instance, validated_data):
+        options_data = validated_data.pop('options', [])
+
+        instance.name = validated_data.get('name', instance.name)
+        instance.platform = validated_data.get('platform', instance.platform)
+        instance.save()
+
+        # Replace all existing options and choices (naive approach)
+        instance.options.all().delete()
+
+        for option_data in options_data:
+            choices_data = option_data.pop('choices', [])
+            option = GameOption.objects.create(game=instance, **option_data)
+            for choice_data in choices_data:
+                GameOptionChoice.objects.create(option=option, **choice_data)
+
+        return instance
