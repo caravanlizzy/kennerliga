@@ -1,23 +1,29 @@
 <template>
   <div
-    :class="`announcement bg-${background} q-px-lg q-py-md column ${
-      props.type === 'NEUTRAL' ? 'text-primary' : 'text-white'
-    }`"
+    class="q-pa-md q-mb-sm full-width flex flex-center"
+    :class="[
+      `bg-${background}`,
+      props.type === 'NEUTRAL' ? 'text-primary' : 'text-white',
+      `border-top border-${border}`
+    ]"
   >
-    <div class="text-bold">
-      <slot name="title" />
+    <div class="column items-center q-px-md q-mx-auto" style="max-width: 1200px; width: 100%">
+      <div v-if="$slots.title" class="text-subtitle1 text-weight-medium q-mb-xs text-center">
+        <slot name="title" />
+      </div>
+      <div v-if="$slots.content" class="text-body2 text-center">
+        <slot name="content" />
+      </div>
     </div>
-    <p class="">
-      <slot name="content" />
-    </p>
   </div>
 </template>
+
 <script setup lang="ts">
 import { computed } from 'vue';
 
 const props = defineProps<{ type: string }>();
 
-const typeToBackgroundMap: { [key: string]: string } = {
+const typeToBackgroundMap: Record<string, string> = {
   WINNER: 'secondary',
   INFO: 'primary',
   REGISTER: 'info',
@@ -25,18 +31,18 @@ const typeToBackgroundMap: { [key: string]: string } = {
   NEUTRAL: 'grey-2',
 };
 
-const typeToBorderMap: { [key: string]: string } = {
+const typeToBorderMap: Record<string, string> = {
   WINNER: 'secondary',
   INFO: 'primary',
   REGISTER: 'info',
   WARNING: 'negative',
-  NEUTRAL: 'grey-2',
-}
+  NEUTRAL: 'grey-4',
+};
 
-const background = computed(() => {
-  return typeToBackgroundMap[props.type];
-});
+const background = computed(() => typeToBackgroundMap[props.type] || 'grey-2');
+const border = computed(() => typeToBorderMap[props.type] || 'grey-4');
 </script>
+
 
 <style scoped lang="scss">
 .announcement {
