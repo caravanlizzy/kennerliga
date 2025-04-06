@@ -4,10 +4,10 @@ from season.models import Season
 
 
 class LeagueStatus(models.TextChoices):
-    PICKING = 'Spielwahl'
-    BANNING = 'Bannen'
-    PLAYING = 'Spielen'
-    DONE = 'Beendet'
+    PICKING = 'PICKING'
+    BANNING = 'BANNING'
+    PLAYING = 'PLAYING'
+    DONE = 'DONE'
 
 
 # Create your models here.

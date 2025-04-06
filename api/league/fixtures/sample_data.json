@@ -6,7 +6,8 @@
       "season": 1,
       "level": 1,
       "members": [1, 2, 3, 4, 5],
-      "active_player": 1
+      "active_player": 1,
+      "status": "PICKING"
     }
   }
 ]
