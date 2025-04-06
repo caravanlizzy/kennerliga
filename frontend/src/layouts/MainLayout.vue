@@ -4,11 +4,11 @@
       <q-toolbar class="background-navbar">
         <NavBar :onToggle="toggleDrawer" />
       </q-toolbar>
-      <BreadCrumbs v-if="isAuthenticated" />
-      <Announcements />
+<!--      <BreadCrumbs v-if="isAuthenticated" />-->
+      <Announcements v-if="announcements.length > 0" />
     </q-header>
 
-    <KennerDrawer v-model="drawerState" />
+<!--    <KennerDrawer v-model="drawerState" />-->
 
     <q-page-container class="flex column justify-center">
       <DevTools v-if="isDev"/>
@@ -20,19 +20,19 @@
 </template>
 
 <script setup lang="ts">
-import BreadCrumbs from 'components/nav/BreadCrumbs.vue';
 import NavBar from 'components/nav/NavBar.vue';
 import { useUserStore } from 'stores/userStore';
 import { storeToRefs } from 'pinia';
-import KennerDrawer from 'components/drawer/KennerDrawer.vue';
 import { ref, Ref } from 'vue';
 import { useResponsive } from 'src/composables/reponsive';
 import Announcements from 'components/ui/AnnouncementList.vue';
 import DevTools from 'components/DevTools.vue';
+import { useAnnouncementStore } from 'stores/announcementStore';
 
 const store = useUserStore();
+const { announcements } = useAnnouncementStore();
 const { isMobile } = useResponsive();
-const { isAuthenticated, isDev } = storeToRefs(store);
+const { isDev } = storeToRefs(store);
 const drawerState: Ref<boolean> = ref(false);
 
 function toggleDrawer(): void {

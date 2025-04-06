@@ -13,10 +13,7 @@
 <script setup lang="ts">
 import AnnouncementCard from 'components/cards/AnnouncementCard.vue';
 import { useAnnouncementStore } from 'stores/announcementStore';
-import { storeToRefs } from 'pinia';
 
-const announcementStore = useAnnouncementStore();
-const { announcements } = storeToRefs(announcementStore);
-const { fetchAnnouncements } = announcementStore;
+const { announcements, fetchAnnouncements } = useAnnouncementStore();
 fetchAnnouncements();
 </script>
