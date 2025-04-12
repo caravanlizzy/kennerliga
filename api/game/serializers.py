@@ -1,7 +1,7 @@
 from rest_framework.serializers import ModelSerializer
 from rest_framework import serializers
 from game.models import Game, GameOption, GameOptionChoice, Faction, TieBreaker, ResultConfig, StartingPointSystem, \
-    Platform, SelectedGame, SelectedOption
+    Platform, SelectedGame, SelectedOption, BanDecision
 from league.models import League
 from user.models import PlayerProfile
 from user.service import get_profile_by_username, find_users_current_league
@@ -173,3 +173,12 @@ class FullGameSerializer(serializers.ModelSerializer):
                 GameOptionChoice.objects.create(option=option, **choice_data)
 
         return instance
+
+
+class BanDecisionSerializer(serializers.ModelSerializer):
+    player_name = serializers.CharField(source='player.profile_name', read_only=True)
+    banned_game_name = serializers.CharField(source='banned_game.game.name', read_only=True)
+
+    class Meta:
+        model = BanDecision
+        fields = ['player', 'player_name', 'banned_game', 'banned_game_name', 'created_at']
