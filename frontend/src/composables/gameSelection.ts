@@ -30,7 +30,7 @@ export function useGameSelection() {
   const platform = ref();
   const filter = ref('');
   const platforms = ref([]);
-  const gameData = ref([]);
+  const gameData = ref<GameDto[]>([]);
 
   const filteredGames = computed(() => {
     return gameData.value.filter((game) => {
