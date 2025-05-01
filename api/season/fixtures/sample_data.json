@@ -9,51 +9,6 @@
     }
   },
   {
-  "model": "season.seasonparticipant",
-  "pk": 1,
-  "fields": {
-    "season": 1,
-    "profile": 1,
-    "rank": 1
-  }
-},
-{
-  "model": "season.seasonparticipant",
-  "pk": 2,
-  "fields": {
-    "season": 1,
-    "profile": 2,
-    "rank": 2
-  }
-},
-{
-  "model": "season.seasonparticipant",
-  "pk": 3,
-  "fields": {
-    "season": 1,
-    "profile": 3,
-    "rank": 3
-  }
-},
-{
-  "model": "season.seasonparticipant",
-  "pk": 4,
-  "fields": {
-    "season": 1,
-    "profile": 4,
-    "rank": 4
-  }
-},
-{
-  "model": "season.seasonparticipant",
-  "pk": 5,
-  "fields": {
-    "season": 1,
-    "profile": 5,
-    "rank": 5
-  }
-},
-  {
     "model": "season.season",
     "pk": 2,
     "fields": {
@@ -339,6 +294,51 @@
       "year": 2020,
       "month": 9,
       "status": "Nächste"
+    }
+  },
+  {
+    "model": "season.seasonparticipant",
+    "pk": 1,
+    "fields": {
+      "season": 1,
+      "profile": 1,
+      "rank": 1
+    }
+  },
+  {
+    "model": "season.seasonparticipant",
+    "pk": 2,
+    "fields": {
+      "season": 1,
+      "profile": 2,
+      "rank": 2
+    }
+  },
+  {
+    "model": "season.seasonparticipant",
+    "pk": 3,
+    "fields": {
+      "season": 1,
+      "profile": 3,
+      "rank": 3
+    }
+  },
+  {
+    "model": "season.seasonparticipant",
+    "pk": 4,
+    "fields": {
+      "season": 1,
+      "profile": 4,
+      "rank": 4
+    }
+  },
+  {
+    "model": "season.seasonparticipant",
+    "pk": 5,
+    "fields": {
+      "season": 1,
+      "profile": 5,
+      "rank": 5
     }
   }
 ]

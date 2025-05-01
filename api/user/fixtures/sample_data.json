@@ -4,7 +4,7 @@
     "pk": 1,
     "fields": {
       "password": "pbkdf2_sha256$870000$3bLxuv1fFYsopmMwqCu5v5$mQCaOcSa4sr515D761jP9bSX/oB7x0FD2D0ZTbxUmso=",
-      "last_login": "2024-10-23T11:33:05.613Z",
+      "last_login": "2025-04-06T10:24:35.520Z",
       "is_superuser": true,
       "email": "asdf@sdfas.de",
       "is_staff": true,
@@ -35,13 +35,13 @@
     "model": "user.user",
     "pk": 3,
     "fields": {
-      "password": "",
+      "password": "pbkdf2_sha256$870000$89nqJcH5Q1B9XjXDwucazi$2jh+JIK0rQx44Rr3XHKuUoORVTvvFsWLJIrE0G+UKp8=",
       "last_login": null,
       "is_superuser": false,
       "email": "",
       "is_staff": false,
       "is_active": true,
-      "date_joined": "2024-10-23T11:38:17.999Z",
+      "date_joined": "2024-10-23T11:38:17Z",
       "username": "MissM1",
       "groups": [],
       "user_permissions": []
@@ -51,13 +51,13 @@
     "model": "user.user",
     "pk": 4,
     "fields": {
-      "password": "",
+      "password": "pbkdf2_sha256$870000$rj7g587nGYQgEFZiUcOIYn$UtH6NWSow/rTI5bBJ1EVw7wmrSAPrUWChpV+/JhigTs=",
       "last_login": null,
       "is_superuser": false,
       "email": "",
       "is_staff": false,
       "is_active": true,
-      "date_joined": "2024-10-23T11:38:27.807Z",
+      "date_joined": "2024-10-23T11:38:27Z",
       "username": "Markus1711",
       "groups": [],
       "user_permissions": []
@@ -67,13 +67,13 @@
     "model": "user.user",
     "pk": 5,
     "fields": {
-      "password": "",
+      "password": "pbkdf2_sha256$870000$67wdOh9e5CxArLOfS7TAnE$XBBGknK49WFlmVx4Oid/G4H3fLKY6A2cG++x+8i2B7I=",
       "last_login": null,
       "is_superuser": false,
       "email": "",
       "is_staff": false,
       "is_active": true,
-      "date_joined": "2024-10-23T11:38:36.886Z",
+      "date_joined": "2024-10-23T11:38:36Z",
       "username": "chefkoch07",
       "groups": [],
       "user_permissions": []
