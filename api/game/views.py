@@ -9,6 +9,8 @@ from game.serializers import GameSerializer, GameOptionSerializer, GameOptionCho
     TieBreakerSerializer, ResultConfigSerializer, StartingPointSystemSerializer, PlatformSerializer, \
     SelectedGameSerializer, SelectedOptionSerializer, FullGameSerializer
 
+from league.service import advance_league_turn, rotate_active_player
+
 
 class GameViewSet(ModelViewSet):
     queryset = Game.objects.all()
@@ -68,8 +70,8 @@ class SelectedGameViewSet(ModelViewSet):
         # Post-save logic:
         league = selected_game.league
 
-        league.next_player()
-        league.check_state()
+        rotate_active_player(league)
+        advance_league_turn(league)
 
 
 class SelectedOptionViewSet(ModelViewSet):

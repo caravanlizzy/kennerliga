@@ -81,7 +81,7 @@ def find_users_current_league(profile):
         # Get the league for the running season
         league = League.objects.get(season__status=Season.SeasonStatus.RUNNING)
         # Check if the profile is a member of the league
-        if profile in league.members.all():  # Adjust `members` to the actual related name
+        if league.members.filter(profile=profile).exists():
             return league
         return None
     except PlayerProfile.DoesNotExist:

@@ -48,7 +48,7 @@ def have_all_players_picked(league):
     """
     members = league.members.all()
     for member in members:
-        if not SelectedGame.objects.filter(league=league, player=member).exists():
+        if not SelectedGame.objects.filter(league=league, player=member.profile).exists():
             return False
     return True
 
