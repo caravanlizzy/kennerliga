@@ -16,7 +16,8 @@
           text-color="white"
           class="q-mr-xs q-ml-md"
         >
-          <q-icon name="play_arrow" size="16px" class="q-mr-xs" />
+          <q-icon name="play_arrow" size="15px" class="q-mr-xs" />
+          <span v-if="isActive"> {{ statusVerb }} </span>
         </q-badge>
       </div>
 
@@ -28,6 +29,7 @@
           text-color="white"
         >
           GAME
+          <q-icon name="check"/>
         </q-badge>
         <q-badge
           v-if="member.banned_game"
@@ -35,6 +37,7 @@
           text-color="white"
         >
           BAN
+          <q-icon name="check"/>
         </q-badge>
       </div>
     </div>
@@ -69,5 +72,6 @@
 defineProps<{
   member: any;
   isActive: boolean;
+  statusVerb: string;
 }>();
 </script>

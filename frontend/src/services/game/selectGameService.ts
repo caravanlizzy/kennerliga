@@ -15,6 +15,7 @@ export async function createSelectedGame(
   }
 
   try {
+    console.log(data)
     await api('/game/selected-games/', {
       method: 'POST',
       data

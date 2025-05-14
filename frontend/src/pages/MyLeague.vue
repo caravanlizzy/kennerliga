@@ -5,7 +5,7 @@
       class="q-pa-lg column justify-center items-center text-primary border border-primary rounded-borders"
     >
       <div class="text-h6 text-uppercase text-weight-bold q-mb-sm">
-        {{ statusNoun }}
+        {{ statusNoun }} {{  }}
       </div>
 
       <div class="text-subtitle1 text-center">
@@ -19,6 +19,9 @@
       </div>
     </div>
 
+    <!-- Game Selector -->
+    <GameSelector v-if="isActive" class="q-mt-xl"/>
+
     <!-- Player Cards -->
     <div
       style="display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; height: 100%; gap: 0;"
@@ -28,19 +31,12 @@
         :key="member.id"
         :class="getQuadrantBorder(index)"
       >
-        <LeagueUserCard :member="member" :isActive="member.is_active_player" />
+        <LeagueUserCard :statusVerb="statusVerb" :member="member" :isActive="member.is_active_player"/>
       </div>
     </div>
 
-
-    <!-- Game Selector -->
-    <GameSelector v-if="isActive" class="q-mt-xl" />
   </div>
 </template>
-
-
-
-
 
 
 <script setup lang="ts">
@@ -65,7 +61,7 @@ const getQuadrantBorder = (index: number) => {
     case 3:
       return `border-left border-top`;
     default:
-      return base;
+      return '';
   }
 };
 
@@ -119,15 +115,19 @@ const statusVerb = computed(() =>
 .gradient {
   background: linear-gradient(to bottom, #fafafa, #f0f0f0);
 }
+
 .border-top {
   border-top: 1px solid #ccc;
 }
+
 .border-right {
   border-right: 1px solid #ccc;
 }
+
 .border-bottom {
   border-bottom: 1px solid #ccc;
 }
+
 .border-left {
   border-left: 1px solid #ccc;
 }
