@@ -5,3 +5,4 @@ django-cors-headers
 django-filter
 django-extensions
 setuptools
+python-dotenv

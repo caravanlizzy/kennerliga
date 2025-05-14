@@ -1,11 +1,14 @@
+import os
 from .settings import *
+
+SECRET_KEY = os.getenv("SECRET_KEY")
 
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'haligh$kennerliga',
-        'USER': 'haligh',
-        'PASSWORD': 'kennerdatabasessssssss1117',
-        'HOST': 'haligh.mysql.pythonanywhere-services.com',
+        'NAME': os.getenv("DB_NAME"),
+        'USER': os.getenv("DB_USER"),
+        'PASSWORD': os.getenv("DB_PASSWORD"),
+        'HOST': os.getenv("DB_HOST"),
     }
 }
