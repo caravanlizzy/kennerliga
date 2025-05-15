@@ -29,15 +29,13 @@
         :key="game.id"
         @click="setGameInformation(game)"
       >
-        <div
-          :class="{
-            selected:
-              gameInformation.game && game.id === gameInformation.game.id,
-          }"
-          class="q-px-lg q-py-md game-selection-element cursor-pointer"
+        <q-btn
+          rounded
+          :color="gameInformation.game && game.id === gameInformation.game.id ? 'accent' : 'primary'"
+          class="q-px-lg q-py-md cursor-pointer q-ma-xs hover:text-secondary"
         >
           {{ game.name.toUpperCase() }}
-        </div>
+        </q-btn>
       </div>
     </div>
 
@@ -111,7 +109,6 @@ const {
   loadPlatformsAndGames,
 } = useGameSelection();
 
-
 onMounted(loadPlatformsAndGames);
 </script>
 
@@ -128,21 +125,7 @@ onMounted(loadPlatformsAndGames);
   }
 }
 
-.selected {
-  color: $accent;
-  outline: $primary;
-
-  //&:hover {
-  //  color: $accent;
-  //}
-}
-
 .select-width {
   width: 140px;
-}
-
-.games-container {
-  border-right: 2px solid $secondary;
-  border-left: 2px solid $secondary;
 }
 </style>
