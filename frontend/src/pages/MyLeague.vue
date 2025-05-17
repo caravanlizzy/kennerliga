@@ -63,13 +63,13 @@ import LeagueUserCard from 'components/cards/LeagueUserCard.vue';
 const getQuadrantBorder = (index: number) => {
   switch (index) {
     case 0:
-      return `border-right border-bottom`;
+      return 'border-right border-bottom';
     case 1:
-      return `border-left border-bottom`;
+      return 'border-left border-bottom';
     case 2:
-      return `border-right border-top`;
+      return 'border-right border-top';
     case 3:
-      return `border-left border-top`;
+      return 'border-left border-top';
     default:
       return '';
   }
@@ -125,10 +125,6 @@ const statusVerb = computed(() =>
 </script>
 
 <style scoped>
-.gradient {
-  background: linear-gradient(to bottom, #fafafa, #f0f0f0);
-}
-
 .border-top {
   border-top: 1px solid #ccc;
 }
