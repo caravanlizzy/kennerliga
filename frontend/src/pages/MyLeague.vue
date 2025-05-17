@@ -28,7 +28,7 @@
         class="q-mx-md"
         @click="() => selectedBan = selectedGame"
         v-for="selectedGame of selectedGames" :key="selectedGame">
-        {{ selectedGame}}
+        {{ selectedGame }}
       </q-btn>
     </div>
 

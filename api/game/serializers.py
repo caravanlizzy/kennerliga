@@ -64,6 +64,7 @@ class SelectedOptionSerializer(serializers.ModelSerializer):
 
 
 class SelectedGameSerializer(serializers.ModelSerializer):
+    game_name = serializers.SerializerMethodField()
     selected_options = SelectedOptionSerializer(many=True)
 
     # Optional write-only fields that aren't part of the model
@@ -72,7 +73,10 @@ class SelectedGameSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = SelectedGame
-        fields = ['id', 'game', 'selected_options', 'leagueId', 'playerProfileId']
+        fields = ['id', 'game', 'game_name', 'selected_options', 'leagueId', 'playerProfileId']
+
+    def get_game_name(self, obj):
+        return obj.game.name if obj.game else None
 
     def set_player_and_league(self, validated_data):
         # Set player

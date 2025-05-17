@@ -46,7 +46,7 @@
     <div class="q-mt-xl">
       <div v-if="member.selected_game" class="q-mb-sm">
         <div class="text-body2 text-weight-bold">
-          {{ member.selected_game }}
+          {{ member.selected_game.game_name }}
         </div>
       </div>
 
