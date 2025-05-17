@@ -22,7 +22,12 @@
     <!-- Game Selector -->
     <GameSelector v-if="isActive && league.status === 'PICKING'" @submit-success="fetchLeagueDetails" class="q-mt-xl"/>
     <div class="q-pa-lg" v-if="isActive && league.status ==='BANNING'">
-      <q-btn size="lg" text-color="primary" class="q-mx-md" v-for="selectedGame of selectedGames" :key="selectedGame">
+      <q-btn
+        size="lg"
+        :color="selectedGame === selectedBan ? 'accent' : undefined"
+        class="q-mx-md"
+        @click="() => selectedBan = selectedGame"
+        v-for="selectedGame of selectedGames" :key="selectedGame">
         {{ selectedGame}}
       </q-btn>
     </div>
@@ -73,6 +78,7 @@ const getQuadrantBorder = (index: number) => {
 const league = ref<any>(null);
 const members = ref<any[]>([]);
 const selectedGames = computed(() => league.value?.members.map((member) => member.selected_game));
+const selectedBan = ref<any>(null);
 const { isMe } = useUserStore();
 
 const myleagueId = 1;
