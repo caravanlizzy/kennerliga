@@ -5,7 +5,7 @@
     "fields": {
       "season": 1,
       "level": 1,
-      "active_player": 5,
+      "active_player": 1,
       "status": "PICKING",
       "members": [
         1,

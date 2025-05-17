@@ -1,4 +1,4 @@
-from game.models import SelectedGame
+from game.models import SelectedGame, BanDecision
 
 
 def get_active_player(league):
@@ -20,6 +20,7 @@ def rotate_active_player(league, reverse_order=False):
     Players are ordered by rank unless reverse_order is True.
     """
     ordered_players = list(get_league_members_order(league))
+
     if reverse_order:
         ordered_players = ordered_players[::-1]
 
@@ -41,7 +42,6 @@ def rotate_active_player(league, reverse_order=False):
     return next_player
 
 
-
 def have_all_players_picked(league):
     """
     Check if all players in the league have picked a game.
@@ -53,12 +53,25 @@ def have_all_players_picked(league):
     return True
 
 
+def have_all_players_banned(league):
+    """
+    Check if all players in the league have banned a game.
+    """
+    members = league.members.all()
+    for member in members:
+        if not BanDecision.objects.filter(league=league, player=member.profile).exists():
+            return False
+    return True
+
+
 def advance_league_turn(league):
     from league.models import LeagueStatus
 
     if league.status == LeagueStatus.PICKING:
         if have_all_players_picked(league):
             league.status = LeagueStatus.BANNING
+            ordered_players = list(get_league_members_order(league))
+            league.active_player = ordered_players[len(ordered_players) - 1]
             league.save()
         else:
             rotate_active_player(league)
@@ -73,7 +86,6 @@ def advance_league_turn(league):
 
     else:
         print("No more rotation required since LeagueStatus is PLAYING or DONE. Current LeagueStatus: " + league.status)
-
 
 
 def select_game(league, player, game):

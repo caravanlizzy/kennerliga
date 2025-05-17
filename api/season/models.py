@@ -9,10 +9,10 @@ from user.models import PlayerProfile  # Assuming this is your participant model
 # Create your models here.
 class Season(models.Model):
     class SeasonStatus(models.TextChoices):
-        NEXT = 'Nächste'
-        OPEN = 'Anmeldung offen'
-        RUNNING = 'Laufend'
-        DONE = 'Beendet'
+        NEXT = 'NEXT'
+        OPEN = 'OPEN'
+        RUNNING = 'RUNNING'
+        DONE = 'DONE'
 
     year = models.IntegerField()
     month = models.IntegerField(

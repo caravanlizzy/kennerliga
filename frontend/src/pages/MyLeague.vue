@@ -20,7 +20,12 @@
     </div>
 
     <!-- Game Selector -->
-    <GameSelector v-if="isActive" class="q-mt-xl"/>
+    <GameSelector v-if="isActive && league.status === 'PICKING'" @submit-success="fetchLeagueDetails" class="q-mt-xl"/>
+    <div class="q-pa-lg" v-if="isActive && league.status ==='BANNING'">
+      <q-btn size="lg" text-color="primary" class="q-mx-md" v-for="selectedGame of selectedGames" :key="selectedGame">
+        {{ selectedGame}}
+      </q-btn>
+    </div>
 
     <!-- Player Cards -->
     <div
@@ -67,6 +72,7 @@ const getQuadrantBorder = (index: number) => {
 
 const league = ref<any>(null);
 const members = ref<any[]>([]);
+const selectedGames = computed(() => league.value?.members.map((member) => member.selected_game));
 const { isMe } = useUserStore();
 
 const myleagueId = 1;
@@ -109,6 +115,7 @@ const statusNoun = computed(() =>
 const statusVerb = computed(() =>
   statusMap[league.value?.status as LeagueStatus]?.verb ?? ''
 );
+
 </script>
 
 <style scoped>

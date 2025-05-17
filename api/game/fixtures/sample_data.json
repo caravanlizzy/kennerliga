@@ -1856,35 +1856,6 @@
     }
   },
   {
-    "model": "game.selectedgame",
-    "pk": 1,
-    "fields": {
-      "player": 1,
-      "game": 1,
-      "league": 1
-    }
-  },
-  {
-    "model": "game.selectedoption",
-    "pk": 1,
-    "fields": {
-      "selected_game": 1,
-      "game_option": 1,
-      "choice": 2,
-      "value": null
-    }
-  },
-  {
-    "model": "game.selectedoption",
-    "pk": 2,
-    "fields": {
-      "selected_game": 1,
-      "game_option": 2,
-      "choice": null,
-      "value": false
-    }
-  },
-  {
     "model": "game.startingpointsystem",
     "pk": 1,
     "fields": {

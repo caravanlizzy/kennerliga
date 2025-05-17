@@ -70,7 +70,7 @@ class SelectedGameViewSet(ModelViewSet):
         # Post-save logic:
         league = selected_game.league
 
-        rotate_active_player(league)
+        # rotate_active_player(league)
         advance_league_turn(league)
 
 
