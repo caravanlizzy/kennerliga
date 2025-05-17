@@ -30,8 +30,13 @@
         @click="setGameInformation(game)"
       >
         <q-btn
+          size="sm"
           rounded
-          :color="gameInformation.game && game.id === gameInformation.game.id ? 'accent' : 'primary'"
+          :color="
+            gameInformation.game && game.id === gameInformation.game.id
+              ? 'accent'
+              : 'primary'
+          "
           class="q-px-lg q-py-md cursor-pointer q-ma-xs hover:text-secondary"
         >
           {{ game.name.toUpperCase() }}
@@ -51,9 +56,9 @@
         <div
           v-for="option in gameInformation.options"
           :key="option.id"
-          class="q-py-sm"
+          class="q-py-sm q-mx-md"
         >
-          <template v-if="option.has_choices">
+          <div v-if="option.has_choices">
             <kenner-select
               :options="findChoicesByOption(option.id)"
               :label="option.name"
@@ -64,7 +69,7 @@
               "
               class="select-width inline-block"
             />
-          </template>
+          </div>
           <template v-else>
             <q-toggle
               v-model="
@@ -79,7 +84,7 @@
     </div>
 
     <KennerButton
-      @click="submitGame"
+      @click="handleSubmit"
       type="submit"
       push
       color="positive"
@@ -108,6 +113,17 @@ const {
   filteredGames,
   loadPlatformsAndGames,
 } = useGameSelection();
+
+const emit = defineEmits(['submit-success']);
+
+const handleSubmit = async () => {
+  try {
+    await submitGame();
+    emit('submit-success');
+  } catch (error) {
+    console.error('Error submitting game:', error);
+  }
+};
 
 onMounted(loadPlatformsAndGames);
 </script>

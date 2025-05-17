@@ -160,7 +160,7 @@ export function useGameSelection() {
     console.log('game selection: ', gameSelection);
     if (gameSelection) {
       const data = transformSubmitData(gameSelection);
-      createSelectedGame(data);
+      return createSelectedGame(data);
     } else {
       console.warn('No game selected');
     }
