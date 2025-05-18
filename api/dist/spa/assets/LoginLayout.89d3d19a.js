@@ -1,0 +1,1 @@
+import{Q as o}from"./QLayout.894809dc.js";import{_ as r,r as t,o as a,c,w as n,a as s}from"./index.ba6213b8.js";import"./scroll.a6f9976b.js";const _={};function f(i,m){const e=t("router-view");return a(),c(o,{class:"column flex-center"},{default:n(()=>[s(e)]),_:1})}var d=r(_,[["render",f]]);export{d as default};
