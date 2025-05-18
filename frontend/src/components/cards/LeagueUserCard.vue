@@ -1,6 +1,6 @@
 <template>
   <div
-    class="q-pa-xl rounded-borders relative full-height"
+    class="q-pa-md rounded-borders relative full-height"
     :style="{
       minHeight: '240px',
     }"

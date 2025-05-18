@@ -15,7 +15,10 @@
         <span class="q-mx-xs">muss ein Spiel</span>
         <span
           class="text-weight-bold"
-          :class="{'text-accent' : league?.status === ' BANNING', 'text-secondary': league?.status === 'PICKING'}"
+          :class="{
+            'text-accent': league?.status === ' BANNING',
+            'text-secondary': league?.status === 'PICKING',
+          }"
         >
           {{ statusVerb }}
         </span>
@@ -29,20 +32,15 @@
       class="q-mt-xl"
     />
 
-    <!-- Player Cards -->
+    <!-- Player Cards Grid -->
     <div
-      style="
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        grid-template-rows: 1fr 1fr;
-        height: 100%;
-        gap: 0;
-      "
+      class="player-grid"
+      :class="{ 'column-reverse': isMobile }"
     >
       <div
-        v-for="(member, index) in members"
+        v-for="member in members"
         :key="member.id"
-        :class="getQuadrantBorder(index)"
+        class="player-card"
       >
         <LeagueUserCard
           :status="league.status"
@@ -60,25 +58,9 @@ import { api } from 'boot/axios';
 import GameSelector from 'components/ui/GameSelector.vue';
 import { useUserStore } from 'stores/userStore';
 import LeagueUserCard from 'components/cards/LeagueUserCard.vue';
+import { useResponsive } from 'src/composables/reponsive';
 
-/**
- * Returns border classes to simulate a cross layout.
- * Index 0 = top-left, 1 = top-right, 2 = bottom-left, 3 = bottom-right
- */
-const getQuadrantBorder = (index: number) => {
-  switch (index) {
-    case 0:
-      return 'border-right border-bottom';
-    case 1:
-      return 'border-left border-bottom';
-    case 2:
-      return 'border-right border-top';
-    case 3:
-      return 'border-left border-top';
-    default:
-      return '';
-  }
-};
+const { isMobile } = useResponsive();
 
 const league = ref<any>(null);
 const members = ref<any[]>([]);
@@ -127,20 +109,38 @@ const statusVerb = computed(
 );
 </script>
 
-<style scoped>
-.border-top {
-  border-top: 1px solid #ccc;
+<style lang="scss" scoped>
+.player-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(420px, 1fr));
+  gap: 0;
 }
 
-.border-right {
-  border-right: 1px solid #ccc;
+.column-reverse {
+  display: flex;
+  flex-direction: column-reverse;
+  gap: 16px;
 }
 
-.border-bottom {
-  border-bottom: 1px solid #ccc;
+.player-card {
+  /* Optional: visual grouping for each card */
+  border: 1px solid #e0e0e0;
+  border-radius: 2px;
+  padding: 12px;
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.04);
+  transition: box-shadow 0.3s ease;
+  background: white;
 }
 
-.border-left {
-  border-left: 1px solid #ccc;
+.is-active-border-accent {
+  border: 2px solid rgba($accent, 0.4);
+}
+
+.is-active-border-secondary {
+  border: 2px solid rgba($secondary, 0.4);
+}
+
+.player-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
 </style>
