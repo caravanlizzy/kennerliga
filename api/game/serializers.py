@@ -25,8 +25,6 @@ class GameOptionChoiceSerializer(ModelSerializer):
         fields = '__all__'
 
 
-
-
 class FactionSerializer(ModelSerializer):
     class Meta:
         model = Faction
@@ -58,9 +56,27 @@ class PlatformSerializer(ModelSerializer):
 
 
 class SelectedOptionSerializer(serializers.ModelSerializer):
+    game_option = GameOptionSerializer(read_only=True)
+    choice = GameOptionChoiceSerializer(read_only=True)
+
+    # Accept IDs for write
+    game_option_id = serializers.PrimaryKeyRelatedField(
+        queryset=GameOption.objects.all(), source='game_option', write_only=True
+    )
+    choice_id = serializers.PrimaryKeyRelatedField(
+        queryset=GameOptionChoice.objects.all(), source='choice', write_only=True, required=False, allow_null=True
+    )
+
     class Meta:
         model = SelectedOption
-        fields = ['id', 'game_option', 'choice', 'value']
+        fields = [
+            'id',
+            'game_option',  # nested, read-only
+            'choice',  # nested, read-only
+            'value',
+            'game_option_id',  # ID, write-only
+            'choice_id',  # ID, write-only
+        ]
 
 
 class SelectedGameSerializer(serializers.ModelSerializer):
@@ -88,7 +104,7 @@ class SelectedGameSerializer(serializers.ModelSerializer):
         # Set league if provided
         league_id = validated_data.pop('leagueId', None)
         if league_id:
-            validated_data['league'] =  League.objects.get(id=league_id)
+            validated_data['league'] = League.objects.get(id=league_id)
         else:
             validated_data['league'] = find_users_current_league(validated_data['player'])
         return validated_data
@@ -131,6 +147,7 @@ class FullGameOptionChoiceSerializer(serializers.ModelSerializer):
         model = GameOptionChoice
         fields = ['id', 'name']
 
+
 class FullGameOptionSerializer(serializers.ModelSerializer):
     choices = FullGameOptionChoiceSerializer(many=True)
 
@@ -140,6 +157,7 @@ class FullGameOptionSerializer(serializers.ModelSerializer):
             'id', 'name', 'has_choices', 'only_if_option',
             'only_if_choice', 'only_if_value', 'choices'
         ]
+
 
 class FullGameSerializer(serializers.ModelSerializer):
     options = FullGameOptionSerializer(many=True)
