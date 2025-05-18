@@ -24,24 +24,20 @@
     </div>
 
     <div class="row games-container q-mt-lg">
-      <div
+      <q-card
         v-for="game in filteredGames"
         :key="game.id"
         @click="setGameInformation(game)"
+        class="q-ma-sm cursor-pointer hoverable-card"
+        :class="{ 'bg-secondary text-white': game.id === gameSelection.game.id }"
+        clickable
       >
-        <q-btn
-          size="sm"
-          rounded
-          :color="
-            gameInformation.game && game.id === gameInformation.game.id
-              ? 'accent'
-              : 'primary'
-          "
-          class="q-px-lg q-py-md cursor-pointer q-ma-xs hover:text-secondary"
-        >
-          {{ game.name.toUpperCase() }}
-        </q-btn>
-      </div>
+        <q-card-section>
+          <div class="text-subtitle2">{{ game.name }}</div>
+          <div class="text-caption">{{ getPlatformName(game.platform) }}</div>
+        </q-card-section>
+      </q-card>
+
     </div>
 
     <div v-if="isLoading">
@@ -53,6 +49,7 @@
         Spiel hat keine weiteren Optionen
       </div>
       <template v-else>
+        {{gameInformation.options}}
         <div
           v-for="option in gameInformation.options"
           :key="option.id"
@@ -72,10 +69,7 @@
           </div>
           <template v-else>
             <q-toggle
-              v-model="
-                gameSelection.selectedOptions.find((o) => o.id == option.id)
-                  .value
-              "
+              v-model="findSelectedOption(option.id).value"
               :label="option.name"
             />
           </template>
@@ -106,6 +100,7 @@ const {
   isLoading,
   setGameInformation,
   findChoicesByOption,
+  findSelectedOption,
   submitGame,
   platform,
   filter,
@@ -124,6 +119,12 @@ const handleSubmit = async () => {
     console.error('Error submitting game:', error);
   }
 };
+
+function getPlatformName(platformId: number | string): string {
+  const platformObj = platforms.value.find(p => p.id === platformId);
+  return platformObj?.name ?? `ID: ${platformId}`;
+}
+
 
 onMounted(loadPlatformsAndGames);
 </script>
@@ -144,4 +145,14 @@ onMounted(loadPlatformsAndGames);
 .select-width {
   width: 140px;
 }
+
+.hoverable-card {
+  transition: background-color 0.3s ease;
+  background-color: white;
+
+  &:hover {
+    background-color: rgba($secondary, 0.06); // Very light secondary tint
+  }
+}
+
 </style>

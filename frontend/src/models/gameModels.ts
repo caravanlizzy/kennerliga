@@ -56,5 +56,11 @@ type SelectedGameOptionPayload = {
 
 export type SelectedGameDtoPayload = {
   game: number;
-  selected_options: SelectedGameOptionPayload[];
+  selected_options: {
+    selected_game: number;
+    game_option_id: number;
+    choice_id?: number;
+    value?: boolean | null;
+  }[];
 };
+

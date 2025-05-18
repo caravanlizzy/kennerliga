@@ -45,9 +45,62 @@
     <!-- Game Info -->
     <div class="q-mt-xl">
       <div v-if="member.selected_game" class="q-mb-sm">
-        <div class="text-body2 text-weight-bold">
-          {{ member.selected_game.game_name }}
-        </div>
+        <q-card flat bordered class="q-mb-md q-pa-sm shadow-1">
+          <q-card-section class="row items-center justify-between">
+            <div class="text-h6">{{ member.selected_game.game_name }}</div>
+
+            <q-btn
+              flat
+              dense
+              round
+              icon="expand_more"
+              class="material-symbols-outlined"
+              :class="{ 'rotate-180': isExpanded }"
+              @click="isExpanded = !isExpanded"
+              color="primary"
+            />
+          </q-card-section>
+
+          <q-slide-transition>
+            <div v-show="isExpanded">
+              <q-separator spaced />
+
+              <q-list dense>
+                <q-item v-for="option in member.selected_game.selected_options" :key="option.id">
+                  <q-item-section>{{ option.game_option.name }}</q-item-section>
+
+                  <q-item-section side class="text-right">
+    <span v-if="option.choice" class="text-secondary">
+      {{ option.choice.name }}
+    </span>
+
+                    <q-icon
+                      v-else-if="option.value === true"
+                      name="check_circle"
+                      class="material-symbols-outlined"
+                      color="positive"
+                    />
+                    <q-icon
+                      v-else-if="option.value === false"
+                      name="cancel"
+                      class="material-symbols-outlined"
+                      color="negative"
+                    />
+                    <q-icon
+                      v-else
+                      name="help"
+                      class="material-symbols-outlined"
+                      color="grey"
+                    />
+                  </q-item-section>
+                </q-item>
+
+              </q-list>
+            </div>
+          </q-slide-transition>
+        </q-card>
+
+
       </div>
 
       <div v-if="member.banned_game">
@@ -74,4 +127,8 @@ defineProps<{
   isActive: boolean;
   statusVerb: string;
 }>();
+
+import { ref } from 'vue';
+
+const isExpanded = ref(false);
 </script>

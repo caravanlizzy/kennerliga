@@ -3,7 +3,7 @@ import {
   GameDto,
   GameOptionDto,
   SelectedGameDtoPayload,
-  SelectedGameOptionDto
+  SelectedGameOptionDto,
 } from 'src/models/gameModels';
 import {
   createSelectedGame,
@@ -36,7 +36,8 @@ export function useGameSelection() {
     return gameData.value.filter((game) => {
       return (
         (!platform.value || game.platform === platform.value.id) &&
-        (!filter.value || game.name.toLowerCase().includes(filter.value.toLowerCase()))
+        (!filter.value ||
+          game.name.toLowerCase().includes(filter.value.toLowerCase()))
       );
     });
   });
@@ -45,7 +46,6 @@ export function useGameSelection() {
     platforms.value = await fetchPlatforms();
     gameData.value = await fetchGames();
   };
-
 
   const EMPTY_GAME: GameDto = {
     id: -1,
@@ -82,21 +82,25 @@ export function useGameSelection() {
     gameSelection.selectedOptions = [];
   }
 
-  function setSelectedOption(option: GameOptionDto) {
-    const selectedOption: SelectedGameOptionDto = {
+  function setSelectedOptions(options: GameOptionDto[]) {
+    gameSelection.selectedOptions = options.map(option => ({
       id: option.id,
       selected_game: gameSelection.game!.id,
       value: option.has_choices ? undefined : false,
       choice: undefined,
-    };
-    gameSelection.selectedOptions.push(selectedOption);
+    }));
   }
+
+  function findSelectedOption(optionId: number) {
+    return gameSelection.selectedOptions.find((o) => o.id === optionId);
+  }
+
 
   async function loadOptions(gameId: number) {
     try {
       const { data: options } = await fetchGameOptions(gameId);
       gameInformation.options = options;
-      options.forEach(setSelectedOption);
+      setSelectedOptions(options); // cleaner
     } catch (error) {
       console.error(`Failed to fetch options for game ${gameId}:`, error);
       gameInformation.options = [];
@@ -128,18 +132,19 @@ export function useGameSelection() {
     return gameData;
   }
 
-
-  function transformSubmitData(selection: TGameSelection): SelectedGameDtoPayload {
+  function transformSubmitData(
+    selection: TGameSelection
+  ): SelectedGameDtoPayload {
     const selected_options = selection.selectedOptions.map((option) => {
       const base = {
         selected_game: selection.game.id,
-        game_option: option.id, // transformed from 'id'
+        game_option_id: option.id, // ✅ now using *_id
       };
 
       if (option.choice) {
         return {
           ...base,
-          choice: option.choice.id,
+          choice_id: option.choice.id, // ✅ now using *_id
         };
       }
 
@@ -157,7 +162,6 @@ export function useGameSelection() {
 
 
   function submitGame() {
-    console.log('game selection: ', gameSelection);
     if (gameSelection) {
       const data = transformSubmitData(gameSelection);
       return createSelectedGame(data);
@@ -172,12 +176,13 @@ export function useGameSelection() {
     isLoading,
     setGameInformation,
     findChoicesByOption,
+    findSelectedOption,
     submitGame,
     platform,
     filter,
     platforms,
     gameData,
     filteredGames,
-    loadPlatformsAndGames
+    loadPlatformsAndGames,
   };
 }

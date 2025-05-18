@@ -98,7 +98,7 @@ onMounted(async () => {
 });
 
 const activePlayer = computed(() =>
-  members.value.find((member) => member.id === league.value?.active_player)
+  members.value.find((member) => member.is_active_player)
 );
 
 const isActive = computed(() =>
