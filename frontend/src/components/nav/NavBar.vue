@@ -8,6 +8,8 @@
   <q-toolbar-title class="text-primary">
     <!--      <h6 class="text-italic" > Kennerliga </h6>-->
   </q-toolbar-title>
+  <DevUsersList/>
+
   <KennerButton :to="{name: 'my-league'}" v-if="isAuthenticated" flat color="positive" icon="sports_esports">
     <KennerTooltip> Meine Liga </KennerTooltip>
 
@@ -29,6 +31,7 @@ import { storeToRefs } from 'pinia';
 import TheUsername from 'components/UserName.vue';
 import { useRouter } from 'vue-router';
 import KennerTooltip from 'components/KennerTooltip.vue';
+import DevUsersList from 'components/lists/DevUsersList.vue';
 
 defineProps<{
   onToggle: () => void,

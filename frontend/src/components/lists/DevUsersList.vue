@@ -1,46 +1,35 @@
 <template>
-  <q-dialog v-model="showDialog">
-    <q-card>
-      <q-card-section>
-        <q-item-label>Login as</q-item-label>
-      </q-card-section>
-      <q-card-section>
-        <q-list>
-          <q-item
-            v-for="user in users"
-            :key="user"
-            clickable
-            @click="impersonate(user, 'test')"
-          >
-            <q-item-section>{{ user }}</q-item-section>
-          </q-item>
-        </q-list>
-      </q-card-section>
-      <q-card-section>
-        <q-btn label="Close" @click="closeDialog" />
-      </q-card-section>
-    </q-card>
-  </q-dialog>
+  <q-list class="row">
+    <q-item
+      v-for="user in users"
+      :key="user"
+      clickable
+      @click="impersonate(user, 'test')"
+      class="col-auto"
+    >
+      <q-item-section>{{ user }}</q-item-section>
+    </q-item>
+  </q-list>
 </template>
 <script setup lang="ts">
 import { ref, watch } from 'vue';
 import { TUser } from 'src/types';
 import { api } from 'boot/axios';
 import { useUserStore } from 'stores/userStore';
+import { useRouter } from 'vue-router';
 
 const { login } = useUserStore();
 const props = withDefaults(defineProps<{ showImpersonate: boolean }>(), {
   showImpersonate: false,
 });
-const emit = defineEmits(['update:showImpersonate']);
 const showDialog = ref(props.showImpersonate);
+const router = useRouter();
 
 const users = ref<TUser[]>([]);
 
 async function impersonate(user: string) {
   try {
     await login(user, 'test');
-    closeDialog();
   } catch (error) {
     console.error('Failed to impersonate user:', error);
   }
@@ -62,8 +51,4 @@ watch(
   }
 );
 
-function closeDialog() {
-  showDialog.value = false;
-  emit('update:showImpersonate', false);
-}
 </script>

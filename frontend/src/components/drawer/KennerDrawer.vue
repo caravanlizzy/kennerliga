@@ -28,16 +28,16 @@
           label="SpielerInnen verwalten"
           forward-name="users"
         />
-        <kenner-item
-          icon="switch_account"
-          label="Impersonate User"
-          @click="showImpersonateList = !showImpersonateList"
-        >
-        </kenner-item>
+<!--        <kenner-item-->
+<!--          icon="switch_account"-->
+<!--          label="Impersonate User"-->
+<!--          @click="showImpersonateList = !showImpersonateList"-->
+<!--        >-->
+<!--        </kenner-item>-->
         <kenner-item icon="logout" label="Logout" @click="logout" />
       </q-list>
     </q-drawer>
-    <DevUsersList :show-impersonate="showImpersonateList" />
+<!--    <DevUsersList :show-impersonate="showImpersonateList" />-->
   </div>
 </template>
 
@@ -45,12 +45,9 @@
 import KennerItem from 'components/items/KennerItem.vue';
 import { useUserStore } from 'stores/userStore';
 import { useResponsive } from 'src/composables/reponsive';
-import { ref } from 'vue';
-import DevUsersList from 'components/lists/DevUsersList.vue';
 
 const drawerState = defineModel();
 
-const showImpersonateList = ref(false)
 
 const responsive = useResponsive();
 const { logout } = useUserStore();

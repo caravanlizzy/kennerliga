@@ -5,49 +5,54 @@
       class="q-pa-lg column justify-center items-center text-primary border border-primary rounded-borders"
     >
       <div class="text-h6 text-uppercase text-weight-bold q-mb-sm">
-        {{ statusNoun }} {{  }}
+        {{ statusNoun }} {{}}
       </div>
 
       <div class="text-subtitle1 text-center">
-        <span class="text-accent text-weight-bold">
+        <span class="text-primary text-weight-bold">
           {{ activePlayer?.username }}
         </span>
         <span class="q-mx-xs">muss ein Spiel</span>
-        <span class="text-accent text-weight-bold">
+        <span
+          class="text-weight-bold"
+          :class="{'text-accent' : league?.status === ' BANNING', 'text-secondary': league?.status === 'PICKING'}"
+        >
           {{ statusVerb }}
         </span>
       </div>
     </div>
 
     <!-- Game Selector -->
-    <GameSelector v-if="isActive && league.status === 'PICKING'" @submit-success="fetchLeagueDetails" class="q-mt-xl"/>
-    <div class="q-pa-lg" v-if="isActive && league.status ==='BANNING'">
-      <q-btn
-        size="lg"
-        :color="selectedGame === selectedBan ? 'accent' : undefined"
-        class="q-mx-md"
-        @click="() => selectedBan = selectedGame"
-        v-for="selectedGame of selectedGames" :key="selectedGame">
-        {{ selectedGame }}
-      </q-btn>
-    </div>
+    <GameSelector
+      v-if="isActive && league.status === 'PICKING'"
+      @submit-success="fetchLeagueDetails"
+      class="q-mt-xl"
+    />
 
     <!-- Player Cards -->
     <div
-      style="display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; height: 100%; gap: 0;"
+      style="
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        grid-template-rows: 1fr 1fr;
+        height: 100%;
+        gap: 0;
+      "
     >
       <div
         v-for="(member, index) in members"
         :key="member.id"
         :class="getQuadrantBorder(index)"
       >
-        <LeagueUserCard :statusVerb="statusVerb" :member="member" :isActive="member.is_active_player"/>
+        <LeagueUserCard
+          :status="league.status"
+          :member="member"
+          :isActive="member.is_active_player"
+        />
       </div>
     </div>
-
   </div>
 </template>
-
 
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue';
@@ -77,7 +82,6 @@ const getQuadrantBorder = (index: number) => {
 
 const league = ref<any>(null);
 const members = ref<any[]>([]);
-const selectedGames = computed(() => league.value?.members.map((member) => member.selected_game));
 const selectedBan = ref<any>(null);
 const { isMe } = useUserStore();
 
@@ -114,14 +118,13 @@ const statusMap: Record<LeagueStatus, { noun?: string; verb?: string }> = {
   DONE: { noun: 'Beendet' },
 };
 
-const statusNoun = computed(() =>
-  statusMap[league.value?.status as LeagueStatus]?.noun ?? ''
+const statusNoun = computed(
+  () => statusMap[league.value?.status as LeagueStatus]?.noun ?? ''
 );
 
-const statusVerb = computed(() =>
-  statusMap[league.value?.status as LeagueStatus]?.verb ?? ''
+const statusVerb = computed(
+  () => statusMap[league.value?.status as LeagueStatus]?.verb ?? ''
 );
-
 </script>
 
 <style scoped>
@@ -140,5 +143,4 @@ const statusVerb = computed(() =>
 .border-left {
   border-left: 1px solid #ccc;
 }
-
 </style>
