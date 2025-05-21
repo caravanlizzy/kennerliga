@@ -198,8 +198,15 @@ class FullGameSerializer(serializers.ModelSerializer):
 
 class BanDecisionSerializer(serializers.ModelSerializer):
     player_name = serializers.CharField(source='player.profile_name', read_only=True)
-    banned_game_name = serializers.CharField(source='banned_game.game.name', read_only=True)
+    game_name = serializers.CharField(source='game.game.name', read_only=True)
+    league = serializers.PrimaryKeyRelatedField(queryset=League.objects.all(), required=True)
+    username = serializers.CharField(write_only=True, required=True)
 
     class Meta:
         model = BanDecision
-        fields = ['player', 'player_name', 'banned_game', 'banned_game_name', 'created_at']
+        fields = ['id', 'player', 'player_name', 'game', 'game_name', 'league', 'created_at', 'username']
+
+    def create(self, validated_data):
+        username = validated_data.pop('username')
+        validated_data['player'] = get_profile_by_username(username)
+        return super().create(validated_data)

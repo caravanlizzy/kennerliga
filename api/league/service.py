@@ -136,7 +136,7 @@ def get_players_to_repick(league):
             was_banned = BanDecision.objects.filter(
                 player=member.profile,
                 league=league,
-                banned_game=selected_game
+                game=selected_game
             ).exists()
 
             if was_banned:
@@ -227,4 +227,4 @@ def ban_game(league, player, game):
     """
     if league.active_player != player:
         raise ValueError("It's not this player's turn to ban a game.")
-    return BanDecision.objects.create(league=league, player=player, banned_game=game)
+    return BanDecision.objects.create(league=league, player=player, game=game)
