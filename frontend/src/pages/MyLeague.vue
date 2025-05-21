@@ -55,9 +55,9 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue';
 import { api } from 'boot/axios';
-import GameSelector from 'components/ui/GameSelector.vue';
+import GameSelector from 'components/league/GameSelector.vue';
 import { useUserStore } from 'stores/userStore';
-import LeagueUserCard from 'components/cards/LeagueUserCard.vue';
+import LeagueUserCard from 'components/league/LeagueUserCard.vue';
 import { useResponsive } from 'src/composables/reponsive';
 
 const { isMobile } = useResponsive();

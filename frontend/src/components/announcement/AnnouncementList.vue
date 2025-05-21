@@ -11,7 +11,7 @@
   </div>
 </template>
 <script setup lang="ts">
-import AnnouncementCard from 'components/cards/AnnouncementCard.vue';
+import AnnouncementCard from 'components/announcement/AnnouncementCard.vue';
 import { useAnnouncementStore } from 'stores/announcementStore';
 
 const { announcements, fetchAnnouncements } = useAnnouncementStore();

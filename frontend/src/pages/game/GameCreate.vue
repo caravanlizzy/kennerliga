@@ -33,9 +33,9 @@
 import { provide, Ref, ref } from 'vue';
 import { useQuasar } from 'quasar';
 import { api } from 'boot/axios';
-import KennerInput from 'components/inputs/KennerInput.vue';
-import KennerSelect from 'components/inputs/KennerSelect.vue';
-import KennerButton from 'components/buttons/KennerButton.vue';
+import KennerInput from 'components/base/KennerInput.vue';
+import KennerSelect from 'components/base/KennerSelect.vue';
+import KennerButton from 'components/base/KennerButton.vue';
 import { TPlatform } from 'src/models/gameModels';
 import GameOption from 'pages/game/createGame/GameOptionCreate.vue';
 import { useItemList } from 'src/composables/itemList';

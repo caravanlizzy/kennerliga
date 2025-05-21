@@ -25,7 +25,7 @@
 </template>
 
 <script setup lang="ts">
-import KennerSelect from 'components/inputs/KennerSelect.vue';
+import KennerSelect from 'components/base/KennerSelect.vue';
 import { computed, inject, ref, Ref } from 'vue';
 import { TGameOption } from 'src/types';
 

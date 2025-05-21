@@ -7,8 +7,8 @@
 
 <script setup lang="ts">
 import { useResponsive } from 'src/composables/reponsive';
-import KennerChat from 'components/chats/KennerChat.vue';
-import YearStandings from 'components/ui/YearStandings.vue';
+import KennerChat from 'components/chat/KennerChat.vue';
+import YearStandings from 'components/league/YearStandings.vue';
 
 const { isMobile } = useResponsive();
 </script>

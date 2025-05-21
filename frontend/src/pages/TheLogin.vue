@@ -20,8 +20,8 @@
 </template>
 
 <script setup lang="ts">
-import KennerInput from 'components/inputs/KennerInput.vue';
-import KennerButton from 'components/buttons/KennerButton.vue';
+import KennerInput from 'components/base/KennerInput.vue';
+import KennerButton from 'components/base/KennerButton.vue';
 import { useUserStore } from 'stores/userStore';
 import { useResponsive } from 'src/composables/reponsive';
 import { ref } from 'vue';

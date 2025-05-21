@@ -48,10 +48,10 @@
 </template>
 <script setup lang="ts">
 
-import KennerButton from 'components/buttons/KennerButton.vue';
+import KennerButton from 'components/base/KennerButton.vue';
 import { Ref, ref } from 'vue';
 import { TItem } from 'src/types';
-import KennerCounter from 'components/items/KennerCounter.vue';
+import KennerCounter from 'components/base/KennerCounter.vue';
 import { createRandomId } from 'src/helpers';
 
 defineProps<{ buttonLabel: string, ranked?: boolean }>();

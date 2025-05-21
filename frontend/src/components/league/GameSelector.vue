@@ -90,8 +90,8 @@
 
 <script setup lang="ts">
 import { onMounted } from 'vue';
-import KennerSelect from 'components/inputs/KennerSelect.vue';
-import KennerButton from 'components/buttons/KennerButton.vue';
+import KennerSelect from 'components/base/KennerSelect.vue';
+import KennerButton from 'components/base/KennerButton.vue';
 import { useGameSelection } from 'src/composables/gameSelection';
 
 const {

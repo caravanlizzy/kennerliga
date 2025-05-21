@@ -51,7 +51,7 @@
 
 <script setup lang="ts">
 
-import YesNoItem from 'components/items/YesNoItem.vue';
+import YesNoItem from 'components/base/YesNoItem.vue';
 
 defineProps<{
   hasPoints: boolean;

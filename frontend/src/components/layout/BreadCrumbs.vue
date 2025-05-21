@@ -20,7 +20,7 @@
 import { useRoute, RouteLocationNormalizedLoaded, useRouter, RouteRecord } from 'vue-router';
 import { BreadCrumb } from 'src/types';
 import { ref, Ref, watch } from 'vue';
-import KennerButton from 'components/buttons/KennerButton.vue';
+import KennerButton from 'components/base/KennerButton.vue';
 
 defineProps<{ color: string }>();
 

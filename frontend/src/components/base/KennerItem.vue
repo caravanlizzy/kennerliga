@@ -10,7 +10,7 @@
 </template>
 
 <script setup lang="ts">
-import KennerButton from 'components/buttons/KennerButton.vue';
+import KennerButton from 'components/base/KennerButton.vue';
 
 type TKennerItem = {
   icon: string;

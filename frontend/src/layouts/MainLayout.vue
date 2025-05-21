@@ -11,7 +11,6 @@
     <KennerDrawer v-model="drawerState" />
 
     <q-page-container class="flex column justify-center">
-      <DevTools v-if="isDev"/>
       <div :class="{ 'q-pa-lg': !isMobile }">
         <router-view class="text-primary" />
       </div>
@@ -20,15 +19,15 @@
 </template>
 
 <script setup lang="ts">
-import NavBar from 'components/nav/NavBar.vue';
+import NavBar from 'components/layout/NavBar.vue';
 import { useUserStore } from 'stores/userStore';
 import { storeToRefs } from 'pinia';
 import { ref, Ref } from 'vue';
 import { useResponsive } from 'src/composables/reponsive';
-import Announcements from 'components/ui/AnnouncementList.vue';
+import Announcements from 'components/announcement/AnnouncementList.vue';
 import DevTools from 'components/DevTools.vue';
 import { useAnnouncementStore } from 'stores/announcementStore';
-import KennerDrawer from 'components/drawer/KennerDrawer.vue';
+import KennerDrawer from 'components/layout/KennerDrawer.vue';
 
 const store = useUserStore();
 const { announcements } = useAnnouncementStore();

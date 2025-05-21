@@ -38,7 +38,7 @@
 </template>
 
 <script setup lang="ts">
-import SelectedGameInfo from 'components/items/SelectedGameInfo.vue';
+import SelectedGameInfo from 'components/league/SelectedGameInfo.vue';
 import { computed } from 'vue';
 
 const props = defineProps<{

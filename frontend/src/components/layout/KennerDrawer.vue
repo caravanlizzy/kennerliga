@@ -42,7 +42,7 @@
 </template>
 
 <script setup lang="ts">
-import KennerItem from 'components/items/KennerItem.vue';
+import KennerItem from 'components/base/KennerItem.vue';
 import { useUserStore } from 'stores/userStore';
 import { useResponsive } from 'src/composables/reponsive';
 

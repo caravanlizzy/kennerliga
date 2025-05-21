@@ -40,7 +40,7 @@
 
 import { Ref, ref, watch } from 'vue';
 import ListCreator from 'components/lists/ListCreator.vue';
-import KennerSelect from 'components/inputs/KennerSelect.vue';
+import KennerSelect from 'components/base/KennerSelect.vue';
 import { api } from 'boot/axios';
 
 import { TResultConfig } from 'src/types';

@@ -25,12 +25,12 @@
 </template>
 
 <script setup lang="ts">
-import KennerButton from 'components/buttons/KennerButton.vue';
+import KennerButton from 'components/base/KennerButton.vue';
 import { useUserStore } from 'stores/userStore';
 import { storeToRefs } from 'pinia';
-import TheUsername from 'components/UserName.vue';
+import TheUsername from 'components/ui/UserName.vue';
 import { useRouter } from 'vue-router';
-import KennerTooltip from 'components/KennerTooltip.vue';
+import KennerTooltip from 'components/base/KennerTooltip.vue';
 import DevUsersList from 'components/lists/DevUsersList.vue';
 
 defineProps<{

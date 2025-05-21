@@ -10,7 +10,7 @@
 
 <script setup lang="ts">
 import { TKennerButton } from 'src/types';
-import KennerButton from 'components/buttons/KennerButton.vue';
+import KennerButton from 'components/base/KennerButton.vue';
 
 defineProps<{
   createButton?: TKennerButton;

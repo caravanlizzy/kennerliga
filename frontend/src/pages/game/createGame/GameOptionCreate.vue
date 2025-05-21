@@ -23,8 +23,8 @@
 </template>
 
 <script setup lang="ts">
-import KennerInput from 'components/inputs/KennerInput.vue';
-import KennerButton from 'components/buttons/KennerButton.vue';
+import KennerInput from 'components/base/KennerInput.vue';
+import KennerButton from 'components/base/KennerButton.vue';
 import { inject, ref } from 'vue';
 import GameOptionChoiceCreate from 'pages/game/createGame/GameOptionChoiceCreate.vue';
 import GameOptionRestrictionCreate from 'pages/game/createGame/GameOptionRestrictionCreate.vue';
