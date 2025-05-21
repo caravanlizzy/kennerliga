@@ -4,10 +4,10 @@ from rest_framework.response import Response
 from rest_framework import status
 
 from game.models import Game, GameOption, GameOptionChoice, Faction, TieBreaker, ResultConfig, StartingPointSystem, \
-    Platform, SelectedGame, SelectedOption
+    Platform, SelectedGame, SelectedOption, BanDecision
 from game.serializers import GameSerializer, GameOptionSerializer, GameOptionChoiceSerializer, FactionSerializer, \
     TieBreakerSerializer, ResultConfigSerializer, StartingPointSystemSerializer, PlatformSerializer, \
-    SelectedGameSerializer, SelectedOptionSerializer, FullGameSerializer
+    SelectedGameSerializer, SelectedOptionSerializer, FullGameSerializer, BanDecisionSerializer
 
 from league.service import advance_league_turn, rotate_active_player
 
@@ -16,6 +16,7 @@ class GameViewSet(ModelViewSet):
     queryset = Game.objects.all()
     serializer_class = GameSerializer
     permission_classes = [IsAuthenticated]
+
 
 class GameOptionViewSet(ModelViewSet):
     queryset = GameOption.objects.all()
@@ -71,6 +72,19 @@ class SelectedGameViewSet(ModelViewSet):
         league = selected_game.league
 
         # rotate_active_player(league)
+        advance_league_turn(league)
+
+
+class BanDecisionViewSet(ModelViewSet):
+    queryset = BanDecision.objects.all()
+    serializer_class = BanDecisionSerializer
+    filterset_fields = ['league']
+
+    def perform_create(self, serializer):
+        ban_decision = serializer.save()
+
+        league = ban_decision.league
+
         advance_league_turn(league)
 
 

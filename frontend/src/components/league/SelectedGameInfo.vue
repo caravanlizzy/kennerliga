@@ -6,18 +6,17 @@
         :flat="status !== 'BANNING'"
         bordered
         class="q-mb-md q-pa-sm shadow-1 hover-card"
-        :class="{ 'cursor-pointer ': isUserBanning }"
-        @click="$emit('select-for-ban')"
+        :class="{ 'cursor-pointer ': isBannable }"
       >
         <q-card-section class="row items-center justify-between">
           <div class="text-h6">
             {{ member.selected_game.game_name }}
             <q-badge
-              v-if="isUserBanning"
+              v-if="isBannable"
               color="accent"
               text-color="white"
-              class="cursor-pointer q-ml-sm q-py-xs q-px-sm"
-              @click="$emit('select-for-ban')"
+              class="bannable-badge q-ml-md"
+              @click.stop="openBanDialog"
             >
               Bannen
             </q-badge>
@@ -38,37 +37,27 @@
         <q-slide-transition>
           <div v-show="isExpanded">
             <q-separator spaced />
-
             <q-list dense>
               <q-item
                 v-for="option in member.selected_game.selected_options"
                 :key="option.id"
               >
                 <q-item-section>{{ option.game_option.name }}</q-item-section>
-
                 <q-item-section side class="text-right">
                   <span v-if="option.choice" class="text-secondary">
                     {{ option.choice.name }}
                   </span>
-
                   <q-icon
                     v-else-if="option.value === true"
                     name="check_circle"
-                    class="material-symbols-outlined"
                     color="positive"
                   />
                   <q-icon
                     v-else-if="option.value === false"
                     name="cancel"
-                    class="material-symbols-outlined"
                     color="negative"
                   />
-                  <q-icon
-                    v-else
-                    name="help"
-                    class="material-symbols-outlined"
-                    color="grey"
-                  />
+                  <q-icon v-else name="help" color="grey" />
                 </q-item-section>
               </q-item>
             </q-list>
@@ -92,52 +81,93 @@
     >
       Noch keine Auswahl oder Bann.
     </div>
+
+    <!-- Confirm Ban Dialog -->
+    <q-dialog v-model="confirmDialog">
+      <q-card>
+        <q-card-section class="text-h6">
+          {{ member.selected_game?.game_name }} bannen?
+        </q-card-section>
+
+        <q-card-section>
+          Sicher dass du <span class="text-weight-bold">{{ member.selected_game?.game_name }}</span> von
+          <span class="text-weight-bold">{{ member.username }}</span> bannen willst?
+        </q-card-section>
+
+        <q-card-actions align="right">
+          <q-btn flat label="Abbrechen" color="primary" v-close-popup />
+          <q-btn unelevated label="Bannen" color="accent" @click="confirmBan" />
+        </q-card-actions>
+      </q-card>
+    </q-dialog>
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { ref } from 'vue';
+import { banGame } from 'src/services/game/banGameService';
+import { useUserStore } from 'stores/userStore';
 
-const isUserBanning = computed(() => {
-  return props.status !== 'BANNING' && props.isActive;
-})
+const { user } = useUserStore();
 
-// Props
 const props = defineProps<{
-  member: {
-    selected_game?: {
-      game_name: string;
-      selected_options: {
-        id: number;
-        game_option: { name: string };
-        choice?: { name: string };
-        value?: boolean | null;
-      }[];
-    };
-    banned_game?: string;
-  };
+  member: any;
   status: string;
   isActive: boolean;
+  isBannable: boolean;
 }>();
 
-const isExpanded = ref(false);
 const emit = defineEmits<{
   (e: 'select-for-ban'): void;
 }>();
+
+const isExpanded = ref(false);
+const confirmDialog = ref(false);
+
+function openBanDialog() {
+  confirmDialog.value = true;
+}
+
+async function confirmBan() {
+  confirmDialog.value = false;
+
+  emit('select-for-ban');
+}
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .rotate-180 {
   transform: rotate(180deg);
   transition: transform 0.3s ease;
 }
 
-.hover-card {
-  transition: box-shadow 0.3s ease, transform 0.3s ease;
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba($accent, 0.6);
+  }
+  70% {
+    transform: scale(1.15);
+    box-shadow: 0 0 0 12px rgba($accent, 0);
+  }
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba($accent, 0);
+  }
 }
 
-.hover-card:hover {
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
-  transform: translateY(-2px);
+.bannable-badge {
+  cursor: pointer;
+  font-weight: bold;
+  border-radius: 12px;
+  font-size: 1.1rem;
+  padding: 4px 10px;
+  animation: pulse 1.6s infinite;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.bannable-badge:hover {
+  transform: scale(1.05);
+  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.3);
 }
 </style>

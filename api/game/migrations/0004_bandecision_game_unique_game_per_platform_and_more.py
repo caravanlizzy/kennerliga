@@ -26,7 +26,7 @@ class Migration(migrations.Migration):
         ),
         migrations.AddField(
             model_name='bandecision',
-            name='banned_game',
+            name='game',
             field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to='game.selectedgame'),
         ),
         migrations.AddField(

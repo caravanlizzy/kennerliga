@@ -33,7 +33,7 @@
     />
 
     <!-- Player Cards Grid -->
-    <PlayerCardList  :members="members" :status="league?.status"/>
+    <PlayerCardList  :members="members" :status="status" :activePlayer="activePlayer?.username"/>
   </div>
 </template>
 
@@ -46,6 +46,7 @@ import PlayerCardList from 'components/league/PlayerCardList.vue';
 
 const league = ref<any>(null);
 const members = ref<any[]>([]);
+const status = ref<string>('');
 const selectedBan = ref<any>(null);
 const { isMe } = useUserStore();
 
@@ -55,6 +56,7 @@ const fetchLeagueDetails = async () => {
   const { data } = await api.get(`league/league-details/${myleagueId}`);
   league.value = data;
   members.value = data.members;
+  status.value = data.status;
 };
 
 onMounted(async () => {

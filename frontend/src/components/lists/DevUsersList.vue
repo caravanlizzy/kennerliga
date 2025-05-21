@@ -19,11 +19,6 @@ import { useUserStore } from 'stores/userStore';
 import { useRouter } from 'vue-router';
 
 const { login } = useUserStore();
-const props = withDefaults(defineProps<{ showImpersonate: boolean }>(), {
-  showImpersonate: false,
-});
-const showDialog = ref(props.showImpersonate);
-const router = useRouter();
 
 const users = ref<TUser[]>([]);
 
@@ -43,12 +38,5 @@ api
   .catch((error) => {
     console.error('Failed to fetch users:', error);
   });
-
-watch(
-  () => props.showImpersonate,
-  (newVal) => {
-    showDialog.value = newVal;
-  }
-);
 
 </script>

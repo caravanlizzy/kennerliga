@@ -64,3 +64,10 @@ export type SelectedGameDtoPayload = {
   }[];
 };
 
+
+export type BanDecisionDtoPayload = {
+  league: number;
+  player: number;
+  game: number | null;
+};
+

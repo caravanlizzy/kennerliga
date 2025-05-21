@@ -7,6 +7,7 @@ from user.models import PlayerProfile, Platform
 class Game(models.Model):
     name = models.CharField(max_length=88)
     platform = models.ForeignKey(Platform, on_delete=models.CASCADE)
+
     class Meta:
         constraints = [
             models.UniqueConstraint(fields=['name', 'platform'], name='unique_game_per_platform')
@@ -68,7 +69,7 @@ class SelectedOption(models.Model):
 class BanDecision(models.Model):
     league = models.ForeignKey(League, on_delete=models.CASCADE, related_name='ban_decisions')
     player = models.ForeignKey(PlayerProfile, on_delete=models.CASCADE, related_name='ban_decisions')
-    banned_game = models.ForeignKey(SelectedGame, null=True, blank=True, on_delete=models.SET_NULL)
+    game = models.ForeignKey(SelectedGame, null=True, blank=True, on_delete=models.SET_NULL)
 
     created_at = models.DateTimeField(auto_now_add=True)
 
@@ -76,7 +77,7 @@ class BanDecision(models.Model):
         unique_together = ('league', 'player')
 
     def __str__(self):
-        return f"{self.player} {'banned ' + str(self.banned_game) if self.banned_game else 'skipped banning'} in {self.league}"
+        return f"{self.player} {'banned ' + str(self.game) if self.game else 'skipped banning'} in {self.league}"
 
 
 class StartingPointSystem(models.Model):

@@ -2,9 +2,10 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 
+from game.models import BanDecision
 from game.views import GameViewSet, GameOptionViewSet, GameOptionChoiceViewSet, FactionViewSet, TieBreakerViewSet, \
     ResultConfigViewSet, StartingPointSystemViewSet, PlatformViewSet, SelectedGameViewSet, SelectedOptionViewSet, \
-    FullGameViewSet
+    FullGameViewSet, BanDecisionViewSet
 
 router = DefaultRouter()
 router.register('games', GameViewSet, basename='games')
@@ -18,6 +19,7 @@ router.register('starting-point-systems', StartingPointSystemViewSet, basename='
 router.register('platforms', PlatformViewSet, basename='platforms')
 router.register('selected-games', SelectedGameViewSet, basename='selected-games')
 router.register('selected-game-options', SelectedOptionViewSet, basename='selected-game-options')
+router.register('ban-decisions', BanDecisionViewSet, basename='ban-decisions')
 
 urlpatterns = [
     path('', include(router.urls)),

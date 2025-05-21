@@ -14,12 +14,12 @@ class LeagueSerializer(serializers.ModelSerializer):
 #     username = serializers.CharField(source='profile.user.username', read_only=True)
 #     profile_name = serializers.CharField(source='profile.profile_name', read_only=True)
 #     selected_game = serializers.SerializerMethodField()
-#     banned_game = serializers.SerializerMethodField()
+#     game = serializers.SerializerMethodField()
 #     is_active_player = serializers.SerializerMethodField()
 #
 #     class Meta:
 #         model = SeasonParticipant
-#         fields = ['id', 'username', 'profile_name', 'selected_game', 'banned_game', 'is_active_player']
+#         fields = ['id', 'username', 'profile_name', 'selected_game', 'game', 'is_active_player']
 #
 #     def get_selected_game(self, participant):
 #         selected_game = SelectedGame.objects.filter(

@@ -63,3 +63,11 @@ export type TUser = {
   groups: any[]; // Can be defined in detail if group structure is known
   user_permissions: any[]; // Can be defined in detail if permission structure is known
 };
+export type TLeagueMember = {
+  id: string | number;
+  username: string;
+  is_active_player: boolean;
+  selected_game?: string;
+  banned_game?: string;
+}
+
