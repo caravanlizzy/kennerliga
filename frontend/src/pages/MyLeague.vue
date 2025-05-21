@@ -33,22 +33,7 @@
     />
 
     <!-- Player Cards Grid -->
-    <div
-      class="player-grid"
-      :class="{ 'column-reverse': isMobile }"
-    >
-      <div
-        v-for="member in members"
-        :key="member.id"
-        class="player-card"
-      >
-        <LeagueUserCard
-          :status="league.status"
-          :member="member"
-          :isActive="member.is_active_player"
-        />
-      </div>
-    </div>
+    <PlayerCardList  :members="members" :status="league?.status"/>
   </div>
 </template>
 
@@ -57,10 +42,7 @@ import { computed, onMounted, ref } from 'vue';
 import { api } from 'boot/axios';
 import GameSelector from 'components/league/GameSelector.vue';
 import { useUserStore } from 'stores/userStore';
-import LeagueUserCard from 'components/league/LeagueUserCard.vue';
-import { useResponsive } from 'src/composables/reponsive';
-
-const { isMobile } = useResponsive();
+import PlayerCardList from 'components/league/PlayerCardList.vue';
 
 const league = ref<any>(null);
 const members = ref<any[]>([]);
