@@ -100,7 +100,6 @@ class SelectedGameSerializer(serializers.ModelSerializer):
         validated_data['player'] = (PlayerProfile.objects.get(id=profile_id)
                                     if profile_id
                                     else get_profile_by_username(self.context.get('request').user.username))
-
         # Set league if provided
         league_id = validated_data.pop('leagueId', None)
         if league_id:

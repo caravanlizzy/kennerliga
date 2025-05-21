@@ -6,6 +6,7 @@ from season.models import Season
 class LeagueStatus(models.TextChoices):
     PICKING = 'PICKING'
     BANNING = 'BANNING'
+    REPICKING = 'REPICKING'
     PLAYING = 'PLAYING'
     DONE = 'DONE'
 
