@@ -19,7 +19,7 @@
   <!--      eintragen-->
   <!--    </q-tooltip>-->
   <!--  </KennerButton>-->
-  <TheUsername v-if="isAuthenticated"/>
+  <UserName v-if="isAuthenticated"/>
   <KennerButton color="white" v-if="isAuthenticated" flat icon="menu" @click="onToggle"/>
   <KennerButton color="white" v-else flat icon="login" :to="{name:'login'}"/>
 </template>
@@ -28,7 +28,7 @@
 import KennerButton from 'components/base/KennerButton.vue';
 import { useUserStore } from 'stores/userStore';
 import { storeToRefs } from 'pinia';
-import TheUsername from 'components/ui/UserName.vue';
+import UserName from 'components/ui/UserName.vue';
 import { useRouter } from 'vue-router';
 import KennerTooltip from 'components/base/KennerTooltip.vue';
 import DevUsersList from 'components/lists/DevUsersList.vue';

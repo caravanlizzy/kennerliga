@@ -12,7 +12,9 @@
         <span class="text-primary text-weight-bold">
           {{ activePlayer?.username }}
         </span>
-        <span v-if="status === 'PICKING||BANNING'" class="q-mx-xs">muss ein Spiel</span>
+        <span v-if="status === 'PICKING' || status === 'BANNING'" class="q-mx-xs"
+          >muss ein Spiel
+        </span>
         <span
           class="text-weight-bold"
           :class="{
@@ -33,7 +35,11 @@
     />
 
     <!-- Player Cards Grid -->
-    <PlayerCardList  :members="members" :status="status" :activePlayer="activePlayer?.username"/>
+    <PlayerCardList
+      :members="members"
+      :status="status"
+      :activePlayer="activePlayer?.username"
+    />
   </div>
 </template>
 
@@ -48,7 +54,7 @@ import { getMyLeagueId } from 'src/services/game/leagueService';
 const league = ref<any>(null);
 const members = ref<any[]>([]);
 const status = ref<string>('');
-const myLeagueId = ref<number|null>(null);
+const myLeagueId = ref<number | null>(null);
 const { isMe } = useUserStore();
 
 const fetchLeagueDetails = async () => {
@@ -93,6 +99,7 @@ const statusVerb = computed(
 );
 
 provide('league', league);
+provide('fetchLeagueDetails', fetchLeagueDetails)
 </script>
 
 <style lang="scss" scoped>

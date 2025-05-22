@@ -20,7 +20,7 @@
           GAME
           <q-icon name="check" />
         </q-badge>
-        <q-badge v-if="member.banned_game" color="negative" text-color="white">
+        <q-badge v-if="member.banned_game" color="positive" text-color="white">
           BAN
           <q-icon name="check" />
         </q-badge>
