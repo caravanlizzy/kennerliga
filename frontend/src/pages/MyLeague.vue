@@ -5,7 +5,7 @@
       class="q-pa-lg column justify-center items-center text-primary border border-primary rounded-borders"
     >
       <div class="text-h6 text-uppercase text-weight-bold q-mb-sm">
-        {{ statusNoun }} {{}}
+        {{ statusNoun }}
       </div>
 
       <div class="text-subtitle1 text-center">

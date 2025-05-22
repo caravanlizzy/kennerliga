@@ -21,7 +21,7 @@
               Bannen
             </q-badge>
           </div>
-
+          {{myBansBannedBy}}
           <q-btn
             flat
             dense
@@ -108,7 +108,7 @@
 </template>
 
 <script setup lang="ts">
-import { inject, ref } from 'vue';
+import { computed, inject, ref } from 'vue';
 import { useUserStore } from 'stores/userStore';
 import { banGame } from 'src/services/game/banGameService';
 
@@ -129,9 +129,29 @@ function openBanDialog() {
   confirmDialog.value = true;
 }
 
+function findMyGame(){
+  const member =  league.value.members.find((member) => member.username = props.member.username);
+  console.log(member.username);
+  return member.selected_game;
+}
+
+function findBanners(game: { id: number }): string[] {
+  if (!league.value?.members) {
+    return [];
+  }
+  const members = league.value.members.filter(member => member.banned_game.id === game.id);
+  return members.map(member => member.username);
+}
+
+
+const myBansBannedBy = computed(() => {
+  const myGame = findMyGame();
+  if(!myGame) return [];
+  return findBanners(myGame);
+})
+
 async function confirmBan() {
   confirmDialog.value = false;
-  console.log(league);
   if (!user?.username || !league.value.id) {
     throw new Error('Missing required parameters');
   }
