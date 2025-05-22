@@ -22,7 +22,6 @@ import { computed } from 'vue';
 import PlayerCard from 'components/league/PlayerCard.vue';
 import { useUserStore } from 'stores/userStore';
 import { TLeagueMember } from 'src/types';
-import SelectedGameInfo from 'components/league/SelectedGameInfo.vue';
 
 const props = defineProps<{
   members: any[];

@@ -12,11 +12,10 @@
   </q-list>
 </template>
 <script setup lang="ts">
-import { ref, watch } from 'vue';
+import { ref } from 'vue';
 import { TUser } from 'src/types';
 import { api } from 'boot/axios';
 import { useUserStore } from 'stores/userStore';
-import { useRouter } from 'vue-router';
 
 const { login } = useUserStore();
 

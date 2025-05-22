@@ -43,17 +43,17 @@ import { api } from 'boot/axios';
 import GameSelector from 'components/league/GameSelector.vue';
 import { useUserStore } from 'stores/userStore';
 import PlayerCardList from 'components/league/PlayerCardList.vue';
+import { getMyLeague, LeagueDetails } from 'src/services/game/leagueService';
 
 const league = ref<any>(null);
 const members = ref<any[]>([]);
 const status = ref<string>('');
+const myLeagueData = ref<LeagueDetails|null>(null);
 const selectedBan = ref<any>(null);
 const { isMe } = useUserStore();
 
-const myleagueId = 1;
-
 const fetchLeagueDetails = async () => {
-  const { data } = await api.get(`league/league-details/${myleagueId}`);
+  const { data } = await api.get(`league/league-details/${myLeagueData.value?.id}`);
   league.value = data;
   members.value = data.members;
   status.value = data.status;
@@ -61,6 +61,8 @@ const fetchLeagueDetails = async () => {
 
 onMounted(async () => {
   try {
+    myLeagueData.value = await getMyLeague();
+    console.log(myLeagueData.value);
     await fetchLeagueDetails();
   } catch (err) {
     console.error('Error loading league details:', err);

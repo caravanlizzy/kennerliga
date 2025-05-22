@@ -47,7 +47,7 @@ export type SelectedOptionsMap = {
 };
 
 // API submission shape
-type SelectedGameOptionPayload = {
+export type SelectedGameOptionPayload = {
   game_option: number;
   selected_game: number;
   value?: boolean;
@@ -66,8 +66,8 @@ export type SelectedGameDtoPayload = {
 
 
 export type BanDecisionDtoPayload = {
-  league: number;
-  player: number;
-  game: number | null;
+  username: string;
+  gameId: number;
+  leagueId: number;
 };
 

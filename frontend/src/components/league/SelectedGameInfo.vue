@@ -105,8 +105,8 @@
 
 <script setup lang="ts">
 import { ref } from 'vue';
-import { banGame } from 'src/services/game/banGameService';
 import { useUserStore } from 'stores/userStore';
+import { banGame } from 'src/services/game/banGameService';
 
 const { user } = useUserStore();
 
@@ -130,7 +130,7 @@ function openBanDialog() {
 
 async function confirmBan() {
   confirmDialog.value = false;
-
+  banGame()
   emit('select-for-ban');
 }
 </script>

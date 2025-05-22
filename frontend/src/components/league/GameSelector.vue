@@ -49,7 +49,6 @@
         Spiel hat keine weiteren Optionen
       </div>
       <template v-else>
-        {{gameInformation.options}}
         <div
           v-for="option in gameInformation.options"
           :key="option.id"
