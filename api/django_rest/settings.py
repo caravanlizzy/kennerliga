@@ -42,7 +42,9 @@ DJANGO_APPS = [
     'corsheaders',
     'nested_admin',
     'django_filters',
-    'django_extensions'
+    'django_extensions',
+    'drf_spectacular',
+    'drf_spectacular_sidecar',  # required for Swagger UI/Redoc
 ]
 
 MY_APPS = [
@@ -93,7 +95,15 @@ REST_FRAMEWORK = {
     ],
     'DEFAULT_FILTER_BACKENDS': [
         'django_filters.rest_framework.DjangoFilterBackend'
-    ]
+    ],
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+}
+
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'Kennerliga API',
+    'DESCRIPTION': 'API documentation kennerliga',
+    'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': False,
 }
 
 WSGI_APPLICATION = 'django_rest.wsgi.application'
