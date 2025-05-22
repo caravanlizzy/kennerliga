@@ -197,9 +197,11 @@ class FullGameSerializer(serializers.ModelSerializer):
 
 
 class BanDecisionSerializer(serializers.ModelSerializer):
+    player = serializers.PrimaryKeyRelatedField(read_only=True)
     player_name = serializers.CharField(source='player.profile_name', read_only=True)
     game_name = serializers.CharField(source='game.game.name', read_only=True)
     league = serializers.PrimaryKeyRelatedField(queryset=League.objects.all(), required=True)
+    game = serializers.PrimaryKeyRelatedField(queryset=SelectedGame.objects.all(), required=True)
     username = serializers.CharField(write_only=True, required=True)
 
     class Meta:
@@ -209,4 +211,6 @@ class BanDecisionSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         username = validated_data.pop('username')
         validated_data['player'] = get_profile_by_username(username)
+        print(validated_data)
         return super().create(validated_data)
+

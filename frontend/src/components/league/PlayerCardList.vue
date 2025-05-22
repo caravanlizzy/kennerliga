@@ -29,10 +29,6 @@ const props = defineProps<{
   activePlayer: string|undefined;
 }>();
 
-const emit = defineEmits<{
-  (e: 'select-for-ban'): void;
-}>();
-
 const { isMobile } = useResponsive();
 const { user } = useUserStore();
 

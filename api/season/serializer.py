@@ -65,7 +65,7 @@ class SeasonParticipantSerializer(serializers.ModelSerializer):
         if not league:
             return None
         ban_decision = BanDecision.objects.filter(player=obj.profile, league=league).first()
-        return GameSerializer(ban_decision.game).data if ban_decision and ban_decision.game else None
+        return SelectedGameSerializer(ban_decision.game).data if ban_decision and ban_decision.game else None
 
     def get_is_active_player(self, obj):
         league = self.context.get('league')

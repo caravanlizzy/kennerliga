@@ -12,7 +12,7 @@
         <span class="text-primary text-weight-bold">
           {{ activePlayer?.username }}
         </span>
-        <span class="q-mx-xs">muss ein Spiel</span>
+        <span v-if="status === 'PICKING||BANNING'" class="q-mx-xs">muss ein Spiel</span>
         <span
           class="text-weight-bold"
           :class="{
@@ -38,22 +38,21 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue';
+import { computed, onMounted, provide, ref } from 'vue';
 import { api } from 'boot/axios';
 import GameSelector from 'components/league/GameSelector.vue';
 import { useUserStore } from 'stores/userStore';
 import PlayerCardList from 'components/league/PlayerCardList.vue';
-import { getMyLeague, LeagueDetails } from 'src/services/game/leagueService';
+import { getMyLeagueId } from 'src/services/game/leagueService';
 
 const league = ref<any>(null);
 const members = ref<any[]>([]);
 const status = ref<string>('');
-const myLeagueData = ref<LeagueDetails|null>(null);
-const selectedBan = ref<any>(null);
+const myLeagueId = ref<number|null>(null);
 const { isMe } = useUserStore();
 
 const fetchLeagueDetails = async () => {
-  const { data } = await api.get(`league/league-details/${myLeagueData.value?.id}`);
+  const { data } = await api.get(`league/league-details/${myLeagueId.value}`);
   league.value = data;
   members.value = data.members;
   status.value = data.status;
@@ -61,8 +60,7 @@ const fetchLeagueDetails = async () => {
 
 onMounted(async () => {
   try {
-    myLeagueData.value = await getMyLeague();
-    console.log(myLeagueData.value);
+    myLeagueId.value = await getMyLeagueId();
     await fetchLeagueDetails();
   } catch (err) {
     console.error('Error loading league details:', err);
@@ -93,6 +91,8 @@ const statusNoun = computed(
 const statusVerb = computed(
   () => statusMap[league.value?.status as LeagueStatus]?.verb ?? ''
 );
+
+provide('league', league);
 </script>
 
 <style lang="scss" scoped>

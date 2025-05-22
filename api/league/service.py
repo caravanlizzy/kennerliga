@@ -42,57 +42,44 @@ def order_players_by_rank(players):
     return players.order_by('rank')
 
 
+from django.db import transaction
+
 @transaction.atomic
 def rotate_active_player(league, reverse_order=False, members=None):
     """
     Rotates the active player in a league based on their ranking and specified order.
 
-    The function selects the next active player in a league by ordering players based
-    on their rank, considering the active player and cycling through the list
-    appropriately. The user can choose to reverse the order of player ranking. If
-    no players are available or the league is invalid, the function will either
-    raise an exception or return None.
-
     Args:
-        league (League): The league object containing the active player and list
-                         of members.
-        reverse_order (bool, optional): Determines the ranking order. If set to
-                                        True, players are ordered in descending
-                                        rank. Defaults to False.
-        members (QuerySet or None, optional): A specific list of members to consider
-                                              instead of the league's full member
-                                              list. Defaults to None.
+        league (League): The league object containing the active player and members.
+        reverse_order (bool): Whether to rotate in descending rank order.
+        members (QuerySet or None): Optional specific list of members.
 
     Returns:
-        Player or None: The new active player if the operation is successful. Returns
-                        None if there are no players in the league.
-
-    Raises:
-        ValueError: If the league parameter is None.
+        SeasonParticipant or None: The new active player.
     """
     if not league:
         raise ValueError("League cannot be None")
 
     players = members if members is not None else league.members.all()
-    order = '-rank' if reverse_order else 'rank'
-    ordered_players = players.order_by(order)
+    ordered_players = list(players.order_by('-rank' if reverse_order else 'rank'))
 
-    if not ordered_players.exists():
+    if not ordered_players:
         return None
 
     current_player = league.active_player
 
     if current_player not in ordered_players:
-        next_player = ordered_players.first()
+        next_player = ordered_players[0]
     else:
-        next_player = ordered_players.filter(
-            rank__gt=current_player.rank
-        ).first() or ordered_players.first()
+        current_index = ordered_players.index(current_player)
+        next_index = (current_index + 1) % len(ordered_players)
+        next_player = ordered_players[next_index]
 
     league.active_player = next_player
     league.save()
 
     return next_player
+
 
 
 def all_players_have_picked(league):

@@ -2,8 +2,9 @@ import { api } from 'boot/axios';
 import { BanDecisionDtoPayload } from 'src/models/gameModels';
 
 export async function banGame(banDecision: BanDecisionDtoPayload) {
+  console.log(banDecision);
   const data: Record<string, any> = {
-    player: banDecision.username,
+    username: banDecision.username,
     game: banDecision.gameId,
     league: banDecision.leagueId,
   };

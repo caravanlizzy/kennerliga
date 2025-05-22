@@ -27,7 +27,6 @@
       </div>
     </div>
     <SelectedGameInfo
-      @select-for-ban="emit('select-for-ban')"
       :member="member"
       :status="status"
       :isActive="isActive"
@@ -47,10 +46,6 @@ const props = defineProps<{
   status: string;
   isBanning: boolean;
   isBannable: boolean;
-}>();
-
-const emit = defineEmits<{
-  (e: 'select-for-ban'): void;
 }>();
 
 const activeBackgroundColor = computed(() => {

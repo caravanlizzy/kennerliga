@@ -70,7 +70,7 @@
     <div v-if="member.banned_game">
       <div class="text-caption text-weight-medium">Gebanntes Spiel:</div>
       <div class="text-body2 text-weight-bold text-negative">
-        {{ member.banned_game }}
+        {{ member.banned_game.game_name }}
       </div>
     </div>
 
@@ -90,8 +90,12 @@
         </q-card-section>
 
         <q-card-section>
-          Sicher dass du <span class="text-weight-bold">{{ member.selected_game?.game_name }}</span> von
-          <span class="text-weight-bold">{{ member.username }}</span> bannen willst?
+          Sicher dass du
+          <span class="text-weight-bold">{{
+            member.selected_game?.game_name
+          }}</span>
+          von <span class="text-weight-bold">{{ member.username }}</span> bannen
+          willst?
         </q-card-section>
 
         <q-card-actions align="right">
@@ -104,11 +108,9 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { inject, ref } from 'vue';
 import { useUserStore } from 'stores/userStore';
 import { banGame } from 'src/services/game/banGameService';
-
-const { user } = useUserStore();
 
 const props = defineProps<{
   member: any;
@@ -117,9 +119,8 @@ const props = defineProps<{
   isBannable: boolean;
 }>();
 
-const emit = defineEmits<{
-  (e: 'select-for-ban'): void;
-}>();
+const league = inject('league');
+const { user } = useUserStore();
 
 const isExpanded = ref(false);
 const confirmDialog = ref(false);
@@ -130,8 +131,15 @@ function openBanDialog() {
 
 async function confirmBan() {
   confirmDialog.value = false;
-  banGame()
-  emit('select-for-ban');
+  console.log(league);
+  if (!user?.username || !league.value.id) {
+    throw new Error('Missing required parameters');
+  }
+  banGame({
+    leagueId: league.value.id,
+    username: user.username,
+    gameId: props.member.selected_game.id, // Should come from a parameter or state
+  });
 }
 </script>
 
