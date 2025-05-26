@@ -93,6 +93,10 @@ import KennerSelect from 'components/base/KennerSelect.vue';
 import KennerButton from 'components/base/KennerButton.vue';
 import { useGameSelection } from 'src/composables/gameSelection';
 
+const props = defineProps<{
+  leagueId: number
+}>()
+
 const {
   gameInformation,
   gameSelection,
@@ -106,7 +110,7 @@ const {
   platforms,
   filteredGames,
   loadPlatformsAndGames,
-} = useGameSelection();
+} = useGameSelection(props.leagueId);
 
 const emit = defineEmits(['submit-success']);
 

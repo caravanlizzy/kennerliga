@@ -32,6 +32,7 @@
       v-if="isActive && league.status === 'PICKING'"
       @submit-success="fetchLeagueDetails"
       class="q-mt-xl"
+      :leagueId="myLeagueId"
     />
 
     <!-- Player Cards Grid -->

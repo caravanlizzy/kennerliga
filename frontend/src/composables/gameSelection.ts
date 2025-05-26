@@ -17,7 +17,7 @@ type TGameSelection = {
   selectedOptions: SelectedGameOptionDto[];
 };
 
-export function useGameSelection() {
+export function useGameSelection(leagueId: number) {
   const gameInformation = reactive<{
     game: GameDto | undefined;
     options: GameOptionDto[];
@@ -128,7 +128,7 @@ export function useGameSelection() {
   }
 
   async function fetchGames() {
-    const { data: gameData } = await api('game/games/');
+    const { data: gameData } = await api(`game/games/?league=${leagueId}&exclude_repeated=true`);
     return gameData;
   }
 
