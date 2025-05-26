@@ -29,8 +29,7 @@ class LoginApiView(APIView):
                             status=status.HTTP_200_OK)
         else:
             # If authentication failed, return error message
-            return Response({'error': 'Invalid username or password'}, status=status.HTTP_401_UNAUTHORIZED)
-
+            return Response({'error': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
 
 class LogoutApiView(APIView):
     @staticmethod
