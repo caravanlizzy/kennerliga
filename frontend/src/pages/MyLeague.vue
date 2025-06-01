@@ -12,24 +12,34 @@
         <span class="text-primary text-weight-bold">
           {{ activePlayer?.username }}
         </span>
-        <span v-if="status === 'PICKING' || status === 'BANNING'" class="q-mx-xs"
+        <span
+          v-if="status === 'PICKING' || status === 'BANNING'"
+          class="q-mx-xs"
           >muss ein Spiel
         </span>
         <span
           class="text-weight-bold"
           :class="{
-            'text-accent': league?.status === ' BANNING',
+            'text-accent': league?.status === 'BANNING',
             'text-secondary': league?.status === 'PICKING',
           }"
         >
           {{ statusVerb }}
         </span>
       </div>
+      <q-btn
+        v-if="isPlayerBanning"
+        color="accent"
+        outline
+        class="q-mt-sm"
+      >
+        Banne nichts
+      </q-btn>
     </div>
 
     <!-- Game Selector -->
     <GameSelector
-      v-if="isActive && league.status === 'PICKING'"
+      v-if="isPlayerPicking"
       @submit-success="fetchLeagueDetails"
       class="q-mt-xl"
       :leagueId="myLeagueId"
@@ -78,9 +88,13 @@ const activePlayer = computed(() =>
   members.value.find((member) => member.is_active_player)
 );
 
-const isActive = computed(() =>
+const isPlayerActive = computed(() =>
   activePlayer.value ? isMe(activePlayer.value.username) : false
 );
+
+const isPlayerBanning = computed(() => league.value?.status === 'BANNING' && isPlayerActive.value);
+
+const isPlayerPicking = computed(() => league.value?.status === 'PICKING' && isPlayerActive.value);
 
 type LeagueStatus = 'PICKING' | 'BANNING' | 'PLAYING' | 'DONE' | string;
 
@@ -100,7 +114,7 @@ const statusVerb = computed(
 );
 
 provide('league', league);
-provide('fetchLeagueDetails', fetchLeagueDetails)
+provide('fetchLeagueDetails', fetchLeagueDetails);
 </script>
 
 <style lang="scss" scoped>
