@@ -78,18 +78,18 @@
     <!-- Banned Game -->
     <div v-if="member.banned_game">
       <div class="text-caption text-weight-medium">Gebanntes Spiel:</div>
-      <div class="text-body2 text-weight-bold text-secondary">
+      <div class="text-body2 text-weight-bold text-accent">
         {{ member.banned_game.game_name }}
       </div>
     </div>
 
-    <!-- Nothing Selected -->
-    <div
-      v-if="!member.selected_game && !member.banned_game"
-      class="text-caption text-grey-6"
-    >
-      Noch keine Auswahl oder Bann.
-    </div>
+<!--    &lt;!&ndash; Nothing Selected &ndash;&gt;-->
+<!--    <div-->
+<!--      v-if="!member.selected_game && !member.banned_game"-->
+<!--      class="text-caption text-grey-6"-->
+<!--    >-->
+<!--      Noch keine Auswahl oder Bann.-->
+<!--    </div>-->
 
     <!-- Confirm Ban Dialog -->
     <q-dialog v-model="confirmDialog">
