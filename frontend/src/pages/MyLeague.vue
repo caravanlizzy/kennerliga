@@ -32,6 +32,7 @@
         color="accent"
         outline
         class="q-mt-sm"
+        @click="banNothin"
       >
         Banne nichts
       </q-btn>
@@ -61,12 +62,13 @@ import GameSelector from 'components/league/GameSelector.vue';
 import { useUserStore } from 'stores/userStore';
 import PlayerCardList from 'components/league/PlayerCardList.vue';
 import { getMyLeagueId } from 'src/services/game/leagueService';
+import { banGame } from 'src/services/game/banGameService';
 
 const league = ref<any>(null);
 const members = ref<any[]>([]);
 const status = ref<string>('');
 const myLeagueId = ref<number | null>(null);
-const { isMe } = useUserStore();
+const { isMe, user } = useUserStore();
 
 const fetchLeagueDetails = async () => {
   const { data } = await api.get(`league/league-details/${myLeagueId.value}`);
@@ -112,6 +114,13 @@ const statusNoun = computed(
 const statusVerb = computed(
   () => statusMap[league.value?.status as LeagueStatus]?.verb ?? ''
 );
+
+function banNothin() {
+  banGame({
+    username: user?.username,
+    leagueId: myLeagueId.value,
+  })
+}
 
 provide('league', league);
 provide('fetchLeagueDetails', fetchLeagueDetails);

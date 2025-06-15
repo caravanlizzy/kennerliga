@@ -17,6 +17,7 @@
               text-color="white"
               class="bannable-badge q-ml-md"
               @click.stop="openBanDialog"
+              outline
             >
               Bannen
             </q-badge>
@@ -74,12 +75,11 @@
         </q-slide-transition>
       </q-card>
     </div>
-
     <!-- Banned Game -->
     <div v-if="member.banned_game">
       <div class="text-caption text-weight-medium">Gebanntes Spiel:</div>
       <div class="text-body2 text-weight-bold text-accent">
-        {{ member.banned_game.game_name }}
+        {{ member.banned_game.game_name || 'Nichts' }}
       </div>
     </div>
 
