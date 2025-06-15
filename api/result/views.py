@@ -1,14 +1,12 @@
-# Create your views here.
-from rest_framework.exceptions import NotFound
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from rest_framework import status
 
+from .models import Result
+from .serializers import ResultSerializer
 from league.models import League
-from result.models import Result
-from result.serializers import ResultSerializer
-from season.models import Season
-from season.service import get_running_season
-from user.models import PlayerProfile
+from game.models import ResultConfig, TieBreaker
 
 
 class ResultViewSet(ModelViewSet):
@@ -17,24 +15,45 @@ class ResultViewSet(ModelViewSet):
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        # Optionally filter queryset based on the authenticated user's profile or other criteria
-        return self.queryset.filter(player_profile__user=self.request.user)
+        queryset = super().get_queryset()
+
+        # Optional filters
+        league_id = self.request.query_params.get('league')
+        season_id = self.request.query_params.get('season')
+        player_id = self.request.query_params.get('player_profile')
+
+        if league_id:
+            queryset = queryset.filter(league_id=league_id)
+        if season_id:
+            queryset = queryset.filter(season_id=season_id)
+        if player_id:
+            queryset = queryset.filter(player_profile_id=player_id)
+
+        return queryset
 
     def perform_create(self, serializer):
-        # Get the authenticated user's player profile
-        try:
-            player_profile = PlayerProfile.objects.get(user=self.request.user)
-        except PlayerProfile.DoesNotExist:
-            raise NotFound("Player profile not found for the authenticated user.")
+        result = serializer.save()
 
-        # Fetch the current running season and league
-        try:
-            season = get_running_season()
-            league = League.objects.get(seasons=season)
-        except Season.DoesNotExist:
-            raise NotFound("Running season not found.")
-        except League.DoesNotExist:
-            raise NotFound("League for the current season not found.")
+        # Optional: trigger tie-breaker assignment logic if league is now full
+        self.maybe_assign_decisive_tiebreaker(result.league)
 
-        # Save the Result instance with the additional context
-        serializer.save(player_profile=player_profile, season=season, league=league)
+    def maybe_assign_decisive_tiebreaker(self, league: League):
+        results = list(Result.objects.filter(league=league))
+        expected_players = league.members.count()
+
+        if len(results) < expected_players:
+            return  # Not all results in yet
+
+        config = ResultConfig.objects.filter(game=results[0].selected_game.game).first()
+        if not config:
+            return
+
+        tiebreakers = config.tiebreaker_set.all().order_by('order')
+
+        for tb in tiebreakers:
+            values = set(r.tie_breaker_value for r in results if r.tie_breaker_value)
+            if len(values) > 1:
+                for r in results:
+                    r.decisive_tie_breaker = tb
+                    r.save(update_fields=['decisive_tie_breaker'])
+                break
