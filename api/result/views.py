@@ -1,59 +1,90 @@
-from rest_framework.viewsets import ModelViewSet
+from rest_framework.viewsets import ModelViewSet, ViewSet
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
+from django.db import transaction
 
+from game.models import SelectedGame
 from .models import Result
 from .serializers import ResultSerializer
-from league.models import League
-from game.models import ResultConfig, TieBreaker
 
-
+# ViewSet to manage a users result, mainly useful for admins
+# The frontend would usually post a set of results => 1 result per player in the league
+# which is handled in a separate ViewSet (MathResultViewSet)
 class ResultViewSet(ModelViewSet):
     queryset = Result.objects.all()
     serializer_class = ResultSerializer
+
+
+from rest_framework.decorators import action
+
+class MatchResultViewSet(ViewSet):
     permission_classes = [IsAuthenticated]
 
-    def get_queryset(self):
-        queryset = super().get_queryset()
+    def create(self, request):
+        selected_game_id = request.data.get("selected_game")
+        data = request.data.get("results", [])
+        dry_run = request.query_params.get("dry_run") == "true" or request.data.get("dry_run") is True
 
-        # Optional filters
-        league_id = self.request.query_params.get('league')
-        season_id = self.request.query_params.get('season')
-        player_id = self.request.query_params.get('player_profile')
+        if not selected_game_id or not isinstance(data, list) or len(data) < 2:
+            return Response(
+                {"detail": "You must submit a selected_game and at least two results."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
 
-        if league_id:
-            queryset = queryset.filter(league_id=league_id)
-        if season_id:
-            queryset = queryset.filter(season_id=season_id)
-        if player_id:
-            queryset = queryset.filter(player_profile_id=player_id)
+        try:
+            selected_game = SelectedGame.objects.select_related('league__season').get(pk=selected_game_id)
+        except SelectedGame.DoesNotExist:
+            return Response({"detail": "SelectedGame not found."}, status=status.HTTP_404_NOT_FOUND)
 
-        return queryset
+        # Preload related objects
+        league = selected_game.league
+        season = league.season
 
-    def perform_create(self, serializer):
-        result = serializer.save()
+        # Validate and enrich each entry
+        serializers = []
+        for entry in data:
+            entry['selected_game'] = selected_game.id
+            entry['league'] = league.id
+            entry['season'] = season.id
 
-        # Optional: trigger tie-breaker assignment logic if league is now full
-        self.maybe_assign_decisive_tiebreaker(result.league)
+            serializer = ResultSerializer(data=entry, context={"request": request})
+            if not serializer.is_valid():
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            serializers.append(serializer)
 
-    def maybe_assign_decisive_tiebreaker(self, league: League):
-        results = list(Result.objects.filter(league=league))
-        expected_players = league.members.count()
+        validated = [s.validated_data for s in serializers]
+        scores = [v["points"] for v in validated]
+        max_score = max(scores)
+        tied = [v for v in validated if v["points"] == max_score]
 
-        if len(results) < expected_players:
-            return  # Not all results in yet
+        if len(tied) > 1:
+            return Response(
+                {
+                    "detail": "Tie detected. Tie-breaker required.",
+                    "dry_run": dry_run,
+                    "tied_players": [r["player_profile"].id for r in tied],
+                },
+                status=status.HTTP_202_ACCEPTED,
+            )
 
-        config = ResultConfig.objects.filter(game=results[0].selected_game.game).first()
-        if not config:
-            return
+        if dry_run:
+            return Response(
+                {
+                    "detail": "No tie detected. Would have saved results.",
+                    "dry_run": True,
+                    "results_preview": [s.data for s in serializers],
+                },
+                status=status.HTTP_200_OK,
+            )
 
-        tiebreakers = config.tiebreaker_set.all().order_by('order')
+        with transaction.atomic():
+            saved_results = [s.save() for s in serializers]
 
-        for tb in tiebreakers:
-            values = set(r.tie_breaker_value for r in results if r.tie_breaker_value)
-            if len(values) > 1:
-                for r in results:
-                    r.decisive_tie_breaker = tb
-                    r.save(update_fields=['decisive_tie_breaker'])
-                break
+        return Response(
+            ResultSerializer(saved_results, many=True).data,
+            status=status.HTTP_201_CREATED,
+        )
+
+
+
