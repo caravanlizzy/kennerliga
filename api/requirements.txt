@@ -6,3 +6,6 @@ django-filter
 django-extensions
 setuptools
 python-dotenv
+
+drf_spectacular
+drf_spectacular_sidecar
