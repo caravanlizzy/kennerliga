@@ -4,10 +4,7 @@
     <div
       class="q-pa-lg column justify-center items-center text-primary border border-primary rounded-borders"
     >
-      <ResultMatchForm
-        selected-game-id="1"
-        :players="[{id: 1, username: 'haligh'},{id: 3, username: 'MissM1'},{id: 4, username: 'Markus1711'},{id: 5, username: 'chefkoch07'}]"
-      />
+
       <div class="text-h6 text-uppercase text-weight-bold q-mb-sm">
         {{ statusNoun }}
       </div>
@@ -50,6 +47,9 @@
       :leagueId="myLeagueId"
     />
 
+    <GameResult v-if="status === 'PLAYING'" :league="league" />
+
+
     <!-- Player Cards Grid -->
     <PlayerCardList
       :members="members"
@@ -68,6 +68,8 @@ import PlayerCardList from 'components/league/PlayerCardList.vue';
 import { getMyLeagueId } from 'src/services/game/leagueService';
 import { banGame } from 'src/services/game/banGameService';
 import ResultMatchForm from 'components/league/ResultMatchForm.vue';
+import SelectedGameResult from 'components/league/SelectedGameResult.vue';
+import GameResult from 'components/league/GameResult.vue';
 
 const league = ref<any>(null);
 const members = ref<any[]>([]);
@@ -130,6 +132,15 @@ function banNothin() {
     leagueId: myLeagueId.value,
   });
 }
+
+const selectedGames = ref<any[]>([]);
+const activeSelectedGame = ref<any | null>(null);
+
+async function fetchSelectedGames() {
+  const { data } = await api.get(`result/selected-games/?league=${myLeagueId.value}`);
+  selectedGames.value = data;
+}
+
 
 provide('league', league);
 provide('fetchLeagueDetails', fetchLeagueDetails);
