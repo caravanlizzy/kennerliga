@@ -4,6 +4,10 @@
     <div
       class="q-pa-lg column justify-center items-center text-primary border border-primary rounded-borders"
     >
+      <ResultMatchForm
+        selected-game-id="1"
+        :players="[{id: 1, username: 'haligh'},{id: 3, username: 'MissM1'},{id: 4, username: 'Markus1711'},{id: 5, username: 'chefkoch07'}]"
+      />
       <div class="text-h6 text-uppercase text-weight-bold q-mb-sm">
         {{ statusNoun }}
       </div>
@@ -63,6 +67,7 @@ import { useUserStore } from 'stores/userStore';
 import PlayerCardList from 'components/league/PlayerCardList.vue';
 import { getMyLeagueId } from 'src/services/game/leagueService';
 import { banGame } from 'src/services/game/banGameService';
+import ResultMatchForm from 'components/league/ResultMatchForm.vue';
 
 const league = ref<any>(null);
 const members = ref<any[]>([]);
@@ -94,9 +99,13 @@ const isPlayerActive = computed(() =>
   activePlayer.value ? isMe(activePlayer.value.username) : false
 );
 
-const isPlayerBanning = computed(() => league.value?.status === 'BANNING' && isPlayerActive.value);
+const isPlayerBanning = computed(
+  () => league.value?.status === 'BANNING' && isPlayerActive.value
+);
 
-const isPlayerPicking = computed(() => league.value?.status === 'PICKING' && isPlayerActive.value);
+const isPlayerPicking = computed(
+  () => league.value?.status === 'PICKING' && isPlayerActive.value
+);
 
 type LeagueStatus = 'PICKING' | 'BANNING' | 'PLAYING' | 'DONE' | string;
 
@@ -119,7 +128,7 @@ function banNothin() {
   banGame({
     username: user?.username,
     leagueId: myLeagueId.value,
-  })
+  });
 }
 
 provide('league', league);
