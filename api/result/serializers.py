@@ -6,7 +6,7 @@ from .models import Result
 class ResultSerializer(serializers.ModelSerializer):
     faction_id = serializers.IntegerField(required=False, write_only=True)
     faction_name = serializers.SerializerMethodField(read_only=True)
-    decisive_tie_breaker = serializers.SerializerMethodField(read_only=True)
+    decisive_tie_breaker = serializers.SerializerMethodField(required=False, read_only=True)
 
     class Meta:
         model = Result
@@ -26,7 +26,11 @@ class ResultSerializer(serializers.ModelSerializer):
         return obj.faction.name if getattr(obj, 'faction', None) else None
 
     def get_decisive_tie_breaker(self, obj):
-        if obj.decisive_tie_breaker:
+        if isinstance(obj, dict):
+            # This is a dict, skip processing (likely in dry_run)
+            return obj.get("decisive_tie_breaker")
+
+        if hasattr(obj, 'decisive_tie_breaker') and obj.decisive_tie_breaker:
             return {
                 "id": obj.decisive_tie_breaker.id,
                 "name": obj.decisive_tie_breaker.name
@@ -42,16 +46,22 @@ class ResultSerializer(serializers.ModelSerializer):
         if not result_config:
             raise serializers.ValidationError("ResultConfig is missing for this game.")
 
-        # Validate faction requirement
+        # ✅ Validate faction requirement
         if result_config.is_asymmetric:
             if 'faction_id' not in self.initial_data:
                 raise serializers.ValidationError("Faction is required for asymmetric games.")
 
-        # Validate starting position requirement
+        # ✅ Validate starting position requirement
         if not result_config.has_starting_player_order:
             data['starting_position'] = None  # ignore if not needed
         elif 'starting_position' not in data:
             raise serializers.ValidationError("Starting position is required.")
+
+        # ✅ Validate points requirement
+        if result_config.has_points:
+            if 'points' not in data:
+                raise serializers.ValidationError("Points are required for this game.")
+
         return data
 
     def create(self, validated_data):
