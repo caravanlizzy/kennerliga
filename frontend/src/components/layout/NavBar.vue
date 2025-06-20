@@ -8,7 +8,14 @@
   <q-toolbar-title class="text-primary">
     <!--      <h6 class="text-italic" > Kennerliga </h6>-->
   </q-toolbar-title>
-  <DevUsersList/>
+  <DevUsersList v-show="showDev"/>
+  <KennerButton
+    @click="() => showDev = !showDev"
+    color="info"
+    rounded
+    dense
+    flat
+  > Dev</KennerButton>
 
   <KennerButton :to="{name: 'my-league'}" v-if="isAuthenticated" flat color="positive" icon="sports_esports">
     <KennerTooltip> Meine Liga </KennerTooltip>
@@ -20,8 +27,8 @@
   <!--    </q-tooltip>-->
   <!--  </KennerButton>-->
   <UserName v-if="isAuthenticated"/>
-  <KennerButton color="white" v-if="isAuthenticated" flat icon="menu" @click="onToggle"/>
-  <KennerButton color="white" v-else flat icon="login" :to="{name:'login'}"/>
+  <KennerButton color="primary" v-if="isAuthenticated" flat icon="menu" @click="onToggle"/>
+  <KennerButton color="primary" v-else flat icon="login" :to="{name:'login'}"/>
 </template>
 
 <script setup lang="ts">
@@ -32,6 +39,7 @@ import UserName from 'components/ui/UserName.vue';
 import { useRouter } from 'vue-router';
 import KennerTooltip from 'components/base/KennerTooltip.vue';
 import DevUsersList from 'components/lists/DevUsersList.vue';
+import { ref } from 'vue';
 
 defineProps<{
   onToggle: () => void,
@@ -40,6 +48,7 @@ defineProps<{
 const store = useUserStore();
 const router = useRouter();
 const { isAuthenticated } = storeToRefs(store);
+const showDev = ref(false);
 
 function goHome() {
   router.push({ name: 'home' });

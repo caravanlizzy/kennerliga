@@ -37,16 +37,17 @@
         </q-tabs>
       </div>
 
-      <!-- Form always below tabs -->
+      <!-- Form or Result -->
       <div v-show="showForm">
         <q-separator class="q-mb-sm" />
-        <keep-alive>
+        <keep-alive include="ResultMatchForm">
           <component
-            :is="ResultMatchForm"
+            :is="hasResult(selectedGameId) ? MatchResult : ResultMatchForm"
             v-if="selectedGameId"
             :key="selectedGameId"
             :selected-game-id="selectedGameId"
             :players="getPlayersForGame(selectedGameId)"
+            v-bind="hasResult(selectedGameId) ? getResultProps(selectedGameId) : {}"
           />
         </keep-alive>
       </div>
@@ -55,9 +56,11 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watchEffect } from 'vue';
+import { ref, computed, watchEffect, watch } from 'vue';
 import { useQuasar } from 'quasar';
+import { api } from 'boot/axios';
 import ResultMatchForm from './ResultMatchForm.vue';
+import MatchResult from './MatchResult.vue';
 
 const props = defineProps<{
   league: any;
@@ -66,6 +69,7 @@ const props = defineProps<{
 const $q = useQuasar();
 const showForm = ref(true);
 const selectedGameId = ref<number | null>(null);
+const resultsByGame = ref<Record<number, any[]>>({});
 
 const isDesktop = computed(() => $q.screen.gt.sm);
 
@@ -84,12 +88,50 @@ watchEffect(() => {
   }
 });
 
-function getPlayersForGame(gameId: number) {
-  return allMembers.value
-    .map((member) => ({
+watch(selectedGameId, async (id) => {
+  showForm.value = true;
+  if (id && !resultsByGame.value[id]) {
+    try {
+      const { data } = await api.get(`/result/results/?selected_game=${id}`);
+      resultsByGame.value[id] = data;
+    } catch (err) {
+      console.error('Fehler beim Laden der Ergebnisse:', err);
+      resultsByGame.value[id] = [];
+    }
+  }
+});
+
+function hasResult(selectedGameId: number) {
+  console.log('running');
+  const results = resultsByGame.value[selectedGameId];
+  const totalPlayers = allMembers.value.length;
+  return results?.length === totalPlayers;
+}
+
+function getPlayersForGame(selectedGameId: number) {
+  return allMembers.value.map((member) => ({
+    id: member.id,
+    username: member.username,
+  }));
+}
+
+function getResultProps(selectedGameId: number) {
+  const game = uniqueSelectedGames.value.find(g => g.id === selectedGameId);
+  const results = resultsByGame.value[selectedGameId] || [];
+
+  const enriched = allMembers.value.map(member => {
+    const result = results.find(r => r.player_profile === member.id);
+    return {
       id: member.id,
       username: member.username,
-    }));
+      ...result,
+    };
+  });
+
+  return {
+    gameName: game?.game_name || 'Spiel',
+    results: enriched,
+  };
 }
 </script>
 

@@ -2,3 +2,19 @@
 * {
   box-sizing: border-box;
 }
+
+// Global player background colors
+.bg-player-1 { background-color: #5e72e4 !important; } // Indigo Blue
+.bg-player-2 { background-color: #f5365c !important; } // Bold Red
+.bg-player-3 { background-color: #2dce89 !important; } // Green
+.bg-player-4 { background-color: #fb6340 !important; } // Orange
+.bg-player-5 { background-color: #11cdef !important; } // Cyan
+.bg-player-6 { background-color: #8965e0 !important; } // Purple
+
+// Optional matching text colors
+.text-player-1 { color: #5e72e4 !important; }
+.text-player-2 { color: #f5365c !important; }
+.text-player-3 { color: #2dce89 !important; }
+.text-player-4 { color: #fb6340 !important; }
+.text-player-5 { color: #11cdef !important; }
+.text-player-6 { color: #8965e0 !important; }

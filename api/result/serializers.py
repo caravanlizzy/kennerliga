@@ -4,7 +4,7 @@ from .models import Result
 
 
 class ResultSerializer(serializers.ModelSerializer):
-    faction_id = serializers.IntegerField(required=False, write_only=True)
+    faction_id = serializers.IntegerField(required=False, allow_null=True, write_only=True)
     faction_name = serializers.SerializerMethodField(read_only=True)
     decisive_tie_breaker = serializers.SerializerMethodField(required=False, read_only=True)
 

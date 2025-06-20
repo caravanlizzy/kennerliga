@@ -36,6 +36,7 @@ function toggleDrawer(): void {
 
 <style scoped lang="scss">
 .background-navbar {
-  background-color: #4d4949;
+  background-color: #ffffff;
+  border-bottom: 1px solid #b15f3a;
 }
 </style>

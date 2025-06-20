@@ -1,68 +1,66 @@
 <template>
   <div class="q-pa-md">
     <q-form v-if="formData.length" @submit.prevent="submitResults">
-      <div class="row q-col-gutter-md q-mb-lg">
+      <div class="row q-col-gutter-md q-mb-xl">
         <div
           v-for="(player, index) in players"
           :key="player.id"
           class="col-12 col-md-6 col-lg-4"
         >
-          <q-card flat bordered class="q-pa-md shadow-1 rounded-borders">
-            <div class="text-h6 text-bold text-primary q-mb-sm">
+          <q-card class="shadow-1 rounded-borders">
+            <!-- Colored Header -->
+            <div
+              class="form-card-header q-pa-sm text-white text-subtitle2"
+              :class="getPlayerColorClass(index)"
+            >
               {{ player.username }}
             </div>
 
-            <div class="row q-col-gutter-sm">
-              <div v-if="resultConfig?.has_points" class="col-12">
-                <q-input
-                  v-model.number="formData[index].points"
-                  type="number"
-                  label="Punkte"
-                  dense
-                  outlined
-                  :rules="[(val) => val !== null || 'Pflichtfeld']"
-                />
-              </div>
+            <!-- Card Body -->
+            <div class="q-pa-md q-gutter-md">
+              <q-input
+                v-if="resultConfig?.has_points"
+                v-model.number="formData[index].points"
+                type="number"
+                label="Punkte"
+                dense
+                outlined
+                :rules="[(val) => val !== null || 'Pflichtfeld']"
+              />
 
-              <div
+              <q-input
                 v-if="resultConfig?.has_starting_player_order"
-                class="col-12"
-              >
-                <q-input
-                  v-model.number="formData[index].starting_position"
-                  type="number"
-                  label="Startposition"
-                  dense
-                  outlined
-                />
-              </div>
+                v-model.number="formData[index].starting_position"
+                type="number"
+                label="Startposition"
+                dense
+                outlined
+              />
 
-              <div v-if="resultConfig?.is_asymmetric" class="col-12">
-                <q-select
-                  v-model="formData[index].faction_id"
-                  :options="factions"
-                  option-label="name"
-                  option-value="id"
-                  label="Faction"
-                  dense
-                  outlined
-                />
-              </div>
+              <q-select
+                v-if="resultConfig?.is_asymmetric"
+                v-model="formData[index].faction_id"
+                :options="factions"
+                option-label="name"
+                option-value="id"
+                label="Faction"
+                dense
+                outlined
+              />
 
-              <div v-if="tieBreakerRequired" class="col-12">
-                <q-input
-                  v-model="formData[index].tie_breaker_value"
-                  label="Tie-Breaker Wert"
-                  dense
-                  outlined
-                />
-              </div>
+              <q-input
+                v-if="tieBreakerRequired"
+                v-model="formData[index].tie_breaker_value"
+                label="Tie-Breaker Wert"
+                dense
+                outlined
+              />
             </div>
           </q-card>
         </div>
       </div>
 
-      <div class="q-mt-lg row justify-end">
+      <div class="row justify-end">
         <q-btn
           type="submit"
           label="Ergebnisse speichern"
@@ -75,6 +73,7 @@
     <q-spinner v-else color="primary" size="md" class="q-my-xl" />
   </div>
 </template>
+
 
 <script setup lang="ts">
 import { ref, watch, onMounted } from 'vue';
@@ -142,13 +141,15 @@ watch(
 
 async function submitResults() {
   // Sanitize faction_id fields
-  formData.value = formData.value.map((entry) => ({
-    ...entry,
-    faction_id:
-      typeof entry.faction_id === 'object'
-        ? entry.faction_id.id
-        : entry.faction_id,
-  }));
+  formData.value = formData.value.map((entry) => {
+    return {
+      ...entry,
+      faction_id:
+        entry.faction_id !== null && typeof entry.faction_id === 'object' && 'id' in entry.faction_id
+          ? entry.faction_id.id
+          : entry.faction_id ?? null,
+    };
+  });
   const payload = {
     selected_game: props.selectedGameId,
     results: formData.value,
@@ -201,4 +202,26 @@ async function submitResults() {
   }
 }
 
+function getPlayerColorClass(index: number): string {
+  const colorClasses = [
+    'bg-player-1',
+    'bg-player-2',
+    'bg-player-3',
+    'bg-player-4',
+    'bg-player-5',
+    'bg-player-6'
+  ];
+  return colorClasses[index % colorClasses.length];
+}
+
+
 </script>
+
+<style scoped>
+.form-card-header {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+}
+</style>
+

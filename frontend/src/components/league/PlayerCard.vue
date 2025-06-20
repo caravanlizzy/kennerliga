@@ -5,7 +5,7 @@
       <div class="row items-center text-weight-medium no-wrap">
         {{ member.username }}
         <div v-if="isActive" class="active-indicator q-ml-xs">
-          <span class="dot" :class="activeBackgroundColor" />
+          <span class="dot" />
         </div>
       </div>
 
@@ -53,10 +53,6 @@ const props = defineProps<{
   isBannable: boolean;
   index?: number;
 }>();
-
-const activeBackgroundColor = computed(() =>
-  props.status === 'BANNING' ? 'bg-accent' : 'bg-secondary'
-);
 
 const bgClass = computed(() => {
   const i = props.index ?? 0;
@@ -112,17 +108,18 @@ const bgClass = computed(() => {
 .active-indicator {
   display: flex;
   align-items: center;
-  margin-left: 4px;
+  margin-left: 7px;
 }
 
 .dot {
-  height: 8px;
-  width: 8px;
+  height: 9px;
+  width: 9px;
   border-radius: 50%;
   display: inline-block;
-  animation: pulse 1.4s infinite ease-in-out;
   background: white;
+  animation: pulse 1.8s ease-in-out infinite;
 }
+
 
 @keyframes pulse {
   0%, 100% {
@@ -134,12 +131,4 @@ const bgClass = computed(() => {
     opacity: 0.5;
   }
 }
-
-/* Distinct player header colors */
-.bg-player-1 { background-color: #5e72e4; } // Indigo Blue
-.bg-player-2 { background-color: #f5365c; } // Bold Red
-.bg-player-3 { background-color: #2dce89; } // Green
-.bg-player-4 { background-color: #fb6340; } // Orange
-.bg-player-5 { background-color: #11cdef; } // Cyan
-.bg-player-6 { background-color: #8965e0; } // Purple
 </style>

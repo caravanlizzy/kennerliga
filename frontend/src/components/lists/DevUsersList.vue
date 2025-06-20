@@ -5,7 +5,7 @@
       :key="user"
       clickable
       @click="impersonate(user, 'test')"
-      class="col-auto"
+      class="col-auto text-black"
     >
       <q-item-section>{{ user }}</q-item-section>
     </q-item>

@@ -133,13 +133,6 @@ function banNothin() {
   });
 }
 
-const selectedGames = ref<any[]>([]);
-const activeSelectedGame = ref<any | null>(null);
-
-async function fetchSelectedGames() {
-  const { data } = await api.get(`result/selected-games/?league=${myLeagueId.value}`);
-  selectedGames.value = data;
-}
 
 
 provide('league', league);

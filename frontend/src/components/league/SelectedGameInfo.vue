@@ -238,4 +238,22 @@ async function confirmBan() {
 .rotate-180 {
   transform: rotate(180deg);
 }
+
+.fade-scale-enter-active {
+  transition: all 0.3s ease;
+}
+.fade-scale-leave-active {
+  transition: all 0.2s ease;
+  opacity: 0;
+  transform: scale(0.9);
+}
+.fade-scale-enter-from {
+  opacity: 0;
+  transform: scale(0.8);
+}
+.fade-scale-enter-to {
+  opacity: 1;
+  transform: scale(1);
+}
+
 </style>
