@@ -14,6 +14,7 @@ from .serializers import ResultSerializer
 class ResultViewSet(ModelViewSet):
     queryset = Result.objects.all()
     serializer_class = ResultSerializer
+    filterset_fields = ['selected_game']
 
 
 class MatchResultViewSet(ViewSet):
