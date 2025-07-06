@@ -136,6 +136,27 @@ class MatchResultViewSet(ViewSet):
             status=status.HTTP_201_CREATED,
         )
 
+    def retrieve(self, request):
+        season_id = request.query_params.get("season")
+        league_id = request.query_params.get("league")
+        selected_game_id = request.query_params.get("selected_game")
+
+        if not all([season_id, league_id, selected_game_id]):
+            return Response(
+                {"detail": "season, league, and selected_game parameters are required."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        results = Result.objects.filter(
+            season_id=season_id,
+            league_id=league_id,
+            selected_game_id=selected_game_id,
+        )
+
+        serializer = ResultSerializer(results, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
 
 
 
