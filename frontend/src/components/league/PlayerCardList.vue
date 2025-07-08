@@ -1,19 +1,23 @@
 <template>
-  <div :class="containerClass">
-    <div
-      v-for="(member, index) in members"
-      :key="member.id"
-      class="player-card"
-    >
-      <PlayerCard
-        :status="status"
-        :member="member"
-        :isActive="member.is_active_player"
-        :isBanning="isBanning(member)"
-        :isBannable="isBannable(member)"
-        :index="index"
-      />
+  <div class="league-card q-pa-md">
+    <div class="text-h6">Spielauswahl</div>
+    <div :class="containerClass" >
+      <div
+        v-for="(member, index) in members"
+        :key="member.id"
+        class="player-card"
+      >
+        <PlayerCard
+          :status="status"
+          :member="member"
+          :isActive="member.is_active_player"
+          :isBanning="isBanning(member)"
+          :isBannable="isBannable(member)"
+          :index="index"
+        />
+      </div>
     </div>
+
   </div>
 </template>
 

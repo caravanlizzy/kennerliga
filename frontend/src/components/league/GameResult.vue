@@ -1,6 +1,6 @@
 <template>
   <div class="q-pa-sm">
-    <q-card class="result-card q-pa-md">
+    <q-card class="league-card q-pa-md">
       <!-- Header with toggler -->
       <div class="row items-center justify-between q-mb-sm">
         <div class="text-h6">Ergebnis eintragen</div>
@@ -136,14 +136,6 @@ function getResultProps(selectedGameId: number) {
 </script>
 
 <style scoped>
-.result-card {
-  background: #f3f3f3;
-  border-radius: 8px;
-  margin: 8px;
-  overflow: hidden;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
-}
-
 .toggle-btn {
   transition: transform 0.2s ease;
 }

@@ -19,13 +19,7 @@
 
   <KennerButton :to="{name: 'my-league'}" v-if="isAuthenticated" flat color="positive" icon="sports_esports">
     <KennerTooltip> Meine Liga </KennerTooltip>
-
   </KennerButton>
-  <!--  <KennerButton v-if="isAuthenticated" flat color="secondary" icon="add_circle">-->
-  <!--    <q-tooltip class="bg-primary text-white" :delay="50" :hide-delay="170" anchor="top left"> Ergebnis-->
-  <!--      eintragen-->
-  <!--    </q-tooltip>-->
-  <!--  </KennerButton>-->
   <UserName v-if="isAuthenticated"/>
   <KennerButton color="primary" v-if="isAuthenticated" flat icon="menu" @click="onToggle"/>
   <KennerButton color="primary" v-else flat icon="login" :to="{name:'login'}"/>

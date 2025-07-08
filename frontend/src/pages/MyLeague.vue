@@ -1,43 +1,11 @@
 <template>
   <div class="q-pa-lg">
-    <!-- Status Bar -->
-    <div
-      class="q-pa-lg column justify-center items-center text-primary border border-primary rounded-borders"
-    >
-
-      <div class="text-h6 text-uppercase text-weight-bold q-mb-sm">
-        {{ statusNoun }}
-      </div>
-
-      <div class="text-subtitle1 text-center">
-        <span class="text-primary text-weight-bold">
-          {{ activePlayer?.username }}
-        </span>
-        <span
-          v-if="status === 'PICKING' || status === 'BANNING'"
-          class="q-mx-xs"
-          >muss ein Spiel
-        </span>
-        <span
-          class="text-weight-bold"
-          :class="{
-            'text-accent': league?.status === 'BANNING',
-            'text-secondary': league?.status === 'PICKING',
-          }"
-        >
-          {{ statusVerb }}
-        </span>
-      </div>
-      <q-btn
-        v-if="isPlayerBanning"
-        color="accent"
-        outline
-        class="q-mt-sm"
-        @click="banNothin"
-      >
-        Banne nichts
-      </q-btn>
-    </div>
+    <LeagueStatusBar
+      :league="league"
+      :status="status"
+      :activePlayer="activePlayer"
+      :isPlayerBanning="isPlayerBanning"
+    />
 
     <!-- Game Selector -->
     <GameSelector
@@ -48,7 +16,6 @@
     />
 
     <GameResult v-if="status === 'PLAYING'" :league="league" />
-
 
     <!-- Player Cards Grid -->
     <PlayerCardList
@@ -67,9 +34,8 @@ import { useUserStore } from 'stores/userStore';
 import PlayerCardList from 'components/league/PlayerCardList.vue';
 import { getMyLeagueId } from 'src/services/game/leagueService';
 import { banGame } from 'src/services/game/banGameService';
-import ResultMatchForm from 'components/league/ResultMatchForm.vue';
-import SelectedGameResult from 'components/league/SelectedGameResult.vue';
 import GameResult from 'components/league/GameResult.vue';
+import LeagueStatusBar from 'pages/LeagueStatusBar.vue';
 
 const league = ref<any>(null);
 const members = ref<any[]>([]);
@@ -101,29 +67,12 @@ const isPlayerActive = computed(() =>
   activePlayer.value ? isMe(activePlayer.value.username) : false
 );
 
-const isPlayerBanning = computed(
-  () => league.value?.status === 'BANNING' && isPlayerActive.value
-);
-
 const isPlayerPicking = computed(
   () => league.value?.status === 'PICKING' && isPlayerActive.value
 );
 
-type LeagueStatus = 'PICKING' | 'BANNING' | 'PLAYING' | 'DONE' | string;
-
-const statusMap: Record<LeagueStatus, { noun?: string; verb?: string }> = {
-  PICKING: { noun: 'Spielauswahl', verb: 'auswählen' },
-  BANNING: { noun: 'Bannen', verb: 'bannen' },
-  PLAYING: { noun: 'Spiele laufen' },
-  DONE: { noun: 'Beendet' },
-};
-
-const statusNoun = computed(
-  () => statusMap[league.value?.status as LeagueStatus]?.noun ?? ''
-);
-
-const statusVerb = computed(
-  () => statusMap[league.value?.status as LeagueStatus]?.verb ?? ''
+const isPlayerBanning = computed(
+  () => league.value?.status === 'BANNING' && isPlayerActive.value
 );
 
 function banNothin() {
@@ -133,13 +82,11 @@ function banNothin() {
   });
 }
 
-
-
 provide('league', league);
 provide('fetchLeagueDetails', fetchLeagueDetails);
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
 .player-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(420px, 1fr));
@@ -152,16 +99,6 @@ provide('fetchLeagueDetails', fetchLeagueDetails);
   gap: 16px;
 }
 
-.player-card {
-  /* Optional: visual grouping for each card */
-  border: 1px solid #e0e0e0;
-  border-radius: 2px;
-  padding: 12px;
-  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.04);
-  transition: box-shadow 0.3s ease;
-  background: white;
-}
-
 .is-active-border-accent {
   border: 2px solid rgba($accent, 0.4);
 }
@@ -170,7 +107,11 @@ provide('fetchLeagueDetails', fetchLeagueDetails);
   border: 2px solid rgba($secondary, 0.4);
 }
 
-.player-card:hover {
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+.league-card {
+  background: #f3f3f3;
+  border-radius: 8px;
+  margin: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
 }
 </style>

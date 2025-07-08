@@ -24,7 +24,7 @@
 
           <!-- Banner Container -->
           <div class="banners-wrapper">
-            <div class="banner-label">Gebannt von:</div>
+            <div v-if="bannerUsernamesForMyGame.length" class="banner-label">Gebannt von:</div>
             <div class="row q-gutter-xs banner-list">
               <UserName
                 v-for="username of bannerUsernamesForMyGame"
