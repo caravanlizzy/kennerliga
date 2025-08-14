@@ -47,12 +47,18 @@ class LeagueDetailSerializer(serializers.ModelSerializer):
         fields = ['id', 'status', 'season', 'level', 'active_player', 'members']
 
     def get_members(self, league):
-        members = league.members.all()
-        return SeasonParticipantSerializer(
+        members = league.members.all().order_by('rank')
+        serializer = SeasonParticipantSerializer(
             members,
             many=True,
             context={'league': league}
-        ).data
+        )
+
+        data = serializer.data
+        for i, member in enumerate(data, 1):
+            member['position'] = i
+
+        return data
 
 
 
