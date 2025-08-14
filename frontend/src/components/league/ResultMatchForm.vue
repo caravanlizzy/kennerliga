@@ -11,7 +11,7 @@
             <!-- Colored Header -->
             <div
               class="form-card-header q-pa-sm text-white text-subtitle2"
-              :class="getPlayerColorClass(index)"
+              :class="getPlayerColorClass(player.position)"
             >
               {{ player.username }}
             </div>
@@ -202,7 +202,7 @@ async function submitResults() {
   }
 }
 
-function getPlayerColorClass(index: number): string {
+function getPlayerColorClass(position: number): string {
   const colorClasses = [
     'bg-player-1',
     'bg-player-2',
@@ -211,7 +211,7 @@ function getPlayerColorClass(index: number): string {
     'bg-player-5',
     'bg-player-6'
   ];
-  return colorClasses[index % colorClasses.length];
+  return colorClasses[position - 1 % colorClasses.length];
 }
 
 

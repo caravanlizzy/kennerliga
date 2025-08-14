@@ -112,6 +112,7 @@ function getPlayersForGame(selectedGameId: number) {
   return allMembers.value.map((member) => ({
     id: member.id,
     username: member.username,
+    position: member.position,
   }));
 }
 
