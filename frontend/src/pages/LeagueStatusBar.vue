@@ -3,7 +3,7 @@
   <div
     class="q-pa-lg column justify-center items-center text-primary border border-primary rounded-borders"
   >
-    <div class="text-h6 text-uppercase text-weight-bold q-mb-sm">
+    <div class="text-h6 text-uppercase text-italic text-weight-bold q-mb-sm">
       {{ statusNoun }}
     </div>
 

@@ -74,7 +74,8 @@ const bgClass = computed(() => {
   border-radius: 8px;
   margin: 8px;
   overflow: hidden;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+  //box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+  border: 1px solid rgb(207, 207, 207);
 }
 
 .card-header {

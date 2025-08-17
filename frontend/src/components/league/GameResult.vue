@@ -1,6 +1,6 @@
 <template>
-  <div class="q-pa-sm">
-    <q-card class="league-card q-pa-md">
+  <div>
+    <q-card flat class="league-card q-pa-md">
       <!-- Header with toggler -->
       <div class="row items-center justify-between q-mb-sm">
         <div class="text-h6">Ergebnis eintragen</div>
@@ -67,7 +67,7 @@ const props = defineProps<{
 }>();
 
 const $q = useQuasar();
-const showForm = ref(true);
+const showForm = ref(false);
 const selectedGameId = ref<number | null>(null);
 const resultsByGame = ref<Record<number, any[]>>({});
 

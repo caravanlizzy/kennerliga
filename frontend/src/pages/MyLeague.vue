@@ -15,7 +15,10 @@
       :leagueId="myLeagueId"
     />
 
-    <GameResult v-if="status === 'PLAYING'" :league="league" />
+    <template v-if="status === 'PLAYING'">
+      <GameResult  :league="league" />
+      <q-separator/>
+    </template>
 
     <!-- Player Cards Grid -->
     <PlayerCardList
@@ -108,10 +111,10 @@ provide('fetchLeagueDetails', fetchLeagueDetails);
 }
 
 .league-card {
-  background: #f3f3f3;
+  //background: #f3f3f3;
   border-radius: 8px;
   margin: 8px;
   overflow: hidden;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+  //box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
 }
 </style>
