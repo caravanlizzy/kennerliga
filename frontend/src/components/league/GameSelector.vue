@@ -25,6 +25,8 @@
 
     <div class="row games-container q-mt-lg">
       <q-card
+        flat
+        :bordered="game.id !== gameSelection.game.id"
         v-for="game in filteredGames"
         :key="game.id"
         @click="setGameInformation(game)"
