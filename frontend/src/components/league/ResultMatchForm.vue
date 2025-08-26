@@ -153,34 +153,15 @@ async function submitResults() {
   const payload = {
     selected_game: props.selectedGameId,
     results: formData.value,
-    dry_run: true,
   };
 
   try {
-    const dryRunResponse = await api.post('/result/match-results/', payload);
-
-    if (dryRunResponse.status === 200) {
-      const confirmed = await $q.dialog({
-        title: 'Ergebnisse speichern',
-        message: 'Dry-Run erfolgreich. Ergebnisse jetzt speichern?',
-        cancel: true,
-        ok: {
-          label: 'Speichern',
-          color: 'primary',
-        },
-        persistent: true,
+    const response = await api.post('/result/match-results/', payload);
+    if (response.status === 201) {
+      $q.notify({
+        type: 'positive',
+        message: 'Match gespeichert.',
       });
-
-      if (confirmed) {
-        const finalPayload = { ...payload };
-        delete finalPayload.dry_run;
-        await api.post('/result/match-results/', finalPayload);
-        $q.notify({
-          type: 'positive',
-          message: 'Ergebnisse erfolgreich gespeichert!',
-        });
-        resetFormData(); // ✅ only reset after real submission
-      }
     }
   } catch (err: any) {
     if (err.response?.status === 202) {
@@ -209,12 +190,10 @@ function getPlayerColorClass(position: number): string {
     'bg-player-3',
     'bg-player-4',
     'bg-player-5',
-    'bg-player-6'
+    'bg-player-6',
   ];
-  return colorClasses[position - 1 % colorClasses.length];
+  return colorClasses[position - (1 % colorClasses.length)];
 }
-
-
 </script>
 
 <style scoped>
@@ -224,4 +203,3 @@ function getPlayerColorClass(position: number): string {
   border-top-right-radius: 8px;
 }
 </style>
-

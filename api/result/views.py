@@ -24,7 +24,6 @@ class MatchResultViewSet(ViewSet):
         # Extract POST data
         selected_game_id = request.data.get("selected_game")
         data = request.data.get("results", [])
-        dry_run = request.query_params.get("dry_run") == "true" or request.data.get("dry_run") is True
 
         # Validate input structure
         if not selected_game_id or not isinstance(data, list) or len(data) < 2:
@@ -110,16 +109,6 @@ class MatchResultViewSet(ViewSet):
                 if s.validated_data in tied:
                     s._decisive_tie_breaker = decisive_tb  # store for later injection
 
-        # Step 5: Dry-run mode → only preview, don’t save
-        if dry_run:
-            return Response(
-                {
-                    "detail": "No tie detected. Would have saved results.",
-                    "dry_run": True,
-                    "results_preview": [s.data for s in serializers],
-                },
-                status=status.HTTP_200_OK,
-            )
 
         # Step 6: Save all results transactionally
         with transaction.atomic():
