@@ -4,32 +4,32 @@
     class="q-pa-lg column justify-center items-center text-primary border border-primary rounded-borders"
   >
     <div class="text-h6 text-uppercase text-italic text-weight-bold q-mb-sm">
-      {{ statusNoun }}
+      {{ currentStatusNoun }}
     </div>
 
     <div class="text-subtitle1 text-center">
       <span class="text-primary text-weight-bold">
         {{ activePlayer?.username }}
       </span>
-      <span v-if="status === 'PICKING' || status === 'BANNING'" class="q-mx-xs"
+      <span v-if="leagueStatus === 'PICKING' || leagueStatus === 'BANNING'" class="q-mx-xs"
         >muss ein Spiel
       </span>
       <span
         class="text-weight-bold"
         :class="{
-          'text-accent': league?.status === 'BANNING',
-          'text-secondary': league?.status === 'PICKING',
+          'text-accent': leagueStatus === 'BANNING',
+          'text-secondary': leagueStatus === 'PICKING',
         }"
       >
         {{ statusVerb }}
       </span>
     </div>
     <q-btn
-      v-if="isPlayerBanning"
+      v-if="isMeBanningGame"
       color="accent"
       outline
       class="q-mt-sm"
-      @click="banNothin"
+      @click="banNothing"
     >
       Banne nichts
     </q-btn>
@@ -38,17 +38,11 @@
 
 <script setup lang="ts">
 import { computed } from 'vue';
+import { useLeagueStore } from 'stores/leagueStore';
 
 type LeagueStatus = 'PICKING' | 'BANNING' | 'PLAYING' | 'DONE';
 
-
-
-const props = defineProps<{
-  league: any;
-  activePlayer: any;
-  status: LeagueStatus;
-  isPlayerBanning: boolean;
-}>();
+const { leagueStatus, activePlayer, isMeBanningGame, banNothing } = useLeagueStore();
 
 
 const statusMap: Record<LeagueStatus, { noun?: string; verb?: string }> = {
@@ -58,12 +52,12 @@ const statusMap: Record<LeagueStatus, { noun?: string; verb?: string }> = {
   DONE: { noun: 'Beendet' },
 };
 
-const statusNoun = computed(
-  () => statusMap[props.league?.status as LeagueStatus]?.noun ?? ''
+const currentStatusNoun = computed(
+  () => statusMap[leagueStatus as LeagueStatus]?.noun ?? ''
 );
 
 const statusVerb = computed(
-  () => statusMap[props.league?.status as LeagueStatus]?.verb ?? ''
+  () => statusMap[leagueStatus as LeagueStatus]?.verb ?? ''
 );
 
 

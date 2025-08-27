@@ -1,92 +1,43 @@
 <template>
   <div class="q-pa-lg">
-    <LeagueStatusBar
-      :league="league"
-      :status="status"
-      :activePlayer="activePlayer"
-      :isPlayerBanning="isPlayerBanning"
-    />
+    <LeagueStatusBar />
 
     <!-- Game Selector -->
     <GameSelector
-      v-if="isPlayerPicking"
-      @submit-success="fetchLeagueDetails"
+      v-if="isMePickingGame"
+      @submit-success="updateLeagueData"
       class="q-mt-xl"
-      :leagueId="myLeagueId"
     />
 
-    <template v-if="status === 'PLAYING'">
-      <GameResult  :league="league" />
+    <template v-if="leagueStatus === 'PLAYING'">
+      <GameResult />
       <q-separator/>
     </template>
 
     <!-- Player Cards Grid -->
-    <PlayerCardList
-      :members="members"
-      :status="status"
-      :activePlayer="activePlayer?.username"
-    />
+    <PlayerCardList />
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, provide, ref } from 'vue';
-import { api } from 'boot/axios';
+import { onMounted } from 'vue';
 import GameSelector from 'components/league/GameSelector.vue';
-import { useUserStore } from 'stores/userStore';
 import PlayerCardList from 'components/league/PlayerCardList.vue';
-import { getMyLeagueId } from 'src/services/game/leagueService';
-import { banGame } from 'src/services/game/banGameService';
 import GameResult from 'components/league/GameResult.vue';
 import LeagueStatusBar from 'pages/LeagueStatusBar.vue';
+import { useLeagueStore } from 'stores/leagueStore';
+import { storeToRefs } from 'pinia';
 
-const league = ref<any>(null);
-const members = ref<any[]>([]);
-const status = ref<string>('');
-const myLeagueId = ref<number | null>(null);
-const { isMe, user } = useUserStore();
 
-const fetchLeagueDetails = async () => {
-  const { data } = await api.get(`league/league-details/${myLeagueId.value}`);
-  league.value = data;
-  members.value = data.members;
-  status.value = data.status;
-};
+const league = useLeagueStore();
 
-onMounted(async () => {
-  try {
-    myLeagueId.value = await getMyLeagueId();
-    await fetchLeagueDetails();
-  } catch (err) {
-    console.error('Error loading league details:', err);
-  }
-});
+onMounted(() => {
+  void league.init();
+})
 
-const activePlayer = computed(() =>
-  members.value.find((member) => member.is_active_player)
-);
+const { isMePickingGame, leagueStatus } = storeToRefs(league);
+const { updateLeagueData } = league;
 
-const isPlayerActive = computed(() =>
-  activePlayer.value ? isMe(activePlayer.value.username) : false
-);
-
-const isPlayerPicking = computed(
-  () => league.value?.status === 'PICKING' && isPlayerActive.value
-);
-
-const isPlayerBanning = computed(
-  () => league.value?.status === 'BANNING' && isPlayerActive.value
-);
-
-function banNothin() {
-  banGame({
-    username: user?.username,
-    leagueId: myLeagueId.value,
-  });
-}
-
-provide('league', league);
-provide('fetchLeagueDetails', fetchLeagueDetails);
 </script>
 
 <style lang="scss">

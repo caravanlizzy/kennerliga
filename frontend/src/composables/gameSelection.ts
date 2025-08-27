@@ -1,4 +1,4 @@
-import { ref, reactive, computed } from 'vue';
+import { ref, reactive, computed, Ref } from 'vue';
 import {
   GameDto,
   GameOptionDto,
@@ -17,7 +17,7 @@ type TGameSelection = {
   selectedOptions: SelectedGameOptionDto[];
 };
 
-export function useGameSelection(leagueId: number) {
+export function useGameSelection(leagueId: Ref<number>) {
   const gameInformation = reactive<{
     game: GameDto | undefined;
     options: GameOptionDto[];

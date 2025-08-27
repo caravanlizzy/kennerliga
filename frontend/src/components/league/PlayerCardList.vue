@@ -8,7 +8,7 @@
         class="player-card"
       >
         <PlayerCard
-          :status="status"
+          :status="leagueStatus"
           :member="member"
           :isActive="member.is_active_player"
           :isBanning="isBanning(member)"
@@ -27,28 +27,30 @@ import { computed } from 'vue';
 import PlayerCard from 'components/league/PlayerCard.vue';
 import { useUserStore } from 'stores/userStore';
 import { TLeagueMember } from 'src/types';
+import { storeToRefs } from 'pinia';
+import { useLeagueStore } from 'stores/leagueStore';
 
-const props = defineProps<{
-  members: any[];
-  status: string;
-  activePlayer: string|undefined;
-}>();
 
 const { isMobile } = useResponsive();
-const { user } = useUserStore();
+const {leagueStatus, members, isMeActivePlayer } = storeToRefs(useLeagueStore());
 
 const containerClass = computed(() =>
   isMobile ? 'column-reverse' : 'player-grid'
 );
 
 function isBannable(member: TLeagueMember): boolean {
-  if (props.status !== 'BANNING') return false;
-  if (user?.username !== props.activePlayer) return false;
+  // only bannable if leagueStatus is in banning phase
+  if (leagueStatus.value !== 'BANNING') return false;
+
+  // only bannable if *I* am the active player
+  if (!isMeActivePlayer.value) return false;
+
+  // I can ban others, but not myself
   return !member.is_active_player;
 }
 
 function isBanning(member: TLeagueMember): boolean {
-  if (props.status !== 'BANNING') return false;
-  return member.is_active_player;
+  return leagueStatus.value === 'BANNING' && member.is_active_player;
 }
+
 </script>

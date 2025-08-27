@@ -61,10 +61,10 @@ import { useQuasar } from 'quasar';
 import { api } from 'boot/axios';
 import ResultMatchForm from './ResultMatchForm.vue';
 import MatchResult from './MatchResult.vue';
+import { storeToRefs } from 'pinia';
+import { useLeagueStore } from 'stores/leagueStore';
 
-const props = defineProps<{
-  league: any;
-}>();
+const { leagueData, members } = storeToRefs(useLeagueStore());
 
 const $q = useQuasar();
 const showForm = ref(false);
@@ -73,11 +73,9 @@ const resultsByGame = ref<Record<number, any[]>>({});
 
 const isDesktop = computed(() => $q.screen.gt.sm);
 
-const allMembers = computed(() => props.league?.members || []);
-
 const uniqueSelectedGames = computed(() => {
   const seen = new Set();
-  return allMembers.value
+  return members.value
     .map((member) => member.selected_game)
     .filter((game) => game && !seen.has(game.id) && seen.add(game.id));
 });
@@ -102,14 +100,13 @@ watch(selectedGameId, async (id) => {
 });
 
 function hasResult(selectedGameId: number) {
-  console.log('running');
   const results = resultsByGame.value[selectedGameId];
-  const totalPlayers = allMembers.value.length;
+  const totalPlayers = members.value.length;
   return results?.length === totalPlayers;
 }
 
 function getPlayersForGame(selectedGameId: number) {
-  return allMembers.value.map((member) => ({
+  return members.value.map((member) => ({
     id: member.id,
     username: member.username,
     position: member.position,
@@ -120,7 +117,7 @@ function getResultProps(selectedGameId: number) {
   const game = uniqueSelectedGames.value.find(g => g.id === selectedGameId);
   const results = resultsByGame.value[selectedGameId] || [];
 
-  const enriched = allMembers.value.map(member => {
+  const enriched = members.value.map(member => {
     const result = results.find(r => r.player_profile === member.id);
     return {
       id: member.id,

@@ -94,10 +94,10 @@ import { onMounted } from 'vue';
 import KennerSelect from 'components/base/KennerSelect.vue';
 import KennerButton from 'components/base/KennerButton.vue';
 import { useGameSelection } from 'src/composables/gameSelection';
+import { useLeagueStore } from 'stores/leagueStore';
+import { storeToRefs } from 'pinia';
 
-const props = defineProps<{
-  leagueId: number
-}>()
+const { leagueId } = storeToRefs(useLeagueStore());
 
 const {
   gameInformation,
@@ -112,7 +112,7 @@ const {
   platforms,
   filteredGames,
   loadPlatformsAndGames,
-} = useGameSelection(props.leagueId);
+} = useGameSelection(leagueId.value);
 
 const emit = defineEmits(['submit-success']);
 

@@ -115,6 +115,8 @@ import { computed, inject, ref } from 'vue';
 import { useUserStore } from 'stores/userStore';
 import { banGame } from 'src/services/game/banGameService';
 import UserName from 'components/ui/UserName.vue';
+import { useLeagueStore } from 'stores/leagueStore';
+import { storeToRefs } from 'pinia';
 
 const props = defineProps<{
   member: any;
@@ -123,8 +125,10 @@ const props = defineProps<{
   isBannable: boolean;
 }>();
 
-const league = inject('league');
-const fetchLeagueDetails = inject('fetchLeagueDetails');
+// const league = inject('league');
+// const fetchLeagueDetails = inject('fetchLeagueDetails');
+const { leagueData, members, leagueId } = storeToRefs(useLeagueStore());
+const { updateLeagueData } = useLeagueStore();
 const { user } = useUserStore();
 
 const isExpanded = ref(false);
@@ -135,15 +139,15 @@ function openBanDialog() {
 }
 
 function getSelectedGameForMember() {
-  const member = league.value.members.find(
+  const member = leagueData.value.members.find(
     (m) => m.username === props.member.username
   );
   return member.selected_game;
 }
 
 function getBannersOfGame(game: { id: number }): string[] {
-  if (!league.value?.members) return [];
-  return league.value.members
+  if (!members.value) return [];
+  return members.value
     .filter((m) => m.banned_game?.id === game.id)
     .map((m) => m.username);
 }
@@ -156,16 +160,16 @@ const bannerUsernamesForMyGame = computed(() => {
 
 async function confirmBan() {
   confirmDialog.value = false;
-  if (!user?.username || !league.value?.id) {
+  if (!user?.username || !leagueId.value?.id) {
     throw new Error('Missing required parameters');
   }
   try {
-    banGame({
-      leagueId: league.value.id,
+    await banGame({
+      leagueId: leagueId.value,
       username: user.username,
       gameId: props.member.selected_game.id,
     });
-    fetchLeagueDetails();
+    await updateLeagueData();
   } catch (error) {
     console.error(error);
   }
