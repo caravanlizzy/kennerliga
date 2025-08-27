@@ -56,7 +56,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watchEffect, watch } from 'vue';
+import { ref, computed, watch } from 'vue';
 import { useQuasar } from 'quasar';
 import { api } from 'boot/axios';
 import ResultMatchForm from './ResultMatchForm.vue';
@@ -64,7 +64,7 @@ import MatchResult from './MatchResult.vue';
 import { storeToRefs } from 'pinia';
 import { useLeagueStore } from 'stores/leagueStore';
 
-const { leagueData, members } = storeToRefs(useLeagueStore());
+const {  members } = storeToRefs(useLeagueStore());
 
 const $q = useQuasar();
 const showForm = ref(false);
@@ -80,29 +80,39 @@ const uniqueSelectedGames = computed(() => {
     .filter((game) => game && !seen.has(game.id) && seen.add(game.id));
 });
 
-watchEffect(() => {
-  if (selectedGameId.value === null && uniqueSelectedGames.value.length > 0) {
-    selectedGameId.value = uniqueSelectedGames.value[0].id;
-  }
-});
-
-watch(selectedGameId, async (id) => {
-  showForm.value = true;
-  if (id && !resultsByGame.value[id]) {
-    try {
-      const { data } = await api.get(`/result/results/?selected_game=${id}`);
-      resultsByGame.value[id] = data;
-    } catch (err) {
-      console.error('Fehler beim Laden der Ergebnisse:', err);
-      resultsByGame.value[id] = [];
+// Replace the two watchers with this single one
+watch(
+  [selectedGameId, uniqueSelectedGames],
+  async ([newSelectedGameId, games]) => {
+    // Auto-select the first game if none selected yet
+    if (newSelectedGameId === null && games.length > 0) {
+      selectedGameId.value = games[0].id;
+      return; // wait for next tick where selectedGameId is set to fetch
     }
-  }
-});
+
+    // With a valid selection, show the form and fetch results if needed
+    if (newSelectedGameId != null) {
+      showForm.value = true;
+
+      if (!resultsByGame.value[newSelectedGameId]) {
+        try {
+          const { data } = await api.get(
+            `/result/results/?selected_game=${newSelectedGameId}`
+          );
+          resultsByGame.value[newSelectedGameId] = data;
+        } catch (err) {
+          console.error('Fehler beim Laden der Ergebnisse:', err);
+          resultsByGame.value[newSelectedGameId] = [];
+        }
+      }
+    }
+  },
+  { immediate: true }
+);
 
 function hasResult(selectedGameId: number) {
   const results = resultsByGame.value[selectedGameId];
-  const totalPlayers = members.value.length;
-  return results?.length === totalPlayers;
+  return results?.length === members.value.length;
 }
 
 function getPlayersForGame(selectedGameId: number) {
