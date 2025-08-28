@@ -1,6 +1,6 @@
 // stores/leagueStore.ts
 import { defineStore } from 'pinia';
-import { ref, computed, shallowRef } from 'vue';
+import { ref, computed, shallowRef, watch } from 'vue';
 import { getMyLeagueId } from 'src/services/game/leagueService';
 import { fetchLeagueDetails } from 'src/services/leagueService';
 import { useUserStore } from 'stores/userStore';
@@ -10,6 +10,7 @@ export const useLeagueStore = defineStore('league', () => {
   const leagueId = ref<number | null>(null);
   const leagueData = shallowRef<any>(null);
   const members = ref<any[]>([]);
+  const selectedGames = ref<any[]>([]);
   const leagueStatus = ref<string>('');
   const initialized = ref(false);
   let initPromise: Promise<void> | null = null;
@@ -21,6 +22,15 @@ export const useLeagueStore = defineStore('league', () => {
     members.value = data.members;
     leagueStatus.value = data.status;
   }
+
+  function getSelectedGames() {
+    if(members.value.length === 0) return [];
+    members.value.forEach(member => {
+      selectedGames.value.push({ ...member.selected_game, selected_by: member.username })
+    })
+  }
+
+  watch(members, getSelectedGames, { deep: true });
 
   async function init() {
     // If we've already initialized once, just exit early
@@ -73,7 +83,7 @@ export const useLeagueStore = defineStore('league', () => {
 
   return {
     // state
-    leagueId, leagueData, members, leagueStatus, initialized,
+    leagueId, leagueData, members, leagueStatus, initialized, selectedGames,
     // getters
     activePlayer, isMeActivePlayer, isMePickingGame, isMeBanningGame,
     // actions
