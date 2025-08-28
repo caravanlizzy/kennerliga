@@ -2,15 +2,11 @@
   <div class="q-pa-md">
     <q-form v-if="formData.length" @submit.prevent="submitResults">
       <div class="row q-col-gutter-md q-mb-xl">
-        <div
-          v-for="(player, index) in players"
-          :key="player.id"
-          class="col-12 col-md-6 col-lg-4"
-        >
+        <div v-for="(player, index) in players" :key="player.id" class="col-3">
           <q-card class="shadow-1 rounded-borders">
             <!-- Colored Header -->
             <div
-              class="form-card-header q-pa-sm text-white text-subtitle2"
+              class="form-card-header q-pa-sm text-white text-subtitle2 text-center"
               :class="getPlayerColorClass(player.position)"
             >
               {{ player.username }}
@@ -22,20 +18,35 @@
                 v-if="resultConfig?.has_points"
                 v-model.number="formData[index].points"
                 type="number"
+                inputmode="numeric"
                 label="Punkte"
                 dense
                 outlined
                 :rules="[(val) => val !== null || 'Pflichtfeld']"
               />
-
-              <q-input
-                v-if="resultConfig?.has_starting_player_order"
-                v-model.number="formData[index].starting_position"
-                type="number"
-                label="Startposition"
-                dense
-                outlined
-              />
+              <div class="col">Startposition</div>
+              <div class="col" style="margin-top: 0">
+                <q-btn-group
+                  flat
+                  v-if="resultConfig?.has_starting_player_order"
+                  class="q-gutter-x-xs"
+                >
+                  <q-btn
+                    flat
+                    v-for="pos in [1, 2, 3, 4]"
+                    :key="pos"
+                    :label="pos"
+                    :color="
+                      formData[index].starting_position === pos
+                        ? 'primary'
+                        : 'grey-4'
+                    "
+                    :text-color="black"
+                    dense
+                    @click="formData[index].starting_position = pos"
+                  />
+                </q-btn-group>
+              </div>
 
               <q-select
                 v-if="resultConfig?.is_asymmetric"
@@ -74,7 +85,6 @@
   </div>
 </template>
 
-
 <script setup lang="ts">
 import { ref, watch, onMounted } from 'vue';
 import { api } from 'boot/axios';
@@ -93,7 +103,9 @@ const formData = ref<Array<any>>([]);
 const tieBreakerRequired = ref(false);
 
 async function fetchResultConfig() {
-  const { data: selectedGame } = await api.get(`game/selected-games/${props.selectedGameId}/`);
+  const { data: selectedGame } = await api.get(
+    `game/selected-games/${props.selectedGameId}/`
+  );
   const gameId = selectedGame.game;
 
   if (!gameId) {
@@ -105,10 +117,10 @@ async function fetchResultConfig() {
   resultConfig.value = data[0];
 }
 
-
-
 async function fetchFactions() {
-  const { data } = await api.get(`game/selected-games/${props.selectedGameId}/`);
+  const { data } = await api.get(
+    `game/selected-games/${props.selectedGameId}/`
+  );
   const gameId = data.game; // assuming the API returns something like { game: 3, ... }
 
   const factionRes = await api.get(`game/factions/?game=${gameId}`);
@@ -145,7 +157,9 @@ async function submitResults() {
     return {
       ...entry,
       faction_id:
-        entry.faction_id !== null && typeof entry.faction_id === 'object' && 'id' in entry.faction_id
+        entry.faction_id !== null &&
+        typeof entry.faction_id === 'object' &&
+        'id' in entry.faction_id
           ? entry.faction_id.id
           : entry.faction_id ?? null,
     };
