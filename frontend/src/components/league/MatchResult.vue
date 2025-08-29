@@ -3,10 +3,9 @@
     <q-card flat bordered class="shadow-2 result-summary-card q-pa-md">
       <!-- Header -->
       <div class="row items-center justify-between q-mb-md">
-        <div class="text-h6 text-primary">{{ gameName }}</div>
+        <div class="text-h6 text-primary">{{ getGameNameBySelectedGameId(selectedGameId) }}</div>
         <q-badge color="primary" label="Ergebnisse" />
       </div>
-
       <q-separator class="q-mb-md" />
 
       <!-- Results List -->
@@ -18,14 +17,14 @@
         >
           <q-item-section avatar class="q-pr-sm">
             <UserName
-              :username="result.username"
+              :username="getUsernameByMemberId(result.player_profile)"
               :color-class="getPlayerColorClass(index)"
             />
           </q-item-section>
 
           <q-item-section>
             <q-item-label class="text-weight-medium text-body1 q-mb-xs">
-              {{ result.username }}
+              {{ getUsernameByMemberId(result.player_profile) }}
             </q-item-label>
 
             <q-item-label>
@@ -69,27 +68,18 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import UserName from 'components/ui/UserName.vue';
+import { useLeagueStore } from 'stores/leagueStore';
+import { storeToRefs } from 'pinia';
 
-const props = defineProps<{
-  gameName: string;
-  results: Array<{
-    id: number;
-    username: string;
-    points?: number;
-    faction_name?: string;
-    starting_position?: number;
-  }>;
-}>();
+const props = defineProps<{ selectedGameId: number }>();
 
-const sortedResults = computed(() => {
-  return [...props.results].sort((a, b) => {
-    if (a.points !== undefined && b.points !== undefined) {
-      return b.points - a.points;
-    }
-    return 0;
-  });
-});
+const { matchResults } = storeToRefs(useLeagueStore());
+const { getUsernameByMemberId, getGameNameBySelectedGameId } = useLeagueStore();
 
+const matchResult = computed(() => matchResults.value.filter(mr => mr.selected_game == props.selectedGameId))
+
+const sortedResults = computed(() => matchResult.value.flat().sort((a, b) => (b.points ?? 0) - (a.points ?? 0)));
+console.log(getGameNameBySelectedGameId(props.selectedGameId));
 function getPlayerColorClass(index: number): string {
   return `bg-player-${(index % 6) + 1}`;
 }

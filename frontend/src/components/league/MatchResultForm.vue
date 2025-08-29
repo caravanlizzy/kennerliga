@@ -2,14 +2,14 @@
   <div class="q-pa-md">
     <q-form v-if="formData.length" @submit.prevent="submitResults">
       <div class="row q-col-gutter-md q-mb-xl">
-        <div v-for="(player, index) in players" :key="player.id" class="col-3">
+        <div v-for="(member, index) in members" :key="member.id" class="col-3">
           <q-card class="shadow-1 rounded-borders">
             <!-- Colored Header -->
             <div
               class="form-card-header q-pa-sm text-white text-subtitle2 text-center"
-              :class="getPlayerColorClass(player.position)"
+              :class="getPlayerColorClass(member.position)"
             >
-              {{ player.username }}
+              {{ member.username }}
             </div>
 
             <!-- Card Body -->
@@ -86,16 +86,21 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch, onMounted } from 'vue';
+import { ref, watch } from 'vue';
 import { api } from 'boot/axios';
 import { useQuasar } from 'quasar';
+import { storeToRefs } from 'pinia';
+import { useLeagueStore } from 'stores/leagueStore';
 
 const $q = useQuasar();
 
 const props = defineProps<{
   selectedGameId: number;
-  players: Array<{ id: number; username: string }>;
 }>();
+
+console.log(props.selectedGameId);
+
+const { members } = storeToRefs(useLeagueStore());
 
 const resultConfig = ref<any>(null);
 const factions = ref<Array<{ id: number; name: string }>>([]);
@@ -128,7 +133,7 @@ async function fetchFactions() {
 }
 
 function resetFormData() {
-  formData.value = props.players.map((p) => ({
+  formData.value = members.value.map((p) => ({
     player_profile: p.id,
     selected_game: props.selectedGameId,
     points: null,

@@ -10,8 +10,17 @@
     />
 
     <template v-if="leagueStatus === 'PLAYING'">
-      <GameResult />
+      <MatchResult
+        v-for="selectedGameId of selectedGamesWithResults"
+        :key="selectedGameId"
+        :selected-game-id="selectedGameId"
+      />
       <q-separator/>
+      <MatchResultForm
+        v-for="selectedGameId of selectedGamesWithoutResults"
+        :key="selectedGameId"
+        :selected-game-id="selectedGameId"
+      />
     </template>
 
     <!-- Player Cards Grid -->
@@ -23,10 +32,11 @@
 import { onMounted } from 'vue';
 import GameSelector from 'components/league/GameSelector.vue';
 import PlayerCardList from 'components/league/PlayerCardList.vue';
-import GameResult from 'components/league/GameResult.vue';
 import LeagueStatusBar from 'pages/LeagueStatusBar.vue';
 import { useLeagueStore } from 'stores/leagueStore';
 import { storeToRefs } from 'pinia';
+import MatchResult from 'components/league/MatchResult.vue';
+import MatchResultForm from 'components/league/MatchResultForm.vue';
 
 
 const league = useLeagueStore();
@@ -35,7 +45,7 @@ onMounted(() => {
   void league.init();
 })
 
-const { isMePickingGame, leagueStatus } = storeToRefs(league);
+const { isMePickingGame, leagueStatus, selectedGamesWithResults, selectedGamesWithoutResults } = storeToRefs(league);
 const { updateLeagueData } = league;
 
 </script>
