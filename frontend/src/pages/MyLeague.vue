@@ -18,7 +18,7 @@
         v-model="currentFormSelectedGameId"
       >
         <q-tab
-          v-for="selectedGame in selectedGamesWithoutResults"
+          v-for="selectedGame in selectedGamesFetchedEmpty"
           :key="selectedGame.id"
           :name="selectedGame.id"
         >
@@ -37,9 +37,9 @@
       <!-- Display Previously Entered Match Results -->
       <div class="flex">
         <MatchResult
-          v-for="selectedGameId of selectedGameIdsWithResults"
-          :key="selectedGameId"
-          :selected-game-id="selectedGameId"
+          v-for="selectedGame of selectedGamesWithResults"
+          :key="selectedGame.id"
+          :selected-game-id="selectedGame.id"
         />
       </div>
     </template>
@@ -68,8 +68,8 @@ onMounted(() => {
 const {
   isMePickingGame,
   leagueStatus,
-  selectedGameIdsWithResults,
-  selectedGamesWithoutResults,
+  selectedGamesFetchedEmpty,
+  selectedGamesWithResults
 } = storeToRefs(league);
 const { updateLeagueData } = league;
 

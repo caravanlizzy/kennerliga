@@ -1,87 +1,255 @@
 // stores/leagueStore.ts
 import { defineStore } from 'pinia';
-import { ref, computed, shallowRef, watch } from 'vue';
+import { ref, computed, shallowRef } from 'vue';
 import { getMyLeagueId } from 'src/services/game/leagueService';
 import { fetchLeagueDetails } from 'src/services/leagueService';
 import { useUserStore } from 'stores/userStore';
 import { banGame } from 'src/services/game/banGameService';
 import { api } from 'boot/axios';
 
+// Shared leaf types
 /**
- * Store for managing and interacting with league-specific data and state.
- * Handles initialization of league data, user actions such as banning games,
- * and computed properties for determining user roles and statuses within the league.
+ * Represents a choice with a unique identifier, name, and a reference to a game option.
  *
- * State:
- * - `leagueId`: A reference holding the current league's unique identifier.
- * - `leagueData`: A shallow reference containing the broader league data fetched from an API.
- * - `members`: A reference holding the list of members in the current league.
- * - `selectedGames`: A computed property containing a list of games selected by members.
- * - `leagueStatus`: A reference to the current status of the league (e.g., "PICKING", "BANNING").
- * - `initialized`: A flag indicating the initialization state of the store.
+ * @typedef {Object} Choice
+ * @property {number} id - The unique identifier for the choice.
+ * @property {string} name - The name of the choice.
+ * @property {number} option - The ID of the associated game option, corresponding to GameOption.id.
+ */
+type Choice = {
+  id: number;
+  name: string;
+  option: number; // GameOption.id
+};
+
+/**
+ * Represents a game option within a game configuration.
  *
- * Getters:
- * - `activePlayer`: Computes the currently active player in the league based on member data.
- * - `isMeActivePlayer`: Indicates whether the current user is the active player in the league.
- * - `isMePickingGame`: Checks if the current user is actively picking a game.
- * - `isMeBanningGame`: Checks if the current user is actively banning a game.
+ * @typedef {Object} GameOption
+ * @property {number} id - The unique identifier for the game option.
+ * @property {string} name - The name of the game option.
+ * @property {boolean} has_choices - Indicates if the game option has selectable choices.
+ * @property {number} game - The identifier of the game that the option belongs to.
+ * @property {boolean|null} only_if_value - Specifies if the option is conditionally displayed based on a specific value. Can be null.
+ * @property {number|null} only_if_option - Specifies the dependent option by its identifier for conditional display. Can be null.
+ * @property {number|null} only_if_choice - Specifies the dependent choice by its identifier for conditional display. Can be null.
+ */
+type GameOption = {
+  id: number;
+  name: string;
+  has_choices: boolean;
+  game: number;
+  only_if_value: boolean | null;
+  only_if_option: number | null;
+  only_if_choice: number | null;
+};
+
+/**
+ * Represents a selected option within a game where choices and values may vary.
  *
- * Actions:
- * - `init`: Initializes the store by fetching the league ID and related data.
- * - `updateLeagueData`: Updates the league's data, members list, and status from an API.
- * - `banNothing`: Allows a user to skip banning a game within the league, if conditions allow.
+ * @typedef {Object} SelectedOption
+ * @property {number} id - Unique identifier for the selected option.
+ * @property {GameOption} game_option - The game option associated with this selection.
+ * @property {Choice | null} choice - The specific choice made, used when choices are available (has_choices === true).
+ * @property {boolean | null} value - The selected boolean value, used when choices are not available (has_choices === false).
+ */
+type SelectedOption = {
+  id: number;
+  game_option: GameOption;
+  choice: Choice | null;       // used when has_choices === true
+  value: boolean | null;       // used when has_choices === false
+};
+
+// Selected/banned game shapes
+/**
+ * Represents the selected game with its associated details and selected options.
  *
- * Watchers:
- * - Watches for changes in the `members` list to automatically update the `selectedGames` property.
+ * @typedef {Object} SelectedGame
+ * @property {number} id - The unique identifier for the selected game.
+ * @property {number} game - The unique identifier for the base game associated with the selected game.
+ * @property {string} game_name - The name of the base game.
+ * @property {SelectedOption[]} selected_options - A list of selected options related to the game.
+ */
+type SelectedGame = {
+  id: number;                  // selected_game id
+  game: number;                // base game id
+  game_name: string;
+  selected_options: SelectedOption[];
+};
+
+/**
+ * Represents detailed information about a banned game.
+ *
+ * This type holds the data associated with a game that has been banned,
+ * including its unique identifier, name, and any selected options related to it.
+ *
+ * Properties:
+ *  @property {number} id - The unique identifier for the banned game.
+ *  @property {number} game - The unique identifier for the corresponding game.
+ *  @property {string} game_name - The name of the banned game.
+ *  @property {SelectedOption[]} selected_options - An array of selected options associated with the game.
+ */
+type BannedGameFull = {
+  id: number;                  // banned selected_game id
+  game: number;
+  game_name: string;
+  selected_options: SelectedOption[];
+};
+
+/**
+ * Represents an object containing details about a banned or unavailable game
+ * with no associated game or options selected.
+ *
+ * This type is used to signify a game that is no longer active or chosen within a specific context,
+ * returning null or empty values for its properties.
+ *
+ * Properties:
+ * - game: Represents the game object, which, in this case, is null, indicating no game is available.
+ * - selected_options: An empty array denoting no options have been selected for this game.
+ * - leagueId: Represents the league identifier, which is null since no game or league is associated.
+ * - playerProfileId: Represents a player's profile identifier, which is null as no specific player context is given.
+ */
+type BannedGameEmpty = {
+  game: null;
+  selected_options: [];
+  leagueId: null;
+  playerProfileId: null;
+};
+
+/**
+ * Represents a game that has been banned. The game can be represented in two forms:
+ * either as a full definition or as an empty placeholder.
+ *
+ * A `BannedGame` can either be:
+ * - `BannedGameFull`: A complete representation of the banned game with detailed information.
+ * - `BannedGameEmpty`: A placeholder for situations where no detailed information about the banned game is available.
+ */
+type BannedGame = BannedGameFull | BannedGameEmpty;
+
+// Member
+/**
+ * Represents a member in the system with associated properties, status, and metadata.
+ *
+ * @typedef {Object} Member
+ * @property {number} id - The unique identifier for the player profile; used in results reference.
+ * @property {string} username - The username of the member.
+ * @property {string} profile_name - The display name of the member.
+ * @property {SelectedGame | null} selected_game - The currently selected game for the member, if any.
+ * @property {BannedGame} banned_game - The game that the member is banned from.
+ * @property {boolean} is_active_player - Indicates whether the member is currently an active player.
+ * @property {number} rank - The rank of the member within the system.
+ * @property {number} position - The position of the member, typically related to ranking.
+ * @property {string} [colorClass] - A client-side UI property that determines the color class for display purposes.
+ */
+type Member = {
+  id: number;                  // player_profile id, also referenced in results
+  username: string;
+  profile_name: string;
+  selected_game: SelectedGame | null;
+  banned_game: BannedGame;
+  is_active_player: boolean;
+  rank: number;
+  position: number;
+  colorClass?: string;         // UI-only, added client-side
+};
+
+/**
+ * Represents the result of a player's match in a game with various related attributes.
+ *
+ * @typedef {Object} MatchResult
+ * @property {number} id - The unique identifier for the match result.
+ * @property {number} player_profile - The ID of the player profile associated with this match result. Corresponds to Member.id.
+ * @property {number} selected_game - The ID of the game selected for this match result. Corresponds to SelectedGame.id.
+ * @property {number|null} points - The points scored by the player in the match. Can be null if not applicable.
+ * @property {number|null} starting_position - The starting position of the player in the match. Can be null if not applicable.
+ * @property {string} tie_breaker_value - The value or criteria used for tie-breaking. May be an empty string if not applicable.
+ * @property {string|null} decisive_tie_breaker - The decisive tie-breaking value or condition, if applicable. Can be null.
+ * @property {string|null} faction_name - The name of the faction used by the player in the match, if applicable. Can be null.
+ */
+export type MatchResult = {
+  id: number;
+  player_profile: number;      // Member.id
+  selected_game: number;       // SelectedGame.id
+  points: number | null;
+  starting_position: number | null;
+  tie_breaker_value: string;    // may be empty ""
+  decisive_tie_breaker: string | null;
+  faction_name: string | null;
+};
+
+
+/**
+ * Represents a Vue Store for managing league-related data and state.
+ *
+ * This store is responsible for fetching, maintaining, and providing access to
+ * information about leagues, their members, games, statuses, and match results.
+ *
+ * A range of state properties, computed values, and actions are provided to
+ * manage or derive data associated with leagues.
+ *
+ * The store provides comprehensive utilities including:
+ * - State variables for holding league info, members, and match results.
+ * - Computed properties for efficient access to specific structured data.
+ * - Actions for initialization, data fetching, and updates.
+ *
+ * Key Features:
+ * - Reactive state management for leagues and members.
+ * - Efficient mapping and lookup utilities for member and game data.
+ * - Result management for games using immutable updates for reactivity.
  */
 export const useLeagueStore = defineStore('league', () => {
   // leagueData
   const leagueId = ref<number | null>(null);
   const leagueData = shallowRef<any>(null);
-  const members = ref<any[]>([]);
+  const members = ref<Member[]>([]);
   const leagueStatus = ref<string>(''); // states: PICKING, BANNING, REPICKING, PLAYING, DONE
 
   // --- Derived maps for O(1) lookups ---
-  const membersById = computed(() =>
-    members.value.reduce((acc, m) => {
-      acc[parseInt(m.id)] = m;
+  const membersById = computed<{ [key: number]: Member }>(() =>
+    members.value.reduce((acc: { [key: number]: Member }, m) => {
+      acc[m.id] = m;
       return acc;
-    })
+    }, {})
   );
 
   const selectedGames = computed(() => {
-    if (members.value.length === 0) return [];
-    return members.value.map((member) => ({
-      ...member.selected_game,
-      selected_by: member.username,
-    }));
+    if (!members.value.length) return [];
+    return members.value
+      .map((member) =>
+        member.selected_game &&
+        ({ ...member.selected_game, selected_by: member.username })
+      )
+      .filter(Boolean) as Array<Member['selected_game'] & { selected_by: string }>;
   });
 
-  // match results
-  const selectedGameIdsWithResults = computed(() =>
-    Array.from(
-      new Set(matchResults.value.map((result) => result.selected_game))
-    ).map((id) => id)
+  const selectedGamesById = computed<
+    Record<number, { id: number; game_name: string; selected_by: string }>
+  >(() =>
+    selectedGames.value.reduce(
+      (acc, g) => {
+        acc[g.id] = g;
+        return acc;
+      },
+      {} as Record<number, { id: number; game_name: string; selected_by: string }>
+    )
   );
 
-  const selectedGameIdsWithoutResults = computed(() =>
-    selectedGames.value
-      .map((game) => game.id)
-      .filter((id) => !selectedGameIdsWithResults.value.includes(id))
+  // --- Results keyed by selected_game for fast access ---
+  // Using a Record so reactivity stays simple.
+  const matchResultsByGame = ref<Record<number, MatchResult[]>>({});
+
+  const matchResults = computed<MatchResult[]>(() =>
+    Object.values(matchResultsByGame.value).flat()
   );
 
   const selectedGamesWithResults = computed(() =>
-    selectedGames.value.filter((game) =>
-      selectedGameIdsWithResults.value.includes(game.id)
-    )
-  );
-  const selectedGamesWithoutResults = computed(() =>
-    selectedGames.value.filter((game) =>
-      selectedGameIdsWithoutResults.value.includes(game.id)
-    )
+    selectedGames.value.filter(g => (matchResultsByGame.value[g.id]?.length ?? 0) > 0)
   );
 
-  const matchResults = ref<any[]>([]);
+  const selectedGamesFetchedEmpty = computed(() =>
+    selectedGames.value.filter(g => (matchResultsByGame.value[g.id]?.length ?? 0) === 0)
+  );
+
 
   const initialized = ref(false);
   let initPromise: Promise<void> | null = null;
@@ -98,53 +266,40 @@ export const useLeagueStore = defineStore('league', () => {
     leagueStatus.value = data.status;
   }
 
+  // Helper to set results atomically & dedup on id
+  function setResultsForGame(selectedGameId: number, results: MatchResult[]) {
+    const uniq = new Map<number, MatchResult>();
+    results.forEach(r => uniq.set(r.id, r));
+    matchResultsByGame.value = {
+      ...matchResultsByGame.value,
+      [selectedGameId]: Array.from(uniq.values()).sort((a, b) => (b.points ?? 0) - (a.points ?? 0)),
+    };
+  }
+
   async function getMatchResults() {
     if (leagueId.value == null) return;
-    const selectedGameIds = selectedGames.value.map((s) => s.id);
-    for (const id of selectedGameIds) {
-      const { data } = await api.get(`/result/results/?selected_game=${id}`);
-      matchResults.value.push(...data);
-    }
-  }
+    const ids = selectedGames.value.map((s) => s.id);
+    if (!ids.length) return;
 
-  function getMemberById(memberId: number) {
-    return members.value.find((m) => m.id === memberId);
-  }
-
-  function getGameNameBySelectedGameId(selectedGameId: number) {
-    const selectedGame = selectedGames.value.find(
-      (s) => s.id === selectedGameId
+    // fetch all in parallel (replace with a single multi-id endpoint when available)
+    const promises = ids.map((id) =>
+      api.get<MatchResult[]>(`/result/results/?selected_game=${id}`)
+        .then(({ data }) => setResultsForGame(id, data))
+        .catch(() => setResultsForGame(id, [])) // keep UI predictable
     );
-    if (selectedGame) return selectedGame.game_name;
-    return null;
+    await Promise.all(promises);
   }
 
   async function init() {
-    // If we've already initialized once, just exit early
     if (initialized.value) return;
-
-    // If another call to init() is already in progress,
-    // return the same Promise so we don't start a duplicate request
     if (initPromise) return initPromise;
-
-    // Otherwise, start the initialization process
-    // and store the Promise so concurrent callers can reuse it
     initPromise = (async () => {
-      // fetch leagueId first
       leagueId.value = await getMyLeagueId();
-
-      // then fetch league details
       await updateLeagueData();
       await getMatchResults();
-
-      // mark as fully initialized
       initialized.value = true;
-
-      // reset the initPromise so future calls don't get stuck on an old Promise
       initPromise = null;
     })();
-
-    // return the Promise so the caller can await initialization
     return initPromise;
   }
 
@@ -178,6 +333,7 @@ export const useLeagueStore = defineStore('league', () => {
     initialized,
     selectedGames,
     matchResults,
+    matchResultsByGame,
 
     // getters
     activePlayer,
@@ -185,17 +341,14 @@ export const useLeagueStore = defineStore('league', () => {
     isMePickingGame,
     isMeBanningGame,
     selectedGamesWithResults,
-    selectedGamesWithoutResults,
-    selectedGameIdsWithResults,
-    selectedGameIdsWithoutResults,
+    selectedGamesFetchedEmpty,
     membersById,
+    selectedGamesById,
 
     // actions
     init,
     updateLeagueData,
     banNothing,
-    getMemberById,
-    getGameNameBySelectedGameId,
     getMatchResults,
   };
 });
