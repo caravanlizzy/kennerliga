@@ -3,7 +3,11 @@
     <div class="q-pa-md">
       <q-form v-if="formData.length" @submit.prevent="submitResults">
         <div class="row q-col-gutter-md q-mb-xl">
-          <div v-for="(member, index) in members" :key="member.id" class="col-3">
+          <div
+            v-for="(member, index) in members"
+            :key="member.id"
+            class="col-3"
+          >
             <q-card class="shadow-1 rounded-borders">
               <!-- Colored Header -->
               <div
@@ -34,15 +38,14 @@
                   >
                     <q-btn
                       flat
-                      v-for="pos in [1, 2, 3, 4]"
+                      v-for="pos in members.length"
                       :key="pos"
                       :label="pos"
-                      :color="
-                      formData[index].starting_position === pos
-                        ? 'primary'
-                        : 'grey-4'
-                    "
-                      text-color="black"
+                      :text-color="
+                        formData[index].starting_position === pos
+                          ? 'secondary'
+                          : 'grey-4'
+                      "
                       dense
                       @click="formData[index].starting_position = pos"
                     />
@@ -84,7 +87,6 @@
 
       <q-spinner v-else color="primary" size="md" class="q-my-xl" />
     </div>
-
   </q-card>
 </template>
 
@@ -95,15 +97,18 @@ import { useQuasar } from 'quasar';
 import { storeToRefs } from 'pinia';
 import { useLeagueStore } from 'stores/leagueStore';
 
+const emit = defineEmits<{
+  (e: 'submitted'): void;
+}>();
+
 const $q = useQuasar();
 
 const props = defineProps<{
   selectedGameId: number;
 }>();
 
-console.log(props.selectedGameId);
-
 const { members } = storeToRefs(useLeagueStore());
+const { getMatchResults } = useLeagueStore();
 
 const resultConfig = ref<any>(null);
 const factions = ref<Array<{ id: number; name: string }>>([]);
@@ -135,7 +140,7 @@ async function fetchFactions() {
   factions.value = factionRes.data;
 }
 
-function resetFormData() {
+function initFormData() {
   formData.value = members.value.map((p) => ({
     player_profile: p.id,
     selected_game: props.selectedGameId,
@@ -153,7 +158,7 @@ watch(
     if (props.selectedGameId) {
       await fetchResultConfig();
       await fetchFactions();
-      resetFormData();
+      initFormData();
     }
   },
   { immediate: true }
@@ -184,6 +189,8 @@ async function submitResults() {
         type: 'positive',
         message: 'Match gespeichert.',
       });
+      await getMatchResults();
+      emit('submitted');
     }
   } catch (err: any) {
     if (err.response?.status === 202) {

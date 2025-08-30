@@ -3,17 +3,15 @@
     <div class="text-h6">Spielauswahl</div>
     <div :class="containerClass" >
       <div
-        v-for="(member, index) in members"
+        v-for="member in members"
         :key="member.id"
         class="player-card"
       >
         <PlayerCard
-          :status="leagueStatus"
           :member="member"
           :isActive="member.is_active_player"
           :isBanning="isBanning(member)"
           :isBannable="isBannable(member)"
-          :index="index"
         />
       </div>
     </div>

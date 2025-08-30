@@ -1,7 +1,7 @@
 <template>
   <div class="player-card">
     <!-- Colored Header -->
-    <div class="card-header" :class="bgClass">
+    <div class="card-header" :class="member.colorClass">
       <div class="row items-center text-weight-medium no-wrap">
         {{ member.username }}
         <div v-if="isActive" class="active-indicator q-ml-xs">
@@ -32,8 +32,6 @@
     <div class="card-body">
       <SelectedGameInfo
         :member="member"
-        :status="status"
-        :isActive="isActive"
         :isBannable="isBannable"
         :isBanning="isBanning"
       />
@@ -42,37 +40,21 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
 import SelectedGameInfo from 'components/league/SelectedGameInfo.vue';
 
-const props = defineProps<{
+defineProps<{
   member: any;
   isActive: boolean;
-  status: string;
   isBanning: boolean;
   isBannable: boolean;
-  index?: number;
 }>();
 
-const bgClass = computed(() => {
-  const i = props.index ?? 0;
-  const bgClasses = [
-    'bg-player-1',
-    'bg-player-2',
-    'bg-player-3',
-    'bg-player-4',
-    'bg-player-5',
-    'bg-player-6',
-  ];
-  return bgClasses[i % bgClasses.length];
-});
 </script>
 
 <style scoped lang="scss">
 .player-card {
   background: #f3f3f3;
   border-radius: 8px;
-  margin: 8px;
   overflow: hidden;
   //box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
   border: 1px solid rgb(207, 207, 207);

@@ -2,22 +2,16 @@
   <div class="q-pa-lg">
     <LeagueStatusBar />
 
-    <!-- Game Selector -->
+    <!-- Game Selector - shown when user needs to pick games -->
     <GameSelector
       v-if="isMePickingGame"
       @submit-success="updateLeagueData"
       class="q-mt-xl"
     />
 
+    <!-- Match Results Section -->
     <template v-if="leagueStatus === 'PLAYING'">
-      <div class="flex">
-        <MatchResult
-          v-for="selectedGameId of selectedGameIdsWithResults"
-          :key="selectedGameId"
-          :selected-game-id="selectedGameId"
-        />
-      </div>
-      <q-separator />
+      <!-- Game Tabs for Entering Results -->
       <q-tabs
         active-color="primary"
         indicator-color="primary"
@@ -31,10 +25,23 @@
           {{ selectedGame.game_name }}
         </q-tab>
       </q-tabs>
+      <!-- Match Result Entry Form -->
       <MatchResultForm
         v-if="currentFormSelectedGameId"
+        @submitted="() => (currentFormSelectedGameId = null)"
         :selected-game-id="currentFormSelectedGameId"
       />
+
+      <q-separator />
+
+      <!-- Display Previously Entered Match Results -->
+      <div class="flex">
+        <MatchResult
+          v-for="selectedGameId of selectedGameIdsWithResults"
+          :key="selectedGameId"
+          :selected-game-id="selectedGameId"
+        />
+      </div>
     </template>
 
     <!-- Player Cards Grid -->
@@ -61,9 +68,7 @@ onMounted(() => {
 const {
   isMePickingGame,
   leagueStatus,
-  selectedGamesWithResults,
   selectedGameIdsWithResults,
-  selectedGameIdsWithoutResults,
   selectedGamesWithoutResults,
 } = storeToRefs(league);
 const { updateLeagueData } = league;

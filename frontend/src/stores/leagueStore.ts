@@ -16,7 +16,7 @@ import { api } from 'boot/axios';
  * - `leagueId`: A reference holding the current league's unique identifier.
  * - `leagueData`: A shallow reference containing the broader league data fetched from an API.
  * - `members`: A reference holding the list of members in the current league.
- * - `selectedGames`: A reference containing a list of games selected by members.
+ * - `selectedGames`: A computed property containing a list of games selected by members.
  * - `leagueStatus`: A reference to the current status of the league (e.g., "PICKING", "BANNING").
  * - `initialized`: A flag indicating the initialization state of the store.
  *
@@ -39,8 +39,23 @@ export const useLeagueStore = defineStore('league', () => {
   const leagueId = ref<number | null>(null);
   const leagueData = shallowRef<any>(null);
   const members = ref<any[]>([]);
-  const selectedGames = ref<any[]>([]);
   const leagueStatus = ref<string>(''); // states: PICKING, BANNING, REPICKING, PLAYING, DONE
+
+  // --- Derived maps for O(1) lookups ---
+  const membersById = computed(() =>
+    members.value.reduce((acc, m) => {
+      acc[parseInt(m.id)] = m;
+      return acc;
+    })
+  );
+
+  const selectedGames = computed(() => {
+    if (members.value.length === 0) return [];
+    return members.value.map((member) => ({
+      ...member.selected_game,
+      selected_by: member.username,
+    }));
+  });
 
   // match results
   const selectedGameIdsWithResults = computed(() =>
@@ -76,6 +91,10 @@ export const useLeagueStore = defineStore('league', () => {
     const { data } = await fetchLeagueDetails(leagueId.value);
     leagueData.value = data;
     members.value = data.members;
+    members.value = members.value.map((member, index) => ({
+      ...member,
+      colorClass: `bg-player-${index + 1}`,
+    }));
     leagueStatus.value = data.status;
   }
 
@@ -88,29 +107,17 @@ export const useLeagueStore = defineStore('league', () => {
     }
   }
 
-  function getSelectedGames() {
-    if (members.value.length === 0) return [];
-    members.value.forEach((member) => {
-      selectedGames.value.push({
-        ...member.selected_game,
-        selected_by: member.username,
-      });
-    });
-  }
-
-  function getUsernameByMemberId(memberId: number) {
-    const member = members.value.find((m) => m.id === memberId);
-    if (member) return member.username;
-    return '';
+  function getMemberById(memberId: number) {
+    return members.value.find((m) => m.id === memberId);
   }
 
   function getGameNameBySelectedGameId(selectedGameId: number) {
-    const selectedGame = selectedGames.value.find((s) => s.id === selectedGameId);
+    const selectedGame = selectedGames.value.find(
+      (s) => s.id === selectedGameId
+    );
     if (selectedGame) return selectedGame.game_name;
     return null;
   }
-
-  watch(members, getSelectedGames, { deep: true });
 
   async function init() {
     // If we've already initialized once, just exit early
@@ -164,10 +171,31 @@ export const useLeagueStore = defineStore('league', () => {
 
   return {
     // state
-    leagueId, leagueData, members, leagueStatus, initialized, selectedGames, matchResults,
+    leagueId,
+    leagueData,
+    members,
+    leagueStatus,
+    initialized,
+    selectedGames,
+    matchResults,
+
     // getters
-    activePlayer, isMeActivePlayer, isMePickingGame, isMeBanningGame, selectedGamesWithResults, selectedGamesWithoutResults, selectedGameIdsWithResults, selectedGameIdsWithoutResults,
+    activePlayer,
+    isMeActivePlayer,
+    isMePickingGame,
+    isMeBanningGame,
+    selectedGamesWithResults,
+    selectedGamesWithoutResults,
+    selectedGameIdsWithResults,
+    selectedGameIdsWithoutResults,
+    membersById,
+
     // actions
-    init, updateLeagueData, banNothing, getUsernameByMemberId, getGameNameBySelectedGameId
+    init,
+    updateLeagueData,
+    banNothing,
+    getMemberById,
+    getGameNameBySelectedGameId,
+    getMatchResults,
   };
 });

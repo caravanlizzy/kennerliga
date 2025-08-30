@@ -24,12 +24,15 @@
 
           <!-- Banner Container -->
           <div class="banners-wrapper">
-            <div v-if="bannerUsernamesForMyGame.length" class="banner-label">Gebannt von:</div>
+            <div v-if="bannerUsernamesForMyGame.length" class="banner-label">
+              Gebannt von:
+            </div>
             <div class="row q-gutter-xs banner-list">
               <UserName
-                v-for="username of bannerUsernamesForMyGame"
+                v-for="{ username, colorClass } of bannerUsernamesForMyGame"
                 :key="username"
                 :username="username"
+                :color-class="colorClass"
               />
             </div>
           </div>
@@ -56,9 +59,9 @@
           >
             <q-item-section>{{ option.game_option.name }}</q-item-section>
             <q-item-section side class="text-right">
-        <span v-if="option.choice" class="text-secondary">
-          {{ option.choice.name }}
-        </span>
+              <span v-if="option.choice" class="text-secondary">
+                {{ option.choice.name }}
+              </span>
               <q-icon
                 v-else-if="option.value === true"
                 name="check"
@@ -74,7 +77,6 @@
           </q-item>
         </q-list>
       </q-card-section>
-
     </div>
 
     <!-- Banned Game -->
@@ -95,8 +97,8 @@
         <q-card-section>
           Sicher dass du
           <span class="text-weight-bold">{{
-              member.selected_game?.game_name
-            }}</span>
+            member.selected_game?.game_name
+          }}</span>
           von <span class="text-weight-bold">{{ member.username }}</span> bannen
           willst?
         </q-card-section>
@@ -111,7 +113,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, inject, ref } from 'vue';
+import { computed, ref } from 'vue';
 import { useUserStore } from 'stores/userStore';
 import { banGame } from 'src/services/game/banGameService';
 import UserName from 'components/ui/UserName.vue';
@@ -120,14 +122,10 @@ import { storeToRefs } from 'pinia';
 
 const props = defineProps<{
   member: any;
-  status: string;
-  isActive: boolean;
   isBannable: boolean;
 }>();
 
-// const league = inject('league');
-// const fetchLeagueDetails = inject('fetchLeagueDetails');
-const { leagueData, members, leagueId } = storeToRefs(useLeagueStore());
+const { members, leagueId } = storeToRefs(useLeagueStore());
 const { updateLeagueData } = useLeagueStore();
 const { user } = useUserStore();
 
@@ -139,7 +137,7 @@ function openBanDialog() {
 }
 
 function getSelectedGameForMember() {
-  const member = leagueData.value.members.find(
+  const member = members.value.find(
     (m) => m.username === props.member.username
   );
   return member.selected_game;
@@ -147,9 +145,7 @@ function getSelectedGameForMember() {
 
 function getBannersOfGame(game: { id: number }): string[] {
   if (!members.value) return [];
-  return members.value
-    .filter((m) => m.banned_game?.id === game.id)
-    .map((m) => m.username);
+  return members.value.filter((m) => m.banned_game?.id === game.id);
 }
 
 const bannerUsernamesForMyGame = computed(() => {
@@ -259,5 +255,4 @@ async function confirmBan() {
   opacity: 1;
   transform: scale(1);
 }
-
 </style>

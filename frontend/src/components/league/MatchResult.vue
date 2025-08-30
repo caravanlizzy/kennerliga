@@ -10,20 +10,21 @@
       <!-- Results List -->
       <q-list>
         <q-item
-          v-for="(result, index) in sortedResults"
+          v-for="result in sortedResults"
           :key="result.id"
           class="q-py-sm"
         >
+<!--          {{membersById[result.player_profile]}}-->
           <q-item-section avatar class="q-pr-sm">
             <UserName
-              :username="getUsernameByMemberId(result.player_profile)"
-              :color-class="getPlayerColorClass(index)"
+              :username="getMemberById(result.player_profile).username"
+              :color-class="getMemberById(result.player_profile).colorClass"
             />
           </q-item-section>
 
           <q-item-section>
             <q-item-label class="text-weight-medium text-body1 q-mb-xs">
-              {{ getUsernameByMemberId(result.player_profile) }}
+              {{ getMemberById(result.player_profile).username }}
             </q-item-label>
 
             <q-item-label>
@@ -71,16 +72,13 @@ import { storeToRefs } from 'pinia';
 
 const props = defineProps<{ selectedGameId: number }>();
 
-const { matchResults } = storeToRefs(useLeagueStore());
-const { getUsernameByMemberId, getGameNameBySelectedGameId } = useLeagueStore();
+const { matchResults, membersById } = storeToRefs(useLeagueStore());
+const { getMemberById, getGameNameBySelectedGameId } = useLeagueStore();
 
 const matchResult = computed(() => matchResults.value.filter(mr => mr.selected_game == props.selectedGameId))
 
 const sortedResults = computed(() => matchResult.value.flat().sort((a, b) => (b.points ?? 0) - (a.points ?? 0)));
-console.log(getGameNameBySelectedGameId(props.selectedGameId));
-function getPlayerColorClass(index: number): string {
-  return `bg-player-${(index % 6) + 1}`;
-}
+
 </script>
 
 <style scoped>
