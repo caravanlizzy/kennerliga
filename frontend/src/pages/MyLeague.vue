@@ -28,7 +28,7 @@
       <!-- Match Result Entry Form -->
       <MatchResultForm
         v-if="currentFormSelectedGameId"
-        @submitted="() => (currentFormSelectedGameId = null)"
+        @submitted="handleSubmit"
         :selected-game-id="currentFormSelectedGameId"
       />
 
@@ -69,11 +69,16 @@ const {
   isMePickingGame,
   leagueStatus,
   selectedGamesFetchedEmpty,
-  selectedGamesWithResults
+  selectedGamesWithResults,
 } = storeToRefs(league);
-const { updateLeagueData } = league;
+const { updateLeagueData, refreshResultsForGame } = league;
 
 const currentFormSelectedGameId = ref(null);
+
+function handleSubmit(selectedGameId: number) {
+  currentFormSelectedGameId.value = null;
+  refreshResultsForGame(selectedGameId);
+}
 </script>
 
 <style lang="scss">

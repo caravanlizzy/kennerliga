@@ -290,6 +290,11 @@ export const useLeagueStore = defineStore('league', () => {
     await Promise.all(promises);
   }
 
+  async function refreshResultsForGame(selectedGameId: number) {
+    const { data } = await api.get<MatchResult[]>(`/result/results/?selected_game=${selectedGameId}`);
+    setResultsForGame(selectedGameId, data);
+  }
+
   async function init() {
     if (initialized.value) return;
     if (initPromise) return initPromise;
@@ -350,5 +355,6 @@ export const useLeagueStore = defineStore('league', () => {
     updateLeagueData,
     banNothing,
     getMatchResults,
+    refreshResultsForGame,
   };
 });

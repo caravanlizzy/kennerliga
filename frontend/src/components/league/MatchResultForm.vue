@@ -12,7 +12,7 @@
               <!-- Colored Header -->
               <div
                 class="form-card-header q-pa-sm text-white text-subtitle2 text-center"
-                :class="getPlayerColorClass(member.position)"
+                :class="member.colorClass"
               >
                 {{ member.username }}
               </div>
@@ -98,7 +98,7 @@ import { storeToRefs } from 'pinia';
 import { useLeagueStore } from 'stores/leagueStore';
 
 const emit = defineEmits<{
-  (e: 'submitted'): void;
+  (e: 'submitted', selectedGameId: number): void;
 }>();
 
 const $q = useQuasar();
@@ -108,7 +108,6 @@ const props = defineProps<{
 }>();
 
 const { members } = storeToRefs(useLeagueStore());
-const { getMatchResults } = useLeagueStore();
 
 const resultConfig = ref<any>(null);
 const factions = ref<Array<{ id: number; name: string }>>([]);
@@ -189,8 +188,7 @@ async function submitResults() {
         type: 'positive',
         message: 'Match gespeichert.',
       });
-      await getMatchResults();
-      emit('submitted');
+      emit('submitted', props.selectedGameId);
     }
   } catch (err: any) {
     if (err.response?.status === 202) {
@@ -210,18 +208,6 @@ async function submitResults() {
       });
     }
   }
-}
-
-function getPlayerColorClass(position: number): string {
-  const colorClasses = [
-    'bg-player-1',
-    'bg-player-2',
-    'bg-player-3',
-    'bg-player-4',
-    'bg-player-5',
-    'bg-player-6',
-  ];
-  return colorClasses[position - (1 % colorClasses.length)];
 }
 </script>
 
