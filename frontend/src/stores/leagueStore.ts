@@ -43,17 +43,29 @@ export const useLeagueStore = defineStore('league', () => {
   const leagueStatus = ref<string>(''); // states: PICKING, BANNING, REPICKING, PLAYING, DONE
 
   // match results
-  const selectedGamesWithResults = computed(() =>
+  const selectedGameIdsWithResults = computed(() =>
     Array.from(
       new Set(matchResults.value.map((result) => result.selected_game))
     ).map((id) => id)
   );
 
-  const selectedGamesWithoutResults = computed(() =>
+  const selectedGameIdsWithoutResults = computed(() =>
     selectedGames.value
       .map((game) => game.id)
-      .filter((id) => !selectedGamesWithResults.value.includes(id))
+      .filter((id) => !selectedGameIdsWithResults.value.includes(id))
   );
+
+  const selectedGamesWithResults = computed(() =>
+    selectedGames.value.filter((game) =>
+      selectedGameIdsWithResults.value.includes(game.id)
+    )
+  );
+  const selectedGamesWithoutResults = computed(() =>
+    selectedGames.value.filter((game) =>
+      selectedGameIdsWithoutResults.value.includes(game.id)
+    )
+  );
+
   const matchResults = ref<any[]>([]);
 
   const initialized = ref(false);
@@ -154,7 +166,7 @@ export const useLeagueStore = defineStore('league', () => {
     // state
     leagueId, leagueData, members, leagueStatus, initialized, selectedGames, matchResults,
     // getters
-    activePlayer, isMeActivePlayer, isMePickingGame, isMeBanningGame, selectedGamesWithResults, selectedGamesWithoutResults,
+    activePlayer, isMeActivePlayer, isMePickingGame, isMeBanningGame, selectedGamesWithResults, selectedGamesWithoutResults, selectedGameIdsWithResults, selectedGameIdsWithoutResults,
     // actions
     init, updateLeagueData, banNothing, getUsernameByMemberId, getGameNameBySelectedGameId
   };

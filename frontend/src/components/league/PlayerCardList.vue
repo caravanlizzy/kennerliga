@@ -1,5 +1,5 @@
 <template>
-  <div class="league-card q-pa-md">
+  <div class="league-card">
     <div class="text-h6">Spielauswahl</div>
     <div :class="containerClass" >
       <div

@@ -1,10 +1,9 @@
 <template>
-  <div class="q-pa-md">
     <q-card flat bordered class="shadow-2 result-summary-card q-pa-md">
       <!-- Header -->
       <div class="row items-center justify-between q-mb-md">
         <div class="text-h6 text-primary">{{ getGameNameBySelectedGameId(selectedGameId) }}</div>
-        <q-badge color="primary" label="Ergebnisse" />
+        <q-badge color="primary" label="Ergebnis" />
       </div>
       <q-separator class="q-mb-md" />
 
@@ -62,7 +61,6 @@
         </q-item>
       </q-list>
     </q-card>
-  </div>
 </template>
 
 <script setup lang="ts">

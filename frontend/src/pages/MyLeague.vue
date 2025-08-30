@@ -10,16 +10,30 @@
     />
 
     <template v-if="leagueStatus === 'PLAYING'">
-      <MatchResult
-        v-for="selectedGameId of selectedGamesWithResults"
-        :key="selectedGameId"
-        :selected-game-id="selectedGameId"
-      />
-      <q-separator/>
+      <div class="flex">
+        <MatchResult
+          v-for="selectedGameId of selectedGameIdsWithResults"
+          :key="selectedGameId"
+          :selected-game-id="selectedGameId"
+        />
+      </div>
+      <q-separator />
+      <q-tabs
+        active-color="primary"
+        indicator-color="primary"
+        v-model="currentFormSelectedGameId"
+      >
+        <q-tab
+          v-for="selectedGame in selectedGamesWithoutResults"
+          :key="selectedGame.id"
+          :name="selectedGame.id"
+        >
+          {{ selectedGame.game_name }}
+        </q-tab>
+      </q-tabs>
       <MatchResultForm
-        v-for="selectedGameId of selectedGamesWithoutResults"
-        :key="selectedGameId"
-        :selected-game-id="selectedGameId"
+        v-if="currentFormSelectedGameId"
+        :selected-game-id="currentFormSelectedGameId"
       />
     </template>
 
@@ -29,7 +43,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted } from 'vue';
+import { onMounted, ref } from 'vue';
 import GameSelector from 'components/league/GameSelector.vue';
 import PlayerCardList from 'components/league/PlayerCardList.vue';
 import LeagueStatusBar from 'pages/LeagueStatusBar.vue';
@@ -38,16 +52,23 @@ import { storeToRefs } from 'pinia';
 import MatchResult from 'components/league/MatchResult.vue';
 import MatchResultForm from 'components/league/MatchResultForm.vue';
 
-
 const league = useLeagueStore();
 
 onMounted(() => {
   void league.init();
-})
+});
 
-const { isMePickingGame, leagueStatus, selectedGamesWithResults, selectedGamesWithoutResults } = storeToRefs(league);
+const {
+  isMePickingGame,
+  leagueStatus,
+  selectedGamesWithResults,
+  selectedGameIdsWithResults,
+  selectedGameIdsWithoutResults,
+  selectedGamesWithoutResults,
+} = storeToRefs(league);
 const { updateLeagueData } = league;
 
+const currentFormSelectedGameId = ref(null);
 </script>
 
 <style lang="scss">

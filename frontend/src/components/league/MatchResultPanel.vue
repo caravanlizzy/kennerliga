@@ -1,6 +1,6 @@
 <template>
   <div>
-    <q-card flat class="league-card q-pa-md">
+    <q-card flat class="league-card">
       <!-- Header with toggler -->
       <div class="row items-center justify-between q-mb-sm">
         <div class="text-h6">Ergebnis eintragen</div>

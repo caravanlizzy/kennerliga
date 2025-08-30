@@ -1,88 +1,91 @@
 <template>
-  <div class="q-pa-md">
-    <q-form v-if="formData.length" @submit.prevent="submitResults">
-      <div class="row q-col-gutter-md q-mb-xl">
-        <div v-for="(member, index) in members" :key="member.id" class="col-3">
-          <q-card class="shadow-1 rounded-borders">
-            <!-- Colored Header -->
-            <div
-              class="form-card-header q-pa-sm text-white text-subtitle2 text-center"
-              :class="getPlayerColorClass(member.position)"
-            >
-              {{ member.username }}
-            </div>
+  <q-card class="q-pa-md" flat bordered rounded>
+    <div class="q-pa-md">
+      <q-form v-if="formData.length" @submit.prevent="submitResults">
+        <div class="row q-col-gutter-md q-mb-xl">
+          <div v-for="(member, index) in members" :key="member.id" class="col-3">
+            <q-card class="shadow-1 rounded-borders">
+              <!-- Colored Header -->
+              <div
+                class="form-card-header q-pa-sm text-white text-subtitle2 text-center"
+                :class="getPlayerColorClass(member.position)"
+              >
+                {{ member.username }}
+              </div>
 
-            <!-- Card Body -->
-            <div class="q-pa-md q-gutter-md">
-              <q-input
-                v-if="resultConfig?.has_points"
-                v-model.number="formData[index].points"
-                type="number"
-                inputmode="numeric"
-                label="Punkte"
-                dense
-                outlined
-                :rules="[(val) => val !== null || 'Pflichtfeld']"
-              />
-              <div class="col">Startposition</div>
-              <div class="col" style="margin-top: 0">
-                <q-btn-group
-                  flat
-                  v-if="resultConfig?.has_starting_player_order"
-                  class="q-gutter-x-xs"
-                >
-                  <q-btn
+              <!-- Card Body -->
+              <div class="q-pa-md q-gutter-md">
+                <q-input
+                  v-if="resultConfig?.has_points"
+                  v-model.number="formData[index].points"
+                  type="number"
+                  inputmode="numeric"
+                  label="Punkte"
+                  dense
+                  outlined
+                  :rules="[(val) => val !== null || 'Pflichtfeld']"
+                />
+                <div class="col">Startposition</div>
+                <div class="col" style="margin-top: 0">
+                  <q-btn-group
                     flat
-                    v-for="pos in [1, 2, 3, 4]"
-                    :key="pos"
-                    :label="pos"
-                    :color="
+                    v-if="resultConfig?.has_starting_player_order"
+                    class="q-gutter-x-xs"
+                  >
+                    <q-btn
+                      flat
+                      v-for="pos in [1, 2, 3, 4]"
+                      :key="pos"
+                      :label="pos"
+                      :color="
                       formData[index].starting_position === pos
                         ? 'primary'
                         : 'grey-4'
                     "
-                    :text-color="black"
-                    dense
-                    @click="formData[index].starting_position = pos"
-                  />
-                </q-btn-group>
+                      text-color="black"
+                      dense
+                      @click="formData[index].starting_position = pos"
+                    />
+                  </q-btn-group>
+                </div>
+
+                <q-select
+                  v-if="resultConfig?.is_asymmetric"
+                  v-model="formData[index].faction_id"
+                  :options="factions"
+                  option-label="name"
+                  option-value="id"
+                  label="Faction"
+                  dense
+                  outlined
+                />
+
+                <q-input
+                  v-if="tieBreakerRequired"
+                  v-model="formData[index].tie_breaker_value"
+                  label="Tie-Breaker Wert"
+                  dense
+                  outlined
+                />
               </div>
-
-              <q-select
-                v-if="resultConfig?.is_asymmetric"
-                v-model="formData[index].faction_id"
-                :options="factions"
-                option-label="name"
-                option-value="id"
-                label="Faction"
-                dense
-                outlined
-              />
-
-              <q-input
-                v-if="tieBreakerRequired"
-                v-model="formData[index].tie_breaker_value"
-                label="Tie-Breaker Wert"
-                dense
-                outlined
-              />
-            </div>
-          </q-card>
+            </q-card>
+          </div>
         </div>
-      </div>
 
-      <div class="row justify-end">
-        <q-btn
-          type="submit"
-          label="Ergebnisse speichern"
-          color="primary"
-          unelevated
-        />
-      </div>
-    </q-form>
+        <div class="row justify-end">
+          <q-btn
+            type="submit"
+            label="Ergebnisse speichern"
+            color="primary"
+            unelevated
+          />
+        </div>
+      </q-form>
 
-    <q-spinner v-else color="primary" size="md" class="q-my-xl" />
-  </div>
+      <q-spinner v-else color="primary" size="md" class="q-my-xl" />
+    </div>
+
+  </q-card>
 </template>
 
 <script setup lang="ts">
