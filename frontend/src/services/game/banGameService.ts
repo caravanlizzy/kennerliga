@@ -6,6 +6,9 @@ export async function banGame(banDecision: BanDecisionDtoPayload) {
     username: banDecision.username,
     league: banDecision.leagueId,
   };
+  if (banDecision.decline) {
+    data.declined_ban = banDecision.decline;
+  }
   if (banDecision.gameId) {
     data.game = banDecision.gameId;
   }

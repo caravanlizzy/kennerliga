@@ -16,14 +16,16 @@ import { ref } from 'vue';
 import { TUser } from 'src/types';
 import { api } from 'boot/axios';
 import { useUserStore } from 'stores/userStore';
+import { useRouter } from 'vue-router';
 
 const { login } = useUserStore();
 
 const users = ref<TUser[]>([]);
-
+const router = useRouter();
 async function impersonate(user: string) {
   try {
     await login(user, 'test');
+    await router.push({ name: 'my-league'})
   } catch (error) {
     console.error('Failed to impersonate user:', error);
   }

@@ -1,5 +1,5 @@
 <template>
-  <div class="q-pa-lg">
+  <div>
     <LeagueStatusBar />
 
     <!-- Game Selector - shown when user needs to pick games -->

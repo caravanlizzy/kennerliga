@@ -4,7 +4,7 @@
     <div class="card-header" :class="member.colorClass">
       <div class="row items-center text-weight-medium no-wrap">
         {{ member.username }}
-        <div v-if="isActive" class="active-indicator q-ml-xs">
+        <div v-if="member.is_active_player" class="active-indicator q-ml-xs">
           <span class="dot" />
         </div>
       </div>
@@ -41,13 +41,31 @@
 
 <script setup lang="ts">
 import SelectedGameInfo from 'components/league/SelectedGameInfo.vue';
+import { TLeagueMember } from 'src/types';
+import { storeToRefs } from 'pinia';
+import { useLeagueStore } from 'stores/leagueStore';
 
 defineProps<{
   member: any;
-  isActive: boolean;
-  isBanning: boolean;
-  isBannable: boolean;
 }>();
+
+const {leagueStatus, isMeActivePlayer } = storeToRefs(useLeagueStore());
+
+
+function isBannable(member: TLeagueMember): boolean {
+  // only bannable if leagueStatus is in banning phase
+  if (leagueStatus.value !== 'BANNING') return false;
+
+  // only bannable if *I* am the active player
+  if (!isMeActivePlayer.value) return false;
+
+  // I can ban others, but not myself
+  return !member.is_active_player;
+}
+
+function isBanning(member: TLeagueMember): boolean {
+  return leagueStatus.value === 'BANNING' && member.is_active_player;
+}
 
 </script>
 

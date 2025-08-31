@@ -6,6 +6,7 @@ import { fetchLeagueDetails } from 'src/services/leagueService';
 import { useUserStore } from 'stores/userStore';
 import { banGame } from 'src/services/game/banGameService';
 import { api } from 'boot/axios';
+import { TLeagueStatus } from 'src/types';
 
 // Shared leaf types
 /**
@@ -34,7 +35,7 @@ type Choice = {
  * @property {number|null} only_if_option - Specifies the dependent option by its identifier for conditional display. Can be null.
  * @property {number|null} only_if_choice - Specifies the dependent choice by its identifier for conditional display. Can be null.
  */
-type GameOption = {
+export type GameOption = {
   id: number;
   name: string;
   has_choices: boolean;
@@ -202,7 +203,7 @@ export const useLeagueStore = defineStore('league', () => {
   const leagueId = ref<number | null>(null);
   const leagueData = shallowRef<any>(null);
   const members = ref<Member[]>([]);
-  const leagueStatus = ref<string>(''); // states: PICKING, BANNING, REPICKING, PLAYING, DONE
+  const leagueStatus = ref<TLeagueStatus>('PICKING'); // states: PICKING, BANNING, REPICKING, PLAYING, DONE
 
   // --- Derived maps for O(1) lookups ---
   const membersById = computed<{ [key: number]: Member }>(() =>
@@ -326,7 +327,12 @@ export const useLeagueStore = defineStore('league', () => {
 
   async function banNothing() {
     if (!user || !leagueId.value) return;
-    await banGame({ username: user.username, leagueId: leagueId.value });
+    try {
+      await banGame({ username: user.username, leagueId: leagueId.value, decline: true });
+      await updateLeagueData();
+    } catch (e) {
+      console.error(e);
+    }
   }
 
   return {

@@ -71,3 +71,6 @@ export type TLeagueMember = {
   banned_game?: string;
 }
 
+export type TLeagueStatus = 'PICKING' | 'REPICKING' | 'BANNING' | 'PLAYING' | 'DONE';
+
+
