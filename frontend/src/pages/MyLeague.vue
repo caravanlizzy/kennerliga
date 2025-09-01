@@ -7,9 +7,10 @@
       @submit-success="updateLeagueData"
       class="q-mt-xl"
     />
-    <SectionTitle class="bg-primary text-white">Upload Result</SectionTitle>
     <!-- Match Results Section -->
     <template v-if="leagueStatus === 'PLAYING'">
+      <SectionTitle class="bg-primary text-white">Upload Result</SectionTitle>
+
       <!-- Game Tabs for Entering Results -->
       <q-tabs
         active-color="primary"
@@ -32,8 +33,10 @@
       />
 
       <!--      <q-separator />-->
-      <SectionTitle class="bg-secondary text-white">Results</SectionTitle>
-      <MyLeagueResults />
+      <template v-if="leagueStatus === 'PLAYING'">
+        <SectionTitle class="bg-secondary text-white">Results</SectionTitle>
+        <MyLeagueResults />
+      </template>
     </template>
 
     <!-- Player Cards Grid -->
