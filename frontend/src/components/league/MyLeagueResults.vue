@@ -1,7 +1,8 @@
 <template>
-  <div class="row no-wrap">
+  <div class="row no-wrap q-pa-xs">
     <!-- Match results -->
-    <div class="row">
+    <div class="row justify-center">
+
       <MatchResult
         v-for="selectedGame of selectedGamesWithResults"
         :key="selectedGame.id"
@@ -22,6 +23,7 @@ const { selectedGamesWithResults } = storeToRefs(useLeagueStore());
 import MatchResult from 'components/league/MatchResult.vue';
 import LeagueStandings from 'components/league/LeagueStandings.vue';
 import { useLeagueStore } from 'stores/leagueStore';
+import SectionTitle from 'components/base/SectionTitle.vue';
 </script>
 
 <style scoped>

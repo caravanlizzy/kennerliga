@@ -7,7 +7,7 @@
       @submit-success="updateLeagueData"
       class="q-mt-xl"
     />
-
+    <SectionTitle class="bg-primary text-white">Upload Result</SectionTitle>
     <!-- Match Results Section -->
     <template v-if="leagueStatus === 'PLAYING'">
       <!-- Game Tabs for Entering Results -->
@@ -31,26 +31,20 @@
         :selected-game-id="currentFormSelectedGameId"
       />
 
-<!--      <q-separator />-->
-
-    <MyLeagueResults />
+      <!--      <q-separator />-->
+      <SectionTitle class="bg-secondary text-white">Results</SectionTitle>
+      <MyLeagueResults />
     </template>
 
     <!-- Player Cards Grid -->
-    <div class="league-card">
-      <div class="text-h6">Selected Games</div>
-      <div>
-        <div
-          v-for="member in members"
-          :key="member.id"
-          class="player-card"
-        >
-          <PlayerCard
-            :member="member"
-          />
-        </div>
+
+    <SectionTitle class="bg-info text-white">Selected Games</SectionTitle>
+    <div class="row wrap justify-between q-pa-md">
+      <div v-for="member in members" :key="member.id" class="player-card">
+        <PlayerCard :member="member" />
       </div>
     </div>
+
   </div>
 </template>
 
@@ -63,6 +57,7 @@ import { storeToRefs } from 'pinia';
 import MatchResultForm from 'components/league/MatchResultForm.vue';
 import PlayerCard from 'components/league/PlayerCard.vue';
 import MyLeagueResults from 'components/league/MyLeagueResults.vue';
+import SectionTitle from 'components/base/SectionTitle.vue';
 
 const league = useLeagueStore();
 
@@ -70,12 +65,8 @@ onMounted(() => {
   void league.init();
 });
 
-const {
-  isMePickingGame,
-  leagueStatus,
-  selectedGamesFetchedEmpty,
-  members
-} = storeToRefs(league);
+const { isMePickingGame, leagueStatus, selectedGamesFetchedEmpty, members } =
+  storeToRefs(league);
 const { updateLeagueData, refreshResultsForGame } = league;
 
 const currentFormSelectedGameId = ref(null);
@@ -87,7 +78,6 @@ function handleSubmit(selectedGameId: number) {
 </script>
 
 <style lang="scss">
-
 .is-active-border-accent {
   border: 2px solid rgba($accent, 0.4);
 }
@@ -95,5 +85,4 @@ function handleSubmit(selectedGameId: number) {
 .is-active-border-secondary {
   border: 2px solid rgba($secondary, 0.4);
 }
-
 </style>

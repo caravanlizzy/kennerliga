@@ -1,8 +1,8 @@
 <template>
-  <q-card flat class="q-pa-xs">
-    <div class="row items-center justify-between q-mb-md">
+  <q-card flat class="">
+    <div class="row items-center justify-around q-mb-md">
       <div class="text-h6 text-primary">{{ gameName ?? '—' }}</div>
-      <q-badge color="primary" label="Ergebnis" />
+<!--      <q-badge color="primary" label="Ergebnis" />-->
     </div>
 
     <template v-if="results.length === 0">

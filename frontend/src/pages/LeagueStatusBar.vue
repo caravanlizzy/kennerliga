@@ -1,7 +1,7 @@
 <template>
   <!-- Status Bar -->
   <div
-    class="column justify-center items-center text-primary border q-py-md bg-amber-1"
+    class="column justify-center items-center text-primary border q-py-xs status-borders"
   >
     <div class="text-h6 text-weight-bold ">
       {{ currentStatusNoun.toUpperCase() }}
@@ -62,3 +62,10 @@ const currentStatusNoun = computed(
 
 const statusVerb = computed(() => statusMap[leagueStatus.value]?.verb ?? '');
 </script>
+
+<style scoped lang="scss">
+.status-borders{
+  border-top: 4px solid $info;
+  border-bottom: 4px solid $info;
+}
+</style>

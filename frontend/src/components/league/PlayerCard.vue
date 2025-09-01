@@ -72,10 +72,10 @@ function isBanning(member: TLeagueMember): boolean {
 <style scoped lang="scss">
 .player-card {
   background: #f3f3f3;
-  border-radius: 8px;
+  //border-radius: 8px;
   overflow: hidden;
   //box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
-  border: 1px solid rgb(207, 207, 207);
+  //border: 1px solid rgb(207, 207, 207);
 }
 
 .card-header {

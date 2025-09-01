@@ -1,6 +1,6 @@
 <template>
   <q-card flat>
-    <div class="row items-center justify-center q-mb-md">
+    <div class="row items-center justify-center">
       <div class="text-h6 text-primary">League Standings</div>
     </div>
     <q-table
