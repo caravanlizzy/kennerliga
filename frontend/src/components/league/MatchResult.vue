@@ -10,62 +10,110 @@
       <div class="text-caption text-grey-7">Noch keine Ergebnisse.</div>
     </template>
 
-    <q-list v-else>
-      <q-item v-for="result in results" :key="result.id" class="q-py-sm">
-        <q-item-section avatar class="q-pr-sm">
-          <UserName :username="result.username" :color-class="result.colorClass" />
-        </q-item-section>
+    <template v-else>
 
-        <q-item-section>
-          <q-item-label class="text-weight-medium text-body1 q-mb-xs">
-            {{ result.username }}
-          </q-item-label>
+      <q-table
+        flat
+        dense
+        :rows="results"
+        :columns="columns"
+        row-key="id"
+        hide-bottom
+      >
+        <!-- Player column -->
+        <template v-slot:body-cell-player="props">
+          <q-td :props="props">
+            <q-chip :class="props.row.colorClass">
+              {{ props.row.username }}
+            </q-chip>
+          </q-td>
+        </template>
+        <!-- Points -->
+        <template v-slot:header-cell-points="props">
+          <q-th :props="props" class="text-center">
+            <q-icon name="star" size="sm" />
+          </q-th>
+        </template>
+        <template v-slot:body-cell-points="props">
+          <q-td :props="props">
+            <q-chip
+              v-if="props.row.points != null"
+              dense
+              square
+              color="grey-3"
+              text-color="black"
+              :label="props.row.points"
+            />
+          </q-td>
+        </template>
 
-          <q-item-label>
-            <div class="row q-gutter-sm items-center no-wrap">
-              <q-chip
-                v-if="result.points != null"
-                dense square color="grey-3" text-color="black"
-                icon="star" :label="`${result.points} Punkte`"
-              />
-              <q-chip
-                v-if="result.starting_position"
-                dense square color="grey-2" text-color="black"
-                icon="flag" :label="`Startpos. ${result.starting_position}`"
-              />
-              <q-chip
-                v-if="result.faction_name"
-                dense square color="indigo-1" text-color="indigo-10"
-                icon="groups" :label="result.faction_name"
-              />
-            </div>
-          </q-item-label>
-        </q-item-section>
-      </q-item>
-    </q-list>
+        <!-- Startpos -->
+        <template v-slot:header-cell-starting_position="props">
+          <q-th :props="props" class="text-center">
+            <q-icon name="flag" size="sm" />
+          </q-th>
+        </template>
+        <template v-slot:body-cell-starting_position="props">
+          <q-td :props="props">
+            <q-chip
+              v-if="props.row.starting_position"
+              dense
+              square
+              color="grey-2"
+              text-color="black"
+              :label="props.row.starting_position"
+            />
+          </q-td>
+        </template>
+
+        <!-- faction -->
+        <template v-slot:header-cell-faction_name="props">
+          <q-th :props="props" class="text-center">
+            <q-icon name="diversity_2" size="sm" />
+          </q-th>
+        </template>
+        <template v-slot:body-cell-faction_name="props">
+          <q-td :props="props">
+            <q-chip
+              v-if="props.row.faction_name"
+              dense
+              square
+              color="indigo-1"
+              text-color="indigo-10"
+              :label="props.row.faction_name"
+            />
+          </q-td>
+        </template>
+      </q-table>
+    </template>
   </q-card>
 </template>
 
 <script setup lang="ts">
 import { computed } from 'vue';
 import { storeToRefs } from 'pinia';
-import UserName from 'components/ui/UserName.vue';
 import { useLeagueStore } from 'stores/leagueStore';
+import { QTableProps } from 'quasar';
 
 const props = defineProps<{ selectedGameId: number }>();
 
 const league = useLeagueStore();
-const { matchResultsByGame, membersById, selectedGamesById } = storeToRefs(league);
+const { matchResultsByGame, membersById, selectedGamesById } =
+  storeToRefs(league);
 
 // Game name via O(1) map
-const gameName = computed(() => selectedGamesById.value[props.selectedGameId]?.game_name ?? null);
+const gameName = computed(
+  () => selectedGamesById.value[props.selectedGameId]?.game_name ?? null
+);
 
 // Results for this game are already sorted in setResultsForGame()
-const resultsForGame = computed(() => matchResultsByGame.value[props.selectedGameId] ?? []);
+const resultsForGame = computed(
+  () => matchResultsByGame.value[props.selectedGameId] ?? []
+);
 
 // Join once → template stays dumb & fast
 const results = computed(() => {
-  return resultsForGame.value.map(r => {
+  return resultsForGame.value.map((r) => {
     const m = membersById.value[r.player_profile];
     return {
       id: r.id,
@@ -77,9 +125,32 @@ const results = computed(() => {
     };
   });
 });
+
+const columns: QTableProps['columns'] = [
+  {
+    name: 'player',
+    label: '',
+    field: 'username',
+    align: 'left',
+  },
+  {
+    name: 'points',
+    label: '',
+    field: 'points',
+    align: 'center',
+  },
+  {
+    name: 'starting_position',
+    label: '',
+    field: 'starting_position',
+    align: 'center',
+  },
+  {
+    name: 'faction_name',
+    label: '',
+    field: 'faction_name',
+    align: 'center',
+  },
+];
 </script>
 
-<style scoped>
-.result-summary-card { border-radius: 10px; background: #fafafa; }
-.q-chip { font-size: 0.75rem; }
-</style>

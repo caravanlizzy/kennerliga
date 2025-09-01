@@ -24,12 +24,12 @@
                   v-model.number="formData[index].points"
                   type="number"
                   inputmode="numeric"
-                  label="Punkte"
+                  label="Points"
                   dense
                   outlined
                   :rules="[(val) => val !== null || 'Pflichtfeld']"
                 />
-                <div class="col">Startposition</div>
+                <div class="col">Starting position</div>
                 <div class="col" style="margin-top: 0">
                   <q-btn-group
                     flat

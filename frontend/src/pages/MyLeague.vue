@@ -1,7 +1,7 @@
 <template>
   <div>
     <LeagueStatusBar />
-
+    <LeagueStandings/>
     <!-- Game Selector - shown when user needs to pick games -->
     <GameSelector
       v-if="isMePickingGame"
@@ -45,19 +45,33 @@
     </template>
 
     <!-- Player Cards Grid -->
-    <PlayerCardList />
+    <div class="league-card">
+      <div class="text-h6">Selected Games</div>
+      <div>
+        <div
+          v-for="member in members"
+          :key="member.id"
+          class="player-card"
+        >
+          <PlayerCard
+            :member="member"
+          />
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { onMounted, ref } from 'vue';
 import GameSelector from 'components/league/GameSelector.vue';
-import PlayerCardList from 'components/league/PlayerCardList.vue';
 import LeagueStatusBar from 'pages/LeagueStatusBar.vue';
 import { useLeagueStore } from 'stores/leagueStore';
 import { storeToRefs } from 'pinia';
 import MatchResult from 'components/league/MatchResult.vue';
 import MatchResultForm from 'components/league/MatchResultForm.vue';
+import PlayerCard from 'components/league/PlayerCard.vue';
+import LeagueStandings from 'components/league/LeagueStandings.vue';
 
 const league = useLeagueStore();
 
@@ -70,6 +84,7 @@ const {
   leagueStatus,
   selectedGamesFetchedEmpty,
   selectedGamesWithResults,
+  members
 } = storeToRefs(league);
 const { updateLeagueData, refreshResultsForGame } = league;
 
@@ -82,17 +97,6 @@ function handleSubmit(selectedGameId: number) {
 </script>
 
 <style lang="scss">
-.player-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(420px, 1fr));
-  gap: 0;
-}
-
-.column-reverse {
-  display: flex;
-  flex-direction: column-reverse;
-  gap: 16px;
-}
 
 .is-active-border-accent {
   border: 2px solid rgba($accent, 0.4);
@@ -102,11 +106,4 @@ function handleSubmit(selectedGameId: number) {
   border: 2px solid rgba($secondary, 0.4);
 }
 
-.league-card {
-  //background: #f3f3f3;
-  border-radius: 8px;
-  margin: 8px;
-  overflow: hidden;
-  //box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
-}
 </style>
