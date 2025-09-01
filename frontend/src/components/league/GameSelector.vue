@@ -24,7 +24,7 @@
 
     </div>
 
-    <div class="row q-mt-md justify-center q-gutter-md" style="max-height: 300px; overflow-y: auto;">
+    <div class="row q-pt-md justify-center q-gutter-md" style="max-height: 300px; overflow-y: auto;">
       <q-card
         v-for="game in filteredGames"
         :key="game.id"
@@ -148,12 +148,13 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted } from 'vue';
+import { h, onMounted } from 'vue';
 import KennerSelect from 'components/base/KennerSelect.vue';
 import KennerButton from 'components/base/KennerButton.vue';
 import { useGameSelection } from 'src/composables/gameSelection';
 import { useLeagueStore } from 'stores/leagueStore';
 import { storeToRefs } from 'pinia';
+import { useActionBar } from 'src/composables/actionBar';
 
 const { leagueId } = storeToRefs(useLeagueStore());
 
@@ -182,6 +183,11 @@ const handleSubmit = async () => {
     console.error('Error submitting game:', error);
   }
 };
+
+const { setActions, setDescription } = useActionBar();
+
+setActions([{name: 'Confirm', callback: handleSubmit}])
+setDescription(() =>  h('div','Confirm you game selection'));
 
 function getPlatformName(platformId: number | string): string {
   const platformObj = platforms.value.find((p) => p.id === platformId);

@@ -1,6 +1,6 @@
 <template>
   <!-- Status Bar -->
-  <div class="column q-pt-md q-pa-xs bg-grey-3">
+  <div class="column bg-grey-3">
     <!-- Main Title -->
     <div class="text-h5 text-weight-bold text-primary text-center">
       {{ currentStatusNoun.toUpperCase() }}
@@ -30,28 +30,18 @@
       </div>
     </div>
     <!-- Reusable Action Bar -->
-    <ActionBar>
-      <q-btn
-        v-if="isMeBanningGame"
-        color="accent"
-        size="sm"
-        flat
-        @click="banNothing"
-        label="Skip Ban"
-        icon="block"
-      />
-    </ActionBar>
+    <ActionBar v-if="isMeActivePlayer"/>
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, h } from 'vue';
 import { useLeagueStore } from 'stores/leagueStore';
 import { storeToRefs } from 'pinia';
 import { TLeagueStatus } from 'src/types';
 import ActionBar from 'components/layout/ActionBar.vue';
 
-const { leagueStatus, activePlayer, isMeBanningGame } = storeToRefs(
+const { leagueStatus, activePlayer, isMeBanningGame, isMeActivePlayer } = storeToRefs(
   useLeagueStore()
 );
 

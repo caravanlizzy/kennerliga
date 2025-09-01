@@ -1,7 +1,6 @@
 <template>
   <q-btn
-    square
-    outline
+    unelevated
     :dense="isMobile"
     :class="{ 'q-mx-xs': isMobile }"
     :color="color"
