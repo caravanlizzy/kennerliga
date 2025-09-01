@@ -7,8 +7,6 @@
     filled
     dense
     color="secondary"
-    text-color="white"
-    popup-content-class="bg-white text-dark"
     class="rounded-borders shadow-2"
   >
   </q-select>

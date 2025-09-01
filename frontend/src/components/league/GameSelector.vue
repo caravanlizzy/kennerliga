@@ -1,8 +1,7 @@
 <template>
   <div>
-    <div class="text-h6">Wähle dein Spiel</div>
-    <div class="row">
-      <kenner-select
+    <div class="row justify-center">
+      <KennerSelect
         class="select-width q-mr-md"
         v-model="platform"
         option-value="name"
@@ -10,17 +9,19 @@
         :options="platforms"
         label="Platform"
       />
-      <q-input v-model="filter" label="Spiel">
+      <q-input
+        v-model="filter"
+        label="Spiel"
+        outlined
+        dense
+        clearable
+        class="rounded-borders shadow-1"
+      >
         <template v-slot:append>
-          <q-icon
-            v-if="filter"
-            name="close"
-            @click="filter = ''"
-            class="cursor-pointer"
-          />
           <q-icon name="search" />
         </template>
       </q-input>
+
     </div>
 
     <div class="row q-mt-md justify-center q-gutter-md" style="max-height: 300px; overflow-y: auto;">
@@ -64,36 +65,45 @@
     <div v-if="isLoading">
       <q-spinner-orbit size="xl" />
     </div>
-    <div v-else-if="gameInformation.game" class="q-py-md q-my-md">
-      <span class="text-h6">{{ gameInformation.game.name }}</span>
+    <q-card
+      v-else-if="gameInformation.game"
+      flat
+      class="q-pa-md q-my-md"
+    >
+      <!-- Game title -->
+      <q-card-section>
+        <div class="text-h6 text-weight-bold">
+          {{ gameInformation.game.name }}
+        </div>
+      </q-card-section>
 
-      <div v-if="!gameInformation.options.length" class="text-italic q-mt-sm">
-        Spiel hat keine weiteren Optionen
-      </div>
+      <!-- No options -->
+      <q-card-section v-if="!gameInformation.options.length">
+        <div class="text-italic text-grey">
+          This game has no additional settings
+        </div>
+      </q-card-section>
 
-      <template v-else>
+      <!-- With options -->
+      <q-card-section v-else>
+        <div class="text-subtitle2 text-primary q-mb-md">Settings</div>
+
         <!-- Choices -->
-        <div
-          v-if="gameInformation.options.some(o => o.has_choices)"
-          class="q-mt-md q-pa-md bg-grey-2 rounded-borders"
-        >
-          <div class="text-subtitle2 text-primary q-mb-sm">
-            Einstellungen
-          </div>
+        <div v-if="gameInformation.options.some(o => o.has_choices)" class="q-mb-md">
           <div class="row q-col-gutter-md">
             <div
               v-for="option in gameInformation.options.filter(o => o.has_choices)"
               :key="option.id"
               class="col-12 col-sm-6 col-md-4"
             >
-              <kenner-select
+              <KennerSelect
                 :options="findChoicesByOption(option.id)"
                 :label="option.name"
                 option-label="name"
                 dense
                 outlined
                 v-model="
-              gameSelection.selectedOptions.find((o) => o.id == option.id).choice
+              gameSelection.selectedOptions.find(o => o.id == option.id).choice
             "
                 class="full-width"
               />
@@ -102,41 +112,38 @@
         </div>
 
         <!-- Toggles -->
-        <div
-          v-if="gameInformation.options.some(o => !o.has_choices)"
-          class="q-mt-lg q-pa-md bg-grey-1 rounded-borders"
-        >
-          <div class="text-subtitle2 text-secondary q-mb-sm">
-            Optionen
-          </div>
-          <div class="column q-gutter-sm">
-            <div class="row q-col-gutter-sm">
-              <q-toggle
-                v-for="option in gameInformation.options.filter(o => !o.has_choices)"
-                :key="option.id"
-                v-model="findSelectedOption(option.id).value"
-                :label="option.name"
-                dense
-                color="secondary"
-                class="col-auto"
-              />
-            </div>
-
+        <div v-if="gameInformation.options.some(o => !o.has_choices)">
+          <div class="row q-col-gutter-sm">
+            <q-toggle
+              v-for="option in gameInformation.options.filter(o => !o.has_choices)"
+              :key="option.id"
+              v-model="findSelectedOption(option.id).value"
+              :label="option.name"
+              dense
+              color="secondary"
+              class="col-auto"
+            />
           </div>
         </div>
-      </template>
+      </q-card-section>
+    </q-card>
+
+
+
+
+
+
+    <!-- Action row -->
+    <div class="row justify-end q-mt-lg">
+      <KennerButton
+        @click="handleSubmit"
+        type="submit"
+        push
+        color="positive"
+        label="Save"
+        class="q-px-lg"
+      />
     </div>
-
-
-
-    <KennerButton
-      @click="handleSubmit"
-      type="submit"
-      push
-      color="positive"
-      label="Speichern"
-      class="q-mt-md"
-    />
   </div>
 </template>
 
@@ -147,7 +154,6 @@ import KennerButton from 'components/base/KennerButton.vue';
 import { useGameSelection } from 'src/composables/gameSelection';
 import { useLeagueStore } from 'stores/leagueStore';
 import { storeToRefs } from 'pinia';
-import KennerTooltip from 'components/base/KennerTooltip.vue';
 
 const { leagueId } = storeToRefs(useLeagueStore());
 
@@ -203,12 +209,4 @@ onMounted(loadPlatformsAndGames);
 .select-width {
   width: 140px;
 }
-//
-//.hoverable-card {
-//  transition: background-color 0.3s ease;
-//
-//  &:hover {
-//    background-color: rgba($info, 0.23); // Very light secondary tint
-//  }
-//}
 </style>

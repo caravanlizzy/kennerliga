@@ -4,14 +4,14 @@
       <div class="q-mx-xs text-bold">Bedingung</div>
     </div>
     <q-separator class="q-mt-md q-mb-xs"/>
-    <kenner-select v-model="restrictToOption" :options="filteredItems"
+    <KennerSelect v-model="restrictToOption" :options="filteredItems"
                    class="q-my-md" option-value="title" option-label="title"
                    label="Option" map-options @update:model-value="updateRestriction"
                    :rules="[val => !!val || 'Auswahl erforderlich']"
     />
 
     <template v-if="restrictToOption && restrictToOption.hasChoices">
-      <kenner-select v-model="restrictionChoice.choiceSelection" :options="restrictToOption.choices"
+      <KennerSelect v-model="restrictionChoice.choiceSelection" :options="restrictToOption.choices"
                      class="q-my-md" option-value="name" option-label="name"
                      label="Bedingter Wert" @update:model-value="updateRestriction"
                      :rules="[val => !!val|| 'Auswahl erforderlich']"/>

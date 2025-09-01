@@ -11,11 +11,15 @@
   <DevUsersList v-show="showDev"/>
   <KennerButton
     @click="() => showDev = !showDev"
-    color="info"
-    rounded
+    color="grey-8"
     dense
+    unelevated
     flat
-  > Dev</KennerButton>
+    icon="build"
+    label="Dev"
+    class="q-mt-sm q-ml-sm"
+  >
+  </KennerButton>
 
   <KennerButton :to="{name: 'my-league'}" v-if="isAuthenticated" flat color="positive" icon="sports_esports">
     <KennerTooltip> Meine Liga </KennerTooltip>

@@ -1,38 +1,46 @@
 <template>
   <!-- Status Bar -->
-  <div
-    class="column justify-center items-center text-primary border q-py-xs status-borders"
-  >
-    <div class="text-h6 text-weight-bold ">
+  <div class="column q-pt-md q-pa-xs bg-grey-3">
+    <!-- Main Title -->
+    <div class="text-h5 text-weight-bold text-primary text-center">
       {{ currentStatusNoun.toUpperCase() }}
-      <div class="text-subtitle1 text-weight-regular text-italic text-center">
-        <span class="text-primary">
+    </div>
+
+    <!-- Subline: user + verb centered, button right -->
+    <div class="row items-center justify-between q-mt-xs">
+      <!-- Centered block -->
+      <div class="row items-center justify-center col text-subtitle1 text-weight-regular text-italic">
+        <q-chip class="text-white" :class="activePlayer?.colorClass">
           {{ activePlayer?.username }}
-        </span>
+        </q-chip>
+
         <span v-if="leagueStatus === 'PICKING' || leagueStatus === 'BANNING'">
           to
         </span>
+
         <span
+          class="q-ml-xs text-weight-medium text-uppercase"
           :class="{
             'text-accent': leagueStatus === 'BANNING',
-            'text-secondary':
-              leagueStatus === 'PICKING' || leagueStatus === 'REPICKING',
+            'text-secondary': leagueStatus === 'PICKING' || leagueStatus === 'REPICKING',
           }"
         >
           {{ statusVerb }}
         </span>
       </div>
     </div>
-
-    <q-btn
-      v-if="isMeBanningGame"
-      color="accent"
-      outline
-      class="q-mt-sm"
-      @click="banNothing"
-    >
-      Do not ban
-    </q-btn>
+    <!-- Reusable Action Bar -->
+    <ActionBar>
+      <q-btn
+        v-if="isMeBanningGame"
+        color="accent"
+        size="sm"
+        flat
+        @click="banNothing"
+        label="Skip Ban"
+        icon="block"
+      />
+    </ActionBar>
   </div>
 </template>
 
@@ -41,6 +49,7 @@ import { computed } from 'vue';
 import { useLeagueStore } from 'stores/leagueStore';
 import { storeToRefs } from 'pinia';
 import { TLeagueStatus } from 'src/types';
+import ActionBar from 'components/layout/ActionBar.vue';
 
 const { leagueStatus, activePlayer, isMeBanningGame } = storeToRefs(
   useLeagueStore()
@@ -49,8 +58,8 @@ const { leagueStatus, activePlayer, isMeBanningGame } = storeToRefs(
 const { banNothing } = useLeagueStore();
 
 const statusMap: Record<TLeagueStatus, { noun?: string; verb?: string }> = {
-  PICKING: { noun: 'Game Selection Phase', verb: 'select' },
-  REPICKING: { noun: 'Game Reselection', verb: 'reselect' },
+  PICKING: { noun: 'Game Selection Phase', verb: 'pick' },
+  REPICKING: { noun: 'Game Reselection', verb: 'pick again' },
   BANNING: { noun: 'Ban Phase', verb: 'ban' },
   PLAYING: { noun: 'Games running' },
   DONE: { noun: 'League finished' },
@@ -64,7 +73,7 @@ const statusVerb = computed(() => statusMap[leagueStatus.value]?.verb ?? '');
 </script>
 
 <style scoped lang="scss">
-.status-borders{
+.status-borders {
   border-top: 4px solid $info;
   border-bottom: 4px solid $info;
 }

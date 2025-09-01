@@ -1,16 +1,21 @@
 <template>
-  <q-list class="row">
-    <q-item
+  <div class="row ">
+    <q-chip
       v-for="user in users"
       :key="user"
       clickable
+      dense
       @click="impersonate(user, 'test')"
-      class="col-auto text-black"
+      color="orange-3"
+      text-color="black"
+      icon="person"
+      class="cursor-pointer hover-shadow-2"
     >
-      <q-item-section>{{ user }}</q-item-section>
-    </q-item>
-  </q-list>
+      {{ user }}
+    </q-chip>
+  </div>
 </template>
+
 <script setup lang="ts">
 import { ref } from 'vue';
 import { TUser } from 'src/types';

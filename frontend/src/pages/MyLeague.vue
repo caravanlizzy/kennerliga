@@ -2,11 +2,14 @@
   <div>
     <LeagueStatusBar />
     <!-- Game Selector - shown when user needs to pick games -->
-    <GameSelector
-      v-if="isMePickingGame"
-      @submit-success="updateLeagueData"
-      class="q-mt-xl"
-    />
+    <template v-if="isMePickingGame">
+      <SectionTitle class="bg-green-3 text-white"> Game Picker </SectionTitle>
+      <GameSelector
+        @submit-success="updateLeagueData"
+        class="q-mt-md q-pa-xs"
+      />
+    </template>
+
     <!-- Match Results Section -->
     <template v-if="leagueStatus === 'PLAYING'">
       <SectionTitle class="bg-primary text-white">Upload Result</SectionTitle>
@@ -41,9 +44,13 @@
 
     <!-- Player Cards Grid -->
 
-    <SectionTitle class="bg-info text-white">Selected Games</SectionTitle>
-    <div class="row wrap justify-between q-pa-md">
-      <div v-for="member in members" :key="member.id" class="player-card">
+    <SectionTitle class="bg-info text-white">Players Overview</SectionTitle>
+    <div class="row q-col-gutter-md q-pa-md">
+      <div
+        v-for="member in members"
+        :key="member.id"
+        class="col-12 col-sm-6 col-md-4 col-lg-3"
+      >
         <PlayerCard :member="member" />
       </div>
     </div>

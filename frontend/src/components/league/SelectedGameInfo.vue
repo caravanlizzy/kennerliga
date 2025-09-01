@@ -13,12 +13,12 @@
             </div>
 
             <q-badge
-              outline
               v-if="isBannable(member)"
               color="accent"
               class="q-ml-sm"
               @click.stop="openBanDialog"
             >
+              <q-icon name="block" class="q-mr-xs"></q-icon>
               BAN
             </q-badge>
           </div>
@@ -42,44 +42,44 @@
         </div>
 
         <q-btn
-          dense
+          flat
           round
-          outline
+          size="sm"
           icon="expand_more"
-          class="expand-btn"
+          class="transition-all"
           :class="{ 'rotate-180': isExpanded }"
           @click="isExpanded = !isExpanded"
-          color="secondary"
+          color="primary"
         />
+
       </div>
 
       <q-card-section v-if="isExpanded" class="card-body">
         <q-separator spaced />
-        <q-list dense>
-          <q-item
+        <q-markup-table flat bordered dense class="rounded-borders">
+          <tbody>
+          <tr
             v-for="opt in member.selected_game.selected_options"
             :key="opt.id"
           >
-            <q-item-section>{{ opt.game_option.name }}</q-item-section>
-            <q-item-section side class="text-right">
-              <span v-if="opt.choice" class="text-secondary">{{
-                opt.choice.name
-              }}</span>
-              <q-icon
-                v-else-if="opt.value === true"
-                name="check"
-                color="grey-7"
-              />
-              <q-icon
-                v-else-if="opt.value === false"
-                name="close"
-                color="grey-5"
-              />
-              <q-icon v-else name="help" color="grey" />
-            </q-item-section>
-          </q-item>
-        </q-list>
+            <td class="text-left text-weight-medium">
+              {{ opt.game_option.name }}
+            </td>
+            <td class="text-right">
+          <span v-if="opt.choice" class="text-primary">
+            {{ opt.choice.name }}
+          </span>
+              <q-icon v-else-if="opt.value === true" name="check_circle" color="positive" />
+              <q-icon v-else-if="opt.value === false" name="cancel" color="negative" />
+              <q-icon v-else name="help_outline" color="grey" />
+            </td>
+          </tr>
+          </tbody>
+        </q-markup-table>
       </q-card-section>
+
+
+
     </div>
 
     <!-- Confirm Ban Dialog -->
