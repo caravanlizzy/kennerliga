@@ -1,7 +1,6 @@
 <template>
   <div>
     <LeagueStatusBar />
-    <LeagueStandings/>
     <!-- Game Selector - shown when user needs to pick games -->
     <GameSelector
       v-if="isMePickingGame"
@@ -32,16 +31,9 @@
         :selected-game-id="currentFormSelectedGameId"
       />
 
-      <q-separator />
+<!--      <q-separator />-->
 
-      <!-- Display Previously Entered Match Results -->
-      <div class="flex">
-        <MatchResult
-          v-for="selectedGame of selectedGamesWithResults"
-          :key="selectedGame.id"
-          :selected-game-id="selectedGame.id"
-        />
-      </div>
+    <MyLeagueResults />
     </template>
 
     <!-- Player Cards Grid -->
@@ -68,10 +60,9 @@ import GameSelector from 'components/league/GameSelector.vue';
 import LeagueStatusBar from 'pages/LeagueStatusBar.vue';
 import { useLeagueStore } from 'stores/leagueStore';
 import { storeToRefs } from 'pinia';
-import MatchResult from 'components/league/MatchResult.vue';
 import MatchResultForm from 'components/league/MatchResultForm.vue';
 import PlayerCard from 'components/league/PlayerCard.vue';
-import LeagueStandings from 'components/league/LeagueStandings.vue';
+import MyLeagueResults from 'components/league/MyLeagueResults.vue';
 
 const league = useLeagueStore();
 
@@ -83,7 +74,6 @@ const {
   isMePickingGame,
   leagueStatus,
   selectedGamesFetchedEmpty,
-  selectedGamesWithResults,
   members
 } = storeToRefs(league);
 const { updateLeagueData, refreshResultsForGame } = league;

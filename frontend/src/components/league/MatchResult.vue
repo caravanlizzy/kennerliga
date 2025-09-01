@@ -1,17 +1,15 @@
 <template>
-  <q-card flat bordered class="shadow-2 result-summary-card q-pa-md">
+  <q-card flat class="q-pa-xs">
     <div class="row items-center justify-between q-mb-md">
       <div class="text-h6 text-primary">{{ gameName ?? '—' }}</div>
       <q-badge color="primary" label="Ergebnis" />
     </div>
-    <q-separator class="q-mb-md" />
 
     <template v-if="results.length === 0">
       <div class="text-caption text-grey-7">Noch keine Ergebnisse.</div>
     </template>
 
     <template v-else>
-
       <q-table
         flat
         dense

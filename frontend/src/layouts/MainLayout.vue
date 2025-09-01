@@ -10,7 +10,7 @@
     <KennerDrawer v-model="drawerState" />
 
     <q-page-container class="flex column justify-center">
-      <div :class="{ 'q-pa-lg': !isMobile }">
+      <div :class="{ '': !isMobile }">
         <router-view class="text-primary" />
       </div>
     </q-page-container>
@@ -37,6 +37,5 @@ function toggleDrawer(): void {
 <style scoped lang="scss">
 .background-navbar {
   background-color: #ffffff;
-  border-bottom: 1px solid #b15f3a;
 }
 </style>

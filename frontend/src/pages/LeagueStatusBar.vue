@@ -1,12 +1,10 @@
 <template>
   <!-- Status Bar -->
   <div
-    class="column justify-center items-center text-primary border border-primary rounded-borders"
+    class="column justify-center items-center text-primary border q-py-md bg-amber-1"
   >
-    <div class="text-h6 text-weight-bold q-mb-sm">
-      <span>
-        {{ currentStatusNoun.toUpperCase() }}
-      </span>
+    <div class="text-h6 text-weight-bold ">
+      {{ currentStatusNoun.toUpperCase() }}
       <div class="text-subtitle1 text-weight-regular text-italic text-center">
         <span class="text-primary">
           {{ activePlayer?.username }}
