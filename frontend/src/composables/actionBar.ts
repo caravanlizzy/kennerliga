@@ -1,5 +1,5 @@
 // useActionBar.ts
-import { ref, shallowRef, type VNode } from "vue";
+import { computed, h, ref, shallowRef, type VNode } from 'vue';
 
 /**
  * Represents an action with a name and an associated callback function.
@@ -8,7 +8,7 @@ import { ref, shallowRef, type VNode } from "vue";
  * - A name representing the identifier or label for the action.
  * - A callback function that executes the desired functionality when invoked.
  */
-export type TAction = { name: string; buttonColor?: string; callback: () => void };
+export type TAction = { name: string; buttonVariant?: string; callback: () => void };
 
 // a render function that returns a VNode, or null
 /**
@@ -49,13 +49,30 @@ const description = shallowRef<RenderFn | null>(null);
  * - `description`: A reactive value holding the description renderer or null.
  * - `setDescription(render)`: Sets the description renderer or clears it by passing null.
  */
+
+const subTitle = ref<string>('');
+
 export function useActionBar() {
-  function setActions(newActions: TAction[]): void {
-    actions.value = newActions;
+  function setActions(newActions: TAction | TAction[]): void {
+    actions.value = Array.isArray(newActions) ? newActions : [newActions];
   }
 
-  function setDescription(render: RenderFn | null): void {
-    description.value = render;
+  function setDescription(render: RenderFn | string | null): void {
+    description.value =
+      typeof render === 'string' ? () => h('div', render) : render;
   }
-  return { actions, description, setActions, setDescription };
+
+  function setSubtitle(subtitle: string){
+    subTitle.value = subtitle;
+  }
+
+  function reset():void{
+    actions.value = [];
+    description.value = null;
+    subTitle.value = '';
+  }
+
+  const hasContent = computed(() => description.value !== null && actions.value.length > 0);
+
+  return { actions, description, subTitle, hasContent, setActions, setDescription, setSubtitle, reset };
 }
