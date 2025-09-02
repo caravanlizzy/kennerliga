@@ -127,30 +127,12 @@
         </div>
       </q-card-section>
     </q-card>
-
-
-
-
-
-
-    <!-- Action row -->
-    <div class="row justify-end q-mt-lg">
-      <KennerButton
-        @click="handleSubmit"
-        type="submit"
-        push
-        color="positive"
-        label="Save"
-        class="q-px-lg"
-      />
-    </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { h, onMounted } from 'vue';
 import KennerSelect from 'components/base/KennerSelect.vue';
-import KennerButton from 'components/base/KennerButton.vue';
 import { useGameSelection } from 'src/composables/gameSelection';
 import { useLeagueStore } from 'stores/leagueStore';
 import { storeToRefs } from 'pinia';
