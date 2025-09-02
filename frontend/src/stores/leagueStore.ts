@@ -141,6 +141,7 @@ type BannedGame = BannedGameFull | BannedGameEmpty;
  * @property {number} rank - The rank of the member within the system.
  * @property {number} position - The position of the member, typically related to ranking.
  * @property {string} [colorClass] - A client-side UI property that determines the color class for display purposes.
+ * @property {string} [color] - A client-side UI property that determines the color variant for display purposes.
  */
 type Member = {
   id: number;                  // player_profile id, also referenced in results
@@ -152,6 +153,7 @@ type Member = {
   rank: number;
   position: number;
   colorClass?: string;         // UI-only, added client-side
+  color?: string;       // UI-only, added client-side
 };
 
 /**
@@ -263,6 +265,8 @@ export const useLeagueStore = defineStore('league', () => {
     members.value = members.value.map((member, index) => ({
       ...member,
       colorClass: `bg-player-${index + 1}`,
+      color: `color-player-${index + 1}`,
+      borderClass: `border-player-${index + 1}`,
     }));
     leagueStatus.value = data.status;
   }
