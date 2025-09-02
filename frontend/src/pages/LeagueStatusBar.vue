@@ -30,7 +30,7 @@
       </div>
     </div>
     <!-- Reusable Action Bar -->
-    <ActionBar v-if="isMeActivePlayer"/>
+    <ActionBar v-if="isMeActivePlayer && hasContent"/>
   </div>
 </template>
 
@@ -40,12 +40,13 @@ import { useLeagueStore } from 'stores/leagueStore';
 import { storeToRefs } from 'pinia';
 import { TLeagueStatus } from 'src/types';
 import ActionBar from 'components/layout/ActionBar.vue';
+import { useActionBar } from 'src/composables/actionBar';
 
-const { leagueStatus, activePlayer, isMeBanningGame, isMeActivePlayer } = storeToRefs(
+const { leagueStatus, activePlayer, isMeActivePlayer } = storeToRefs(
   useLeagueStore()
 );
 
-const { banNothing } = useLeagueStore();
+const { hasContent } = useActionBar();
 
 const statusMap: Record<TLeagueStatus, { noun?: string; verb?: string }> = {
   PICKING: { noun: 'Game Selection Phase', verb: 'pick' },
