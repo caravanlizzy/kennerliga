@@ -1,6 +1,7 @@
 <template>
   <div>
     <LeagueStatusBar />
+    {{banGameSelectionId}}
     <!-- Game Selector - shown when user needs to pick games -->
     <template v-if="isMePickingGame">
       <GameSelector
@@ -35,9 +36,6 @@
         />
       </ContentSection>
 
-
-
-
       <!--      <q-separator />-->
       <template v-if="leagueStatus === 'PLAYING'">
         <ContentSection title="Results" color="secondary">
@@ -59,13 +57,11 @@
         </div>
       </div>
     </ContentSection>
-
-
   </div>
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from 'vue';
+import { onMounted, ref, watch } from 'vue';
 import GameSelector from 'components/league/GameSelector.vue';
 import LeagueStatusBar from 'pages/LeagueStatusBar.vue';
 import { useLeagueStore } from 'stores/leagueStore';
@@ -74,6 +70,9 @@ import MatchResultForm from 'components/league/MatchResultForm.vue';
 import PlayerCard from 'components/league/PlayerCard.vue';
 import MyLeagueResults from 'components/league/MyLeagueResults.vue';
 import ContentSection from 'components/base/ContentSection.vue';
+import { useActionBar } from 'src/composables/actionBar';
+import { banGame } from 'src/services/game/banGameService';
+import { useUserStore } from 'stores/userStore';
 
 const league = useLeagueStore();
 
@@ -81,15 +80,59 @@ onMounted(() => {
   void league.init();
 });
 
-const { isMePickingGame, leagueStatus, selectedGamesFetchedEmpty, members } =
-  storeToRefs(league);
+const {
+  isMePickingGame,
+  isMeBanningGame,
+  leagueStatus,
+  selectedGamesFetchedEmpty,
+  selectedGamesById,
+  members,
+  leagueId
+} = storeToRefs(league);
 const { updateLeagueData, refreshResultsForGame } = league;
+
+const { setActions, setDescription, setSubtitle } = useActionBar();
+
+const { user } = useUserStore();
 
 const currentFormSelectedGameId = ref(null);
 
 function handleSubmit(selectedGameId: number) {
   currentFormSelectedGameId.value = null;
   refreshResultsForGame(selectedGameId);
+}
+
+const banGameSelectionId = ref<number|null>(null);
+
+watch(isMeBanningGame, () => {
+  if (isMeBanningGame.value && leagueId.value && user.username) {
+    setDescription('Select a game to ban');
+    setActions(
+      Object.values(selectedGamesById.value)
+        .filter((game) => game.selected_by !== user?.username)
+        .map((game) => ({
+        name: `${game.game_name}`,
+        buttonVariant: 'accent',
+        callback: () => handleBanGame(game.id)
+      }))
+    );
+  }
+});
+
+function handleBanGame(gameId: number) {
+  if(banGameSelectionId.value === null && gameId !== null) {
+    console.log('here');
+    banGameSelectionId.value = gameId
+    setSubtitle('Are you sure? Please click again to ban this game');
+    return;
+  }
+  console.log('submitting ban game');
+  banGame({
+    leagueId: leagueId,
+    username: user.username,
+    gameId: gameId
+  })
+  banGameSelectionId.value = null;
 }
 </script>
 
