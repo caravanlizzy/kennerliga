@@ -12,15 +12,15 @@
               {{ member.selected_game.game_name }}
             </div>
 
-            <q-badge
-              v-if="isBannable(member)"
-              color="accent"
-              class="q-ml-sm"
-              @click.stop="openBanDialog"
-            >
-              <q-icon name="block" class="q-mr-xs"></q-icon>
-              BAN
-            </q-badge>
+<!--            <q-badge-->
+<!--              v-if="isBannable(member)"-->
+<!--              color="accent"-->
+<!--              class="q-ml-sm"-->
+<!--              @click.stop="openBanDialog"-->
+<!--            >-->
+<!--              <q-icon name="block" class="q-mr-xs"></q-icon>-->
+<!--              BAN-->
+<!--            </q-badge>-->
           </div>
 
           <!-- Banners -->
@@ -82,28 +82,6 @@
 
     </div>
 
-    <!-- Confirm Ban Dialog -->
-    <q-dialog v-model="confirmDialog">
-      <q-card>
-        <q-card-section class="text-h6">
-          {{ member.selected_game?.game_name }} ban?
-        </q-card-section>
-
-        <q-card-section>
-          Are you sure you want to ban
-          <span class="text-weight-bold">{{
-            member.selected_game?.game_name
-          }}</span>
-          by <span class="text-weight-bold">{{ member.username }}</span>
-          ?
-        </q-card-section>
-
-        <q-card-actions align="right">
-          <q-btn flat label="No, cancel" color="primary" v-close-popup />
-          <q-btn unelevated label="Yes, ban" color="accent" @click="confirmBan" />
-        </q-card-actions>
-      </q-card>
-    </q-dialog>
   </div>
 </template>
 
@@ -167,15 +145,6 @@ const { updateLeagueData } = league;
 const { user } = useUserStore();
 
 const isExpanded = ref(false);
-const confirmDialog = ref(false);
-
-function openBanDialog() {
-  confirmDialog.value = true;
-}
-
-function closeBanDialog() {
-  confirmDialog.value = false;
-}
 
 function isBannedGameFull(bg: BannedGame): bg is BannedGameFull {
   return (bg as BannedGameFull).id != null;
@@ -200,20 +169,7 @@ const banners = computed(() => {
     }));
 });
 
-async function confirmBan() {
-  closeBanDialog();
-  if (!user?.username || !leagueId.value || !myGameId.value) return;
-  try {
-    await banGame({
-      leagueId: leagueId.value, // your store has number|null, not an object
-      username: user.username,
-      gameId: myGameId.value,
-    });
-    await updateLeagueData(); // optional: expose a lighter refresh if you add one
-  } catch (e) {
-    console.error(e);
-  }
-}
+
 </script>
 
 <style scoped lang="scss">
