@@ -2,7 +2,6 @@
 <script setup lang="ts">
 import { useActionBar } from 'src/composables/actionBar';
 import KennerButton from 'components/base/KennerButton.vue';
-import { storeToRefs } from 'pinia';
 
 const { actions, description } = useActionBar();
 
@@ -52,7 +51,7 @@ const { actions, description } = useActionBar();
 /* You can bump the cap a bit more on very wide displays if you like */
 @media (min-width: 1440px) {
   .actionBar {
-    width: min(100%, 1000px);
+    width: min(100%, 700px);
   }
 }
 </style>

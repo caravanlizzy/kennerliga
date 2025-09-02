@@ -23,7 +23,7 @@ const { selectedGamesWithResults } = storeToRefs(useLeagueStore());
 import MatchResult from 'components/league/MatchResult.vue';
 import LeagueStandings from 'components/league/LeagueStandings.vue';
 import { useLeagueStore } from 'stores/leagueStore';
-import SectionTitle from 'components/base/SectionTitle.vue';
+import ContentSection from 'components/base/ContentSection.vue';
 </script>
 
 <style scoped>
