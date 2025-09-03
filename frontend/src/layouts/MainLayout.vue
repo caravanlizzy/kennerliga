@@ -13,6 +13,7 @@
       <div :class="{ '': !isMobile }">
         <router-view class="text-primary" />
       </div>
+      <ConfirmDialog />
     </q-page-container>
   </q-layout>
 </template>
@@ -24,6 +25,7 @@ import { useResponsive } from 'src/composables/reponsive';
 import Announcements from 'components/announcement/AnnouncementList.vue';
 import { useAnnouncementStore } from 'stores/announcementStore';
 import KennerDrawer from 'components/layout/KennerDrawer.vue';
+import ConfirmDialog from 'components/ui/ConfirmDialog.vue';
 
 const { announcements } = useAnnouncementStore();
 const { isMobile } = useResponsive();
