@@ -39,7 +39,7 @@ import { computed, h } from 'vue';
 import { useLeagueStore } from 'stores/leagueStore';
 import { storeToRefs } from 'pinia';
 import { TLeagueStatus } from 'src/types';
-import ActionBar from 'components/layout/ActionBar.vue';
+import ActionBar from 'components/ui/ActionBar.vue';
 import { useActionBar } from 'src/composables/actionBar';
 
 const { leagueStatus, activePlayer, isMeActivePlayer } = storeToRefs(

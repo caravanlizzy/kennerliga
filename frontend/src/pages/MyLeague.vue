@@ -73,6 +73,7 @@ import ContentSection from 'components/base/ContentSection.vue';
 import { useActionBar } from 'src/composables/actionBar';
 import { banGame } from 'src/services/game/banGameService';
 import { useUserStore } from 'stores/userStore';
+import { useDialog } from 'src/composables/dialog';
 
 const league = useLeagueStore();
 
@@ -102,38 +103,54 @@ function handleSubmit(selectedGameId: number) {
   refreshResultsForGame(selectedGameId);
 }
 
-const banGameSelectionId = ref<number|null>(null);
+setDescription('Select a game to ban')
+setActions(
+  Object.values(selectedGamesById.value)
+    .filter((game) => game.selected_by !== user?.username)
+    .map((game) => ({
+      name: `${game.game_name}`,
+      buttonVariant: 'accent',
+      callback: () => handleBanGame(game.id)
+    }))
+)
 
 watch(isMeBanningGame, () => {
   if (isMeBanningGame.value && leagueId.value && user.username) {
-    setDescription('Select a game to ban');
+    setDescription('Select a game to ban')
     setActions(
       Object.values(selectedGamesById.value)
         .filter((game) => game.selected_by !== user?.username)
         .map((game) => ({
-        name: `${game.game_name}`,
-        buttonVariant: 'accent',
-        callback: () => handleBanGame(game.id)
-      }))
-    );
+          name: `${game.game_name}`,
+          buttonVariant: 'accent',
+          callback: () => handleBanGame(game.id)
+        }))
+    )
   }
-});
+})
+
+const { setDialog } = useDialog()
 
 function handleBanGame(gameId: number) {
-  if(banGameSelectionId.value === null && gameId !== null) {
-    console.log('here');
-    banGameSelectionId.value = gameId
-    setSubtitle('Are you sure? Please click again to ban this game');
-    return;
-  }
-  console.log('submitting ban game');
-  banGame({
-    leagueId: leagueId,
-    username: user.username,
-    gameId: gameId
-  })
-  banGameSelectionId.value = null;
+  setDialog(
+    'Confirm Ban',
+    'Are you sure you want to ban this game?',
+    'warning',
+    async () => {
+      console.log('submitting ban game')
+      await banGame({
+        leagueId: leagueId.value,
+        username: user.username,
+        gameId
+      })
+    },
+    () => {
+      console.log('Ban cancelled')
+    },
+    'Ban'
+  )
 }
+
 </script>
 
 <style lang="scss">
