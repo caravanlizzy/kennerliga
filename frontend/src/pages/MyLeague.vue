@@ -12,7 +12,7 @@
 
     <!-- Match Results Section -->
     <template v-if="leagueStatus === 'PLAYING'">
-      <ContentSection title="Upoad Results" color="primary">
+      <ContentSection title="Upload Results" color="accent">
         <!-- Game Tabs for Entering Results -->
         <q-tabs
           active-color="primary"
@@ -38,7 +38,7 @@
 
       <!--      <q-separator />-->
       <template v-if="leagueStatus === 'PLAYING'">
-        <ContentSection title="Results" color="secondary">
+        <ContentSection title="Results" color="positive">
           <MyLeagueResults />
         </ContentSection>
       </template>
@@ -46,7 +46,7 @@
 
     <!-- Player Cards Grid -->
 
-    <ContentSection title="Players" color="info">
+    <ContentSection title="Players" color="primary">
       <div class="row q-col-gutter-md q-pa-md">
         <div
           v-for="member in members"
@@ -74,6 +74,7 @@ import { useActionBar } from 'src/composables/actionBar';
 import { banGame } from 'src/services/game/banGameService';
 import { useUserStore } from 'stores/userStore';
 import { useDialog } from 'src/composables/dialog';
+import { useQuasar } from 'quasar';
 
 const league = useLeagueStore();
 
@@ -122,14 +123,15 @@ watch(isMeBanningGame, () => {
         .filter((game) => game.selected_by !== user?.username)
         .map((game) => ({
           name: `${game.game_name}`,
-          buttonVariant: 'accent',
+          buttonVariant: 'primary',
           callback: () => handleBanGame(game.id)
         }))
     )
   }
 })
 
-const { setDialog } = useDialog()
+const { setDialog } = useDialog();
+const $q = useQuasar();
 
 function handleBanGame(gameId: number) {
   setDialog(
@@ -137,12 +139,21 @@ function handleBanGame(gameId: number) {
     'Are you sure you want to ban this game?',
     'warning',
     async () => {
-      console.log('submitting ban game')
-      await banGame({
-        leagueId: leagueId.value,
-        username: user.username,
-        gameId
-      })
+      try {
+        await banGame({
+          leagueId: leagueId.value,
+          username: user.username,
+          gameId
+        });
+        await updateLeagueData();
+        $q.notify({
+          type: 'warning',
+          message: 'Banned!',
+        });
+      } catch (e) {
+        console.log('Could not ban game', e);
+      }
+
     },
     () => {
       console.log('Ban cancelled')

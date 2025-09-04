@@ -207,6 +207,19 @@ export const useLeagueStore = defineStore('league', () => {
   const members = ref<Member[]>([]);
   const leagueStatus = ref<TLeagueStatus>('PICKING'); // states: PICKING, BANNING, REPICKING, PLAYING, DONE
 
+  const statusMap: Record<TLeagueStatus, { noun?: string; verb?: string }> = {
+    PICKING: { noun: 'Game Selection Phase', verb: 'pick' },
+    REPICKING: { noun: 'Game Reselection', verb: 'pick again' },
+    BANNING: { noun: 'Ban Phase', verb: 'ban' },
+    PLAYING: { noun: 'Games running' },
+    DONE: { noun: 'League finished' },
+  };
+
+  const statusNoun = computed(
+    () => statusMap[leagueStatus.value]?.noun ?? ''
+  );
+  const statusVerb = computed(() => statusMap[leagueStatus.value]?.verb ?? '');
+
   // --- Derived maps for O(1) lookups ---
   const membersById = computed<{ [key: number]: Member }>(() =>
     members.value.reduce((acc: { [key: number]: Member }, m) => {
@@ -359,6 +372,9 @@ export const useLeagueStore = defineStore('league', () => {
     selectedGamesFetchedEmpty,
     membersById,
     selectedGamesById,
+    statusNoun,
+    statusVerb,
+
 
     // actions
     init,

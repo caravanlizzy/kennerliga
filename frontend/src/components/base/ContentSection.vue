@@ -1,5 +1,5 @@
 <template>
-  <div class="section q-ma-md"
+  <div class="section"
        :style="`border-color: var(--q-${color})`"
   >
     <div

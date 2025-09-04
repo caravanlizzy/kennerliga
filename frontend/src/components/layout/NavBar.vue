@@ -8,9 +8,8 @@
   <q-toolbar-title class="text-primary">
     <!--      <h6 class="text-italic" > Kennerliga </h6>-->
   </q-toolbar-title>
-  <DevUsersList v-show="showDev"/>
   <KennerButton
-    @click="() => showDev = !showDev"
+    @click="toggleDev"
     color="grey-8"
     dense
     unelevated
@@ -38,6 +37,7 @@ import { useRouter } from 'vue-router';
 import KennerTooltip from 'components/base/KennerTooltip.vue';
 import DevUsersList from 'components/lists/DevUsersList.vue';
 import { ref } from 'vue';
+import { useUiStore } from 'stores/uiStore';
 
 defineProps<{
   onToggle: () => void,
@@ -45,8 +45,8 @@ defineProps<{
 
 const store = useUserStore();
 const router = useRouter();
+const { toggleDev } = useUiStore();
 const { isAuthenticated } = storeToRefs(store);
-const showDev = ref(false);
 
 function goHome() {
   router.push({ name: 'home' });

@@ -50,7 +50,6 @@ const description = shallowRef<RenderFn | null>(null);
  * - `setDescription(render)`: Sets the description renderer or clears it by passing null.
  */
 
-const subTitle = ref<string>('');
 
 export function useActionBar() {
   function setActions(newActions: TAction | TAction[]): void {
@@ -62,17 +61,12 @@ export function useActionBar() {
       typeof render === 'string' ? () => h('div', render) : render;
   }
 
-  function setSubtitle(subtitle: string){
-    subTitle.value = subtitle;
-  }
-
   function reset():void{
     actions.value = [];
     description.value = null;
-    subTitle.value = '';
   }
 
   const hasContent = computed(() => description.value !== null && actions.value.length > 0);
 
-  return { actions, description, subTitle, hasContent, setActions, setDescription, setSubtitle, reset };
+  return { actions, description, hasContent, setActions, setDescription, reset };
 }

@@ -5,6 +5,7 @@
       :key="user"
       clickable
       dense
+      square
       @click="impersonate(user, 'test')"
       color="orange-3"
       text-color="black"
