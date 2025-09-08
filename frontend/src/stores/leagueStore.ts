@@ -336,7 +336,7 @@ export const useLeagueStore = defineStore('league', () => {
   );
 
   const isMePickingGame = computed(
-    () => leagueStatus.value === 'PICKING' && isMeActivePlayer.value
+    () => (leagueStatus.value === 'PICKING' || leagueStatus.value === 'REPICKING') && isMeActivePlayer.value
   );
   const isMeBanningGame = computed(
     () => leagueStatus.value === 'BANNING' && isMeActivePlayer.value

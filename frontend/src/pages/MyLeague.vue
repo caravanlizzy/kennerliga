@@ -1,7 +1,6 @@
 <template>
   <div>
     <LeagueStatusBar />
-    {{banGameSelectionId}}
     <!-- Game Selector - shown when user needs to pick games -->
     <template v-if="isMePickingGame">
       <GameSelector
