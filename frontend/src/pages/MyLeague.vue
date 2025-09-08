@@ -3,10 +3,13 @@
     <LeagueStatusBar />
     <!-- Game Selector - shown when user needs to pick games -->
     <template v-if="isMePickingGame">
-      <GameSelector
-        @submit-success="updateLeagueData"
-        class="q-mt-md q-pa-xs"
-      />
+      <ContentSection title="Game Selection" color="positive">
+        <GameSelector
+          @submit-success="updateLeagueData"
+          class="q-mt-md q-pa-xs"
+        />
+      </ContentSection>
+
     </template>
 
     <!-- Match Results Section -->
