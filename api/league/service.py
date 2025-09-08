@@ -110,6 +110,7 @@ def get_players_to_repick(league):
     - That game was banned by a BanDecision.
     """
     repick_players = []
+    min_bans = 2 if league.members.count() > 2 else 1
 
     for member in league.members.all():
         selected_games = SelectedGame.objects.filter(
@@ -120,13 +121,12 @@ def get_players_to_repick(league):
         if selected_games.count() == 1:
             selected_game = selected_games.first()
 
-            was_banned = BanDecision.objects.filter(
-                player=member.profile,
+            ban_count = BanDecision.objects.filter(
                 league=league,
                 game=selected_game
-            ).exists()
+            ).count()
 
-            if was_banned:
+            if ban_count >= min_bans:
                 repick_players.append(member)
 
     return repick_players
