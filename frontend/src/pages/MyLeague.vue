@@ -93,7 +93,7 @@ const {
 } = storeToRefs(league);
 const { updateLeagueData, refreshResultsForGame } = league;
 
-const { setActions, setDescription, setSubtitle } = useActionBar();
+const { setActions, setDescription, reset } = useActionBar();
 
 const { user } = useUserStore();
 
@@ -111,7 +111,7 @@ setActions(
     .map((game) => ({
       name: `${game.game_name}`,
       buttonVariant: 'accent',
-      callback: () => handleBanGame(game.id)
+      callback: () => handleBanGame(game.id, game.game_name)
     }))
 )
 
@@ -124,7 +124,8 @@ watch(isMeBanningGame, () => {
         .map((game) => ({
           name: `${game.game_name}`,
           buttonVariant: 'primary',
-          callback: () => handleBanGame(game.id)
+          callback: () => handleBanGame(game.id, game.game_name),
+          autoReset: false
         }))
     )
   }
@@ -133,11 +134,12 @@ watch(isMeBanningGame, () => {
 const { setDialog } = useDialog();
 const $q = useQuasar();
 
-function handleBanGame(gameId: number) {
+function handleBanGame(gameId: number, gameName: string) {
+  const notifyType = 'warning';
   setDialog(
     'Confirm Ban',
-    'Are you sure you want to ban this game?',
-    'warning',
+    `Are you sure you want to ban ${gameName.toUpperCase()}?`,
+    notifyType,
     async () => {
       try {
         await banGame({
@@ -147,11 +149,13 @@ function handleBanGame(gameId: number) {
         });
         await updateLeagueData();
         $q.notify({
-          type: 'warning',
+          type: notifyType,
           message: 'Banned!',
         });
       } catch (e) {
         console.log('Could not ban game', e);
+      } finally {
+        reset();
       }
 
     },
@@ -163,13 +167,3 @@ function handleBanGame(gameId: number) {
 }
 
 </script>
-
-<style lang="scss">
-.is-active-border-accent {
-  border: 2px solid rgba($accent, 0.4);
-}
-
-.is-active-border-secondary {
-  border: 2px solid rgba($secondary, 0.4);
-}
-</style>

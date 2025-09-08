@@ -8,7 +8,12 @@ import { computed, h, ref, shallowRef, type VNode } from 'vue';
  * - A name representing the identifier or label for the action.
  * - A callback function that executes the desired functionality when invoked.
  */
-export type TAction = { name: string; buttonVariant?: string; callback: () => void };
+export type TAction = {
+  name: string;
+  buttonVariant?: string;
+  callback: () => void;
+  autoReset?: boolean;
+};
 
 // a render function that returns a VNode, or null
 /**
@@ -50,10 +55,15 @@ const description = shallowRef<RenderFn | null>(null);
  * - `setDescription(render)`: Sets the description renderer or clears it by passing null.
  */
 
-
 export function useActionBar() {
   function setActions(newActions: TAction | TAction[]): void {
-    actions.value = Array.isArray(newActions) ? newActions : [newActions];
+    const processedActions = Array.isArray(newActions)
+      ? newActions
+      : [newActions];
+    actions.value = processedActions.map((action) => ({
+      ...action,
+      autoReset: action.autoReset === undefined ? true : action.autoReset,
+    }));
   }
 
   function setDescription(render: RenderFn | string | null): void {
@@ -61,12 +71,21 @@ export function useActionBar() {
       typeof render === 'string' ? () => h('div', render) : render;
   }
 
-  function reset():void{
+  function reset(): void {
     actions.value = [];
     description.value = null;
   }
 
-  const hasContent = computed(() => description.value !== null && actions.value.length > 0);
+  const hasContent = computed(
+    () => description.value !== null && actions.value.length > 0
+  );
 
-  return { actions, description, hasContent, setActions, setDescription, reset };
+  return {
+    actions,
+    description,
+    hasContent,
+    setActions,
+    setDescription,
+    reset,
+  };
 }

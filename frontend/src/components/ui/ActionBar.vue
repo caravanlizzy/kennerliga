@@ -46,17 +46,17 @@
 import { useActionBar } from 'src/composables/actionBar';
 import KennerButton from 'components/base/KennerButton.vue';
 import { useLeagueStore } from 'stores/leagueStore';
-import { TLeagueStatus } from 'src/types';
-import { computed } from 'vue';
 import { storeToRefs } from 'pinia';
 
 const { actions, description, reset } = useActionBar();
 const { activePlayer, isMeActivePlayer } = storeToRefs(useLeagueStore());
 
-function handleAction(action: any) {
+async function handleAction(action: any) {
   try {
     action.callback();
-    reset();
+    if(action.autoReset){
+      reset();
+    }
   } catch (e) {
     console.error(e);
   }
@@ -70,7 +70,7 @@ function handleAction(action: any) {
 
 /* The "action area" — full width on mobile, constrained & centered on desktop */
 .actionBar {
-  border: 3px solid $accent;
+  border: 3px solid $info;
   width: min(100%, 800px); /* cap width on large screens */
   margin-inline: auto; /* center horizontally */
   border-radius: 12px;
