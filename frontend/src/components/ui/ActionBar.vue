@@ -70,7 +70,7 @@ async function handleAction(action: any) {
 
 /* The "action area" — full width on mobile, constrained & centered on desktop */
 .actionBar {
-  border: 3px solid $info;
+  border: 3px solid #cdcdcd;
   width: min(100%, 800px); /* cap width on large screens */
   margin-inline: auto; /* center horizontally */
   border-radius: 12px;
