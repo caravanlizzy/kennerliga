@@ -1,48 +1,60 @@
 <template>
   <div>
-    <div class="row justify-center">
-      <KennerSelect
-        class="select-width q-mr-md"
-        v-model="platform"
-        option-value="name"
-        option-label="name"
-        :options="platforms"
-        label="Platform"
-      />
-      <q-input
-        v-model="filter"
-        label="Spiel"
-        outlined
-        dense
-        clearable
-        class="rounded-borders shadow-1"
-      >
-        <template v-slot:append>
-          <q-icon name="search" />
-        </template>
-      </q-input>
+    <div class="column justify-center">
+      <div class="row">
+        <q-input
+          v-model="filter"
+          label="Spiel"
+          outlined
+          dense
+          clearable
+          class="rounded-borders col-grow"
+        >
+          <template v-slot:append>
+            <q-icon name="search" />
+          </template>
+        </q-input>
+        <q-btn unelevated class="q-ml-lg" color="negative" icon="filter_alt_off" @click="clearFilters" />
+      </div>
 
+      <q-btn-group spread outline push square>
+        <q-btn
+          v-for="p in platforms || []"
+          :key="p.id"
+          :color="platform?.id === p.id ? 'primary' : 'white'"
+          :text-color="getPlatformColor(p.name).color"
+          @click="platform = p"
+        >
+          {{ p.name }}
+        </q-btn>
+      </q-btn-group>
     </div>
 
-    <div class="row q-pt-md justify-center q-gutter-md" style="max-height: 300px; overflow-y: auto;">
+    <div
+      class="row q-pt-md justify-center"
+      style="max-height: 220px; overflow-y: auto"
+    >
       <q-card
         v-for="game in filteredGames"
         :key="game.id"
         @click="setGameInformation(game)"
         flat
+        bordered
         square
         clickable
         class="cursor-pointer text-center q-pa-sm transition-all"
         style="width: 130px"
         :class="[
-      game.id === gameSelection.game.id
-        ? 'bg-primary text-white shadow-8'
-        : 'bg-grey-3 text-dark shadow-2 hover-bg-grey-4 hover-shadow-6'
-    ]"
+          game.id === gameSelection.game.id
+            ? 'bg-primary text-white shadow-8'
+            : 'bg-grey-3 text-dark shadow-2 hover-bg-grey-4 hover-shadow-6',
+        ]"
       >
         <q-card-section class="q-pa-sm">
           <div class="text-body2 text-weight-bold ellipsis">
-            {{ game.name.length > 13 ? game.name.slice(0, 12) + '…' : game.name }}
+            {{
+              game.name.length > 13 ? game.name.slice(0, 12) + '…' : game.name
+            }}
           </div>
 
           <!-- Platform badge -->
@@ -59,17 +71,10 @@
       </q-card>
     </div>
 
-
-
-
     <div v-if="isLoading">
       <q-spinner-orbit size="xl" />
     </div>
-    <q-card
-      v-else-if="gameInformation.game"
-      flat
-      class="q-pa-md q-my-md"
-    >
+    <q-card v-else-if="gameInformation.game" flat class="q-pa-md q-my-md">
       <!-- Game title -->
       <q-card-section>
         <div class="text-h6 text-weight-bold">
@@ -89,10 +94,15 @@
         <div class="text-subtitle2 text-primary q-mb-md">Settings</div>
 
         <!-- Choices -->
-        <div v-if="gameInformation.options.some(o => o.has_choices)" class="q-mb-md">
+        <div
+          v-if="gameInformation.options.some((o) => o.has_choices)"
+          class="q-mb-md"
+        >
           <div class="row q-col-gutter-md">
             <div
-              v-for="option in gameInformation.options.filter(o => o.has_choices)"
+              v-for="option in gameInformation.options.filter(
+                (o) => o.has_choices
+              )"
               :key="option.id"
               class="col-12 col-sm-6 col-md-4"
             >
@@ -103,8 +113,9 @@
                 dense
                 outlined
                 v-model="
-              gameSelection.selectedOptions.find(o => o.id == option.id).choice
-            "
+                  gameSelection.selectedOptions.find((o) => o.id == option.id)
+                    .choice
+                "
                 class="full-width"
               />
             </div>
@@ -112,10 +123,12 @@
         </div>
 
         <!-- Toggles -->
-        <div v-if="gameInformation.options.some(o => !o.has_choices)">
+        <div v-if="gameInformation.options.some((o) => !o.has_choices)">
           <div class="row q-col-gutter-sm">
             <q-toggle
-              v-for="option in gameInformation.options.filter(o => !o.has_choices)"
+              v-for="option in gameInformation.options.filter(
+                (o) => !o.has_choices
+              )"
               :key="option.id"
               v-model="findSelectedOption(option.id).value"
               :label="option.name"
@@ -168,8 +181,8 @@ const handleSubmit = async () => {
 
 const { setActions, setDescription } = useActionBar();
 
-setActions([{name: 'Confirm', callback: handleSubmit}])
-setDescription(() =>  h('div','Confirm you game selection'));
+setActions([{ name: 'Confirm', callback: handleSubmit }]);
+setDescription(() => h('div', 'Confirm you game selection'));
 
 function getPlatformName(platformId: number | string): string {
   const platformObj = platforms.value.find((p) => p.id === platformId);
@@ -179,16 +192,15 @@ function getPlatformName(platformId: number | string): string {
 function getPlatformColor(name: string): { color: string; text: string } {
   switch (name.toLowerCase()) {
     case 'boardgamers.space':
-      return { color: 'deep-purple-3', text: 'white' }
+      return { color: 'deep-purple-3', text: 'white' };
     case 'yucata':
-      return { color: 'blue-5', text: 'white' }
+      return { color: 'blue-5', text: 'white' };
     case 'bga':
-      return { color: 'green-5', text: 'white' }
+      return { color: 'green-5', text: 'white' };
     default:
-      return { color: 'grey-3', text: 'dark' }
+      return { color: 'grey-3', text: 'dark' };
   }
 }
-
 
 onMounted(loadPlatformsAndGames);
 </script>
