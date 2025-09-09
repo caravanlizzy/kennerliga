@@ -44,7 +44,9 @@ const actions = ref<TAction[]>([]);
  *
  * @type {import('vue').ShallowRef<RenderFn | null>}
  */
-const description = shallowRef<RenderFn | null>(null);
+const leadText = shallowRef<RenderFn | null>(null);
+
+const subject = shallowRef<RenderFn | null>(null);
 
 /**
  * Provides functionalities to manage an action bar including actions and descriptions.
@@ -52,7 +54,7 @@ const description = shallowRef<RenderFn | null>(null);
  * @return {Object} An object containing the following properties and methods:
  * - `actions`: A reactive value holding the list of actions.
  * - `description`: A reactive value holding the description renderer or null.
- * - `setDescription(render)`: Sets the description renderer or clears it by passing null.
+ * - `setLeadText(render)`: Sets the description renderer or clears it by passing null.
  */
 
 export function useActionBar() {
@@ -66,26 +68,34 @@ export function useActionBar() {
     }));
   }
 
-  function setDescription(render: RenderFn | string | null): void {
-    description.value =
+  function setLeadText(render: RenderFn | string | null): void {
+    leadText.value =
+      typeof render === 'string' ? () => h('div', render) : render;
+  }
+
+  function setSubject(render: RenderFn | string | null): void {
+    subject.value =
       typeof render === 'string' ? () => h('div', render) : render;
   }
 
   function reset(): void {
     actions.value = [];
-    description.value = null;
+    leadText.value = null;
+    subject.value = null;
   }
 
   const hasContent = computed(
-    () => description.value !== null && actions.value.length > 0
+    () => leadText.value !== null && actions.value.length > 0
   );
 
   return {
     actions,
-    description,
+    leadText,
+    subject,
+    setSubject,
     hasContent,
     setActions,
-    setDescription,
+    setLeadText,
     reset,
   };
 }

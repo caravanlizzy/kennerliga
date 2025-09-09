@@ -22,8 +22,11 @@
         v-if="isMeActivePlayer"
         class="row justify-between no-wrap items-center q-py-md q-px-lg"
       >
-        <div class="text-body2 text-primary">
-          <component v-if="description" :is="description" />
+        <div v-if="leadText" class="text-body2 text-primary">
+          <component  :is="leadText" />
+        </div>
+        <div v-if="subject" class="text-body1 text-primary text-weight-bold ">
+          <component :is="subject" />
         </div>
 
         <div class="row items-center no-wrap q-gutter-sm">
@@ -48,7 +51,7 @@ import KennerButton from 'components/base/KennerButton.vue';
 import { useLeagueStore } from 'stores/leagueStore';
 import { storeToRefs } from 'pinia';
 
-const { actions, description, reset } = useActionBar();
+const { actions, leadText, subject, reset } = useActionBar();
 const { activePlayer, isMeActivePlayer } = storeToRefs(useLeagueStore());
 
 async function handleAction(action: any) {

@@ -95,7 +95,7 @@ const {
 } = storeToRefs(league);
 const { updateLeagueData, refreshResultsForGame } = league;
 
-const { setActions, setDescription, reset } = useActionBar();
+const { setActions, setLeadText, reset } = useActionBar();
 
 const { user } = useUserStore();
 
@@ -106,7 +106,7 @@ function handleSubmit(selectedGameId: number) {
   refreshResultsForGame(selectedGameId);
 }
 
-setDescription('Select a game to ban')
+setLeadText('Select a game to ban')
 setActions(
   Object.values(selectedGamesById.value)
     .filter((game) => game.selected_by !== user?.username)
@@ -119,7 +119,7 @@ setActions(
 
 watch(isMeBanningGame, () => {
   if (isMeBanningGame.value && leagueId.value && user.username) {
-    setDescription('Select a game to ban')
+    setLeadText('Select a game to ban')
     setActions(
       Object.values(selectedGamesById.value)
         .filter((game) => game.selected_by !== user?.username)
