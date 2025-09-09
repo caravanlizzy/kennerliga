@@ -1,21 +1,18 @@
 <template>
   <div>
     <div class="column justify-center">
-      <div class="row">
-        <q-input
-          v-model="filter"
-          label="Spiel"
-          outlined
-          dense
-          clearable
-          class="rounded-borders col-grow"
-        >
-          <template v-slot:append>
-            <q-icon name="search" />
-          </template>
-        </q-input>
-        <q-btn unelevated class="q-ml-lg" color="negative" icon="filter_alt_off" @click="clearFilters" />
-      </div>
+      <q-input
+        v-model="filter"
+        label="Spiel"
+        outlined
+        dense
+        clearable
+        class="rounded-borders col-grow"
+      >
+        <template v-slot:append>
+          <q-icon name="search" />
+        </template>
+      </q-input>
 
       <q-btn-group spread outline push square>
         <q-btn
@@ -23,7 +20,7 @@
           :key="p.id"
           :color="platform?.id === p.id ? 'primary' : 'white'"
           :text-color="getPlatformColor(p.name).color"
-          @click="platform = p"
+          @click="platform = platform?.id === p.id ? null : p"
         >
           {{ p.name }}
         </q-btn>
@@ -166,7 +163,7 @@ const {
   platforms,
   filteredGames,
   loadPlatformsAndGames,
-} = useGameSelection(leagueId.value);
+} = useGameSelection(leagueId);
 
 const emit = defineEmits(['submit-success']);
 
@@ -181,13 +178,15 @@ const handleSubmit = async () => {
 
 const { setActions, setLeadText, setSubject } = useActionBar();
 
-setActions([{ name: 'Confirm', callback: handleSubmit }]);
+setActions([
+  { name: 'Confirm', callback: handleSubmit, buttonVariant: 'positive' },
+]);
 setLeadText(() => h('div', 'Confirm your game selection'));
 watch(gameSelection, (newVal) => {
   if (newVal.game) {
     setSubject(newVal.game.name);
   }
-})
+});
 
 function getPlatformName(platformId: number | string): string {
   const platformObj = platforms.value.find((p) => p.id === platformId);
@@ -206,8 +205,6 @@ function getPlatformColor(name: string): { color: string; text: string } {
       return { color: 'grey-3', text: 'dark' };
   }
 }
-
-
 
 onMounted(loadPlatformsAndGames);
 </script>

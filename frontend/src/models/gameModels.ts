@@ -6,7 +6,7 @@ export type TPlatform = {
 export type GameDto = {
   id: number;
   name: string;
-  platform: string;
+  platform: number;
 }
 
 export type GameOptionDto = {

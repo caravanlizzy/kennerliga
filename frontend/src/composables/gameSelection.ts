@@ -3,7 +3,7 @@ import {
   GameDto,
   GameOptionDto,
   SelectedGameDtoPayload,
-  SelectedGameOptionDto,
+  SelectedGameOptionDto, TPlatform
 } from 'src/models/gameModels';
 import {
   createSelectedGame,
@@ -17,7 +17,7 @@ type TGameSelection = {
   selectedOptions: SelectedGameOptionDto[];
 };
 
-export function useGameSelection(leagueId: Ref<number>) {
+export function useGameSelection(leagueId: Ref<number|null>) {
   const gameInformation = reactive<{
     game: GameDto | undefined;
     options: GameOptionDto[];
@@ -27,9 +27,9 @@ export function useGameSelection(leagueId: Ref<number>) {
   });
 
   const isLoading = ref(false);
-  const platform = ref();
+  const platform: Ref<TPlatform|null> = ref(null);
   const filter = ref('');
-  const platforms = ref([]);
+  const platforms :Ref<TPlatform[]> = ref([]);
   const gameData = ref<GameDto[]>([]);
 
   const filteredGames = computed(() => {
@@ -50,7 +50,7 @@ export function useGameSelection(leagueId: Ref<number>) {
   const EMPTY_GAME: GameDto = {
     id: -1,
     name: '',
-    platform: '',
+    platform: -1,
   };
 
   const gameSelection = reactive<TGameSelection>({
@@ -128,7 +128,7 @@ export function useGameSelection(leagueId: Ref<number>) {
   }
 
   async function fetchGames() {
-    const { data: gameData } = await api(`game/games/?league=${leagueId}&exclude_repeated=true`);
+    const { data: gameData } = await api(`game/games/?league=${leagueId.value}&exclude_repeated=true`);
     return gameData;
   }
 
