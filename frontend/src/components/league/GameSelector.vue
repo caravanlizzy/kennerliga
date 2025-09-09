@@ -144,7 +144,7 @@
 </template>
 
 <script setup lang="ts">
-import { h, onMounted } from 'vue';
+import { h, onMounted, watch } from 'vue';
 import KennerSelect from 'components/base/KennerSelect.vue';
 import { useGameSelection } from 'src/composables/gameSelection';
 import { useLeagueStore } from 'stores/leagueStore';
@@ -179,10 +179,15 @@ const handleSubmit = async () => {
   }
 };
 
-const { setActions, setDescription } = useActionBar();
+const { setActions, setLeadText, setSubject } = useActionBar();
 
 setActions([{ name: 'Confirm', callback: handleSubmit }]);
-setDescription(() => h('div', 'Confirm you game selection'));
+setLeadText(() => h('div', 'Confirm your game selection'));
+watch(gameSelection, (newVal) => {
+  if (newVal.game) {
+    setSubject(newVal.game.name);
+  }
+})
 
 function getPlatformName(platformId: number | string): string {
   const platformObj = platforms.value.find((p) => p.id === platformId);
@@ -201,6 +206,8 @@ function getPlatformColor(name: string): { color: string; text: string } {
       return { color: 'grey-3', text: 'dark' };
   }
 }
+
+
 
 onMounted(loadPlatformsAndGames);
 </script>
