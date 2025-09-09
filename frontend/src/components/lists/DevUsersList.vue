@@ -4,11 +4,10 @@
       v-for="user in users"
       :key="user"
       clickable
-      dense
       square
+      color="grey-4"
       @click="impersonate(user, 'test')"
-      color="orange-3"
-      text-color="black"
+      text-color="primary"
       icon="person"
       class="cursor-pointer hover-shadow-2"
     >
