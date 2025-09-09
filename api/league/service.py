@@ -134,41 +134,36 @@ def get_players_to_repick(league):
 
 
 def advance_league_turn(league):
-    """
-    Advances the turn for a league by updating its status and active player based on the current
-    progress of the league. Handles transitions between different statuses: PICKING, BANNING,
-    REPICKING, PLAYING, or DONE.
-
-    Parameters:
-    league (League): The league object whose turn needs to be advanced.
-    """
     from league.models import LeagueStatus
 
-    if league.status == LeagueStatus.PICKING:
-        if all_players_have_picked(league):
-            league.status = LeagueStatus.BANNING
-            ordered_players = get_league_members_order(league)
-            league.active_player = ordered_players.last()
-            league.save()
-        else:
-            rotate_active_player(league)
-
-    elif league.status == LeagueStatus.BANNING:
-        if all_players_have_banned(league):
-            players_to_repick = get_players_to_repick(league)
-            if players_to_repick:
-                league.status = LeagueStatus.REPICKING
-                rotate_active_player(league, reverse_order=False, members=players_to_repick)
-                league.save()
+    with transaction.atomic():
+        if league.status == LeagueStatus.PICKING:
+            if all_players_have_picked(league):
+                league.status = LeagueStatus.BANNING
+                league.active_player = get_league_members_order(league).last()
+                league.save(update_fields=["status", "active_player"])
             else:
-                league.status = LeagueStatus.PLAYING
-                league.active_player = None
-                league.save()
-        else:
-            rotate_active_player(league, reverse_order=True)
+                rotate_active_player(league)
 
-    else:
-        print("No more rotation required since LeagueStatus is PLAYING or DONE. Current LeagueStatus: " + league.status)
+        elif league.status == LeagueStatus.BANNING:
+            if all_players_have_banned(league):
+                players_to_repick = get_players_to_repick(league)
+                if players_to_repick:
+                    league.status = LeagueStatus.REPICKING
+                    league.save(update_fields=["status"])
+                    players_to_repick_ids = [m.id for m in players_to_repick]
+                    qs_to_repick = league.members.filter(id__in=players_to_repick_ids)
+                    rotate_active_player(league, reverse_order=False, members=qs_to_repick)
+                else:
+                    league.status = LeagueStatus.PLAYING
+                    league.active_player = None
+                    league.save(update_fields=["status", "active_player"])
+            else:
+                rotate_active_player(league, reverse_order=True)
+
+        else:
+            # LeagueStatus is PLAYING or DONE
+            pass
 
 
 def select_game(league, player, game):
