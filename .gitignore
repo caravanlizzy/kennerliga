@@ -30,3 +30,6 @@ venv*
 api/.idea
 
 ergebnistabellen
+
+# build files
+frontend/dist*
