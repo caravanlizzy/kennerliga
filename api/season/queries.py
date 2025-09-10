@@ -14,10 +14,6 @@ def get_running_season() -> Season:
     return Season.objects.filter(status=Season.SeasonStatus.RUNNING).first()
 
 
-def get_season_by_league(league):
-    return league.season
-
-
 def get_open_season() -> Season:
     """
     Retrieves the season with an open registration, if any.
@@ -51,14 +47,6 @@ def get_leagues(season: Season) -> QuerySet:
     Retrieves all leagues associated with a given season.
     """
     return season.league_set.all()
-
-
-def get_registered_participant_count() -> int:
-    """
-    Returns the number of participants in the current open season.
-    If no season is open, returns 0.
-    """
-    return len(get_registered_participants())
 
 
 def get_registered_participants() -> List[SeasonParticipant]:

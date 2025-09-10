@@ -1,0 +1,39 @@
+from typing import List
+from league.models import League
+from game.models import SelectedGame, BanDecision
+
+
+def get_members_ordered(league: League):
+    """Return league members ordered by rank."""
+    return league.members.all().select_related("profile").order_by("rank")
+
+
+def all_players_have_picked(league: League) -> bool:
+    """Check if all league members have selected a game."""
+    for participant in league.members.all():
+        if not SelectedGame.objects.filter(league=league, player=participant.profile).exists():
+            return False
+    return True
+
+
+def all_players_have_banned(league: League) -> bool:
+    """Check if all league members have submitted at least one ban."""
+    for participant in league.members.all():
+        if not BanDecision.objects.filter(league=league, player=participant.profile).exists():
+            return False
+    return True
+
+
+def get_players_to_repick(league: League) -> List:
+    """Return members who must repick because their only game was banned."""
+    repick_players = []
+    min_bans = 2 if league.members.count() > 2 else 1
+
+    for member in league.members.all():
+        selected_games = SelectedGame.objects.filter(player=member.profile, league=league)
+        if selected_games.count() == 1:
+            sg = selected_games.first()
+            ban_count = BanDecision.objects.filter(league=league, game=sg).count()
+            if ban_count >= min_bans:
+                repick_players.append(member)
+    return repick_players

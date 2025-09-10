@@ -8,7 +8,7 @@ from game.serializers import GameSerializer, GameOptionSerializer, GameOptionCho
     TieBreakerSerializer, ResultConfigSerializer, StartingPointSystemSerializer, PlatformSerializer, \
     SelectedGameSerializer, SelectedOptionSerializer, FullGameSerializer, BanDecisionSerializer
 
-from league.service import advance_league_turn, rotate_active_player
+from league.services import LeagueService
 from user.models import YearlyGameSelection
 
 
@@ -92,12 +92,10 @@ class SelectedGameViewSet(ModelViewSet):
 
     def perform_create(self, serializer):
         selected_game = serializer.save()
-
-        # Post-save logic:
         league = selected_game.league
 
-        # rotate_active_player(league)
-        advance_league_turn(league)
+        # Use service
+        LeagueService(league).advance_turn()
 
 
 class BanDecisionViewSet(ModelViewSet):
@@ -107,10 +105,9 @@ class BanDecisionViewSet(ModelViewSet):
 
     def perform_create(self, serializer):
         ban_decision = serializer.save()
-
         league = ban_decision.league
 
-        advance_league_turn(league)
+        LeagueService(league).advance_turn()
 
 
 class SelectedOptionViewSet(ModelViewSet):
