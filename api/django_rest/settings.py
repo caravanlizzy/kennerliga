@@ -164,7 +164,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 AUTH_USER_MODEL = 'user.User'
 
 ORIGIN_LIST = [
-    'http://localhost:9000',
+    "http://localhost:9000",
     "https://haligh.pythonanywhere.com",
     "http://haligh.pythonanywhere.com",
     "http://www.kennerliga.de",
@@ -173,19 +173,19 @@ ORIGIN_LIST = [
 ]
 
 CSRF_TRUSTED_ORIGINS = ORIGIN_LIST
-
 CORS_ALLOWED_ORIGINS = ORIGIN_LIST
 
-from corsheaders.defaults import default_methods
+#from corsheaders.defaults import default_methods
 
-CORS_ALLOW_METHODS = (
-    *default_methods,
-)
+#CORS_ALLOW_METHODS = (
+#    *default_methods,
+#)
 
-CORS_ALLOWED_HEADERS = [
-    'Authorization',
-    'Content-Type'
-]
+CORS_ALLOW_CREDENTIALS = True
+# CORS_ALLOWED_HEADERS = [
+#    'Authorization',
+#    'Content-Type'
+#]
 
 SESSION_COOKIE_SECURE = True
 SESSION_COOKIE_SAMESITE = "Lax"
