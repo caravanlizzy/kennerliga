@@ -58,7 +58,7 @@ module.exports = configure(function (ctx) {
       env: {
         API_URL: ctx.dev
           ? 'http://localhost:8000/api'
-          : 'https://haligh.pythonanywhere.com/api'
+          : 'https://www.kennerliga.de/api'
       },
       target: {
         browser: [ 'es2019', 'edge88', 'firefox78', 'chrome87', 'safari13.1' ],
