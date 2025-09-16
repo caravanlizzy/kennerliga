@@ -1,6 +1,7 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 
+
 # Create your models here.
 class User(AbstractUser):
     first_name = None
@@ -12,6 +13,7 @@ class User(AbstractUser):
         null=False,
         help_text='Username is used to login'
     )
+    password = models.CharField(max_length=128, blank=False, null=False)
     USERNAME_FIELD = 'username'
 
     # REQUIRED_FIELDS = ['username']
@@ -25,6 +27,19 @@ class Platform(models.Model):
 
     def __str__(self):
         return str(self.name)
+
+
+class UserInvitation(models.Model):
+    username = models.TextField()
+    otp = models.TextField()
+    failed_attempts = models.IntegerField(default=0)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.username} invited at {self.created_at}"
+
+    class Meta:
+        ordering = ['-created_at']
 
 
 class PlayerProfile(models.Model):
