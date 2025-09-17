@@ -13,7 +13,7 @@
           class="text-italic">{{ startingPointSystem.description }} </span></div>
       </div>
       <div class="row justify-between">
-        <div class="text-bold">StartspielerInreihenfolge</div>
+        <div class="text-bold">Starting Order</div>
         <YesNoItem :yes="hasStartingPlayerOrder" />
       </div>
       <div class="col">

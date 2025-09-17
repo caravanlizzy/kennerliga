@@ -1,5 +1,5 @@
 <template>
-  <KennerligaTable v-if="isFinished" :create-button="button" flat title="SpielerInnen" @row-click="onRowClick"
+  <KennerligaTable v-if="isFinished" :create-button="button" flat title="Kennerliga Members" @row-click="onRowClick"
                    :rows="data" :columns="columns" :rows-per-page-options="[10, 20, 50]" />
 </template>
 

@@ -5,7 +5,7 @@
       <q-card class="config-box q-pa-md">
         <div class="column">
           <q-toggle
-            label="Startspielerreihenfolge"
+            label="Starting Order"
             :model-value="hasStartingPlayerOrder"
             @update:model-value="
               hasStartingPlayerOrder = !hasStartingPlayerOrder
@@ -13,7 +13,7 @@
           />
           <q-separator />
           <q-toggle
-            label="Punkte"
+            label="Points"
             :model-value="hasPoints"
             @update:model-value="hasPoints = !hasPoints"
           />

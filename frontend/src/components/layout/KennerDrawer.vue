@@ -10,30 +10,24 @@
       <q-list>
         <kenner-item
           icon="settings"
-          label="Einstellungen"
+          label="Settings"
           forward-name="settings"
         />
         <kenner-item
           icon="account_circle"
-          label="Profil"
+          label="Profile"
           forward-name="profile"
         />
         <kenner-item
           icon="casino"
-          label="Spiele verwalten"
+          label="Games"
           forward-name="games"
         />
         <kenner-item
           icon="group"
-          label="SpielerInnen verwalten"
+          label="Users"
           forward-name="users"
         />
-<!--        <kenner-item-->
-<!--          icon="switch_account"-->
-<!--          label="Impersonate User"-->
-<!--          @click="showImpersonateList = !showImpersonateList"-->
-<!--        >-->
-<!--        </kenner-item>-->
         <kenner-item icon="logout" label="Logout" @click="logout" />
       </q-list>
     </q-drawer>
