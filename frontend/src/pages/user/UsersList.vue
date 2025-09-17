@@ -18,7 +18,7 @@ const onRowClick = (_event: never, row: { id: never; }) => {
   router.push({ name: 'user-detail', params: { id: row.id } });
 };
 
-const button: TKennerButton = { color: 'secondary', label: 'Person', icon: 'add_circle' };
+const button: TKennerButton = { color: 'secondary', label: 'Invite', icon: 'add_circle', forwardName: 'user-invite' };
 
 const columns = [
   {
@@ -37,13 +37,5 @@ const columns = [
     field: x => x.bga_name,
     sortable: true
   },
-  {
-    name: 'email',
-    label: 'Email',
-    required: false,
-    align: 'right',
-    field: x => x.email,
-    sortable: true
-  }
 ];
 </script>
