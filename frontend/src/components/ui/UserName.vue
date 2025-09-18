@@ -1,40 +1,37 @@
 <template>
-  <q-avatar size="27px" class="user-avatar text-white" :class="colorClass">
-    <div class="avatar-content">
-      <span v-if="initials">{{ initials }}</span>
-      <q-icon v-else name="person" size="18px" />
-    </div>
+  <q-avatar :size="size" class="flex flex-center text-white bg-red-4 text-bold">
+    <span v-if="letters">{{ letters }}</span>
+    <q-icon v-else name="person" size="70%" />
+
     <KennerTooltip>{{ displayUsername }}</KennerTooltip>
   </q-avatar>
 </template>
 
 <script setup lang="ts">
 import { computed } from 'vue';
-import { useUserStore } from 'stores/userStore';
-import { storeToRefs } from 'pinia';
 import KennerTooltip from 'components/base/KennerTooltip.vue';
 
-const props = withDefaults(defineProps<{
-  username?: string;
-  colorClass?: string;
-}>(), {
-  colorClass: 'bg-accent' // 👈 your default
-});
+const props = withDefaults(
+  defineProps<{
+    displayUsername: string;
+    size?: string;
+    maxLetters?: 1 | 2;
+  }>(),
+  {
+    size: '28px',
+    maxLetters: 2,
+  }
+);
 
-const { user } = storeToRefs(useUserStore());
+const clean = computed(() => (props.displayUsername || '').trim());
+const parts = computed(() => clean.value.split(/\s+/).filter(Boolean));
 
-const displayUsername = computed(() => {
-  return props.username || user.value?.username || '';
-});
-
-const initials = computed(() => {
-  const name = displayUsername.value.trim();
-  if (!name) return '';
-  const parts = name.split(' ');
-  return parts
-    .map((p) => p[0]?.toUpperCase())
-    .join('')
-    .slice(0, 2);
+const letters = computed(() => {
+  if (!clean.value) return '';
+  if (props.maxLetters === 1) return clean.value[0].toUpperCase();
+  if (parts.value.length >= 2) {
+    return (parts.value[0][0] + parts.value.at(-1)![0]).toUpperCase();
+  }
+  return clean.value.slice(0, 2).toUpperCase();
 });
 </script>
-

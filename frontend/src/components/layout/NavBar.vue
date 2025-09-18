@@ -20,7 +20,9 @@
       <q-avatar size="24px" class="q-mr-sm q-mx-auto">
         <q-icon name="emoji_events" color="amber-4" />
       </q-avatar>
-      <div v-if="!isMobile" class="text-weight-bold text-primary">My League</div>
+      <div v-if="!isMobile" class="text-weight-bold text-primary">
+        My League
+      </div>
     </KennerButton>
   </q-toolbar-title>
   <KennerButton
@@ -28,15 +30,13 @@
     color="grey-8"
     unelevated
     flat
-    icon="build"
-    class="q-mt-sm q-ml-sm"
   >
+    <q-avatar size="24px" class="q-mx-auto">
+      <q-icon name="build" color="grey-8" />
+    </q-avatar>
   </KennerButton>
 
-
-
-
-  <UserName v-if="isAuthenticated" />
+  <UserName v-if="isAuthenticated" :display-username="user.username" />
   <KennerButton
     color="primary"
     v-if="isAuthenticated"
@@ -59,9 +59,6 @@ import { useUserStore } from 'stores/userStore';
 import { storeToRefs } from 'pinia';
 import UserName from 'components/ui/UserName.vue';
 import { useRouter } from 'vue-router';
-import KennerTooltip from 'components/base/KennerTooltip.vue';
-import DevUsersList from 'components/lists/DevUsersList.vue';
-import { ref } from 'vue';
 import { useUiStore } from 'stores/uiStore';
 import { useResponsive } from 'src/composables/reponsive';
 
@@ -69,10 +66,9 @@ defineProps<{
   onToggle: () => void;
 }>();
 
-const store = useUserStore();
 const router = useRouter();
 const { toggleDev } = useUiStore();
-const { isAuthenticated } = storeToRefs(store);
+const { isAuthenticated, user } = storeToRefs(useUserStore());
 const { isMobile } = useResponsive();
 
 function goHome() {
