@@ -1,5 +1,6 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
+from django.db.models import Q
 
 
 # Create your models here.
@@ -71,13 +72,16 @@ class YearlyGameSelection(models.Model):
     selected_in_season = models.ForeignKey('season.Season', on_delete=models.CASCADE, null=True, blank=True)
 
     class Meta:
-        unique_together = ('player_profile', 'year', 'game', 'selection_count')
         ordering = ['-year', 'selected_in_season']
         constraints = [
+            models.UniqueConstraint(
+                fields=['player_profile', 'year', 'game', 'selection_count'],
+                name='uniq_profile_year_game_selcount',
+            ),
             models.CheckConstraint(
-                check=models.Q(selection_count__in=[1, 2, 3]),
-                name='valid_selection_count'
-            )
+                check=Q(selection_count__in=[1, 2, 3]),
+                name='valid_selection_count',
+            ),
         ]
 
     def __str__(self):
