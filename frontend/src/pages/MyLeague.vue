@@ -78,7 +78,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, Ref, ref, watch, watchEffect } from 'vue';
+import { onMounted, ref, watch, watchEffect } from 'vue';
 import GameSelector from 'components/league/GameSelector.vue';
 import LeagueStatusBar from 'pages/LeagueStatusBar.vue';
 import { useLeagueStore } from 'stores/leagueStore';

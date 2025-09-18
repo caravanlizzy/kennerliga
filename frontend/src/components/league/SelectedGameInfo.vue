@@ -89,9 +89,7 @@
 import { computed, ref } from 'vue';
 import { storeToRefs } from 'pinia';
 import UserName from 'components/ui/UserName.vue';
-import { useUserStore } from 'stores/userStore';
 import { GameOption, useLeagueStore } from 'stores/leagueStore';
-import { banGame } from 'src/services/game/banGameService';
 import { TLeagueMember } from 'src/types';
 
 // Reuse the types you already defined in your store file
@@ -140,9 +138,7 @@ const props = defineProps<{
 }>();
 
 const league = useLeagueStore();
-const { members, leagueId, membersById } = storeToRefs(league);
-const { updateLeagueData } = league;
-const { user } = useUserStore();
+const { members } = storeToRefs(league);
 
 const isExpanded = ref(false);
 
