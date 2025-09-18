@@ -33,3 +33,4 @@ ergebnistabellen
 
 # build files
 frontend/dist*
+api/dist*
