@@ -14,13 +14,13 @@
     <KennerButton
       :to="{ name: 'my-league' }"
       v-if="isAuthenticated"
-      class="my-league-btn q-px-md"
+      class="my-league-btn q-px-sm"
       color="info"
     >
-      <q-avatar size="24px" class="q-mr-sm">
+      <q-avatar size="24px" class="q-mr-sm q-mx-auto">
         <q-icon name="emoji_events" color="amber-4" />
       </q-avatar>
-      <div class="text-weight-bold text-primary">My League</div>
+      <div v-if="!isMobile" class="text-weight-bold text-primary">My League</div>
     </KennerButton>
   </q-toolbar-title>
   <KennerButton
@@ -63,6 +63,7 @@ import KennerTooltip from 'components/base/KennerTooltip.vue';
 import DevUsersList from 'components/lists/DevUsersList.vue';
 import { ref } from 'vue';
 import { useUiStore } from 'stores/uiStore';
+import { useResponsive } from 'src/composables/reponsive';
 
 defineProps<{
   onToggle: () => void;
@@ -72,6 +73,7 @@ const store = useUserStore();
 const router = useRouter();
 const { toggleDev } = useUiStore();
 const { isAuthenticated } = storeToRefs(store);
+const { isMobile } = useResponsive();
 
 function goHome() {
   router.push({ name: 'home' });
