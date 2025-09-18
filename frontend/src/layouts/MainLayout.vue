@@ -4,6 +4,7 @@
       <q-toolbar class="background-navbar">
         <NavBar :onToggle="toggleDrawer" />
       </q-toolbar>
+      <q-separator />
       <DevTools v-show="isDev"/>
       <Announcements v-if="announcements.length > 0" />
     </q-header>
