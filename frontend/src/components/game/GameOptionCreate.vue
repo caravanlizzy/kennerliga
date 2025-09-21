@@ -26,8 +26,8 @@
 import KennerInput from 'components/base/KennerInput.vue';
 import KennerButton from 'components/base/KennerButton.vue';
 import { inject, ref } from 'vue';
-import GameOptionChoiceCreate from 'pages/game/createGame/GameOptionChoiceCreate.vue';
-import GameOptionRestrictionCreate from 'pages/game/createGame/GameOptionRestrictionCreate.vue';
+import GameOptionChoiceCreate from 'components/game/GameOptionChoiceCreate.vue';
+import GameOptionRestrictionCreate from 'components/game/GameOptionRestrictionCreate.vue';
 import GameOptionCard from 'components/cards/OverviewCard.vue';
 import { createRandomId } from 'src/helpers';
 import { TGameOption, TGameOptionChoice } from 'src/types';

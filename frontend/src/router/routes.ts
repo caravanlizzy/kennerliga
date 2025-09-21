@@ -26,7 +26,7 @@ const routes: RouteRecordRaw[] = [
       {
         path: '',
         name: 'login',
-        component: () => import('pages/TheLogin.vue'),
+        component: () => import('pages/account/TheLoginPage.vue'),
       },
     ],
   },
@@ -45,7 +45,7 @@ const routes: RouteRecordRaw[] = [
       {
         path: 'league',
         name: 'my-league',
-        component: () => import('pages/MyLeague.vue'),
+        component: () => import('pages/MyLeaguePage.vue'),
         meta: { icon: 'sports_esports', label: 'Meine Liga' },
       },
     ],
@@ -55,7 +55,7 @@ const routes: RouteRecordRaw[] = [
   // but you can also remove it
   {
     path: '/:catchAll(.*)*',
-    component: () => import('pages/ErrorNotFound.vue'),
+    component: () => import('pages/ErrorNotFoundPage.vue'),
   },
 ];
 

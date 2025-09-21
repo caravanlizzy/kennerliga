@@ -42,7 +42,7 @@
 <script setup lang="ts">
 import { api } from 'boot/axios';
 import { useRoute } from 'vue-router';
-import ResultConfiguration from 'pages/game/gameDetail/ResultConfiguration.vue';
+import ResultConfiguration from 'components/game/ResultConfiguration.vue';
 import KennerGrid from 'components/grid/KennerGrid.vue';
 import { computed, ref } from 'vue';
 
