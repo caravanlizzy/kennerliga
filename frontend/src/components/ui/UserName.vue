@@ -1,11 +1,18 @@
 <template>
-  <q-avatar :size="size" class="flex flex-center text-white bg-red-4 text-bold">
+  <q-avatar
+    :size="size"
+    class="flex flex-center rounded-borders bg-grey-3 text-weight-medium bordered"
+    :class="`text-${color}`"
+  >
     <span v-if="letters">{{ letters }}</span>
     <q-icon v-else name="person" size="70%" />
 
     <KennerTooltip>{{ displayUsername }}</KennerTooltip>
   </q-avatar>
+
 </template>
+
+
 
 <script setup lang="ts">
 import { computed } from 'vue';
@@ -15,10 +22,12 @@ const props = withDefaults(
   defineProps<{
     displayUsername: string;
     size?: string;
+    color? : string;
     maxLetters?: 1 | 2;
   }>(),
   {
     size: '28px',
+    color: 'teal-3',
     maxLetters: 2,
   }
 );
