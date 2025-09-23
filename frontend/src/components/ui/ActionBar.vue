@@ -1,10 +1,11 @@
 <template>
   <!-- full-width wrapper so we can center the inner bar -->
-  <div class="column actionBar q-ma-md q-mx-auto q-pa-sm q-px-md rounded-borders bg-grey-2">
-
+  <div
+    class="column actionBar q-ma-md q-mx-auto q-pa-sm q-px-md rounded-borders bg-grey-2"
+  >
     <div
       v-if="activePlayer"
-      class="row items-center justify-around status-line q-py-xs "
+      class="row items-center justify-around status-line q-py-xs"
     >
       <!-- Status chip -->
       <q-chip
@@ -36,13 +37,19 @@
 
     <div
       v-if="isMeActivePlayer"
-      class="row justify-between no-wrap items-center q-py-sm q-px-md"
+      :class="[
+        isMobile ? 'column' : 'row q-py-sm',
+        'justify-between items-center no-wrap q-px-md',
+      ]"
     >
       <div v-if="leadText" class="text-body2 text-primary q-mr-md">
         <component :is="leadText" />
       </div>
 
-      <div v-if="subject" class="text-body1 text-primary text-weight-bold q-mr-md">
+      <div
+        v-if="subject"
+        class="text-body1 text-primary text-weight-bold q-mr-md"
+      >
         <component :is="subject" />
       </div>
 
@@ -60,7 +67,6 @@
         </kenner-button>
       </div>
     </div>
-
   </div>
 </template>
 
@@ -69,9 +75,12 @@ import { useActionBar } from 'src/composables/actionBar';
 import KennerButton from 'components/base/KennerButton.vue';
 import { useLeagueStore } from 'stores/leagueStore';
 import { storeToRefs } from 'pinia';
+import { useResponsive } from 'src/composables/reponsive';
 
 const { actions, leadText, subject, reset } = useActionBar();
-const { activePlayer, isMeActivePlayer, statusNoun, leagueStatus } = storeToRefs(useLeagueStore());
+const { activePlayer, isMeActivePlayer, statusNoun, leagueStatus } =
+  storeToRefs(useLeagueStore());
+const { isMobile } = useResponsive();
 
 async function handleAction(action: any) {
   try {
