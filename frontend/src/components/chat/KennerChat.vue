@@ -8,12 +8,10 @@
       <q-card-section class="q-px-lg">
         <div class="row justify-between q-py-xs" v-for="message of messages" :key="JSON.stringify(message)">
           <div class="">
-            {{ message.sender }} <span class="text-caption text-italic">
-            <q-tooltip anchor="top middle" self="bottom middle"> {{ formatDateTime(message.datetime) }}</q-tooltip>
-            [{{
-              formatDateTime(message.datetime).split(',')[1]
-            }}]
-          </span>
+            {{ message.sender }}
+            <KennerTooltip anchor="top middle" self="bottom middle">
+              {{ formatDateTime(message.datetime) }}
+            </KennerTooltip>
           </div>
           <div> {{ message.text }}</div>
         </div>
@@ -35,6 +33,7 @@
 import { formatDateTime } from 'src/helpers';
 import { Ref, ref } from 'vue';
 import { addMessage, getMessages, TMessage } from 'src/services/chatService';
+import KennerTooltip from 'components/base/KennerTooltip.vue';
 
 let lastDateTime: string | undefined;
 
