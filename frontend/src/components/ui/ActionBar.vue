@@ -1,22 +1,39 @@
 <template>
   <!-- full-width wrapper so we can center the inner bar -->
-    <div class="column actionBar radius q-mb-md">
+    <div class="column actionBar radius q-ma-md">
       <div
         v-if="activePlayer"
-        class="row items-center justify-between status-line q-py-xs"
+        class="row items-center justify-around status-line q-py-xs "
       >
-        <!-- Centered block -->
-        <div
-          class="row items-center justify-center col text-subtitle1 text-weight-regular text-italic"
+        <!-- Status chip -->
+        <q-chip
+          color="primary"
+          text-color="white"
+          square
+          dense
+          class="text-uppercase text-bold"
         >
-          <span class="text-bold">
-            <q-chip :class="activePlayer?.colorClass" text-color="white">{{
-              activePlayer?.username
-            }}</q-chip
-            >'s turn
-          </span>
+          {{ statusNoun }}
+        </q-chip>
+
+        <!-- Divider dot -->
+        <q-icon name="circle" size="6px" class="text-grey-5" />
+
+        <!-- Active player turn -->
+        <div class="row items-center no-wrap text-subtitle1 text-italic">
+          <q-chip
+            :class="activePlayer?.colorClass"
+            text-color="white"
+            square
+            dense
+            class="q-mr-xs text-weight-bold"
+          >
+            {{ activePlayer?.username }}
+          </q-chip>
+          <span>'s turn</span>
         </div>
       </div>
+
       <q-separator inset v-if="isMeActivePlayer"/>
       <div
         v-if="isMeActivePlayer"
@@ -29,17 +46,25 @@
           <component :is="subject" />
         </div>
 
-        <div class="row items-center no-wrap q-gutter-sm">
+        <div class="row items-center no-wrap q-gutter-xs">
           <kenner-button
-            outline
-            :color="a.buttonVariant || 'primary'"
             v-for="a in actions"
             :key="a.name"
+            outline
+            :color="a.buttonVariant || 'primary'"
+            class="compact-btn q-px-sm q-py-xs text-caption"
             @click="handleAction(a)"
           >
-            {{ a.name }}
+            <q-icon v-if="a.icon" :name="a.icon" size="16px" class="q-mr-xs" />
+            <span class="btn-label">{{ a.name }}</span>
+
+            <!-- show full label on hover -->
+            <q-tooltip anchor="top middle" self="bottom middle">
+              {{ a.name }}
+            </q-tooltip>
           </kenner-button>
         </div>
+
       </div>
     </div>
 </template>
@@ -52,7 +77,7 @@ import { useLeagueStore } from 'stores/leagueStore';
 import { storeToRefs } from 'pinia';
 
 const { actions, leadText, subject, reset } = useActionBar();
-const { activePlayer, isMeActivePlayer } = storeToRefs(useLeagueStore());
+const { activePlayer, isMeActivePlayer, statusNoun, leagueStatus } = storeToRefs(useLeagueStore());
 
 async function handleAction(action: any) {
   try {

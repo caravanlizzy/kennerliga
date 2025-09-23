@@ -1,6 +1,6 @@
 <template>
   <div>
-    <LeagueStatusBar />
+    <ActionBar />
     <!-- Game Selector - shown when user needs to pick games -->
     <template v-if="isMePickingGame">
       <ContentSection
@@ -92,6 +92,7 @@ import { banGame } from 'src/services/game/banGameService';
 import { useUserStore } from 'stores/userStore';
 import { useDialog } from 'src/composables/dialog';
 import { useQuasar } from 'quasar';
+import ActionBar from 'components/ui/ActionBar.vue';
 
 const league = useLeagueStore();
 
