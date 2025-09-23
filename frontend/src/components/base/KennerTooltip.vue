@@ -1,25 +1,17 @@
 <template>
   <q-tooltip
-    class="kenner-tooltip"
-    :delay="50"
-    :hide-delay="170"
+    class="kenner-tooltip bg-white text-dark rounded-borders shadow-6 q-px-sm q-py-xs text-caption"
+    :delay="60"
+    :hide-delay="120"
     anchor="top left"
+    self="bottom left"
+    transition-show="scale"
+    transition-hide="fade"
+    :offset="[8, 8]"
   >
-    <slot />
+    <div class="row items-center no-wrap q-gutter-x-xs">
+      <slot />
+    </div>
   </q-tooltip>
 </template>
 
-<style scoped>
-.kenner-tooltip {
-  background-color: white;
-  color: #444;
-  border-radius: 8px;
-  box-shadow:
-    0 2px 4px rgba(0, 0, 0, 0.08),
-    0 4px 10px rgba(0, 0, 0, 0.04);
-  font-size: 0.75rem;
-  font-weight: 500;
-  padding: 6px 10px;
-  transition: all 0.2s ease-in-out;
-}
-</style>
