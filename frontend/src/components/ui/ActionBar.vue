@@ -57,11 +57,6 @@
           >
             <q-icon v-if="a.icon" :name="a.icon" size="16px" class="q-mr-xs" />
             <span class="btn-label">{{ a.name }}</span>
-
-            <!-- show full label on hover -->
-            <q-tooltip anchor="top middle" self="bottom middle">
-              {{ a.name }}
-            </q-tooltip>
           </kenner-button>
         </div>
 
