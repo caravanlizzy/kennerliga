@@ -34,7 +34,7 @@
               <UserName
                 v-for="b in banners"
                 :key="b.id"
-                :username="b.username"
+                :display-username="b.username"
                 :color-class="b.colorClass"
               ></UserName>
             </div>
