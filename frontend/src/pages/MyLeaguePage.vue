@@ -141,7 +141,6 @@ watch(isMeBanningGame, () => {
         .filter((game) => game.selected_by !== user?.username)
         .map((game) => ({
           name: `${game.game_name}`,
-          buttonVariant: 'primary',
           callback: () => handleBanGame(game.id, game.game_name),
           autoReset: false,
         }))
@@ -153,7 +152,7 @@ const { setDialog } = useDialog();
 const $q = useQuasar();
 
 function handleBanGame(gameId: number, gameName: string) {
-  const notifyType = 'warning';
+  const notifyType = undefined;
   setDialog(
     'Confirm Ban',
     `Are you sure you want to ban ${gameName.toUpperCase()}?`,
