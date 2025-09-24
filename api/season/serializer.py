@@ -29,8 +29,8 @@ class SeasonSerializer(serializers.ModelSerializer):
 
 
 class SeasonParticipantSerializer(serializers.ModelSerializer):
-    username = serializers.SerializerMethodField()
-    profile_name = serializers.SerializerMethodField()
+    username = serializers.CharField(source='profile.user.username', read_only=True)
+    profile_name = serializers.CharField(source='profile.profile_name', read_only=True)
     selected_game = serializers.SerializerMethodField()
     banned_game = serializers.SerializerMethodField()
     is_active_player = serializers.SerializerMethodField()
@@ -47,16 +47,11 @@ class SeasonParticipantSerializer(serializers.ModelSerializer):
             'rank',  # from the model
         ]
 
-    def get_username(self, obj):
-        return obj.profile.user.username  # Assuming PlayerProfile has a OneToOneField to User
-
-    def get_profile_name(self, obj):
-        return obj.profile.profile_name
-
     def get_selected_game(self, obj):
         league = self.context.get('league')
         if not league:
             return None
+        # if a game has been banned, several games need to be returned, one with a banned flag
         selected_game = SelectedGame.objects.filter(player=obj.profile, league=league).first()
         return SelectedGameSerializer(selected_game).data if selected_game else None
 

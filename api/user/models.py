@@ -53,15 +53,21 @@ class PlayerProfile(models.Model):
 
 
 class PlatformPlayer(models.Model):
-    player_profile = models.ForeignKey(PlayerProfile, on_delete=models.CASCADE)
-    platform = models.ForeignKey(Platform, on_delete=models.CASCADE)
+    player_profile = models.ForeignKey(
+        PlayerProfile, on_delete=models.CASCADE, related_name='platform_links'
+    )
+    platform = models.ForeignKey(
+        Platform, on_delete=models.CASCADE, related_name='player_links'
+    )
     name = models.CharField(max_length=100)
 
     class Meta:
-        unique_together = ('player_profile', 'platform')
-
-    def __str__(self):
-        return f"{self.name} on {self.platform.name}"
+        constraints = [
+            models.UniqueConstraint(
+                fields=('player_profile', 'platform'),
+                name='uniq_profile_platform',
+            )
+        ]
 
 
 class YearlyGameSelection(models.Model):
