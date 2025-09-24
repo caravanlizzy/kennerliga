@@ -37,6 +37,14 @@ class LeagueService:
             else:
                 self.rotate_active_player()
 
+        elif self.league.status == LeagueStatus.REPICKING:
+            if q.all_repickers_have_repicked(self.league):
+                self.league.status = LeagueStatus.PLAYING
+                self.league.active_player = None
+                self.league.save(update_fields=["status", "active_player"])
+            else:
+                self.rotate_active_player(reverse_order=True)
+
         elif self.league.status == LeagueStatus.BANNING:
             if q.all_players_have_banned(self.league):
                 players_to_repick = q.get_players_to_repick(self.league)

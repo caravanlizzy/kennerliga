@@ -37,3 +37,10 @@ def get_players_to_repick(league: League) -> List:
             if ban_count >= min_bans:
                 repick_players.append(member)
     return repick_players
+
+def all_repickers_have_repicked(league: League) -> bool:
+    """Check if all players who must repick have done so."""
+    for player in get_players_to_repick(league):
+        if not SelectedGame.objects.filter(player=player.profile, league=league).count() > 1:
+            return False
+    return True
