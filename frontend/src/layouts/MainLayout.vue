@@ -1,10 +1,9 @@
 <template>
   <q-layout class="column" view="hHh Lpr lFf">
     <q-header>
-      <q-toolbar class="background-navbar">
+      <q-toolbar class="bg-secondary">
         <NavBar :onToggle="toggleDrawer" />
       </q-toolbar>
-      <q-separator />
       <DevTools v-show="isDev"/>
       <Announcements v-if="announcements.length > 0" />
     </q-header>
@@ -42,9 +41,3 @@ function toggleDrawer(): void {
   drawerState.value = !drawerState.value;
 }
 </script>
-
-<style scoped lang="scss">
-.background-navbar {
-  background-color: #ffffff;
-}
-</style>
