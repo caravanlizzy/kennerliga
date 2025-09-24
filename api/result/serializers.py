@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from game.models import SelectedGame, ResultConfig, Faction, TieBreaker
+from game.models import ResultConfig, Faction
 from .models import Result
 
 
