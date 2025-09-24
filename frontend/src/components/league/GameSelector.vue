@@ -22,7 +22,7 @@
           :text-color="getPlatformColor(p.name).color"
           @click="platform = platform?.id === p.id ? null : p"
         >
-          {{ p.name }}
+          {{ p.name.length > 10 ? p.name.slice(0,11) : p.name }}
         </q-btn>
       </q-btn-group>
     </div>
@@ -179,7 +179,7 @@ const handleSubmit = async () => {
 const { setActions, setLeadText, setSubject } = useActionBar();
 
 setActions([
-  { name: 'Confirm', callback: handleSubmit, buttonVariant: 'positive' },
+  { name: 'Confirm', callback: handleSubmit, buttonVariant: 'positive', buttonFilled: true },
 ]);
 setLeadText(() => h('div', 'Confirm your game selection'));
 watch(gameSelection, (newVal) => {
@@ -211,6 +211,6 @@ onMounted(loadPlatformsAndGames);
 
 <style lang="scss">
 .select-width {
-  width: 140px;
+  width: 120px;
 }
 </style>
