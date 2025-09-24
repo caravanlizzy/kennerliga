@@ -11,26 +11,18 @@
             <div class="text-subtitle1 text-weight-medium">
               {{ member.selected_game.game_name }}
             </div>
-
-<!--            <q-badge-->
-<!--              v-if="isBannable(member)"-->
-<!--              color="accent"-->
-<!--              class="q-ml-sm"-->
-<!--              @click.stop="openBanDialog"-->
-<!--            >-->
-<!--              <q-icon name="block" class="q-mr-xs"></q-icon>-->
-<!--              BAN-->
-<!--            </q-badge>-->
           </div>
 
           <!-- Banners -->
-          <q-card flat class="q-mt-sm row q-pa-sm bg-grey-1">
+          <q-card flat class="q-mt-sm row q-pa-sm bg-grey-2">
             <div class="row items-center q-gutter-xs q-mb-xs q-mr-xs">
-              <q-icon name="block" size="18px" class="text-negative" />
-              <div class="text-caption text-weight-medium">Banned by</div>
+              <div>
+                <q-icon name="block" size="18px" class="text-negative" />
+              </div>
+              <KennerTooltip> Banned by</KennerTooltip>
             </div>
-
-            <div v-if="banners.length" class="row">
+            <q-separator vertical />
+            <div v-if="banners.length" class="row q-ml-xs">
               <UserName
                 v-for="b in banners"
                 :key="b.id"
@@ -91,6 +83,7 @@ import { storeToRefs } from 'pinia';
 import UserName from 'components/ui/UserName.vue';
 import { GameOption, useLeagueStore } from 'stores/leagueStore';
 import { TLeagueMember } from 'src/types';
+import KennerTooltip from 'components/base/KennerTooltip.vue';
 
 // Reuse the types you already defined in your store file
 type Choice = { id: number; name: string; option: number };
