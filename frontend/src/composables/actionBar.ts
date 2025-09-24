@@ -11,6 +11,7 @@ import { computed, h, ref, shallowRef, type VNode } from 'vue';
 export type TAction = {
   name: string;
   buttonVariant?: string;
+  buttonFilled?: boolean;
   callback: () => void;
   autoReset?: boolean;
 };

@@ -33,7 +33,7 @@
       </div>
     </div>
 
-    <q-separator v-if="isMeActivePlayer" inset spaced />
+    <q-separator v-if="isMeActivePlayer" inset spaced/>
 
     <div
       v-if="isMeActivePlayer"
@@ -43,26 +43,29 @@
       ]"
     >
       <div v-if="leadText" class="text-body2 text-primary q-mr-md">
-        <component :is="leadText" />
+        <component :is="leadText"/>
       </div>
 
       <div
         v-if="subject"
         class="text-body1 text-primary text-weight-bold q-mr-md"
       >
-        <component :is="subject" />
+        <component :is="subject"/>
       </div>
 
-      <div class="row items-center no-wrap q-gutter-xs">
+      <div
+        class="row items-center no-wrap q-gutter-xs"
+        :class="{'q-mt-xs': isMobile }"
+      >
         <kenner-button
           v-for="a in actions"
           :key="a.name"
-          outline
+          :outline="!a.buttonFilled"
           :color="a.buttonVariant || 'primary'"
           class="compact-btn q-px-sm q-py-xs text-caption"
           @click="handleAction(a)"
         >
-          <q-icon v-if="a.icon" :name="a.icon" size="16px" class="q-mr-xs" />
+          <q-icon v-if="a.icon" :name="a.icon" size="16px" class="q-mr-xs"/>
           <span class="btn-label">{{ a.name }}</span>
         </kenner-button>
       </div>
@@ -78,8 +81,7 @@ import { storeToRefs } from 'pinia';
 import { useResponsive } from 'src/composables/reponsive';
 
 const { actions, leadText, subject, reset } = useActionBar();
-const { activePlayer, isMeActivePlayer, statusNoun, leagueStatus } =
-  storeToRefs(useLeagueStore());
+const { activePlayer, isMeActivePlayer, statusNoun, leagueStatus } = storeToRefs(useLeagueStore());
 const { isMobile } = useResponsive();
 
 async function handleAction(action: any) {
@@ -97,7 +99,7 @@ async function handleAction(action: any) {
 <style scoped lang="scss">
 /* Keep width control here; Quasar doesn't ship border utilities */
 .actionBar {
-  width: min(100%, 800px);
+  width: min(100%, 600px);
 }
 
 /* Optional: slightly slimmer chip buttons in the action row */
