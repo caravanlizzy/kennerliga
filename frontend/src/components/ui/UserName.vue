@@ -1,36 +1,36 @@
 <template>
   <q-avatar
     :size="size"
-    class="flex flex-center rounded-borders bg-grey-3 text-weight-medium bordered"
-    :class="`text-${color}`"
+    class="flex flex-center text-weight-medium rounded-full shadow-1"
+    :class="[`bg-${bgColor}`, `text-${textColor}`]"
   >
     <span v-if="letters">{{ letters }}</span>
-    <q-icon v-else name="person" size="70%" />
-
+    <q-icon v-else name="person" size="70%"/>
     <KennerTooltip>{{ displayUsername }}</KennerTooltip>
   </q-avatar>
 
 </template>
 
 
-
-<script setup lang="ts">
+<script setup lang="ts">``
 import { computed } from 'vue';
 import KennerTooltip from 'components/base/KennerTooltip.vue';
 
 const props = withDefaults(
   defineProps<{
-    displayUsername: string;
-    size?: string;
-    color? : string;
-    maxLetters?: 1 | 2;
+    displayUsername: string
+    size?: string
+    bgColor?: string
+    textColor?: string
+    maxLetters?: 1 | 2
   }>(),
   {
-    size: '28px',
-    color: 'teal-3',
+    size: '32px',
+    bgColor: 'teal-5',
+    textColor: 'white',
     maxLetters: 2,
   }
-);
+)
 
 const clean = computed(() => (props.displayUsername || '').trim());
 const parts = computed(() => clean.value.split(/\s+/).filter(Boolean));
