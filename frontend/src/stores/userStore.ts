@@ -6,6 +6,7 @@ import { useRouter } from 'vue-router';
 export type TUser = {
   username: string;
   token: string;
+  admin: boolean;
   platform_players: { name: string }[];
 };
 
@@ -14,7 +15,7 @@ export const useUserStore = defineStore(
   () => {
     const router = useRouter();
     const user: Ref<TUser | null> = ref(null);
-    const isDev: Ref<boolean> = ref(false);
+    const isAdmin: Ref<boolean> = ref(false);
     const isAuthenticated: Ref<boolean> = ref(false);
 
     async function listUsers() {
@@ -55,6 +56,7 @@ export const useUserStore = defineStore(
     function applyLogin(userData: TUser): void {
       isAuthenticated.value = true;
       user.value = userData;
+      isAdmin.value = userData.admin;
       storeToken();
     }
 
@@ -79,7 +81,7 @@ export const useUserStore = defineStore(
       }
     }
 
-    return { user, isAuthenticated, isDev, isMe, login, logout, listUsers };
+    return { user, isAuthenticated, isAdmin, isMe, login, logout };
   },
   {
     persist: {

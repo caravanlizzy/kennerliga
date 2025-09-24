@@ -69,6 +69,7 @@ def get_user_information(user):
     token = get_token(user)
     user = {
         "username": user.username,
+        "admin": user.is_superuser,
         "token": token,
         "platform_players": get_platform_players(user)
     }
