@@ -3,7 +3,6 @@
 ## frontend
 
 - RegistrationForm
-- Avatar Initials
 - Result Overview (Landing Page)
 - PlayerProfile Page
 - store color according to rank
