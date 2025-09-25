@@ -25,8 +25,8 @@ const props = withDefaults(
     maxLetters?: 1 | 2
   }>(),
   {
-    size: '32px',
-    bgColor: 'teal-5',
+    size: '26px',
+    bgColor: 'teal-4',
     textColor: 'white',
     maxLetters: 2,
   }
