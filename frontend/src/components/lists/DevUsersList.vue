@@ -29,7 +29,7 @@ const users = ref<TUser[]>([]);
 const router = useRouter();
 async function impersonate(user: string) {
   try {
-    await login(user, 'test');
+    await login(user, 'test', { ignorePermission: true });
     await router.push({ name: 'my-league'})
   } catch (error) {
     console.error('Failed to impersonate user:', error);

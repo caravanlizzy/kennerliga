@@ -27,14 +27,18 @@ export const useUserStore = defineStore(
       }
     }
 
-    async function login(username: string, password: string): Promise<void> {
+    async function login(
+      username: string,
+      password: string,
+      { ignorePermission = false } = {}
+    ): Promise<void> {
       try {
         const { data } = await api('login/', {
           method: 'POST',
           data: { username: username, password },
         });
         const userData = data.user;
-        applyLogin(userData);
+        applyLogin(userData, ignorePermission);
         await router.push({ name: 'home' });
       } catch (error) {
         console.log(error);
@@ -53,10 +57,12 @@ export const useUserStore = defineStore(
       }
     }
 
-    function applyLogin(userData: TUser): void {
+    function applyLogin(userData: TUser, ignorePermission: boolean): void {
       isAuthenticated.value = true;
       user.value = userData;
-      isAdmin.value = userData.admin;
+      if( !ignorePermission ){
+        isAdmin.value = userData.admin;
+      }
       storeToken();
     }
 
