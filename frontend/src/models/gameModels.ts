@@ -67,7 +67,7 @@ export type SelectedGameDtoPayload = {
 
 export type BanDecisionDtoPayload = {
   username: string;
-  gameId?: number;
+  selectedGameId?: number;
   leagueId: number;
   decline?: boolean;
 };

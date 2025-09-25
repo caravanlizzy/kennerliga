@@ -1,5 +1,6 @@
-from rest_framework.serializers import ModelSerializer
 from rest_framework import serializers
+from rest_framework.serializers import ModelSerializer
+
 from game.models import Game, GameOption, GameOptionChoice, Faction, TieBreaker, ResultConfig, StartingPointSystem, \
     Platform, SelectedGame, SelectedOption, BanDecision
 from league.models import League
@@ -197,19 +198,60 @@ class FullGameSerializer(serializers.ModelSerializer):
 
 
 class BanDecisionSerializer(serializers.ModelSerializer):
-    player = serializers.PrimaryKeyRelatedField(read_only=True)
-    player_name = serializers.CharField(source='player.profile_name', read_only=True)
-    game_name = serializers.CharField(source='game.game.name', read_only=True)
+    player_banning = serializers.PrimaryKeyRelatedField(read_only=True)
+    player_banning_name = serializers.CharField(
+        source='player_banning.profile_name', read_only=True
+    )
+
+    # Client sends/receives `selected_game_id`, but we write to model field `selected_game`
+    selected_game_id = serializers.PrimaryKeyRelatedField(
+        source='selected_game',
+        queryset=SelectedGame.objects.all(),
+        required=False,
+        allow_null=True
+    )
+    selected_game_name = serializers.CharField(
+        source='selected_game.game.name', read_only=True
+    )
+
     league = serializers.PrimaryKeyRelatedField(queryset=League.objects.all(), required=True)
-    game = serializers.PrimaryKeyRelatedField(queryset=SelectedGame.objects.all(), required=False, allow_null=True)
     username = serializers.CharField(write_only=True, required=True)
 
     class Meta:
         model = BanDecision
-        fields = ['id', 'player', 'player_name', 'game', 'game_name', 'league', 'created_at', 'username']
+        fields = [
+            'id',
+            'player_banning', 'player_banning_name',
+            'selected_game_id', 'selected_game_name',  # <-- use _id here
+            'league',
+            'created_at',
+            'username',
+        ]
+        read_only_fields = [
+            'id', 'created_at',
+            'player_banning', 'player_banning_name',
+            'selected_game_name',
+        ]
+
+    def validate(self, attrs):
+        print("Raw client data:", self.initial_data)
+        print("Validated so far:", attrs)
+        league = attrs.get('league') or getattr(self.instance, 'league', None)
+        selected_game = attrs.get('selected_game')  # populated via source='selected_game'
+
+        if selected_game and league and selected_game.league_id != league.id:
+            raise serializers.ValidationError({
+                'selected_game_id': 'Selected game must belong to the same league.'
+            })
+        return attrs
 
     def create(self, validated_data):
+        print("Final validated_data in create:", validated_data)
         username = validated_data.pop('username')
-        validated_data['player'] = get_profile_by_username(username)
-        return super().create(validated_data)
-
+        validated_data['player_banning'] = get_profile_by_username(username)
+        obj, _ = BanDecision.objects.update_or_create(
+            league=validated_data['league'],
+            player_banning=validated_data['player_banning'],
+            defaults={'selected_game': validated_data.get('selected_game')}
+        )
+        return obj

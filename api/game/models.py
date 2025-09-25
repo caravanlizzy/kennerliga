@@ -68,16 +68,16 @@ class SelectedOption(models.Model):
 
 class BanDecision(models.Model):
     league = models.ForeignKey(League, on_delete=models.CASCADE, related_name='ban_decisions')
-    player = models.ForeignKey(PlayerProfile, on_delete=models.CASCADE, related_name='ban_decisions')
-    game = models.ForeignKey(SelectedGame, null=True, blank=True, on_delete=models.SET_NULL)
+    player_banning = models.ForeignKey(PlayerProfile, on_delete=models.CASCADE, related_name='ban_decisions')
+    selected_game = models.ForeignKey(SelectedGame, null=True, blank=True, on_delete=models.SET_NULL)
 
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        unique_together = ('league', 'player')
+        unique_together = ('league', 'player_banning')
 
     def __str__(self):
-        return f"{self.player} {'banned ' + str(self.game) if self.game else 'skipped banning'} in {self.league}"
+        return f"{self.player_banning} {'banned ' + str(self.game) if self.selected_game else 'skipped banning'} in {self.league}"
 
 
 class StartingPointSystem(models.Model):

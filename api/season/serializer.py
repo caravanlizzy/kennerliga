@@ -1,7 +1,8 @@
+from django.db.models import OuterRef, Exists
 from rest_framework import serializers
 
 from game.models import SelectedGame, BanDecision
-from game.serializers import SelectedGameSerializer, GameSerializer
+from game.serializers import SelectedGameSerializer
 from season.models import Season, SeasonParticipant
 
 
@@ -51,18 +52,47 @@ class SeasonParticipantSerializer(serializers.ModelSerializer):
         league = self.context.get('league')
         if not league:
             return None
-        # if a game has been banned, several games need to be returned, one with a banned flag
-        selected_game = SelectedGame.objects.filter(player=obj.profile, league=league).first()
+
+        qs = SelectedGame.objects.filter(player=obj.profile, league=league)
+
+        selected_games_count = qs.count()
+
+        if selected_games_count == 0:
+            selected_game = None
+
+        elif selected_games_count == 1:
+            selected_game = qs.first()
+
+        elif selected_games_count == 2:
+            # Any ban by someone else against THIS selected game
+            bans_by_others = BanDecision.objects.filter(
+                league=league,
+                selected_game=OuterRef('pk'),
+            ).exclude(player_banning=obj.profile)
+
+            selected_game = (
+                qs.annotate(has_ban_by_others=Exists(bans_by_others))
+                .filter(has_ban_by_others=False)
+                .order_by('id')  # tie-breaker if both unbanned
+                .first()
+            )
+
+        else:
+            raise Exception("More than 2 selected games for a player in a league.")
+
         return SelectedGameSerializer(selected_game).data if selected_game else None
 
     def get_banned_game(self, obj):
         league = self.context.get('league')
         if not league:
             return None
-        ban_decision = BanDecision.objects.filter(player=obj.profile, league=league).first()
-        return SelectedGameSerializer(ban_decision.game).data if ban_decision else None
+
+        ban = (BanDecision.objects
+               .filter(league=league, selected_game__player=obj.profile)
+               .select_related('selected_game__game')
+               .first())
+        return SelectedGameSerializer(ban.selected_game).data if ban else None
 
     def get_is_active_player(self, obj):
         league = self.context.get('league')
         return obj == league.active_player if league else False
-

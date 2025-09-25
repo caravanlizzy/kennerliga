@@ -26,6 +26,7 @@ class LeagueDetailViewSet(ReadOnlyModelViewSet):
             .select_related('profile__user')
             .order_by('rank', 'id')
             .prefetch_related(
+                # Prefetch all selected games of this player in this league
                 Prefetch(
                     'profile__selected_games',
                     queryset=SelectedGame.objects
@@ -33,16 +34,22 @@ class LeagueDetailViewSet(ReadOnlyModelViewSet):
                     .select_related('game'),
                     to_attr='selected_in_this_league',
                 ),
-                # If you have BanDecision → PlayerProfile with related_name='ban_decisions':
+                # Prefetch bans made BY this player (via player_banning)
                 Prefetch(
                     'profile__ban_decisions',
                     queryset=BanDecision.objects
                     .filter(league=league)
-                    .select_related('game'),
-                    to_attr='ban_in_this_league',
+                    .select_related('selected_game__game'),
+                    to_attr='bans_made_in_this_league',
                 ),
-                # If your BanDecision uses a different related_name, adjust the line above accordingly.
-                # If it has no related_name, use 'profile__bandecision_set' instead.
+                # Prefetch bans AGAINST this player’s selected games
+                Prefetch(
+                    'profile__selected_games__bandecision_set',
+                    queryset=BanDecision.objects
+                    .filter(league=league)
+                    .select_related('player_banning', 'selected_game__game'),
+                    to_attr='bans_against_in_this_league',
+                ),
             )
         )
 
@@ -51,6 +58,6 @@ class LeagueDetailViewSet(ReadOnlyModelViewSet):
 
         serializer = LeagueDetailSerializer(
             league,
-            context={'league': league}  # still handy for is_active_player, etc.
+            context={'league': league}
         )
         return Response(serializer.data)

@@ -1,11 +1,7 @@
 <template>
   <div class="selected-game-card">
-    <!-- Selected Game -->
     <div v-if="member.selected_game" class="game-container">
-      <div
-        class="card-header row items-start justify-between"
-        :class="{ 'cursor-pointer': isBannable(member) }"
-      >
+      <div class="card-header row items-start justify-between">
         <div class="column">
           <div class="row items-center no-wrap">
             <div class="text-subtitle1 text-weight-medium">
@@ -19,16 +15,20 @@
               <div>
                 <q-icon name="block" size="18px" class="text-negative" />
               </div>
-              <KennerTooltip> Banned by</KennerTooltip>
+              <KennerTooltip>Banned by</KennerTooltip>
             </div>
             <q-separator vertical />
+
             <div v-if="banners.length" class="row q-ml-xs">
               <UserName
-                v-for="b in banners"
-                :key="b.id"
-                :display-username="b.username"
-                :color-class="b.colorClass"
-              ></UserName>
+                v-for="(name, idx) in banners"
+                :key="idx"
+                :display-username="name"
+                :color-class="'bg-grey-2'"
+              />
+            </div>
+            <div v-else class="q-ml-sm text-grey-7">
+              No bans yet
             </div>
           </q-card>
         </div>
@@ -43,7 +43,6 @@
           @click="isExpanded = !isExpanded"
           color="primary"
         />
-
       </div>
 
       <q-card-section v-if="isExpanded" class="card-body">
@@ -58,9 +57,9 @@
               {{ opt.game_option.name }}
             </td>
             <td class="text-right">
-          <span v-if="opt.choice" class="text-primary">
-            {{ opt.choice.name }}
-          </span>
+                <span v-if="opt.choice" class="text-primary">
+                  {{ opt.choice.name }}
+                </span>
               <q-icon v-else-if="opt.value === true" name="check_circle" color="positive" />
               <q-icon v-else-if="opt.value === false" name="cancel" color="negative" />
               <q-icon v-else name="help_outline" color="grey" />
@@ -69,24 +68,18 @@
           </tbody>
         </q-markup-table>
       </q-card-section>
-
-
-
     </div>
-
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue';
-import { storeToRefs } from 'pinia';
+import { ref, computed } from 'vue';
 import UserName from 'components/ui/UserName.vue';
-import { GameOption, useLeagueStore } from 'stores/leagueStore';
-import { TLeagueMember } from 'src/types';
 import KennerTooltip from 'components/base/KennerTooltip.vue';
 
-// Reuse the types you already defined in your store file
+// --- types trimmed to what we actually render ---
 type Choice = { id: number; name: string; option: number };
+type GameOption = { id: number; name: string; /* other fields omitted */ };
 
 type SelectedOption = {
   id: number;
@@ -94,31 +87,22 @@ type SelectedOption = {
   choice: Choice | null;
   value: boolean | null;
 };
+
 type SelectedGame = {
   id: number;
   game: number;
   game_name: string;
   selected_options: SelectedOption[];
 };
-type BannedGameFull = {
-  id: number;
-  game: number;
-  game_name: string;
-  selected_options: SelectedOption[];
-};
-type BannedGameEmpty = {
-  game: null;
-  selected_options: [];
-  leagueId: null;
-  playerProfileId: null;
-};
-type BannedGame = BannedGameFull | BannedGameEmpty;
+
 type Member = {
   id: number;
   username: string;
   profile_name: string;
   selected_game: SelectedGame | null;
-  banned_game: BannedGame;
+  // NEW from backend:
+  banned_by: string[];           // array of display names (e.g., profile_name or username)
+  selected_game_id?: number | null; // optional convenience
   is_active_player: boolean;
   rank: number;
   position: number;
@@ -127,38 +111,12 @@ type Member = {
 
 const props = defineProps<{
   member: Member;
-  isBannable?: (m: TLeagueMember) => boolean;
 }>();
-
-const league = useLeagueStore();
-const { members } = storeToRefs(league);
 
 const isExpanded = ref(false);
 
-function isBannedGameFull(bg: BannedGame): bg is BannedGameFull {
-  return (bg as BannedGameFull).id != null;
-}
-
-const myGameId = computed(() => props.member.selected_game?.id ?? null);
-
-const banners = computed(() => {
-  const id = myGameId.value;
-  if (!id) return [];
-  // Members whose banned_game matches my selected_game
-  return members.value
-    .filter(
-      (m) =>
-        m.banned_game &&
-        isBannedGameFull(m.banned_game) &&
-        m.banned_game.id === id
-    )
-    .map((m) => ({
-      username: m.username,
-      colorClass: m.colorClass ?? 'bg-grey-2',
-    }));
-});
-
-
+// Directly use backend-provided banned_by
+const banners = computed(() => props.member.banned_by ?? []);
 </script>
 
 <style scoped lang="scss">
@@ -167,7 +125,6 @@ const banners = computed(() => {
   border-radius: 8px;
   overflow: hidden;
 }
-
 .rotate-180 {
   transform: rotate(180deg);
 }

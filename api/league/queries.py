@@ -19,7 +19,7 @@ def all_players_have_picked(league: League) -> bool:
 def all_players_have_banned(league: League) -> bool:
     """Check if all league members have submitted at least one ban."""
     for participant in league.members.all():
-        if not BanDecision.objects.filter(league=league, player=participant.profile).exists():
+        if not BanDecision.objects.filter(league=league, player_banning=participant.profile).exists():
             return False
     return True
 
@@ -30,10 +30,14 @@ def get_players_to_repick(league: League) -> List:
     min_bans = 2 if league.members.count() > 2 else 1
 
     for member in league.members.all():
-        selected_games = SelectedGame.objects.filter(player=member.profile, league=league)
-        if selected_games.count() == 1:
-            sg = selected_games.first()
-            ban_count = BanDecision.objects.filter(league=league, game=sg).count()
+        qs = SelectedGame.objects.filter(player=member.profile, league=league)
+        sgs = list(qs.only('id')[:2])           # 1 query, avoids count()+first() double hit
+        if len(sgs) == 1:
+            sg = sgs[0]
+            ban_count = BanDecision.objects.filter(
+                league=league,
+                selected_game=sg               # or: selected_game_id=sg.id
+            ).count()
             if ban_count >= min_bans:
                 repick_players.append(member)
     return repick_players

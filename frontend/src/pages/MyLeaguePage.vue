@@ -125,11 +125,11 @@ function handleSubmit(selectedGameId: number) {
 setLeadText('Select a game to ban');
 setActions(
   Object.values(selectedGamesById.value)
-    .filter((game) => game.selected_by !== user?.username)
-    .map((game) => ({
-      name: `${game.game_name}`,
-      buttonVariant: 'accent',
-      callback: () => handleBanGame(game.id, game.game_name),
+    .filter((selectedGame) => selectedGame.selected_by !== user?.username)
+    .map((selectedGame) => ({
+      name: `${selectedGame.game_name}`,
+      buttonVariant: 'primary',
+      callback: () => handleBanGame(selectedGame.id, selectedGame.game_name),
     }))
 );
 
@@ -151,7 +151,7 @@ watch(isMeBanningGame, () => {
 const { setDialog } = useDialog();
 const $q = useQuasar();
 
-function handleBanGame(gameId: number, gameName: string) {
+function handleBanGame(selectedGameId: number, gameName: string) {
   const notifyType = undefined;
   setDialog(
     'Confirm Ban',
@@ -162,7 +162,7 @@ function handleBanGame(gameId: number, gameName: string) {
         await banGame({
           leagueId: leagueId.value,
           username: user.username,
-          gameId,
+          selectedGameId
         });
         await updateLeagueData();
         $q.notify({

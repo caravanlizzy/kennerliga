@@ -9,8 +9,8 @@ export async function banGame(banDecision: BanDecisionDtoPayload) {
   if (banDecision.decline) {
     data.declined_ban = banDecision.decline;
   }
-  if (banDecision.gameId) {
-    data.game = banDecision.gameId;
+  if (banDecision.selectedGameId) {
+    data.selected_game_id = banDecision.selectedGameId;
   }
 
   try {
