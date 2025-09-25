@@ -51,8 +51,7 @@
 
     <!-- Right: controls -->
     <div class="row justify-center items-center">
-      <KennerButton @click="toggleDev" color="white" icon="build" flat>
-      </KennerButton>
+      <KennerButton @click="toggleDev" color="white" icon="build" flat />
 
       <UserName
         v-if="isAuthenticated"
@@ -71,7 +70,6 @@
         v-else
         flat
         color="white"
-        text-color="secondary"
         icon="login"
         :to="{ name: 'login' }"
       />
@@ -95,7 +93,7 @@ defineProps<{
 
 const router = useRouter();
 const { toggleDev } = useUiStore();
-const { isAuthenticated, user } = storeToRefs(useUserStore());
+const { isAuthenticated, user, isAdmin } = storeToRefs(useUserStore());
 const { isMeActivePlayer } = storeToRefs(useLeagueStore());
 const { isMobile } = useResponsive();
 
