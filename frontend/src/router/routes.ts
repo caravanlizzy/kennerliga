@@ -26,7 +26,18 @@ const routes: RouteRecordRaw[] = [
       {
         path: '',
         name: 'login',
-        component: () => import('pages/account/TheLoginPage.vue'),
+        component: () => import('pages/account/LoginPage.vue'),
+      },
+    ],
+  },
+  {
+    path: '/register',
+    component: () => import('layouts/LoginLayout.vue'),
+    children: [
+      {
+        path: '',
+        name: 'register',
+        component: () => import('pages/account/RegistraionPage.vue'),
       },
     ],
   },
@@ -51,7 +62,7 @@ const routes: RouteRecordRaw[] = [
     ],
   },
 
-  // Always leave this as last one,
+  // Always leave this as the last one,
   // but you can also remove it
   {
     path: '/:catchAll(.*)*',
