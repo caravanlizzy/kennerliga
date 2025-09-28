@@ -1,5 +1,8 @@
 import random
+import secrets
+import string
 
+from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.response import Response
@@ -90,20 +93,36 @@ class MeViewSet(ViewSet):
 class UserInvitationViewSet(ModelViewSet):
     queryset = UserInvitation.objects.all()
     serializer_class = UserInvitationSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAdminUser]   # or [IsAdminUser] if only admins may invite
+    http_method_names = ["post", "delete", "get", "head", "options"]  # adjust as needed
 
-    def create(self, request):
-        username = request.data.get('username')
-        if not username:
-            return Response({'detail': 'Username is required.'}, status=400)
-        otp = str(random.randint(1000, 9999))
-        UserInvitation.objects.create(username=username, otp=otp)
-        return Response({'otp': otp})
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
 
-    def destroy(self, request, pk=None):
+        username = serializer.validated_data["username"]
+
+        # Block duplicate invites or existing users
+        if User.objects.filter(username=username).exists():
+            return Response({"detail": "User already exists."}, status=status.HTTP_400_BAD_REQUEST)
+        if UserInvitation.objects.filter(username=username).exists():
+            return Response({"detail": "Invitation already exists for this username."}, status=status.HTTP_400_BAD_REQUEST)
+
+        invitation = UserInvitation.objects.create(
+            username=username,
+            otp=generate_otp(4),
+            created_by=request.user  # requires a field on the model, optional
+        )
+
+        # Return only what you need. If OTP must be shown once, include it here.
+        data = self.get_serializer(invitation).data
+        data["otp"] = invitation.otp
+        return Response(data, status=status.HTTP_201_CREATED)
+
+    def destroy(self, request, *args, **kwargs):
         invitation = self.get_object()
         invitation.delete()
-        return Response({'detail': 'Invitation deleted.'})
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class UserRegistrationViewSet(ViewSet):
@@ -136,3 +155,8 @@ class UserRegistrationViewSet(ViewSet):
 
         except Exception as e:
             return Response({'detail': str(e)}, status=400)
+
+
+def generate_otp(length=4):
+    # digits only to match your 4-digit flow; increase length if you can
+    return ''.join(secrets.choice(string.digits) for _ in range(length))

@@ -1,46 +1,71 @@
+from django.conf import settings
 from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.validators import UnicodeUsernameValidator
 from django.db import models
-from django.db.models import Q
+from django.db.models.functions import Lower
 
-
-# Create your models here.
 class User(AbstractUser):
+    # remove inherited first_name/last_name
     first_name = None
     last_name = None
+
+    # Re-declare username with your length but keep validators & uniqueness
+    username_validator = UnicodeUsernameValidator()
+
     username = models.CharField(
         max_length=44,
         unique=True,
         blank=False,
         null=False,
-        help_text='Username is used to login'
+        help_text='Username is used to login',
+        validators=[username_validator],
+        error_messages={
+            "unique": "A user with that username already exists.",
+        },
     )
-    password = models.CharField(max_length=128, blank=False, null=False)
-    USERNAME_FIELD = 'username'
 
-    # REQUIRED_FIELDS = ['username']
+    USERNAME_FIELD = 'username'
+    REQUIRED_FIELDS = []
 
     def __str__(self):
         return str(self.username)
 
 
+
 class Platform(models.Model):
-    name = models.CharField(max_length=255)
+    name = models.CharField(max_length=255, unique=True)
 
     def __str__(self):
         return str(self.name)
 
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(Lower('name'), name='uniq_platform_name_ci'),
+        ]
+
 
 class UserInvitation(models.Model):
-    username = models.TextField()
-    otp = models.TextField()
+    username = models.CharField(max_length=44, db_index=True)
+    otp = models.CharField(max_length=10)
     failed_attempts = models.IntegerField(default=0)
+    created_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="invitations"
+    )
     created_at = models.DateTimeField(auto_now_add=True)
+    expires_at = models.DateTimeField(null=True, blank=True)
 
     def __str__(self):
-        return f"{self.username} invited at {self.created_at}"
+        return f"Invitation for {self.username} (by {self.created_by})"
 
     class Meta:
         ordering = ['-created_at']
+        constraints = [
+            models.UniqueConstraint(
+                fields=['username'], name='unique_invite_per_username'
+            )
+        ]
 
 
 class PlayerProfile(models.Model):
@@ -69,22 +94,5 @@ class PlatformPlayer(models.Model):
             )
         ]
 
-
-class YearlyGameSelection(models.Model):
-    player_profile = models.ForeignKey(PlayerProfile, on_delete=models.CASCADE, related_name='yearly_selections')
-    year = models.IntegerField()
-    game = models.ForeignKey('game.Game', on_delete=models.CASCADE)
-    selection_count = models.IntegerField()  # Tracks how many times this game has been selected (1-3)
-    selected_in_season = models.ForeignKey('season.Season', on_delete=models.CASCADE, null=True, blank=True)
-
-    class Meta:
-        ordering = ['-year', 'selected_in_season']
-        constraints = [
-            models.UniqueConstraint(
-                fields=['player_profile', 'year', 'game', 'selection_count'],
-                name='uniq_profile_year_game_selcount',
-            ),
-        ]
-
     def __str__(self):
-        return f"{self.player_profile.profile_name}'s selection #{self.selection_count} of {self.game} in {self.year}"
+        return f"{self.player_profile} @ {self.platform} as {self.name}"
