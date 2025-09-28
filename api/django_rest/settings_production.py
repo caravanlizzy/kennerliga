@@ -3,6 +3,8 @@ from .settings import *
 
 SECRET_KEY = os.getenv("SECRET_KEY")
 
+FRONTEND_REGISTER_URL = 'www.kennerliga.de/#/register'
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
