@@ -1,8 +1,10 @@
+from django.contrib.auth import get_user_model
 from rest_framework.serializers import ModelSerializer, Serializer
 from rest_framework import serializers
 
-from user.models import User, PlayerProfile, UserInvitation
+from user.models import PlayerProfile, UserInviteLink
 
+User = get_user_model()
 
 class UserSerializer(ModelSerializer):
     class Meta:
@@ -16,13 +18,19 @@ class PlayerProfileSerializer(ModelSerializer):
         fields = ['id', 'username', 'profile_name']
 
 
-class UserInvitationSerializer(ModelSerializer):
+class UserInviteLinkSerializer(serializers.ModelSerializer):
     class Meta:
-        model = UserInvitation
-        fields = '__all__'
+        model = UserInviteLink
+        fields = ["id", "label", "created_by", "created_at", "expires_at"]
+        read_only_fields = ["id", "created_by", "created_at"]
 
 
-class UserRegistrationSerializer(Serializer):
-    username = serializers.CharField(required=True)
-    password = serializers.CharField(required=True, write_only=True)
-    otp = serializers.CharField(required=True)
+class UserRegistrationSerializer(serializers.Serializer):
+    username = serializers.CharField(max_length=150)
+    password = serializers.CharField(write_only=True)
+    invite_key = serializers.CharField(write_only=True)
+
+    def validate_username(self, value):
+        if User.objects.filter(username=value).exists():
+            raise serializers.ValidationError("Username already taken.")
+        return value

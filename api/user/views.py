@@ -1,10 +1,10 @@
-import random
-import secrets
-import string
+from urllib.parse import urlencode
 
+from django.conf import settings
+from django.db import transaction
 from rest_framework import status
 from rest_framework.decorators import action
-from rest_framework.permissions import IsAuthenticated, IsAdminUser
+from rest_framework.permissions import IsAuthenticated, IsAdminUser, AllowAny
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet, ViewSet
 
@@ -14,8 +14,8 @@ from result.models import Result
 from result.serializers import ResultSerializer
 from season.models import Season, SeasonParticipant
 from season.serializer import SeasonSerializer
-from user.models import User, UserInvitation, PlayerProfile, Platform, PlatformPlayer
-from user.serializers import UserSerializer, UserInvitationSerializer
+from user.models import User, PlayerProfile, Platform, PlatformPlayer, _hash_key, UserInviteLink
+from user.serializers import UserSerializer, UserInviteLinkSerializer, UserRegistrationSerializer
 
 
 # Create your views here.
@@ -55,8 +55,6 @@ class UserViewSet(ModelViewSet):
         return Response(serializer.data)
 
 
-
-
 class MeViewSet(ViewSet):
     permission_classes = [IsAuthenticated]
 
@@ -90,73 +88,122 @@ class MeViewSet(ViewSet):
         return Response(ResultSerializer(results, many=True).data)
 
 
-class UserInvitationViewSet(ModelViewSet):
-    queryset = UserInvitation.objects.all()
-    serializer_class = UserInvitationSerializer
-    permission_classes = [IsAdminUser]   # or [IsAdminUser] if only admins may invite
-    http_method_names = ["post", "delete", "get", "head", "options"]  # adjust as needed
+class UserInviteLinkViewSet(ModelViewSet):
+    """
+    Admin-only:
+      - GET    /invite-links/        list
+      - POST   /invite-links/        create (returns raw invite_key once)
+      - GET    /invite-links/{id}/   retrieve
+      - DELETE /invite-links/{id}/   destroy
+    """
+    queryset = UserInviteLink.objects.select_related("created_by").all()
+    serializer_class = UserInviteLinkSerializer
+    permission_classes = [IsAdminUser]
+    http_method_names = ["get", "post", "delete", "head", "options"]
 
     def create(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
+        ser = self.get_serializer(data=request.data)
+        ser.is_valid(raise_exception=True)
 
-        username = serializer.validated_data["username"]
+        label = ser.validated_data.get("label", "")
+        expires_at = ser.validated_data.get("expires_at")
 
-        # Block duplicate invites or existing users
-        if User.objects.filter(username=username).exists():
-            return Response({"detail": "User already exists."}, status=status.HTTP_400_BAD_REQUEST)
-        if UserInvitation.objects.filter(username=username).exists():
-            return Response({"detail": "Invitation already exists for this username."}, status=status.HTTP_400_BAD_REQUEST)
-
-        invitation = UserInvitation.objects.create(
-            username=username,
-            otp=generate_otp(4),
-            created_by=request.user  # requires a field on the model, optional
+        invite, raw_key = UserInviteLink.create_with_random_key(
+            created_by=request.user,
+            label=label,
+            expires_at=expires_at,
         )
 
-        # Return only what you need. If OTP must be shown once, include it here.
-        data = self.get_serializer(invitation).data
-        data["otp"] = invitation.otp
+        frontend_base = getattr(settings, "FRONTEND_REGISTER_URL", None)
+        invite_url = None
+        if frontend_base:
+            query = urlencode({"key": raw_key})
+            sep = "&" if "?" in frontend_base else "?"
+            invite_url = f"{frontend_base}{sep}{query}"
+
+        data = self.get_serializer(invite).data
+        data.update({"invite_key": raw_key, "invite_url": invite_url})
         return Response(data, status=status.HTTP_201_CREATED)
 
-    def destroy(self, request, *args, **kwargs):
-        invitation = self.get_object()
-        invitation.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+    def update(self, request, *args, **kwargs):
+        return Response({"detail": "Updates are not allowed."}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    def partial_update(self, request, *args, **kwargs):
+        return Response({"detail": "Updates are not allowed."}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
 
 
 class UserRegistrationViewSet(ViewSet):
+    """
+    Public:
+      - POST /register/                 -> create user (consumes invite)
+      - GET  /register/validate/?key=.. -> check invite validity
+    """
+    permission_classes = [AllowAny]
+
     def create(self, request):
-        username = request.data.get('username')
-        password = request.data.get('password')
-        input_otp = request.data.get('otp')
-        if not username or not password:
-            return Response({'detail': 'Username and password are required.'}, status=400)
+        serializer = UserRegistrationSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        username = serializer.validated_data["username"]
+        password = serializer.validated_data["password"]
+        invite_key = serializer.validated_data["invite_key"]
+
+        key_hash = _hash_key(invite_key)
+
         try:
-            user_invitation = UserInvitation.objects.get(username=username)
-            if user_invitation.failed_attempts > 3:
-                return Response({'detail': 'Maximum number of failed attempts reached.'}, status=400)
-            if input_otp != user_invitation.otp:
-                user_invitation.failed_attempts += 1
-                user_invitation.save()
-                return Response({'detail': 'Invalid One Time Password.'}, status=400)
-            user = User.objects.create_user(username=username, password=password)
-            profile_name = username + '_profile'
-            player_profile = PlayerProfile.objects.create(user=user, profile_name=profile_name)
-            BGA = Platform.objects.get(name='BGA')
-            PlatformPlayer.objects.create(
-                player_profile=player_profile,
-                platform=BGA,
-                name=player_profile.user.username if player_profile.user else player_profile.profile_name
-            )
+            with transaction.atomic():
+                invite = UserInviteLink.objects.select_for_update().get(key_hash=key_hash)
 
-            user_invitation.delete()
-            return Response({f'detail': f'User {username} created successfully.'}, status=201)
+                if invite.is_expired():
+                    invite.delete()
+                    return Response({"detail": "Invite expired."}, status=400)
 
+                # Create user + related models
+                user = User.objects.create_user(username=username, password=password)
+
+                profile_name = f"{username}_profile"
+                player_profile = PlayerProfile.objects.create(user=user, profile_name=profile_name)
+
+                BGA = Platform.objects.get(name="BGA")
+                PlatformPlayer.objects.create(
+                    player_profile=player_profile,
+                    platform=BGA,
+                    name=user.username,
+                )
+
+                # Delete invite after success
+                invite.delete()
+
+            return Response({"detail": f"User {username} created successfully."}, status=201)
+
+        except UserInviteLink.DoesNotExist:
+            return Response({"detail": "Invalid invite key."}, status=400)
+        except Platform.DoesNotExist:
+            return Response({"detail": "Platform 'BGA' not configured."}, status=500)
         except Exception as e:
-            return Response({'detail': str(e)}, status=400)
+            return Response({"detail": str(e)}, status=400)
 
+    @action(detail=False, methods=["get"], url_path="validate")
+    def validate_invite(self, request):
+        raw_key = request.query_params.get("invite") or request.query_params.get("key")
+        if not raw_key:
+            return Response({"valid": False, "reason": "missing_key"}, status=400)
 
-def generate_otp(length=4):
-    # digits only to match your 4-digit flow; increase length if you can
-    return ''.join(secrets.choice(string.digits) for _ in range(length))
+        key_hash = _hash_key(raw_key)
+
+        try:
+            invite = UserInviteLink.objects.get(key_hash=key_hash)
+        except UserInviteLink.DoesNotExist:
+            return Response({"valid": False, "reason": "not_found"}, status=404)
+
+        if invite.is_expired():
+            invite.delete()
+            return Response({"valid": False, "reason": "expired"}, status=410)
+
+        return Response({
+            "valid": True,
+            "label": invite.label,
+            "expires_at": invite.expires_at,
+        }, status=200)
+

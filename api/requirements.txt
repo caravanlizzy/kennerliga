@@ -6,6 +6,7 @@ django-filter
 django-extensions
 setuptools
 python-dotenv
+python-dateutil
 
 drf_spectacular
 drf_spectacular_sidecar
