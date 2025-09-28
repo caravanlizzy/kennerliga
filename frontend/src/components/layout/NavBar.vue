@@ -1,5 +1,5 @@
 <template>
-  <q-toolbar class="q-px-none row justify-between items-center">
+  <q-toolbar class="kenner-toolbar q-px-none row justify-between items-center">
     <!-- Left: Brand -->
     <div class="row items-center">
       <template v-if="isMobile">
@@ -7,8 +7,9 @@
           :to="{ name: 'home' }"
           round
           size="md"
-          color="white"
-          text-color="secondary"
+          flat
+          :ripple="{ color: 'accent' }"
+          color="accent"
           icon="psychology"
           aria-label="Home"
           type="button"
@@ -17,15 +18,14 @@
       <template v-else>
         <q-chip
           clickable
-          :to="{ name: 'home' }"
-          color="secondary"
-          text-color="white"
-          :ripple="{ color: 'white' }"
-          class="kenner-brand q-px-sm q-py-xs"
+          @click="goHome()"
+          outline
+          color="accent"
+          text-color="accent"
+          :ripple="{ color: 'accent' }"
+          class="q-px-sm q-py-xs"
         >
-          <q-avatar size="18px" class="bg-white text-secondary">
-            <q-icon name="psychology" size="16px" />
-          </q-avatar>
+          <q-icon name="psychology" size="16px" color="accent" />
           <span class="q-ml-sm text-weight-medium">Kennerliga</span>
         </q-chip>
       </template>
@@ -36,22 +36,35 @@
       <q-btn
         v-if="isAuthenticated"
         :to="{ name: 'my-league' }"
+        outline
         color="primary"
-        text-color="white"
-        class="my-league-btn q-px-md q-py-xs rounded-full shadow-2"
-        :style="isMeActivePlayer ? 'border: 2px solid #FFC107;' : ''"
+        class="q-px-md q-py-xs rounded-borders"
+        :ripple="{ color: 'accent' }"
         no-caps
-        unelevated
         type="button"
       >
-        <q-icon name="emoji_events" color="amber-4" />
-        <span v-show="!isMobile" class="text-weight-medium">My League</span>
+        <q-icon name="emoji_events" />
+        <span v-show="!isMobile" class="text-weight-medium q-ml-xs">My League</span>
+
+        <!-- tiny positive indicator when user is active player -->
+        <q-badge
+          v-if="isMeActivePlayer"
+          floating
+          rounded
+          color="positive"
+        />
       </q-btn>
     </q-toolbar-title>
 
     <!-- Right: controls -->
     <div class="row justify-center items-center">
-      <KennerButton @click="toggleDev" color="white" icon="build" flat />
+      <KennerButton
+        @click="toggleDev"
+        flat
+        color="accent"
+        icon="build"
+        :ripple="{ color: 'accent' }"
+      />
 
       <UserName
         v-if="isAuthenticated"
@@ -61,21 +74,25 @@
       <KennerButton
         v-if="isAuthenticated"
         flat
-        color="white"
+        color="primary"
         icon="menu"
         @click="onToggle"
+        :ripple="{ color: 'accent' }"
       />
 
       <KennerButton
         v-else
         flat
-        color="white"
+        color="positive"
         icon="login"
         :to="{ name: 'login' }"
+        :ripple="{ color: 'accent' }"
       />
     </div>
   </q-toolbar>
 </template>
+
+
 
 <script setup lang="ts">
 import KennerButton from 'components/base/KennerButton.vue';
@@ -93,7 +110,7 @@ defineProps<{
 
 const router = useRouter();
 const { toggleDev } = useUiStore();
-const { isAuthenticated, user, isAdmin } = storeToRefs(useUserStore());
+const { isAuthenticated, user } = storeToRefs(useUserStore());
 const { isMeActivePlayer } = storeToRefs(useLeagueStore());
 const { isMobile } = useResponsive();
 

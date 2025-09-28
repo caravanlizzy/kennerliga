@@ -1,10 +1,8 @@
 <template>
   <q-layout class="column" view="hHh Lpr lFf">
-    <q-header>
-      <q-toolbar class="bg-secondary">
-        <NavBar :onToggle="toggleDrawer" />
-      </q-toolbar>
-      <DevTools v-show="isDev"/>
+    <q-header bordered class="bg-transparent text-primary">
+      <NavBar :onToggle="toggleDrawer" />
+      <DevTools v-show="isDev" />
       <Announcements v-if="announcements.length > 0" />
     </q-header>
 
@@ -27,7 +25,6 @@ import Announcements from 'components/announcement/AnnouncementList.vue';
 import { useAnnouncementStore } from 'stores/announcementStore';
 import KennerDrawer from 'components/layout/KennerDrawer.vue';
 import ConfirmDialog from 'components/ui/ConfirmDialog.vue';
-import DevUsersList from 'components/lists/DevUsersList.vue';
 import { useUiStore } from 'stores/uiStore';
 import { storeToRefs } from 'pinia';
 import DevTools from 'components/ui/DevTools.vue';
