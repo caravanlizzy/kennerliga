@@ -7,7 +7,6 @@
       <div class="row items-center no-wrap">
         <!-- small color dot from member.colorClass -->
         <q-icon name="circle" :class="memberColor" size="10px" class="q-mr-sm" />
-
         <span class="text-subtitle2 text-weight-medium">
           {{ member.username }}
         </span>
@@ -44,8 +43,6 @@
     <q-card-section class="q-pa-sm bg-grey-1">
       <SelectedGameInfo
         :member="member"
-        :isBannable="isBannable"
-        :isBanning="isBanning"
       />
     </q-card-section>
   </q-card>
@@ -53,21 +50,9 @@
 
 <script setup lang="ts">
 import SelectedGameInfo from 'components/league/SelectedGameInfo.vue';
-import { TLeagueMember } from 'src/types';
-import { storeToRefs } from 'pinia';
-import { useLeagueStore } from 'stores/leagueStore';
 import { computed } from 'vue';
 
 const props = defineProps<{ member: any }>();
-
-const { leagueStatus, isMeActivePlayer } = storeToRefs(useLeagueStore());
-
-function isBannable(member: TLeagueMember): boolean {
-  return leagueStatus.value === 'BANNING' && isMeActivePlayer.value && !member.is_active_player;
-}
-function isBanning(member: TLeagueMember): boolean {
-  return leagueStatus.value === 'BANNING' && member.is_active_player;
-}
 
 /**
  * Derive a Quasar color name from member.colorClass (e.g. 'bg-red-6' -> 'red-6').

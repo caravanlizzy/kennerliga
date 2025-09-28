@@ -1,16 +1,18 @@
 <template>
-  <!-- full-width wrapper so we can center the inner bar -->
   <div
-    class="column actionBar q-ma-md q-mx-auto q-pa-sm q-px-md rounded-borders bg-grey-2"
+    :class="[
+      'column actionBar q-ma-md q-mx-auto q-pa-sm q-px-md rounded-borders bg-grey-2',
+      isMeActivePlayer ? 'shadow-3' : 'shadow-1'   // subtle elevation only
+    ]"
   >
     <div
       v-if="activePlayer"
       class="row items-center justify-around status-line q-py-xs"
     >
-      <!-- Status chip -->
+      <!-- Status chip (unchanged: neutral primary outline) -->
       <q-chip
         color="primary"
-        text-color="white"
+        text-color="primary"
         square
         outline
         dense
@@ -22,20 +24,21 @@
       <!-- Active player turn -->
       <div class="row items-center no-wrap text-subtitle1 text-italic">
         <q-chip
-          :class="activePlayer?.color"
-          text-color="white"
-          square
-          outline
-          dense
-          class="q-mr-xs text-weight-bold"
+          :color="playerChipColor"
+        :text-color="playerChipColor"
+        square
+        outline
+        dense
+        class="q-mr-xs text-weight-bold"
         >
-          {{ activePlayer?.username }}
+        {{ activePlayer?.username }}
         </q-chip>
         <span>'s turn</span>
+        <span v-if="isMeActivePlayer" class="q-ml-xs text-caption text-primary">(you)</span>
       </div>
     </div>
 
-    <q-separator v-if="isMeActivePlayer" inset spaced/>
+    <q-separator v-if="isMeActivePlayer" inset spaced />
 
     <div
       v-if="isMeActivePlayer"
@@ -48,17 +51,11 @@
         <component :is="leadText"/>
       </div>
 
-      <div
-        v-if="subject"
-        class="text-body1 text-primary text-weight-bold q-mr-md"
-      >
+      <div v-if="subject" class="text-body1 text-primary text-weight-bold q-mr-md">
         <component :is="subject"/>
       </div>
 
-      <div
-        class="row items-center no-wrap q-gutter-xs"
-        :class="{'q-mt-xs': isMobile }"
-      >
+      <div class="row items-center no-wrap q-gutter-xs" :class="{ 'q-mt-xs': isMobile }">
         <kenner-button
           v-for="a in actions"
           :key="a.name"
@@ -76,6 +73,7 @@
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue';
 import { useActionBar } from 'src/composables/actionBar';
 import KennerButton from 'components/base/KennerButton.vue';
 import { useLeagueStore } from 'stores/leagueStore';
@@ -83,30 +81,30 @@ import { storeToRefs } from 'pinia';
 import { useResponsive } from 'src/composables/reponsive';
 
 const { actions, leadText, subject, reset } = useActionBar();
-const { activePlayer, isMeActivePlayer, statusNoun, leagueStatus } = storeToRefs(useLeagueStore());
+const { activePlayer, isMeActivePlayer, statusNoun } = storeToRefs(useLeagueStore());
 const { isMobile } = useResponsive();
 
 async function handleAction(action: any) {
   try {
     action.callback();
-    if (action.autoReset) {
-      reset();
-    }
+    if (action.autoReset) reset();
   } catch (e) {
     console.error(e);
   }
 }
+
+/** Derive a Quasar color name from player's class (e.g. 'bg-red-6' -> 'red-6').
+ *  If it's my turn, use 'accent' as a subtle cue. */
+const playerChipColor = computed(() => {
+  if (isMeActivePlayer.value) return 'accent';
+  const cls = (activePlayer.value as any)?.color || '';
+  const first = String(cls).split(/\s+/)[0];
+  const derived = first.replace(/^bg-/, '');
+  return derived || 'primary';
+});
 </script>
 
 <style scoped lang="scss">
-/* Keep width control here; Quasar doesn't ship border utilities */
-.actionBar {
-  width: min(100%, 600px);
-}
-
-/* Optional: slightly slimmer chip buttons in the action row */
-.compact-btn {
-  min-height: 32px;
-  font-size: 0.75rem;
-}
+.actionBar { width: min(100%, 600px); }
+.compact-btn { min-height: 32px; font-size: 0.75rem; }
 </style>
