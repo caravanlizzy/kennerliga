@@ -9,7 +9,6 @@ from game.serializers import GameSerializer, GameOptionSerializer, GameOptionCho
     SelectedGameSerializer, SelectedOptionSerializer, FullGameSerializer, BanDecisionSerializer
 
 from league.services import LeagueService
-from user.models import YearlyGameSelection
 
 
 class GameViewSet(ModelViewSet):
@@ -29,18 +28,7 @@ class GameViewSet(ModelViewSet):
             ).values_list("game_id", flat=True)
             queryset = queryset.exclude(id__in=selected_games)
 
-        # Optionally: Exclude games selected 3 times in the current year by any user
-        exclude_repeated = self.request.query_params.get("exclude_repeated", "false").lower() == "true"
-        if exclude_repeated:
-            current_year = datetime.now().year
-            repeated_games = YearlyGameSelection.objects.filter(
-                year=current_year,
-                selection_count=3
-            ).values_list("game_id", flat=True)
-            queryset = queryset.exclude(id__in=repeated_games)
-
         return queryset
-
 
 
 class GameOptionViewSet(ModelViewSet):
