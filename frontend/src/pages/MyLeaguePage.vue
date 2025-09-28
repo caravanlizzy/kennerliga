@@ -80,7 +80,6 @@
 <script setup lang="ts">
 import { onMounted, ref, watch, watchEffect } from 'vue';
 import GameSelector from 'components/league/GameSelector.vue';
-import LeagueStatusBar from 'components/league/LeagueStatusBar.vue';
 import { useLeagueStore } from 'stores/leagueStore';
 import { storeToRefs } from 'pinia';
 import MatchResultForm from 'components/league/MatchResultForm.vue';

@@ -58,6 +58,7 @@
           <q-chip
             dense
             square
+            outline
             class="q-mt-xs"
             :color="getPlatformColor(getPlatformName(game.platform)).color"
             :text-color="getPlatformColor(getPlatformName(game.platform)).text"

@@ -12,6 +12,7 @@
         color="primary"
         text-color="white"
         square
+        outline
         dense
         class="text-uppercase text-bold"
       >
@@ -21,9 +22,10 @@
       <!-- Active player turn -->
       <div class="row items-center no-wrap text-subtitle1 text-italic">
         <q-chip
-          :class="activePlayer?.colorClass"
+          :class="activePlayer?.color"
           text-color="white"
           square
+          outline
           dense
           class="q-mr-xs text-weight-bold"
         >
