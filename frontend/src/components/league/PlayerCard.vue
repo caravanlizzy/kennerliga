@@ -32,7 +32,7 @@
           Game
         </q-badge>
 
-        <q-badge v-if="member.banned_game" outline color="negative" text-color="negative">
+        <q-badge v-if="member.has_banned" outline color="negative" text-color="negative">
           <q-icon name="block" size="14px" class="q-mr-xs" />
           Ban
         </q-badge>

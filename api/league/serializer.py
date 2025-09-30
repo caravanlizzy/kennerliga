@@ -1,6 +1,6 @@
 from collections import defaultdict
 
-from django.db.models import Count
+from django.db.models import Count, Exists, OuterRef
 from rest_framework import serializers
 
 from game.models import BanDecision
@@ -23,7 +23,19 @@ class LeagueDetailSerializer(serializers.ModelSerializer):
 
     def get_members(self, league):
         # Render members with your existing participant serializer
-        members_qs = league.members.all().order_by('rank')
+        members_qs = (
+            league.members
+            .select_related('profile__user')
+            .annotate(
+                has_banned=Exists(
+                    BanDecision.objects.filter(
+                        league=league,
+                        player_banning_id=OuterRef('profile_id'),
+                    )
+                )
+            )
+            .order_by('rank')
+        )
         serializer = SeasonParticipantSerializer(
             members_qs,
             many=True,
