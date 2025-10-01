@@ -24,9 +24,10 @@
       >
         <!-- Game Tabs for Entering Results -->
         <q-tabs
+          v-model="currentFormSelectedGameId"
           active-color="primary"
           indicator-color="primary"
-          v-model="currentFormSelectedGameId"
+          :vertical="isMobile"
         >
           <q-tab
             v-for="selectedGame in selectedGamesFetchedEmpty"
@@ -36,6 +37,7 @@
             {{ selectedGame.game_name }}
           </q-tab>
         </q-tabs>
+
 
         <!-- Match Result Entry Form -->
         <MatchResultForm
@@ -92,6 +94,7 @@ import { useUserStore } from 'stores/userStore';
 import { useDialog } from 'src/composables/dialog';
 import { useQuasar } from 'quasar';
 import ActionBar from 'components/ui/ActionBar.vue';
+import { useResponsive } from 'src/composables/reponsive';
 
 const league = useLeagueStore();
 
@@ -148,6 +151,7 @@ watch(isMeBanningGame, () => {
 });
 
 const { setDialog } = useDialog();
+const { isMobile } = useResponsive();
 const $q = useQuasar();
 
 function handleBanGame(selectedGameId: number, gameName: string) {
