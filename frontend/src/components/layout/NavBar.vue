@@ -8,8 +8,8 @@
           round
           size="md"
           flat
-          :ripple="{ color: 'accent' }"
-          color="accent"
+          :ripple="{ color: 'positive' }"
+          color="positive"
           icon="psychology"
           aria-label="Home"
           type="button"
@@ -20,12 +20,12 @@
           clickable
           @click="goHome()"
           outline
-          color="accent"
-          text-color="accent"
-          :ripple="{ color: 'accent' }"
+          color="positive"
+          text-color="positive"
+          :ripple="{ color: 'positive' }"
           class="q-px-sm q-py-xs"
         >
-          <q-icon name="psychology" size="16px" color="accent" />
+          <q-icon name="psychology" size="16px" color="positive" />
           <span class="q-ml-sm text-weight-medium">Kennerliga</span>
         </q-chip>
       </template>
