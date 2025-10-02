@@ -7,7 +7,7 @@
     filled
     dense
     color="secondary"
-    class="rounded-borders shadow-2"
+    class="rounded-borders "
   >
   </q-select>
 </template>
