@@ -1,8 +1,7 @@
 <template>
   <div class="current-season q-pa-md">
     <q-card flat bordered class="q-pa-md">
-      <div class="text-h6">Aktuelle Saison</div>
-      <div class="text-caption text-grey">Noch keine Daten verfügbar.</div>
+      <div class="text-h6">Current Season</div>
     </q-card>
   </div>
 </template>

@@ -1,8 +1,7 @@
 <template>
   <div class="season-list q-pa-md">
     <q-card flat bordered class="q-pa-md">
-      <div class="text-h6">Vergangene Saisons</div>
-      <div class="text-caption text-grey">Saisonliste wird hier angezeigt.</div>
+      <div class="text-h6">Past Seasons</div>
     </q-card>
   </div>
 </template>

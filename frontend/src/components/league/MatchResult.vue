@@ -4,9 +4,10 @@
       <div class="text-h6 text-primary">{{ gameName ?? '—' }}</div>
 <!--      <q-badge color="primary" label="Ergebnis" />-->
     </div>
+    huhu
 
     <template v-if="results.length === 0">
-      <div class="text-caption text-grey-7">Noch keine Ergebnisse.</div>
+      <div class="text-caption text-grey-7">Noch keine .</div>
     </template>
 
     <template v-else>
