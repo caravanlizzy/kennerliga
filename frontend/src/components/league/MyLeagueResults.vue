@@ -11,7 +11,6 @@
     </div>
 
     <!-- League standings -->
-    <LeagueStandings class="q-ml-auto" />
   </div>
 </template>
 
@@ -25,9 +24,3 @@ import LeagueStandings from 'components/league/LeagueStandings.vue';
 import { useLeagueStore } from 'stores/leagueStore';
 </script>
 
-<style scoped>
-.border-right {
-  border-right: 1px solid #ddd;
-  margin: 2px;
-}
-</style>

@@ -1,11 +1,15 @@
 <template>
   <div>
     <ActionBar />
+    <LeagueStandings
+      v-if="leagueStatus === 'PLAYING' || leagueStatus === 'DONE'"
+    />
+
     <!-- Game Selector - shown when user needs to pick games -->
     <template v-if="isMePickingGame">
       <ContentSection
         title="Game Selection"
-        color="positive"
+        color="secondary"
         :is-opened="sectionVisibilityStates['selection']"
       >
         <GameSelector
@@ -15,11 +19,14 @@
       </ContentSection>
     </template>
 
+    <template v-if="leagueStatus === 'PLAYING' || leagueStatus === 'DONE'">
+    </template>
+
     <!-- Match Results Section -->
     <template v-if="leagueStatus === 'PLAYING'">
       <ContentSection
         title="Upload Results"
-        color="accent"
+        color="positive"
         :is-opened="sectionVisibilityStates['upload']"
       >
         <!-- Game Tabs for Entering Results -->
@@ -38,7 +45,6 @@
           </q-tab>
         </q-tabs>
 
-
         <!-- Match Result Entry Form -->
         <MatchResultForm
           v-if="currentFormSelectedGameId"
@@ -51,10 +57,10 @@
       <template v-if="leagueStatus === 'PLAYING'">
         <ContentSection
           title="Results"
-          color="positive"
+          color="secondary"
           :is-opened="sectionVisibilityStates['results']"
         >
-          <MyLeagueResults />
+          Results to be displayed here
         </ContentSection>
       </template>
     </template>
@@ -95,6 +101,7 @@ import { useDialog } from 'src/composables/dialog';
 import { useQuasar } from 'quasar';
 import ActionBar from 'components/ui/ActionBar.vue';
 import { useResponsive } from 'src/composables/reponsive';
+import LeagueStandings from 'components/league/LeagueStandings.vue';
 
 const league = useLeagueStore();
 
