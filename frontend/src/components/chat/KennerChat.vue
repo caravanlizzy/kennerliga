@@ -1,11 +1,11 @@
 <template>
-  <div class="q-pa-md">
+  <SideAccentBox color="accent">
     <q-card bordered flat>
       <q-card-section class="text-h6">
         Kennerchat
       </q-card-section>
       <q-separator color="accent"/>
-      <q-card-section class="q-px-lg">
+      <q-card-section class="q-px-lg chat">
         <div class="row justify-between q-py-xs" v-for="message of messages" :key="JSON.stringify(message)">
           <div class="">
             {{ message.sender }}
@@ -25,7 +25,7 @@
         </q-input>
       </q-card-section>
     </q-card>
-  </div>
+  </SideAccentBox>
 </template>
 
 <script setup lang="ts">
@@ -34,6 +34,7 @@ import { formatDateTime } from 'src/helpers';
 import { Ref, ref } from 'vue';
 import { addMessage, getMessages, TMessage } from 'src/services/chatService';
 import KennerTooltip from 'components/base/KennerTooltip.vue';
+import SideAccentBox from 'components/base/SideAccentBox.vue';
 
 let lastDateTime: string | undefined;
 
@@ -59,4 +60,10 @@ async function loadMessages() {
 
 </script>
 
+<style scoped lang="scss">
+.chat {
+  max-height: 300px;
+  overflow-y: auto;
+}
+</style>
 
