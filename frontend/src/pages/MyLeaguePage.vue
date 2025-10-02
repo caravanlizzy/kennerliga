@@ -165,7 +165,7 @@ function handleBanGame(selectedGameId: number, gameName: string) {
         await banGame({
           leagueId: leagueId.value,
           username: user.username,
-          selectedGameId
+          selectedGameId,
         });
         await updateLeagueData();
         $q.notify({
@@ -185,16 +185,14 @@ function handleBanGame(selectedGameId: number, gameName: string) {
   );
 }
 
-/**
- * Controls visibility of UI sections based on league status
- * @type {import('vue').Ref<{
- *   selection: boolean, // Game selection section visibility
- *   upload: boolean,    // Match upload section visibility
- *   results: boolean,   // Results section visibility
- *   players: boolean    // Players section visibility
- * }>}
- */
-const sectionVisibilityStates = ref({
+interface SectionVisibilityStates {
+  selection: boolean; // Game selection section visibility
+  upload: boolean; // Match upload section visibility
+  results: boolean; // Results section visibility
+  players: boolean; // Players section visibility
+}
+
+const sectionVisibilityStates = ref<SectionVisibilityStates>({
   selection: true,
   upload: false,
   results: false,
