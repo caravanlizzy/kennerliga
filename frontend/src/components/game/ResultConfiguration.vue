@@ -1,70 +1,82 @@
 <template>
-  <div>
-    <div class="text-accent text-h6">Ergebniskonfiguration</div>
-    <div class="q-gutter-md">
-      <div class="row justify-between">
-        <div class="text-bold">Spiel mit Punkten:</div>
+  <div class="q-pa-sm">
+    <div class="text-subtitle1 text-weight-medium text-primary q-mb-sm">Result configuration</div>
+
+    <div class="column q-gutter-sm">
+
+      <div class="row items-center justify-between">
+        <div class="text-weight-medium">Points scoring</div>
         <YesNoItem :yes="hasPoints" />
       </div>
 
-      <div class="row justify-between">
-        <div class="text-bold">Startpunkte:</div>
-        <div> {{ startingPointSystem.code }} <span
-          class="text-italic">{{ startingPointSystem.description }} </span></div>
+      <q-separator />
+
+      <div class="row items-baseline justify-between">
+        <div class="text-weight-medium q-mr-md">Starting point system</div>
+        <div class="text-right">
+          <div class="text-body2">{{ startingPointSystem.code }}</div>
+          <div class="text-caption text-grey-7">{{ startingPointSystem.description }}</div>
+        </div>
       </div>
-      <div class="row justify-between">
-        <div class="text-bold">Starting Order</div>
+
+      <q-separator />
+
+      <div class="row items-center justify-between">
+        <div class="text-weight-medium">Starting order</div>
         <YesNoItem :yes="hasStartingPlayerOrder" />
       </div>
-      <div class="col">
-        <div class="row justify-between">
-          <div class="text-bold">Asymmetrisch</div>
-          <YesNoItem :yes="isAsymmetric" />
-        </div>
-        <div class="row justify-between ">
-          <div v-if="isAsymmetric" class="text-bold">
-            Factions
-          </div>
-          <div v-if="isAsymmetric">
-            <div v-for="faction of factions" :key="faction.id" class="inline-block faction">
-              <div class="q-pa-xs ">{{ faction.name }}</div>
-            </div>
+
+      <q-separator />
+
+      <div class="row items-center justify-between">
+        <div class="text-weight-medium">Asymmetric</div>
+        <YesNoItem :yes="isAsymmetric" />
+      </div>
+
+      <div v-if="isAsymmetric" class="q-pt-xs">
+        <div class="text-caption text-grey-7 q-mb-xs">Factions</div>
+        <div class="row q-col-gutter-xs">
+          <div v-for="faction in factions" :key="faction.id" class="col-auto">
+            <q-chip dense outline>{{ faction.name }}</q-chip>
           </div>
         </div>
       </div>
-      <div class="row justify-between">
-        <div> Tie Breaker</div>
-        <div>
-          <template v-if="tieBreakers.length > 0">
-            <div v-for="(tieBreaker, index) in tieBreakers" :key="tieBreaker.order">
-              {{ index + 1 }}. {{ tieBreaker.name }}
-            </div>
+
+      <q-separator />
+
+      <div class="row items-start justify-between">
+        <div class="text-weight-medium q-mr-md">Tie-breakers</div>
+        <div class="text-right">
+          <template v-if="tieBreakers.length">
+            <ol class="q-ma-none q-pa-none" style="list-style: decimal; padding-left: 1.25rem;">
+              <li v-for="(tieBreaker) in tieBreakers" :key="tieBreaker.id" class="text-body2">
+                {{ tieBreaker.name }}
+              </li>
+            </ol>
           </template>
           <template v-else>
-            Keine
+            <span class="text-grey-7">None</span>
           </template>
         </div>
       </div>
+
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-
 import YesNoItem from 'components/base/YesNoItem.vue';
 
 defineProps<{
   hasPoints: boolean;
-  startingPointSystem: { code: string, description: string };
+  startingPointSystem: { code: string; description: string };
   hasStartingPlayerOrder: boolean;
   isAsymmetric: boolean;
-  factions: { id: number, name: string }[];
-  tieBreakers: { id: number, name: string }[];
+  factions: { id: number; name: string }[];
+  tieBreakers: { id: number; name: string }[];
 }>();
 </script>
 
 <style scoped>
-.faction {
-  //border: 1px solid grey;
-}
+/* Keep styles minimal; layout handled via Quasar utility classes */
 </style>

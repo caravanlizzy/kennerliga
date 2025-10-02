@@ -64,7 +64,7 @@ const yesNoOptions = computed(() => game.options.filter(option => !option.has_ch
 
 // Create "An-/Aus Option" with all yesNoOption names as choices
 const anAusOption = computed(() => ({
-  name: 'An-/Aus Optionen', // Name for the new option
+  name: 'Enabled/Disabled Options', // Name for the new option
   has_choices: true,        // Set to true since we are adding choices
   choices: yesNoOptions.value.map(option => ({ name: option.name })) // Map option names to choices
 }));

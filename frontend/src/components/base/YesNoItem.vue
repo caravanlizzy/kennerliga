@@ -1,7 +1,7 @@
 <template>
   <div>
-    <template v-if="yes">Ja</template>
-    <template v-else>Nein</template>
+    <template v-if="yes">Yes</template>
+    <template v-else>No</template>
   </div>
 </template>
 
