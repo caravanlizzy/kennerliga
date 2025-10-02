@@ -1,33 +1,39 @@
 <template>
   <div
-    class="column actionBar q-ma-md q-mx-auto q-pa-sm q-px-md rounded-borders shadow-3 bg-sand"
+    class="column actionBar q-ma-md q-mx-auto q-pa-sm q-px-md rounded-borders shadow-3 sandy-background"
   >
-    <div class="row items-center justify-between q-py-xs">
+    <div
+      class="q-py-xs"
+      style="display:grid; grid-template-columns: 1fr auto 1fr; align-items:center;"
+    >
+      <div></div> <!-- left spacer -->
+
       <q-chip
         color="primary"
         text-color="primary"
         square
         outline
         dense
-        class="text-uppercase text-bold "
+        class="text-uppercase text-bold"
       >
         {{ statusNoun }}
       </q-chip>
 
-      <!-- Active player turn display -->
-
-      <q-chip
-        v-if="activePlayer"
-        color="info"
-        square
-        outline
-        dense
-        class="q-mr-xs text-weight-bold"
-      >
-        <span v-if="isMeActivePlayer"> Your turn </span>
-        <span v-else> {{ activePlayer?.username }}'s turn </span>
-      </q-chip>
+      <div style="display:flex; justify-content:flex-end;">
+        <q-chip
+          v-if="activePlayer"
+          color="info"
+          square
+          outline
+          dense
+          class="q-mr-xs text-weight-bold"
+        >
+          <span v-if="isMeActivePlayer">Your turn</span>
+          <span v-else>{{ activePlayer?.username }}'s turn</span>
+        </q-chip>
+      </div>
     </div>
+
 
     <q-separator v-if="isMeActivePlayer" inset spaced />
 
