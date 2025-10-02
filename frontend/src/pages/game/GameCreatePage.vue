@@ -41,7 +41,7 @@ import GameOption from 'components/game/GameOptionCreate.vue';
 import { useItemList } from 'src/composables/itemList';
 import { useRouter } from 'vue-router';
 import CreateResultConfig from 'components/game/CreateResultConfig.vue';
-import { createGame, createOptions, createResultConfigData } from 'src/services/game/createGameService';
+import { createResultConfigData } from 'src/services/game/createGameService';
 import { createRandomId } from 'src/helpers';
 import { TGameOption, TResultConfig } from 'src/types';
 
@@ -69,36 +69,6 @@ function addEmptyOption(): void {
   addOption(emptyOption, { prepend: true });
 }
 
-
-// const onSubmit = async () => {
-//   try {
-//     if (platform.value === undefined) return;
-//     const gameId = await createGame(name.value, platform.value);
-//     await createOptions(gameId, gameOptions.value);
-//     if (resultConfig !== undefined) {
-//       await createResultConfigData(gameId, resultConfig);
-//     } else {
-//       console.log('Missing result config');
-//       return;
-//     }
-//     $q.notify({
-//       color: 'positive',
-//       textColor: 'white',
-//       icon: 'save',
-//       message: 'Gespeichert'
-//     });
-//     await router.push({ name: 'games' });
-//   } catch (e) {
-//     console.log('Could not create game because ', e);
-//     const message = 'Fehler ' + errorMessages.value;
-//     $q.notify({
-//       color: 'negative',
-//       textColor: 'white',
-//       icon: 'warning',
-//       message: message
-//     });
-//   }
-// };
 const onSubmit = async () => {
   try {
     if (!platform.value) return;
