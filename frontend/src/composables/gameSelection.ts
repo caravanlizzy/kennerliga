@@ -128,7 +128,7 @@ export function useGameSelection(leagueId: Ref<number|null>) {
   }
 
   async function fetchGames() {
-    const { data: gameData } = await api(`game/games/?league=${leagueId.value}&exclude_repeated=true`);
+    const { data: gameData } = await api(`game/games/?league=${leagueId.value}`);
     return gameData;
   }
 
