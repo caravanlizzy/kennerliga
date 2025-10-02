@@ -1,6 +1,6 @@
 <template>
   <q-layout class="column" view="hHh Lpr lFf">
-    <q-header bordered class="text-primary" style="background-color: #f5f5dc">
+    <q-header bordered class="text-primary sandy-background">
       <NavBar :onToggle="toggleDrawer" />
       <DevTools v-show="isDev" />
     </q-header>

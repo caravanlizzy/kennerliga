@@ -1,7 +1,7 @@
 <template>
   <q-card flat bordered class="q-ma-sm rounded-borders">
     <!-- Header -->
-    <q-card-section class="row justify-between items-center q-py-xs">
+    <q-card-section class="row justify-between items-center q-py-xs sandy-background">
 
       <!-- Username + active indicator -->
       <div class="row items-center no-wrap">
@@ -10,7 +10,7 @@
           <q-icon name="person" size="14px" />
         </q-avatar>
 
-        <span class="text-subtitle2 text-weight-medium ellipsis maxw-username">
+        <span class="text-subtitle2 text-weight-medium ellipsis">
         {{ member.username }}
       </span>
         <q-tooltip v-if="(member.username || '').length > 18">

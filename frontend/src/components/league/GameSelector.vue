@@ -44,7 +44,7 @@
         :class="[
           game.id === gameSelection.game.id
             ? 'bg-primary text-white shadow-8'
-            : 'bg-grey-3 text-dark shadow-2 hover-bg-grey-4 hover-shadow-6',
+            : 'sandy-background text-dark shadow-2 hover-bg-grey-4 hover-shadow-6',
         ]"
       >
         <q-card-section class="q-pa-sm">
