@@ -23,7 +23,7 @@
           </div>
         </div>
         <CreateResultConfig @update-result-config="updateResultConfig"/>
-        <KennerButton class="q-my-xl" type="submit" push color="positive" label="Speichern"/>
+        <KennerButton class="q-my-xl" type="submit" push color="positive" label="Save" icon="save"/>
       </q-form>
     </div>
   </div>
@@ -142,7 +142,7 @@ const onSubmit = async () => {
       color: 'negative',
       textColor: 'white',
       icon: 'warning',
-      message: 'Fehler beim Speichern'
+      message: 'Error creating game'
     });
   }
 };

@@ -94,7 +94,7 @@
         <div class="row justify-end">
           <q-btn
             type="submit"
-            label="Ergebnisse speichern"
+            label="Save Result"
             color="primary"
             unelevated
           />
@@ -303,7 +303,7 @@ async function submitResults() {
       console.error('Fehler beim Senden:', err);
       $q.notify({
         type: 'negative',
-        message: 'Unbekannter Fehler beim Speichern.',
+        message: 'Error saving match results.',
       });
     }
   }
