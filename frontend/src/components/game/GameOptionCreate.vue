@@ -1,23 +1,91 @@
 <template>
   <GameOptionCard>
-
     <template #content>
-      <div class="flex justify-end">
-        <KennerButton flat  color="accent" size="md" class="close-button q-pa-none" icon="delete"
-                       @click="deleteOption"></KennerButton>
-      </div>
-      <div class="col">
-        <KennerInput :model-value="gameOption.title" @update:modelValue="updateTitle" label="Spieloption Titel"
-                      class="q-mb-md q-mx-xs" :rules="[val => !!val || 'Titel erforderlich']" />
-        <div class="column">
-          <q-toggle :model-value="gameOption.hasChoices" @update:model-value="updateHasChoices"
-                    label="Auswahloptionen" />
-          <q-toggle label="Bedingungen" :model-value="hasRestrictions"
-                    @update:model-value="hasRestrictions = !hasRestrictions; deleteRestriction()" />
+      <div class="column q-gutter-sm">
+
+        <!-- Header: title + delete -->
+        <div class="row items-start justify-between">
+          <KennerInput
+            :model-value="gameOption.title"
+            @update:modelValue="updateTitle"
+            label="Option title"
+            class="full-width q-mr-sm"
+            :rules="[val => !!val || 'Title required']"
+          />
+          <KennerButton
+            flat round size="sm" color="negative" icon="delete"
+            aria-label="Delete option"
+            class="q-mt-xs"
+            @click="confirmDelete = true"
+          />
+          <q-tooltip anchor="bottom middle" self="top middle">Delete option</q-tooltip>
         </div>
-        <GameOptionChoiceCreate :addChoice="addChoice" :gameOption="gameOption" v-if="gameOption.hasChoices" />
-        <GameOptionRestrictionCreate :gameOption="gameOption" v-if="hasRestrictions" />
+
+        <q-separator spaced />
+
+        <!-- Toggles -->
+        <div class="row q-col-gutter-md">
+          <div class="col-12 col-sm-6">
+            <q-toggle
+              :model-value="gameOption.hasChoices"
+              @update:model-value="updateHasChoices"
+              label="Choices"
+              dense
+            />
+            <div v-if="gameOption.hasChoices" class="text-caption text-grey-7 q-pl-xs q-mt-xs">
+              Add selectable values for this option.
+            </div>
+          </div>
+
+          <div class="col-12 col-sm-6">
+            <q-toggle
+              label="Conditions"
+              :model-value="hasRestrictions"
+              @update:model-value="hasRestrictions = !hasRestrictions; deleteRestriction()"
+              dense
+            />
+            <div class="text-caption text-grey-7 q-pl-xs q-mt-xs">
+              Only apply this option when another option meets a condition.
+            </div>
+          </div>
+        </div>
+
+        <!-- Choices list -->
+        <GameOptionChoiceCreate
+          v-if="gameOption.hasChoices"
+          :addChoice="addChoice"
+          :gameOption="gameOption"
+          class="q-mt-sm"
+        />
+
+        <!-- Restrictions -->
+        <GameOptionRestrictionCreate
+          v-if="hasRestrictions"
+          :gameOption="gameOption"
+          class="q-mt-sm"
+        />
+
+        <!-- Empty hint -->
+        <div
+          v-if="!gameOption.hasChoices && !hasRestrictions"
+          class="bg-grey-2 text-grey-8 text-caption q-pa-md rounded-borders"
+        >
+          Tip: Enable <span class="text-weight-medium">Choices</span> if the option has multiple values,
+          and enable <span class="text-weight-medium">Conditions</span> to make this option depend on another.
+        </div>
       </div>
+
+      <!-- Delete confirmation -->
+      <q-dialog v-model="confirmDelete">
+        <q-card class="q-pa-md rounded-borders">
+          <div class="text-subtitle1 q-mb-sm">Delete option?</div>
+          <div class="text-caption text-grey-7 q-mb-md">This cannot be undone.</div>
+          <div class="row justify-end q-gutter-sm">
+            <q-btn flat label="Cancel" v-close-popup />
+            <q-btn color="negative" label="Delete" @click="onConfirmDelete" />
+          </div>
+        </q-card>
+      </q-dialog>
     </template>
   </GameOptionCard>
 </template>
@@ -35,9 +103,14 @@ import { TGameOption, TGameOptionChoice } from 'src/types';
 const props = defineProps<{ gameOption: TGameOption }>();
 const { gameOption } = props;
 
-const { updateItem, deleteItem } = inject('useGameOptions');
+const { updateItem, deleteItem } = inject('useGameOptions') as any;
 
-const hasRestrictions = ref(false);
+// initialize from existing restriction fields if present
+const hasRestrictions = ref(Boolean(
+  gameOption.onlyIfOption || gameOption.onlyIfChoice || gameOption.onlyIfValue !== undefined
+));
+
+const confirmDelete = ref(false);
 
 function updateHasChoices(hasChoices: boolean) {
   updateItem(gameOption, 'hasChoices', hasChoices);
@@ -51,9 +124,13 @@ function deleteRestriction() {
   }
 }
 
-
 function deleteOption() {
   deleteItem(props.gameOption);
+}
+
+function onConfirmDelete() {
+  confirmDelete.value = false;
+  deleteOption();
 }
 
 function updateTitle(newTitle: string) {
@@ -64,16 +141,8 @@ function addChoice() {
   const emptyChoice: TGameOptionChoice = { itemId: createRandomId(), name: '' };
   updateItem(gameOption, 'choices', [...props.gameOption.choices, emptyChoice]);
 }
-
 </script>
 
-<style scoped lang="scss">
-.bordered {
-  border: 1px solid $primary;
-}
-
-.close-button {
-  min-width: 22px;
-  min-height: 22px;
-}
+<style scoped>
+/* Minimal; layout handled via Quasar utility classes */
 </style>

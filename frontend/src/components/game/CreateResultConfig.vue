@@ -1,71 +1,114 @@
 <template>
-  <div class="q-mt-xl q-pa-md q-mx-md">
-    <div class="text-h6 q-mb-md">Ergebnis konfigurieren</div>
-    <div class="row">
-      <q-card class="config-box q-pa-md">
-        <div class="column">
-          <q-toggle
-            label="Starting Order"
-            :model-value="hasStartingPlayerOrder"
-            @update:model-value="
-              hasStartingPlayerOrder = !hasStartingPlayerOrder
-            "
-          />
-          <q-separator />
-          <q-toggle
-            label="Points"
-            :model-value="hasPoints"
-            @update:model-value="hasPoints = !hasPoints"
-          />
+  <div class="q-pa-md">
+    <div class="text-subtitle1 text-weight-medium q-mb-md">Configure results</div>
 
-          <KennerSelect
-            v-if="hasPoints"
-            class="q-px-md q-pb-sm"
-            v-model="startingPointSystem"
-            :options="startingPointSystemOptions"
-            option-value="code"
-            option-label="code"
-            label="Startsiegpunktesystem"
-          />
-          <div class="text-italic text-caption">
-            {{ startingPointSystem.description }}
+    <q-card flat class="q-pa-sm rounded-borders">
+        <div class="column">
+          <!-- Starting Order -->
+          <div class="row items-center justify-between q-pl-sm q-pr-sm">
+            <div>
+              <div class="text-body2">Starting order</div>
+              <div class="text-caption text-grey-7">
+                Who starts the first round?
+              </div>
+            </div>
+            <q-toggle v-model="hasStartingPlayerOrder" dense />
           </div>
-          <q-separator />
-          <q-toggle
-            label="Assymmentrisch"
-            :model-value="isAsymmetric"
-            @update:model-value="isAsymmetric = !isAsymmetric"
-          />
-          <list-creator
-            v-if="isAsymmetric"
-            button-label="Neue Faction"
-            @update-list="(updatedList: string[]) => factions = updatedList"
-          ></list-creator>
-          <q-separator />
-          <q-toggle
-            label="Tie Breaker"
-            :model-value="hasTieBreaker"
-            @update:model-value="hasTieBreaker = !hasTieBreaker"
-          />
-          <list-creator
-            button-label="Neuer Tiebreaker"
-            v-if="hasTieBreaker"
-            ranked
-            @update-list="(updatedList: string[]) => tieBreakers = updatedList"
-          />
+
+          <q-separator spaced />
+
+          <!-- Points -->
+          <div class="row items-center justify-between q-pl-sm q-pr-sm">
+            <div>
+              <div class="text-body2">Points scoring</div>
+              <div class="text-caption text-grey-7">
+                Enable victory points / scoring
+              </div>
+            </div>
+            <q-toggle v-model="hasPoints" dense />
+          </div>
+
+          <!-- Point system -->
+          <div class="q-pl-sm q-pr-sm q-mt-xs">
+            <div v-if="loadingSystems" class="q-mt-sm">
+              <q-skeleton type="QInput" />
+            </div>
+            <KennerSelect
+              v-else
+              class="full-width q-mt-sm"
+              v-model="startingPointSystem"
+              :options="startingPointSystemOptions"
+              option-value="code"
+              option-label="code"
+              label="Starting point system"
+              :disable="!hasPoints"
+            />
+            <div class="text-caption text-grey-7 q-mt-xs">
+              {{ pointsDescription }}
+            </div>
+          </div>
+
+          <q-separator spaced />
+
+          <!-- Asymmetric -->
+          <div class="row items-center justify-between q-pl-sm q-pr-sm">
+            <div>
+              <div class="text-body2">Asymmetric</div>
+              <div class="text-caption text-grey-7">
+                Different factions / starting conditions
+              </div>
+            </div>
+            <q-toggle v-model="isAsymmetric" dense />
+          </div>
+
+          <div v-if="isAsymmetric" class="q-pl-sm q-pr-sm q-mt-sm">
+            <list-creator
+              button-label="New faction"
+              @update-list="(updatedList: string[]) => (factions = updatedList)"
+            />
+            <div
+              v-if="!factions.length"
+              class="text-caption text-grey-7 q-mt-xs"
+            >
+              No factions added yet.
+            </div>
+          </div>
+
+          <q-separator spaced />
+
+          <!-- Tie Breaker -->
+          <div class="row items-center justify-between q-pl-sm q-pr-sm">
+            <div>
+              <div class="text-body2">Tie-breaker</div>
+              <div class="text-caption text-grey-7">Rules for ties</div>
+            </div>
+            <q-toggle v-model="hasTieBreaker" dense />
+          </div>
+
+          <div v-if="hasTieBreaker" class="q-pl-sm q-pr-sm q-mt-sm">
+            <list-creator
+              button-label="New tie-breaker"
+              ranked
+              @update-list="(updatedList: string[]) => (tieBreakers = updatedList)"
+            />
+            <div
+              v-if="!tieBreakers.length"
+              class="text-caption text-grey-7 q-mt-xs"
+            >
+              No tie-breakers defined yet.
+            </div>
+          </div>
         </div>
-      </q-card>
-    </div>
+    </q-card>
   </div>
 </template>
 
 <script setup lang="ts">
-import { Ref, ref, watch } from 'vue';
+import { Ref, ref, watch, computed } from 'vue';
 import ListCreator from 'components/lists/ListCreator.vue';
 import KennerSelect from 'components/base/KennerSelect.vue';
 import { api } from 'boot/axios';
-
-import { TResultConfig } from 'src/types';
+import { TResultConfig, TTieBreaker } from 'src/types';
 
 const emit = defineEmits<{
   (event: 'updateResultConfig', resultConfig: TResultConfig): void;
@@ -75,49 +118,41 @@ const isAsymmetric = ref(false);
 const hasStartingPlayerOrder = ref(true);
 const hasPoints = ref(true);
 const hasTieBreaker = ref(false);
-const tieBreakers: Ref<string[]> = ref([]);
 
-const { data: startingPointSystemOptions } = await api(
-  'game/starting-point-systems'
-);
-const startingPointSystem = ref(startingPointSystemOptions[0]);
-// const startingPointSystem = computed(() => startingPointSystemOptions.find(o => o.code === startingPointSystemCode.value));
 const factions: Ref<string[]> = ref([]);
+const tieBreakers: Ref<TTieBreaker[]> = ref([]);
 
-function getResultConfig(): TResultConfig {
-  return {
-    isAsymmetric: isAsymmetric.value,
-    hasPoints: hasPoints.value,
-    startingPointSystem: startingPointSystem.value.id,
-    hasStartingPlayerOrder: hasStartingPlayerOrder.value,
-    factions: factions.value,
-    hasTieBreaker: hasTieBreaker.value,
-    tieBreakers: tieBreakers.value,
-  };
+const loadingSystems = ref(true);
+const startingPointSystemOptions = ref<any[]>([]);
+const startingPointSystem = ref<any | null>(null);
+
+try {
+  const { data } = await api('game/starting-point-systems');
+  startingPointSystemOptions.value = data || [];
+  startingPointSystem.value = startingPointSystemOptions.value[0] || null;
+} finally {
+  loadingSystems.value = false;
 }
 
-function emitResultConfig() {
-  const resultConfig = getResultConfig();
-  emit('updateResultConfig', resultConfig);
-}
+const pointsDescription = computed(() => {
+  if (!hasPoints.value) return 'Points are disabled.';
+  if (!startingPointSystem.value) return 'Select a point system.';
+  return (
+    startingPointSystem.value.description || 'Selected point system active.'
+  );
+});
 
-watch(
-  [
-    isAsymmetric,
-    hasPoints,
-    startingPointSystem,
-    hasStartingPlayerOrder,
-    factions,
-    hasTieBreaker,
-    tieBreakers,
-  ],
-  () => emitResultConfig(),
-  { immediate: true }
-);
+const resultConfig = computed<TResultConfig>(() => ({
+  isAsymmetric: isAsymmetric.value,
+  hasPoints: hasPoints.value,
+  startingPointSystem: startingPointSystem.value?.id ?? null,
+  hasStartingPlayerOrder: hasStartingPlayerOrder.value,
+  factions: factions.value,
+  hasTieBreaker: hasTieBreaker.value,
+  tieBreakers: tieBreakers.value,
+}));
+
+watch(resultConfig, (val) => emit('updateResultConfig', val), {
+  immediate: true,
+});
 </script>
-
-<style scoped>
-.config-box {
-  max-width: 300px;
-}
-</style>

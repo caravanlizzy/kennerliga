@@ -1,5 +1,5 @@
 <template>
-  <div class="q-px-md q-pb-sm">
+  <div class="q-pb-sm">
     <q-input filled square bottom-slots hide-bottom-space :label="buttonLabel" v-model="inputItem.name"
              @keyup.enter="addItem">
       <template v-slot:append>
