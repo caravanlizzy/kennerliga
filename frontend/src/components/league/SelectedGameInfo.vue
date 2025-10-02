@@ -154,7 +154,6 @@ const bannedGameName = computed(() => {
 
 <style scoped lang="scss">
 .selected-game-card {
-  background: #fff;
   border-radius: 8px;
   overflow: hidden;
 }
