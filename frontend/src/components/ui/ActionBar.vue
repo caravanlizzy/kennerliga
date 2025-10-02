@@ -1,25 +1,28 @@
 <template>
-  <div
-    class="column actionBar q-ma-md q-mx-auto q-pa-sm q-px-md rounded-borders shadow-3 sandy-background"
+  <q-card
+    bordered
+    flat
+    class="q-ma-md q-mx-auto q-pa-sm q-px-md rounded-borders bg-grey-2"
+    style="max-width: 600px"
   >
-    <div
-      class="q-py-xs"
-      style="display:grid; grid-template-columns: 1fr auto 1fr; align-items:center;"
-    >
-      <div></div> <!-- left spacer -->
+    <!-- top row: center status + right active chip using Quasar grid -->
+    <div class="row items-center q-py-xs">
+      <div class="col"></div>
 
-      <q-chip
-        color="primary"
-        text-color="primary"
-        square
-        outline
-        dense
-        class="text-uppercase text-bold"
-      >
-        {{ statusNoun }}
-      </q-chip>
+      <div class="col-auto flex flex-center">
+        <q-chip
+          color="primary"
+          text-color="primary"
+          square
+          outline
+          dense
+          class="text-uppercase text-bold"
+        >
+          {{ statusNoun }}
+        </q-chip>
+      </div>
 
-      <div style="display:flex; justify-content:flex-end;">
+      <div class="col flex justify-end">
         <q-chip
           v-if="activePlayer"
           color="info"
@@ -34,9 +37,9 @@
       </div>
     </div>
 
-
     <q-separator v-if="isMeActivePlayer" inset spaced />
 
+    <!-- action row -->
     <div
       v-if="isMeActivePlayer"
       :class="[
@@ -64,7 +67,7 @@
           :key="a.name"
           :outline="!a.buttonFilled"
           :color="a.buttonVariant || 'primary'"
-          class="compact-btn q-px-sm q-py-xs text-caption"
+          class="q-px-sm q-py-xs text-caption"
           @click="handleAction(a)"
         >
           <q-icon v-if="a.icon" :name="a.icon" size="16px" class="q-mr-xs" />
@@ -72,7 +75,7 @@
         </kenner-button>
       </div>
     </div>
-  </div>
+  </q-card>
 </template>
 
 <script setup lang="ts">
@@ -83,9 +86,7 @@ import { storeToRefs } from 'pinia';
 import { useResponsive } from 'src/composables/reponsive';
 
 const { actions, leadText, subject, reset } = useActionBar();
-const { activePlayer, isMeActivePlayer, statusNoun } = storeToRefs(
-  useLeagueStore()
-);
+const { activePlayer, isMeActivePlayer, statusNoun } = storeToRefs(useLeagueStore());
 const { isMobile } = useResponsive();
 
 async function handleAction(action: any) {
@@ -97,13 +98,3 @@ async function handleAction(action: any) {
   }
 }
 </script>
-
-<style scoped lang="scss">
-.actionBar {
-  width: min(100%, 600px);
-}
-.compact-btn {
-  min-height: 32px;
-  font-size: 0.75rem;
-}
-</style>
