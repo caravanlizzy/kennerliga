@@ -51,6 +51,14 @@ class SelectedGame(models.Model):
     game = models.ForeignKey(Game, on_delete=models.CASCADE, related_name='game_selections')
     league = models.ForeignKey(League, on_delete=models.CASCADE, related_name='game_selections')
 
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=['league', 'game'],
+                name='unique_game_per_league'
+            ),
+        ]
+
     def __str__(self):
         return f"{self.player}'s selection for {self.game.name}"
 
