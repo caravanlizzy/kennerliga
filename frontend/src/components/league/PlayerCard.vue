@@ -49,7 +49,7 @@
     <q-separator />
 
     <!-- Body -->
-    <q-card-section class="q-pa-md bg-grey-1">
+    <q-card-section class="q-pa-md">
       <SelectedGameInfo :member="member" />
     </q-card-section>
   </q-card>

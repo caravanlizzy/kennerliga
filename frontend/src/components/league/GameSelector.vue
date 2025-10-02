@@ -180,7 +180,7 @@ const handleSubmit = async () => {
 const { setActions, setLeadText, setSubject } = useActionBar();
 
 setActions([
-  { name: 'Confirm', callback: handleSubmit, buttonVariant: 'positive', buttonFilled: true },
+  { name: 'Confirm', callback: handleSubmit, buttonVariant: 'secondary' },
 ]);
 setLeadText(() => h('div', 'Confirm your game selection'));
 watch(gameSelection, (newVal) => {
