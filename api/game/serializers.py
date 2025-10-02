@@ -140,8 +140,6 @@ class SelectedGameSerializer(serializers.ModelSerializer):
         return instance
 
 
-# Approach to have a single response for game only instaed of batching down the properties
-
 class FullGameOptionChoiceSerializer(serializers.ModelSerializer):
     class Meta:
         model = GameOptionChoice

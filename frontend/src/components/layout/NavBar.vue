@@ -103,6 +103,7 @@ import { useRouter } from 'vue-router';
 import { useUiStore } from 'stores/uiStore';
 import { useResponsive } from 'src/composables/reponsive';
 import { useLeagueStore } from 'stores/leagueStore';
+import { onMounted } from 'vue';
 
 defineProps<{
   onToggle: () => void;
@@ -112,7 +113,10 @@ const router = useRouter();
 const { toggleDev } = useUiStore();
 const { isAuthenticated, user } = storeToRefs(useUserStore());
 const { isMeActivePlayer } = storeToRefs(useLeagueStore());
+const { updateLeagueData } = useLeagueStore();
 const { isMobile } = useResponsive();
+
+onMounted(() => updateLeagueData());
 
 function goHome() {
   router.push({ name: 'home' });
