@@ -5,7 +5,6 @@
     :label="label"
     square
     filled
-    dense
     color="secondary"
     class="rounded-borders "
   >
