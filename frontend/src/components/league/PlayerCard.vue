@@ -1,59 +1,70 @@
 <template>
-  <q-card flat bordered class="q-ma-sm rounded-borders">
+  <q-card flat bordered class="q-ma-sm rounded-borders hover-elevate">
     <!-- Header -->
-    <q-card-section class="row justify-between items-center q-py-xs sandy-background">
-
-      <!-- Username + active indicator -->
-      <div class="row items-center no-wrap">
-        <!-- subtle avatar dot -->
-        <q-avatar size="18px" class="q-mr-sm header-avatar">
-          <q-icon name="person" size="14px" />
+    <q-card-section class="header sandy-background q-py-sm q-px-md">
+      <div class="row items-center no-wrap full-width">
+        <!-- Avatar with tiny active dot -->
+        <q-avatar size="24px" class="q-mr-sm">
+          <q-icon name="person" size="16px" />
+          <q-badge
+            v-if="member.is_active_player"
+            floating
+            rounded
+            color="positive"
+            class="dot-badge"
+          />
         </q-avatar>
 
-        <span class="text-subtitle2 text-weight-medium ellipsis">
-        {{ member.username }}
-      </span>
-        <q-tooltip v-if="(member.username || '').length > 18">
-          {{ member.username }}
-        </q-tooltip>
+        <!-- Name + optional rank -->
+        <div class="col text-truncate">
+          <div class="row items-center no-wrap">
+            <span class="text-subtitle2 text-weight-medium ellipsis">
+              {{ member.username }}
+            </span>
+            <q-tooltip v-if="(member.username || '').length > 18">
+              {{ member.username }}
+            </q-tooltip>
 
-        <q-badge
-          v-if="member.is_active_player"
-          outline rounded color="positive" text-color="positive" class="q-ml-sm"
-        >
-          <q-icon name="verified" size="14px" class="q-mr-xs" />
-          Active
-        </q-badge>
+            <span
+              v-if="member.rank !== undefined"
+              class="text-caption text-grey-7 q-ml-sm"
+            >
+              #{{ member.rank }}
+            </span>
+          </div>
+        </div>
 
-        <!-- optional: rank adds nice structure if available -->
-        <q-badge v-if="member.rank !== undefined" outline class="q-ml-sm text-caption" color="grey-6" text-color="grey-8">
-          #{{ member.rank }}
-        </q-badge>
-      </div>
+        <!-- Small meta icons (lighter than badges) -->
+        <div class="row items-center no-wrap q-ml-auto meta-icons">
+          <q-icon
+            v-if="member.selected_game"
+            name="sports_esports"
+            size="16px"
+            class="text-positive"
+          >
+            <q-tooltip>Has a selected game</q-tooltip>
+          </q-icon>
 
-      <!-- Badges (outline, semantic) -->
-      <div class="row items-center q-gutter-xs no-wrap">
-        <q-badge v-if="member.selected_game" color="positive">
-          <q-icon name="sports_esports" size="14px" />
-          <q-tooltip>Has a selected game</q-tooltip>
-        </q-badge>
-
-        <q-badge v-if="member.has_banned" color="negative">
-          <q-icon name="block" size="14px" />
-          <q-tooltip>Submitted a ban</q-tooltip>
-        </q-badge>
+          <q-icon
+            v-if="member.has_banned"
+            name="block"
+            size="16px"
+            class="text-negative q-ml-xs"
+          >
+            <q-tooltip>Submitted a ban</q-tooltip>
+          </q-icon>
+        </div>
       </div>
     </q-card-section>
 
-    <!-- a hairline to separate header/body more clearly -->
-    <q-separator />
+    <!-- Hairline -->
+    <q-separator class="hairline" />
 
     <!-- Body -->
-    <q-card-section class="q-pa-md">
+    <q-card-section class="q-pt-sm q-pb-md q-pl-md q-pr-md">
       <SelectedGameInfo :member="member" />
     </q-card-section>
   </q-card>
-
 </template>
 
 <script setup lang="ts">
