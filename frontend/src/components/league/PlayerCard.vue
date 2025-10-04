@@ -1,7 +1,7 @@
 <template>
-  <q-card flat bordered class="q-ma-sm rounded-borders hover-elevate">
+  <q-card flat bordered class="q-ma-sm rounded-borders hover-elevate" style="border-left: 4px solid var(--q-primary);">
     <!-- Header -->
-    <q-card-section class="header sandy-background q-py-sm q-px-md">
+    <q-card-section class="header q-py-sm q-px-md bg-blue-grey-11">
       <div class="row items-center no-wrap full-width">
         <!-- Avatar with tiny active dot -->
         <q-avatar size="24px" class="q-mr-sm">

@@ -1,9 +1,9 @@
 <template>
   <q-page :class="{ 'row items-start': !isMobile }">
-    <CurrentSeason/>
-    <SeasonList />
-    <KennerChat class="col-9" />
+    <CurrentSeason class="col-9"/>
     <YearStandings class="col-3" />
+    <SeasonList class="col-12"/>
+    <KennerChat class="col-9" />
   </q-page>
 </template>
 

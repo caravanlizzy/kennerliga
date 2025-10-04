@@ -1,10 +1,12 @@
 <template>
-  <div class="q-pa-md">
+  <SideAccentBox>
     <q-table flat bordered>{{columns}}</q-table>
-  </div>
+  </SideAccentBox>
 </template>
 
 <script setup lang="ts">
+import SideAccentBox from 'components/base/SideAccentBox.vue';
+
 const columns = [
   {
     name: 'player',
