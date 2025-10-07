@@ -71,7 +71,7 @@
 import SelectedGameInfo from 'components/league/SelectedGameInfo.vue';
 
 withDefaults(
-  defineProps<{ member: any, color: string }>(),
+  defineProps<{ member: any, color?: string }>(),
   { color: 'var(--q-primary)' }
 )
 </script>
