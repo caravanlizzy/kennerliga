@@ -44,15 +44,12 @@
         type="button"
       >
         <q-icon name="emoji_events" />
-        <span v-show="!isMobile" class="text-weight-medium q-ml-xs">My League</span>
+        <span v-show="!isMobile" class="text-weight-medium q-ml-xs"
+          >My League</span
+        >
 
         <!-- tiny positive indicator when user is active player -->
-        <q-badge
-          v-if="isMeActivePlayer"
-          floating
-          rounded
-          color="positive"
-        />
+        <q-badge v-if="isMeActivePlayer" floating rounded color="positive" />
       </q-btn>
     </q-toolbar-title>
 
@@ -92,8 +89,6 @@
   </q-toolbar>
 </template>
 
-
-
 <script setup lang="ts">
 import KennerButton from 'components/base/KennerButton.vue';
 import { useUserStore } from 'stores/userStore';
@@ -122,3 +117,15 @@ function goHome() {
   router.push({ name: 'home' });
 }
 </script>
+
+
+<style scoped>
+.kenner-toolbar {
+  background-color: #fff8ed; /* slightly warm tint */
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.03);
+}
+</style>
+
+
+
