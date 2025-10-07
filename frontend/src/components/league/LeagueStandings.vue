@@ -1,14 +1,15 @@
 <template>
-  <q-table
-    title="League Standings"
-    flat
-    bordered
-    :rows="rows"
-    :columns="columns"
-    row-key="id"
-    hide-bottom
-    class="bg-transparent"
-  />
+    <q-table
+      title="League Standings"
+      flat
+      bordered
+      :rows="rows"
+      :columns="columns"
+      row-key="id"
+      hide-bottom
+      class="bg-transparent"
+      style="max-width: 500px; margin: auto;"
+    />
 </template>
 
 <script setup lang="ts">
