@@ -16,7 +16,7 @@
           square
           outline
           dense
-          class="text-uppercase text-bold"
+          class="bg-white text-uppercase text-bold"
         >
           {{ statusNoun }}
         </q-chip>
