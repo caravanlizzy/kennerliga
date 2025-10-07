@@ -1,6 +1,8 @@
 <template>
-  <div>
+  <div style="max-width: 1200px; margin: 0 auto; padding: 20px;">
+
     <ActionBar />
+
     <LeagueStandings
       v-if="leagueStatus === 'PLAYING' || leagueStatus === 'DONE'"
     />
