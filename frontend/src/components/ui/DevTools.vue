@@ -1,5 +1,5 @@
 <template>
-  <div class="q-pa-md bg-info">
+  <div class="q-pa-md">
     <div class="text-h6">
       Hijack into accounts
     </div>

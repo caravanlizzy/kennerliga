@@ -69,7 +69,7 @@
 
     <ContentSection
       title="Players"
-      color="primary"
+      color="info"
       :is-opened="sectionVisibilityStates['players']"
     >
       <div class="row q-col-gutter-md q-pa-md">

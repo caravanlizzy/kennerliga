@@ -1,6 +1,6 @@
 <template>
   <div
-    class="rounded-borders q-my-xs rel"
+    class="rounded-borders q-my-xs"
     :style="`border: 3px solid var(--q-${color})`"
   >
     <q-expansion-item

@@ -1,7 +1,7 @@
 <template>
-  <q-card flat bordered class="q-ma-sm rounded-borders hover-elevate" style="border-left: 4px solid var(--q-primary);">
+  <q-card flat bordered class="rounded-borders" style="border-left: 4px solid var(--q-info);">
     <!-- Header -->
-    <q-card-section class="header q-py-sm q-px-md bg-blue-grey-11">
+    <q-card-section class="header q-py-sm q-px-md ">
       <div class="row items-center no-wrap full-width">
         <!-- Avatar with tiny active dot -->
         <q-avatar size="24px" class="q-mr-sm">
@@ -58,7 +58,7 @@
     </q-card-section>
 
     <!-- Hairline -->
-    <q-separator class="hairline" />
+    <q-separator class="hairline" color="info" />
 
     <!-- Body -->
     <q-card-section class="q-pt-sm q-pb-md q-pl-md q-pr-md">

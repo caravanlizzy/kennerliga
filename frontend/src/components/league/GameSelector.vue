@@ -1,156 +1,203 @@
 <template>
-  <div>
-    <!-- FILTER BAR -->
-    <div class="q-pa-sm q-mb-md bg-grey-2 rounded-borders">
-      <div class="row items-center q-gutter-sm q-mb-sm">
-        <q-icon name="tune" size="18px" class="text-grey-7" />
-        <div class="text-caption text-uppercase text-grey-7">Filter</div>
-      </div>
-
-      <div class="row q-col-gutter-md items-start">
-        <!-- Search -->
-        <div class="col-12 col-md-6">
-          <q-input
-            v-model="filter"
-            label="Spiel"
-            outlined
-            dense
-            clearable
-            class="rounded-borders"
-          >
-            <template #append>
-              <q-icon name="search" />
-            </template>
-          </q-input>
+  <div class="row q-col-gutter-lg">
+    <!-- LEFT: FILTER + GRID -->
+    <div class="selector col-12 col-md-6">
+      <!-- FILTER CARD -->
+      <q-card flat bordered class="q-pa-md rounded-borders">
+        <div class="row items-center q-gutter-sm q-mb-sm">
+          <q-icon name="tune" size="18px" class="text-grey-7" />
+          <div class="text-caption text-uppercase text-grey-7">Filters</div>
         </div>
 
-        <!-- Platform multi-select chips -->
-        <div class="col-12 col-md-6">
-          <div class="text-caption text-grey-7 q-mb-xs">Platform</div>
-          <div class="row items-center q-gutter-xs">
-            <q-chip
-              v-for="p in platforms || []"
-              :key="p.id"
-              clickable
-              :outline="!isPlatformSelected(p.id)"
-              :color="getPlatformColor(p.name).color"
-              :text-color="isPlatformSelected(p.id) ? 'white' : getPlatformColor(p.name).color"
-              :style="!isPlatformSelected(p.id) ? 'background-color: white' : ''"
-              @click="togglePlatform(p.id)"
+        <div class="row q-col-gutter-md items-start">
+          <!-- Search -->
+          <div class="col-12 col-md-6">
+            <q-input
+              v-model="filter"
+              label="Game"
+              outlined
+              dense
+              clearable
+              class="rounded-borders"
             >
-              <q-icon name="sports_esports" size="16px" class="q-mr-xs" />
-              {{ shortPlatformLabel(p.name) }}
-            </q-chip>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- GAME GRID -->
-    <div
-      class="row q-pt-md justify-center"
-      style="max-height: 220px; overflow-y: auto"
-    >
-      <q-card
-        v-for="game in displayedGames"
-        :key="game.id"
-        @click="setGameInformation(game)"
-        flat
-        bordered
-        square
-        clickable
-        class="cursor-pointer text-center q-pa-sm transition-all"
-        style="width: 130px"
-        :class="[
-          game.id === gameSelection.game.id
-            ? 'bg-primary text-white shadow-8'
-            : 'text-dark bg-grey-2'
-        ]"
-      >
-        <q-card-section class="q-pa-sm">
-          <div class="text-body2 text-weight-bold ellipsis">
-            {{
-              game.name.length > 13 ? game.name.slice(0, 12) + '…' : game.name
-            }}
+              <template #append>
+                <q-icon name="search" />
+              </template>
+            </q-input>
           </div>
 
-          <!-- Platform badge -->
-          <q-chip
-            dense
-            square
-            outline
-            class="q-mt-xs"
-            :color="getPlatformColor(getPlatformName(game.platform)).color"
-            :text-color="getPlatformColor(getPlatformName(game.platform)).text"
-          >
-            {{ getPlatformName(game.platform).split('.')[0] }}
-          </q-chip>
-        </q-card-section>
-      </q-card>
-    </div>
-
-    <!-- DETAILS -->
-    <div v-if="isLoading">
-      <q-spinner-orbit size="xl" />
-    </div>
-    <q-card v-else-if="gameInformation.game" flat class="q-pa-md q-my-md">
-      <q-card-section>
-        <div class="text-h6 text-weight-bold">
-          {{ gameInformation.game.name }}
-        </div>
-      </q-card-section>
-
-      <q-card-section v-if="!gameInformation.options.length">
-        <div class="text-italic text-grey">
-          This game has no additional settings
-        </div>
-      </q-card-section>
-
-      <q-card-section v-else>
-        <div class="text-subtitle2 text-primary q-mb-md">Settings</div>
-
-        <!-- Choices -->
-        <div
-          v-if="gameInformation.options.some((o) => o.has_choices)"
-          class="q-mb-md"
-        >
-          <div class="row q-col-gutter-md">
-            <div
-              v-for="option in gameInformation.options.filter((o) => o.has_choices)"
-              :key="option.id"
-              class="col-12 col-sm-6 col-md-4"
-            >
-              <KennerSelect
-                :options="findChoicesByOption(option.id)"
-                :label="option.name"
-                option-label="name"
-                dense
-                outlined
-                v-model="
-                  gameSelection.selectedOptions.find((o) => o.id == option.id).choice
-                "
-                class="full-width"
-              />
+          <!-- Platform multi-select chips -->
+          <div class="col-12 col-md-6">
+            <div class="text-caption text-grey-7 q-mb-xs">Platform</div>
+            <div class="row items-center q-gutter-xs">
+              <q-chip
+                v-for="p in platforms || []"
+                :key="p.id"
+                clickable
+                :outline="!isPlatformSelected(p.id)"
+                :color="getPlatformColor(p.name).color"
+                :text-color="isPlatformSelected(p.id) ? 'white' : getPlatformColor(p.name).color"
+                :style="!isPlatformSelected(p.id) ? 'background-color: white' : ''"
+                @click="togglePlatform(p.id)"
+              >
+                <q-icon name="sports_esports" size="16px" class="q-mr-xs" />
+                {{ shortPlatformLabel(p.name) }}
+              </q-chip>
             </div>
           </div>
         </div>
+      </q-card>
 
-        <!-- Toggles -->
-        <div v-if="gameInformation.options.some((o) => !o.has_choices)">
-          <div class="row q-col-gutter-sm">
-            <q-toggle
-              v-for="option in gameInformation.options.filter((o) => !o.has_choices)"
-              :key="option.id"
-              v-model="findSelectedOption(option.id).value"
-              :label="option.name"
-              dense
-              color="secondary"
-              class="col-auto"
-            />
+      <!-- GAME GRID CARD -->
+      <q-card flat bordered class="q-pa-sm q-mt-md rounded-borders">
+        <div class="row items-center q-gutter-sm q-px-sm q-pt-sm q-pb-xs">
+          <q-icon name="grid_view" size="16px" class="text-grey-7" />
+          <div class="text-caption text-uppercase text-grey-7">
+            Games ({{ displayedGames.length }})
           </div>
         </div>
-      </q-card-section>
-    </q-card>
+
+        <div class="game-grid">
+          <!-- Empty state -->
+          <q-banner
+            v-if="displayedGames.length === 0"
+            class="bg-grey-2 text-grey-8 rounded-borders q-ma-md"
+          >
+            <div class="row items-center">
+              <q-icon name="info" class="q-mr-sm" />
+              <div>No games found. Adjust filters.</div>
+            </div>
+          </q-banner>
+
+          <!-- Cards -->
+          <q-card
+            v-for="game in displayedGames"
+            :key="game.id"
+            @click="setGameInformation(game)"
+            flat
+            bordered
+            clickable
+            square
+            v-ripple="{ color: 'secondary' }"
+            class="game-card modern rounded-borders cursor-pointer relative-position"
+            :class="{ selected: game.id === gameSelection.game.id }"
+            role="button"
+            tabindex="0"
+            @keyup.enter.space="setGameInformation(game)"
+            :aria-pressed="game.id === gameSelection.game.id"
+            :aria-label="`Select ${game.name}`"
+          >
+            <!-- Floating platform badge -->
+            <q-badge
+              class="platform-badge"
+              :color="getPlatformColor(getPlatformName(game.platform)).color"
+              :text-color="getPlatformColor(getPlatformName(game.platform)).text"
+            >
+              {{ getPlatformName(game.platform).split('.')[0] }}
+            </q-badge>
+
+            <q-card-section class="q-pa-md column items-start">
+              <div class="row items-center justify-between full-width q-mb-sm">
+                <q-icon name="sports_esports" size="18px" class="text-grey-7" />
+              </div>
+
+              <div class="game-name text-body2 text-weight-medium ellipsis">
+                {{ game.name.length > 18 ? game.name.slice(0, 17) + '…' : game.name }}
+                <q-tooltip anchor="top middle" self="bottom middle">
+                  {{ game.name }}
+                </q-tooltip>
+              </div>
+            </q-card-section>
+          </q-card>
+
+        </div>
+      </q-card>
+    </div>
+
+    <!-- RIGHT: DETAILS -->
+    <div class="col-12 col-md-6">
+      <q-card flat bordered class="q-pa-md q-my-md rounded-borders details-card shadow-2">
+        <q-inner-loading :showing="isLoading">
+          <q-spinner-orbit size="96px" color="secondary" />
+        </q-inner-loading>
+
+        <template v-if="!isLoading && !gameInformation.game">
+          <q-banner class="bg-grey-2 text-grey-8 rounded-borders q-pa-md">
+            <div class="row items-center">
+              <q-icon name="info" class="q-mr-sm" />
+              <div>Please select a game on the left to see details.</div>
+            </div>
+          </q-banner>
+        </template>
+
+        <template v-else-if="gameInformation.game">
+          <!-- Header -->
+          <div class="row items-center justify-between q-mb-sm">
+            <div class="text-h6 text-weight-bold">
+              {{ gameInformation.game.name }}
+            </div>
+            <q-chip
+              dense
+              square
+              outline
+              :color="getPlatformColor(getPlatformName(gameInformation.game.platform)).color"
+              :text-color="getPlatformColor(getPlatformName(gameInformation.game.platform)).text"
+            >
+              {{ getPlatformName(gameInformation.game.platform).split('.')[0] }}
+            </q-chip>
+          </div>
+
+          <q-separator spaced />
+
+          <!-- No settings -->
+          <div v-if="!gameInformation.options.length" class="text-italic text-grey">
+            This game has no additional settings.
+          </div>
+
+          <!-- Settings -->
+          <template v-else>
+            <div class="section-title q-mb-sm">Settings</div>
+
+            <!-- Choices -->
+            <div v-if="gameInformation.options.some(o => o.has_choices)" class="q-mb-md">
+              <div class="row q-col-gutter-md">
+                <div
+                  v-for="option in gameInformation.options.filter(o => o.has_choices)"
+                  :key="option.id"
+                  class="col-12 col-sm-6"
+                >
+                  <KennerSelect
+                    :options="findChoicesByOption(option.id)"
+                    :label="option.name"
+                    option-label="name"
+                    dense
+                    outlined
+                    v-model="gameSelection.selectedOptions.find(o => o.id == option.id).choice"
+                    class="full-width"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <!-- Toggles -->
+            <div v-if="gameInformation.options.some(o => !o.has_choices)">
+              <div class="section-subtitle q-mb-xs">Toggles</div>
+              <div class="row q-col-gutter-sm">
+                <q-toggle
+                  v-for="option in gameInformation.options.filter(o => !o.has_choices)"
+                  :key="option.id"
+                  v-model="findSelectedOption(option.id).value"
+                  :label="option.name"
+                  dense
+                  color="secondary"
+                  class="col-auto"
+                />
+              </div>
+            </div>
+          </template>
+        </template>
+      </q-card>
+    </div>
   </div>
 </template>
 
@@ -239,3 +286,58 @@ function shortPlatformLabel(name: string): string {
 
 onMounted(loadPlatformsAndGames);
 </script>
+
+<style scoped lang="scss">
+/* CSS kept only where Quasar utilities aren't expressive enough */
+
+/* CSS Grid for responsive, evenly-spaced game cards */
+.game-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 12px;
+  max-height: 260px;
+  overflow-y: auto;
+  padding: 8px 12px 12px;
+}
+
+/* Card look & feel for games (hover + selected) */
+.game-card {
+  background: #f7f7f9;
+  transition: box-shadow .12s ease, transform .12s ease, border-color .12s ease;
+}
+.game-card:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(0,0,0,.06);
+}
+.game-card.selected {
+  border: 2px solid var(--q-color-secondary);
+  background: #fff;
+  box-shadow: 0 6px 18px rgba(0,0,0,.08);
+}
+.game-name { font-weight: 600; }
+
+/* Details card: subtle accent divider */
+.details-card {
+  position: relative;
+  background: white;
+  border-left: 4px solid var(--q-color-secondary);
+}
+
+/* Section headings */
+.section-title {
+  font-size: .9rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  color: var(--q-dark);
+  opacity: .85;
+}
+.section-subtitle {
+  font-size: .8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: .05em;
+  color: var(--q-dark);
+  opacity: .65;
+}
+</style>

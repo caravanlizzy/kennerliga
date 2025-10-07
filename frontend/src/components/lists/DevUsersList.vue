@@ -5,11 +5,11 @@
       :key="user"
       clickable
       square
-      color="white"
+      color="info"
       @click="impersonate(user, 'test')"
-      text-color="primary"
+      text-color="white"
       icon="person"
-      class="cursor-pointer hover-shadow-2"
+      class="cursor-pointer"
     >
       {{ user }}
     </q-chip>
