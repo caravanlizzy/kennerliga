@@ -1,5 +1,5 @@
 <template>
-  <q-card flat bordered class="rounded-borders" style="border-left: 4px solid var(--q-info);">
+  <q-card flat bordered class="rounded-borders" :style="`border-left: 4px solid ${color}`">
     <!-- Header -->
     <q-card-section class="header q-py-sm q-px-md ">
       <div class="row items-center no-wrap full-width">
@@ -70,5 +70,8 @@
 <script setup lang="ts">
 import SelectedGameInfo from 'components/league/SelectedGameInfo.vue';
 
-defineProps<{ member: any }>();
+withDefaults(
+  defineProps<{ member: any, color: string }>(),
+  { color: 'var(--q-primary)' }
+)
 </script>
