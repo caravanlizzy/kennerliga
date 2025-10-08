@@ -1,5 +1,5 @@
 <template>
-  <q-layout class="column" view="hHh Lpr lFf">
+  <q-layout class="column" view="hHh Lpr lFf" style="max-width: 1150px; margin: 0 auto;">
     <q-header bordered class="text-primary bg-white" >
       <NavBar :onToggle="toggleDrawer" />
       <DevTools v-show="isDev" />

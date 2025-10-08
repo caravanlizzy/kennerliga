@@ -8,7 +8,6 @@
       row-key="id"
       hide-bottom
       class="bg-transparent"
-      style="max-width: 500px; margin: auto;"
     />
 </template>
 

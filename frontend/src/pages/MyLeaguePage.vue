@@ -1,5 +1,4 @@
 <template>
-  <div style="max-width: 1200px; margin: 0 auto; padding: 20px;">
 
     <ActionBar />
 
@@ -84,7 +83,6 @@
         </div>
       </div>
     </ContentSection>
-  </div>
 </template>
 
 <script setup lang="ts">
