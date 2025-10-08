@@ -2,9 +2,11 @@
 
     <ActionBar />
 
-    <LeagueStandings
-      v-if="leagueStatus === 'PLAYING' || leagueStatus === 'DONE'"
-    />
+    <template v-if="leagueStatus === 'PLAYING' || leagueStatus === 'DONE'">
+      <ContentSection title="My League Results">
+        <LeagueStandings />
+      </ContentSection>
+    </template>
 
     <!-- Game Selector - shown when user needs to pick games -->
     <template v-if="isMePickingGame">
