@@ -1,8 +1,9 @@
 <template>
   <q-card class="q-pa-md" flat bordered rounded>
-    <div class="row items-center q-mb-md">
+    <div class="row items-center q-mb-sm">
       <div class="col">
         <div class="text-h6 text-primary">Match Result</div>
+        <div class="text-caption text-grey-7">{{ members.length }} players</div>
       </div>
       <div class="col-auto">
         <q-toggle
@@ -14,24 +15,29 @@
       </div>
     </div>
 
-    <div class="q-pa-md">
+    <div class="q-pa-sm">
       <q-form v-if="formData.length" @submit.prevent="submitResults">
-        <div class="row q-col-gutter-md q-mb-xl">
+        <div class="row q-col-gutter-sm q-mb-xl">
           <div
             v-for="member in displayMembers"
             :key="member.id"
             class="col-12 col-sm-6 col-md-4 col-lg-3"
           >
-            <q-card flat class="sandy-background text-primary rounded-borders">
-              <q-card-section
-                class="form-card-header text-subtitle2 text-center"
-              >
-                {{ member.username }}
+            <q-card flat bordered class="member-card">
+              <q-card-section class="row items-center justify-between q-py-xs q-px-sm">
+                <div class="text-subtitle2 ellipsis">{{ member.username }}</div>
+                <q-chip
+                  v-if="getEntry(member.id).starting_position"
+                  dense outline square size="sm"
+                >
+                  #{{ getEntry(member.id).starting_position }}
+                </q-chip>
               </q-card-section>
 
-              <q-separator />
+              <q-separator spaced inset />
 
-              <q-card-section class="q-gutter-md">
+              <q-card-section class="q-gutter-xs q-pt-sm q-pb-sm">
+                <!-- Points -->
                 <KennerInput
                   v-if="resultConfig?.has_points"
                   v-model.number="getEntry(member.id).points"
@@ -40,34 +46,45 @@
                   label="Points"
                   dense
                   outlined
-                  :rules="[(val:string) => val !== null || 'Pflichtfeld']"
-                />
+                  hide-bottom-space
+                  :suffix="'pts'"
+                  :rules="[(v:string|number|null) => v !== null && v !== '' || 'Points required']"
+                >
+                  <template #prepend>
+                    <q-icon name="score" size="16px" class="q-mr-xs" />
+                  </template>
+                </KennerInput>
 
                 <!-- Starting position -->
-                <div class="text-caption text-weight-medium q-mt-xs row items-center justify-between">
+                <div class="row items-center no-wrap justify-between">
                   <div>
-                    Starting position
+                    <q-badge color="grey-8" text-color="grey-2" class="q-mr-xs" outline>Start</q-badge>
+                    <span class="text-caption text-grey-7">Position</span>
                   </div>
-                  <div>
-                    <q-btn-group flat class="q-gutter-x-xs">
+                  <div class="row items-center q-gutter-xs">
+                    <div
+                      v-for="pos in members.length"
+                      :key="pos"
+                      class="col-auto"
+                    >
                       <q-btn
-                        v-for="pos in members.length"
-                        :key="pos"
-                        flat
+
+                        size="sm"
+                        no-caps
+                        outline
+                        :color="getEntry(member.id).starting_position === pos ? 'white' : 'grey-6'"
+                        :class="[{'bg-secondary' : getEntry(member.id).starting_position === pos}]"
                         :label="pos"
-                        :text-color="
-                        getEntry(member.id).starting_position === pos
-                          ? 'secondary'
-                          : 'grey-7'
-                      "
-                        dense
-                        :disable="isPosLockedFor(member.id, pos)"
-                        @click="setStartingPosition(member.id, pos)"
+                        @click="swapStartingPosition(member.id, pos)"
                       />
-                    </q-btn-group>
+                    </div>
                   </div>
                 </div>
 
+                <div class="row items-center q-col-gutter-xs q-mt-xs justify-center">
+                </div>
+
+                <!-- Faction -->
                 <KennerSelect
                   v-if="resultConfig?.is_asymmetric"
                   v-model="getEntry(member.id).faction_id"
@@ -77,27 +94,36 @@
                   label="Faction"
                   dense
                   outlined
-                />
+                  hide-bottom-space
+                  clearable
+                  options-dense
+                >
+                  <template #prepend>
+                    <q-icon name="groups" size="16px" class="q-mr-xs" />
+                  </template>
+                </KennerSelect>
 
+                <!-- Tie-Breaker -->
                 <q-input
                   v-if="tieBreakerRequired"
                   v-model="getEntry(member.id).tie_breaker_value"
-                  label="Tie-Breaker Wert"
+                  label="Tie-breaker"
                   dense
                   outlined
-                />
+                  hide-bottom-space
+                >
+                  <template #prepend>
+                    <q-icon name="toll" size="16px" class="q-mr-xs" />
+                  </template>
+                </q-input>
               </q-card-section>
             </q-card>
           </div>
         </div>
 
-        <div class="row justify-end">
-          <q-btn
-            type="submit"
-            label="Save Result"
-            color="primary"
-            unelevated
-          />
+        <div class="row justify-end q-gutter-sm q-pt-xs q-pb-sm bg-white">
+          <q-btn flat color="secondary" icon="refresh" label="Reset" @click="initFormData" />
+          <q-btn type="submit" label="Save Result" color="primary" unelevated />
         </div>
       </q-form>
 
@@ -125,12 +151,11 @@ const resultConfig = ref<any>(null);
 const factions = ref<Array<{ id: number; name: string }>>([]);
 const formData = ref<Array<any>>([]);
 const tieBreakerRequired = ref(false);
-const orderByStartingPos = ref(true); // toggle for display order
+const orderByStartingPos = ref(true);
 
-// Helpers to access entries by member id (stable even if we reorder display)
+// ---- helpers (unchanged) ----
 function getEntry(memberId: number) {
   let found = formData.value.find((e) => e.player_profile === memberId);
-  // Defensive (shouldn't happen)
   if (!found) {
     found = {
       player_profile: memberId,
@@ -145,64 +170,36 @@ function getEntry(memberId: number) {
   return found;
 }
 
-// Preselect 1..n, unique
 function preselectStartingPositions() {
-  const n = members.value.length;
   members.value.forEach((m, i) => {
-    getEntry(m.id).starting_position = i + 1; // 1..n
+    getEntry(m.id).starting_position = i + 1;
   });
 }
 
-// Called when user sets a position for a member
-function setStartingPosition(memberId: number, newPos: number) {
-  const n = members.value.length;
-  // 1) Lock in left side order: we consider the natural "members" order left->right.
-  const indexOf = (id: number) => members.value.findIndex((m) => m.id === id);
-  const i = indexOf(memberId);
+/**
+ * NEW: swap behavior (no locks, no disables)
+ * If target position is taken, swap with its owner; otherwise just assign.
+ */
+function swapStartingPosition(memberId: number, newPos: number) {
+  const currentPos = getEntry(memberId).starting_position ?? null;
+  if (currentPos === newPos) return;
 
-  // 2) Assign chosen pos to this player
+  // find owner of newPos (if any)
+  const owner = members.value.find(
+    (m) => getEntry(m.id).starting_position === newPos
+  );
+
+  // assign new position to clicked member
   getEntry(memberId).starting_position = newPos;
 
-  // 3) Build a set of taken positions from players on the left INCLUDING current
-  const taken = new Set<number>();
-  for (let k = 0; k <= i; k++) {
-    const pos = getEntry(members.value[k].id).starting_position;
-    if (pos) taken.add(pos);
-  }
-
-  // 4) Repack right side with next available positions ascending
-  let next = 1;
-  const nextFree = () => {
-    while (taken.has(next) && next <= n) next++;
-    return next <= n ? next : null;
-  };
-
-  for (let k = i + 1; k < n; k++) {
-    const entry = getEntry(members.value[k].id);
-    // If current choice conflicts or is empty, assign the next free
-    if (!entry.starting_position || taken.has(entry.starting_position)) {
-      const nf = nextFree();
-      if (nf !== null) {
-        entry.starting_position = nf;
-        taken.add(nf);
-      }
-    } else {
-      // Keep current if unique; also mark as taken
-      taken.add(entry.starting_position);
-    }
+  // if someone owned that position, give them the old one (can become null)
+  if (owner && owner.id !== memberId) {
+    getEntry(owner.id).starting_position = currentPos;
   }
 }
 
-// Disable positions already locked by players to the left (visual hint)
-function isPosLockedFor(memberId: number, pos: number) {
-  const idx = members.value.findIndex((m) => m.id === memberId);
-  for (let k = 0; k < idx; k++) {
-    if (getEntry(members.value[k].id).starting_position === pos) return true;
-  }
-  return false;
-}
+// removed: isPosLockedFor + left-to-right packing
 
-// Display order (optional): by starting_position then by original member order
 const displayMembers = computed(() => {
   if (!orderByStartingPos.value) return members.value;
 
@@ -210,7 +207,6 @@ const displayMembers = computed(() => {
     const pa = getEntry(a.id).starting_position ?? Infinity;
     const pb = getEntry(b.id).starting_position ?? Infinity;
     if (pa !== pb) return pa - pb;
-    // stable tie: keep original index
     return (
       members.value.findIndex((m) => m.id === a.id) -
       members.value.findIndex((m) => m.id === b.id)
@@ -224,10 +220,7 @@ async function fetchResultConfig() {
     `game/selected-games/${props.selectedGameId}/`
   );
   const gameId = selectedGame.game;
-  if (!gameId) {
-    console.warn('Game ID not found');
-    return;
-  }
+  if (!gameId) return;
   const { data } = await api.get(`game/result-configs/?game=${gameId}`);
   resultConfig.value = data[0];
 }
@@ -266,8 +259,8 @@ watch(
   { immediate: true }
 );
 
+// submitResults unchanged...
 async function submitResults() {
-  // Sanitize faction_id fields
   formData.value = formData.value.map((entry) => ({
     ...entry,
     faction_id:
@@ -286,7 +279,7 @@ async function submitResults() {
   try {
     const response = await api.post('/result/match-results/', payload);
     if (response.status === 201) {
-      $q.notify({ type: 'positive', message: 'Match gespeichert.' });
+      $q.notify({ type: 'positive', message: 'Result saved.' });
       emit('submitted', props.selectedGameId);
     }
   } catch (err: any) {
@@ -311,9 +304,6 @@ async function submitResults() {
 </script>
 
 <style scoped>
-.form-card-header {
-  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
-  border-top-left-radius: 8px;
-  border-top-right-radius: 8px;
-}
+.member-card { border-radius: 10px; background: #fff; }
+.ellipsis { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 </style>

@@ -32,32 +32,11 @@
         color="secondary"
         :is-opened="sectionVisibilityStates['upload']"
       >
-        <!-- Game Tabs for Entering Results -->
-        <q-tabs
-          v-model="currentFormSelectedGameId"
-          active-color="primary"
-          indicator-color="primary"
-          :vertical="isMobile"
-        >
-          <q-tab
-            v-for="selectedGame in selectedGamesFetchedEmpty"
-            :key="selectedGame.id"
-            :name="selectedGame.id"
-          >
-            {{ selectedGame.game_name }}
-          </q-tab>
-        </q-tabs>
-
-        <!-- Match Result Entry Form -->
-        <MatchResultForm
-          v-if="currentFormSelectedGameId"
-          @submitted="handleSubmit"
-          :selected-game-id="currentFormSelectedGameId"
-        />
+        <MatchResultTabs />
       </ContentSection>
 
       <!--      <q-separator />-->
-      <template v-if="leagueStatus === 'PLAYING'">
+      <template v-if="leagueStatus === 'PLAYING' || leagueStatus === 'DONE'">
         <ContentSection
           title="Results"
           color="positive"
@@ -104,6 +83,7 @@ import { useQuasar } from 'quasar';
 import ActionBar from 'components/ui/ActionBar.vue';
 import { useResponsive } from 'src/composables/reponsive';
 import LeagueStandings from 'components/league/LeagueStandings.vue';
+import MatchResultTabs from 'components/league/MatchResultTabs.vue';
 
 const league = useLeagueStore();
 
@@ -115,24 +95,15 @@ const {
   isMePickingGame,
   isMeBanningGame,
   leagueStatus,
-  selectedGamesFetchedEmpty,
   selectedGamesById,
   members,
   leagueId,
 } = storeToRefs(league);
-const { updateLeagueData, refreshResultsForGame } = league;
+const { updateLeagueData } = league;
 
 const { setActions, setLeadText, reset } = useActionBar();
 
 const { user } = useUserStore();
-
-const currentFormSelectedGameId = ref(null);
-
-function handleSubmit(selectedGameId: number) {
-  currentFormSelectedGameId.value = null;
-  refreshResultsForGame(selectedGameId);
-}
-
 setLeadText('Select a game to ban');
 setActions(
   Object.values(selectedGamesById.value)
