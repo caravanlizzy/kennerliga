@@ -29,7 +29,7 @@
     <template v-if="leagueStatus === 'PLAYING'">
       <ContentSection
         title="Upload Results"
-        color="positive"
+        color="secondary"
         :is-opened="sectionVisibilityStates['upload']"
       >
         <!-- Game Tabs for Entering Results -->
@@ -60,7 +60,7 @@
       <template v-if="leagueStatus === 'PLAYING'">
         <ContentSection
           title="Results"
-          color="secondary"
+          color="positive"
           :is-opened="sectionVisibilityStates['results']"
         >
           Results to be displayed here
