@@ -1,69 +1,68 @@
 <template>
+  <!--  Box where players are informed  -->
+  <ActionBar />
+    <SideBarLayout>
 
-    <ActionBar />
+      <div class="q-pa-md">
 
-    <template v-if="leagueStatus === 'PLAYING' || leagueStatus === 'DONE'">
-      <ContentSection title="My League Results">
-        <LeagueStandings />
-      </ContentSection>
-    </template>
+        <!-- Game Selector - shown when user needs to pick games -->
+        <template v-if="isMePickingGame">
+          <ContentSection
+            title="Game Selection"
+            color="secondary"
+            :is-opened="sectionVisibilityStates['selection']"
+          >
+            <GameSelector
+              @submit-success="updateLeagueData"
+              class="q-mt-md q-pa-xs"
+            />
+          </ContentSection>
+        </template>
 
-    <!-- Game Selector - shown when user needs to pick games -->
-    <template v-if="isMePickingGame">
-      <ContentSection
-        title="Game Selection"
-        color="secondary"
-        :is-opened="sectionVisibilityStates['selection']"
-      >
-        <GameSelector
-          @submit-success="updateLeagueData"
-          class="q-mt-md q-pa-xs"
-        />
-      </ContentSection>
-    </template>
+        <!-- Match Results Section -->
+        <template v-if="leagueStatus === 'PLAYING'">
+          <ContentSection
+            title="Upload Results"
+            color="secondary"
+            :is-opened="sectionVisibilityStates['upload']"
+          >
+            <MatchResultTabs />
+          </ContentSection>
 
-    <template v-if="leagueStatus === 'PLAYING' || leagueStatus === 'DONE'">
-    </template>
+          <!--      <q-separator />-->
+          <template v-if="leagueStatus === 'PLAYING' || leagueStatus === 'DONE'">
+            <ContentSection
+              title="Results"
+              color="positive"
+              :is-opened="sectionVisibilityStates['results']"
+            >
+              Results to be displayed here
+            </ContentSection>
+          </template>
+        </template>
 
-    <!-- Match Results Section -->
-    <template v-if="leagueStatus === 'PLAYING'">
-      <ContentSection
-        title="Upload Results"
-        color="secondary"
-        :is-opened="sectionVisibilityStates['upload']"
-      >
-        <MatchResultTabs />
-      </ContentSection>
-
-      <!--      <q-separator />-->
-      <template v-if="leagueStatus === 'PLAYING' || leagueStatus === 'DONE'">
+        <!-- Player Cards Grid -->
         <ContentSection
-          title="Results"
-          color="positive"
-          :is-opened="sectionVisibilityStates['results']"
+          title="Players"
+          color="info"
+          :is-opened="sectionVisibilityStates['players']"
         >
-          Results to be displayed here
+          <div class="row q-col-gutter-md ">
+            <div
+              v-for="member in members"
+              :key="member.id"
+              class="col-12 col-sm-6 col-md-4 col-lg-3"
+            >
+              <PlayerCard :member="member" />
+            </div>
+          </div>
         </ContentSection>
-      </template>
-    </template>
-
-    <!-- Player Cards Grid -->
-
-    <ContentSection
-      title="Players"
-      color="info"
-      :is-opened="sectionVisibilityStates['players']"
-    >
-      <div class="row q-col-gutter-md q-pa-md">
-        <div
-          v-for="member in members"
-          :key="member.id"
-          class="col-12 col-sm-6 col-md-4 col-lg-3"
-        >
-          <PlayerCard :member="member" />
-        </div>
       </div>
-    </ContentSection>
+
+      <template #side>
+        <LeagueStandings />
+      </template>
+    </SideBarLayout>
 </template>
 
 <script setup lang="ts">
@@ -84,6 +83,7 @@ import ActionBar from 'components/ui/ActionBar.vue';
 import { useResponsive } from 'src/composables/reponsive';
 import LeagueStandings from 'components/league/LeagueStandings.vue';
 import MatchResultTabs from 'components/league/MatchResultTabs.vue';
+import SideBarLayout from 'layouts/SideBarLayout.vue';
 
 const league = useLeagueStore();
 

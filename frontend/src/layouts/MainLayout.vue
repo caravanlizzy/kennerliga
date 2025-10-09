@@ -7,9 +7,11 @@
 
     <KennerDrawer v-model="drawerState" />
 
-    <q-page-container class="flex column justify-center q-pa-md">
-      <div :class="{ '': !isMobile }">
-        <router-view class="text-primary" />
+    <q-page-container class="flex column justify-center">
+      <div class="">
+        <q-page>
+          <router-view class="text-primary q-mx-auto" />
+        </q-page>
       </div>
       <ConfirmDialog />
     </q-page-container>

@@ -1,5 +1,5 @@
 <template>
-  <div class="row no-wrap q-pa-xs">
+  <div class="q-pa-xs">
     <!-- Match results -->
     <div class="row justify-center">
 

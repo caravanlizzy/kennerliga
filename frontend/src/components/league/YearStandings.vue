@@ -1,11 +1,8 @@
 <template>
-  <SideAccentBox>
-    <q-table flat bordered>{{columns}}</q-table>
-  </SideAccentBox>
+    <q-table flat>{{columns}}</q-table>
 </template>
 
 <script setup lang="ts">
-import SideAccentBox from 'components/base/SideAccentBox.vue';
 
 const columns = [
   {
