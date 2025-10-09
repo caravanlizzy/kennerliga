@@ -21,8 +21,4 @@ function resolveColor(c: string) {
   </div>
 </template>
 
-<style scoped>
-.bordered-container {
-  border-radius: 4px;    /* optional */
-}
-</style>
+

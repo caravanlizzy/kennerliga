@@ -2,7 +2,6 @@
     <q-table
       title="League Standings"
       flat
-      bordered
       :rows="rows"
       :columns="columns"
       row-key="id"
