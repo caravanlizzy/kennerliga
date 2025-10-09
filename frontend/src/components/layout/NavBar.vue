@@ -1,93 +1,72 @@
 <template>
-  <q-toolbar class="kenner-toolbar q-px-none row justify-between items-center">
+  <q-toolbar
+    class="bg-grey-1 text-dark q-px-md q-py-none shadow-1"
+    style="border-bottom: 1px solid var(--q-primary)"
+  >
     <!-- Left: Brand -->
-    <div class="row items-center">
-      <template v-if="isMobile">
-        <q-btn
-          :to="{ name: 'home' }"
-          round
-          size="md"
-          flat
-          :ripple="{ color: 'secondary' }"
-          color="secondary"
-          icon="psychology"
-          aria-label="Home"
-          type="button"
-        />
-      </template>
-      <template v-else>
-        <q-chip
-          clickable
-          @click="goHome()"
-          outline
-          color="secondary"
-          text-color="secondary"
-          :ripple="{ color: 'secondary' }"
-          class="q-px-sm q-py-xs"
-        >
-          <q-icon name="psychology" size="16px" color="secondary" />
-          <span class="q-ml-sm text-weight-medium">Kennerliga</span>
-        </q-chip>
-      </template>
+    <div class="row items-center no-wrap">
+      <q-btn
+        v-if="isMobile"
+        :to="{ name: 'home' }"
+        flat round dense
+        color="primary"
+        icon="psychology"
+        aria-label="Home"
+      />
+      <q-chip
+        v-else
+        clickable
+        outline
+        color="primary"
+        text-color="primary"
+        @click="goHome"
+        class="q-px-sm q-py-xs bg-grey-1 text-dark"
+      >
+        <q-icon name="psychology" size="16px" class="q-mr-xs" />
+        <span class="text-weight-medium">Kennerliga</span>
+      </q-chip>
     </div>
 
-    <!-- Center: CTA -->
-    <q-toolbar-title class="absolute-center">
+    <q-space />
+
+    <!-- Center: Main CTA -->
+    <div class="row items-center no-wrap">
       <q-btn
         v-if="isAuthenticated"
         :to="{ name: 'my-league' }"
-        outline
+        unelevated
         color="primary"
-        class="q-px-md q-py-xs rounded-borders"
-        :ripple="{ color: 'accent' }"
+        class="q-px-md q-py-xs rounded-borders text-weight-medium"
         no-caps
-        type="button"
       >
         <q-icon name="emoji_events" />
-        <span v-show="!isMobile" class="text-weight-medium q-ml-xs"
-          >My League</span
-        >
-
-        <!-- tiny positive indicator when user is active player -->
+        <span v-show="!isMobile" class="q-ml-xs">My League</span>
         <q-badge v-if="isMeActivePlayer" floating rounded color="positive" />
       </q-btn>
-    </q-toolbar-title>
+    </div>
 
-    <!-- Right: controls -->
-    <div class="row justify-center items-center">
-      <KennerButton
-        @click="toggleDev"
-        flat
-        color="accent"
-        icon="build"
-        :ripple="{ color: 'accent' }"
-      />
+    <q-space />
 
-      <UserName
+    <!-- Right: Controls -->
+    <div class="row items-center no-wrap">
+      <q-btn flat dense round color="accent" icon="build" @click="toggleDev" />
+      <UserName v-if="isAuthenticated" :display-username="user?.username || ''" />
+      <q-btn
         v-if="isAuthenticated"
-        :display-username="user?.username || ''"
-      />
-
-      <KennerButton
-        v-if="isAuthenticated"
-        flat
-        color="primary"
+        flat dense round color="primary"
         icon="menu"
         @click="onToggle"
-        :ripple="{ color: 'accent' }"
       />
-
-      <KennerButton
+      <q-btn
         v-else
-        flat
-        color="positive"
+        flat dense round color="positive"
         icon="login"
         :to="{ name: 'login' }"
-        :ripple="{ color: 'accent' }"
       />
     </div>
   </q-toolbar>
 </template>
+
 
 <script setup lang="ts">
 import KennerButton from 'components/base/KennerButton.vue';
@@ -117,15 +96,5 @@ function goHome() {
   router.push({ name: 'home' });
 }
 </script>
-
-
-<style scoped>
-.kenner-toolbar {
-  background-color: #fff8ed; /* slightly warm tint */
-  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.03);
-}
-</style>
-
 
 
