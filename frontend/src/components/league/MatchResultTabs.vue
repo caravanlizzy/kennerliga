@@ -11,7 +11,7 @@
       :key="selectedGame.id"
       :name="selectedGame.id"
     >
-      {{ selectedGame.game_name }}
+      {{ truncateString(selectedGame.game_name) }}
     </q-tab>
   </q-tabs>
 
@@ -28,8 +28,11 @@ import MatchResultForm from 'components/league/MatchResultForm.vue';
 import { storeToRefs } from 'pinia';
 import { useLeagueStore } from 'stores/leagueStore';
 import { ref } from 'vue';
+import { useResponsive } from 'src/composables/reponsive';
+import { truncateString } from 'src/helpers';
 const { selectedGamesFetchedEmpty } = storeToRefs(useLeagueStore());
 const { refreshResultsForGame } = useLeagueStore();
+const { isMobile } = useResponsive();
 
 const currentFormSelectedGameId = ref(null);
 

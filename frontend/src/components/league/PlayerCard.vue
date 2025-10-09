@@ -16,7 +16,7 @@
         </q-avatar>
 
         <!-- Name + optional rank -->
-        <div class="col text-truncate">
+        <div class="col ">
           <div class="row items-center no-wrap">
             <span class="text-subtitle2 text-weight-medium ellipsis">
               {{ member.username }}
@@ -75,3 +75,4 @@ withDefaults(
   { color: 'var(--q-primary)' }
 )
 </script>
+

@@ -25,3 +25,10 @@ export function loadToken(): void {
     }
   }
 }
+
+export function truncateString(input: string, maxLength = 12): string {
+  if (input.length <= maxLength) {
+    return input;
+  }
+  return input.substring(0, maxLength) + '...';
+}

@@ -8,8 +8,8 @@
               <q-icon name="sports_esports" />
             </q-avatar>
 
-            <div class="text-subtitle1 text-weight-medium ellipsis" style="max-width: 320px">
-              {{ member.selected_game.game_name }}
+            <div class="text-subtitle1 text-weight-medium ellipsis" >
+              {{ truncateString(member.selected_game.game_name) }}
               <q-tooltip v-if="(member.selected_game.game_name || '').length > 28">
                 {{ member.selected_game.game_name }}
               </q-tooltip>
@@ -23,7 +23,6 @@
             </template>
 
             <div class="row items-center no-wrap">
-              <span class="text-grey-7 text-caption">Ban info</span>
               <q-separator vertical inset class="q-mx-sm" />
 
               <!-- Subtle, neutral chip -->
@@ -102,6 +101,7 @@
 import { ref, computed } from 'vue';
 import UserName from 'components/ui/UserName.vue';
 import KennerTooltip from 'components/base/KennerTooltip.vue';
+import { truncateString } from 'src/helpers';
 
 // --- types trimmed to what we actually render ---
 type Choice = { id: number; name: string; option: number };
