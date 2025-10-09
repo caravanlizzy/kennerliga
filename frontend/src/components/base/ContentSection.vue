@@ -1,7 +1,11 @@
 <template>
   <div
-    class="rounded-borders q-my-xs"
-    :style="`border: 3px solid var(--q-${color})`"
+    class=" q-my-xs"
+    :style="{
+      borderWidth: '3px',
+      borderStyle: 'solid',
+      borderImage: `linear-gradient(to right, var(--q-${color}) 0%, transparent 100%) 1`,
+    }"
   >
     <q-expansion-item
       v-model="model"
