@@ -21,14 +21,12 @@
 <script setup lang="ts">
 import NavBar from 'components/layout/NavBar.vue';
 import { ref, Ref } from 'vue';
-import { useResponsive } from 'src/composables/reponsive';
 import KennerDrawer from 'components/layout/KennerDrawer.vue';
 import ConfirmDialog from 'components/ui/ConfirmDialog.vue';
 import { useUiStore } from 'stores/uiStore';
 import { storeToRefs } from 'pinia';
 import DevTools from 'components/ui/DevTools.vue';
 
-const { isMobile } = useResponsive();
 const { isDev } = storeToRefs(useUiStore());
 const drawerState: Ref<boolean> = ref(false);
 

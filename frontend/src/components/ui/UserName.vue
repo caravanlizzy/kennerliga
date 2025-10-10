@@ -12,7 +12,7 @@
 </template>
 
 
-<script setup lang="ts">``
+<script setup lang="ts">
 import { computed } from 'vue';
 import KennerTooltip from 'components/base/KennerTooltip.vue';
 
@@ -39,7 +39,7 @@ const letters = computed(() => {
   if (!clean.value) return '';
   if (props.maxLetters === 1) return clean.value[0].toUpperCase();
   if (parts.value.length >= 2) {
-    return (parts.value[0][0] + parts.value.at(-1)![0]).toUpperCase();
+    return (parts.value[0][0] + parts.value.at(-1)?.[0]).toUpperCase();
   }
   return clean.value.slice(0, 2).toUpperCase();
 });

@@ -1,6 +1,6 @@
 <template>
   <q-toolbar
-    class="bg-grey-1 text-dark q-px-md q-py-none shadow-1"
+    class="bg-grey-1 text-dark q-px-md q-py-none shadow-1 relative-position"
     style="border-bottom: 1px solid var(--q-primary)"
   >
     <!-- Left: Brand -->
@@ -30,7 +30,7 @@
     <q-space />
 
     <!-- Center: Main CTA -->
-    <div class="row items-center no-wrap">
+    <div class="row items-center no-wrap absolute-center">
       <q-btn
         v-if="isAuthenticated"
         :to="{ name: 'my-league' }"
@@ -69,7 +69,6 @@
 
 
 <script setup lang="ts">
-import KennerButton from 'components/base/KennerButton.vue';
 import { useUserStore } from 'stores/userStore';
 import { storeToRefs } from 'pinia';
 import UserName from 'components/ui/UserName.vue';

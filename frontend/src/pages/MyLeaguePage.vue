@@ -70,9 +70,7 @@ import { onMounted, ref, watch, watchEffect } from 'vue';
 import GameSelector from 'components/league/GameSelector.vue';
 import { useLeagueStore } from 'stores/leagueStore';
 import { storeToRefs } from 'pinia';
-import MatchResultForm from 'components/league/MatchResultForm.vue';
 import PlayerCard from 'components/league/PlayerCard.vue';
-import MyLeagueResults from 'components/league/MyLeagueResults.vue';
 import ContentSection from 'components/base/ContentSection.vue';
 import { useActionBar } from 'src/composables/actionBar';
 import { banGame } from 'src/services/game/banGameService';
@@ -80,7 +78,6 @@ import { useUserStore } from 'stores/userStore';
 import { useDialog } from 'src/composables/dialog';
 import { useQuasar } from 'quasar';
 import ActionBar from 'components/ui/ActionBar.vue';
-import { useResponsive } from 'src/composables/reponsive';
 import LeagueStandings from 'components/league/LeagueStandings.vue';
 import MatchResultTabs from 'components/league/MatchResultTabs.vue';
 import SideBarLayout from 'layouts/SideBarLayout.vue';
@@ -131,7 +128,6 @@ watch(isMeBanningGame, () => {
 });
 
 const { setDialog } = useDialog();
-const { isMobile } = useResponsive();
 const $q = useQuasar();
 
 function handleBanGame(selectedGameId: number, gameName: string) {

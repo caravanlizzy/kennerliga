@@ -85,7 +85,7 @@ export function useGameSelection(leagueId: Ref<number|null>) {
   function setSelectedOptions(options: GameOptionDto[]) {
     gameSelection.selectedOptions = options.map(option => ({
       id: option.id,
-      selected_game: gameSelection.game!.id,
+      selected_game: gameSelection.game?.id,
       value: option.has_choices ? undefined : false,
       choice: undefined,
     }));
