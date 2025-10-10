@@ -1,5 +1,5 @@
 <template>
-  <SideBarLayout>
+  <SideBarLayout side-title="Year Standings">
     <div class="q-pl-lg q-py-lg row">
       <CurrentSeason class="col-12"/>
       <SeasonList class="col-12"/>

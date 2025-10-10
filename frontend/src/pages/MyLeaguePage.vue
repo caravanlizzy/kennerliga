@@ -1,7 +1,7 @@
 <template>
   <!--  Box where players are informed  -->
   <ActionBar />
-    <SideBarLayout>
+    <SideBarLayout side-title="League Standings">
 
       <div class="q-pa-md">
 
