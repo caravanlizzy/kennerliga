@@ -1,6 +1,5 @@
 from django.db import models
 
-from league.models import League
 from user.models import PlayerProfile, Platform
 
 
@@ -49,7 +48,7 @@ class GameOptionChoice(models.Model):
 class SelectedGame(models.Model):
     player = models.ForeignKey(PlayerProfile, on_delete=models.CASCADE, related_name='selected_games')
     game = models.ForeignKey(Game, on_delete=models.CASCADE, related_name='game_selections')
-    league = models.ForeignKey(League, on_delete=models.CASCADE, related_name='game_selections')
+    league = models.ForeignKey("league.League", on_delete=models.CASCADE, related_name='game_selections')
 
     class Meta:
         constraints = [
@@ -75,7 +74,7 @@ class SelectedOption(models.Model):
 
 
 class BanDecision(models.Model):
-    league = models.ForeignKey(League, on_delete=models.CASCADE, related_name='ban_decisions')
+    league = models.ForeignKey("league.League", on_delete=models.CASCADE, related_name='ban_decisions')
     player_banning = models.ForeignKey(PlayerProfile, on_delete=models.CASCADE, related_name='ban_decisions')
     selected_game = models.ForeignKey(SelectedGame, null=True, blank=True, on_delete=models.SET_NULL)
 

@@ -4,7 +4,7 @@ from django.db.models import Count, Exists, OuterRef
 from rest_framework import serializers
 
 from game.models import BanDecision
-from league.models import League
+from league.models import League, GameStanding, LeagueStanding
 from season.serializer import SeasonParticipantSerializer
 
 
@@ -12,6 +12,21 @@ class LeagueSerializer(serializers.ModelSerializer):
     class Meta:
         model = League
         fields = '__all__'
+
+class LeagueStandingSerializer(serializers.ModelSerializer):
+    player = serializers.CharField(source="player_profile.profile_name", read_only=True)
+
+    class Meta:
+        model = LeagueStanding
+        fields = ("player_profile", "player", "wins", "league_points")
+
+
+class GameStandingSerializer(serializers.ModelSerializer):
+    player = serializers.CharField(source="player_profile.profile_name", read_only=True)
+
+    class Meta:
+        model = GameStanding
+        fields = ("player_profile", "player", "selected_game", "points", "rank", "league_points", "win_share")
 
 
 class LeagueDetailSerializer(serializers.ModelSerializer):

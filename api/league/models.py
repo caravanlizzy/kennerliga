@@ -1,6 +1,10 @@
+from django.utils import timezone
+
 from django.db import models
 
+from game.models import SelectedGame
 from season.models import Season
+from user.models import PlayerProfile
 
 
 class LeagueStatus(models.TextChoices):
@@ -46,3 +50,44 @@ class LeagueResult(models.Model):
     league_points = models.FloatField()
     position = models.IntegerField()
     last = models.BooleanField()
+
+
+class LeagueStanding(models.Model):
+    league = models.ForeignKey(League, on_delete=models.CASCADE, related_name="standings")
+    player_profile = models.ForeignKey(PlayerProfile, on_delete=models.CASCADE)
+    points = models.DecimalField(max_digits=10, decimal_places=2, default=0)  # raw sum of Result.points
+    wins = models.DecimalField(max_digits=10, decimal_places=2, default=0)  # per your win_mode
+    league_points = models.DecimalField(max_digits=10, decimal_places=2, default=0)  # 6/3/1/0 with tie-sharing
+    updated_at = models.DateTimeField(default=timezone.now)
+
+    class Meta:
+        unique_together = ("league", "player_profile")
+        indexes = [
+            models.Index(fields=["league", "-league_points", "-wins", "-points"]),
+        ]
+
+    def __str__(self):
+        return f"{self.league_id} - {self.player_profile_id}: {self.league_points}"
+
+
+class GameStanding(models.Model):
+    league = models.ForeignKey(League, on_delete=models.CASCADE, related_name="game_standings")
+    selected_game = models.ForeignKey(SelectedGame, on_delete=models.CASCADE, related_name="standings")
+    player_profile = models.ForeignKey(PlayerProfile, on_delete=models.CASCADE)
+
+    # Per-game snapshot
+    points = models.DecimalField(max_digits=10, decimal_places=2, default=0)  # raw points in that game
+    rank = models.PositiveIntegerField()  # dense rank within the game
+    league_points = models.DecimalField(max_digits=10, decimal_places=2, default=0)  # tie-shared per rules
+    win_share = models.DecimalField(max_digits=10, decimal_places=2, default=0)  # 1, fractional, or 0
+    updated_at = models.DateTimeField(default=timezone.now)
+
+    class Meta:
+        unique_together = ("selected_game", "player_profile")
+        indexes = [
+            models.Index(fields=["league", "selected_game"]),
+            models.Index(fields=["league", "-league_points", "-points"]),
+        ]
+
+    def __str__(self):
+        return f"{self.selected_game_id} - {self.player_profile_id}: {self.league_points}"
