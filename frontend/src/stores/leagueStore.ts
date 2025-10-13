@@ -201,6 +201,8 @@ export type MatchResult = {
  * - Result management for games using immutable updates for reactivity.
  */
 export const useLeagueStore = defineStore('league', () => {
+  const loading = ref(false);
+
   // leagueData
   const leagueId = ref<number | null>(null);
   const leagueData = shallowRef<any>(null);
@@ -272,16 +274,20 @@ export const useLeagueStore = defineStore('league', () => {
 
   async function updateLeagueData() {
     if (leagueId.value == null) return;
-    const { data } = await fetchLeagueDetails(leagueId.value);
-    leagueData.value = data;
-    members.value = data.members;
-    members.value = members.value.map((member, index) => ({
-      ...member,
-      colorClass: `bg-player-${index + 1}`,
-      color: `color-player-${index + 1}`,
-      borderClass: `border-player-${index + 1}`,
-    }));
-    leagueStatus.value = data.status;
+    loading.value = true;
+    try {
+      const { data } = await fetchLeagueDetails(leagueId.value);
+      leagueData.value = data;
+      members.value = data.members.map((member: Member, index: number) => ({
+        ...member,
+        colorClass: `bg-player-${index + 1}`,
+        color: `color-player-${index + 1}`,
+        borderClass: `border-player-${index + 1}`,
+      }));
+      leagueStatus.value = data.status;
+    } finally {
+      loading.value = false;
+    }
   }
 
   // Helper to set results atomically & dedup on id
@@ -299,30 +305,46 @@ export const useLeagueStore = defineStore('league', () => {
     const ids = selectedGames.value.map((s) => s.id);
     if (!ids.length) return;
 
-    // fetch all in parallel (replace with a single multi-id endpoint when available)
-    const promises = ids.map((id) =>
-      api.get<MatchResult[]>(`/result/results/?selected_game=${id}`)
-        .then(({ data }) => setResultsForGame(id, data))
-        .catch(() => setResultsForGame(id, [])) // keep UI predictable
-    );
-    await Promise.all(promises);
+    loading.value = true;
+    try {
+      const promises = ids.map((id) =>
+        api.get<MatchResult[]>(`/result/results/?selected_game=${id}`)
+          .then(({ data }) => setResultsForGame(id, data))
+          .catch(() => setResultsForGame(id, []))
+      );
+      await Promise.all(promises);
+    } finally {
+      loading.value = false;
+    }
   }
 
   async function refreshResultsForGame(selectedGameId: number) {
-    const { data } = await api.get<MatchResult[]>(`/result/results/?selected_game=${selectedGameId}`);
-    setResultsForGame(selectedGameId, data);
+    loading.value = true;
+    try {
+      const { data } = await api.get<MatchResult[]>(`/result/results/?selected_game=${selectedGameId}`);
+      setResultsForGame(selectedGameId, data);
+    } finally {
+      loading.value = false;
+    }
   }
 
   async function init() {
     if (initialized.value) return;
     if (initPromise) return initPromise;
+
+    loading.value = true;
     initPromise = (async () => {
-      leagueId.value = await getMyLeagueId();
-      await updateLeagueData();
-      await getMatchResults();
-      initialized.value = true;
-      initPromise = null;
+      try {
+        leagueId.value = await getMyLeagueId();
+        await updateLeagueData();
+        await getMatchResults();
+        initialized.value = true;
+      } finally {
+        loading.value = false;
+        initPromise = null;
+      }
     })();
+
     return initPromise;
   }
 
@@ -354,6 +376,7 @@ export const useLeagueStore = defineStore('league', () => {
 
   return {
     // state
+    loading,
     leagueId,
     leagueData,
     members,

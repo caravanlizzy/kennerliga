@@ -57,7 +57,7 @@ const routes: RouteRecordRaw[] = [
         path: 'league',
         name: 'my-league',
         component: () => import('pages/MyLeaguePage.vue'),
-        meta: { icon: 'sports_esports', label: 'Meine Liga' },
+        meta: { icon: 'sports_esports', label: 'My League' },
       },
     ],
   },

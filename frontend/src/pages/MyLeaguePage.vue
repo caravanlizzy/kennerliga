@@ -1,68 +1,86 @@
 <template>
-  <!--  Box where players are informed  -->
   <ActionBar />
-    <SideBarLayout side-title="League Standings">
 
-      <div class="q-pa-md">
+  <SideBarLayout side-title="League Standings">
+    <!-- ==================== LOADING STATE ==================== -->
+    <div v-if="loading" class="q-pa-xl flex flex-center column q-gutter-md" style="min-height: 60vh;">
+      <q-spinner-ball size="64px" color="accent" />
+      <div class="text-subtitle1 text-accent">Loading league data…</div>
 
-        <!-- Game Selector - shown when user needs to pick games -->
-        <template v-if="isMePickingGame">
-          <ContentSection
-            title="Game Selection"
-            color="secondary"
-            :is-opened="sectionVisibilityStates['selection']"
-          >
-            <GameSelector
-              @submit-success="updateLeagueData"
-              class="q-mt-md q-pa-xs"
-            />
-          </ContentSection>
-        </template>
+      <!-- (optional) subtle placeholders; remove if you want only the spinner -->
+      <div class="full-width q-mt-md">
+        <q-skeleton type="rect" height="28px" class="q-mb-sm" />
+        <q-skeleton type="text" class="q-mb-xs" />
+        <q-skeleton type="text" width="70%" class="q-mb-md" />
 
-        <!-- Match Results Section -->
-        <template v-if="leagueStatus === 'PLAYING'">
-          <ContentSection
-            title="Upload Results"
-            color="secondary"
-            :is-opened="sectionVisibilityStates['upload']"
-          >
-            <MatchResultTabs />
-          </ContentSection>
-
-          <!--      <q-separator />-->
-          <template v-if="leagueStatus === 'PLAYING' || leagueStatus === 'DONE'">
-            <ContentSection
-              title="Results"
-              color="positive"
-              :is-opened="sectionVisibilityStates['results']"
-            >
-              Results to be displayed here
-            </ContentSection>
-          </template>
-        </template>
-
-        <!-- Player Cards Grid -->
-        <ContentSection
-          title="Players"
-          color="info"
-          :is-opened="sectionVisibilityStates['players']"
-        >
-          <div class="row q-col-gutter-md ">
-            <div
-              v-for="member in members"
-              :key="member.id"
-              class="col-12 col-sm-6 col-md-4 col-lg-3"
-            >
-              <PlayerCard :member="member" />
-            </div>
+        <div class="row q-col-gutter-md">
+          <div v-for="n in 4" :key="n" class="col-12 col-sm-6 col-md-4 col-lg-3">
+            <q-skeleton height="160px" square />
           </div>
-        </ContentSection>
+        </div>
       </div>
+    </div>
 
-      <template #side>
-        <LeagueStandings />
+    <!-- ==================== NORMAL CONTENT ==================== -->
+    <div v-else class="q-pa-md">
+      <!-- Game Selector - shown when user needs to pick games -->
+      <template v-if="isMePickingGame">
+        <ContentSection
+          title="Game Selection"
+          color="secondary"
+          :is-opened="sectionVisibilityStates['selection']"
+        >
+          <GameSelector
+            @submit-success="updateLeagueData"
+            class="q-mt-md q-pa-xs"
+          />
+        </ContentSection>
       </template>
-    </SideBarLayout>
+
+      <!-- Match Results Section -->
+      <template v-if="leagueStatus === 'PLAYING'">
+        <ContentSection
+          title="Upload Results"
+          color="secondary"
+          :is-opened="sectionVisibilityStates['upload']"
+        >
+          <MatchResultTabs />
+        </ContentSection>
+
+        <template v-if="leagueStatus === 'PLAYING' || leagueStatus === 'DONE'">
+          <ContentSection
+            title="Results"
+            color="positive"
+            :is-opened="sectionVisibilityStates['results']"
+          >
+            Results to be displayed here
+          </ContentSection>
+        </template>
+      </template>
+
+      <!-- Player Cards Grid -->
+      <ContentSection
+        title="Players"
+        color="info"
+        :is-opened="sectionVisibilityStates['players']"
+      >
+        <div class="row q-col-gutter-md ">
+          <div
+            v-for="member in members"
+            :key="member.id"
+            class="col-12 col-sm-6 col-md-4 col-lg-3"
+          >
+            <PlayerCard :member="member" />
+          </div>
+        </div>
+      </ContentSection>
+    </div>
+
+    <template #side>
+      <!-- You can also hide the sidebar while loading; if you want that, wrap with v-if="!loading" -->
+      <LeagueStandings v-if="!loading" />
+    </template>
+  </SideBarLayout>
 </template>
 
 <script setup lang="ts">
@@ -95,6 +113,7 @@ const {
   selectedGamesById,
   members,
   leagueId,
+  loading, // 👈 global store flag
 } = storeToRefs(league);
 const { updateLeagueData } = league;
 
@@ -162,10 +181,10 @@ function handleBanGame(selectedGameId: number, gameName: string) {
 }
 
 interface SectionVisibilityStates {
-  selection: boolean; // Game selection section visibility
-  upload: boolean; // Match upload section visibility
-  results: boolean; // Results section visibility
-  players: boolean; // Players section visibility
+  selection: boolean;
+  upload: boolean;
+  results: boolean;
+  players: boolean;
 }
 
 const sectionVisibilityStates = ref<SectionVisibilityStates>({
@@ -175,13 +194,6 @@ const sectionVisibilityStates = ref<SectionVisibilityStates>({
   players: true,
 });
 
-/**
- * Automatically updates section visibility based on league status changes
- * - PLAYING: Shows upload and results sections
- * - DONE: Shows only results section
- * - BANNING: Hides selection, shows players
- * - PICKING/REPICKING: Shows selection section
- */
 watchEffect(() => {
   switch (leagueStatus.value) {
     case 'PLAYING':

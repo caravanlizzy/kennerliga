@@ -48,18 +48,39 @@
     <q-space />
 
     <!-- Right: Controls -->
-    <div class="row items-center no-wrap">
-      <q-btn flat dense round color="accent" icon="build" @click="toggleDev" />
-      <UserName v-if="isAuthenticated" :display-username="user?.username || ''" />
+    <div class="row items-center no-wrap q-gutter-x-sm">
+      <q-btn
+        flat
+        dense
+        round
+        color="accent"
+        icon="build"
+        @click="toggleDev"
+        aria-label="Developer tools"
+      />
+
+      <UserName
+        v-if="isAuthenticated"
+        :display-username="user?.username || ''"
+        class="q-ml-xs q-mr-xs"
+      />
+
       <q-btn
         v-if="isAuthenticated"
-        flat dense round color="primary"
+        flat
+        dense
+        round
+        color="primary"
         icon="menu"
         @click="onToggle"
       />
+
       <q-btn
         v-else
-        flat dense round color="positive"
+        flat
+        dense
+        round
+        color="positive"
         icon="login"
         :to="{ name: 'login' }"
       />
@@ -67,33 +88,28 @@
   </q-toolbar>
 </template>
 
-
 <script setup lang="ts">
-import { useUserStore } from 'stores/userStore';
-import { storeToRefs } from 'pinia';
-import UserName from 'components/ui/UserName.vue';
-import { useRouter } from 'vue-router';
-import { useUiStore } from 'stores/uiStore';
-import { useResponsive } from 'src/composables/reponsive';
-import { useLeagueStore } from 'stores/leagueStore';
-import { onMounted } from 'vue';
+import { useUserStore } from 'stores/userStore'
+import { storeToRefs } from 'pinia'
+import UserName from 'components/ui/UserName.vue'
+import { useRouter } from 'vue-router'
+import { useUiStore } from 'stores/uiStore'
+import { useResponsive } from 'src/composables/reponsive'
+import { useLeagueStore } from 'stores/leagueStore'
+import { onMounted } from 'vue'
 
-defineProps<{
-  onToggle: () => void;
-}>();
+defineProps<{ onToggle: () => void }>()
 
-const router = useRouter();
-const { toggleDev } = useUiStore();
-const { isAuthenticated, user } = storeToRefs(useUserStore());
-const { isMeActivePlayer } = storeToRefs(useLeagueStore());
-const { updateLeagueData } = useLeagueStore();
-const { isMobile } = useResponsive();
+const router = useRouter()
+const { toggleDev } = useUiStore()
+const { isAuthenticated, user } = storeToRefs(useUserStore())
+const { isMeActivePlayer } = storeToRefs(useLeagueStore())
+const { updateLeagueData } = useLeagueStore()
+const { isMobile } = useResponsive()
 
-onMounted(() => updateLeagueData());
+onMounted(() => updateLeagueData())
 
 function goHome() {
-  router.push({ name: 'home' });
+  router.push({ name: 'home' })
 }
 </script>
-
-

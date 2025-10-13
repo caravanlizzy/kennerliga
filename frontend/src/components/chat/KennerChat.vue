@@ -87,7 +87,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, type Ref, nextTick, watch, onMounted, computed } from 'vue';
+import { ref, type Ref, nextTick, watch, onMounted, onUnmounted, computed } from 'vue';
 import { formatDateTime } from 'src/helpers';
 import {
   addMessage,
@@ -118,6 +118,7 @@ const inputRef = ref<any>(null);
 const notAtBottom = ref(false);
 const unreadCount = ref(0);
 const inputFocused = ref(false);
+let pollTimer: number | undefined;
 
 const showUnread = computed(() => notAtBottom.value && unreadCount.value > 0);
 
@@ -189,6 +190,7 @@ async function send() {
     jumpToBottom(true);
   } finally {
     sending.value = false;
+    // focus ONLY after sending
     nextTick(() => inputRef.value?.focus());
   }
 }
@@ -209,9 +211,10 @@ watch(
     if (newLen === 0) return;
 
     const wasNear = isNearBottom();
-    const added = newLen - (oldLen ?? 0) || 0;
+    const prevLen = oldLen ?? 0;
+    const added = newLen - prevLen;
 
-    if (!oldLen) {
+    if (prevLen === 0) {
       // First render
       jumpToBottom(false);
       return;
@@ -239,14 +242,21 @@ watch(
 onMounted(() => {
   loadMessages().then(() => {
     jumpToBottom(false);
-    nextTick(() => inputRef.value?.focus());
+    // ❌ no initial focus — only focus after a send()
   });
 
   // polling for new messages
-  setInterval(async () => {
+  pollTimer = window.setInterval(async () => {
     await loadMessages();
     if (isNearBottom()) jumpToBottom(true);
   }, 5000);
+});
+
+onUnmounted(() => {
+  if (pollTimer) {
+    clearInterval(pollTimer);
+    pollTimer = undefined;
+  }
 });
 </script>
 
