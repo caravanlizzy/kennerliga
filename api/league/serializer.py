@@ -5,13 +5,36 @@ from rest_framework import serializers
 
 from game.models import BanDecision
 from league.models import League, GameStanding, LeagueStanding
+from season.models import SeasonParticipant
 from season.serializer import SeasonParticipantSerializer
 
 
 class LeagueSerializer(serializers.ModelSerializer):
+    # Accept a list of SeasonParticipant IDs
+    members = serializers.PrimaryKeyRelatedField(
+        queryset=SeasonParticipant.objects.all(), many=True
+    )
+
     class Meta:
         model = League
-        fields = '__all__'
+        fields = ["id", "season", "level", "status", "active_player", "members"]
+
+    def validate(self, attrs):
+        season = attrs.get("season") or getattr(self.instance, "season", None)
+        members = attrs.get("members", [])
+        # Ensure all members are from the same season
+        invalid = [sp.id for sp in members if sp.season_id != season.id]
+        if invalid:
+            raise serializers.ValidationError(
+                {"members": f"All members must belong to season {season.id}. Offenders: {invalid}"}
+            )
+        return attrs
+
+    def create(self, validated_data):
+        members = validated_data.pop("members", [])
+        league = League.objects.create(**validated_data)
+        league.members.set(members)
+        return league
 
 class LeagueStandingSerializer(serializers.ModelSerializer):
     player = serializers.CharField(source="player_profile.profile_name", read_only=True)

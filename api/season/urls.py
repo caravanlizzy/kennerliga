@@ -1,11 +1,13 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 
-from season.views import SeasonViewSet, SeasonRegistrationView, SeasonScoreboardViewSet, CurrentSeasonView
+from season.views import SeasonViewSet, SeasonRegistrationView, SeasonScoreboardViewSet, CurrentSeasonView, \
+    SeasonParticipantViewSet
 
 router = DefaultRouter()
 router.register('seasons', SeasonViewSet, basename='seasons')
 router.register('season-scoreboards', SeasonScoreboardViewSet, basename='season-scoreboards')
+router.register('season-participants', SeasonParticipantViewSet, basename='season-participants')
 
 urlpatterns = [
     path('', include(router.urls)),

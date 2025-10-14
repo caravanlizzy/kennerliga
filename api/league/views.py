@@ -1,25 +1,21 @@
-from collections import defaultdict
-from decimal import Decimal
-from typing import List, Dict
-
 from django.db.models import Prefetch
 from django.db.models import prefetch_related_objects
-from django.shortcuts import get_object_or_404
 from rest_framework import status
 from rest_framework.decorators import action
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from rest_framework.viewsets import ReadOnlyModelViewSet, ViewSet
+from rest_framework.viewsets import ReadOnlyModelViewSet, ModelViewSet
 
 from game.models import SelectedGame, BanDecision
 from league.models import League, LeagueStanding, GameStanding
-from league.serializer import LeagueDetailSerializer, LeagueStandingSerializer, GameStandingSerializer
-from season.models import Season
+from league.serializer import LeagueDetailSerializer, LeagueStandingSerializer, GameStandingSerializer, LeagueSerializer
 from services.standings_snapshot import rebuild_league_snapshot
 
 
-class LeagueViewSet(ReadOnlyModelViewSet):
+class LeagueViewSet(ModelViewSet):
     queryset = League.objects.all()
-    # serializer_class = LeagueSerializer  # your usual league serializer
+    serializer_class = LeagueSerializer
+    permission_classes = [IsAuthenticated]  # adjust to your needs
 
     @action(detail=True, methods=['get'], url_path='standings')
     def standings(self, request, pk=None):

@@ -55,8 +55,7 @@
         round
         color="accent"
         icon="build"
-        @click="toggleDev"
-        aria-label="Developer tools"
+        :to="{ name: 'admin-home' }"
       />
 
       <UserName
@@ -101,7 +100,6 @@ import { onMounted } from 'vue'
 defineProps<{ onToggle: () => void }>()
 
 const router = useRouter()
-const { toggleDev } = useUiStore()
 const { isAuthenticated, user } = storeToRefs(useUserStore())
 const { isMeActivePlayer } = storeToRefs(useLeagueStore())
 const { updateLeagueData } = useLeagueStore()

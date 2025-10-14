@@ -7,6 +7,7 @@ from django.http import HttpResponseNotFound
 from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.generics import get_object_or_404
+from rest_framework.permissions import IsAdminUser
 from rest_framework.response import Response
 from django.utils import timezone
 from rest_framework.views import APIView
@@ -15,8 +16,8 @@ from rest_framework.viewsets import ModelViewSet, ViewSet
 from league.models import League, LeagueStanding, GameStanding
 from season.queries import register, is_profile_registered
 from season_manager import SeasonManager
-from season.models import Season
-from season.serializer import SeasonSerializer
+from season.models import Season, SeasonParticipant
+from season.serializer import SeasonSerializer, SeasonParticipantSerializer
 from user.models import PlayerProfile
 
 
@@ -207,3 +208,13 @@ class CurrentSeasonView(APIView):
             {"id": season.id, "name": season.name, "status": season.status},
             status=status.HTTP_200_OK,
         )
+
+class SeasonParticipantViewSet(ModelViewSet):
+    """
+    list:   GET  /season-participants/?season=<id>
+    create: POST /season-participants/  {season, profile, rank?}
+    """
+    queryset = SeasonParticipant.objects.select_related("season", "profile")
+    serializer_class = SeasonParticipantSerializer
+    permission_classes = [IsAdminUser]  # adjust if needed
+    filterset_fields = ["season", "profile"]

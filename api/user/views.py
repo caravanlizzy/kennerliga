@@ -15,7 +15,8 @@ from result.serializers import ResultSerializer
 from season.models import Season, SeasonParticipant
 from season.serializer import SeasonSerializer
 from user.models import User, PlayerProfile, Platform, PlatformPlayer, _hash_key, UserInviteLink
-from user.serializers import UserSerializer, UserInviteLinkSerializer, UserRegistrationSerializer
+from user.serializers import UserSerializer, UserInviteLinkSerializer, UserRegistrationSerializer, \
+    PlayerProfileSerializer
 
 
 # Create your views here.
@@ -207,3 +208,8 @@ class UserRegistrationViewSet(ViewSet):
             "expires_at": invite.expires_at,
         }, status=200)
 
+
+class PlayerProfileViewSet(ModelViewSet):
+    queryset = PlayerProfile.objects.all()
+    serializer_class = PlayerProfileSerializer
+    permission_classes = [IsAuthenticated]

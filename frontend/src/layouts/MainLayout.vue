@@ -2,7 +2,6 @@
   <q-layout class="column" view="hHh Lpr lFf">
     <q-header bordered class="text-primary bg-white" >
       <NavBar :onToggle="toggleDrawer" />
-      <DevTools v-show="isDev" />
     </q-header>
 
     <KennerDrawer v-model="drawerState" />
@@ -23,11 +22,7 @@ import NavBar from 'components/layout/NavBar.vue';
 import { ref, Ref } from 'vue';
 import KennerDrawer from 'components/layout/KennerDrawer.vue';
 import ConfirmDialog from 'components/ui/ConfirmDialog.vue';
-import { useUiStore } from 'stores/uiStore';
-import { storeToRefs } from 'pinia';
-import DevTools from 'components/ui/DevTools.vue';
 
-const { isDev } = storeToRefs(useUiStore());
 const drawerState: Ref<boolean> = ref(false);
 
 function toggleDrawer(): void {
