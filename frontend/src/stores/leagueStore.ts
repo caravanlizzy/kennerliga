@@ -274,6 +274,7 @@ export const useLeagueStore = defineStore('league', () => {
 
   async function updateLeagueData() {
     if (leagueId.value == null) return;
+    await new Promise(resolve => setTimeout(resolve, 1000));
     loading.value = true;
     try {
       const { data } = await fetchLeagueDetails(leagueId.value);

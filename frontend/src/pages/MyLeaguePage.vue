@@ -3,23 +3,21 @@
 
   <SideBarLayout side-title="League Standings">
     <!-- ==================== LOADING STATE ==================== -->
-    <div v-if="loading" class="q-pa-xl flex flex-center column q-gutter-md" style="min-height: 60vh;">
-      <q-spinner-ball size="64px" color="accent" />
-      <div class="text-subtitle1 text-accent">Loading league data…</div>
+    <template v-if="loading">
+      <LoadingSpinner text="Loading league data...">
+        <template #skeleton>
+          <q-skeleton type="rect" height="28px" class="q-mb-sm" />
+          <q-skeleton type="text" class="q-mb-xs" />
+          <q-skeleton type="text" width="70%" class="q-mb-md" />
 
-      <!-- (optional) subtle placeholders; remove if you want only the spinner -->
-      <div class="full-width q-mt-md">
-        <q-skeleton type="rect" height="28px" class="q-mb-sm" />
-        <q-skeleton type="text" class="q-mb-xs" />
-        <q-skeleton type="text" width="70%" class="q-mb-md" />
-
-        <div class="row q-col-gutter-md">
-          <div v-for="n in 4" :key="n" class="col-12 col-sm-6 col-md-4 col-lg-3">
-            <q-skeleton height="160px" square />
+          <div class="row q-col-gutter-md">
+            <div v-for="n in 4" :key="n" class="col-12 col-sm-6 col-md-4 col-lg-3">
+              <q-skeleton height="160px" square />
+            </div>
           </div>
-        </div>
-      </div>
-    </div>
+        </template>
+      </LoadingSpinner>
+    </template>
 
     <!-- ==================== NORMAL CONTENT ==================== -->
     <div v-else class="q-pa-md">
@@ -99,6 +97,7 @@ import ActionBar from 'components/ui/ActionBar.vue';
 import LeagueStandings from 'components/league/LeagueStandings.vue';
 import MatchResultTabs from 'components/league/MatchResultTabs.vue';
 import SideBarLayout from 'layouts/SideBarLayout.vue';
+import LoadingSpinner from 'components/base/LoadingSpinner.vue';
 
 const league = useLeagueStore();
 

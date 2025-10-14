@@ -10,6 +10,7 @@
       <div class="col"></div>
 
       <div class="col-auto flex flex-center">
+
         <q-chip
           color="primary"
           text-color="primary"
@@ -18,7 +19,12 @@
           dense
           class="bg-white text-uppercase text-bold"
         >
-          {{ statusNoun }}
+          <template v-if="loading">
+            Loading
+          </template>
+          <template v-else>
+            {{ statusNoun }}
+          </template>
         </q-chip>
       </div>
 
@@ -86,7 +92,7 @@ import { storeToRefs } from 'pinia';
 import { useResponsive } from 'src/composables/reponsive';
 
 const { actions, leadText, subject, reset } = useActionBar();
-const { activePlayer, isMeActivePlayer, statusNoun } = storeToRefs(useLeagueStore());
+const { activePlayer, isMeActivePlayer, statusNoun, loading } = storeToRefs(useLeagueStore());
 const { isMobile } = useResponsive();
 
 async function handleAction(action: any) {
