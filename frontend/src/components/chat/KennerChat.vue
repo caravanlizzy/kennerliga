@@ -33,20 +33,33 @@
           @wheel.passive="markChatRead"
         >
           <div
-            class="row justify-between q-py-xs"
+            class="row no-wrap items-start q-py-xs msg-row"
             v-for="(message, i) in messages"
             :key="message.id ?? `${message.datetime}-${i}`"
+            :style="{ '--uclr': userColor(message.sender) }"
           >
-            <div>
-              {{ message.sender }}
+            <!-- username + dot -->
+            <div class="col-auto q-pr-sm username q-pt-xs flex items-center">
+              <span class="text-caption text-weight-medium">
+                {{ message.sender }}
+              </span>
+              <span class="color-dot q-mr-xs" />
               <KennerTooltip anchor="top middle" self="bottom middle">
                 {{ formatDateTime(message.datetime) }}
               </KennerTooltip>
             </div>
-            <div>{{ message.text }}</div>
+
+            <!-- message bubble -->
+            <div class="col msg-right">
+              <div
+                class="bubble q-pa-sm rounded-borders bg-grey-1 text-dark"
+                :class="{ mine: isMine(message) }"
+              >
+                <div class="prewrap">{{ message.text }}</div>
+              </div>
+            </div>
           </div>
 
-          <!-- sentinel to scroll to bottom -->
           <div ref="bottomAnchor" aria-hidden="true" />
         </q-card-section>
       </div>
@@ -87,7 +100,15 @@
 </template>
 
 <script setup lang="ts">
-import { ref, type Ref, nextTick, watch, onMounted, onUnmounted, computed } from 'vue';
+import {
+  ref,
+  type Ref,
+  nextTick,
+  watch,
+  onMounted,
+  onUnmounted,
+  computed,
+} from 'vue';
 import { formatDateTime } from 'src/helpers';
 import {
   addMessage,
@@ -204,6 +225,16 @@ async function loadMessages() {
   lastDateTime = messages.value[messages.value.length - 1].datetime;
 }
 
+// helpers for username → stable color
+function userColor(name?: string | null) {
+  const s = (name ?? '').trim();
+  if (!s) return 'hsl(0, 0%, 70%)';
+  let h = 0;
+  for (let i = 0; i < s.length; i++) h = ((h << 5) - h + s.charCodeAt(i)) | 0;
+  const hue = Math.abs(h) % 360;
+  return `hsl(${hue}, 65%, 55%)`;
+}
+
 // When messages change, decide auto-scroll & unread count
 watch(
   () => messages.value.length,
@@ -261,16 +292,67 @@ onUnmounted(() => {
 </script>
 
 <style scoped lang="scss">
-.chat-card {
-  position: relative;
-}
-.chat-wrap {
-  position: relative;
+.chat {
+  max-height: 400px;
+  min-height: 200px;
+  overflow-y: auto;
+  scroll-behavior: smooth;
+  padding-right: 4px;
 }
 
-.chat {
-  max-height: 300px;
-  overflow-y: auto;
-  scroll-behavior: smooth; /* smooth user-initiated scrolls */
+/* message row */
+.msg-row {
+  align-items: flex-start;
+}
+
+/* username + color dot */
+.username { min-width: 5.5rem; }
+
+/* softer, smaller dot */
+.color-dot {
+  width: 6px;            /* was 8px */
+  height: 6px;
+  border-radius: 50%;
+  background-color: var(--uclr);
+  opacity: 0.5;         /* very light */
+  margin-left: 6px;      /* space after name */
+  box-shadow: none;      /* remove glow */
+  flex: 0 0 auto;
+}
+
+
+/* right side aligns bubble to the right */
+.msg-right {
+  display: flex;
+  justify-content: flex-end;
+  width: 100%;
+}
+
+/* message bubble */
+.bubble {
+  max-width: 45%;
+  min-width: 220px;
+  word-wrap: break-word;
+  overflow-wrap: anywhere;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+  border-radius: 8px;
+}
+
+/* slightly accentuate your own messages */
+.bubble.mine {
+  background-color: var(--q-grey-2);
+}
+
+/* preserve line breaks */
+.prewrap {
+  white-space: pre-wrap;
+}
+
+/* mobile: relax bubble cap a bit */
+@media (max-width: 600px) {
+  .bubble {
+    max-width: 80%;
+    min-width: 160px;
+  }
 }
 </style>
