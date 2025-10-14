@@ -1,6 +1,6 @@
 <template>
   <SideBarLayout side-title="Year Standings">
-    <div class="q-pl-lg q-py-lg row">
+    <div class="q-px-lg q-py-lg row">
       <CurrentSeason :seasonId="seasonId" class="col-12" />
       <SeasonList class="col-12" />
       <KennerChat class="col-12" />
