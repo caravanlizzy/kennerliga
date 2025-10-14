@@ -1,57 +1,8 @@
 <!-- CollapsibleSidePanel.vue -->
-<script setup lang="ts">
-import { ref, computed, watch } from 'vue'
-import { useResponsive } from 'src/composables/reponsive';
-
-type Break = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
-
-type Props = {
-  /** Sidebar title used on the rail and drawer header */
-  sideTitle?: string
-  /** Sidebar width on large screens (px) */
-  sideWidth?: number
-  /** Rail thickness on small screens (px) */
-  railWidth?: number
-  /** Treat screens <= this breakpoint as "small" (defaults to 'md') */
-  switchAt?: Break
-  /** Start collapsed on small screens */
-  collapsedSmallByDefault?: boolean
-}
-
-const props = withDefaults(defineProps<Props>(), {
-  sideTitle: 'Details',
-  sideWidth: 300,
-  railWidth: 28,
-  switchAt: 'sm',
-  collapsedSmallByDefault: true
-})
-
-/** Use your composable; grab screenName specifically */
-const { screenName } = useResponsive()
-
-/** Determine if we're on a "small" screen using screenName */
-const order: Break[] = ['xs', 'sm', 'md', 'lg', 'xl']
-const isSmall = computed(() => {
-  const cur = order.indexOf(screenName.value)
-  const cut = order.indexOf(props.switchAt)
-  return cur <= cut
-})
-
-/** Open state: large screens always open; small screens follow default & toggles */
-const sideOpen = ref(true)
-watch(isSmall, (small) => {
-  sideOpen.value = small ? !props.collapsedSmallByDefault : true
-}, { immediate: true })
-
-function toggleSide () {
-  sideOpen.value = !sideOpen.value
-}
-</script>
-
 <template>
   <div class="row no-wrap items-stretch">
     <!-- Main content -->
-    <div class="col min-w-0">
+    <div class="col min-w-0 q-px-md">
       <slot />
     </div>
 
@@ -112,6 +63,56 @@ function toggleSide () {
     </template>
   </div>
 </template>
+
+<script setup lang="ts">
+import { ref, computed, watch } from 'vue'
+import { useResponsive } from 'src/composables/reponsive';
+
+type Break = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
+
+type Props = {
+  /** Sidebar title used on the rail and drawer header */
+  sideTitle?: string
+  /** Sidebar width on large screens (px) */
+  sideWidth?: number
+  /** Rail thickness on small screens (px) */
+  railWidth?: number
+  /** Treat screens <= this breakpoint as "small" (defaults to 'md') */
+  switchAt?: Break
+  /** Start collapsed on small screens */
+  collapsedSmallByDefault?: boolean
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  sideTitle: 'Details',
+  sideWidth: 300,
+  railWidth: 28,
+  switchAt: 'sm',
+  collapsedSmallByDefault: true
+})
+
+/** Use your composable; grab screenName specifically */
+const { screenName } = useResponsive()
+
+/** Determine if we're on a "small" screen using screenName */
+const order: Break[] = ['xs', 'sm', 'md', 'lg', 'xl']
+const isSmall = computed(() => {
+  const cur = order.indexOf(screenName.value)
+  const cut = order.indexOf(props.switchAt)
+  return cur <= cut
+})
+
+/** Open state: large screens always open; small screens follow default & toggles */
+const sideOpen = ref(true)
+watch(isSmall, (small) => {
+  sideOpen.value = small ? !props.collapsedSmallByDefault : true
+}, { immediate: true })
+
+function toggleSide () {
+  sideOpen.value = !sideOpen.value
+}
+</script>
+
 
 <style scoped>
 .min-w-0 { min-width: 0; }

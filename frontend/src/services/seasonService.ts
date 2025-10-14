@@ -7,3 +7,8 @@ export async function registerForCurrentSeason(): Promise<void> {
     console.error(error)
   }
 }
+
+export async function getCurrentSeasonId(): Promise<number> {
+  const { data } = await api('/season/current/');
+  return data.id;
+}

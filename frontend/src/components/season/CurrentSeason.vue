@@ -1,10 +1,13 @@
 <template>
     <SideAccentBox color="info" class="current-season q-pa-md">
-        <div class="text-h6">Current Season</div>
+        <SeasonScoreboards v-if="seasonId" :season-id="seasonId" />
     </SideAccentBox>
 </template>
 
 <script setup lang="ts">
 
 import SideAccentBox from 'components/base/SideAccentBox.vue';
+import SeasonScoreboards from 'components/season/SeasonScoreboards.vue';
+
+defineProps<{ seasonId: number }>();
 </script>
