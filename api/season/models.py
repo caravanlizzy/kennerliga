@@ -1,4 +1,6 @@
 from datetime import datetime
+
+from django.utils import timezone
 from django.utils.timezone import now  # Use timezone-aware datetime
 from django.core.validators import MinValueValidator, MaxValueValidator
 
@@ -26,16 +28,23 @@ class Season(models.Model):
     )
 
     @property
-    def name(self):
-        return str(self.year) + '_S' + str(self.month)
+    def name(self) -> str:
+        # zero-pad month if you like "2025_S10" vs "2025_S9"
+        return f"{self.year}_S{self.month}"
 
     @property
-    def season_start_time(self):
-        return datetime(self.year, self.month, 1, 0, 0)
+    def season_start_time(self) -> datetime:
+        # Build a naive dt for the first day of the month at 00:00
+        dt = datetime(self.year, self.month, 1, 0, 0)
+        # Make it timezone-aware using the project's default TZ
+        if timezone.is_naive(dt):
+            dt = timezone.make_aware(dt, timezone.get_default_timezone())
+        return dt
 
     @property
     def time_to_start(self):
-        return self.season_start_time - now()
+        # Both operands are now aware -> safe subtraction
+        return self.season_start_time - timezone.now()
 
     def __str__(self):
         return self.name

@@ -1,3 +1,5 @@
+from collections import defaultdict
+
 from rest_framework.viewsets import ModelViewSet, ViewSet
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -24,18 +26,14 @@ class MatchResultViewSet(ViewSet):
     permission_classes = [IsAuthenticated]
 
     def create(self, request):
-        # ---- Extract POST data
         selected_game_id = request.data.get("selected_game")
         data = request.data.get("results", [])
+        requested_tb_id = (request.data.get("tiebreaker") or {}).get("id")
 
-        # ---- Validate input structure
         if not selected_game_id or not isinstance(data, list) or len(data) < 2:
-            return Response(
-                {"detail": "You must submit a selected_game and at least two results."},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
+            return Response({"detail": "You must submit a selected_game and at least two results."},
+                            status=status.HTTP_400_BAD_REQUEST)
 
-        # ---- Load SelectedGame (with game + league + season context)
         try:
             selected_game = (
                 SelectedGame.objects
@@ -49,101 +47,225 @@ class MatchResultViewSet(ViewSet):
         season = league.season
         game = selected_game.game
 
-        # ---- Load ResultConfig (scoring / tie-breaker rules selection)
+        expected_result_count = league.members.count()
+        if len(data) != expected_result_count:
+            return Response({"detail": f"Expected {expected_result_count} results, got {len(data)}."},
+                            status=status.HTTP_400_BAD_REQUEST)
+
         try:
             result_config = ResultConfig.objects.get(game=game)
         except ResultConfig.DoesNotExist:
             return Response({"detail": "ResultConfig not found for this game."}, status=status.HTTP_400_BAD_REQUEST)
 
-        # ---- Validate & enrich each submitted result
+        # ---- Validate rows via serializer
         serializers = []
-        seen_players = set()
+        seen = set()
         for entry in data:
-            # inject FKs
             entry['selected_game'] = selected_game.id
             entry['league'] = league.id
             entry['season'] = season.id
 
-            # (optional) ensure each player only appears once for this game payload
             pid = entry.get("player_profile")
-            if pid in seen_players:
+            if pid in seen:
                 return Response({"detail": f"Duplicate player_profile {pid} in payload."},
                                 status=status.HTTP_400_BAD_REQUEST)
-            seen_players.add(pid)
+            seen.add(pid)
 
             s = ResultSerializer(data=entry, context={"request": request})
             if not s.is_valid():
                 return Response(s.errors, status=status.HTTP_400_BAD_REQUEST)
             serializers.append(s)
 
-        # ---- Get validated rows
-        validated = [s.validated_data for s in serializers]
+        rows = [s.validated_data for s in serializers]
 
-        # ---- Determine top scorers (by raw 'points')
-        scores = [v["points"] for v in validated]
-        max_score = max(scores)
-        tied = [v for v in validated if v["points"] == max_score]
+        # ---- Tie-breakers (highest order first)
+        tbs = list(TieBreaker.objects.filter(result_config=result_config).order_by('-order'))
+        tb_index_by_id = {tb.id: idx for idx, tb in enumerate(tbs)}
 
-        # helper to parse tie breaker value from a validated row
-        def parse_tb(valdict):
+        def fnum(x, default=None):
             try:
-                return float(valdict.get("tie_breaker_value") or -1)
-            except (ValueError, TypeError):
-                return -1
+                return float(x)
+            except (TypeError, ValueError):
+                return default
 
-        decisive_tb = None  # which TieBreaker (if any) resolved the tie
+        # Build a key for sorting/grouping up to a given TB level (inclusive)
+        # level=-1 => only points
+        def key_up_to(row, level):
+            key = [-fnum(row["points"], 0)]  # descending points
+            for i in range(level + 1):
+                if i < 0:  # no TBs yet
+                    continue
+                val = fnum(row.get("tie_breaker_value"))
+                # Missing values sort as smallest so they group as ties until provided
+                key.append(-val if val is not None else float('inf'))
+            return tuple(key)
 
-        if len(tied) > 1:
-            # apply configured tie-breakers sequentially
-            tie_breakers = TieBreaker.objects.filter(result_config=result_config).order_by("order")
-            for tb in tie_breakers:
-                tb_values = [(row, parse_tb(row)) for row in tied]
-                max_tb = max(val for _, val in tb_values)
-                tied = [row for row, val in tb_values if val == max_tb]
-                if len(tied) == 1:
-                    decisive_tb = tb
-                    break
+        # Group rows by a given level's key; return groups (list of lists)
+        def tie_groups_at_level(level):
+            groups = defaultdict(list)
+            for r in rows:
+                groups[key_up_to(r, level)].append(r)
+            # Only return groups with ties (size > 1)
+            return [g for g in groups.values() if len(g) > 1]
 
-            # still tied after all configured TBs → early 202 w/ info
-            if len(tied) > 1:
+        # Determine which TB level we are processing now
+        if requested_tb_id is None:
+            # First pass: did we tie on raw points anywhere?
+            g = tie_groups_at_level(-1)
+            if not g:
+                # No ties at any position → persist, mark resolved
+                with transaction.atomic():
+                    saved = []
+                    for s in serializers:
+                        s.validated_data["tie_breaker_resolved"] = True
+                        saved.append(s.save())
+                    rebuild_game_snapshot(selected_game, win_mode="count_top_block")
+                    rebuild_league_snapshot(league, win_mode="count_top_block")
+
+                standings = (
+                    GameStanding.objects
+                    .filter(league=league, selected_game=selected_game.id)
+                    .select_related("player_profile")
+                    .order_by("rank", "player_profile__profile_name")
+                )
                 return Response(
                     {
-                        "detail": "Still tied after all tie-breakers.",
-                        "tied_players": [r["player_profile"].id for r in tied],
-                        "unresolved_tie": True
+                        "results": ResultSerializer(saved, many=True).data,
+                        "game_standings": GameStandingSerializer(standings, many=True).data,
                     },
-                    status=status.HTTP_202_ACCEPTED,
+                    status=status.HTTP_201_CREATED
                 )
 
-            # remember which tie-breaker resolved the tie for the winner row
-            for s in serializers:
-                if s.validated_data in tied:
-                    s._decisive_tie_breaker = decisive_tb  # noqa: SLF001
+            if not tbs:
+                # Ties exist but no TB configured
+                return Response(
+                    {
+                        "detail": "Tie detected but no tie-breakers configured.",
+                        "unresolved_tie": True,
+                        "tie_groups": [
+                            {"points": grp[0]["points"], "players": [r["player_profile"].id for r in grp]}
+                            for grp in sorted(g, key=lambda gg: -gg[0]["points"])
+                        ],
+                    },
+                    status=status.HTTP_202_ACCEPTED
+                )
 
-        # ---- Persist Results + refresh snapshots
+            # Ask for the highest-order TB for ALL tie groups
+            next_tb = tbs[0]
+            return Response(
+                {
+                    "detail": "Tie detected. Provide values for the required tie-breaker.",
+                    "required_tie_breaker": {"id": next_tb.id, "name": next_tb.name, "order": next_tb.order},
+                    "unresolved_tie": True,
+                    "tie_groups": [
+                        {"points": grp[0]["points"], "players": [r["player_profile"].id for r in grp]}
+                        for grp in sorted(g, key=lambda gg: -gg[0]["points"])
+                    ],
+                },
+                status=status.HTTP_202_ACCEPTED
+            )
+
+        # We are applying a specific TB level
+        if requested_tb_id not in tb_index_by_id:
+            return Response({"detail": "Requested tie-breaker is invalid for this game."},
+                            status=status.HTTP_400_BAD_REQUEST)
+
+        level = tb_index_by_id[requested_tb_id]
+
+        # Ensure ALL players that are currently tied at this level-1 supplied a value
+        # 1) find the groups that need this level
+        needing_values = tie_groups_at_level(level - 1)
+        needing_pids = {r["player_profile"].id for grp in needing_values for r in grp}
+
+        # 2) check values exist for those pids
+        missing = [r["player_profile"].id for r in rows
+                   if r["player_profile"].id in needing_pids and fnum(r.get("tie_breaker_value")) is None]
+        if missing:
+            return Response(
+                {
+                    "detail": "Provide tie_breaker_value for all players in the listed tie groups.",
+                    "required_tie_breaker": {"id": requested_tb_id},
+                    "missing_players": missing,
+                    "tie_groups": [
+                        {"points": grp[0]["points"], "players": [r["player_profile"].id for r in grp]}
+                        for grp in sorted(needing_values, key=lambda gg: -gg[0]["points"])
+                    ],
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        # After values provided, check if any ties remain at this level
+        remaining = tie_groups_at_level(level)
+        if remaining:
+            # Still tied at this TB → ask next, if any
+            if level + 1 < len(tbs):
+                next_tb = tbs[level + 1]
+                return Response(
+                    {
+                        "detail": "Still tied after this tie-breaker. Provide the next one.",
+                        "required_tie_breaker": {"id": next_tb.id, "name": next_tb.name, "order": next_tb.order},
+                        "unresolved_tie": True,
+                        "tie_groups": [
+                            {"points": grp[0]["points"], "players": [r["player_profile"].id for r in grp]}
+                            for grp in sorted(remaining, key=lambda gg: -gg[0]["points"])
+                        ],
+                    },
+                    status=status.HTTP_202_ACCEPTED
+                )
+            # No more TBs to apply; accept unresolved tie
+            return Response(
+                {
+                    "detail": "Still tied after all tie-breakers.",
+                    "unresolved_tie": True,
+                    "tie_groups": [
+                        {"points": grp[0]["points"], "players": [r["player_profile"].id for r in grp]}
+                        for grp in sorted(remaining, key=lambda gg: -gg[0]["points"])
+                    ],
+                },
+                status=status.HTTP_202_ACCEPTED
+            )
+
+        # No ties remain anywhere → persist. Mark decisive_tie_breaker for any row
+        # that *first* broke its prior tie (optional: here we mark the TB used on this step
+        # for all players that were part of any group needing_values and are now separated).
+        needing_set = {r["player_profile"].id for grp in needing_values for r in grp}
+        decisive_tb = tbs[level]
+
         with transaction.atomic():
-            saved_results = []
-            for s in serializers:
-                if hasattr(s, "_decisive_tie_breaker"):
-                    s.validated_data["decisive_tie_breaker"] = s._decisive_tie_breaker
-                saved_results.append(s.save())
+            saved = []
+            # Sort rows for storage consistency (optional)
+            # full key includes all TB levels present
+            def full_key(r):
+                k = [-fnum(r["points"], 0)]
+                for tb_idx in range(level + 1):
+                    v = fnum(r.get("tie_breaker_value"), -1.0)
+                    k.append(-v)
+                return tuple(k)
 
-            # Rebuild snapshots (per-game + league)
+            # Mark flags
+            for s in serializers:
+                pid = s.validated_data["player_profile"].id
+                if pid in needing_set:
+                    s.validated_data["decisive_tie_breaker"] = decisive_tb
+                s.validated_data["tie_breaker_resolved"] = True
+                saved.append(s.save())
+
             rebuild_game_snapshot(selected_game, win_mode="count_top_block")
             rebuild_league_snapshot(league, win_mode="count_top_block")
 
-        # ---- Optionally include the fresh per-game standings in the response
-        game_standings_qs = (
+        standings = (
             GameStanding.objects
             .filter(league=league, selected_game=selected_game.id)
             .select_related("player_profile")
             .order_by("rank", "player_profile__profile_name")
         )
-        payload = {
-            "results": ResultSerializer(saved_results, many=True).data,
-            "game_standings": GameStandingSerializer(game_standings_qs, many=True).data,
-        }
-        return Response(payload, status=status.HTTP_201_CREATED)
+        return Response(
+            {
+                "results": ResultSerializer(saved, many=True).data,
+                "game_standings": GameStandingSerializer(standings, many=True).data,
+            },
+            status=status.HTTP_201_CREATED
+        )
 
     def list(self, request):
         """

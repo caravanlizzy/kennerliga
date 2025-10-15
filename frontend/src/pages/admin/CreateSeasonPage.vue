@@ -94,9 +94,14 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, watch } from 'vue';
+import { computed, onMounted, ref, watch } from 'vue';
 import { api } from 'boot/axios';
 import KennerInput from 'components/base/KennerInput.vue';
+import {
+  createLeagueForSeason,
+  createSeason,
+  ensureParticipants,
+} from 'src/services/seasonService';
 
 /** form state */
 const year = ref<number | null>(null);
@@ -139,20 +144,11 @@ onMounted(loadMembers);
 async function loadMembers() {
   const { data } = await api('/user/profiles/');
   // handle both paginated and non-paginated responses
-  const raw = Array.isArray(data)
+  availableMembers.value = Array.isArray(data)
     ? data
     : Array.isArray(data?.results)
     ? data.results
     : [];
-  // fallback mock so UI is still testable
-  availableMembers.value = raw.length
-    ? raw
-    : [
-        { id: 1, profile_name: 'Alice' },
-        { id: 2, profile_name: 'Bob' },
-        { id: 3, profile_name: 'Charlie' },
-        { id: 4, profile_name: 'Dana' },
-      ];
 }
 
 /** Unique assignment logic */
@@ -195,69 +191,6 @@ function getOptionsForLeague(leagueIndex: number) {
   return selectedProfileOptions.value.filter(
     (opt) => !otherAssigned.has(opt.value)
   );
-}
-
-/** Backend helpers */
-// find-or-create season
-async function createSeason(targetYear: number, targetMonth: number) {
-  const { data: seasons } = await api('/seasons/');
-  let season = Array.isArray(seasons)
-    ? seasons.find((s: any) => s.year === targetYear && s.month === targetMonth)
-    : null;
-
-  if (!season) {
-    const res = await api('/seasons/', {
-      method: 'POST',
-      data: { year: targetYear, month: targetMonth },
-    });
-    season = res.data;
-  }
-  return season; // { id, year, month, ... }
-}
-
-async function getSeasonParticipants(seasonId: number) {
-  // Season detail should include participants array
-  const { data } = await api(`/seasons/${seasonId}/`);
-  return data?.participants ?? [];
-}
-
-async function ensureParticipants(seasonId: number, profileIds: number[]) {
-  const existing = await getSeasonParticipants(seasonId);
-  const byProfile: Record<number, any> = {};
-  for (const sp of existing) {
-    const pid = sp.profile?.id ?? sp.profile_id ?? sp.profile;
-    if (pid != null) byProfile[pid] = sp;
-  }
-  const missing = profileIds.filter((pid) => !byProfile[pid]);
-
-  // create SeasonParticipant for any missing
-  for (const pid of missing) {
-    await api('/season-participants/', {
-      method: 'POST',
-      data: { season: seasonId, profile: pid },
-    });
-  }
-  return await getSeasonParticipants(seasonId);
-}
-
-async function createLeagueForSeason(
-  seasonId: number,
-  level: number,
-  seasonParticipants: any[],
-  memberProfileIds: number[]
-) {
-  // map chosen PlayerProfile IDs -> SeasonParticipant IDs
-  const spIds = seasonParticipants
-    .filter((sp: any) =>
-      memberProfileIds.includes(sp.profile?.id ?? sp.profile_id ?? sp.profile)
-    )
-    .map((sp: any) => sp.id);
-
-  const { data } = await api('/leagues/', {
-    method: 'POST',
-    data: { season: seasonId, level, members: spIds },
-  });
-  return data;
 }
 
 /** Submit */

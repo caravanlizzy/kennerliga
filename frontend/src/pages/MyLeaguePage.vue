@@ -51,7 +51,7 @@
             color="positive"
             :is-opened="sectionVisibilityStates['results']"
           >
-            Results to be displayed here
+            <MyLeagueResults />
           </ContentSection>
         </template>
       </template>
@@ -98,6 +98,7 @@ import LeagueStandings from 'components/league/LeagueStandings.vue';
 import MatchResultTabs from 'components/league/MatchResultTabs.vue';
 import SideBarLayout from 'layouts/SideBarLayout.vue';
 import LoadingSpinner from 'components/base/LoadingSpinner.vue';
+import MyLeagueResults from 'components/league/MyLeagueResults.vue';
 
 const league = useLeagueStore();
 

@@ -9,7 +9,7 @@
     <q-page-container class="flex column justify-center">
       <div class="">
         <q-page>
-          <router-view class="text-primary q-mx-auto" />
+          <router-view />
         </q-page>
       </div>
       <ConfirmDialog />
