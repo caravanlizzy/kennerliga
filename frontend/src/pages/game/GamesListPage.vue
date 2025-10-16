@@ -1,13 +1,23 @@
 <template>
   <KennerligaTable
-    v-if="isFinished && isPlatformFinished"
+    v-if="!loading && !error && data && Array.isArray(data)"
     :create-button="button"
     flat
-    title="Spiele"
+    title="Games"
+    row-key="id"
     @row-click="onRowClick"
     :rows="data"
     :columns="columns"
-    :rows-per-page-options="[10, 20, 50]"/>
+    :rows-per-page-options="[10, 20, 50]"
+  />
+
+  <div v-else class="q-pa-md">
+    <q-banner v-if="error" rounded dense class="q-mb-sm">
+      <template #avatar><q-icon name="warning" color="negative" /></template>
+      {{ error }}
+    </q-banner>
+    <q-skeleton v-else height="180px" square />
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -16,59 +26,80 @@ import { useAxios } from '@vueuse/integrations/useAxios';
 import { api } from 'boot/axios';
 import { useRouter } from 'vue-router';
 import { TKennerButton } from 'src/types';
-import { ref, computed, watch, onMounted } from 'vue';
+import { computed } from 'vue';
 
-// Fetching games data
-const { data, isFinished } = useAxios('game/games', api);
-
-// Fetching platforms data to create platformMap
-const platformMap = ref<{ [key: string]: string }>({});
-const { data: platformData, isFinished: isPlatformFinished } = useAxios('game/platforms', api);
-
-// Define a type for the platform map
-type TPlatformMap = { [key: string]: string };
-
-onMounted(() => {
-  watch(() => isPlatformFinished.value, (newVal) => {
-    if (newVal && platformData.value) {
-      // Creating a map of platform IDs to platform names
-      platformMap.value = platformData.value.reduce((map: TPlatformMap, platform: { id: string, name: string }) => {
-        map[platform.id] = platform.name;
-        return map;
-      }, {} as TPlatformMap); // Use {} as PlatformMap for initial type
-    }
-  });
-})
-;
-
-// Router for navigation on row click
-const router = useRouter();
-const onRowClick = (_event: never, row: { id: never; }) => {
-  router.push({ name: 'game-detail', params: { id: row.id } });
+type GameRow = {
+  id: number | string;
+  name: string;
+  platform: number | string; // id
+  // ...any other fields your table needs
 };
 
-// Button configuration
-const button: TKennerButton = { color: 'secondary', label: 'Spiel', icon: 'add_circle', forwardName: 'game-create' };
+type Platform = { id: number | string; name: string };
 
-// Reactive columns definition that depends on platformMap
+// Fetch games
+const {
+  data,
+  isFinished,
+  error: gamesError,
+} = useAxios<GameRow[]>('game/games', api);
+
+// Fetch platforms
+const {
+  data: platformData,
+  isFinished: isPlatformFinished,
+  error: platformError,
+} = useAxios<Platform[]>('game/platforms', api);
+
+// Unified loading/error
+const loading = computed(() => !isFinished.value || !isPlatformFinished.value);
+const error = computed(() => gamesError?.value?.message || platformError?.value?.message || null);
+
+// Build a map id->name from platformData (reactive, no manual watch needed)
+const platformMap = computed<Record<string, string>>(() => {
+  const arr = platformData.value ?? [];
+  const map: Record<string, string> = {};
+  for (const p of arr) {
+    // coerce id to string to avoid 1 vs "1" mismatches
+    map[String(p.id)] = p.name;
+  }
+  return map;
+});
+
+// Small helper to resolve platform label from a row
+function lookupPlatform(row: GameRow) {
+  return platformMap.value[String(row.platform)] ?? 'Unknown Platform';
+}
+
+// Router navigation
+const router = useRouter();
+function onRowClick(_evt: unknown, row: GameRow) {
+  router.push({ name: 'game-detail', params: { id: row.id } });
+}
+
+// Create button
+const button: TKennerButton = {
+  color: 'secondary',
+  label: 'Game',
+  icon: 'add_circle',
+  forwardName: 'game-create',
+};
+
+// Reactive columns
 const columns = computed(() => [
   {
     name: 'game',
-    required: true,
+    label: 'Game',
+    field: (x: GameRow) => x.name,
     align: 'left',
-    label: 'Spiel',
-    field: (x: { name: never; }) => x.name,
-    sortable: true
+    sortable: true,
   },
   {
     name: 'platform',
-    label: 'Plattform',
-    required: false,
-    align: 'center',
-    // Using platformMap to get the platform name from the platform ID
-    field: (x: { platform: string; }) => platformMap.value[x.platform] || 'Unknown Platform',
-    sortable: true
-  }
+    label: 'Platform',
+    field: (x: GameRow) => lookupPlatform(x),
+    align: 'left',
+    sortable: true,
+  },
 ]);
-
 </script>
