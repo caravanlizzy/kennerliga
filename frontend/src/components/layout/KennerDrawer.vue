@@ -8,27 +8,32 @@
       :width="220"
     >
       <q-list>
-        <kenner-item
+        <KennerItem
           icon="settings"
           label="Settings"
           forward-name="settings"
         />
-        <kenner-item
+        <KennerItem
           icon="account_circle"
           label="Profile"
           forward-name="profile"
         />
-        <kenner-item
+        <KennerItem
+          icon="calendar_month"
+          label="Seasons"
+          forward-name="seasons"
+          />
+        <KennerItem
           icon="casino"
           label="Games"
           forward-name="games"
         />
-        <kenner-item
+        <KennerItem
           icon="group"
           label="Users"
           forward-name="users"
         />
-        <kenner-item icon="logout" label="Logout" @click="logout" />
+        <KennerItem icon="logout" label="Logout" @click="logout" />
       </q-list>
     </q-drawer>
 <!--    <DevUsersList :show-impersonate="showImpersonateList" />-->

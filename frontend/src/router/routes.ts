@@ -5,7 +5,7 @@ import userRoutes from 'src/router/userRoutes';
 // It can also be added to a `.d.ts` file. Make sure it's included in
 // project's tsconfig.json "files"
 import 'vue-router';
-import adminRoutes from 'src/router/adminRoutes';
+import seasonRoutes from 'src/router/seasonRoutes';
 
 // To ensure it is treated as a module, add at least one `export` statement
 export {};
@@ -54,12 +54,16 @@ const routes: RouteRecordRaw[] = [
       },
       userRoutes,
       gameRoutes,
-      adminRoutes,
+      seasonRoutes,
       {
         path: 'league',
         name: 'my-league',
         component: () => import('pages/MyLeaguePage.vue'),
-        meta: { icon: 'sports_esports', label: 'My League' },
+      },
+      {
+        path: 'dev',
+        name: 'dev',
+        component: () => import('pages/DevPage.vue'),
       }
     ],
   },
