@@ -1,5 +1,4 @@
 <template>
-  <ActionBar />
 
   <SideBarLayout side-title="League Standings">
     <!-- ==================== LOADING STATE ==================== -->
@@ -20,7 +19,10 @@
     </template>
 
     <!-- ==================== NORMAL CONTENT ==================== -->
-    <div v-else class="q-pa-md">
+    <div v-else class="q-pa-md relative-position">
+      <ActionBar />
+
+
       <!-- Game Selector - shown when user needs to pick games -->
       <template v-if="isMePickingGame">
         <ContentSection

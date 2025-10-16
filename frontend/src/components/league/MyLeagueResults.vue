@@ -25,7 +25,7 @@
         <div
           v-for="it in items"
           :key="it.selectedGameId"
-          class="col-12 col-sm-6 col-md-6 col-lg-4"
+          class="col-12 col-md-6"
         >
           <q-card flat bordered class="result-card">
             <q-card-section
@@ -43,8 +43,6 @@
                 :columns="columns"
                 row-key="rowKey"
                 flat
-                bordered
-                dense
                 wrap-cells
                 hide-bottom
                 :pagination="{ rowsPerPage: 10 }"
