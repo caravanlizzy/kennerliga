@@ -1,7 +1,6 @@
 <template>
   <q-toolbar
     class="bg-grey-1 text-dark q-px-md q-py-none shadow-1 relative-position"
-    style="border-bottom: 1px solid var(--q-primary)"
   >
     <!-- Left: Brand -->
     <div class="row items-center no-wrap">
@@ -55,7 +54,7 @@
         round
         color="accent"
         icon="build"
-        :to="{ name: 'admin-home' }"
+        :to="{ name: 'dev' }"
       />
 
       <UserName
