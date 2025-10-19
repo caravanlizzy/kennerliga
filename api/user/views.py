@@ -4,6 +4,7 @@ from django.conf import settings
 from django.db import transaction
 from rest_framework import status
 from rest_framework.decorators import action
+from rest_framework.exceptions import NotFound
 from rest_framework.permissions import IsAuthenticated, IsAdminUser, AllowAny
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet, ViewSet
@@ -24,6 +25,19 @@ class UserViewSet(ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
     permission_classes = [IsAuthenticated]
+
+    def get_object(self):
+        lookup = self.kwargs["pk"]  # Django REST by default uses pk
+        qs = self.get_queryset()
+        # Try ID first, then username
+        user = None
+        if lookup.isdigit():
+            user = qs.filter(id=lookup).first()
+        if user is None:
+            user = qs.filter(username=lookup).first()
+        if not user:
+            raise NotFound("User not found.")
+        return user
 
     @action(detail=True, methods=['get'], url_path='leagues')
     def user_leagues(self, request, pk=None):
