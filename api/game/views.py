@@ -76,15 +76,11 @@ class PlatformViewSet(ModelViewSet):
 class SelectedGameViewSet(ModelViewSet):
     queryset = SelectedGame.objects.all()
     serializer_class = SelectedGameSerializer
-    filterset_fields = ['league']
+    filterset_fields = ['league', '']
 
     def perform_create(self, serializer):
         selected_game = serializer.save()
         league = selected_game.league
-        # check if has been selected by someone else
-        # check if has been selected 3 times this year
-        # check if
-        # Use service
         LeagueService(league).advance_turn()
 
 

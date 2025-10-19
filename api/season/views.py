@@ -7,7 +7,7 @@ from django.http import HttpResponseNotFound
 from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.generics import get_object_or_404
-from rest_framework.permissions import IsAdminUser
+from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework.response import Response
 from django.utils import timezone
 from rest_framework.views import APIView
@@ -41,6 +41,7 @@ class SeasonRegistrationView(APIView):
 class SeasonViewSet(ModelViewSet):
     queryset = Season.objects.all()
     serializer_class = SeasonSerializer
+    filterset_fields = ['year', 'month', 'status']
 
 
 def build_league_scoreboard_payload(league: League) -> dict:
@@ -216,5 +217,5 @@ class SeasonParticipantViewSet(ModelViewSet):
     """
     queryset = SeasonParticipant.objects.select_related("season", "profile")
     serializer_class = SeasonParticipantSerializer
-    permission_classes = [IsAdminUser]  # adjust if needed
-    filterset_fields = ["season", "profile"]
+    permission_classes = [IsAuthenticated]  # adjust if needed
+    filterset_fields = ["season", "profile__profile_name"]
