@@ -6,6 +6,7 @@
       <KennerChat class="col-12" />
     </div>
     <template #side>
+      <FeaturesList />
       <YearStandings />
     </template>
   </SideBarLayout>
@@ -21,6 +22,7 @@ import { getMyLeagueId } from 'src/services/game/leagueService';
 import SideBarLayout from 'layouts/SideBarLayout.vue';
 import { getCurrentSeasonId } from 'src/services/seasonService';
 import PastSeaons from 'components/season/PastSeaons.vue';
+import FeaturesList from 'components/dev/FeaturesList.vue';
 
 const { init } = useLeagueStore();
 
