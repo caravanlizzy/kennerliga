@@ -14,8 +14,8 @@ const { data, isFinished } = useAxios('user/users', api);
 
 const router = useRouter();
 
-const onRowClick = (_event: never, row: { id: never; }) => {
-  router.push({ name: 'user-detail', params: { id: row.id } });
+const onRowClick = (_event: never, row: { username: never; }) => {
+  router.push({ name: 'user-detail', params: { username: row.username } });
 };
 
 const button: TKennerButton = { color: 'secondary', label: 'Invite', icon: 'add_circle', forwardName: 'user-invite' };

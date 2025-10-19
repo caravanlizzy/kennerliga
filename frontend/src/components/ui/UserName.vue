@@ -5,7 +5,7 @@
     :class="shapeClass"
     :style="faceStyle"
     role="img"
-    aria-label="user monogram"
+    @click="router.push({ name: 'user-detail', params: { username: displayUsername } })"
   >
     <span class="mono" :class="textClass">{{ initials }}</span>
   </q-avatar>

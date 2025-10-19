@@ -50,7 +50,7 @@ const error = computed(() => fetchError.value?.message || null);
 // navigation
 const router = useRouter();
 function onRowClick(_evt: unknown, row: Season) {
-  router.push({ name: 'SeasonDetail', params: { id: row.id } });
+  router.push({ name: 'season-detail', params: { id: row.id } });
 }
 
 // display helpers
