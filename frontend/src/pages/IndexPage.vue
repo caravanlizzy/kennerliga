@@ -1,5 +1,5 @@
 <template>
-  <SideBarLayout side-title="Year Standings">
+  <SideBarLayout side-title="Infos">
     <div class="q-px-lg q-py-lg row">
       <CurrentSeason v-if="seasonId" :seasonId="seasonId" class="col-12" />
       <PastSeaons class="col-12" />
