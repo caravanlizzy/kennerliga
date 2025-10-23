@@ -14,11 +14,6 @@
           forward-name="settings"
         />
         <KennerItem
-          icon="account_circle"
-          label="Profile"
-          forward-name="profile"
-        />
-        <KennerItem
           icon="calendar_month"
           label="Seasons"
           forward-name="seasons"
@@ -30,7 +25,7 @@
         />
         <KennerItem
           icon="group"
-          label="Users"
+          label="Members"
           forward-name="users"
         />
         <KennerItem icon="logout" label="Logout" @click="logout" />
