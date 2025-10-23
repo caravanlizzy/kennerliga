@@ -1,5 +1,5 @@
 export default {
-  path: 'admin/', meta: { requiresAuth: true, requiresAdmin: true }, children: [
+  path: 'seasons/', meta: { requiresAuth: true, requiresAdmin: true }, children: [
     {
       path: '',
       name: 'seasons',
@@ -10,6 +10,11 @@ export default {
       path: 'create',
       name: 'season-create',
       component: () => import('pages/season/SeasonCreatePage.vue'),
+    },
+    {
+      path: ':id',
+      name: 'season-detail',
+      component: () => import('pages/season/SeasonDetailPage.vue'),
     }
   ]
 };

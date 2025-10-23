@@ -36,6 +36,29 @@ async function getSeasonParticipants(seasonId: number) {
   return data?.participants ?? [];
 }
 
+export async function getLeaguesBySeason(seasonId: number) {
+  try {
+    const { data } = await api(`/league/leagues/?season=${seasonId}`);
+    return data;
+  } catch (error) {
+    console.error('Error fetching leagues by season:', error);
+    throw error; // Re-throw the error to let the caller handle it
+  }
+}
+
+export async function getLeageDetailsBySeason(seasonId: number) {
+  try {
+    const leagues = await getLeaguesBySeason(seasonId);
+    const leagueDetails = await Promise.all(
+      leagues.map((league) => api(`/league/league-details/${league.id}/`))
+    );
+    return leagueDetails.map((response) => response.data);
+  } catch (error) {
+    console.error('Error fetching league details by season:', error);
+  }
+}
+
+
 export async function ensureParticipants(seasonId: number, profileIds: number[]) {
   const existing = await getSeasonParticipants(seasonId);
   const byProfile: Record<number, any> = {};
