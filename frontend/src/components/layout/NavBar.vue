@@ -1,13 +1,15 @@
 <template>
   <q-toolbar
-    class="bg-grey-1 text-dark q-px-md q-py-none shadow-1 relative-position"
+    class="navbar bg-grey-1 text-dark q-px-md q-py-none shadow-1 relative-position"
   >
     <!-- Left: Brand -->
     <div class="row items-center no-wrap">
       <q-btn
         v-if="isMobile"
         :to="{ name: 'home' }"
-        flat round dense
+        flat
+        round
+        dense
         color="primary"
         icon="psychology"
         aria-label="Home"
@@ -47,7 +49,7 @@
     <q-space />
 
     <!-- Right: Controls -->
-    <div class="row items-center no-wrap q-gutter-x-sm">
+    <div class="row items-center no-wrap q-gutter-x-sm bg-grey-1" style="z-index: 1">
       <q-btn
         flat
         dense
@@ -110,3 +112,20 @@ function goHome() {
   router.push({ name: 'home' })
 }
 </script>
+
+<style scoped>
+.navbar {
+  position: relative;
+  overflow: hidden;
+}
+
+.navbar::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: url("data:image/svg+xml,%3Csvg viewBox='0 0 1200 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0,50 C100,90 200,10 300,70 C400,130 500,0 600,50 C700,100 800,20 900,60 C1000,100 1100,30 1200,50' stroke='%23e53935' stroke-width='3' fill='none'/%3E%3C/svg%3E")
+    center / cover no-repeat;
+  opacity: 0.7;
+  z-index: 0;
+}
+</style>
