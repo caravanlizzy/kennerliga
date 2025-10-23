@@ -16,7 +16,7 @@ class LeagueViewSet(ModelViewSet):
     queryset = League.objects.all()
     serializer_class = LeagueSerializer
     permission_classes = [IsAuthenticated]  # adjust to your needs
-    filterset_fields = ['season', '']
+    filterset_fields = ['season']
 
     @action(detail=True, methods=['get'], url_path='standings')
     def standings(self, request, pk=None):

@@ -76,7 +76,7 @@ class PlatformViewSet(ModelViewSet):
 class SelectedGameViewSet(ModelViewSet):
     queryset = SelectedGame.objects.all()
     serializer_class = SelectedGameSerializer
-    filterset_fields = ['league', '']
+    filterset_fields = ['league']
 
     def perform_create(self, serializer):
         selected_game = serializer.save()
