@@ -6,18 +6,24 @@ from rest_framework import serializers
 from game.models import BanDecision
 from league.models import League, GameStanding, LeagueStanding
 from season.models import SeasonParticipant
-from season.serializer import SeasonParticipantSerializer
+from season.serializer import SeasonParticipantSerializer, SeasonParticipantMiniSerializer
 
 
 class LeagueSerializer(serializers.ModelSerializer):
-    # Accept a list of SeasonParticipant IDs
-    members = serializers.PrimaryKeyRelatedField(
-        queryset=SeasonParticipant.objects.all(), many=True
+    # write: accept SP ids
+    member_ids = serializers.PrimaryKeyRelatedField(
+        source="members",
+        queryset=SeasonParticipant.objects.all(),
+        many=True,
+        write_only=True,
+        required=False,
     )
+    # read: return mini objects
+    members = SeasonParticipantMiniSerializer(many=True, read_only=True)
 
     class Meta:
         model = League
-        fields = ["id", "season", "level", "status", "active_player", "members"]
+        fields = ["id", "season", "level", "status", "active_player", "members", "member_ids"]
 
     def validate(self, attrs):
         season = attrs.get("season") or getattr(self.instance, "season", None)

@@ -1,12 +1,15 @@
 from django.db.models import OuterRef, Exists
 from rest_framework import serializers
+from rest_framework.fields import SerializerMethodField, BooleanField, CharField
+from rest_framework.serializers import ModelSerializer
 
 from game.models import SelectedGame, BanDecision
 from game.serializers import SelectedGameSerializer
 from season.models import Season, SeasonParticipant
+from user.models import PlayerProfile
 
 
-class SeasonSerializer(serializers.ModelSerializer):
+class SeasonSerializer(ModelSerializer):
     name = serializers.SerializerMethodField(read_only=True)
     season_start_time = serializers.SerializerMethodField(read_only=True)
     time_to_start = serializers.SerializerMethodField(read_only=True)
@@ -29,25 +32,44 @@ class SeasonSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class SeasonParticipantSerializer(serializers.ModelSerializer):
-    username = serializers.CharField(source='profile.user.username', read_only=True)
-    profile_name = serializers.CharField(source='profile.profile_name', read_only=True)
-    selected_game = serializers.SerializerMethodField()
-    banned_selected_game = serializers.SerializerMethodField()
-    has_banned = serializers.BooleanField(read_only=True)
-    is_active_player = serializers.SerializerMethodField()
+class SeasonParticipantMiniSerializer(ModelSerializer):
+    display_name = CharField(source="profile.profile_name", read_only=True)
+    username = SerializerMethodField()
+
+    class Meta:
+        model = SeasonParticipant
+        fields = ("id", "display_name", "username")
+        read_only_fields = ("id", "display_name", "username")
+
+    def get_username(self, obj):
+        user = getattr(obj.profile, "user", None)
+        return getattr(user, "username", None)
+
+
+class SeasonParticipantSerializer(ModelSerializer):
+    username = CharField(source='profile.user.username', read_only=True)
+    profile_name = CharField(source='profile.profile_name', read_only=True)
+    profile_id = serializers.PrimaryKeyRelatedField(
+        source="profile",
+        queryset=PlayerProfile.objects.all(),
+        write_only=True,
+        required=True,
+    )
+    season = serializers.PrimaryKeyRelatedField(
+        queryset=Season.objects.all(),
+        required=True,
+    )
+    selected_game = SerializerMethodField()
+    banned_selected_game = SerializerMethodField()
+    has_banned = BooleanField(read_only=True)
+    is_active_player = SerializerMethodField()
 
     class Meta:
         model = SeasonParticipant
         fields = [
-            'id',
-            'username',
-            'profile_name',
-            'selected_game',
-            'banned_selected_game',   # NEW
-            'has_banned',
-            'is_active_player',
-            'rank',
+            'id', 'season', 'profile_id', 'rank',  # write
+            'username', 'profile_name', 'selected_game',  # read
+            'banned_selected_game', 'has_banned', 'is_active_player',
         ]
 
     # ---- internal helper & cache -------------------------------------------

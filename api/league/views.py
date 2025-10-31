@@ -13,7 +13,7 @@ from services.standings_snapshot import rebuild_league_snapshot
 
 
 class LeagueViewSet(ModelViewSet):
-    queryset = League.objects.all()
+    queryset = League.objects.all().prefetch_related("members__profile", "members__profile__user")
     serializer_class = LeagueSerializer
     permission_classes = [IsAuthenticated]  # adjust to your needs
     filterset_fields = ['season']
