@@ -8,6 +8,15 @@ export async function registerForCurrentSeason(): Promise<void> {
   }
 }
 
+export async function getSeason(seasonId: number): Promise<any> {
+  try {
+    const { data } = await api(`/season/seasons/${seasonId}/`);
+    return data;
+  } catch (error) {
+    console.error('Error fetching season: ' + seasonId, error);
+  }
+}
+
 export async function getCurrentSeasonId(): Promise<number | null> {
   const { data } = await api('/season/current/');
   return data.id ?? null;
@@ -32,10 +41,10 @@ export async function createSeason(targetYear: number, targetMonth: number) {
 
 async function getSeasonParticipants(seasonId: number) {
   // Season detail should include participants array
-  console.log({seasonId});
+  console.log({ seasonId });
   const { data } = await api(`/season/season-participants/?season=${seasonId}`);
   console.log('data in getSeasonParticipants: ', data);
-  return data ? data : []
+  return data ? data : [];
 }
 
 export async function getLeaguesBySeason(seasonId: number) {
@@ -45,18 +54,6 @@ export async function getLeaguesBySeason(seasonId: number) {
   } catch (error) {
     console.error('Error fetching leagues by season:', error);
     throw error; // Re-throw the error to let the caller handle it
-  }
-}
-
-export async function getLeageDetailsBySeason(seasonId: number) {
-  try {
-    const leagues = await getLeaguesBySeason(seasonId);
-    const leagueDetails = await Promise.all(
-      leagues.map((league) => api(`/league/league-details/${league.id}/`))
-    );
-    return leagueDetails.map((response) => response.data);
-  } catch (error) {
-    console.error('Error fetching league details by season:', error);
   }
 }
 
@@ -100,7 +97,6 @@ export async function ensureParticipants(
   return await getSeasonParticipants(seasonId);
 }
 
-
 export async function createLeagueForSeason(
   seasonId: number,
   level: number,
@@ -109,9 +105,7 @@ export async function createLeagueForSeason(
 ) {
   // map chosen PlayerProfile IDs -> SeasonParticipant IDs
   const spIds = seasonParticipants
-    .filter((sp: any) =>
-      memberProfileIds.includes(sp.profile_id)
-    )
+    .filter((sp: any) => memberProfileIds.includes(sp.profile_id))
     .map((sp: any) => sp.id);
 
   console.log({ seasonParticipants, memberProfileIds, spIds });
