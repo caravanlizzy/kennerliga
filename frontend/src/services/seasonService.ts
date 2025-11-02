@@ -8,7 +8,7 @@ export async function registerForCurrentSeason(): Promise<void> {
   }
 }
 
-export async function getSeason(seasonId: number): Promise<any> {
+export async function fetchSeason(seasonId: number): Promise<any> {
   try {
     const { data } = await api(`/season/seasons/${seasonId}/`);
     return data;
@@ -17,7 +17,7 @@ export async function getSeason(seasonId: number): Promise<any> {
   }
 }
 
-export async function getCurrentSeasonId(): Promise<number | null> {
+export async function fetchCurrentSeasonId(): Promise<number | null> {
   const { data } = await api('/season/current/');
   return data.id ?? null;
 }
@@ -39,15 +39,15 @@ export async function createSeason(targetYear: number, targetMonth: number) {
   return season; // { id, year, month, ... }
 }
 
-async function getSeasonParticipants(seasonId: number) {
+async function fetchSeasonParticipants(seasonId: number) {
   // Season detail should include participants array
   console.log({ seasonId });
   const { data } = await api(`/season/season-participants/?season=${seasonId}`);
-  console.log('data in getSeasonParticipants: ', data);
+  console.log('data in fetchSeasonParticipants: ', data);
   return data ? data : [];
 }
 
-export async function getLeaguesBySeason(seasonId: number) {
+export async function fetchLeaguesBySeason(seasonId: number) {
   try {
     const { data } = await api(`/league/leagues/?season=${seasonId}`);
     return data;
@@ -74,7 +74,7 @@ export async function ensureParticipants(
   console.log('incomingIds:', incomingIds);
 
   // Fetch existing participants and index by profile id
-  const existing = await getSeasonParticipants(seasonId);
+  const existing = await fetchSeasonParticipants(seasonId);
   const byProfile: Record<number, any> = {};
   for (const sp of existing) {
     const pid = sp?.profile?.id ?? sp?.profile_id ?? sp?.profile;
@@ -94,7 +94,7 @@ export async function ensureParticipants(
   }
 
   // Return the updated list
-  return await getSeasonParticipants(seasonId);
+  return await fetchSeasonParticipants(seasonId);
 }
 
 export async function createLeagueForSeason(

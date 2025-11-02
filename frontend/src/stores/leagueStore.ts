@@ -277,14 +277,9 @@ export const useLeagueStore = defineStore('league', () => {
     await new Promise(resolve => setTimeout(resolve, 1000));
     loading.value = true;
     try {
-      const { data } = await fetchLeagueDetails(leagueId.value);
+      const data = await fetchLeagueDetails(leagueId.value);
       leagueData.value = data;
-      members.value = data.members.map((member: Member, index: number) => ({
-        ...member,
-        colorClass: `bg-player-${index + 1}`,
-        color: `color-player-${index + 1}`,
-        borderClass: `border-player-${index + 1}`,
-      }));
+      members.value = data.members;
       leagueStatus.value = data.status;
     } finally {
       loading.value = false;

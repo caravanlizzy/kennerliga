@@ -1,5 +1,5 @@
 <template>
-  <div class="q-pa-md">
+  <div>
     <div class="row items-center q-mb-md">
       <q-btn flat round icon="arrow_back" @click="router.back()" class="q-mr-sm" />
       <div class="text-h5 text-weight-bold">Manage Season {{ season?.name || '…' }}</div>
@@ -67,7 +67,7 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import { getLeaguesBySeason, getSeason } from 'src/services/seasonService';
+import { fetchLeaguesBySeason, fetchSeason } from 'src/services/seasonService';
 
 interface Member { id: number|string; username?: string; name?: string }
 interface League { id: number|string; level: number|string; members?: Member[] }
@@ -96,8 +96,8 @@ function goToLeague(league: League) {
 onMounted(async () => {
   try {
     loading.value = true;
-    season.value = await getSeason(seasonId);
-    leagues.value = await getLeaguesBySeason(seasonId);
+    season.value = await fetchSeason(seasonId);
+    leagues.value = await fetchLeaguesBySeason(seasonId);
   } catch (e: any) {
     error.value = e?.message || 'Failed to load season or leagues.';
   } finally {

@@ -1,6 +1,6 @@
 <template>
   <SideBarLayout side-title="Infos">
-    <div class="q-px-lg q-py-lg row">
+    <div class="row">
       <CurrentSeason v-if="seasonId" :seasonId="seasonId" class="col-12" />
       <PastSeaons class="col-12" />
       <KennerChat class="col-12" />
@@ -20,7 +20,7 @@ import { onMounted, ref } from 'vue';
 import { useLeagueStore } from 'stores/leagueStore';
 import { getMyLeagueId } from 'src/services/game/leagueService';
 import SideBarLayout from 'layouts/SideBarLayout.vue';
-import { getCurrentSeasonId } from 'src/services/seasonService';
+import { fetchCurrentSeasonId } from 'src/services/seasonService';
 import PastSeaons from 'components/season/PastSeaons.vue';
 import FeaturesList from 'components/dev/FeaturesList.vue';
 
@@ -29,7 +29,7 @@ const { init } = useLeagueStore();
 const seasonId = ref<number | null>(null);
 
 onMounted(async () => {
-  seasonId.value = await getCurrentSeasonId() || null;
+  seasonId.value = await fetchCurrentSeasonId() || null;
   const leagueId = await getMyLeagueId();
   if (leagueId !== null) {
     void init();

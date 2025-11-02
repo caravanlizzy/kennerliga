@@ -111,8 +111,8 @@ import {
 } from 'vue';
 import { formatDateTime } from 'src/helpers';
 import {
-  addMessage,
-  getMessages,
+  postMessage,
+  fetchMessages,
   type TMessage,
 } from 'src/services/chatService';
 import KennerTooltip from 'components/base/KennerTooltip.vue';
@@ -205,7 +205,7 @@ async function send() {
 
   sending.value = true;
   try {
-    await addMessage(text);
+    await postMessage(text);
     newMessage.value = '';
     await loadMessages();
     jumpToBottom(true);
@@ -217,7 +217,7 @@ async function send() {
 }
 
 async function loadMessages() {
-  const { data } = await getMessages(lastDateTime);
+  const { data } = await fetchMessages(lastDateTime);
   if (!data || data.length === 0) return;
 
   // Append in chronological order

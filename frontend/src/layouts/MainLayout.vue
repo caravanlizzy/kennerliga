@@ -7,7 +7,7 @@
     <KennerDrawer v-model="drawerState" />
 
     <q-page-container class="flex column justify-center">
-      <div class="">
+      <div class="q-px-md q-py-xs">
         <q-page>
           <router-view />
         </q-page>
