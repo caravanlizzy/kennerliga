@@ -52,7 +52,6 @@ class SeasonParticipantSerializer(ModelSerializer):
     profile_id = serializers.PrimaryKeyRelatedField(
         source="profile",
         queryset=PlayerProfile.objects.all(),
-        write_only=True,
         required=True,
     )
     season = serializers.PrimaryKeyRelatedField(
