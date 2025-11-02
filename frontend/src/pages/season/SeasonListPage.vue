@@ -102,7 +102,7 @@ const columns = computed<QTableProps['columns']>(() => ([
 // create button shown by KennerTable header
 const createBtn: TKennerButton = {
   color: 'secondary',
-  label: 'Create',
+  label: 'Season',
   icon: 'add_circle',
   forwardName: 'season-create', // if your KennerTable uses router push instead
 };

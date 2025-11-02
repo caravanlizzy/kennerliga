@@ -32,8 +32,10 @@ export async function createSeason(targetYear: number, targetMonth: number) {
 
 async function getSeasonParticipants(seasonId: number) {
   // Season detail should include participants array
+  console.log({seasonId});
   const { data } = await api(`/season/season-participants/?season=${seasonId}`);
-  return data?.participants ?? [];
+  console.log('data in getSeasonParticipants: ', data);
+  return data ? data : []
 }
 
 export async function getLeaguesBySeason(seasonId: number) {
@@ -58,33 +60,46 @@ export async function getLeageDetailsBySeason(seasonId: number) {
   }
 }
 
+type ProfileLike = { id: number } | number;
+
 export async function ensureParticipants(
   seasonId: number,
-  profileIds: number[]
+  profiles: ProfileLike[]
 ) {
+  // Normalize incoming profiles to a unique list of numeric IDs
+  const incomingIds = Array.from(
+    new Set(
+      (profiles || [])
+        .map((p) => (typeof p === 'number' ? p : p?.id))
+        .filter((id): id is number => Number.isInteger(id))
+    )
+  );
+  console.log('incomingIds:', incomingIds);
+
+  // Fetch existing participants and index by profile id
   const existing = await getSeasonParticipants(seasonId);
   const byProfile: Record<number, any> = {};
   for (const sp of existing) {
-    const pid = sp.profile?.id ?? sp.profile_id ?? sp.profile;
+    const pid = sp?.profile?.id ?? sp?.profile_id ?? sp?.profile;
     if (pid != null) byProfile[pid] = sp;
   }
-  const missing = profileIds.filter((pid) => !byProfile[pid]);
 
-  // create SeasonParticipant for any missing
+  // Compute which incoming profiles are missing from this season
+  const missing = incomingIds.filter((pid) => !byProfile[pid]);
+  console.log({ missing });
+  // Create SeasonParticipant for any missing profiles
   for (const pid of missing) {
-    console.log(
-      'creating missing participant: ',
-      pid,
-      ' for season: ',
-      seasonId
-    );
+    console.log('creating missing participant:', pid, 'for season:', seasonId);
     await api('/season/season-participants/', {
       method: 'POST',
       data: { season: seasonId, profile_id: pid },
     });
   }
+
+  // Return the updated list
   return await getSeasonParticipants(seasonId);
 }
+
 
 export async function createLeagueForSeason(
   seasonId: number,
@@ -92,15 +107,14 @@ export async function createLeagueForSeason(
   seasonParticipants: any[],
   memberProfileIds: number[]
 ) {
-  console.log({ memberProfileIds, seasonParticipants });
   // map chosen PlayerProfile IDs -> SeasonParticipant IDs
   const spIds = seasonParticipants
     .filter((sp: any) =>
-      memberProfileIds.includes(sp.profile?.id ?? sp.profile_id ?? sp.profile)
+      memberProfileIds.includes(sp.profile_id)
     )
     .map((sp: any) => sp.id);
 
-
+  console.log({ seasonParticipants, memberProfileIds, spIds });
   const { data } = await api('/league/leagues/', {
     method: 'POST',
     data: { season: seasonId, level, member_ids: spIds },
