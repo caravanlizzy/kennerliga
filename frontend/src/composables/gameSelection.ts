@@ -5,12 +5,12 @@ import {
   SelectedGameDtoPayload,
   SelectedGameOptionDto, TPlatform
 } from 'src/models/gameModels';
+import { api } from 'boot/axios';
 import {
   createSelectedGame,
   fetchGameOptionChoices,
   fetchGameOptions,
-} from 'src/services/game/selectGameService';
-import { api } from 'boot/axios';
+} from 'src/services/gameService';
 
 type TGameSelection = {
   game: GameDto;

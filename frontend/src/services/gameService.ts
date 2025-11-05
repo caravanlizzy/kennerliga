@@ -1,9 +1,38 @@
+import {
+  BanDecisionDtoPayload,
+  GameOptionChoiceDto,
+  GameOptionDto,
+  SelectedGameDtoPayload,
+  TPlatform,
+} from 'src/models/gameModels';
 import { api } from 'boot/axios';
-import { GameOptionChoiceDto, GameOptionDto, TPlatform } from 'src/models/gameModels';
 import { TGameOption, TGameOptionChoice, TResultConfig } from 'src/types';
+
 import { useIDStorage } from 'src/composables/IDStorage';
 
-const { IDStorage, addStorageItem, getStorageItem } = useIDStorage();
+const { addStorageItem, getStorageItem } = useIDStorage();
+
+export async function banGame(banDecision: BanDecisionDtoPayload) {
+  const data: Record<string, any> = {
+    username: banDecision.username,
+    league: banDecision.leagueId,
+  };
+  if (banDecision.decline) {
+    data.declined_ban = banDecision.decline;
+  }
+  if (banDecision.selectedGameId) {
+    data.selected_game_id = banDecision.selectedGameId;
+  }
+
+  try {
+    return await api('/game/ban-decisions/', {
+      method: 'POST',
+      data,
+    });
+  } catch (error) {
+    throw new Error('Error creating ban decision: ' + error);
+  }
+}
 
 export async function createGame(name: string, platform: TPlatform): Promise<number> {
   try {
@@ -111,7 +140,6 @@ export async function createOptions(gameId: number, gameOptions: TGameOption[]):
   }
 }
 
-
 export async function createResultConfigData(gameId: number, resultConfig: TResultConfig): Promise<void> {
   try {
     const { data: resultConfigData } = await api('game/result-configs/', {
@@ -168,5 +196,47 @@ export async function createTieBreakers(resultConfigId: number, resultConfig: TR
     } catch (e) {
       console.log('Error creating tieBreaker', e);
     }
+  }
+}
+export async function createSelectedGame(
+  selectedGame: SelectedGameDtoPayload,
+  leagueId: number | null = null
+) {
+  const data: Record<string, any> = {
+    game: selectedGame.game,
+    selected_options: selectedGame.selected_options,
+  };
+
+  if (leagueId !== null) {
+    data.leagueId = leagueId;
+  }
+
+  try {
+    return await api('/game/selected-games/', {
+      method: 'POST',
+      data,
+    });
+  } catch (error) {
+    throw new Error('Error creating selectedGame: ' + error);
+  }
+}
+
+export async function fetchGameOptions(gameId: number) {
+  try {
+    return await api(`/game/options/?game=${gameId}`);
+  } catch (error) {
+    throw new Error(
+      `Error retrieving game options for game with id: ${gameId} \n ${error}`
+    );
+  }
+}
+
+export async function fetchGameOptionChoices(optionId: number) {
+  try {
+    return await api(`/game/option-choices/?option=${optionId}`);
+  } catch (error) {
+    throw new Error(
+      `Error retrieving game option choices for game with id: ${optionId} \n ${error}`
+    );
   }
 }

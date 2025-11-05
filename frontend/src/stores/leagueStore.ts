@@ -1,12 +1,11 @@
 // stores/leagueStore.ts
 import { defineStore } from 'pinia';
 import { ref, computed, shallowRef } from 'vue';
-import { getMyLeagueId } from 'src/services/game/leagueService';
-import { fetchLeagueDetails } from 'src/services/leagueService';
+import { fetchLeagueDetails, getMyLeagueId } from 'src/services/leagueService';
 import { useUserStore } from 'stores/userStore';
-import { banGame } from 'src/services/game/banGameService';
 import { api } from 'boot/axios';
 import { TLeagueStatus } from 'src/types';
+import { banGame } from 'src/services/gameService';
 
 // Shared leaf types
 /**

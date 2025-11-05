@@ -18,11 +18,11 @@ import YearStandings from 'components/league/YearStandings.vue';
 import CurrentSeason from 'components/season/CurrentSeason.vue';
 import { onMounted, ref } from 'vue';
 import { useLeagueStore } from 'stores/leagueStore';
-import { getMyLeagueId } from 'src/services/game/leagueService';
 import SideBarLayout from 'layouts/SideBarLayout.vue';
 import { fetchCurrentSeasonId } from 'src/services/seasonService';
 import PastSeaons from 'components/season/PastSeaons.vue';
 import FeaturesList from 'components/dev/FeaturesList.vue';
+import { getMyLeagueId } from 'src/services/leagueService';
 
 const { init } = useLeagueStore();
 

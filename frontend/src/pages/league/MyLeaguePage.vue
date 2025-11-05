@@ -91,7 +91,6 @@ import { storeToRefs } from 'pinia';
 import PlayerCard from 'components/league/PlayerCard.vue';
 import ContentSection from 'components/base/ContentSection.vue';
 import { useActionBar } from 'src/composables/actionBar';
-import { banGame } from 'src/services/game/banGameService';
 import { useUserStore } from 'stores/userStore';
 import { useDialog } from 'src/composables/dialog';
 import { useQuasar } from 'quasar';
@@ -101,6 +100,7 @@ import MatchResultTabs from 'components/league/MatchResultTabs.vue';
 import SideBarLayout from 'layouts/SideBarLayout.vue';
 import LoadingSpinner from 'components/base/LoadingSpinner.vue';
 import MyLeagueResults from 'components/league/MyLeagueResults.vue';
+import { banGame } from 'src/services/gameService';
 
 const league = useLeagueStore();
 

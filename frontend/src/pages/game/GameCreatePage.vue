@@ -68,9 +68,9 @@ import GameOption from 'components/game/GameOptionCreate.vue';
 import { useItemList } from 'src/composables/itemList';
 import { useRouter } from 'vue-router';
 import CreateResultConfig from 'components/game/CreateResultConfig.vue';
-import { createResultConfigData } from 'src/services/game/createGameService';
 import { createRandomId } from 'src/helpers';
 import { TGameOption, TResultConfig } from 'src/types';
+import { createResultConfigData } from 'src/services/gameService';
 
 const router = useRouter();
 const $q = useQuasar();

@@ -121,7 +121,8 @@
 import { ref, onMounted, computed } from 'vue';
 import { api } from 'boot/axios';
 import type { QTableProps } from 'quasar';
-import { getMyLeagueId } from 'src/services/game/leagueService';
+
+import { getMyLeagueId } from 'src/services/leagueService';
 
 type GameStandingRow = {
   id?: number;
