@@ -18,7 +18,7 @@ export function useResponsive(breakpoint?: Ref<'xs' | 'sm' | 'md' | 'lg' | 'xl'>
   // New: "smallScreen" based on screen breakpoint (separate from platform)
   const smallScreen = computed(() => {
     const bp = breakpoint?.value ?? 'md'
-    return ($q.screen as any).lt[bp]
+    return $q.screen.lt[bp as keyof typeof $q.screen.lt]
   })
 
   // Your original helper, but reactive

@@ -1,24 +1,42 @@
 <template>
-  <KennerligaTable v-if="isFinished" :create-button="button" flat title="Kennerliga Members" @row-click="onRowClick"
-                   :rows="data" :columns="columns" :rows-per-page-options="[10, 20, 50]" />
+  <KennerligaTable
+    v-if="isFinished"
+    :create-button="button"
+    flat
+    title="Kennerliga Members"
+    @row-click="onRowClick"
+    :rows="users"
+    :columns="columns"
+    :rows-per-page-options="[10, 20, 50]"
+  />
 </template>
 
 <script setup lang="ts">
 import KennerligaTable from 'components/tables/KennerTable.vue';
-import { useAxios } from '@vueuse/integrations/useAxios';
-import { api } from 'boot/axios';
 import { useRouter } from 'vue-router';
-import { TKennerButton } from 'src/types';
+import { TKennerButton, TUser } from 'src/types';
+import { onMounted, ref } from 'vue';
+import { useUserStore } from 'stores/userStore';
 
-const { data, isFinished } = useAxios('user/users', api);
+const { listUsers } = useUserStore();
+const users = ref<TUser[]>([]);
+
+onMounted(async () => {
+  users.value = await listUsers();
+});
 
 const router = useRouter();
 
-const onRowClick = (_event: never, row: { username: never; }) => {
+const onRowClick = (_event: never, row: { username: never }) => {
   router.push({ name: 'user-detail', params: { username: row.username } });
 };
 
-const button: TKennerButton = { color: 'secondary', label: 'Invite', icon: 'add_circle', forwardName: 'user-invite' };
+const button: TKennerButton = {
+  color: 'secondary',
+  label: 'Invite',
+  icon: 'add_circle',
+  forwardName: 'user-invite',
+};
 
 const columns = [
   {
@@ -26,16 +44,16 @@ const columns = [
     required: true,
     align: 'left',
     label: 'Name',
-    field: x => x.username,
-    sortable: true
+    field: (x: TUser) => x.username,
+    sortable: true,
   },
   {
     name: 'bga_name',
     label: 'BGA Name',
     required: false,
     align: 'center',
-    field: x => x.bga_name,
-    sortable: true
+    field: (x: TUser) => x.bga_name,
+    sortable: true,
   },
 ];
 </script>

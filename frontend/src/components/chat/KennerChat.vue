@@ -113,17 +113,19 @@ import { formatDateTime } from 'src/helpers';
 import {
   postMessage,
   fetchMessages,
-  type TMessage,
 } from 'src/services/chatService';
 import KennerTooltip from 'components/base/KennerTooltip.vue';
 import SideAccentBox from 'components/base/SideAccentBox.vue';
+import { QInput } from 'quasar';
+import { TMessage } from 'src/types';
+import { useUserStore } from 'stores/userStore';
+import { storeToRefs } from 'pinia';
 
+const { user } = storeToRefs(useUserStore());
 /**
  * Identify current user — PREFER an ID from your auth/session store.
  * Fill these with your real values (e.g. from Pinia, cookies, etc.)
  */
-const currentUserId: string | number | null = null; // e.g. useAuthStore().user.id
-const currentUserName: string | null = null; // e.g. useAuthStore().user.username
 
 // ---------- State ----------
 let lastDateTime: string | undefined;
@@ -134,7 +136,7 @@ const sending = ref(false);
 
 const chatEl = ref<HTMLElement | null>(null);
 const bottomAnchor = ref<HTMLElement | null>(null);
-const inputRef = ref<any>(null);
+const inputRef = ref<QInput | null>(null);
 
 const notAtBottom = ref(false);
 const unreadCount = ref(0);
@@ -147,12 +149,8 @@ const showUnread = computed(() => notAtBottom.value && unreadCount.value > 0);
 const norm = (s?: string | null) => (s ?? '').trim().toLowerCase();
 
 function isMine(m: TMessage) {
-  const anyMsg = m as any;
-  if (anyMsg.sender_id != null && currentUserId != null) {
-    return anyMsg.sender_id === currentUserId;
-  }
-  if (currentUserName) {
-    return norm(anyMsg.sender) === norm(currentUserName);
+  if (m.sender != null && user.value?.username != null) {
+    return m.sender === user.value.username;
   }
   return false;
 }
@@ -218,6 +216,7 @@ async function send() {
 
 async function loadMessages() {
   const { data } = await fetchMessages(lastDateTime);
+  console.log({ data });
   if (!data || data.length === 0) return;
 
   // Append in chronological order
@@ -273,7 +272,6 @@ watch(
 onMounted(() => {
   loadMessages().then(() => {
     jumpToBottom(false);
-    // ❌ no initial focus — only focus after a send()
   });
 
   // polling for new messages
@@ -306,20 +304,21 @@ onUnmounted(() => {
 }
 
 /* username + color dot */
-.username { min-width: 5.5rem; }
+.username {
+  min-width: 5.5rem;
+}
 
 /* softer, smaller dot */
 .color-dot {
-  width: 6px;            /* was 8px */
+  width: 6px; /* was 8px */
   height: 6px;
   border-radius: 50%;
   background-color: var(--uclr);
-  opacity: 0.5;         /* very light */
-  margin-left: 6px;      /* space after name */
-  box-shadow: none;      /* remove glow */
+  opacity: 0.5; /* very light */
+  margin-left: 6px; /* space after name */
+  box-shadow: none; /* remove glow */
   flex: 0 0 auto;
 }
-
 
 /* right side aligns bubble to the right */
 .msg-right {
@@ -339,8 +338,9 @@ onUnmounted(() => {
 }
 
 /* slightly accentuate your own messages */
-.bubble.mine {
-  background-color: var(--q-grey-2);
+.mine {
+  border-right: 2px solid teal;
+  border-left: 2px solid teal;
 }
 
 /* preserve line breaks */

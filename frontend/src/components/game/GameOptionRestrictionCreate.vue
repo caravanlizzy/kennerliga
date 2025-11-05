@@ -25,7 +25,7 @@
       label="Option"
       map-options
       @update:model-value="updateRestriction"
-      :rules="[val => !!val || 'Selection required']"
+      :rules="[(val: string) => !!val || 'Selection required']"
     />
 
     <div v-if="restrictToOption" class="row items-center q-gutter-xs q-pl-xs q-mb-sm">
@@ -45,7 +45,7 @@
         label="Conditional value"
         map-options
         @update:model-value="updateRestriction"
-        :rules="[val => !!val || 'Selection required']"
+        :rules="[(val: string) => !!val || 'Selection required']"
       />
       <div class="text-caption text-grey-7 q-pl-xs">
         Applies only if the selected option equals this value.
@@ -87,7 +87,7 @@ const { updateItem, items } = inject('useGameOptions') as {
 const restrictToOption: Ref<TGameOption | null> = ref(null);
 const restrictionChoice = ref({
   booleanActive: true,
-  choiceSelection: { name: null as string | null, itemId: null as any }
+  choiceSelection: { name: null as string | null, id: null as any }
 });
 
 const conditionalLabel = computed(() =>
@@ -101,10 +101,10 @@ const filteredItems = computed(() =>
 );
 
 function updateRestriction() {
-  updateItem(props.gameOption, 'onlyIfOption', restrictToOption.value?.itemId);
+  updateItem(props.gameOption, 'onlyIfOption', restrictToOption.value?.id);
   if (restrictToOption.value?.hasChoices) {
     updateItem(props.gameOption, 'onlyIfValue', undefined);
-    updateItem(props.gameOption, 'onlyIfChoice', restrictionChoice.value?.choiceSelection.itemId);
+    updateItem(props.gameOption, 'onlyIfChoice', restrictionChoice.value?.choiceSelection.id);
   } else {
     updateItem(props.gameOption, 'onlyIfChoice', undefined);
     updateItem(props.gameOption, 'onlyIfValue', restrictionChoice.value?.booleanActive);
@@ -114,7 +114,7 @@ function updateRestriction() {
 // Quick reset (UI sugar only; logic unchanged)
 function clearRestriction() {
   restrictToOption.value = null;
-  restrictionChoice.value = { booleanActive: true, choiceSelection: { name: null, itemId: null } };
+  restrictionChoice.value = { booleanActive: true, choiceSelection: { name: null, id: null } };
   updateItem(props.gameOption, 'onlyIfOption', undefined);
   updateItem(props.gameOption, 'onlyIfChoice', undefined);
   updateItem(props.gameOption, 'onlyIfValue', undefined);

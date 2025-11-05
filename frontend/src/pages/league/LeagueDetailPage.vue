@@ -149,33 +149,13 @@ import { useRoute, useRouter } from 'vue-router';
 import { onMounted, ref } from 'vue';
 import { fetchLeagueDetails } from 'src/services/leagueService';
 import { fetchSeason } from 'src/services/seasonService';
-
-type Member = {
-  id: number;
-  username: string;
-  selected_game?: {
-    id: number;
-    game_name: string;
-  } | null;
-};
-
-type League = {
-  id: number;
-  level: number | string;
-  season: number;
-  members: Member[];
-};
-
-type Season = {
-  id: number;
-  name: string;
-};
+import { TLeague, TMember, TSeason } from 'src/types';
 
 const route = useRoute();
 const router = useRouter();
 
-const league = ref<League | null>(null);
-const season = ref<Season | null>(null);
+const league = ref<TLeague | null>(null);
+const season = ref<TSeason | null>(null);
 
 const loading = ref(false);
 const error = ref<string | null>(null);
@@ -185,34 +165,35 @@ async function load() {
   error.value = null;
   try {
     const leagueId = Number(route.params.id);
-    const l = (league.value = await fetchLeagueDetails(leagueId));
+    league.value = await fetchLeagueDetails(leagueId);
+    if(!league.value) throw new Error('Failed to load league data.')
     season.value = await fetchSeason(league.value.season);
-  } catch (e: any) {
+  } catch (e: string) {
     error.value = e?.message || 'Failed to load league/season data.';
   } finally {
     loading.value = false;
   }
 }
 
-function handleSelectOrEdit(member: Member) {
+function handleSelectOrEdit(member: TMember) {
   // Adjust navigation to your routes; example targets:
   // - "/leagues/:leagueId/members/:memberId/select-game"
   // - or open a dialog instead
-  const leagueId = league.value?.id;
-  if (!leagueId) return;
-  const target = member.selected_game
-    ? {
-        name: 'EditMemberGame',
-        params: {
-          leagueId,
-          memberId: member.id,
-          selectedGameId: member.selected_game.id,
-        },
-      }
-    : { name: 'SelectMemberGame', params: { leagueId, memberId: member.id } };
-
-  // If you don’t have routes yet, replace with your dialog logic
-  router.push(target as any);
+  // const leagueId = league.value?.id;
+  // if (!leagueId) return;
+  // const target = member.selected_game
+  //   ? {
+  //       name: 'EditMemberGame',
+  //       params: {
+  //         leagueId,
+  //         memberId: member.id,
+  //         selectedGameId: member.selected_game.id,
+  //       },
+  //     }
+  //   : { name: 'SelectMemberGame', params: { leagueId, memberId: member.id } };
+  //
+  // // If you don’t have routes yet, replace with your dialog logic
+  // router.push(target as any);
 }
 
 onMounted(load);

@@ -2,7 +2,9 @@ import {
   BanDecisionDtoPayload,
   GameOptionChoiceDto,
   GameOptionDto,
+  SelectedGameDto,
   SelectedGameDtoPayload,
+  SelectedGameOptionDto,
   TPlatform,
 } from 'src/models/gameModels';
 import { api } from 'boot/axios';
@@ -13,7 +15,7 @@ import { useIDStorage } from 'src/composables/IDStorage';
 const { addStorageItem, getStorageItem } = useIDStorage();
 
 export async function banGame(banDecision: BanDecisionDtoPayload) {
-  const data: Record<string, any> = {
+  const data: Record<string, string|number|boolean> = {
     username: banDecision.username,
     league: banDecision.leagueId,
   };
@@ -96,7 +98,7 @@ async function createOption(option: TGameOption, gameId: number): Promise<GameOp
         game: gameId
       }
     });
-    addStorageItem(option.itemId, newOption.id);
+    addStorageItem(option.id, newOption.id);
     return newOption;
   } catch (e) {
     // errorMessages.value.push('CreateGameOption');
@@ -114,7 +116,7 @@ async function createOptionChoice(choice: TGameOptionChoice, optionId: number): 
         option: optionId
       }
     });
-    addStorageItem(choice.itemId, newChoice.id);
+    addStorageItem(choice.id, newChoice.id);
     return newChoice;
   } catch (e) {
     console.log('Error creating game option choice', e);
@@ -125,7 +127,7 @@ async function createOptionChoice(choice: TGameOptionChoice, optionId: number): 
 async function createOptionChoices(option: TGameOption): Promise<void> {
   if (!option.hasChoices) return;
   for (const choice of option.choices) {
-    const optionId = getStorageItem(option.itemId);
+    const optionId = getStorageItem(option.id);
     await createOptionChoice(choice, optionId);
   }
 }
@@ -166,7 +168,7 @@ export async function createFactions(gameId: number, resultConfig: TResultConfig
   if (resultConfig.factions === undefined) return;
   for (const faction of resultConfig.factions) {
     try {
-      api('game/factions/', {
+      await api('game/factions/', {
         method: 'POST',
         data: {
           game: gameId,

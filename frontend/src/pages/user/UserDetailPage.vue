@@ -12,7 +12,9 @@
     <!-- Seasons box -->
     <q-card flat bordered class="rounded-borders">
       <q-card-section class="bg-grey-1 q-py-xs q-px-sm">
-        <div class="text-subtitle2 text-weight-medium">Seasons Participated</div>
+        <div class="text-subtitle2 text-weight-medium">
+          Seasons Participated
+        </div>
       </q-card-section>
 
       <q-separator />
@@ -47,7 +49,12 @@
               @click="$emit('open:season', s.id)"
             >
               <q-card-section class="row items-center no-wrap">
-                <q-avatar icon="event" color="primary" text-color="white" class="q-mr-md" />
+                <q-avatar
+                  icon="event"
+                  color="primary"
+                  text-color="white"
+                  class="q-mr-md"
+                />
                 <div class="col">
                   <div class="text-subtitle2 text-weight-medium">
                     {{ s.name }}
@@ -67,67 +74,70 @@
 </template>
 
 <script setup lang="ts">
-import { api } from 'boot/axios'
-import { useRoute } from 'vue-router'
-import { onMounted, ref } from 'vue'
+import { api } from 'boot/axios';
+import { useRoute } from 'vue-router';
+import { onMounted, ref } from 'vue';
+import { TSeason, TSeasonParticipantRead, TUser } from 'src/types';
 
-defineEmits<{ (e: 'open:season', seasonId: number | string): void }>()
+defineEmits<{ (e: 'open:season', seasonId: number | string): void }>();
 
-const user = ref<any>()
-const userSeasonList = ref<any[]>([])
-const seasons = ref<any[]>([])
-const loading = ref(true)
-const route = useRoute()
+const user = ref<TUser>();
+const userSeasonList = ref<TSeasonParticipantRead[]>([]);
+const seasons = ref<TSeason[]>([]);
+const loading = ref(true);
+const route = useRoute();
 
 onMounted(async () => {
-  await loadData()
-})
+  await loadData();
+});
 
 async function loadData() {
-  loading.value = true
+  loading.value = true;
   try {
-    await fetchUser()
-    await fetchUserSeasons()
-    await fetchSeasonDetails()
+    await fetchUser();
+    await fetchUserSeasons();
+    await fetchSeasonDetails();
   } finally {
-    loading.value = false
+    loading.value = false;
   }
 }
 
 function reload() {
-  loadData()
+  loadData();
 }
 
 async function fetchUser(): Promise<void> {
-  const { data } = await api(`user/users/${encodeURIComponent(String(route.params.username))}/`)
-  user.value = data
+  const { data } = await api(
+    `user/users/${encodeURIComponent(String(route.params.username))}/`
+  );
+  user.value = data;
 }
 
 async function fetchUserSeasons(): Promise<void> {
-  const username = route.params.username
-  if (!username) return
+  const username = route.params.username;
+  if (!username) return;
   try {
     const { data } = await api.get('season/season-participants/', {
-      params: { 'profile__profile_name': `${username}_profile` },
-    })
-    userSeasonList.value = Array.isArray(data) ? data : data.results || []
+      params: { profile__profile_name: `${username}_profile` },
+    });
+    userSeasonList.value = Array.isArray(data) ? data : data.results || [];
   } catch (err: any) {
-    console.error('Failed to fetch user seasons:', err)
-    userSeasonList.value = []
+    console.error('Failed to fetch user seasons:', err);
+    userSeasonList.value = [];
   }
 }
 
 async function fetchSeasonDetails(): Promise<void> {
-  const details: any[] = []
+  const details: any[] = [];
   for (const sp of userSeasonList.value) {
     try {
       // Assuming sp.id is the season id in your updated setup
-      const { data } = await api.get(`season/seasons/${sp.id}/`)
-      details.push(data)
+      const { data } = await api.get(`season/seasons/${sp.id}/`);
+      details.push(data);
     } catch (err) {
-      console.error(`Failed to fetch season ${sp.id}:`, err)
+      console.error(`Failed to fetch season ${sp.id}:`, err);
     }
   }
-  seasons.value = details
+  seasons.value = details;
 }
 </script>

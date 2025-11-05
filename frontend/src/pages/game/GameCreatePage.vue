@@ -3,12 +3,16 @@
     <p class="text-h5">New Game</p>
 
     <div class="q-py-md">
-      <q-form @submit.prevent="onSubmit" @keydown.enter.stop.prevent class="q-gutter-md">
+      <q-form
+        @submit.prevent="onSubmit"
+        @keydown.enter.stop.prevent
+        class="q-gutter-md"
+      >
         <KennerInput
           class="max-w"
           label="Game name"
           v-model="name"
-          :rules="[val => !!val || 'Please enter a game name']"
+          :rules="[(val: string) => !!val || 'Please enter a game name']"
         />
         <KennerSelect
           class="max-w"
@@ -17,7 +21,7 @@
           v-model="platform"
           option-value="name"
           option-label="name"
-          :rules="[val => !!val || 'Please select a platform']"
+          :rules="[(val: string) => !!val || 'Please select a platform']"
         />
 
         <!-- Game options -->
@@ -33,8 +37,12 @@
             />
           </div>
 
-          <div v-if="!gameOptions.length" class="text-caption text-grey-7 q-pa-sm">
-            No options yet. Click <span class="text-weight-medium">Add option</span> to get started.
+          <div
+            v-if="!gameOptions.length"
+            class="text-caption text-grey-7 q-pa-sm"
+          >
+            No options yet. Click
+            <span class="text-weight-medium">Add option</span> to get started.
           </div>
 
           <div v-else class="row q-col-gutter-md">
@@ -48,9 +56,19 @@
           </div>
         </div>
 
-        <CreateResultConfig class="q-mt-md" @update-result-config="updateResultConfig" />
+        <CreateResultConfig
+          class="q-mt-md"
+          @update-result-config="updateResultConfig"
+        />
 
-        <KennerButton class="q-my-xl" type="submit" push color="positive" label="Save" icon="save" />
+        <KennerButton
+          class="q-my-xl"
+          type="submit"
+          push
+          color="positive"
+          label="Save"
+          icon="save"
+        />
       </q-form>
     </div>
   </div>
@@ -83,7 +101,6 @@ provide('useGameOptions', useGameOptions);
 
 const name = ref('');
 const platform: Ref<TPlatform | undefined> = ref(undefined);
-const errorMessages: Ref<string[]> = ref([]);
 
 let resultConfig: TResultConfig | undefined = undefined;
 
@@ -92,7 +109,12 @@ function updateResultConfig(newResultConfig: TResultConfig) {
 }
 
 function addEmptyOption(): void {
-  const emptyOption: TGameOption = { title: '', hasChoices: false, itemId: createRandomId(), choices: [] };
+  const emptyOption: TGameOption = {
+    title: '',
+    hasChoices: false,
+    id: createRandomId(),
+    choices: [],
+  };
   addOption(emptyOption, { prepend: true });
 }
 
@@ -103,15 +125,15 @@ const onSubmit = async () => {
     const payload = {
       name: name.value,
       platform: platform.value.id,
-      options: gameOptions.value.map(option => ({
+      options: gameOptions.value.map((option) => ({
         name: option.title,
         has_choices: option.hasChoices,
         // keep your existing keys as-is:
-        only_if_option: option.onlyIfOptionId || null,
-        only_if_choice: option.onlyIfChoiceId || null,
+        only_if_option: option.onlyIfOption || null,
+        only_if_choice: option.onlyIfChoice || null,
         only_if_value: option.onlyIfValue ?? null,
-        choices: option.choices.map(choice => ({ name: choice.name }))
-      }))
+        choices: option.choices.map((choice) => ({ name: choice.name })),
+      })),
     };
 
     const { data: game } = await api.post('/game/games-full/', payload);
@@ -127,7 +149,7 @@ const onSubmit = async () => {
       color: 'positive',
       textColor: 'white',
       icon: 'save',
-      message: 'Saved'
+      message: 'Saved',
     });
 
     await router.push({ name: 'games' });
@@ -137,7 +159,7 @@ const onSubmit = async () => {
       color: 'negative',
       textColor: 'white',
       icon: 'warning',
-      message: 'Error creating game'
+      message: 'Error creating game',
     });
   }
 };

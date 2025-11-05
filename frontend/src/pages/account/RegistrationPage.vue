@@ -120,7 +120,7 @@ async function doRegister(): Promise<void> {
     // await login(username.value, password.value);
     // router.push({ name: 'home' });
 
-  } catch (err: any) {
+  } catch (err: string) {
     $q.notify({
       type: 'negative',
       message: err?.message || 'Unknown error during registration.',

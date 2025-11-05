@@ -4,7 +4,7 @@ import { ref, computed, shallowRef } from 'vue';
 import { fetchLeagueDetails, getMyLeagueId } from 'src/services/leagueService';
 import { useUserStore } from 'stores/userStore';
 import { api } from 'boot/axios';
-import { TLeagueStatus } from 'src/types';
+import { TLeague, TLeagueStatus } from 'src/types';
 import { banGame } from 'src/services/gameService';
 
 // Shared leaf types
@@ -204,7 +204,7 @@ export const useLeagueStore = defineStore('league', () => {
 
   // leagueData
   const leagueId = ref<number | null>(null);
-  const leagueData = shallowRef<any>(null);
+  const leagueData = shallowRef<TLeague|null>(null);
   const members = ref<Member[]>([]);
   const leagueStatus = ref<TLeagueStatus>('PICKING'); // states: PICKING, BANNING, REPICKING, PLAYING, DONE
 

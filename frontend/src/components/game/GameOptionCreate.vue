@@ -10,7 +10,7 @@
             @update:modelValue="updateTitle"
             label="Option title"
             class="full-width q-mr-sm"
-            :rules="[val => !!val || 'Title required']"
+            :rules="[(val: string) => !!val || 'Title required']"
           />
           <KennerButton
             flat round size="sm" color="negative" icon="delete"
@@ -103,7 +103,7 @@ import { TGameOption, TGameOptionChoice } from 'src/types';
 const props = defineProps<{ gameOption: TGameOption }>();
 const { gameOption } = props;
 
-const { updateItem, deleteItem } = inject('useGameOptions') as any;
+const { updateItem, deleteItem } = inject('useGameOptions');
 
 // initialize from existing restriction fields if present
 const hasRestrictions = ref(Boolean(
@@ -138,7 +138,7 @@ function updateTitle(newTitle: string) {
 }
 
 function addChoice() {
-  const emptyChoice: TGameOptionChoice = { itemId: createRandomId(), name: '' };
+  const emptyChoice: TGameOptionChoice = { id: createRandomId(), name: '' };
   updateItem(gameOption, 'choices', [...props.gameOption.choices, emptyChoice]);
 }
 </script>

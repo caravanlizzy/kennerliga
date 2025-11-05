@@ -1,9 +1,11 @@
+import { SelectedGameDto } from 'src/models/gameModels';
+
 export type TKennerButton = {
   label?: string;
   icon?: string;
   color?: string;
   forwardName?: string;
-}
+};
 export interface Meta {
   totalCount: number;
 }
@@ -11,36 +13,36 @@ export type BreadCrumb = {
   label: string;
   icon: string;
   forwardRouteName: string;
-}
+};
 export type TItem = {
   itemId: number;
   name: string;
   isEditable: boolean;
-}
+};
 export type ObjPool<T> = {
   [key: string]: T;
-}
+};
 export type TGameOptionChoice = {
-  itemId: number;
+  id: number;
   name: string;
-}
+};
 export type TFaction = {
-  itemId: number;
+  id: number;
   name: string;
-}
+};
 export type TTieBreaker = {
-  itemId: number;
+  id: number;
   name: string;
-}
+};
 export type TGameOption = {
-  itemId: number;
+  id: number;
   title: string;
   hasChoices: boolean;
   choices: TGameOptionChoice[];
   onlyIfOption?: number;
   onlyIfChoice?: number;
   onlyIfValue?: boolean;
-}
+};
 export type TResultConfig = {
   isAsymmetric: boolean;
   hasPoints: boolean;
@@ -49,7 +51,7 @@ export type TResultConfig = {
   factions?: TFaction[]; // Assuming it's an array of faction names or identifiers
   hasTieBreaker: boolean;
   tieBreakers?: TTieBreaker[]; // Assuming array of tie breaker rules or identifiers
-}
+};
 export type TUser = {
   id: number;
   password: string; // Encrypted password format
@@ -63,14 +65,61 @@ export type TUser = {
   groups: any[]; // Can be defined in detail if group structure is known
   user_permissions: any[]; // Can be defined in detail if permission structure is known
 };
-export type TLeagueMember = {
-  id: string | number;
+
+export type TMember = {
+  id: number;
   username: string;
+  selected_game?: {
+    id: number;
+    game_name: string;
+  } | null;
+};
+
+export type TLeagueStatus =
+  | 'PICKING'
+  | 'REPICKING'
+  | 'BANNING'
+  | 'PLAYING'
+  | 'DONE';
+
+export type TLeague = {
+  id: number;
+  level: number | string;
+  season: number;
+  members: TMember[];
+};
+
+export type TSeason = {
+  id: number;
+  name: string;
+};
+export type TMessage = {
+  text: string;
+  datetime: string;
+  user: number;
+  sender: string;
+};
+// ---------- READ (response from DRF) ----------
+export type TSeasonParticipantRead = {
+  id: number;
+
+  // write fields echoed back as values
+  season: number;
+  profile_id: number;
+  rank: number | null;
+
+  // read-only fields
+  username: string;
+  profile_name: string;
+  selected_game: SelectedGameDto | null;
+  banned_selected_game: SelectedGameDto | null;
+  has_banned: boolean;
   is_active_player: boolean;
-  selected_game?: string;
-  banned_game?: string;
-}
+};
 
-export type TLeagueStatus = 'PICKING' | 'REPICKING' | 'BANNING' | 'PLAYING' | 'DONE';
-
-
+// ---------- CREATE (POST payload) ----------
+export type TSeasonParticipantCreate = {
+  season: number;
+  profile_id: number;
+  rank?: number | null;
+};

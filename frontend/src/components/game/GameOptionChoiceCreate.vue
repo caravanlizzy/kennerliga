@@ -2,7 +2,9 @@
   <div class="column q-pa-xs q-mt-lg">
     <div class="row items-center justify-between q-mx-xs q-mb-xs">
       <div class="text-bold">Choices</div>
-      <q-badge transparent class="text-caption">{{ choiceCount }} total</q-badge>
+      <q-badge transparent class="text-caption"
+        >{{ choiceCount }} total</q-badge
+      >
     </div>
 
     <!-- If ListCreator supports initial values, pass them in -->
@@ -26,13 +28,17 @@ import { TGameOption, TGameOptionChoice } from 'src/types';
 import { createRandomId } from 'src/helpers';
 
 const { updateItem } = inject('useGameOptions') as {
-  updateItem: (item: TGameOption, key: keyof TGameOption, value: any) => void
+  updateItem: (
+    item: TGameOption,
+    key: keyof TGameOption,
+    value: TGameOption[keyof TGameOption]
+  ) => void;
 };
 
 const props = defineProps<{ gameOption: TGameOption }>();
 
-const initialNames = computed<string[]>(
-  () => (props.gameOption.choices || []).map(c => c.name)
+const initialNames = computed<string[]>(() =>
+  (props.gameOption.choices || []).map((c) => c.name)
 );
 const choiceCount = computed(() => props.gameOption.choices?.length ?? 0);
 
@@ -41,15 +47,15 @@ const choiceCount = computed(() => props.gameOption.choices?.length ?? 0);
  */
 function onUpdate(updatedNames: string[]) {
   const existingByName = new Map(
-    (props.gameOption.choices || []).map(c => [c.name, c.itemId])
+    (props.gameOption.choices || []).map((c) => [c.name, c.id])
   );
 
   const nextChoices: TGameOptionChoice[] = updatedNames.map((name, i) => ({
-    itemId:
+    id:
       existingByName.get(name) ??
-      props.gameOption.choices?.[i]?.itemId ??
+      props.gameOption.choices?.[i]?.id ??
       createRandomId(),
-    name
+    name,
   }));
 
   updateItem(props.gameOption, 'choices', nextChoices);

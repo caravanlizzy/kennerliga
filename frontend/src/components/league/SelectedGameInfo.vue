@@ -100,7 +100,6 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue';
 import UserName from 'components/ui/UserName.vue';
-import KennerTooltip from 'components/base/KennerTooltip.vue';
 import { truncateString } from 'src/helpers';
 
 // --- types trimmed to what we actually render ---

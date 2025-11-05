@@ -87,7 +87,7 @@ export const useUserStore = defineStore(
       }
     }
 
-    return { user, isAuthenticated, isAdmin, isMe, login, logout };
+    return { user, listUsers, isAuthenticated, isAdmin, isMe, login, logout };
   },
   {
     persist: {
