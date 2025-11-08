@@ -1,5 +1,7 @@
 <template>
    <LeagueMemberManager />
+<!--  <LeagueResultUpload />-->
+<!--  <LeagueResults />-->
 </template>
 
 <script setup lang="ts">
