@@ -103,7 +103,7 @@ import { TGameOption, TGameOptionChoice } from 'src/types';
 const props = defineProps<{ gameOption: TGameOption }>();
 const { gameOption } = props;
 
-const { updateItem, deleteItem } = inject('useGameOptions');
+const { updateItem, deleteItem } = inject('useGameOptions') as any;
 
 // initialize from existing restriction fields if present
 const hasRestrictions = ref(Boolean(
