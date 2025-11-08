@@ -3,7 +3,7 @@
     class="q-pa-xl flex flex-center column q-gutter-md"
     style="min-height: 60vh"
   >
-    <q-spinner-ball size="64px" color="accent" />
+    <q-spinner-ios size="64px" color="accent" />
     <div class="text-subtitle1 text-accent">
       <span v-if="text"> {{text}}</span>
       <span v-else> Loading...</span>
