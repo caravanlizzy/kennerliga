@@ -1,12 +1,9 @@
 <template>
-  <SideAccentBox title="Past Seasons" color="teal">
+  <SideAccentBox title="Season Standings" color="teal">
     <q-card flat bordered class="q-pa-md">
       <div class="row items-center q-gutter-md q-mb-md">
         <div class="col">
-          <div class="text-h6">Past Seasons</div>
-          <div class="text-caption text-grey-7">
-            Pick a year, then select the season in that year.
-          </div>
+          <div class="text-h6">Season Standings</div>
         </div>
 
         <!-- Year -->
@@ -19,7 +16,6 @@
             outlined
             emit-value
             map-options
-            clearable
             :loading="loadingSeasons"
             :disable="loadingSeasons"
             @update:model-value="onYearChange"
@@ -38,7 +34,6 @@
             outlined
             emit-value
             map-options
-            clearable
             :disable="!selectedYear || loading"
             @update:model-value="onMonthChange"
           />
@@ -89,8 +84,8 @@
                 :columns="columns"
                 row-key="rowKey"
                 flat
-                bordered
                 dense
+                hide-bottom
                 :pagination="{ rowsPerPage: 10 }"
                 :rows-per-page-options="[5, 10, 20, 50]"
               />
