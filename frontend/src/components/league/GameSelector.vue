@@ -36,8 +36,14 @@
                 clickable
                 :outline="!isPlatformSelected(p.id)"
                 :color="getPlatformColor(p.name).color"
-                :text-color="isPlatformSelected(p.id) ? 'white' : getPlatformColor(p.name).color"
-                :style="!isPlatformSelected(p.id) ? 'background-color: white' : ''"
+                :text-color="
+                  isPlatformSelected(p.id)
+                    ? 'white'
+                    : getPlatformColor(p.name).color
+                "
+                :style="
+                  !isPlatformSelected(p.id) ? 'background-color: white' : ''
+                "
                 @click="togglePlatform(p.id)"
               >
                 <q-icon name="sports_esports" size="16px" class="q-mr-xs" />
@@ -91,7 +97,9 @@
             <q-badge
               class="platform-badge"
               :color="getPlatformColor(getPlatformName(game.platform)).color"
-              :text-color="getPlatformColor(getPlatformName(game.platform)).text"
+              :text-color="
+                getPlatformColor(getPlatformName(game.platform)).text
+              "
             >
               {{ getPlatformName(game.platform).split('.')[0] }}
             </q-badge>
@@ -102,21 +110,28 @@
               </div>
 
               <div class="game-name text-body2 text-weight-medium ellipsis">
-                {{ game.name.length > 18 ? game.name.slice(0, 17) + '…' : game.name }}
+                {{
+                  game.name.length > 18
+                    ? game.name.slice(0, 17) + '…'
+                    : game.name
+                }}
                 <q-tooltip anchor="top middle" self="bottom middle">
                   {{ game.name }}
                 </q-tooltip>
               </div>
             </q-card-section>
           </q-card>
-
         </div>
       </q-card>
     </div>
 
     <!-- RIGHT: DETAILS -->
     <div class="col-12 col-md-6">
-      <q-card flat bordered class="q-pa-md q-my-md rounded-borders details-card shadow-2">
+      <q-card
+        flat
+        bordered
+        class="q-pa-md q-my-md rounded-borders details-card shadow-2"
+      >
         <q-inner-loading :showing="isLoading">
           <q-spinner-orbit size="96px" color="secondary" />
         </q-inner-loading>
@@ -140,8 +155,14 @@
               dense
               square
               outline
-              :color="getPlatformColor(getPlatformName(gameInformation.game.platform)).color"
-              :text-color="getPlatformColor(getPlatformName(gameInformation.game.platform)).text"
+              :color="
+                getPlatformColor(getPlatformName(gameInformation.game.platform))
+                  .color
+              "
+              :text-color="
+                getPlatformColor(getPlatformName(gameInformation.game.platform))
+                  .text
+              "
             >
               {{ getPlatformName(gameInformation.game.platform).split('.')[0] }}
             </q-chip>
@@ -150,7 +171,10 @@
           <q-separator spaced />
 
           <!-- No settings -->
-          <div v-if="!gameInformation.options.length" class="text-italic text-grey">
+          <div
+            v-if="!gameInformation.options.length"
+            class="text-italic text-grey"
+          >
             This game has no additional settings.
           </div>
 
@@ -159,10 +183,15 @@
             <div class="section-title q-mb-sm">Settings</div>
 
             <!-- Choices -->
-            <div v-if="gameInformation.options.some(o => o.has_choices)" class="q-mb-md">
+            <div
+              v-if="gameInformation.options.some((o) => o.has_choices)"
+              class="q-mb-md"
+            >
               <div class="row q-col-gutter-md">
                 <div
-                  v-for="option in gameInformation.options.filter(o => o.has_choices)"
+                  v-for="option in gameInformation.options.filter(
+                    (o) => o.has_choices
+                  )"
                   :key="option.id"
                   class="col-12 col-sm-6"
                 >
@@ -172,7 +201,11 @@
                     option-label="name"
                     dense
                     outlined
-                    v-model="gameSelection.selectedOptions.find(o => o.id == option.id).choice"
+                    v-model="
+                      gameSelection.selectedOptions.find(
+                        (o) => o.id == option.id
+                      ).choice
+                    "
                     class="full-width"
                   />
                 </div>
@@ -180,11 +213,13 @@
             </div>
 
             <!-- Toggles -->
-            <div v-if="gameInformation.options.some(o => !o.has_choices)">
+            <div v-if="gameInformation.options.some((o) => !o.has_choices)">
               <div class="section-subtitle q-mb-xs">Toggles</div>
               <div class="row q-col-gutter-sm">
                 <q-toggle
-                  v-for="option in gameInformation.options.filter(o => !o.has_choices)"
+                  v-for="option in gameInformation.options.filter(
+                    (o) => !o.has_choices
+                  )"
                   :key="option.id"
                   v-model="findSelectedOption(option.id).value"
                   :label="option.name"
@@ -197,19 +232,20 @@
           </template>
         </template>
       </q-card>
+      <KennerButton class="float-right" :disable="!isValid" @click="onSubmit()">
+        Save
+      </KennerButton>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { h, onMounted, watch, computed, ref } from 'vue';
+import { onMounted, watch, computed, ref } from 'vue';
 import KennerSelect from 'components/base/KennerSelect.vue';
 import { useGameSelection } from 'src/composables/gameSelection';
-import { useLeagueStore } from 'stores/leagueStore';
-import { storeToRefs } from 'pinia';
-import { useActionBar } from 'src/composables/actionBar';
+import KennerButton from 'components/base/KennerButton.vue';
 
-const { leagueId } = storeToRefs(useLeagueStore());
+const props = defineProps<{ leagueId: number }>();
 
 const {
   gameInformation,
@@ -218,12 +254,13 @@ const {
   setGameInformation,
   findChoicesByOption,
   findSelectedOption,
-  submitGame,
   filter,
   platforms,
   filteredGames,
   loadPlatformsAndGames,
-} = useGameSelection(leagueId);
+  submitGame,
+  isValid,
+} = useGameSelection(props.leagueId);
 
 const selectedPlatforms = ref<Set<number>>(new Set());
 
@@ -244,21 +281,9 @@ const displayedGames = computed(() => {
 });
 
 // ---- actions / header wiring ----
-const emit = defineEmits(['submit-success']);
-const handleSubmit = async () => {
-  try {
-    await submitGame();
-    emit('submit-success');
-  } catch (error) {
-    console.error('Error submitting game:', error);
-  }
-};
-
-const { setActions, setLeadText, setSubject } = useActionBar();
-setActions([{ name: 'Confirm', callback: handleSubmit, buttonVariant: 'secondary' }]);
-setLeadText(() => h('div', 'Confirm your game selection'));
+const emit = defineEmits(['selection-updated', 'set-submitter', 'on-success']);
 watch(gameSelection, (newVal) => {
-  if (newVal.game) setSubject(newVal.game.name);
+  emit('selection-updated', newVal);
 });
 
 // ---- helpers ----
@@ -284,7 +309,19 @@ function shortPlatformLabel(name: string): string {
   return name.length > 14 ? name.slice(0, 13) + '…' : name;
 }
 
-onMounted(loadPlatformsAndGames);
+async function onSubmit() {
+  try {
+    await submitGame();
+    emit('on-success');
+  } catch (e) {
+    console.error(e);
+  }
+}
+
+onMounted(() => {
+  loadPlatformsAndGames();
+  emit('set-submitter', onSubmit);
+});
 </script>
 
 <style scoped lang="scss">
@@ -303,18 +340,21 @@ onMounted(loadPlatformsAndGames);
 /* Card look & feel for games (hover + selected) */
 .game-card {
   background: #f7f7f9;
-  transition: box-shadow .12s ease, transform .12s ease, border-color .12s ease;
+  transition: box-shadow 0.12s ease, transform 0.12s ease,
+    border-color 0.12s ease;
 }
 .game-card:hover {
   transform: translateY(-1px);
-  box-shadow: 0 4px 14px rgba(0,0,0,.06);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
 }
 .game-card.selected {
   border: 2px solid var(--q-color-secondary);
   background: #fff;
-  box-shadow: 0 6px 18px rgba(0,0,0,.08);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
 }
-.game-name { font-weight: 600; }
+.game-name {
+  font-weight: 600;
+}
 
 /* Details card: subtle accent divider */
 .details-card {
@@ -325,19 +365,19 @@ onMounted(loadPlatformsAndGames);
 
 /* Section headings */
 .section-title {
-  font-size: .9rem;
+  font-size: 0.9rem;
   font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: .04em;
+  letter-spacing: 0.04em;
   color: var(--q-dark);
-  opacity: .85;
+  opacity: 0.85;
 }
 .section-subtitle {
-  font-size: .8rem;
+  font-size: 0.8rem;
   font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: .05em;
+  letter-spacing: 0.05em;
   color: var(--q-dark);
-  opacity: .65;
+  opacity: 0.65;
 }
 </style>

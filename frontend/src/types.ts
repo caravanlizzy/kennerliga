@@ -99,7 +99,7 @@ export type TMessage = {
   user: number;
   sender: string;
 };
-// ---------- READ (response from DRF) ----------
+
 export type TSeasonParticipantRead = {
   id: number;
 
@@ -117,9 +117,19 @@ export type TSeasonParticipantRead = {
   is_active_player: boolean;
 };
 
-// ---------- CREATE (POST payload) ----------
-export type TSeasonParticipantCreate = {
+export type TLeagueMember = {
+  id: number;
   season: number;
   profile_id: number;
-  rank?: number | null;
-};
+  rank: number;
+  username: string;
+  profile_name: string;
+  selected_game: SelectedGameDto | null;
+  banned_selected_game: SelectedGameDto | null;
+  has_banned: boolean;
+  is_active_player: boolean;
+  position: number;
+  selected_game_id: number | null;
+  banned_by: string[];
+}
+

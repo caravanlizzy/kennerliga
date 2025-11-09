@@ -1,5 +1,4 @@
 <template>
-
   <SideBarLayout side-title="League Standings">
     <!-- ==================== LOADING STATE ==================== -->
     <template v-if="loading">
@@ -10,7 +9,11 @@
           <q-skeleton type="text" width="70%" class="q-mb-md" />
 
           <div class="row q-col-gutter-md">
-            <div v-for="n in 4" :key="n" class="col-12 col-sm-6 col-md-4 col-lg-3">
+            <div
+              v-for="n in 4"
+              :key="n"
+              class="col-12 col-sm-6 col-md-4 col-lg-3"
+            >
               <q-skeleton height="160px" square />
             </div>
           </div>
@@ -22,7 +25,6 @@
     <div v-else class="q-pa-md relative-position">
       <ActionBar />
 
-
       <!-- Game Selector - shown when user needs to pick games -->
       <template v-if="isMePickingGame">
         <ContentSection
@@ -31,7 +33,8 @@
           :is-opened="sectionVisibilityStates['selection']"
         >
           <GameSelector
-            @submit-success="updateLeagueData"
+            @selection-updated="(updated) => updateGameSelection(updated)"
+            @set-submitter="(s) => setSubmit(s)"
             class="q-mt-md q-pa-xs"
           />
         </ContentSection>
@@ -64,7 +67,7 @@
         color="info"
         :is-opened="sectionVisibilityStates['players']"
       >
-        <div class="row q-col-gutter-md ">
+        <div class="row q-col-gutter-md">
           <div
             v-for="member in members"
             :key="member.id"
@@ -84,7 +87,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref, watch, watchEffect } from 'vue';
+import { h, onMounted, ref, watch, watchEffect } from 'vue';
 import GameSelector from 'components/league/GameSelector.vue';
 import { useLeagueStore } from 'stores/leagueStore';
 import { storeToRefs } from 'pinia';
@@ -115,38 +118,67 @@ const {
   selectedGamesById,
   members,
   leagueId,
-  loading, // 👈 global store flag
+  loading,
 } = storeToRefs(league);
 const { updateLeagueData } = league;
 
-const { setActions, setLeadText, reset } = useActionBar();
+const { setActions, setLeadText, setSubject, reset } = useActionBar();
 
 const { user } = useUserStore();
-setLeadText('Select a game to ban');
-setActions(
-  Object.values(selectedGamesById.value)
-    .filter((selectedGame) => selectedGame.selected_by !== user?.username)
-    .map((selectedGame) => ({
-      name: `${selectedGame.game_name}`,
-      buttonVariant: 'primary',
-      callback: () => handleBanGame(selectedGame.id, selectedGame.game_name),
-    }))
-);
 
-watch(isMeBanningGame, () => {
-  if (isMeBanningGame.value && leagueId.value && user.username) {
-    setLeadText('Select a game to ban');
-    setActions(
-      Object.values(selectedGamesById.value)
-        .filter((game) => game.selected_by !== user?.username)
-        .map((game) => ({
-          name: `${game.game_name}`,
-          callback: () => handleBanGame(game.id, game.game_name),
-          autoReset: false,
-        }))
-    );
+const gameSelection = ref(null);
+function updateGameSelection(newSelection) {
+  gameSelection.value = newSelection;
+}
+
+function manageActionBar() {
+  switch (leagueStatus.value) {
+    case 'BANNING':
+      if (isMeBanningGame.value && leagueId.value && user.username) {
+        setLeadText('Select a game to ban');
+        setActions(
+          Object.values(selectedGamesById.value)
+            .filter((game) => game.selected_by !== user?.username)
+            .map((game) => ({
+              name: `${game.game_name}`,
+              callback: () => handleBanGame(game.id, game.game_name),
+              autoReset: false,
+            }))
+        );
+      }
+      break;
+    case 'PICKING':
+      setActions([
+        {
+          name: 'Save',
+          callback: submitGameSelection,
+        },
+      ]);
+      setLeadText(() => h('div', 'Confirm your game selection'));
+      setSubject(gameSelection.value?.game?.name);
+      break;
+    default:
+      console.log('No case matched');
   }
+}
+
+watch([isMeBanningGame, leagueStatus, gameSelection], manageActionBar, {
+  immediate: true,
+  deep: true,
 });
+
+type TSubmitter = (() => Promise<void>);
+let submitGame: TSubmitter;
+function setSubmit(submitterFunc:TSubmitter): void {
+  submitGame = submitterFunc;
+}
+async function submitGameSelection() {
+  try {
+    await submitGame();
+  } catch (error) {
+    console.error('Error submitting game:', error);
+  }
+}
 
 const { setDialog } = useDialog();
 const $q = useQuasar();

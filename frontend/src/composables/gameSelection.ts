@@ -17,7 +17,7 @@ type TGameSelection = {
   selectedOptions: SelectedGameOptionDto[];
 };
 
-export function useGameSelection(leagueId: Ref<number|null>) {
+export function useGameSelection(leagueId: number|null) {
   const gameInformation = reactive<{
     game: GameDto | undefined;
     options: GameOptionDto[];
@@ -27,6 +27,7 @@ export function useGameSelection(leagueId: Ref<number|null>) {
   });
 
   const isLoading = ref(false);
+  const isValid = ref(true);
   const platform: Ref<TPlatform|null> = ref(null);
   const filter = ref('');
   const platforms :Ref<TPlatform[]> = ref([]);
@@ -128,7 +129,7 @@ export function useGameSelection(leagueId: Ref<number|null>) {
   }
 
   async function fetchGames() {
-    const { data: gameData } = await api(`game/games/?league=${leagueId.value}`);
+    const { data: gameData } = await api(`game/games/?league=${leagueId}`);
     return gameData;
   }
 
@@ -174,6 +175,7 @@ export function useGameSelection(leagueId: Ref<number|null>) {
     gameInformation,
     gameSelection,
     isLoading,
+    isValid,
     setGameInformation,
     findChoicesByOption,
     findSelectedOption,

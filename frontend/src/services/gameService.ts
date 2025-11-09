@@ -2,9 +2,7 @@ import {
   BanDecisionDtoPayload,
   GameOptionChoiceDto,
   GameOptionDto,
-  SelectedGameDto,
   SelectedGameDtoPayload,
-  SelectedGameOptionDto,
   TPlatform,
 } from 'src/models/gameModels';
 import { api } from 'boot/axios';

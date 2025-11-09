@@ -31,7 +31,7 @@
     </template>
     {{ error }}
     <template #action>
-      <q-btn flat color="negative" label="Retry" @click="reload" />
+      <q-btn flat color="negative" label="Retry" @click="load" />
     </template>
   </q-banner>
 
@@ -131,27 +131,85 @@
 
         <q-card-actions align="right">
           <q-btn
-            :label="member.selected_game ? 'Edit Game' : 'Select Game'"
-            :icon="member.selected_game ? 'edit' : 'add'"
+            v-if="member.selected_game"
+            label="Edit Game"
+            icon="edit"
             color="primary"
-            @click="console.log(member)"
+            @click="onEditGame(member)"
           />
+          <q-btn
+            v-else
+            label="Select Game"
+            icon="add"
+            color="primary"
+            @click="onSelectGame(member)"
+          />
+          <q-btn
+            v-if="member.selected_game"
+            label="Delete Game"
+            icon="delete"
+            color="negative"
+            @click="onDeleteSelectedGame(member)"
+          >
+          </q-btn>
         </q-card-actions>
       </q-card>
+    </div>
+
+    <!--    Edit a members game selection-->
+    <div v-if="currentEditMember !== null">
+      <div class="text-h6">
+        Edit Game
+        {{ currentEditMember.selected_game?.game_name }}
+      </div>
+      <div
+        v-for="option in currentEditMember.selected_game.selected_options"
+        :key="option.id"
+      >
+        {{ option }}
+      </div>
+      {{ editOptions }}
+    </div>
+
+    <!-- Form to select a game -->
+    <div
+      v-if="selectingGameMember"
+      class="q-pa-md q-mt-md bg-grey-1 rounded-borders"
+    >
+      <div class="row items-center justify-between q-mb-sm">
+        <div class="text-subtitle1 text-weight-medium">
+          Select a game for
+          <span class="text-primary">{{ selectingGameMember.username }}</span>
+        </div>
+        <q-btn
+          dense
+          flat
+          round
+          icon="close"
+          color="grey-7"
+          @click="selectingGameMember = null"
+        />
+      </div>
+
+      <q-separator class="q-mb-md" />
+
+      <GameSelector :leagueId="league.id" @onSuccess="load" />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { useRoute } from 'vue-router';
-import { onMounted, ref } from 'vue';
-import { TLeague, TSeason } from 'src/types';
+import { onMounted, ref, computed } from 'vue';
+import { TLeagueMember, TSeason } from 'src/types';
 import { fetchLeagueDetails } from 'src/services/leagueService';
 import { fetchSeason } from 'src/services/seasonService';
+import { api } from 'boot/axios';
+import GameSelector from 'components/league/GameSelector.vue';
 
 const route = useRoute();
 
-const league = ref<TLeague | null>(null);
+const league = ref(null);
 const season = ref<TSeason | null>(null);
 
 const loading = ref(false);
@@ -172,5 +230,40 @@ async function load() {
   }
 }
 
+// Edit Game
+const currentEditMember = ref<any | null>(null);
+const editOptions = computed(
+  () =>
+    currentEditMember.value?.selected_game?.selected_options.map(
+      (option: any) =>
+        ({}) => ({
+          name: option.game_option.name,
+          has_choices: option.game_option.has_choices,
+          value: option.choice?.value, // fixed the extra dot and added optional chaining
+        })
+    ) || []
+);
+
+function onEditGame(member: any) {
+  currentEditMember.value = member;
+}
+
+// Delete Game
+async function onDeleteSelectedGame(member: any) {
+  selectingGameMember.value = null;
+  try {
+    await api.delete(`game/selected-games/${member.selected_game.id}/`);
+    await load();
+  } catch (err) {
+    console.error('Delete failed', err);
+  }
+}
+
+// Select Game
+const selectingGameMember = ref<TLeagueMember | null>(null);
+
+function onSelectGame(member: TLeagueMember) {
+  selectingGameMember.value = member;
+}
 onMounted(load);
 </script>

@@ -1,20 +1,23 @@
 import { api } from 'boot/axios';
+import { TLeagueDetail } from 'src/types';
 
-export async function fetchLeagueDetails(leagueId: number) {
+export async function fetchLeagueDetails(
+  leagueId: number
+): Promise<TLeagueDetail> {
   try {
     const { data } = await api.get(`league/league-details/${leagueId}`);
     return data;
   } catch (error) {
     console.error('Error fetching league details:', error);
+    throw new Error('Failed to fetch league details');
   }
 }
-
 
 export async function getMyLeagueId(): Promise<number | null> {
   try {
     const response = await api.get('user/me/current-league');
     return response.data.id;
-  } catch (error: string) {
+  } catch (error: any) {
     // Check if the error is a 404 (Not Found) which indicates no active league
     if (error.response?.status === 404) {
       return null;
