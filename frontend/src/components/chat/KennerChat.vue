@@ -216,7 +216,6 @@ async function send() {
 
 async function loadMessages() {
   const { data } = await fetchMessages(lastDateTime);
-  console.log({ data });
   if (!data || data.length === 0) return;
 
   // Append in chronological order

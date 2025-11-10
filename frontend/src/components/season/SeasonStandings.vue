@@ -5,9 +5,26 @@
         <div class="col">
           <div class="text-h6">Season Standings</div>
         </div>
+        <!-- Season (month within selected year) -->
+        <div class="row q-gutter-sm items-center">
 
-        <!-- Year -->
-        <div class="col-auto" style="min-width: 180px">
+          <!-- Month -->
+          <q-select
+            v-if="selectedYear"
+            v-model="selectedMonth"
+            :options="monthOptions"
+            option-label="label"
+            option-value="value"
+            label="Season"
+            dense
+            outlined
+            emit-value
+            map-options
+            :disable="!selectedYear || loading"
+            @update:model-value="onMonthChange"
+            style="min-width: 140px"
+          />
+          <!-- Year -->
           <q-select
             v-model="selectedYear"
             :options="yearOptions"
@@ -19,25 +36,13 @@
             :loading="loadingSeasons"
             :disable="loadingSeasons"
             @update:model-value="onYearChange"
+            style="min-width: 140px"
           />
+
+
         </div>
 
-        <!-- Season (month within selected year) -->
-        <div class="col-auto" style="min-width: 260px">
-          <q-select
-            v-model="selectedMonth"
-            :options="monthOptions"
-            option-label="label"
-            option-value="value"
-            label="Season in Year"
-            dense
-            outlined
-            emit-value
-            map-options
-            :disable="!selectedYear || loading"
-            @update:model-value="onMonthChange"
-          />
-        </div>
+
       </div>
 
       <q-banner v-if="error" class="q-mb-md" rounded dense>
@@ -207,32 +212,6 @@ function resolveSeasonIdByYearMonth(year: number, month: number): number | null 
   return match ? match.id : null;
 }
 
-/* Pick the most recent season strictly before the current month.
-   If none exist, fall back to the latest available season. */
-function preselectPreviousSeason() {
-  if (!seasons.value.length) return;
-
-  const now = new Date();
-  const nowYear = now.getFullYear();
-  const nowMonth = now.getMonth() + 1; // JS months are 0-based
-
-  // candidates strictly before current YM
-  const past = seasons.value
-    .filter(s => s.year < nowYear || (s.year === nowYear && s.month < nowMonth));
-
-  // choose the max (latest) among 'past', or overall latest if 'past' empty
-  const pickFrom = past.length ? past : seasons.value;
-  const chosen = pickFrom
-    .slice()
-    .sort((a, b) => (b.year - a.year) || (b.month - a.month))[0];
-
-  if (!chosen) return;
-
-  selectedYear.value = chosen.year;
-  selectedMonth.value = chosen.month;
-  selectedSeasonId.value = chosen.id;
-}
-
 /* Reset when year changes */
 async function onYearChange() {
   selectedMonth.value = null;
@@ -309,9 +288,6 @@ const columns = computed<QTableProps['columns']>(() => ([
 onMounted(async () => {
   await loadSeasons();
 
-  // Auto-select the previous season (or latest available if none in the past)
-  preselectPreviousSeason();
-
   // If something was selected, load its data
   if (selectedYear.value && selectedMonth.value) {
     // ensure monthOptions computed sees selectedYear before month handler runs
@@ -320,7 +296,3 @@ onMounted(async () => {
   }
 });
 </script>
-
-<style scoped>
-/* minimal styling */
-</style>
