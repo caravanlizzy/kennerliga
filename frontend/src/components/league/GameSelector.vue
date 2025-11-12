@@ -245,7 +245,7 @@ import KennerSelect from 'components/base/KennerSelect.vue';
 import { useGameSelection } from 'src/composables/gameSelection';
 import KennerButton from 'components/base/KennerButton.vue';
 
-const props = defineProps<{ leagueId: number }>();
+const props = defineProps<{ leagueId: number, profileId: number }>();
 
 const {
   gameInformation,
@@ -260,7 +260,7 @@ const {
   loadPlatformsAndGames,
   submitGame,
   isValid,
-} = useGameSelection(props.leagueId);
+} = useGameSelection(props.leagueId, props.profileId);
 
 const selectedPlatforms = ref<Set<number>>(new Set());
 

@@ -71,7 +71,6 @@
             <q-item-label class="text-weight-medium">
               {{ member.username }}
             </q-item-label>
-            <q-item-label caption> Member ID: {{ member.id }} </q-item-label>
           </q-item-section>
           <q-item-section side>
             <q-badge
@@ -96,7 +95,7 @@
 
         <q-card-section>
           <div class="text-caption text-grey-7 q-mb-xs">Selected Game</div>
-          <div class="row items-center">
+          <div class="row items-center" style="min-height: 29px">
             <div class="col-auto">
               <q-chip
                 v-if="member.selected_game?.game_name"
@@ -131,6 +130,7 @@
 
         <q-card-actions align="right">
           <q-btn
+            outline
             v-if="member.selected_game"
             label="Edit Game"
             icon="edit"
@@ -139,12 +139,14 @@
           />
           <q-btn
             v-else
+            outline
             label="Select Game"
             icon="add"
             color="primary"
             @click="onSelectGame(member)"
           />
           <q-btn
+            outline
             v-if="member.selected_game"
             label="Delete Game"
             icon="delete"
@@ -174,10 +176,10 @@
     <!-- Form to select a game -->
     <div
       v-if="selectingGameMember"
-      class="q-pa-md q-mt-md bg-grey-1 rounded-borders"
+      class="q-pa-md q-mt-md bg-grey-1 rounded-borders col-12"
     >
       <div class="row items-center justify-between q-mb-sm">
-        <div class="text-subtitle1 text-weight-medium">
+        <div class="text-h6 text-weight-medium">
           Select a game for
           <span class="text-primary">{{ selectingGameMember.username }}</span>
         </div>
@@ -193,7 +195,11 @@
 
       <q-separator class="q-mb-md" />
 
-      <GameSelector :leagueId="league.id" @onSuccess="load" />
+      <GameSelector
+        :leagueId="league.id"
+        :profileId="selectingGameMember!.profile_id"
+        @onSuccess="onSuccessfullGameSelection"
+      />
     </div>
   </div>
 </template>
@@ -265,5 +271,11 @@ const selectingGameMember = ref<TLeagueMember | null>(null);
 function onSelectGame(member: TLeagueMember) {
   selectingGameMember.value = member;
 }
+
+function onSuccessfullGameSelection() {
+  selectingGameMember.value = null;
+  load();
+}
+
 onMounted(load);
 </script>

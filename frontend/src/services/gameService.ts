@@ -200,22 +200,20 @@ export async function createTieBreakers(resultConfigId: number, resultConfig: TR
 }
 export async function createSelectedGame(
   selectedGame: SelectedGameDtoPayload,
-  leagueId: number | null = null
 ) {
   const data: Record<string, any> = {
     game: selectedGame.game,
     selected_options: selectedGame.selected_options,
+    league_id: selectedGame.league_id,
+    profile_id: selectedGame.profile_id,
   };
 
-  if (leagueId !== null) {
-    data.leagueId = leagueId;
-  }
-
   try {
-    return await api('/game/selected-games/', {
+    const response = await api('/game/selected-games/', {
       method: 'POST',
       data,
     });
+    return response;
   } catch (error) {
     throw new Error('Error creating selectedGame: ' + error);
   }

@@ -3,7 +3,8 @@ import {
   GameDto,
   GameOptionDto,
   SelectedGameDtoPayload,
-  SelectedGameOptionDto, TPlatform
+  SelectedGameOptionDto,
+  TPlatform
 } from 'src/models/gameModels';
 import { api } from 'boot/axios';
 import {
@@ -15,9 +16,11 @@ import {
 type TGameSelection = {
   game: GameDto;
   selectedOptions: SelectedGameOptionDto[];
+  profileId: number;
+  leagueId: number;
 };
 
-export function useGameSelection(leagueId: number|null) {
+export function useGameSelection(leagueId: number, profileId: number) {
   const gameInformation = reactive<{
     game: GameDto | undefined;
     options: GameOptionDto[];
@@ -57,6 +60,8 @@ export function useGameSelection(leagueId: number|null) {
   const gameSelection = reactive<TGameSelection>({
     game: EMPTY_GAME,
     selectedOptions: [],
+    profileId: 0,
+    leagueId: 0,
   });
 
   async function setGameInformation(game: GameDto) {
@@ -133,38 +138,27 @@ export function useGameSelection(leagueId: number|null) {
     return gameData;
   }
 
-  function transformSubmitData(
+  function toSelectedGamePayload(
     selection: TGameSelection
   ): SelectedGameDtoPayload {
-    const selected_options = selection.selectedOptions.map((option) => {
-      const base = {
-        selected_game: selection.game.id,
-        game_option_id: option.id, // ✅ now using *_id
-      };
-
-      if (option.choice) {
-        return {
-          ...base,
-          choice_id: option.choice.id, // ✅ now using *_id
-        };
-      }
-
-      return {
-        ...base,
-        value: option.value,
-      };
-    });
-
     return {
       game: selection.game.id,
-      selected_options,
+      selected_options: selection.selectedOptions.map((option) => ({
+        selected_game: selection.game.id,
+        game_option_id: option.id,
+        ...(option.choice
+          ? { choice_id: option.choice.id }
+          : { value: option.value }),
+      })),
+      profile_id: profileId,
+      league_id: leagueId,
     };
   }
 
 
   function submitGame() {
     if (gameSelection) {
-      const data = transformSubmitData(gameSelection);
+      const data = toSelectedGamePayload(gameSelection);
       return createSelectedGame(data);
     } else {
       console.warn('No game selected');

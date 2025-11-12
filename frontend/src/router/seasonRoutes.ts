@@ -14,7 +14,7 @@ export default {
     {
       path: ':id',
       name: 'season-detail',
-      component: () => import('pages/season/SeasonDetailPage.vue'),
+      component: () => import('pages/season/SeasonOverviewPage.vue'),
     }
   ]
 };

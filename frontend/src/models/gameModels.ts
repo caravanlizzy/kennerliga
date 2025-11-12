@@ -62,6 +62,8 @@ export type SelectedGameDtoPayload = {
     choice_id?: number;
     value?: boolean | null;
   }[];
+  profile_id: number;
+  league_id: number;
 };
 
 

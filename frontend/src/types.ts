@@ -6,9 +6,6 @@ export type TKennerButton = {
   color?: string;
   forwardName?: string;
 };
-export interface Meta {
-  totalCount: number;
-}
 export type BreadCrumb = {
   label: string;
   icon: string;
@@ -18,9 +15,6 @@ export type TItem = {
   itemId: number;
   name: string;
   isEditable: boolean;
-};
-export type ObjPool<T> = {
-  [key: string]: T;
 };
 export type TGameOptionChoice = {
   id: number;

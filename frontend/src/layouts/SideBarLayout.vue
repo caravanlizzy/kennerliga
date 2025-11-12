@@ -32,9 +32,9 @@
           transform: 'translateY(-50%)',
           width: props.railWidth + 'px',
           minWidth: props.railWidth + 'px',
-          height: '120px', // 👈 small tab height
+          height: '120px',
           borderRadius: '8px 0 0 8px',
-          zIndex: 2000,
+          zIndex: 2002,
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',

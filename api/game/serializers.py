@@ -84,33 +84,36 @@ class SelectedGameSerializer(serializers.ModelSerializer):
     game_name = serializers.SerializerMethodField()
     selected_options = SelectedOptionSerializer(many=True)
 
-    # Optional write-only fields that aren't part of the model
-    leagueId = serializers.IntegerField(write_only=True, required=False)
-    playerProfileId = serializers.IntegerField(write_only=True, required=False)
+    profile_id = serializers.PrimaryKeyRelatedField(
+        source='player',
+        queryset=PlayerProfile.objects.all(),
+        write_only=True,
+        required=False,
+    )
+    league_id = serializers.PrimaryKeyRelatedField(
+        source='league',
+        queryset=League.objects.all(),
+        write_only=True,
+        required=False,
+    )
 
     class Meta:
         model = SelectedGame
-        fields = ['id', 'game', 'game_name', 'selected_options', 'leagueId', 'playerProfileId']
+        fields = ['id', 'game', 'game_name', 'selected_options', 'league_id', 'profile_id']
 
     def get_game_name(self, obj):
         return obj.game.name if obj.game else None
 
     def set_player_and_league(self, validated_data):
         # Set player
-        profile_id = validated_data.pop('playerProfileId', None)
-        validated_data['player'] = (PlayerProfile.objects.get(id=profile_id)
-                                    if profile_id
-                                    else get_profile_by_username(self.context.get('request').user.username))
-        # Set league if provided
-        league_id = validated_data.pop('leagueId', None)
-        if league_id:
-            validated_data['league'] = League.objects.get(id=league_id)
-        else:
-            validated_data['league'] = find_users_current_league(validated_data['player'])
+        profile_id = validated_data.pop('profile_id', None)
+        validated_data['player'] = PlayerProfile.objects.get(id=profile_id)
+        # Set league
+        league_id = validated_data.pop('league_id', None)
+        validated_data['league'] = League.objects.get(id=league_id)
         return validated_data
 
     def create(self, validated_data):
-        validated_data = self.set_player_and_league(validated_data)
         # Create SelectedGame and SelectedOption instances
         selected_options_data = validated_data.pop('selected_options')
         selected_game = SelectedGame.objects.create(**validated_data)

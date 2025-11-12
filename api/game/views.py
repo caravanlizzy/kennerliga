@@ -80,6 +80,10 @@ class SelectedGameViewSet(ModelViewSet):
 
     def perform_create(self, serializer):
         selected_game = serializer.save()
+        # Trigger league logic when request from inside a league
+        manage_only = self.request.query_params.get('manage_only', '')
+        if manage_only == True and self.request.user.is_staff:
+            return
         league = selected_game.league
         LeagueService(league).advance_turn()
 
@@ -91,8 +95,10 @@ class BanDecisionViewSet(ModelViewSet):
 
     def perform_create(self, serializer):
         ban_decision = serializer.save()
+        manage_only = self.request.query_params.get('manage_only', '')
+        if manage_only == True and self.request.user.is_staff:
+            return
         league = ban_decision.league
-
         LeagueService(league).advance_turn()
 
 

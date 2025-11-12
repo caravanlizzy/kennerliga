@@ -1,5 +1,5 @@
 <template>
-  <SideBarLayout side-title="League Standings">
+  <SideBarLayout side-title="Standings">
     <!-- ==================== LOADING STATE ==================== -->
     <template v-if="loading">
       <LoadingSpinner text="Loading league data...">
@@ -33,8 +33,10 @@
           :is-opened="sectionVisibilityStates['selection']"
         >
           <GameSelector
+            :leagueId="leagueId"
+            :profileId="profile.id"
             @selection-updated="(updated) => updateGameSelection(updated)"
-            @set-submitter="(s) => setSubmit(s)"
+            @set-submitter="(s: () => {}) => setSubmit(s)"
             class="q-mt-md q-pa-xs"
           />
         </ContentSection>
@@ -124,7 +126,7 @@ const { updateLeagueData } = league;
 
 const { setActions, setLeadText, setSubject, reset } = useActionBar();
 
-const { user } = useUserStore();
+const { user, profile } = useUserStore();
 
 const gameSelection = ref(null);
 function updateGameSelection(newSelection) {
@@ -175,6 +177,7 @@ function setSubmit(submitterFunc:TSubmitter): void {
 async function submitGameSelection() {
   try {
     await submitGame();
+    await updateLeagueData();
   } catch (error) {
     console.error('Error submitting game:', error);
   }

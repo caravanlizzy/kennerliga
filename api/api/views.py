@@ -71,7 +71,8 @@ def get_user_information(user):
         "username": user.username,
         "admin": user.is_superuser,
         "token": token,
-        "platform_players": get_platform_players(user)
+        "platform_players": get_platform_players(user),
+        "profile": {"id": user.profile.id, "name": user.profile.profile_name}
     }
     return user
 
