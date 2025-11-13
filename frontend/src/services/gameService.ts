@@ -200,12 +200,14 @@ export async function createTieBreakers(resultConfigId: number, resultConfig: TR
 }
 export async function createSelectedGame(
   selectedGame: SelectedGameDtoPayload,
+  manageOnly = false
 ) {
   const data: Record<string, any> = {
     game: selectedGame.game,
     selected_options: selectedGame.selected_options,
     league_id: selectedGame.league_id,
     profile_id: selectedGame.profile_id,
+    manage_only: manageOnly
   };
 
   try {

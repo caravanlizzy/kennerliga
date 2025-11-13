@@ -196,6 +196,7 @@
       <q-separator class="q-mb-md" />
 
       <GameSelector
+        manageOnly
         :leagueId="league.id"
         :profileId="selectingGameMember!.profile_id"
         @onSuccess="onSuccessfullGameSelection"
@@ -211,7 +212,7 @@ import { TLeagueMember, TSeason } from 'src/types';
 import { fetchLeagueDetails } from 'src/services/leagueService';
 import { fetchSeason } from 'src/services/seasonService';
 import { api } from 'boot/axios';
-import GameSelector from 'components/league/GameSelector.vue';
+import GameSelector from 'components/game/GameSelector.vue';
 
 const route = useRoute();
 

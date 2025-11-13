@@ -139,7 +139,7 @@ export function useGameSelection(leagueId: number, profileId: number) {
   }
 
   function toSelectedGamePayload(
-    selection: TGameSelection
+    selection: TGameSelection,
   ): SelectedGameDtoPayload {
     return {
       game: selection.game.id,
@@ -156,10 +156,10 @@ export function useGameSelection(leagueId: number, profileId: number) {
   }
 
 
-  function submitGame() {
+  function submitGame(manageOnly = false) {
     if (gameSelection) {
       const data = toSelectedGamePayload(gameSelection);
-      return createSelectedGame(data);
+      return createSelectedGame(data, manageOnly);
     } else {
       console.warn('No game selected');
     }

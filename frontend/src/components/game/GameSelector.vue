@@ -245,7 +245,7 @@ import KennerSelect from 'components/base/KennerSelect.vue';
 import { useGameSelection } from 'src/composables/gameSelection';
 import KennerButton from 'components/base/KennerButton.vue';
 
-const props = defineProps<{ leagueId: number, profileId: number }>();
+const props = defineProps<{ leagueId: number, profileId: number, manageOnly?: boolean }>();
 
 const {
   gameInformation,
@@ -311,7 +311,7 @@ function shortPlatformLabel(name: string): string {
 
 async function onSubmit() {
   try {
-    await submitGame();
+    await submitGame(props.manageOnly);
     emit('on-success');
   } catch (e) {
     console.error(e);

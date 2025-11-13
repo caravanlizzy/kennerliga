@@ -1,10 +1,10 @@
 <template>
-   <LeaguePlayers />
+   <ManageLeaguePlayers />
 <!--  <LeagueResultUpload />-->
 <!--  <LeagueResults />-->
 </template>
 
 <script setup lang="ts">
-import LeaguePlayers from 'components/league/LeaguePlayers.vue';
+import ManageLeaguePlayers from 'components/league/ManageLeaguePlayers.vue';
 
 </script>

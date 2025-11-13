@@ -72,11 +72,11 @@ class SelectedOptionSerializer(serializers.ModelSerializer):
         model = SelectedOption
         fields = [
             'id',
-            'game_option',  # nested, read-only
-            'choice',  # nested, read-only
+            'game_option',
+            'choice',
             'value',
-            'game_option_id',  # ID, write-only
-            'choice_id',  # ID, write-only
+            'game_option_id',
+            'choice_id',
         ]
 
 
@@ -97,9 +97,11 @@ class SelectedGameSerializer(serializers.ModelSerializer):
         required=False,
     )
 
+    manage_only = serializers.BooleanField(write_only=True, required=False)
+
     class Meta:
         model = SelectedGame
-        fields = ['id', 'game', 'game_name', 'selected_options', 'league_id', 'profile_id']
+        fields = ['id', 'game', 'game_name', 'selected_options', 'league_id', 'profile_id', 'manage_only']
 
     def get_game_name(self, obj):
         return obj.game.name if obj.game else None
@@ -114,26 +116,38 @@ class SelectedGameSerializer(serializers.ModelSerializer):
         return validated_data
 
     def create(self, validated_data):
+        # Remove write-only fields that shouldn't go to the model
+        manage_only = validated_data.pop('manage_only', None)
         # Create SelectedGame and SelectedOption instances
         selected_options_data = validated_data.pop('selected_options')
+
+        # Create SelectedGame instance
         selected_game = SelectedGame.objects.create(**validated_data)
+
+        # Create SelectedOption instances
         for option_data in selected_options_data:
             SelectedOption.objects.create(selected_game=selected_game, **option_data)
+
         return selected_game
 
     def update(self, instance, validated_data):
-        validated_data = self.set_player_and_league(validated_data)
+        # Remove write-only field
+        manage_only = validated_data.pop('manage_only', None)
+        selected_options_data = validated_data.pop('selected_options', None)
 
-        # Update other fields and selected options
+        # Update player and league if provided
+        instance.player = validated_data.get('player', instance.player)
+        instance.league = validated_data.get('league', instance.league)
         instance.game = validated_data.get('game', instance.game)
         instance.save()
 
-        selected_options_data = validated_data.pop('selected_options', None)
+        # Update selected options
         if selected_options_data:
             for option_data in selected_options_data:
                 option_id = option_data.get('id')
                 if option_id:
                     option_instance = SelectedOption.objects.get(id=option_id, selected_game=instance)
+                    option_instance.game_option = option_data.get('game_option', option_instance.game_option)
                     option_instance.choice = option_data.get('choice', option_instance.choice)
                     option_instance.value = option_data.get('value', option_instance.value)
                     option_instance.save()
