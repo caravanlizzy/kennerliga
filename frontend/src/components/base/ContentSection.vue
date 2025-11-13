@@ -1,10 +1,13 @@
 <template>
   <div
-    class=" q-my-xs"
+    class="q-my-xs"
     :style="{
-      borderWidth: '3px',
-      borderStyle: 'solid',
-      borderImage: `linear-gradient(to right, var(--q-${color}) 0%, transparent 100%) 1`,
+      borderRadius: '13px',
+      padding: '1rem',
+      border: '3px solid transparent',
+      backgroundImage: `linear-gradient(white, white), linear-gradient(to right, var(--q-${color}), transparent)`,
+      backgroundOrigin: 'border-box',
+      backgroundClip: 'padding-box, border-box',
     }"
   >
     <q-expansion-item
@@ -22,7 +25,7 @@
           {{ title }}
         </div>
       </template>
-      <q-separator :color="color"/>
+      <q-separator :color="color" />
       <div class="q-pa-md">
         <slot />
       </div>

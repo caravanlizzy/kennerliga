@@ -1,6 +1,6 @@
 <template>
   <q-toolbar
-    class="navbar bg-grey-1 text-dark q-px-md q-py-none shadow-1 relative-position"
+    class="navbar bg-grey-2 text-dark q-px-md q-py-none shadow-1 relative-position"
   >
     <!-- Left: Brand -->
     <div class="row items-center no-wrap">
@@ -49,7 +49,7 @@
     <q-space />
 
     <!-- Right: Controls -->
-    <div class="row items-center no-wrap q-gutter-x-sm bg-grey-1" style="z-index: 1">
+    <div class="row items-center no-wrap q-gutter-x-sm bg-grey-2" style="z-index: 1">
       <q-btn
         flat
         dense

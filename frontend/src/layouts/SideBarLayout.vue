@@ -2,7 +2,7 @@
 <template>
   <div class="row no-wrap items-stretch">
     <!-- Main content -->
-    <div class="col min-w-0">
+    <div class="col min-w-0" :class="[{ 'q-pr-md': !isSmall }]">
       <slot />
     </div>
 

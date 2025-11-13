@@ -1,6 +1,6 @@
 <template>
   <SideAccentBox color="accent">
-    <q-card bordered square flat class="chat-card">
+    <q-card bordered flat class="chat-card">
       <!-- Header with unread chip -->
       <q-card-section class="row items-center justify-between">
         <div class="text-h6">Kennerchat</div>
@@ -338,8 +338,7 @@ onUnmounted(() => {
 
 /* slightly accentuate your own messages */
 .mine {
-  border-right: 2px solid teal;
-  border-left: 2px solid teal;
+  border-right: 2px solid var(--uclr);
 }
 
 /* preserve line breaks */

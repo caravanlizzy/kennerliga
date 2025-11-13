@@ -9,11 +9,6 @@
     >
       <q-list>
         <KennerItem
-          icon="settings"
-          label="Settings"
-          forward-name="settings"
-        />
-        <KennerItem
           icon="calendar_month"
           label="Seasons"
           forward-name="seasons"

@@ -14,11 +14,21 @@ function resolveColor(c: string) {
 
 <template>
   <div
-    class="bordered-container q-mt-md"
-    :style="{ borderLeft: `4px solid ${resolveColor(props.color)}` }"
+    class="bordered-container q-mt-md side-accent-border"
+    :style="{ borderLeft: `3px solid ${resolveColor(props.color)}` }"
   >
     <slot />
   </div>
 </template>
+
+<style scoped>
+.side-accent-border {
+  border-radius: 13px;
+}
+
+::v-deep(.q-card) {
+  border-radius: 13px;
+}
+</style>
 
 
