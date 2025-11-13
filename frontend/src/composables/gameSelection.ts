@@ -4,7 +4,7 @@ import {
   GameOptionDto,
   SelectedGameDtoPayload,
   SelectedGameOptionDto,
-  TPlatform
+  TPlatform,
 } from 'src/models/gameModels';
 import { api } from 'boot/axios';
 import {
@@ -30,11 +30,39 @@ export function useGameSelection(leagueId: number, profileId: number) {
   });
 
   const isLoading = ref(false);
-  const isValid = ref(true);
-  const platform: Ref<TPlatform|null> = ref(null);
+  const platform: Ref<TPlatform | null> = ref(null);
   const filter = ref('');
-  const platforms :Ref<TPlatform[]> = ref([]);
+  const platforms: Ref<TPlatform[]> = ref([]);
   const gameData = ref<GameDto[]>([]);
+  const EMPTY_GAME: GameDto = {
+    id: -1,
+    name: '',
+    platform: -1,
+  };
+
+  const gameSelection = reactive<TGameSelection>({
+    game: EMPTY_GAME,
+    selectedOptions: [],
+    profileId: 0,
+    leagueId: 0,
+  });
+
+  const isValid = computed(() => {
+    if (!gameInformation.game || gameSelection.game.id === -1) {
+      return false;
+    }
+
+    const optionsWithChoices = gameInformation.options.filter(
+      (o) => o.has_choices
+    );
+
+    return optionsWithChoices.every((option) => {
+      const selected = gameSelection.selectedOptions.find(
+        (so) => so.id === option.id
+      );
+      return !!selected?.choice;
+    });
+  });
 
   const filteredGames = computed(() => {
     return gameData.value.filter((game) => {
@@ -50,19 +78,6 @@ export function useGameSelection(leagueId: number, profileId: number) {
     platforms.value = await fetchPlatforms();
     gameData.value = await fetchGames();
   };
-
-  const EMPTY_GAME: GameDto = {
-    id: -1,
-    name: '',
-    platform: -1,
-  };
-
-  const gameSelection = reactive<TGameSelection>({
-    game: EMPTY_GAME,
-    selectedOptions: [],
-    profileId: 0,
-    leagueId: 0,
-  });
 
   async function setGameInformation(game: GameDto) {
     if (gameInformation.game && gameInformation.game.id === game.id) return;
@@ -89,7 +104,7 @@ export function useGameSelection(leagueId: number, profileId: number) {
   }
 
   function setSelectedOptions(options: GameOptionDto[]) {
-    gameSelection.selectedOptions = options.map(option => ({
+    gameSelection.selectedOptions = options.map((option) => ({
       id: option.id,
       selected_game: gameSelection.game?.id,
       value: option.has_choices ? undefined : false,
@@ -100,7 +115,6 @@ export function useGameSelection(leagueId: number, profileId: number) {
   function findSelectedOption(optionId: number) {
     return gameSelection.selectedOptions.find((o) => o.id === optionId);
   }
-
 
   async function loadOptions(gameId: number) {
     try {
@@ -139,7 +153,7 @@ export function useGameSelection(leagueId: number, profileId: number) {
   }
 
   function toSelectedGamePayload(
-    selection: TGameSelection,
+    selection: TGameSelection
   ): SelectedGameDtoPayload {
     return {
       game: selection.game.id,
@@ -154,7 +168,6 @@ export function useGameSelection(leagueId: number, profileId: number) {
       league_id: leagueId,
     };
   }
-
 
   function submitGame(manageOnly = false) {
     if (gameSelection) {

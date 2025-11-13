@@ -206,6 +206,7 @@
                         (o) => o.id == option.id
                       ).choice
                     "
+                    :rules="[(val) => !!val || `${option.name} is required`]"
                     class="full-width"
                   />
                 </div>
@@ -245,7 +246,11 @@ import KennerSelect from 'components/base/KennerSelect.vue';
 import { useGameSelection } from 'src/composables/gameSelection';
 import KennerButton from 'components/base/KennerButton.vue';
 
-const props = defineProps<{ leagueId: number, profileId: number, manageOnly?: boolean }>();
+const props = defineProps<{
+  leagueId: number;
+  profileId: number;
+  manageOnly?: boolean;
+}>();
 
 const {
   gameInformation,
