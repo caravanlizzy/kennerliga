@@ -85,7 +85,7 @@ class SelectedGameSerializer(serializers.ModelSerializer):
     selected_options = SelectedOptionSerializer(many=True)
 
     profile_id = serializers.PrimaryKeyRelatedField(
-        source='player',
+        source='profile',
         queryset=PlayerProfile.objects.all(),
         write_only=True,
         required=False,
@@ -109,7 +109,7 @@ class SelectedGameSerializer(serializers.ModelSerializer):
     def set_player_and_league(self, validated_data):
         # Set player
         profile_id = validated_data.pop('profile_id', None)
-        validated_data['player'] = PlayerProfile.objects.get(id=profile_id)
+        validated_data['profile'] = PlayerProfile.objects.get(id=profile_id)
         # Set league
         league_id = validated_data.pop('league_id', None)
         validated_data['league'] = League.objects.get(id=league_id)
@@ -136,7 +136,7 @@ class SelectedGameSerializer(serializers.ModelSerializer):
         selected_options_data = validated_data.pop('selected_options', None)
 
         # Update player and league if provided
-        instance.player = validated_data.get('player', instance.player)
+        instance.profile = validated_data.get('profile', instance.profile)
         instance.league = validated_data.get('league', instance.league)
         instance.game = validated_data.get('game', instance.game)
         instance.save()

@@ -92,7 +92,7 @@ class SeasonParticipantSerializer(ModelSerializer):
             cache[key] = (None, None)
             return cache[key]
 
-        qs = SelectedGame.objects.filter(player=obj.profile, league=league)
+        qs = SelectedGame.objects.filter(profile=obj.profile, league=league)
 
         count = qs.count()
         if count == 0:

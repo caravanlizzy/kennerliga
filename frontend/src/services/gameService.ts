@@ -2,6 +2,7 @@ import {
   BanDecisionDtoPayload,
   GameOptionChoiceDto,
   GameOptionDto,
+  SelectedGameDto,
   SelectedGameDtoPayload,
   TPlatform,
 } from 'src/models/gameModels';
@@ -205,8 +206,8 @@ export async function createSelectedGame(
   const data: Record<string, any> = {
     game: selectedGame.game,
     selected_options: selectedGame.selected_options,
-    league_id: selectedGame.league_id,
-    profile_id: selectedGame.profile_id,
+    league_id: selectedGame.league,
+    profile_id: selectedGame.profile,
     manage_only: manageOnly
   };
 
@@ -218,6 +219,22 @@ export async function createSelectedGame(
     return response;
   } catch (error) {
     throw new Error('Error creating selectedGame: ' + error);
+  }
+}
+
+export async function editSelectedGame(selectedGame: SelectedGameDto) {
+  const data: Record<string, any> = {
+    id: selectedGame.id,
+    game: selectedGame.game,
+    selected_options: selectedGame.selected_options,
+    league_id: selectedGame.league,
+    profile_id: selectedGame.profile,
+  };
+
+  try {
+    const response = await api('/game/selected-games/')
+  } catch (error) {
+    throw new Error('Error editing selectedGame: ' + error);
   }
 }
 
