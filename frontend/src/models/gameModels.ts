@@ -27,32 +27,13 @@ export type GameOptionChoiceDto = {
 }
 
 export type SelectedGameDto = {
-  id?: number;
-  player?: number;
+  id: number;
+  profile: number;
   game: number;
-  league?: number;
+  league: number;
   selected_options: SelectedGameOptionDto[];
 }
 
-export type SelectedGameOptionDto = {
-  id: number;
-  selected_game: number;
-  choice?: GameOptionChoiceDto;
-  value?: boolean;
-}
-
-// Define the type
-export type SelectedOptionsMap = {
-  [optionId: number]: SelectedGameOptionDto | boolean | null;
-};
-
-// API submission shape
-export type SelectedGameOptionPayload = {
-  game_option: number;
-  selected_game: number;
-  value?: boolean;
-  choice?: number;
-};
 
 export type SelectedGameDtoPayload = {
   game: number;
@@ -62,9 +43,25 @@ export type SelectedGameDtoPayload = {
     choice_id?: number;
     value?: boolean | null;
   }[];
-  profile_id: number;
-  league_id: number;
+  profile: number;
+  league: number;
 };
+
+export type SelectedGameOptionDto = {
+  id: number;
+  selected_game: number;
+  choice?: GameOptionChoiceDto;
+  value?: boolean;
+}
+
+// API submission shape
+export type SelectedGameOptionPayload = {
+  game_option: number;
+  selected_game: number;
+  value?: boolean;
+  choice?: number;
+};
+
 
 
 export type BanDecisionDtoPayload = {

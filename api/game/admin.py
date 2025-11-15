@@ -52,4 +52,4 @@ class ResultConfig(admin.ModelAdmin):
 
 @admin.register(SelectedGame)
 class SelectedGame(admin.ModelAdmin):
-    list_display = ('player', 'game', 'league')
+    list_display = ('profile', 'game', 'league')
