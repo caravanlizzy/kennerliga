@@ -12,7 +12,6 @@
         dense
         color="primary"
         icon="psychology"
-        aria-label="Home"
       />
       <q-chip
         v-else

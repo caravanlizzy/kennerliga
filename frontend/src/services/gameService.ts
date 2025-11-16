@@ -2,9 +2,8 @@ import {
   BanDecisionDtoPayload,
   GameOptionChoiceDto,
   GameOptionDto,
-  SelectedGameDto,
   SelectedGameDtoPayload,
-  TPlatform,
+  TPlatform
 } from 'src/models/gameModels';
 import { api } from 'boot/axios';
 import { TGameOption, TGameOptionChoice, TResultConfig } from 'src/types';
@@ -212,19 +211,29 @@ export async function createSelectedGame(
   };
 
   try {
-    const response = await api('/game/selected-games/', {
+    return await api('/game/selected-games/', {
       method: 'POST',
       data,
     });
-    return response;
   } catch (error) {
     throw new Error('Error creating selectedGame: ' + error);
   }
 }
 
-export async function editSelectedGame(selectedGame: SelectedGameDto) {
+export async function editSelectedGame(selectedGame: {
+  id: number;
+  game: number;
+  selected_options: {
+    selected_game: number;
+    game_option_id: number;
+    choice_id?: number;
+    value?: boolean | null;
+  }[];
+  profile: number;
+  league: number;
+}) {
   const data: Record<string, any> = {
-    id: selectedGame.id,
+    // id is not needed in the payload, it is used in the URL
     game: selectedGame.game,
     selected_options: selectedGame.selected_options,
     league_id: selectedGame.league,
@@ -232,7 +241,10 @@ export async function editSelectedGame(selectedGame: SelectedGameDto) {
   };
 
   try {
-    const response = await api('/game/selected-games/')
+    return await api(`/game/selected-games/${selectedGame.id}/`, {
+      method: 'PATCH',
+      data,
+    });
   } catch (error) {
     throw new Error('Error editing selectedGame: ' + error);
   }

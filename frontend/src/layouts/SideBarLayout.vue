@@ -65,7 +65,6 @@
             round
             dense
             icon="close"
-            :aria-label="`Close ${props.sideTitle}`"
             @click="toggleSide"
           />
         </q-toolbar>

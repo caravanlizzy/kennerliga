@@ -14,7 +14,6 @@
           />
           <KennerButton
             flat round size="sm" color="negative" icon="delete"
-            aria-label="Delete option"
             class="q-mt-xs"
             @click="confirmDelete = true"
           />

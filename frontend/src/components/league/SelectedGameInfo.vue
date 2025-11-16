@@ -63,8 +63,6 @@
           icon="expand_more"
           class="transition-all"
           :class="{ 'rotate-180': isExpanded }"
-          :aria-expanded="isExpanded ? 'true' : 'false'"
-          aria-label="Toggle game details"
           @click="isExpanded = !isExpanded"
           color="primary"
         />

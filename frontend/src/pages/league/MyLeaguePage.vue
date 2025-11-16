@@ -90,7 +90,7 @@
 
 <script setup lang="ts">
 import { h, onMounted, ref, watch, watchEffect } from 'vue';
-import GameSelector from 'components/game/GameSelector.vue';
+import GameSelector from 'components/game/selectedGame/GameSelector.vue';
 import { useLeagueStore } from 'stores/leagueStore';
 import { storeToRefs } from 'pinia';
 import PlayerCard from 'components/league/PlayerCard.vue';

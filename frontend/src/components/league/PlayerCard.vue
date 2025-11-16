@@ -16,7 +16,6 @@
               <span
                 v-if="member.is_active_player"
                 class="active-dot"
-                aria-label="active player"
               />
             </div>
 

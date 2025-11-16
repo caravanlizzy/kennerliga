@@ -25,7 +25,6 @@
         <q-card-section
           ref="chatEl"
           class="q-px-lg chat"
-          aria-live="polite"
           @scroll.passive="onScroll"
           @pointerdown.passive="markChatRead"
           @mousedown.passive="markChatRead"
@@ -60,7 +59,7 @@
             </div>
           </div>
 
-          <div ref="bottomAnchor" aria-hidden="true" />
+          <div ref="bottomAnchor" />
         </q-card-section>
       </div>
 

@@ -60,7 +60,7 @@
       :key="member.id"
       class="col-12 col-sm-6 col-md-4"
     >
-      <q-card flat bordered class="fit">
+      <q-card flat bordered class="fit" v-if="currentEditMember === null">
         <q-item>
           <q-item-section avatar>
             <q-avatar rounded>
@@ -157,20 +157,21 @@
         </q-card-actions>
       </q-card>
     </div>
-
     <!--    Edit a members game selection-->
     <div v-if="currentEditMember !== null">
       <div class="text-h6">
         Edit Game
-        {{ currentEditMember.selected_game?.game_name }}
+        {{ currentEditMember.selected_game?.game_name }} for {{currentEditMember.profile_name.replace('_profile', '')}}
       </div>
-      <div
-        v-for="option in currentEditMember.selected_game.selected_options"
-        :key="option.id"
-      >
-        {{ option }}
-      </div>
-      {{ editOptions }}
+            <GameSelector
+              editMode
+              :leagueId="league.id"
+              :profileId="currentEditMember.profile_id"
+              @onSuccess="onSuccessfullGameSelection"
+              :id="currentEditMember.selected_game.id"
+              :game="currentEditMember.selected_game.game"
+              :selectedOptions="currentEditMember.selected_game.selected_options"
+            />
     </div>
 
     <!-- Form to select a game -->
@@ -207,12 +208,12 @@
 
 <script setup lang="ts">
 import { useRoute } from 'vue-router';
-import { onMounted, ref, computed } from 'vue';
+import { onMounted, ref } from 'vue';
 import { TLeagueMember, TSeason } from 'src/types';
 import { fetchLeagueDetails } from 'src/services/leagueService';
 import { fetchSeason } from 'src/services/seasonService';
 import { api } from 'boot/axios';
-import GameSelector from 'components/game/GameSelector.vue';
+import GameSelector from 'components/game/selectedGame/GameSelector.vue';
 
 const route = useRoute();
 
@@ -239,17 +240,6 @@ async function load() {
 
 // Edit Game
 const currentEditMember = ref<any | null>(null);
-const editOptions = computed(
-  () =>
-    currentEditMember.value?.selected_game?.selected_options.map(
-      (option: any) =>
-        ({}) => ({
-          name: option.game_option.name,
-          has_choices: option.game_option.has_choices,
-          value: option.choice?.value, // fixed the extra dot and added optional chaining
-        })
-    ) || []
-);
 
 function onEditGame(member: any) {
   currentEditMember.value = member;
