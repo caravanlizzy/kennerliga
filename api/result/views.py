@@ -273,10 +273,10 @@ class MatchResultViewSet(ViewSet):
         Returns raw Result rows for that selected_game in that league/season.
         """
         season_id = request.query_params.get("season")
-        league_id = request.query_params.get("league")
+        league = request.query_params.get("league")
         selected_game_id = request.query_params.get("selected_game")
 
-        if not all([season_id, league_id, selected_game_id]):
+        if not all([season_id, league, selected_game_id]):
             return Response(
                 {"detail": "season, league, and selected_game parameters are required."},
                 status=status.HTTP_400_BAD_REQUEST,
@@ -284,7 +284,7 @@ class MatchResultViewSet(ViewSet):
 
         qs = Result.objects.filter(
             season_id=season_id,
-            league_id=league_id,
+            league=league,
             selected_game_id=selected_game_id,
         )
         return Response(ResultSerializer(qs, many=True).data, status=status.HTTP_200_OK)

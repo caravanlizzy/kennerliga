@@ -18,13 +18,13 @@ class GameViewSet(ModelViewSet):
 
     def get_queryset(self):
         queryset = Game.objects.all()
-        league_id = self.request.query_params.get("league")  # Query param to specify the league
+        league = self.request.query_params.get("league")  # Query param to specify the league
 
-        # Ensure league_id is provided to apply filtering
-        if league_id:
+        # Ensure league is provided to apply filtering
+        if league:
             # Exclude games selected by any player in the league
             selected_games = SelectedGame.objects.filter(
-                league_id=league_id
+                league=league
             ).values_list("game_id", flat=True)
             queryset = queryset.exclude(id__in=selected_games)
 

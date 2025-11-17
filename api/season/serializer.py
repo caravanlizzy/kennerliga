@@ -49,8 +49,7 @@ class SeasonParticipantMiniSerializer(ModelSerializer):
 class SeasonParticipantSerializer(ModelSerializer):
     username = CharField(source='profile.user.username', read_only=True)
     profile_name = CharField(source='profile.profile_name', read_only=True)
-    profile_id = serializers.PrimaryKeyRelatedField(
-        source="profile",
+    profile = serializers.PrimaryKeyRelatedField(
         queryset=PlayerProfile.objects.all(),
         required=True,
     )
@@ -66,7 +65,7 @@ class SeasonParticipantSerializer(ModelSerializer):
     class Meta:
         model = SeasonParticipant
         fields = [
-            'id', 'season', 'profile_id', 'rank',  # write
+            'id', 'season', 'profile', 'rank',  # write
             'username', 'profile_name', 'selected_game',  # read
             'banned_selected_game', 'has_banned', 'is_active_player',
         ]

@@ -15,12 +15,12 @@ def rebuild_game_snapshot(selected_game: SelectedGame, *, win_mode: str = "count
         Result.objects
         .filter(selected_game=selected_game.id)
         .select_related("player_profile")
-        .only("selected_game_id", "player_profile_id", "player_profile__profile_name", "points")
+        .only("selected_game_id", "player_profile", "player_profile__profile_name", "points")
     )
     rows = [
         Row(
             selected_game_id=selected_game.id,
-            player_id=r.player_profile_id,
+            player_id=r.player_profile,
             player_name=r.player_profile.profile_name,
             points=Decimal(r.points),
         )
@@ -30,7 +30,7 @@ def rebuild_game_snapshot(selected_game: SelectedGame, *, win_mode: str = "count
 
     # upsert GameStanding rows for this selected_game
     existing = {
-        (gs.player_profile_id): gs
+        (gs.player_profile): gs
         for gs in GameStanding.objects.filter(selected_game=selected_game.id)
     }
     to_create, to_update = [], []
@@ -40,7 +40,7 @@ def rebuild_game_snapshot(selected_game: SelectedGame, *, win_mode: str = "count
             to_create.append(GameStanding(
                 league=league,
                 selected_game=selected_game,
-                player_profile_id=r["player_id"],
+                player_profile=r["player_id"],
                 points=r["points"],
                 rank=r["rank"],
                 league_points=r["league_points"],
@@ -66,12 +66,12 @@ def rebuild_league_snapshot(league: League, *, win_mode: str = "count_top_block"
         Result.objects
         .filter(league=league)
         .select_related("selected_game", "player_profile")
-        .only("selected_game_id", "player_profile_id", "player_profile__profile_name", "points")
+        .only("selected_game_id", "player_profile", "player_profile__profile_name", "points")
     )
     rows = [
         Row(
             selected_game_id=r.selected_game_id,
-            player_id=r.player_profile_id,
+            player_id=r.player_profile,
             player_name=r.player_profile.profile_name,
             points=Decimal(r.points),
         )
@@ -80,14 +80,14 @@ def rebuild_league_snapshot(league: League, *, win_mode: str = "count_top_block"
     table = compute_league_table(rows, win_mode=win_mode, return_decimals=True)
 
     # upsert LeagueStanding (NO raw points)
-    existing = {ls.player_profile_id: ls for ls in LeagueStanding.objects.filter(league=league)}
+    existing = {ls.player_profile: ls for ls in LeagueStanding.objects.filter(league=league)}
     to_create, to_update = [], []
     for r in table:
         obj = existing.get(r["player_id"])
         if obj is None:
             to_create.append(LeagueStanding(
                 league=league,
-                player_profile_id=r["player_id"],
+                player_profile=r["player_id"],
                 wins=r["wins"],
                 league_points=r["league_points"],
             ))

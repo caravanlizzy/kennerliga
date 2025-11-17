@@ -67,7 +67,7 @@ class LeagueStanding(models.Model):
         ]
 
     def __str__(self):
-        return f"{self.league_id} - {self.player_profile_id}: {self.league_points}"
+        return f"{self.league} - {self.player_profile}: {self.league_points}"
 
 
 class GameStanding(models.Model):
@@ -90,4 +90,4 @@ class GameStanding(models.Model):
         ]
 
     def __str__(self):
-        return f"{self.selected_game_id} - {self.player_profile_id}: {self.league_points}"
+        return f"{self.selected_game_id} - {self.player_profile}: {self.league_points}"

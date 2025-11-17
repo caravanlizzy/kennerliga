@@ -63,16 +63,16 @@ def build_league_scoreboard_payload(league: League) -> dict:
         league.members
         .select_related('profile__user')
         .order_by('rank', 'id')
-        .values('profile_id', 'profile__profile_name')
+        .values('profile', 'profile__profile_name')
     )
     members = list(members_qs)
-    player_order: List[int] = [m['profile_id'] for m in members]
-    player_names: Dict[int, str] = {m['profile_id']: m['profile__profile_name'] for m in members}
+    player_order: List[int] = [m['profile'] for m in members]
+    player_names: Dict[int, str] = {m['profile']: m['profile__profile_name'] for m in members}
 
     # All per-game standings for this league
     gs_qs = (
         GameStanding.objects
-        .filter(league_id=league.id)
+        .filter(league=league.id)
         .select_related('player_profile', 'selected_game__game')
         .order_by('selected_game_id', 'rank')
     )
@@ -93,7 +93,7 @@ def build_league_scoreboard_payload(league: League) -> dict:
     # Build game rows
     rows: List[dict] = []
     for selected_game_id, standings in by_game.items():
-        points_by_player = {s.player_profile_id: getattr(s, 'ingame_points', None) for s in standings}
+        points_by_player = {s.player_profile: getattr(s, 'ingame_points', None) for s in standings}
 
         cells = []
         for pid in player_order:
@@ -115,10 +115,10 @@ def build_league_scoreboard_payload(league: League) -> dict:
     # Final league totals row
     ls_qs = (
         LeagueStanding.objects
-        .filter(league_id=league.id)
+        .filter(league=league.id)
         .select_related('player_profile')
     )
-    league_points_by_player = {ls.player_profile_id: getattr(ls, 'league_points', 0) for ls in ls_qs}
+    league_points_by_player = {ls.player_profile: getattr(ls, 'league_points', 0) for ls in ls_qs}
 
     total_cells = []
     for pid in player_order:

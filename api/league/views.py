@@ -22,7 +22,7 @@ class LeagueViewSet(ModelViewSet):
     def standings(self, request, pk=None):
         qs = (
             LeagueStanding.objects
-            .filter(league_id=pk)
+            .filter(league=pk)
             .select_related("player_profile")
             .order_by("-league_points", "-wins", "player_profile__profile_name")
         )
@@ -36,7 +36,7 @@ class LeagueViewSet(ModelViewSet):
 
         qs = (
             GameStanding.objects
-            .filter(league_id=pk, selected_game_id=sg_id)
+            .filter(league=pk, selected_game_id=sg_id)
             .select_related("player_profile")
             .order_by("rank", "player_profile__profile_name")
         )

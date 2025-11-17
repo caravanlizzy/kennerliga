@@ -81,17 +81,16 @@ class SelectedOptionSerializer(serializers.ModelSerializer):
 
 
 class SelectedGameSerializer(serializers.ModelSerializer):
+    # game_name is read only
     game_name = serializers.SerializerMethodField()
     selected_options = SelectedOptionSerializer(many=True)
 
-    profile_id = serializers.PrimaryKeyRelatedField(
-        source='profile',
+    profile = serializers.PrimaryKeyRelatedField(
         queryset=PlayerProfile.objects.all(),
         write_only=True,
         required=False,
     )
-    league_id = serializers.PrimaryKeyRelatedField(
-        source='league',
+    league = serializers.PrimaryKeyRelatedField(
         queryset=League.objects.all(),
         write_only=True,
         required=False,
@@ -101,23 +100,23 @@ class SelectedGameSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = SelectedGame
-        fields = ['id', 'game', 'game_name', 'selected_options', 'league_id', 'profile_id', 'manage_only']
+        fields = ['id', 'game', 'game_name', 'selected_options', 'league', 'profile', 'manage_only']
 
     def get_game_name(self, obj):
         return obj.game.name if obj.game else None
 
     def set_player_and_league(self, validated_data):
         # Set player
-        profile_id = validated_data.pop('profile_id', None)
-        validated_data['profile'] = PlayerProfile.objects.get(id=profile_id)
+        profile = validated_data.pop('profile', None)
+        validated_data['profile'] = PlayerProfile.objects.get(id=profile)
         # Set league
-        league_id = validated_data.pop('league_id', None)
-        validated_data['league'] = League.objects.get(id=league_id)
+        league = validated_data.pop('league', None)
+        validated_data['league'] = League.objects.get(id=league)
         return validated_data
 
     def create(self, validated_data):
         # Remove write-only fields that shouldn't go to the model
-        manage_only = validated_data.pop('manage_only', None)
+        validated_data.pop('manage_only', None)
         # Create SelectedGame and SelectedOption instances
         selected_options_data = validated_data.pop('selected_options')
 
@@ -132,7 +131,7 @@ class SelectedGameSerializer(serializers.ModelSerializer):
 
     def update(self, instance, validated_data):
         # Remove write-only field
-        manage_only = validated_data.pop('manage_only', None)
+        validated_data.pop('manage_only', None)
         selected_options_data = validated_data.pop('selected_options', None)
 
         # Update player and league if provided
@@ -254,7 +253,7 @@ class BanDecisionSerializer(serializers.ModelSerializer):
         league = attrs.get('league') or getattr(self.instance, 'league', None)
         selected_game = attrs.get('selected_game')  # populated via source='selected_game'
 
-        if selected_game and league and selected_game.league_id != league.id:
+        if selected_game and league and selected_game.league != league.id:
             raise serializers.ValidationError({
                 'selected_game_id': 'Selected game must belong to the same league.'
             })

@@ -74,7 +74,7 @@ class LeagueDetailSerializer(serializers.ModelSerializer):
                 has_banned=Exists(
                     BanDecision.objects.filter(
                         league=league,
-                        player_banning_id=OuterRef('profile_id'),
+                        player_banning_id=OuterRef('profile'),
                     )
                 )
             )
