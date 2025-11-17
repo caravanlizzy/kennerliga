@@ -8,22 +8,27 @@
       :width="220"
     >
       <q-list>
-        <KennerItem
+        <DrawerItem
+          icon="feedback"
+          label="Feedback"
+          forward-name="feedback"
+        />
+        <DrawerItem
           icon="calendar_month"
           label="Seasons"
           forward-name="seasons"
           />
-        <KennerItem
+        <DrawerItem
           icon="casino"
           label="Games"
           forward-name="games"
         />
-        <KennerItem
+        <DrawerItem
           icon="group"
           label="Members"
           forward-name="users"
         />
-        <KennerItem icon="logout" label="Logout" @click="logout" />
+        <DrawerItem icon="logout" label="Logout" @click="logout" />
       </q-list>
     </q-drawer>
 <!--    <DevUsersList :show-impersonate="showImpersonateList" />-->
@@ -31,7 +36,7 @@
 </template>
 
 <script setup lang="ts">
-import KennerItem from 'components/base/KennerItem.vue';
+import DrawerItem from 'components/base/DrawerItem.vue';
 import { useUserStore } from 'stores/userStore';
 import { useResponsive } from 'src/composables/reponsive';
 

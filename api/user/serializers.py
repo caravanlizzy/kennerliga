@@ -2,7 +2,7 @@ from django.contrib.auth import get_user_model
 from rest_framework.serializers import ModelSerializer, Serializer
 from rest_framework import serializers
 
-from user.models import PlayerProfile, UserInviteLink
+from user.models import PlayerProfile, UserInviteLink, Feedback
 
 User = get_user_model()
 
@@ -34,3 +34,10 @@ class UserRegistrationSerializer(serializers.Serializer):
         if User.objects.filter(username=value).exists():
             raise serializers.ValidationError("Username already taken.")
         return value
+
+
+class FeedbackSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Feedback
+        fields = ['message', 'user', 'datetime']
+        read_only_fields = ['user', 'datetime']

@@ -15,9 +15,9 @@ from result.models import Result
 from result.serializers import ResultSerializer
 from season.models import Season, SeasonParticipant
 from season.serializer import SeasonSerializer
-from user.models import User, PlayerProfile, Platform, PlatformPlayer, _hash_key, UserInviteLink
+from user.models import User, PlayerProfile, Platform, PlatformPlayer, _hash_key, UserInviteLink, Feedback
 from user.serializers import UserSerializer, UserInviteLinkSerializer, UserRegistrationSerializer, \
-    PlayerProfileSerializer
+    PlayerProfileSerializer, FeedbackSerializer
 
 
 # Create your views here.
@@ -227,3 +227,13 @@ class PlayerProfileViewSet(ModelViewSet):
     queryset = PlayerProfile.objects.all()
     serializer_class = PlayerProfileSerializer
     permission_classes = [IsAuthenticated]
+
+
+class FeedbackViewSet(ModelViewSet):
+    permission_classes = [IsAuthenticated]
+    queryset = Feedback.objects.all()
+    serializer_class = FeedbackSerializer
+    http_method_names = ["get", "post", "head", "options"]
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)

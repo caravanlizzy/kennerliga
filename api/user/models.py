@@ -117,3 +117,9 @@ class UserInviteLink(models.Model):
             expires_at=expires_at,
         )
         return obj, raw  # return the raw key so you can share it
+
+
+class Feedback(models.Model):
+    message = models.TextField()
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    datetime = models.DateTimeField(auto_now_add=True)

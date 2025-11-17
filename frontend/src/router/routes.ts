@@ -44,6 +44,17 @@ const routes: RouteRecordRaw[] = [
     ],
   },
   {
+    path: '/feedback',
+    component: () => import('layouts/MainLayout.vue'),
+    children: [
+      {
+        path: '',
+        name: 'feedback',
+        component: () => import('pages/FeedbackPage.vue'),
+      },
+    ],
+  },
+  {
     path: '/',
     component: () => import('layouts/MainLayout.vue'),
     children: [
@@ -61,7 +72,7 @@ const routes: RouteRecordRaw[] = [
         path: 'dev',
         name: 'dev',
         component: () => import('pages/DevPage.vue'),
-      }
+      },
     ],
   },
 

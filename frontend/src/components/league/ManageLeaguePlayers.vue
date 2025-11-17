@@ -18,22 +18,7 @@
   <!-- Loading -->
   <q-linear-progress v-if="loading" indeterminate class="q-mb-md" />
 
-  <!-- Error -->
-  <q-banner
-    v-if="error"
-    dense
-    class="q-mb-md bg-red-1 text-negative"
-    rounded
-    inline-actions
-  >
-    <template #avatar>
-      <q-icon name="error" />
-    </template>
-    {{ error }}
-    <template #action>
-      <q-btn flat color="negative" label="Retry" @click="load" />
-    </template>
-  </q-banner>
+  <ErrorDisplay v-if="error" :error="error"  class="q-mb-md" />
 
   <!-- Empty state -->
   <q-card
@@ -188,8 +173,6 @@
         :gameId="editingGameMember.selected_game.game"
         :selectedGameId="editingGameMember.selected_game.id"
       />
-      <!--      <GameSelectionForm gameInformation="" game-selection="" is-loading="" is-valid="" on-submit=""-->
-      <!--      <GameSelectionForm :gameInformation="editingGameMember" game-selection="" is-loading="" is-valid="" on-submit="" />-->
     </div>
 
     <!-- Form to select a game -->
@@ -234,6 +217,7 @@ import { api } from 'boot/axios';
 import GameSelector from 'components/game/selectedGame/GameSelector.vue';
 import GameSelectionForm from 'components/game/selectedGame/GameSelectionForm.vue';
 import GameEditor from 'components/game/selectedGame/GameEditor.vue';
+import ErrorDisplay from 'components/base/ErrorDisplay.vue';
 
 const route = useRoute();
 
