@@ -1,6 +1,6 @@
 <template>
   <q-card
-    @click="setGameInformation(game)"
+    @click="initGameInformation(game)"
     flat
     bordered
     clickable
@@ -10,7 +10,7 @@
     :class="{ selected: game.id === gameSelection.game.id }"
     role="button"
     tabindex="0"
-    @keyup.enter.space="setGameInformation(game)"
+    @keyup.enter.space="initGameInformation(game)"
   >
     <!-- Floating platform badge -->
     <q-badge
@@ -38,10 +38,13 @@
 <script setup lang="ts">
 import { getPlatformColor, getPlatformName } from 'src/composables/gameSelection';
 import { TPlatform } from 'src/models/gameModels';
+import { inject } from 'vue';
+
+const platforms = inject<TPlatform[]>('platforms', []);
+
 defineProps<{
   game: any;
-  platforms: TPlatform[];
-  setGameInformation: (game: any) => void;
+  initGameInformation: (game: any) => void;
   gameSelection: any;
 }>();
 </script>

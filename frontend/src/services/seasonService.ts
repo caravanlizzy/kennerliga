@@ -77,7 +77,7 @@ export async function ensureParticipants(
   const existing = await fetchSeasonParticipants(seasonId);
   const byProfile: Record<number, any> = {};
   for (const sp of existing) {
-    const pid = sp?.profile?.id ?? sp?.profile_id ?? sp?.profile;
+    const pid = sp?.profile?.id ?? sp?.profile ?? sp?.profile;
     if (pid != null) byProfile[pid] = sp;
   }
 
@@ -89,7 +89,7 @@ export async function ensureParticipants(
     console.log('creating missing participant:', pid, 'for season:', seasonId);
     await api('/season/season-participants/', {
       method: 'POST',
-      data: { season: seasonId, profile_id: pid },
+      data: { season: seasonId, profile: pid },
     });
   }
 
@@ -105,7 +105,7 @@ export async function createLeagueForSeason(
 ) {
   // map chosen PlayerProfile IDs -> SeasonParticipant IDs
   const spIds = seasonParticipants
-    .filter((sp: any) => memberProfileIds.includes(sp.profile_id))
+    .filter((sp: any) => memberProfileIds.includes(sp.profile))
     .map((sp: any) => sp.id);
 
   console.log({ seasonParticipants, memberProfileIds, spIds });

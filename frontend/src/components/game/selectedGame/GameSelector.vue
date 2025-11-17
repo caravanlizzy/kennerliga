@@ -15,7 +15,6 @@
 
           <!-- Platform multi-select chips -->
           <PlatformMultiSelect
-            :platforms="platforms"
             :isPlatformSelected="isPlatformSelected"
             :togglePlatform="togglePlatform"
           />
@@ -27,22 +26,22 @@
         <div class="row items-center q-gutter-sm q-px-sm q-pt-sm q-pb-xs">
           <q-icon name="grid_view" size="16px" class="text-grey-7" />
           <div class="text-caption text-uppercase text-grey-7">
-            Games ({{ displayedGames.length }})
+            Games ({{ availableGames.length }})
           </div>
         </div>
 
         <div class="game-grid">
           <!-- Empty state -->
-          <NoGamesFound v-if="displayedGames.length === 0" />
+          <NoGamesFound v-if="availableGames.length === 0" />
 
           <!-- Cards -->
           <GameSelectionCard
-            v-for="game in displayedGames"
+            v-for="game in availableGames"
             :key="game.id"
             :game="game"
-            :setGameInformation="setGameInformation"
+            :initGameInformation="initGameInformation"
             :gameSelection="gameSelection"
-            :platforms="platforms" />
+          />
         </div>
       </q-card>
     </div>
@@ -52,7 +51,6 @@
       <GameSelectionForm
         :isLoading="isLoading"
         :isValid="isValid"
-        :platforms="platforms"
         :gameSelection="gameSelection"
         :gameInformation="gameInformation"
         :onSubmit="onSubmit"
@@ -62,33 +60,19 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, watch } from 'vue';
+import { onMounted, provide, watch } from 'vue';
 import { useGameSelection } from 'src/composables/gameSelection';
-import { SelectedGameDto } from 'src/models/gameModels';
 import GameFilter from 'components/game/selectedGame/GameFilter.vue';
 import PlatformMultiSelect from 'components/game/selectedGame/PlatformMultiSelect.vue';
 import NoGamesFound from 'components/game/selectedGame/NoGamesFound.vue';
 import GameSelectionCard from 'components/game/selectedGame/GameSelectionCard.vue';
 import GameSelectionForm from 'components/game/selectedGame/GameSelectionForm.vue';
 
-type Props =
-  | {
+const props = defineProps<{
   leagueId: number;
   profileId: number;
   manageOnly?: boolean;
-  editMode: true;
-  id: SelectedGameDto['id'];
-  game: SelectedGameDto['game'];
-  selectedOptions: SelectedGameDto['selected_options'];
-}
-  | {
-  leagueId: number;
-  profileId: number;
-  manageOnly?: boolean;
-  editMode?: false;
-};
-
-const props = defineProps<Props>();
+}>();
 
 // ---- actions / header wiring ----
 const emit = defineEmits<{
@@ -97,7 +81,6 @@ const emit = defineEmits<{
   (e: 'on-success'): void;
 }>();
 
-
 const {
   gameInformation,
   gameSelection,
@@ -105,13 +88,15 @@ const {
   filter,
   platforms,
   isValid,
-  displayedGames,
-  setGameInformation,
+  availableGames,
+  initGameInformation,
   togglePlatform,
   isPlatformSelected,
   loadPlatformsAndGames,
-  submitGame
+  submitGame,
 } = useGameSelection(props.leagueId, props.profileId);
+
+provide('platforms', platforms);
 
 // init: load games/platforms and, in edit mode, pre-fill selection
 onMounted(async () => {
@@ -125,11 +110,7 @@ watch(gameSelection, (newVal) => {
 
 async function onSubmit() {
   try {
-    if (props.editMode && props.id) {
-      await editGame(props.id);
-    } else {
-      await submitGame(props.manageOnly);
-    }
+    await submitGame(props.manageOnly);
     emit('on-success');
   } catch (e) {
     console.error(e);
@@ -154,7 +135,7 @@ async function onSubmit() {
 .game-card {
   background: #f7f7f9;
   transition: box-shadow 0.12s ease, transform 0.12s ease,
-  border-color 0.12s ease;
+    border-color 0.12s ease;
 }
 
 .game-card:hover {

@@ -1,6 +1,7 @@
 <template>
   <div>
     <q-card
+      flat
       bordered
       class="q-pa-md q-my-md rounded-borders details-card"
     >
@@ -52,7 +53,7 @@
 
         <!-- Settings -->
         <template v-else>
-          <div class="section-title q-mb-sm">Settings</div>
+          <div class="section-title text-grey-7 q-mb-sm">Settings</div>
 
           <!-- Choices -->
           <div
@@ -114,13 +115,16 @@ import KennerSelect from 'components/base/KennerSelect.vue';
 import KennerButton from 'components/base/KennerButton.vue';
 import { getPlatformColor, getPlatformName } from 'src/composables/gameSelection';
 import { TPlatform } from 'src/models/gameModels';
+import { inject } from 'vue';
+
+
+const platforms = inject<TPlatform[]>('platforms', []);
 
 const props = defineProps<{
   gameInformation: any;
   gameSelection: any;
   isLoading: boolean;
   isValid: boolean;
-  platforms: TPlatform[];
   onSubmit: () => void;
 }>();
 

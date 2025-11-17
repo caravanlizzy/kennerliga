@@ -60,7 +60,7 @@
       :key="member.id"
       class="col-12 col-sm-6 col-md-4"
     >
-      <q-card flat bordered class="fit" v-if="currentEditMember === null">
+      <q-card flat bordered class="fit" v-if="showPlayerGrid">
         <q-item>
           <q-item-section avatar>
             <q-avatar rounded>
@@ -158,20 +158,38 @@
       </q-card>
     </div>
     <!--    Edit a members game selection-->
-    <div v-if="currentEditMember !== null">
-      <div class="text-h6">
-        Edit Game
-        {{ currentEditMember.selected_game?.game_name }} for {{currentEditMember.profile_name.replace('_profile', '')}}
+    <div
+      v-if="editingGameMember"
+      class="q-pa-md q-mt-md bg-grey-1 rounded-borders col-12"
+    >
+      <div class="row items-center justify-between q-mb-sm">
+        <div class="text-h6 text-weight-medium">
+          Edit Game
+          <span class="text-primary">{{
+            editingGameMember.selected_game?.game_name
+          }}</span>
+          for
+          <span class="text-primary">{{
+            editingGameMember.profile_name.replace('_profile', '')
+          }}</span>
+        </div>
+        <q-btn
+          dense
+          flat
+          round
+          icon="close"
+          color="grey-7"
+          @click="editingGameMember = null"
+        />
       </div>
-            <GameSelector
-              editMode
-              :leagueId="league.id"
-              :profileId="currentEditMember.profile_id"
-              @onSuccess="onSuccessfullGameSelection"
-              :id="currentEditMember.selected_game.id"
-              :game="currentEditMember.selected_game.game"
-              :selectedOptions="currentEditMember.selected_game.selected_options"
-            />
+      <GameEditor
+        :leagueId="league.id"
+        :profileId="editingGameMember.profile"
+        :gameId="editingGameMember.selected_game.game"
+        :selectedGameId="editingGameMember.selected_game.id"
+      />
+      <!--      <GameSelectionForm gameInformation="" game-selection="" is-loading="" is-valid="" on-submit=""-->
+      <!--      <GameSelectionForm :gameInformation="editingGameMember" game-selection="" is-loading="" is-valid="" on-submit="" />-->
     </div>
 
     <!-- Form to select a game -->
@@ -199,7 +217,7 @@
       <GameSelector
         manageOnly
         :leagueId="league.id"
-        :profileId="selectingGameMember!.profile_id"
+        :profileId="selectingGameMember!.profile"
         @onSuccess="onSuccessfullGameSelection"
       />
     </div>
@@ -208,12 +226,14 @@
 
 <script setup lang="ts">
 import { useRoute } from 'vue-router';
-import { onMounted, ref } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 import { TLeagueMember, TSeason } from 'src/types';
 import { fetchLeagueDetails } from 'src/services/leagueService';
 import { fetchSeason } from 'src/services/seasonService';
 import { api } from 'boot/axios';
 import GameSelector from 'components/game/selectedGame/GameSelector.vue';
+import GameSelectionForm from 'components/game/selectedGame/GameSelectionForm.vue';
+import GameEditor from 'components/game/selectedGame/GameEditor.vue';
 
 const route = useRoute();
 
@@ -222,6 +242,12 @@ const season = ref<TSeason | null>(null);
 
 const loading = ref(false);
 const error = ref<string | null>(null);
+
+const editingGameMember = ref<any | null>(null);
+const selectingGameMember = ref<TLeagueMember | null>(null);
+const showPlayerGrid = computed(
+  () => !selectingGameMember.value && !editingGameMember.value
+);
 
 async function load() {
   loading.value = true;
@@ -239,10 +265,9 @@ async function load() {
 }
 
 // Edit Game
-const currentEditMember = ref<any | null>(null);
 
 function onEditGame(member: any) {
-  currentEditMember.value = member;
+  editingGameMember.value = member;
 }
 
 // Delete Game
@@ -257,7 +282,6 @@ async function onDeleteSelectedGame(member: any) {
 }
 
 // Select Game
-const selectingGameMember = ref<TLeagueMember | null>(null);
 
 function onSelectGame(member: TLeagueMember) {
   selectingGameMember.value = member;

@@ -24,9 +24,12 @@
 <script setup lang="ts">
 
 import { getPlatformColor } from 'src/composables/gameSelection';
+import { inject } from 'vue';
+import { TPlatform } from 'src/models/gameModels';
+
+const platforms = inject<TPlatform[]>('platforms', []);
 
 defineProps<{
-  platforms: any[];
   isPlatformSelected: (id: number) => boolean;
   togglePlatform: (id: number) => void;
 }>();

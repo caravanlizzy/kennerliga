@@ -1,4 +1,8 @@
-import { SelectedGameDto } from 'src/models/gameModels';
+import {
+  GameDto,
+  SelectedGameDto,
+  SelectedGameOptionDto,
+} from 'src/models/gameModels';
 
 export type TKennerButton = {
   label?: string;
@@ -126,4 +130,11 @@ export type TLeagueMember = {
   selected_game_id: number | null;
   banned_by: string[];
 }
+
+export type TGameSelection = {
+  game: GameDto;
+  selectedOptions: SelectedGameOptionDto[];
+  profileId: number;
+  leagueId: number;
+};
 

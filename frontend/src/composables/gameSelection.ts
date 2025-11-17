@@ -3,7 +3,6 @@ import {
   GameDto,
   GameOptionDto,
   SelectedGameDtoPayload,
-  SelectedGameOptionDto,
   TPlatform,
 } from 'src/models/gameModels';
 import { api } from 'boot/axios';
@@ -12,13 +11,7 @@ import {
   fetchGameOptionChoices,
   fetchGameOptions,
 } from 'src/services/gameService';
-
-type TGameSelection = {
-  game: GameDto;
-  selectedOptions: SelectedGameOptionDto[];
-  profileId: number;
-  leagueId: number;
-};
+import { TGameSelection } from 'src/types';
 
 const EMPTY_GAME: GameDto = {
   id: -1,
@@ -83,7 +76,7 @@ export function useGameSelection(leagueId: number, profileId: number) {
     });
   });
 
-  const displayedGames = computed(() => {
+  const availableGames = computed(() => {
     // final list: text filter + multi-platform filter
     const base = filteredGames.value || [];
     if (selectedPlatforms.value.size === 0) return base;
@@ -93,23 +86,23 @@ export function useGameSelection(leagueId: number, profileId: number) {
   // --- platform / game loading ---
 
   const loadPlatformsAndGames = async () => {
-    platforms.value = await fetchPlatforms();
-    gameData.value = await fetchGames();
+    await fetchPlatforms();
+    await fetchGames();
   };
 
   async function fetchPlatforms() {
-    const { data: platforms } = await api('game/platforms/');
-    return platforms;
+    const { data } = await api('game/platforms/');
+    platforms.value = data;
   }
 
   async function fetchGames() {
-    const { data: gameData } = await api(`game/games/?league=${leagueId}`);
-    return gameData;
+    const { data } = await api('game/games/');
+    gameData.value = data;
   }
 
   // --- game selection / info ---
 
-  async function setGameInformation(game: GameDto) {
+  async function initGameInformation(game: GameDto) {
     // avoid reloading if same game
     if (gameInformation.game && gameInformation.game.id === game.id) return;
     isLoading.value = true;
@@ -134,7 +127,7 @@ export function useGameSelection(leagueId: number, profileId: number) {
     gameSelection.selectedOptions = [];
   }
 
-  function setSelectedOptions(options: GameOptionDto[]) {
+  function initGameSelection(options: GameOptionDto[]) {
     // initialize selectedOptions from options
     gameSelection.selectedOptions = options.map((option) => ({
       id: option.id,
@@ -150,7 +143,7 @@ export function useGameSelection(leagueId: number, profileId: number) {
     try {
       const { data: options } = await fetchGameOptions(gameId);
       gameInformation.options = options;
-      setSelectedOptions(options);
+      initGameSelection(options);
     } catch (error) {
       console.error(`Failed to fetch options for game ${gameId}:`, error);
       gameInformation.options = [];
@@ -222,14 +215,16 @@ export function useGameSelection(leagueId: number, profileId: number) {
     // computed
     isValid,
     filteredGames,
-    displayedGames,
+    availableGames,
 
     // functions
     loadPlatformsAndGames,
-    setGameInformation,
+    fetchPlatforms,
+    initGameInformation,
     togglePlatform,
     isPlatformSelected,
     submitGame,
+    toSelectedGamePayload
   };
 }
 
