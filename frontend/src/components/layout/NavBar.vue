@@ -48,7 +48,11 @@
     <q-space />
 
     <!-- Right: Controls -->
-    <div class="row items-center no-wrap q-gutter-x-sm bg-grey-2" style="z-index: 1">
+    <div
+      class="row items-center no-wrap q-gutter-x-sm bg-grey-2 right-controls"
+      :class="{ 'right-controls--mobile': isMobile }"
+      style="z-index: 1"
+    >
       <q-btn
         flat
         dense
@@ -88,26 +92,26 @@
 </template>
 
 <script setup lang="ts">
-import { useUserStore } from 'stores/userStore'
-import { storeToRefs } from 'pinia'
-import UserName from 'components/ui/UserName.vue'
-import { useRouter } from 'vue-router'
-import { useResponsive } from 'src/composables/reponsive'
-import { useLeagueStore } from 'stores/leagueStore'
-import { onMounted } from 'vue'
+import { useUserStore } from 'stores/userStore';
+import { storeToRefs } from 'pinia';
+import UserName from 'components/ui/UserName.vue';
+import { useRouter } from 'vue-router';
+import { useResponsive } from 'src/composables/reponsive';
+import { useLeagueStore } from 'stores/leagueStore';
+import { onMounted } from 'vue';
 
-defineProps<{ onToggle: () => void }>()
+defineProps<{ onToggle: () => void }>();
 
-const router = useRouter()
-const { isAuthenticated, user } = storeToRefs(useUserStore())
-const { isMeActivePlayer } = storeToRefs(useLeagueStore())
-const { updateLeagueData } = useLeagueStore()
-const { isMobile } = useResponsive()
+const router = useRouter();
+const { isAuthenticated, user } = storeToRefs(useUserStore());
+const { isMeActivePlayer } = storeToRefs(useLeagueStore());
+const { updateLeagueData } = useLeagueStore();
+const { isMobile } = useResponsive();
 
-onMounted(() => updateLeagueData())
+onMounted(() => updateLeagueData());
 
 function goHome() {
-  router.push({ name: 'home' })
+  router.push({ name: 'home' });
 }
 </script>
 
@@ -118,12 +122,35 @@ function goHome() {
 }
 
 .navbar::before {
-  content: "";
+  content: '';
   position: absolute;
   inset: 0;
   background: url("data:image/svg+xml,%3Csvg viewBox='0 0 1200 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0,50 C100,90 200,10 300,70 C400,130 500,0 600,50 C700,100 800,20 900,60 C1000,100 1100,30 1200,50' stroke='%23e53935' stroke-width='3' fill='none'/%3E%3C/svg%3E")
     center / cover no-repeat;
   opacity: 0.7;
   z-index: 0;
+}
+
+.right-controls {
+  position: relative;
+  z-index: 1;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.95);
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+/* Compact version for mobile */
+.right-controls--mobile {
+  padding: 2px 6px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.85);
+  box-shadow: 0 0 6px rgba(0, 0, 0, 0.06);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.right-controls--mobile .q-btn {
+  transform: scale(0.9);
 }
 </style>
