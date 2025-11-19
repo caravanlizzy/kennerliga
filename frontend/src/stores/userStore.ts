@@ -19,7 +19,6 @@ export const useUserStore = defineStore(
   () => {
     const router = useRouter();
     const user: Ref<TUser | null> = ref(null);
-    const profile: Ref<TProfile|null> = ref(null);
     const isAdmin: Ref<boolean> = ref(false);
     const isAuthenticated: Ref<boolean> = ref(false);
 
@@ -38,7 +37,6 @@ export const useUserStore = defineStore(
       { ignorePermission = false } = {}
     ): Promise<void> {
       try {
-        console.log(password);
         const { data } = await api('login/', {
           method: 'POST',
           data: { username: username, password },
@@ -66,7 +64,6 @@ export const useUserStore = defineStore(
     function applyLogin(userData: TUser, ignorePermission: boolean): void {
       isAuthenticated.value = true;
       user.value = userData;
-      profile.value = userData.profile;
       if( !ignorePermission ){
         isAdmin.value = userData.admin;
       }
@@ -94,7 +91,7 @@ export const useUserStore = defineStore(
       }
     }
 
-    return { user, profile, listUsers, isAuthenticated, isAdmin, isMe, login, logout };
+    return { user, listUsers, isAuthenticated, isAdmin, isMe, login, logout };
   },
   {
     persist: {
