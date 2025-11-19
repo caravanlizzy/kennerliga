@@ -1,121 +1,37 @@
 <template>
   <q-toolbar
-    class="navbar bg-grey-2 text-dark q-px-md q-py-none shadow-1 relative-position"
+    class="navbar bg-grey-4 text-dark q-px-md q-py-none shadow-1 relative-position"
   >
     <!-- Left: Brand -->
-    <div class="row items-center no-wrap">
-      <q-btn
-        v-if="isMobile"
-        :to="{ name: 'home' }"
-        flat
-        round
-        dense
-        color="primary"
-        icon="psychology"
-      />
-      <q-chip
-        v-else
-        clickable
-        outline
-        color="primary"
-        text-color="primary"
-        @click="goHome"
-        class="q-px-sm q-py-xs bg-grey-1 text-dark"
-      >
-        <q-icon name="psychology" size="16px" class="q-mr-xs" />
-        <span class="text-weight-medium">Kennerliga</span>
-      </q-chip>
-    </div>
+    <NavHome />
 
     <q-space />
 
     <!-- Center: Main CTA -->
-    <div class="row items-center no-wrap absolute-center">
-      <q-btn
-        v-if="isAuthenticated"
-        :to="{ name: 'my-league' }"
-        unelevated
-        color="primary"
-        class="q-px-md q-py-xs rounded-borders text-weight-medium"
-        no-caps
-      >
-        <q-icon name="emoji_events" />
-        <span v-show="!isMobile" class="q-ml-xs">My League</span>
-        <q-badge v-if="isMeActivePlayer" floating rounded color="positive" />
-      </q-btn>
-    </div>
+    <NavMyLeague />
 
     <q-space />
 
     <!-- Right: Controls -->
-    <div
-      class="row items-center no-wrap q-gutter-x-sm bg-grey-2 right-controls"
-      :class="{ 'right-controls--mobile': isMobile }"
-      style="z-index: 1"
-    >
-      <q-btn
-        flat
-        dense
-        round
-        color="accent"
-        icon="build"
-        :to="{ name: 'dev' }"
-      />
-
-      <UserName
-        v-if="isAuthenticated"
-        :display-username="user?.username || ''"
-        class="q-ml-xs q-mr-xs"
-      />
-
-      <q-btn
-        v-if="isAuthenticated"
-        flat
-        dense
-        round
-        color="primary"
-        icon="menu"
-        @click="onToggle"
-      />
-
-      <q-btn
-        v-else
-        flat
-        dense
-        round
-        color="positive"
-        icon="login"
-        :to="{ name: 'login' }"
-      />
-    </div>
+    <NavProfileMenu :onToggle="onToggle" />
   </q-toolbar>
 </template>
 
 <script setup lang="ts">
-import { useUserStore } from 'stores/userStore';
-import { storeToRefs } from 'pinia';
-import UserName from 'components/ui/UserName.vue';
-import { useRouter } from 'vue-router';
-import { useResponsive } from 'src/composables/reponsive';
 import { useLeagueStore } from 'stores/leagueStore';
 import { onMounted } from 'vue';
+import NavHome from 'components/nav/NavHome.vue';
+import NavMyLeague from 'components/nav/NavMyLeague.vue';
+import NavProfileMenu from 'components/nav/NavProfileMenu.vue';
 
 defineProps<{ onToggle: () => void }>();
 
-const router = useRouter();
-const { isAuthenticated, user } = storeToRefs(useUserStore());
-const { isMeActivePlayer } = storeToRefs(useLeagueStore());
 const { updateLeagueData } = useLeagueStore();
-const { isMobile } = useResponsive();
 
 onMounted(() => updateLeagueData());
-
-function goHome() {
-  router.push({ name: 'home' });
-}
 </script>
 
-<style scoped>
+<style lang="scss">
 .navbar {
   position: relative;
   overflow: hidden;
@@ -131,26 +47,19 @@ function goHome() {
   z-index: 0;
 }
 
-.right-controls {
-  position: relative;
-  z-index: 1;
-  padding: 4px 10px;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.95);
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.08);
-  border: 1px solid rgba(0, 0, 0, 0.1);
-}
-
 /* Compact version for mobile */
-.right-controls--mobile {
-  padding: 2px 6px;
-  border-radius: 12px;
-  background: rgba(255, 255, 255, 0.85);
-  box-shadow: 0 0 6px rgba(0, 0, 0, 0.06);
-  border: 1px solid rgba(0, 0, 0, 0.06);
+.nav-item-radius {
+  padding: 2px 7px;
+  border-radius: 13px;
 }
 
 .right-controls--mobile .q-btn {
   transform: scale(0.9);
 }
+
+
+.full-rounded {
+  border-radius: 100%;
+}
+
 </style>

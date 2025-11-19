@@ -8,30 +8,19 @@
       :width="220"
     >
       <q-list>
-        <DrawerItem
-          icon="feedback"
-          label="Feedback"
-          forward-name="feedback"
-        />
+        <DrawerItem icon="build" label="Hijack" forward-name="dev"/>
+        <DrawerItem icon="feedback" label="Feedback" forward-name="feedback" />
         <DrawerItem
           icon="calendar_month"
           label="Seasons"
           forward-name="seasons"
-          />
-        <DrawerItem
-          icon="casino"
-          label="Games"
-          forward-name="games"
         />
-        <DrawerItem
-          icon="group"
-          label="Members"
-          forward-name="users"
-        />
+        <DrawerItem icon="casino" label="Games" forward-name="games" />
+        <DrawerItem icon="group" label="Members" forward-name="users" />
         <DrawerItem icon="logout" label="Logout" @click="logout" />
       </q-list>
     </q-drawer>
-<!--    <DevUsersList :show-impersonate="showImpersonateList" />-->
+    <!--    <DevUsersList :show-impersonate="showImpersonateList" />-->
   </div>
 </template>
 
@@ -41,7 +30,6 @@ import { useUserStore } from 'stores/userStore';
 import { useResponsive } from 'src/composables/reponsive';
 
 const drawerState = defineModel();
-
 
 const responsive = useResponsive();
 const { logout } = useUserStore();
