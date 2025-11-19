@@ -11,7 +11,7 @@ def get_members_ordered(league: League):
 def all_players_have_picked(league: League) -> bool:
     """Check if all league members have selected a game."""
     for participant in league.members.all():
-        if not SelectedGame.objects.filter(league=league, player=participant.profile).exists():
+        if not SelectedGame.objects.filter(league=league, profile=participant.profile).exists():
             return False
     return True
 
