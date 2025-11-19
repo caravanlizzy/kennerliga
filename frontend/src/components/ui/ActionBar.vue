@@ -68,17 +68,17 @@
         class="row items-center no-wrap q-gutter-xs"
         :class="{ 'q-mt-xs': isMobile }"
       >
-        <kenner-button
+        <KennerButton
           v-for="a in actions"
           :key="a.name"
-          :outline="!a.buttonFilled"
+          :disabled="a.disabled"
           :color="a.buttonVariant || 'primary'"
           class="q-px-sm q-py-xs text-caption"
           @click="handleAction(a)"
         >
           <q-icon v-if="a.icon" :name="a.icon" size="16px" class="q-mr-xs" />
           <span class="btn-label">{{ a.name }}</span>
-        </kenner-button>
+        </KennerButton>
       </div>
     </div>
   </q-card>

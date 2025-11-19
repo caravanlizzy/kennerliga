@@ -1,6 +1,7 @@
 // useActionBar.ts
 import { computed, h, ref, shallowRef, type VNode } from 'vue';
 
+
 /**
  * Represents an action with a name and an associated callback function.
  *
@@ -11,7 +12,7 @@ import { computed, h, ref, shallowRef, type VNode } from 'vue';
 export type TAction = {
   name: string;
   buttonVariant?: string;
-  buttonFilled?: boolean;
+  disabled?: boolean;
   callback: () => void;
   autoReset?: boolean;
 };
@@ -60,6 +61,7 @@ const subject = shallowRef<RenderFn | null>(null);
 
 export function useActionBar() {
   function setActions(newActions: TAction | TAction[]): void {
+    console.log({ newActions });
     const processedActions = Array.isArray(newActions)
       ? newActions
       : [newActions];
