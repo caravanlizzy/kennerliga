@@ -6,7 +6,7 @@ export default {
       path: '',
       name: 'users',
       component: () => import('pages/user/UsersListPage.vue'),
-      meta: { icon: 'group', label: 'Players' },
+      meta: { icon: 'group', label: 'Users' },
     },
     {
       path: ':username',

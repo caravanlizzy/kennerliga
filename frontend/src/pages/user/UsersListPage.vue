@@ -1,7 +1,6 @@
 <template>
   <KennerligaTable
-    v-if="isFinished"
-    :create-button="button"
+    :create-button="createButton"
     flat
     title="Kennerliga Members"
     @row-click="onRowClick"
@@ -31,7 +30,7 @@ const onRowClick = (_event: never, row: { username: never }) => {
   router.push({ name: 'user-detail', params: { username: row.username } });
 };
 
-const button: TKennerButton = {
+const createButton: TKennerButton = {
   color: 'secondary',
   label: 'Invite',
   icon: 'add_circle',
@@ -45,14 +44,6 @@ const columns = [
     align: 'left',
     label: 'Name',
     field: (x: TUser) => x.username,
-    sortable: true,
-  },
-  {
-    name: 'bga_name',
-    label: 'BGA Name',
-    required: false,
-    align: 'center',
-    field: (x: TUser) => x.bga_name,
     sortable: true,
   },
 ];
