@@ -114,7 +114,7 @@
         <q-separator />
 
         <q-card-actions align="right">
-          <q-btn
+          <KennerButton
             outline
             v-if="member.selected_game"
             label="Edit Game"
@@ -122,7 +122,7 @@
             color="primary"
             @click="onEditGame(member)"
           />
-          <q-btn
+          <KennerButton
             v-else
             outline
             label="Select Game"
@@ -130,7 +130,7 @@
             color="primary"
             @click="onSelectGame(member)"
           />
-          <q-btn
+          <KennerButton
             outline
             v-if="member.selected_game"
             label="Delete Game"
@@ -138,7 +138,7 @@
             color="negative"
             @click="onDeleteSelectedGame(member)"
           >
-          </q-btn>
+          </KennerButton>
         </q-card-actions>
       </q-card>
     </div>
@@ -218,6 +218,7 @@ import GameSelector from 'components/game/selectedGame/GameSelector.vue';
 import GameSelectionForm from 'components/game/selectedGame/GameSelectionForm.vue';
 import GameEditor from 'components/game/selectedGame/GameEditor.vue';
 import ErrorDisplay from 'components/base/ErrorDisplay.vue';
+import KennerButton from 'components/base/KennerButton.vue';
 
 const route = useRoute();
 

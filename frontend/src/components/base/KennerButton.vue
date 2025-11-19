@@ -2,6 +2,7 @@
   <q-btn
     unelevated
     outline
+    rounded
     :dense="isMobile"
     class="q-mx-xs"
     :color="color"
