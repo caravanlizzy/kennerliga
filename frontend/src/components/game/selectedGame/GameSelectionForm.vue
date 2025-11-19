@@ -13,32 +13,46 @@
         <q-banner class="bg-grey-2 text-grey-8 rounded-borders q-pa-md">
           <div class="row items-center">
             <q-icon name="info" class="q-mr-sm" />
-            <div>Please select a game on the left to see details.</div>
+            <div>Please select a game to see details.</div>
           </div>
         </q-banner>
       </template>
 
-      <template v-else-if="gameInformation.game">
+      <template v-else-if="!isLoading && gameInformation.game">
         <!-- Header -->
         <div class="row items-center justify-between q-mb-sm">
           <div class="text-h6 text-weight-bold">
             {{ gameInformation.game.name }}
           </div>
-          <q-chip
-            dense
-            square
-            outline
-            :color="
-              getPlatformColor(getPlatformName(platforms, gameInformation.game.platform))
-                .color
-            "
-            :text-color="
-              getPlatformColor(getPlatformName(platforms, gameInformation.game.platform))
-                .text
-            "
-          >
-            {{ getPlatformName(platforms, gameInformation.game.platform).split('.')[0] }}
-          </q-chip>
+
+          <!-- Right side: platform + save -->
+          <div class="row items-center q-gutter-sm">
+            <q-chip
+              dense
+              square
+              outline
+              :color="
+                getPlatformColor(
+                  getPlatformName(platforms, gameInformation.game.platform)
+                ).color
+              "
+              :text-color="
+                getPlatformColor(
+                  getPlatformName(platforms, gameInformation.game.platform)
+                ).text
+              "
+            >
+              {{ getPlatformName(platforms, gameInformation.game.platform).split('.')[0] }}
+            </q-chip>
+
+            <KennerButton
+              size="sm"
+              :disable="!isValid"
+              @click="onSubmit"
+            >
+              Save
+            </KennerButton>
+          </div>
         </div>
 
         <q-separator spaced />
@@ -105,11 +119,9 @@
         </template>
       </template>
     </q-card>
-    <KennerButton class="float-right" :disable="!isValid" @click="onSubmit()">
-      Save
-    </KennerButton>
   </div>
 </template>
+
 <script setup lang="ts">
 import KennerSelect from 'components/base/KennerSelect.vue';
 import KennerButton from 'components/base/KennerButton.vue';

@@ -1,6 +1,17 @@
 <template>
   <div class="row q-col-gutter-lg">
-    <!-- LEFT: FILTER + GRID -->
+
+    <!-- RIGHT: SELECTED GAME DETAILS -->
+    <div class="col-12 col-md-6">
+      <GameSelectionForm
+        :isLoading="isLoading"
+        :isValid="isValid"
+        :gameSelection="gameSelection"
+        :gameInformation="gameInformation"
+        :onSubmit="onSubmit"
+      />
+    </div>
+
     <div class="selector col-12 col-md-6">
       <!-- FILTER CARD -->
       <q-card flat bordered class="q-pa-md rounded-borders">
@@ -46,16 +57,7 @@
       </q-card>
     </div>
 
-    <!-- RIGHT: SELECTED GAME DETAILS -->
-    <div class="col-12 col-md-6">
-      <GameSelectionForm
-        :isLoading="isLoading"
-        :isValid="isValid"
-        :gameSelection="gameSelection"
-        :gameInformation="gameInformation"
-        :onSubmit="onSubmit"
-      />
-    </div>
+
   </div>
 </template>
 
@@ -77,6 +79,7 @@ const props = defineProps<{
 // ---- actions / header wiring ----
 const emit = defineEmits<{
   (e: 'selection-updated', value: typeof gameSelection): void;
+  (e: 'selection-valid', value: boolean): void;
   (e: 'set-submitter', submitter: () => Promise<void>): void;
   (e: 'on-success'): void;
 }>();
@@ -106,6 +109,7 @@ onMounted(async () => {
 
 watch(gameSelection, (newVal) => {
   emit('selection-updated', newVal);
+  emit('selection-valid', isValid.value);
 });
 
 async function onSubmit() {

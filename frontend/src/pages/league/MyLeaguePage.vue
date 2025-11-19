@@ -1,7 +1,7 @@
 <template>
   <SideBarLayout side-title="Standings">
     <!-- ==================== LOADING STATE ==================== -->
-    <template v-if="loading">
+    <template v-if="loading || !user">
       <LoadingSpinner text="Loading league data...">
         <template #skeleton>
           <q-skeleton type="rect" height="28px" class="q-mb-sm" />
@@ -34,8 +34,9 @@
         >
           <GameSelector
             :leagueId="leagueId"
-            :profileId="profile.id"
+            :profileId="user.profile.id"
             @selection-updated="(updated) => updateGameSelection(updated)"
+            @selectionValid="valid => selectionValid = valid"
             @set-submitter="(s: () => {}) => setSubmit(s)"
             class="q-mt-md q-pa-xs"
           />
@@ -126,9 +127,10 @@ const { updateLeagueData } = league;
 
 const { setActions, setLeadText, setSubject, reset } = useActionBar();
 
-const { user, profile } = useUserStore();
+const { user } = useUserStore();
 
 const gameSelection = ref(null);
+const selectionValid = ref(false);
 function updateGameSelection(newSelection) {
   gameSelection.value = newSelection;
 }
@@ -154,6 +156,7 @@ function manageActionBar() {
         {
           name: 'Save',
           callback: submitGameSelection,
+          disabled: !selectionValid.value,
         },
       ]);
       setLeadText(() => h('div', 'Confirm your game selection'));
@@ -164,7 +167,7 @@ function manageActionBar() {
   }
 }
 
-watch([isMeBanningGame, leagueStatus, gameSelection], manageActionBar, {
+watch([isMeBanningGame, leagueStatus, gameSelection, selectionValid], manageActionBar, {
   immediate: true,
   deep: true,
 });
