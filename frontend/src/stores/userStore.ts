@@ -64,6 +64,7 @@ export const useUserStore = defineStore(
     function applyLogin(userData: TUser, ignorePermission: boolean): void {
       isAuthenticated.value = true;
       user.value = userData;
+      isAdmin.value = true;
       if( !ignorePermission ){
         isAdmin.value = userData.admin;
       }
