@@ -23,11 +23,12 @@ import { onMounted } from 'vue';
 import NavHome from 'components/nav/NavHome.vue';
 import NavMyLeague from 'components/nav/NavMyLeague.vue';
 import NavProfileMenu from 'components/nav/NavProfileMenu.vue';
+import { useUserStore } from 'stores/userStore';
+import { storeToRefs } from 'pinia';
 
 defineProps<{ onToggle: () => void }>();
 
 const { updateLeagueData } = useLeagueStore();
-
 onMounted(() => updateLeagueData());
 </script>
 

@@ -19,7 +19,6 @@ import CurrentSeason from 'components/season/CurrentSeason.vue';
 import { onMounted, ref } from 'vue';
 import { useLeagueStore } from 'stores/leagueStore';
 import SideBarLayout from 'layouts/SideBarLayout.vue';
-import { fetchCurrentSeasonId } from 'src/services/seasonService';
 import FeaturesList from 'components/dev/FeaturesList.vue';
 import { getMyLeagueId } from 'src/services/leagueService';
 import SeasonStandings from 'components/season/SeasonStandings.vue';

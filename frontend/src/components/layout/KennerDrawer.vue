@@ -8,10 +8,10 @@
       :width="220"
     >
       <q-list>
+        <DrawerSubGroup class="q-pt-sm"> General </DrawerSubGroup>
         <DrawerItem icon="feedback" label="Feedback" forward-name="feedback" />
 
         <q-separator class="q-my-sm" />
-
         <template v-if="isAdmin">
           <DrawerSubGroup>Admin</DrawerSubGroup>
           <DrawerItem icon="casino" label="Games" forward-name="games" />
@@ -22,9 +22,7 @@
             forward-name="seasons"
           />
           <q-separator class="q-my-sm" />
-
         </template>
-
 
         <DrawerSubGroup>Dev</DrawerSubGroup>
         <DrawerItem icon="build" label="Hijack" forward-name="dev" />
