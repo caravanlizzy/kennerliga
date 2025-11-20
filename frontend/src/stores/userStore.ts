@@ -97,8 +97,7 @@ export const useUserStore = defineStore(
         delete api.defaults.headers.common['Authorization'];
         delete api.defaults.headers['Authorization'];
 
-        // Optional: Redirect to login or home
-        await router.push({ name: 'login' });
+        await router.push({ name: 'home' });
       }
     }
 
