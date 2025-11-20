@@ -49,6 +49,16 @@ export const useUserStore = defineStore(
       }
     }
 
+    function loadDataFromLocalStorage(): void {
+      const data = localStorage.getItem('userStore');
+      if (data) {
+        const parsedData = JSON.parse(data);
+        user.value = parsedData.user;
+        isAuthenticated.value = parsedData.isAuthenticated;
+        isAdmin.value = parsedData.user.admin;
+      }
+    }
+
     function isMe(someUsername: string): boolean {
       return someUsername === user.value?.username;
     }
@@ -92,7 +102,7 @@ export const useUserStore = defineStore(
       }
     }
 
-    return { user, listUsers, isAuthenticated, isAdmin, isMe, login, logout };
+    return { user, listUsers, isAuthenticated, isAdmin, isMe, login, logout, loadDataFromLocalStorage };
   },
   {
     persist: {
