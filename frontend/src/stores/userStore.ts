@@ -17,7 +17,6 @@ export type TUser = {
 export const useUserStore = defineStore(
   'userStore',
   () => {
-    const router = useRouter();
     const user: Ref<TUser | null> = ref(null);
     const isAdmin: Ref<boolean> = ref(false);
     const isAuthenticated: Ref<boolean> = ref(false);
@@ -35,17 +34,18 @@ export const useUserStore = defineStore(
       username: string,
       password: string,
       { ignorePermission = false } = {}
-    ): Promise<void> {
+    ): Promise<boolean> {
       try {
         const { data } = await api('login/', {
           method: 'POST',
-          data: { username: username, password },
+          data: { username, password },
         });
         const userData = data.user;
         applyLogin(userData, ignorePermission);
-        await router.push({ name: 'home' });
+        return true;
       } catch (error) {
         console.log(error);
+        return false;
       }
     }
 
@@ -96,8 +96,6 @@ export const useUserStore = defineStore(
         // Remove token from Axios headers
         delete api.defaults.headers.common['Authorization'];
         delete api.defaults.headers['Authorization'];
-
-        await router.push({ name: 'home' });
       }
     }
 

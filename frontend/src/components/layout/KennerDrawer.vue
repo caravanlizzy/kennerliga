@@ -29,7 +29,7 @@
 
         <q-separator class="q-my-sm" />
 
-        <DrawerItem icon="logout" label="Logout" @click="logout" />
+        <DrawerItem icon="logout" label="Logout" @click="doLogout" />
       </q-list>
     </q-drawer>
     <!--    <DevUsersList :show-impersonate="showImpersonateList" />-->
@@ -42,6 +42,7 @@ import { useUserStore } from 'stores/userStore';
 import { useResponsive } from 'src/composables/reponsive';
 import DrawerSubGroup from 'components/base/DrawerSubGroup.vue';
 import { storeToRefs } from 'pinia';
+import { useRouter } from 'vue-router';
 
 const drawerState = defineModel();
 
@@ -50,4 +51,11 @@ const { logout } = useUserStore();
 const { isAdmin } = storeToRefs(useUserStore());
 
 const { isMobile } = responsive;
+const router = useRouter();
+
+async function doLogout(): Promise<void> {
+  await logout();
+  drawerState.value = false;
+  await router.push({ name: 'home' });
+}
 </script>
