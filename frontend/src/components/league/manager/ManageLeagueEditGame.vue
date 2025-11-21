@@ -28,6 +28,7 @@
       :profileId="editingGameMember.profile"
       :gameId="editingGameMember.selected_game.game"
       :selectedGameId="editingGameMember.selected_game.id"
+      @onSuccess="onSuccessfulGameEdit"
     />
   </div>
 
@@ -36,6 +37,6 @@
 import GameEditor from 'components/game/selectedGame/GameEditor.vue';
 import { TLeagueMember } from 'src/types';
 
-defineProps<{editingGameMember: TLeagueMember}>();
+defineProps<{editingGameMember: TLeagueMember, league: any, onSuccessfulGameEdit: () => void}>();
 const emit = defineEmits(['onClose']);
 </script>

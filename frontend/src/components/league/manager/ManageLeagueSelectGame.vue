@@ -24,15 +24,18 @@
       manageOnly
       :leagueId="league.id"
       :profileId="selectingGameMember!.profile"
-      @onSuccess="onSuccessfullGameSelection"
+      @onSuccess="onSuccessfulGameSubmit"
     />
   </div>
-
 </template>
 <script setup lang="ts">
 import GameSelector from 'components/game/selectedGame/GameSelector.vue';
 import { TLeagueMember } from 'src/types';
 
-defineProps<{selectingGameMember: TLeagueMember}>();
+defineProps<{
+  selectingGameMember: TLeagueMember;
+  league: any;
+  onSuccessfulGameSubmit: () => void;
+}>();
 const emit = defineEmits(['onClose']);
 </script>

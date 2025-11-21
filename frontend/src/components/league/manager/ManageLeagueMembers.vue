@@ -143,67 +143,22 @@
       </q-card>
     </div>
     <!--    Edit a members game selection-->
-    <div
+    <ManageLeagueEditGame
       v-if="editingGameMember"
-      class="q-pa-md q-mt-md bg-grey-1 rounded-borders col-12"
-    >
-      <div class="row items-center justify-between q-mb-sm">
-        <div class="text-h6 text-weight-medium">
-          Edit Game
-          <span class="text-primary">{{
-            editingGameMember.selected_game?.game_name
-          }}</span>
-          for
-          <span class="text-primary">{{
-            editingGameMember.profile_name.replace('_profile', '')
-          }}</span>
-        </div>
-        <q-btn
-          dense
-          flat
-          round
-          icon="close"
-          color="grey-7"
-          @click="editingGameMember = null"
-        />
-      </div>
-      <GameEditor
-        :leagueId="league.id"
-        :profileId="editingGameMember.profile"
-        :gameId="editingGameMember.selected_game.game"
-        :selectedGameId="editingGameMember.selected_game.id"
-      />
-    </div>
+      :editingGameMember="editingGameMember"
+      :league="league"
+      :onSuccessfulGameEdit="onSuccessfulGameEdit"
+      @onClose="close"
+    />
 
     <!-- Form to select a game -->
-    <div
+    <ManageLeagueSelectGame
       v-if="selectingGameMember"
-      class="q-pa-md q-mt-md bg-grey-1 rounded-borders col-12"
-    >
-      <div class="row items-center justify-between q-mb-sm">
-        <div class="text-h6 text-weight-medium">
-          Select a game for
-          <span class="text-primary">{{ selectingGameMember.username }}</span>
-        </div>
-        <q-btn
-          dense
-          flat
-          round
-          icon="close"
-          color="grey-7"
-          @click="selectingGameMember = null"
-        />
-      </div>
-
-      <q-separator class="q-mb-md" />
-
-      <GameSelector
-        manageOnly
-        :leagueId="league.id"
-        :profileId="selectingGameMember!.profile"
-        @onSuccess="onSuccessfullGameSelection"
-      />
-    </div>
+      :selectingGameMember="selectingGameMember"
+      :league="league"
+      :onSuccessfulGameSubmit="onSuccessfulGameSubmit"
+      @onClose="close"
+    />
   </div>
 </template>
 
@@ -219,6 +174,8 @@ import GameSelectionForm from 'components/game/selectedGame/GameSelectionForm.vu
 import GameEditor from 'components/game/selectedGame/GameEditor.vue';
 import ErrorDisplay from 'components/base/ErrorDisplay.vue';
 import KennerButton from 'components/base/KennerButton.vue';
+import ManageLeagueEditGame from 'components/league/manager/ManageLeagueEditGame.vue';
+import ManageLeagueSelectGame from 'components/league/manager/ManageLeagueSelectGame.vue';
 
 const route = useRoute();
 
@@ -249,8 +206,12 @@ async function load() {
   }
 }
 
-// Edit Game
+function close(){
+  selectingGameMember.value = null;
+  editingGameMember.value = null;
+}
 
+// Edit Game
 function onEditGame(member: any) {
   editingGameMember.value = member;
 }
@@ -267,13 +228,17 @@ async function onDeleteSelectedGame(member: any) {
 }
 
 // Select Game
-
 function onSelectGame(member: TLeagueMember) {
   selectingGameMember.value = member;
 }
 
-function onSuccessfullGameSelection() {
+function onSuccessfulGameSubmit() {
   selectingGameMember.value = null;
+  load();
+}
+
+function onSuccessfulGameEdit() {
+  editingGameMember.value = null;
   load();
 }
 
