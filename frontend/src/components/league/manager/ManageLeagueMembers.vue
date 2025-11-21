@@ -11,14 +11,14 @@
       </div>
     </div>
     <div class="col-auto">
-      <q-btn flat icon="refresh" round @click="load" :loading="loading" />
+      <q-btn flat icon="refresh" round @click="load" />
     </div>
   </div>
 
   <!-- Loading -->
   <q-linear-progress v-if="loading" indeterminate class="q-mb-md" />
 
-  <ErrorDisplay v-if="error" :error="error"  class="q-mb-md" />
+  <ErrorDisplay v-if="error" :error="error" class="q-mb-md" />
 
   <!-- Empty state -->
   <q-card
@@ -163,24 +163,20 @@
 </template>
 
 <script setup lang="ts">
-import { useRoute } from 'vue-router';
-import { computed, onMounted, ref } from 'vue';
-import { TLeagueMember, TSeason } from 'src/types';
-import { fetchLeagueDetails } from 'src/services/leagueService';
-import { fetchSeason } from 'src/services/seasonService';
+import { computed, onMounted, Ref, ref } from 'vue';
+import { TLeague, TLeagueMember, TSeason } from 'src/types';
 import { api } from 'boot/axios';
-import GameSelector from 'components/game/selectedGame/GameSelector.vue';
-import GameSelectionForm from 'components/game/selectedGame/GameSelectionForm.vue';
-import GameEditor from 'components/game/selectedGame/GameEditor.vue';
 import ErrorDisplay from 'components/base/ErrorDisplay.vue';
 import KennerButton from 'components/base/KennerButton.vue';
 import ManageLeagueEditGame from 'components/league/manager/ManageLeagueEditGame.vue';
 import ManageLeagueSelectGame from 'components/league/manager/ManageLeagueSelectGame.vue';
 
-const route = useRoute();
+const props = defineProps<{
+  load: () => void;
+  league: Ref<TLeague | null>;
+  season: Ref<TSeason | null>;
 
-const league = ref(null);
-const season = ref<TSeason | null>(null);
+}>();
 
 const loading = ref(false);
 const error = ref<string | null>(null);
@@ -191,22 +187,7 @@ const showPlayerGrid = computed(
   () => !selectingGameMember.value && !editingGameMember.value
 );
 
-async function load() {
-  loading.value = true;
-  error.value = null;
-  try {
-    const leagueId = Number(route.params.id);
-    league.value = await fetchLeagueDetails(leagueId);
-    if (!league.value) throw new Error('Failed to load league data.');
-    season.value = await fetchSeason(league.value.season);
-  } catch (e: any) {
-    error.value = e?.message || 'Failed to load league/season data.';
-  } finally {
-    loading.value = false;
-  }
-}
-
-function close(){
+function close() {
   selectingGameMember.value = null;
   editingGameMember.value = null;
 }
@@ -221,7 +202,7 @@ async function onDeleteSelectedGame(member: any) {
   selectingGameMember.value = null;
   try {
     await api.delete(`game/selected-games/${member.selected_game.id}/`);
-    await load();
+    await props.load();
   } catch (err) {
     console.error('Delete failed', err);
   }
@@ -234,13 +215,12 @@ function onSelectGame(member: TLeagueMember) {
 
 function onSuccessfulGameSubmit() {
   selectingGameMember.value = null;
-  load();
+  props.load();
 }
 
 function onSuccessfulGameEdit() {
   editingGameMember.value = null;
-  load();
+  props.load();
 }
 
-onMounted(load);
 </script>

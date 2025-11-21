@@ -8,7 +8,7 @@ export default {
     {
       path: ':id',
       name: 'league-manager',
-      component: () => import('pages/league/LeagueOverviewPage.vue'),
+      component: () => import('pages/league/ManageLeaguePage.vue'),
     }
   ]
 };
