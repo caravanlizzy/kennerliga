@@ -1,5 +1,5 @@
 <template>
-  <q-item :to="{name: forwardName}" clickable>
+  <q-item :to="{name: forwardName}" @click="closeDrawer" clickable>
     <q-item-section>
       <KennerButton  color="primary" flat :icon="icon" />
     </q-item-section>
@@ -11,6 +11,7 @@
 
 <script setup lang="ts">
 import KennerButton from 'components/base/KennerButton.vue';
+import { inject } from 'vue';
 
 type TKennerItem = {
   icon: string;
@@ -19,4 +20,6 @@ type TKennerItem = {
   forwardName?: string;
 }
 defineProps<TKennerItem>();
+
+const closeDrawer = inject('closeDrawer');
 </script>

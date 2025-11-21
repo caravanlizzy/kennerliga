@@ -43,6 +43,7 @@ import { useResponsive } from 'src/composables/reponsive';
 import DrawerSubGroup from 'components/base/DrawerSubGroup.vue';
 import { storeToRefs } from 'pinia';
 import { useRouter } from 'vue-router';
+import { provide } from 'vue';
 
 const drawerState = defineModel();
 
@@ -52,6 +53,8 @@ const { isAdmin } = storeToRefs(useUserStore());
 
 const { isMobile } = responsive;
 const router = useRouter();
+
+provide('closeDrawer', () => drawerState.value = false)
 
 async function doLogout(): Promise<void> {
   await logout();
