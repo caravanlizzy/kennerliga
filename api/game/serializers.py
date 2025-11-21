@@ -140,18 +140,23 @@ class SelectedGameSerializer(serializers.ModelSerializer):
         instance.game = validated_data.get('game', instance.game)
         instance.save()
 
-        # Update selected options
-        if selected_options_data:
+        # Update selected options (no id in payload)
+        if selected_options_data is not None:
             for option_data in selected_options_data:
-                option_id = option_data.get('id')
-                if option_id:
-                    option_instance = SelectedOption.objects.get(id=option_id, selected_game=instance)
-                    option_instance.game_option = option_data.get('game_option', option_instance.game_option)
-                    option_instance.choice = option_data.get('choice', option_instance.choice)
-                    option_instance.value = option_data.get('value', option_instance.value)
-                    option_instance.save()
-                else:
-                    SelectedOption.objects.create(selected_game=instance, **option_data)
+                game_option = option_data.get('game_option')
+                if not game_option:
+                    # optionally raise ValidationError here instead of skipping
+                    continue
+
+                # assuming one SelectedOption per (selected_game, game_option)
+                option_instance, _ = SelectedOption.objects.get_or_create(
+                    selected_game=instance,
+                    game_option=game_option,
+                )
+
+                option_instance.choice = option_data.get('choice', option_instance.choice)
+                option_instance.value = option_data.get('value', option_instance.value)
+                option_instance.save()
 
         return instance
 
