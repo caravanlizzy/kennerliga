@@ -35,9 +35,10 @@
           <GameSelector
             :leagueId="leagueId"
             :profileId="user.profile.id"
-            @selection-updated="(updated) => updateGameSelection(updated)"
-            @selectionValid="valid => selectionValid = valid"
-            @set-submitter="(s: () => {}) => setSubmit(s)"
+            @selection-updated="(updated:TGameSelection) => updateGameSelection(updated)"
+            @selectionValid="(valid: boolean ) => selectionValid = valid"
+            @set-submitter="(s: () => {}) => submitter = s"
+            @onSuccess="updateLeagueData"
             class="q-mt-md q-pa-xs"
           />
         </ContentSection>
@@ -107,6 +108,7 @@ import SideBarLayout from 'layouts/SideBarLayout.vue';
 import LoadingSpinner from 'components/base/LoadingSpinner.vue';
 import MyLeagueResults from 'components/league/MyLeagueResults.vue';
 import { banGame } from 'src/services/gameService';
+import { TGameSelection } from 'src/types';
 
 const league = useLeagueStore();
 
@@ -129,16 +131,16 @@ const { setActions, setLeadText, setSubject, reset } = useActionBar();
 
 const { user } = useUserStore();
 
-const gameSelection = ref(null);
+const gameSelection = ref<TGameSelection|null>(null);
 const selectionValid = ref(false);
-function updateGameSelection(newSelection) {
+function updateGameSelection(newSelection: TGameSelection) {
   gameSelection.value = newSelection;
 }
 
 function manageActionBar() {
   switch (leagueStatus.value) {
     case 'BANNING':
-      if (isMeBanningGame.value && leagueId.value && user.username) {
+      if (isMeBanningGame.value && leagueId.value && user!.username) {
         setLeadText('Select a game to ban');
         setActions(
           Object.values(selectedGamesById.value)
@@ -173,13 +175,11 @@ watch([isMeBanningGame, leagueStatus, gameSelection, selectionValid], manageActi
 });
 
 type TSubmitter = (() => Promise<void>);
-let submitGame: TSubmitter;
-function setSubmit(submitterFunc:TSubmitter): void {
-  submitGame = submitterFunc;
-}
+let submitter: TSubmitter;
+
 async function submitGameSelection() {
   try {
-    await submitGame();
+    await submitter();
     await updateLeagueData();
   } catch (error) {
     console.error('Error submitting game:', error);
@@ -198,8 +198,8 @@ function handleBanGame(selectedGameId: number, gameName: string) {
     async () => {
       try {
         await banGame({
-          leagueId: leagueId.value,
-          username: user.username,
+          leagueId: leagueId.value!,
+          username: user!.username,
           selectedGameId,
         });
         await updateLeagueData();
