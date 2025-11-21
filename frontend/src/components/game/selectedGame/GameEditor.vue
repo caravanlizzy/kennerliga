@@ -54,12 +54,17 @@ onMounted(async () => {
   isLoading.value = false;
 });
 
+const emit = defineEmits<{
+  (e: 'on-success'): void;
+}>();
+
 provide('platforms', platforms);
 
 async function onSubmit() {
   try {
     const payload = toSelectedGamePayload(gameSelection);
     await editSelectedGame({ id: props.selectedGameId, ...payload });
+    emit('on-success');
   } catch (e) {
     console.error(e);
   }

@@ -74,6 +74,8 @@ const props = defineProps<{
   leagueId: number;
   profileId: number;
   manageOnly?: boolean;
+  onSuccess?: () => void;
+  onError?: () => void;
 }>();
 
 // ---- actions / header wiring ----
@@ -116,8 +118,10 @@ async function onSubmit() {
   try {
     await submitGame(props.manageOnly);
     emit('on-success');
+    await props.onSuccess?.();
   } catch (e) {
     console.error(e);
+    props.onError?.();
   }
 }
 </script>
