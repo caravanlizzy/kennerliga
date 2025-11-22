@@ -64,15 +64,6 @@ export type TUser = {
   user_permissions: any[]; // Can be defined in detail if permission structure is known
 };
 
-export type TMember = {
-  id: number;
-  username: string;
-  selected_game?: {
-    id: number;
-    game_name: string;
-  } | null;
-};
-
 export type TLeagueStatus =
   | 'PICKING'
   | 'REPICKING'
@@ -129,7 +120,7 @@ export type TLeagueMember = {
   position: number;
   selected_game_id: number | null;
   banned_by: string[];
-}
+};
 
 export type TGameSelection = {
   game: GameDto;
@@ -138,3 +129,77 @@ export type TGameSelection = {
   leagueId: number;
 };
 
+export type TMember = {
+  id: number; // player_profile id, also referenced in results
+  username: string;
+  profile_name: string;
+  selected_game: SelectedGame | null;
+  banned_game: BannedGame;
+  is_active_player: boolean;
+  rank: number;
+  position: number;
+};
+
+export type MatchResult = {
+  id: number;
+  player_profile: number; // Member.id
+  selected_game: number; // SelectedGame.id
+  points: number | null;
+  starting_position: number | null;
+  tie_breaker_value: string; // may be empty ""
+  decisive_tie_breaker: string | null;
+  faction_name: string | null;
+}; // Selected/banned game shapes
+// Shared leaf types
+/**
+ * Represents a choice with a unique identifier, name, and a reference to a game option.
+ *
+ * @typedef {Object} Choice
+ * @property {number} id - The unique identifier for the choice.
+ * @property {string} name - The name of the choice.
+ * @property {number} option - The ID of the associated game option, corresponding to GameOption.id.
+ */
+type Choice = {
+  id: number;
+  name: string;
+  option: number; // GameOption.id
+};
+export type GameOption = {
+  id: number;
+  name: string;
+  has_choices: boolean;
+  game: number;
+  only_if_value: boolean | null;
+  only_if_option: number | null;
+  only_if_choice: number | null;
+};
+
+type SelectedOption = {
+  id: number;
+  game_option: GameOption;
+  choice: Choice | null; // used when has_choices === true
+  value: boolean | null; // used when has_choices === false
+};
+
+type SelectedGame = {
+  id: number; // selected_game id
+  game: number; // base game id
+  game_name: string;
+  selected_options: SelectedOption[];
+};
+
+type BannedGameFull = {
+  id: number; // banned selected_game id
+  game: number;
+  game_name: string;
+  selected_options: SelectedOption[];
+};
+
+type BannedGameEmpty = {
+  game: null;
+  selected_options: [];
+  leagueId: null;
+  playerProfileId: null;
+};
+
+type BannedGame = BannedGameFull | BannedGameEmpty;

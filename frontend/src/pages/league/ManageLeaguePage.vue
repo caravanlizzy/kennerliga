@@ -1,9 +1,6 @@
 <template>
   <!-- Loading -->
   <LoadingSpinner v-if="loading" />
-  <div v-if="league">
-    {{ selectedGameIds }}
-  </div>
 
   <ErrorDisplay v-if="error" :error="error" class="q-mb-md" />
 
@@ -17,7 +14,7 @@
   <!--  <LeagueResultUpload />-->
   <ManageLeagueResults
     v-if="!loading && !error"
-    :selectedGameIds="selectedGameIds"
+    :selectedGames="selectedGames"
   />
 </template>
 
@@ -28,13 +25,13 @@ import { fetchLeagueDetails } from 'src/services/leagueService';
 import { fetchSeason } from 'src/services/seasonService';
 import ErrorDisplay from 'components/base/ErrorDisplay.vue';
 import { computed, onMounted, ref } from 'vue';
-import { TSeason } from 'src/types';
+import { TLeague, TSeason } from 'src/types';
 import { useRoute } from 'vue-router';
 import LoadingSpinner from 'components/base/LoadingSpinner.vue';
 
 const route = useRoute();
 
-const league = ref(null);
+const league = ref<TLeague|null>(null);
 const season = ref<TSeason | null>(null);
 
 const loading = ref(false);
@@ -56,10 +53,9 @@ async function load() {
   }
 }
 
-const selectedGameIds = computed(() =>
-  league.value.members
-    .map((m) => m.selected_game?.id)
-    .filter((id) => id != null)
+const selectedGames = computed(() =>
+  league.value?.members
+    .map((m) => m.selected_game)
 );
 
 onMounted(load);

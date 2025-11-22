@@ -16,7 +16,7 @@ import { storeToRefs } from 'pinia';
 import { computed } from 'vue';
 import { useLeagueStore } from 'stores/leagueStore';
 
-const { matchResultsByGame, membersById } = storeToRefs(useLeagueStore());
+const { matchResultsBySelectedGame, membersById } = storeToRefs(useLeagueStore());
 
 // compute league standings
 const rows = computed(() => {
@@ -39,8 +39,8 @@ const rows = computed(() => {
 
   // 2) Aggregate league points & wins from finished games
   const placementPoints = [6, 3, 1, 0]; // extend/adjust if needed
-  for (const gameId in matchResultsByGame.value) {
-    const results = [...(matchResultsByGame.value[gameId] ?? [])];
+  for (const gameId in matchResultsBySelectedGame.value) {
+    const results = [...(matchResultsBySelectedGame.value[gameId] ?? [])];
     if (results.length === 0) continue;
 
     // Sort by raw points desc; null/undefined sink to bottom

@@ -1,12 +1,12 @@
 <template>
   <q-card flat class="">
     <div class="row items-center justify-around q-mb-md">
-      <div class="text-h6 text-primary">{{ gameName ?? '—' }}</div>
+      <div class="text-h6 text-primary">{{selectedGame.game_name}}</div>
 <!--      <q-badge color="primary" label="Ergebnis" />-->
     </div>
 
     <template v-if="results.length === 0">
-      <div class="text-caption text-grey-7">Noch keine .</div>
+      <div class="text-caption text-grey-7">No results uploaded.</div>
     </template>
 
     <template v-else>
@@ -93,20 +93,15 @@ import { storeToRefs } from 'pinia';
 import { useLeagueStore } from 'stores/leagueStore';
 import { QTableProps } from 'quasar';
 
-const props = defineProps<{ selectedGameId: number }>();
+const props = defineProps<{ selectedGame: any }>();
 
 const league = useLeagueStore();
-const { matchResultsByGame, membersById, selectedGamesById } =
+const { matchResultsBySelectedGame, membersById } =
   storeToRefs(league);
-
-// Game name via O(1) map
-const gameName = computed(
-  () => selectedGamesById.value[props.selectedGameId]?.game_name ?? null
-);
 
 // Results for this game are already sorted in setResultsForGame()
 const resultsForGame = computed(
-  () => matchResultsByGame.value[props.selectedGameId] ?? []
+  () => matchResultsBySelectedGame.value[props.selectedGame.id] ?? []
 );
 
 // Join once → template stays dumb & fast
@@ -116,7 +111,6 @@ const results = computed(() => {
     return {
       id: r.id,
       username: m?.username ?? `#${r.player_profile}`,
-      colorClass: m?.colorClass ?? 'bg-grey-2',
       points: r.points ?? null,
       starting_position: r.starting_position ?? null,
       faction_name: r.faction_name ?? null,

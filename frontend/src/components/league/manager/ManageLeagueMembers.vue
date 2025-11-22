@@ -163,7 +163,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, Ref, ref } from 'vue';
+import { computed, Ref, ref } from 'vue';
 import { TLeague, TLeagueMember, TSeason } from 'src/types';
 import { api } from 'boot/axios';
 import ErrorDisplay from 'components/base/ErrorDisplay.vue';
