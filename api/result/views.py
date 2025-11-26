@@ -17,12 +17,40 @@ from .serializers import ResultSerializer
 # The frontend would usually post a set of results => 1 result per player in the league
 # which is handled in a separate ViewSet (MathResultViewSet)
 class ResultViewSet(ModelViewSet):
+    """
+    Handles the operations related to the Result model.
+
+    This class is a ViewSet for the Result model and provides
+    CRUD operations for handling Result data. It is based on
+    Django Rest Framework's ModelViewSet and integrates
+    filtering functionality for specified fields.
+
+    Attributes:
+        queryset: Defines the default queryset for the ModelViewSet.
+        serializer_class: Specifies the serializer to be used for
+            serializing and deserializing Result objects.
+        filterset_fields: Lists the fields that can be used for
+            filtering results during API requests.
+    """
     queryset = Result.objects.all()
     serializer_class = ResultSerializer
     filterset_fields = ['selected_game']
 
 
 class MatchResultViewSet(ViewSet):
+    """
+    Handles operations for match results, including creation of results and resolving tie-breakers.
+
+    This class provides the functionality to validate, process, and save match results, ensuring that
+    all necessary data is supplied and adheres to expected business rules. It handles the detection
+    and resolution of ties based on defined tie-breaker rules within a game configuration. The class
+    also interacts with multiple related models such as `SelectedGame`, `ResultConfig`, and
+    `TieBreaker` to validate and process results. If results meet all constraints, they are saved,
+    and necessary snapshots for the game and league standings are rebuilt.
+
+    Attributes:
+        permission_classes: Specifies the permission classes required to access this viewset.
+    """
     permission_classes = [IsAuthenticated]
 
     def create(self, request):
