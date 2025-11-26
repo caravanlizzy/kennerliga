@@ -43,17 +43,13 @@
     <div
       v-for="member in league?.members"
       :key="member.id"
-      class="col-12 col-sm-6 col-md-4"
+      class="col-12 col-md-6"
     >
       <q-card flat bordered class="fit" v-if="showPlayerGrid">
         <q-item>
-          <q-item-section avatar>
-            <q-avatar rounded>
-              <q-icon name="person" />
-            </q-avatar>
-          </q-item-section>
           <q-item-section>
             <q-item-label class="text-weight-medium">
+              <q-icon name="person"></q-icon>
               {{ member.username }}
             </q-item-label>
           </q-item-section>
@@ -63,8 +59,10 @@
               color="positive"
               outline
               class="text-uppercase"
-              >Selected</q-badge
             >
+              {{ member.selected_game.game_name }}
+              <q-icon class="q-ml-xs" name="sports_esports" />
+            </q-badge>
             <q-badge
               v-else
               color="grey-5"
@@ -79,37 +77,21 @@
         <q-separator />
 
         <q-card-section>
-          <div class="text-caption text-grey-7 q-mb-xs">Selected Game</div>
-          <div class="row items-center" style="min-height: 29px">
-            <div class="col-auto">
-              <q-chip
-                v-if="member.selected_game?.game_name"
-                icon="sports_esports"
-                dense
-                square
-              >
-                {{ member.selected_game.game_name }}
-              </q-chip>
-              <span v-else class="text-grey-6">No game yet</span>
-            </div>
-            <div class="col">
-              <q-space />
-            </div>
-          </div>
+          <q-expansion-item
+            dense
+            icon="info"
+            label="Game Settings"
+            expand-icon="expand_more"
+            class="q-mx-sm q-mb-sm"
+          >
+            <q-card-section class="bg-grey-1">
+              <pre v-if="member.selected_game" class="q-ma-none text-body2">{{
+                member.selected_game
+              }}</pre>
+              <div v-else>No game settings available</div>
+            </q-card-section>
+          </q-expansion-item>
         </q-card-section>
-
-        <!-- Optional raw data toggle (dev aid) -->
-        <q-expansion-item
-          dense
-          icon="info"
-          label="Details"
-          expand-icon="expand_more"
-          class="q-mx-sm q-mb-sm"
-        >
-          <q-card-section class="bg-grey-1">
-            <pre class="q-ma-none text-body2">{{ member }}</pre>
-          </q-card-section>
-        </q-expansion-item>
 
         <q-separator />
 
@@ -175,7 +157,6 @@ const props = defineProps<{
   load: () => void;
   league: Ref<TLeague | null>;
   season: Ref<TSeason | null>;
-
 }>();
 
 const loading = ref(false);
@@ -222,5 +203,4 @@ function onSuccessfulGameEdit() {
   editingGameMember.value = null;
   props.load();
 }
-
 </script>
