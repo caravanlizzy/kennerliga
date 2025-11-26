@@ -1,9 +1,9 @@
 <template>
   <div
     class="q-pa-xl flex flex-center column q-gutter-md"
-    style="min-height: 60vh"
   >
-    <q-linear-progress indeterminate class="q-mb-md" />
+    <q-linear-progress v-if="$slots.skeleton" indeterminate class="q-mb-md" />
+    <q-spinner v-else size="3em" color="primary"/>
 
     <div class="text-subtitle1 text-primary">
       <span v-if="text"> {{text}}</span>

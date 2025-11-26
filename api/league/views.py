@@ -54,6 +54,36 @@ class LeagueViewSet(ModelViewSet):
         )
         return Response(LeagueStandingSerializer(qs, many=True).data, status=status.HTTP_200_OK)
 
+    @action(detail=True, methods=['post'], url_path='set-active-player')
+    def set_active_player(self, request, pk=None):
+        """
+        Set the active player for the league using a profile_id.
+        Expects profile_id in the request data.
+        """
+        league = self.get_object()
+        profile_id = request.data.get('profile_id')
+
+        if not profile_id:
+            return Response(
+                {"detail": "profile_id is required."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        # Find the SeasonParticipant with the given profile_id in this league
+        try:
+            season_participant = league.members.get(profile_id=profile_id)
+        except league.members.model.DoesNotExist:
+            return Response(
+                {"detail": "Profile is not a member of this league."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        # Update the active player
+        league.active_player = season_participant
+        league.save(update_fields=['active_player'])
+
+        return Response({"profile": profile_id}, status=status.HTTP_200_OK)
+
 
 class LeagueDetailViewSet(ReadOnlyModelViewSet):
     serializer_class = LeagueDetailSerializer
