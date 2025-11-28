@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia';
 import { ref, Ref } from 'vue';
 import { api } from 'boot/axios';
-import { useRouter } from 'vue-router';
+import { fetchMyCurrentLeagueId } from 'src/services/leagueService';
 export type TProfile = {
   id: number;
   name: string;
@@ -12,6 +12,7 @@ export type TUser = {
   admin: boolean;
   platform_players: { name: string }[];
   profile: TProfile;
+  myCurrentLeagueId: number|null;
 };
 
 export const useUserStore = defineStore(
@@ -42,11 +43,17 @@ export const useUserStore = defineStore(
         });
         const userData = data.user;
         applyLogin(userData, ignorePermission);
+        await setMyCurrentLeagueId();
         return true;
       } catch (error) {
         console.log(error);
         return false;
       }
+    }
+
+    async function setMyCurrentLeagueId() {
+      if( !user.value ) return;
+      user.value.myCurrentLeagueId = await fetchMyCurrentLeagueId();
     }
 
     function loadDataFromLocalStorage(): void {
@@ -99,7 +106,7 @@ export const useUserStore = defineStore(
       }
     }
 
-    return { user, listUsers, isAuthenticated, isAdmin, isMe, login, logout, loadDataFromLocalStorage };
+    return { user, listUsers, isAuthenticated, isAdmin, isMe, login, logout, loadDataFromLocalStorage, setMyCurrentLeagueId };
   },
   {
     persist: {

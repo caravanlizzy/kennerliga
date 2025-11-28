@@ -2,7 +2,7 @@
   <div
     class="q-pa-md q-mt-md bg-grey-1 rounded-borders col-12"
   >
-    <FormHead @onClose="emit('onClose')">
+    <FormHead @onClose="emit('onClose')" class="text-h6 text-weight-medium">
       <slot name="head"></slot>
     </FormHead>
     <div>

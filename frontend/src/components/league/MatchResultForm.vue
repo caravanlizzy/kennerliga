@@ -180,7 +180,9 @@ type Member = { id: number; username: string };
 const emit = defineEmits<{ (e: 'submitted', selectedGameId: number): void }>();
 const $q = useQuasar();
 
-const props = defineProps<{ selectedGameId: number }>();
+const props = defineProps<{ selectedGameId: number, leagueId: number }>();
+const { init } = useLeagueStore();
+await init(props.leagueId);
 const { members } = storeToRefs(useLeagueStore()); // Member[]
 
 const resultConfig = ref<any>(null);
@@ -389,7 +391,6 @@ async function submitResults() {
     }
 
     if (response.status === 202) {
-      // <-- this is the important bit
       handleTieBreaker202(response.data);
       return;
     }

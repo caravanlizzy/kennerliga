@@ -21,8 +21,9 @@ import { useLeagueStore } from 'stores/leagueStore';
 import { useUserStore } from 'stores/userStore';
 
 const { isMobile } = useResponsive();
-const { isMeActivePlayer } = storeToRefs(useLeagueStore());
-const { isAuthenticated } = storeToRefs(useUserStore());
+const { isAuthenticated, user } = storeToRefs(useUserStore());
+const myLeagueStore = useLeagueStore(user.value?.myCurrentLeagueId)();
+const { isMeActivePlayer } = storeToRefs(myLeagueStore);
 
 
 </script>

@@ -20,6 +20,7 @@
     v-if="currentFormSelectedGameId"
     @submitted="handleSubmit"
     :selected-game-id="currentFormSelectedGameId"
+    :leagueId="leagueId"
   />
 </template>
 
@@ -35,6 +36,7 @@ const { refreshResultsForGame } = useLeagueStore();
 const { isMobile } = useResponsive();
 
 const currentFormSelectedGameId = ref(null);
+const leagueId = inject('leagueId');
 
 function handleSubmit(selectedGameId: number) {
   currentFormSelectedGameId.value = null;

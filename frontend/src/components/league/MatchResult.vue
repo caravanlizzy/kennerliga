@@ -1,8 +1,8 @@
 <template>
   <q-card flat class="">
     <div class="row items-center justify-around q-mb-md">
-      <div class="text-h6 text-primary">{{selectedGame.game_name}}</div>
-<!--      <q-badge color="primary" label="Ergebnis" />-->
+      <div class="text-h6 text-primary">{{ selectedGame.game_name }}</div>
+      <!--      <q-badge color="primary" label="Ergebnis" />-->
     </div>
 
     <template v-if="results.length === 0">
@@ -92,12 +92,14 @@ import { computed } from 'vue';
 import { storeToRefs } from 'pinia';
 import { useLeagueStore } from 'stores/leagueStore';
 import { QTableProps } from 'quasar';
+import { useUserStore } from 'stores/userStore';
 
 const props = defineProps<{ selectedGame: any }>();
 
-const league = useLeagueStore();
-const { matchResultsBySelectedGame, membersById } =
-  storeToRefs(league);
+const { user } = storeToRefs(useUserStore());
+const myLeagueStore = useLeagueStore(user.value.myCurrentLeagueId)();
+console.log(myLeagueStore, 'myLeagueStore');
+const { matchResultsBySelectedGame, membersById } = storeToRefs(myLeagueStore);
 
 // Results for this game are already sorted in setResultsForGame()
 const resultsForGame = computed(
@@ -145,4 +147,3 @@ const columns: QTableProps['columns'] = [
   },
 ];
 </script>
-

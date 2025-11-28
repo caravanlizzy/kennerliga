@@ -1,13 +1,13 @@
 <template>
-    <q-table
-      title="League Standings"
-      flat
-      :rows="rows"
-      :columns="columns"
-      row-key="id"
-      hide-bottom
-      class="bg-transparent"
-    />
+  <q-table
+    title="League Standings"
+    flat
+    :rows="rows"
+    :columns="columns"
+    row-key="id"
+    hide-bottom
+    class="bg-transparent"
+  />
 </template>
 
 <script setup lang="ts">
@@ -15,8 +15,11 @@ import { QTableProps } from 'quasar';
 import { storeToRefs } from 'pinia';
 import { computed } from 'vue';
 import { useLeagueStore } from 'stores/leagueStore';
+import { useUserStore } from 'stores/userStore';
+const { user } = storeToRefs(useUserStore());
 
-const { matchResultsBySelectedGame, membersById } = storeToRefs(useLeagueStore());
+const myLeagueStore = useLeagueStore(user.value.myCurrentLeagueId)();
+const { matchResultsBySelectedGame, membersById } = storeToRefs(myLeagueStore);
 
 // compute league standings
 const rows = computed(() => {

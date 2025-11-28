@@ -61,7 +61,6 @@ const subject = shallowRef<RenderFn | null>(null);
 
 export function useActionBar() {
   function setActions(newActions: TAction | TAction[]): void {
-    console.log({ newActions });
     const processedActions = Array.isArray(newActions)
       ? newActions
       : [newActions];

@@ -140,6 +140,7 @@
         <template v-if="member.selected_game">
           <q-card-section> Result </q-card-section>
           <q-card-actions align="right" class="bg-grey-2">
+
             <KennerButton
               v-if="hasResult(member)"
               outline
@@ -163,7 +164,6 @@
     <!--    Form to edit a members game selection-->
     <FormLayout v-if="editingGameMember" @onClose="closeForm">
       <template #head>
-        <div class="text-h6 text-weight-medium">
           Edit Game
           <span class="text-primary">{{
             editingGameMember.selected_game?.game_name
@@ -172,7 +172,6 @@
           <span class="text-primary">{{
             editingGameMember.profile_name.replace('_profile', '')
           }}</span>
-        </div>
       </template>
       <GameSettingsEditor
         :leagueId="league.id"
@@ -186,10 +185,8 @@
     <!-- Form to select a game -->
     <FormLayout v-if="selectingGameMember" @onClose="closeForm">
       <template #head>
-        <div class="text-h6 text-weight-medium">
           Select a game for
           <span class="text-primary">{{ selectingGameMember.username }}</span>
-        </div>
       </template>
 
       <GameSelector
@@ -199,13 +196,12 @@
         @onSuccess="onSuccessfulGameSubmit"
       />
     </FormLayout>
-
     <!--      Form to post match results-->
     <FormLayout @onClose="closeForm" v-if="postResultForSelGame">
       <template #head>
-        Post Match Results for {{ postResultForSelGame.game_name }}
+        Post Match Results for <span class="text-primary"> {{ postResultForSelGame.game_name }} </span>
       </template>
-      logic here
+      <MatchResultForm :selectedGameId="postResultForSelGame.id" :leagueId="league.id" @submitted="closeForm"/>
     </FormLayout>
     <!--      Form to edit match results-->
     <div v-if="editResultForSelGameId"></div>
@@ -226,6 +222,7 @@ import { useQuasar } from 'quasar';
 import FormLayout from 'components/league/manager/FormLayout.vue';
 import GameSelector from 'components/game/selectedGame/GameSelector.vue';
 import GameSettingsEditor from 'components/game/selectedGame/GameSettingsEditor.vue';
+import MatchResultForm from 'components/league/MatchResultForm.vue';
 
 const route = useRoute();
 const $q = useQuasar();
@@ -241,8 +238,8 @@ const error = ref<string | null>(null);
 // vars to control which form is shown if any
 const editingGameMember = ref<any | null>(null);
 const selectingGameMember = ref<TLeagueMember | null>(null);
-const postResultForSelGame = ref(false);
-const editResultForSelGameId = ref(false);
+const postResultForSelGame = ref(null);
+const editResultForSelGameId = ref(null);
 const showPlayerGrid = computed(
   () =>
     !selectingGameMember.value &&
@@ -313,6 +310,7 @@ async function setActivePlayer(profileId) {
 
 function hasResult(member: TLeagueMember) {
   if (member.selected_game === null) return false;
+  if (matchResults.value.length === 0) return false;
   return matchResults.value
     .map((mr) => mr.selectedGameId)
     .includes(member.selected_game.id);

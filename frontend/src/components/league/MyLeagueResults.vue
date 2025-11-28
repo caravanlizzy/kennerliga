@@ -122,7 +122,9 @@ import { ref, onMounted, computed } from 'vue';
 import { api } from 'boot/axios';
 import type { QTableProps } from 'quasar';
 
-import { getMyLeagueId } from 'src/services/leagueService';
+import { fetchMyCurrentLeagueId } from 'src/services/leagueService';
+import { storeToRefs } from 'pinia';
+import { useUserStore } from 'stores/userStore';
 
 type GameStandingRow = {
   id?: number;
@@ -220,10 +222,10 @@ async function loadData() {
   }
 }
 
+const { user } = storeToRefs(useUserStore());
 onMounted(async () => {
   try {
-    leagueId.value = await getMyLeagueId();
-    if (leagueId.value) await loadData();
+    if (user.value.myCurrentLeagueId) await loadData();
   } catch (e: any) {
     console.error(e);
     error.value = 'Could not determine your league.';

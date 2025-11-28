@@ -91,7 +91,7 @@
 </template>
 
 <script setup lang="ts">
-import { h, onMounted, ref, watch, watchEffect } from 'vue';
+import { h, inject, onMounted, provide, ref, watch, watchEffect } from 'vue';
 import GameSelector from 'components/game/selectedGame/GameSelector.vue';
 import { useLeagueStore } from 'stores/leagueStore';
 import { storeToRefs } from 'pinia';
@@ -110,11 +110,9 @@ import MyLeagueResults from 'components/league/MyLeagueResults.vue';
 import { banGame } from 'src/services/gameService';
 import { TGameSelection } from 'src/types';
 
-const league = useLeagueStore();
 
-onMounted(() => {
-  void league.init();
-});
+const { user } = storeToRefs(useUserStore());
+const myLeagueStore = useLeagueStore(user.value.myCurrentLeagueId)();
 
 const {
   isMePickingGame,
@@ -124,14 +122,14 @@ const {
   members,
   leagueId,
   loading,
-} = storeToRefs(league);
-const { updateLeagueData } = league;
+} = storeToRefs(myLeagueStore);
+const { updateLeagueData } = myLeagueStore;
+
+provide('leagueId', leagueId);
 
 const { setActions, setLeadText, setSubject, reset } = useActionBar();
 
-const { user } = useUserStore();
-
-const gameSelection = ref<TGameSelection|null>(null);
+const gameSelection = ref<TGameSelection | null>(null);
 const selectionValid = ref(false);
 function updateGameSelection(newSelection: TGameSelection) {
   gameSelection.value = newSelection;
@@ -169,12 +167,16 @@ function manageActionBar() {
   }
 }
 
-watch([isMeBanningGame, leagueStatus, gameSelection, selectionValid], manageActionBar, {
-  immediate: true,
-  deep: true,
-});
+watch(
+  [isMeBanningGame, leagueStatus, gameSelection, selectionValid],
+  manageActionBar,
+  {
+    immediate: true,
+    deep: true,
+  }
+);
 
-type TSubmitter = (() => Promise<void>);
+type TSubmitter = () => Promise<void>;
 let submitter: TSubmitter;
 
 async function submitGameSelection() {
