@@ -26,7 +26,7 @@ import { storeToRefs } from 'pinia';
 
 defineProps<{ onToggle: () => void }>();
 const { user } = storeToRefs(useUserStore());
-
+console.log({ user });
 </script>
 
 <style lang="scss">
