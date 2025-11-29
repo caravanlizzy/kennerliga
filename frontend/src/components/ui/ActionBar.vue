@@ -90,9 +90,12 @@ import KennerButton from 'components/base/KennerButton.vue';
 import { useLeagueStore } from 'stores/leagueStore';
 import { storeToRefs } from 'pinia';
 import { useResponsive } from 'src/composables/reponsive';
+import { useUserStore } from 'stores/userStore';
 
 const { actions, leadText, subject, reset } = useActionBar();
-const { activePlayer, isMeActivePlayer, statusNoun, loading } = storeToRefs(useLeagueStore());
+const { user } = storeToRefs(useUserStore());
+const myLeagueStore = useLeagueStore(user.value!.myCurrentLeagueId)()
+const { activePlayer, isMeActivePlayer, statusNoun, loading } = storeToRefs(myLeagueStore);
 const { isMobile } = useResponsive();
 
 async function handleAction(action: any) {

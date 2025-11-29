@@ -15,7 +15,6 @@ export async function fetchLeagueDetails(
 export async function fetchMyCurrentLeagueId(): Promise<number | null> {
   try {
     const response = await api.get('user/me/current-league');
-    console.log(response.data.id, 'myLueageId in fetch');
     return response.data.id;
   } catch (error: any) {
     // Check if the error is a 404 (Not Found) which indicates no active league

@@ -138,11 +138,11 @@ function updateGameSelection(newSelection: TGameSelection) {
 function manageActionBar() {
   switch (leagueStatus.value) {
     case 'BANNING':
-      if (isMeBanningGame.value && leagueId.value && user!.username) {
+      if (isMeBanningGame.value && leagueId.value && user.value?.username) {
         setLeadText('Select a game to ban');
         setActions(
           Object.values(selectedGamesById.value)
-            .filter((game) => game.selected_by !== user?.username)
+            .filter((game) => game.selected_by !== user.value?.username)
             .map((game) => ({
               name: `${game.game_name}`,
               callback: () => handleBanGame(game.id, game.game_name),

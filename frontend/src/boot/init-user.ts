@@ -8,7 +8,6 @@ export default boot(async () => {
   try {
     userStore.loadDataFromLocalStorage();
     await userStore.setMyCurrentLeagueId();
-    console.log('inituser');
   } catch (err) {
     console.error('Failed to load user on boot:', err)
   }

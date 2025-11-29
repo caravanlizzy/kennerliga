@@ -8,7 +8,7 @@
     <q-space />
 
     <!-- Center: Main CTA -->
-    <NavMyLeague v-if="user.myCurrentLeagueId" />
+    <NavMyLeague v-if="user && user.myCurrentLeagueId" />
 
     <q-space />
 
@@ -26,7 +26,7 @@ import { storeToRefs } from 'pinia';
 
 defineProps<{ onToggle: () => void }>();
 const { user } = storeToRefs(useUserStore());
-console.log({ user });
+
 </script>
 
 <style lang="scss">
