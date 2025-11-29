@@ -213,7 +213,7 @@ import { fetchLeagueDetails } from 'src/services/leagueService';
 import { fetchSeason } from 'src/services/seasonService';
 import ErrorDisplay from 'components/base/ErrorDisplay.vue';
 import { computed, onMounted, ref } from 'vue';
-import { TLeague, TLeagueMember, TSeason } from 'src/types';
+import { TLeagueMember, TSeason } from 'src/types';
 import { useRoute } from 'vue-router';
 import LoadingSpinner from 'components/base/LoadingSpinner.vue';
 import KennerButton from 'components/base/KennerButton.vue';
@@ -228,7 +228,7 @@ const route = useRoute();
 const $q = useQuasar();
 
 // league and season data
-const league = ref<TLeague | null>(null);
+const league = ref<any | null>(null);
 const season = ref<TSeason | null>(null);
 const matchResults = ref([]);
 

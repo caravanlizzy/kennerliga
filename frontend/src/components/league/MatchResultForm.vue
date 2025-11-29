@@ -181,9 +181,8 @@ const emit = defineEmits<{ (e: 'submitted', selectedGameId: number): void }>();
 const $q = useQuasar();
 
 const props = defineProps<{ selectedGameId: number, leagueId: number }>();
-const { init } = useLeagueStore();
-await init(props.leagueId);
-const { members } = storeToRefs(useLeagueStore()); // Member[]
+const leagueStore = useLeagueStore(props.leagueId)()
+const { members } = storeToRefs(leagueStore); // Member[]
 
 const resultConfig = ref<any>(null);
 const factions = ref<Faction[]>([]);
