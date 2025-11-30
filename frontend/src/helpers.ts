@@ -26,7 +26,7 @@ export function loadToken(): void {
   }
 }
 
-export function truncateString(input: string, maxLength = 12): string {
+export function truncateString(input: string, maxLength = 17): string {
   if (input.length <= maxLength) {
     return input;
   }

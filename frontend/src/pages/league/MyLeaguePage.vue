@@ -29,7 +29,7 @@
       <template v-if="isMePickingGame">
         <ContentSection
           title="Game Selection"
-          color="secondary"
+          color="accent"
           :is-opened="sectionVisibilityStates['selection']"
         >
           <GameSelector

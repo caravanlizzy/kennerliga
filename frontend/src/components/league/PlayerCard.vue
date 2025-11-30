@@ -1,110 +1,214 @@
 <template>
-  <q-card flat bordered class="rounded-borders" :style="`border-left: 4px solid ${color}`">
-    <!-- Header -->
-    <q-card-section class="header q-py-sm q-px-md">
-      <div class="row items-center no-wrap full-width">
-
-        <!-- Name + optional rank -->
-        <div class="col">
-          <div class="row items-center no-wrap">
-            <div class="name-wrap">
-              <span class="name-text text-subtitle2 text-weight-medium ellipsis">
-                {{ member.username }}
-              </span>
-
-              <!-- Tiny active dot -->
-              <span
-                v-if="member.is_active_player"
-                class="active-dot"
-              />
-            </div>
-
-            <q-tooltip v-if="(member.username || '').length > 18">
-              {{ member.username }}
-            </q-tooltip>
-
-            <span
-              v-if="member.rank !== undefined"
-              class="text-caption text-grey-7 q-ml-sm"
-            >
-              #{{ member.rank }}
-            </span>
+  <q-card flat class="player-card" :class="{ 'active-player': member.is_active_player }">
+    <!-- Header with gradient -->
+    <div class="card-header">
+      <div class="header-content">
+        <!-- Avatar/Initial Circle -->
+        <div class="player-avatar">
+          <span class="avatar-text">{{ userInitial }}</span>
+          <div v-if="member.is_active_player" class="active-indicator">
+            <q-icon name="bolt" size="12px" />
           </div>
         </div>
 
-        <!-- Small meta icons -->
-        <div class="row items-center no-wrap q-ml-auto meta-icons">
-          <q-icon
-            v-if="member.selected_game"
-            name="sports_esports"
-            size="16px"
-            class="text-positive"
-          >
-            <q-tooltip>Has a selected game</q-tooltip>
-          </q-icon>
-
-          <q-icon
-            v-if="member.has_banned"
-            name="block"
-            size="16px"
-            class="text-negative q-ml-xs"
-          >
-            <q-tooltip>Submitted a ban</q-tooltip>
-          </q-icon>
+        <!-- Name and Status -->
+        <div class="player-info">
+          <div class="player-name">
+            {{ member.username }}
+          </div>
+          <div class="player-status">
+            <q-badge
+              v-if="member.is_active_player"
+              color="positive"
+              label="Active"
+              class="status-badge"
+            />
+            <q-badge
+              v-else
+              color="grey-6"
+              label="Inactive"
+              class="status-badge"
+            />
+          </div>
         </div>
       </div>
-    </q-card-section>
+    </div>
 
-    <q-separator class="hairline" color="info" />
+    <!-- Body Content -->
+    <q-card-section class="card-body">
+      <!-- Meta Info Chips -->
+      <div v-if="member.selected_game || member.has_banned" class="meta-chips">
+        <q-chip
+          v-if="member.selected_game"
+          dense
+          color="positive"
+          text-color="white"
+          icon="sports_esports"
+          size="sm"
+        >
+          Game Selected
+        </q-chip>
+        <q-chip
+          v-if="member.has_banned"
+          dense
+          color="negative"
+          text-color="white"
+          icon="block"
+          size="sm"
+        >
+          Ban Submitted
+        </q-chip>
+      </div>
 
-    <!-- Body -->
-    <q-card-section class="q-pt-sm q-pb-md q-pl-md q-pr-md">
-      <SelectedGameInfo :member="member" />
+      <!-- Selected Game Info -->
+      <div class="game-info-section">
+        <SelectedGameInfo :member="member" />
+      </div>
     </q-card-section>
   </q-card>
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue';
 import SelectedGameInfo from 'components/league/SelectedGameInfo.vue';
 
-withDefaults(
+const props = withDefaults(
   defineProps<{ member: any; color?: string }>(),
   { color: 'var(--q-primary)' }
 );
+
+const userInitial = computed(() => {
+  return props.member.username?.charAt(0).toUpperCase() || '?';
+});
 </script>
 
 <style scoped>
-/* Keep the name container tight and relative so the dot can float on it */
-.name-wrap {
+.player-card {
+  border-radius: 12px;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  background: var(--q-card-bg, #fff);
+}
+
+
+.player-card.active-player {
+  border-color: var(--q-positive);
+  box-shadow: 0 0 0 1px var(--q-positive);
+}
+
+/* Header Section */
+.card-header {
+  background: linear-gradient(135deg, rgba(var(--q-primary-rgb), 0.08) 0%, rgba(var(--q-secondary-rgb), 0.12) 100%);
+  padding: 20px 16px;
   position: relative;
-  display: inline-block;
-  max-width: 100%;
-  line-height: 1.2;
+  overflow: hidden;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
 }
 
-/* Ellipsis already exists on the span; ensure it doesn’t get pushed by the dot */
-.name-text {
-  display: inline-block;
-  max-width: 100%;
-  vertical-align: middle;
-  padding-right: 12px; /* breathing room so the dot doesn’t overlap letters */
-}
-
-/* The dot itself */
-.active-dot {
+.card-header::before {
+  content: '';
   position: absolute;
-  top: -2px;        /* tweak to taste */
-  right: 0;
-  width: 8px;
-  height: 8px;
+  top: -50%;
+  right: -20%;
+  width: 200px;
+  height: 200px;
+  background: rgba(var(--q-primary-rgb), 0.03);
+  border-radius: 50%;
+}
+
+.header-content {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  position: relative;
+  z-index: 1;
+}
+
+/* Avatar */
+.player-avatar {
+  position: relative;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--q-primary) 0%, var(--q-secondary) 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.avatar-text {
+  font-size: 20px;
+  font-weight: 600;
+  color: white;
+}
+
+.active-indicator {
+  position: absolute;
+  bottom: -2px;
+  right: -2px;
+  width: 20px;
+  height: 20px;
   border-radius: 50%;
   background: var(--q-positive);
-  /* ring for contrast against any background */
-  box-shadow: 0 0 0 2px var(--q-card-bg, #fff);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid white;
+  animation: pulse 2s infinite;
 }
 
-/* Optional: if you use dark mode, give the ring a darker fallback */
-:root[class*="body--dark"] .active-dot {
-  box-shadow: 0 0 0 2px rgba(0,0,0,.6);
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+}
+
+/* Player Info */
+.player-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.player-name {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--q-dark);
+  margin-bottom: 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.player-status {
+  display: flex;
+  align-items: center;
+}
+
+.status-badge {
+  font-size: 10px;
+  padding: 2px 8px;
+  font-weight: 500;
+}
+
+/* Body Section */
+.card-body {
+  padding: 16px;
+}
+
+.meta-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.game-info-section {
+  margin-top: 8px;
 }
 </style>

@@ -1,6 +1,6 @@
 <template>
   <div
-    class="q-my-xs"
+    class="q-my-xs shadow-2"
     :style="{
       borderRadius: '13px',
       padding: '1rem',
