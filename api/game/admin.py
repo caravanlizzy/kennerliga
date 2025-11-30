@@ -3,7 +3,7 @@ from nested_admin.nested import NestedModelAdmin, NestedStackedInline, NestedTab
 
 # Register your models here.
 from game.models import Game, GameOption, GameOptionChoice, StartingPointSystem, Faction, TieBreaker, \
-    ResultConfig, SelectedGame
+    ResultConfig, SelectedGame, BanDecision, SelectedOption
 
 
 # @admin.register(GameOption)
@@ -24,6 +24,9 @@ class OptionsAdmin(NestedStackedInline):
 
 @admin.register(Game)
 class GameAdmin(NestedModelAdmin):
+    list_display = ('name', 'platform')
+    list_filter = ('platform',)
+    search_fields = ('name',)
     inlines = (OptionsAdmin,)
 
 
@@ -37,19 +40,39 @@ class StartingPointSystemAdmin(admin.ModelAdmin):
 
 
 @admin.register(Faction)
-class Faction(admin.ModelAdmin):
-    list_display = ('name',)
+class FactionAdmin(admin.ModelAdmin):
+    list_display = ('name', 'game')
+    list_filter = ('game',)
+    search_fields = ('name',)
 
 
 @admin.register(TieBreaker)
-class TieBreaker(admin.ModelAdmin):
-    list_display = ('name',)
+class TieBreakerAdmin(admin.ModelAdmin):
+    list_display = ('name', 'result_config', 'order')
+    list_filter = ('result_config__game',)
 
 
 @admin.register(ResultConfig)
-class ResultConfig(admin.ModelAdmin):
+class ResultConfigAdmin(admin.ModelAdmin):
     list_display = ('game', 'is_asymmetric', 'has_starting_player_order', 'starting_points_system', 'has_points')
+    list_filter = ('game',)
+
 
 @admin.register(SelectedGame)
-class SelectedGame(admin.ModelAdmin):
+class SelectedGameAdmin(admin.ModelAdmin):
     list_display = ('profile', 'game', 'league')
+    list_filter = ('league', 'game', 'profile')
+    search_fields = ('profile__profile_name', 'game__name')
+
+
+@admin.register(BanDecision)
+class BanDecisionAdmin(admin.ModelAdmin):
+    list_display = ('player_banning', 'league', 'selected_game', 'created_at')
+    list_filter = ('league', 'player_banning')
+    date_hierarchy = 'created_at'
+
+
+@admin.register(SelectedOption)
+class SelectedOptionAdmin(admin.ModelAdmin):
+    list_display = ('selected_game', 'game_option', 'choice', 'value')
+    list_filter = ('selected_game__game', 'game_option')
