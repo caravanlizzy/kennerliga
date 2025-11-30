@@ -88,10 +88,12 @@
 
         <q-separator />
 
-
-        <template v-if="hasResult(member)">
+        <div v-if="hasResult(member)">
           <q-card-section>
-            <MatchResult v-if="hasResult(member)" :selectedGame="member.selected_game" />
+            <MatchResult
+              v-if="hasResult(member)"
+              :selectedGame="member.selected_game"
+            />
           </q-card-section>
           <q-card-actions align="right" class="bg-grey-3">
             <KennerButton
@@ -102,28 +104,26 @@
               color="accent"
               @click="() => (editResultForSelGameId = member.selected_game.id)"
             />
-
           </q-card-actions>
-        </template>
-
+        </div>
         <q-card-section>
           <q-expansion-item
             dense
+            default-opened
             icon="info"
             label="Game Settings"
             expand-icon="expand_more"
             class="q-mx-sm q-mb-sm"
           >
             <q-card-section class="bg-grey-1">
-              <pre v-if="member.selected_game" class="q-ma-none text-body2">{{
-                member.selected_game
-              }}</pre>
+              <GameSettingsDisplay
+                v-if="member.selected_game"
+                :selectedOptions="member.selected_game.selected_options"
+              />
               <div v-else>No game settings available</div>
             </q-card-section>
           </q-expansion-item>
         </q-card-section>
-
-        <q-separator />
 
         <q-card-actions align="right" class="bg-grey-3">
           <KennerButton
@@ -229,6 +229,7 @@ import GameSelector from 'components/game/selectedGame/GameSelector.vue';
 import GameSettingsEditor from 'components/game/selectedGame/GameSettingsEditor.vue';
 import MatchResultForm from 'components/league/MatchResultForm.vue';
 import MatchResult from 'components/league/MatchResult.vue';
+import GameSettingsDisplay from 'components/game/selectedGame/GameSettingsDisplay.vue';
 
 const route = useRoute();
 const $q = useQuasar();
@@ -320,8 +321,6 @@ function hasResult(member: TLeagueMember) {
 
   return results.some((mr) => mr.selected_game === selGame.id);
 }
-
-
 
 function closeForm() {
   selectingGameMember.value = null;

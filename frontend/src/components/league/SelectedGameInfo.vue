@@ -69,27 +69,7 @@
       </div>
 
       <q-card-section v-if="isExpanded" class="card-body">
-        <q-separator spaced />
-        <q-markup-table flat bordered dense class="rounded-borders">
-          <tbody>
-          <tr
-            v-for="opt in member.selected_game.selected_options"
-            :key="opt.id"
-          >
-            <td class="text-left text-weight-medium">
-              {{ opt.game_option.name }}
-            </td>
-            <td class="text-right">
-                <span v-if="opt.choice" class="text-primary">
-                  {{ opt.choice.name }}
-                </span>
-              <q-icon v-else-if="opt.value === true" name="check_circle" color="positive" />
-              <q-icon v-else-if="opt.value === false" name="cancel" color="negative" />
-              <q-icon v-else name="help_outline" color="grey" />
-            </td>
-          </tr>
-          </tbody>
-        </q-markup-table>
+        <GameSettingsDisplay :selectedOptions="member.selected_game.selected_options" />
       </q-card-section>
     </div>
   </div>
@@ -99,6 +79,7 @@
 import { ref, computed } from 'vue';
 import UserName from 'components/ui/UserName.vue';
 import { truncateString } from 'src/helpers';
+import GameSettingsDisplay from 'components/game/selectedGame/GameSettingsDisplay.vue';
 
 // --- types trimmed to what we actually render ---
 type Choice = { id: number; name: string; option: number };
