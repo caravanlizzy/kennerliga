@@ -1,18 +1,21 @@
 <template>
   <q-avatar
     :size="size"
-    class="flex flex-center text-weight-medium"
+    class="user-avatar"
     :class="shapeClass"
-    :style="faceStyle"
+    :style="avatarStyle"
     role="img"
     @click="router.push({ name: 'user-detail', params: { username: displayUsername } })"
   >
-    <span class="mono" :class="textClass">{{ initials }}</span>
+    <span class="avatar-text" :class="textClass">{{ initials }}</span>
   </q-avatar>
 </template>
 
 <script setup lang="ts">
 import { computed } from 'vue'
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
 
 const props = withDefaults(defineProps<{
   displayUsername: string
@@ -44,13 +47,16 @@ function hash(str: string) {
   return Math.abs(h)
 }
 const hue = computed(() => hash(clean.value || 'user') % 360)
+const hue2 = computed(() => (hue.value + 30) % 360) // offset for gradient
 const sat = 55
 const light = 70
+const light2 = 60 // slightly darker for gradient end
 
 const textClass = computed(() => (light >= 65 ? 'text-dark' : 'text-white'))
 const borderColor = computed(() => `hsl(${hue.value} ${sat}% ${Math.max(light - 18, 35)}%)`)
-const faceStyle = computed(() => ({
-  background: `hsl(${hue.value} ${sat}% ${light}%)`,
+
+const avatarStyle = computed(() => ({
+  background: `linear-gradient(135deg, hsl(${hue.value} ${sat}% ${light}%) 0%, hsl(${hue2.value} ${sat}% ${light2}%) 100%)`,
   border: props.border ? `1px solid ${borderColor.value}` : 'none'
 } as Record<string, string>))
 
@@ -65,10 +71,26 @@ const shapeClass = computed(() => {
 </script>
 
 <style scoped>
-.mono {
+.user-avatar {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.user-avatar:hover {
+  transform: scale(1.05);
+}
+
+.avatar-text {
+  font-size: 0.78rem;
+  font-weight: 600;
   line-height: 1;
   letter-spacing: 0.2px;
-  font-size: 0.78rem;
   user-select: none;
 }
 
