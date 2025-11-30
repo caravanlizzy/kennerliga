@@ -140,7 +140,6 @@
         <template v-if="member.selected_game">
           <q-card-section> Result </q-card-section>
           <q-card-actions align="right" class="bg-grey-2">
-
             <KennerButton
               v-if="hasResult(member)"
               outline
@@ -164,14 +163,14 @@
     <!--    Form to edit a members game selection-->
     <FormLayout v-if="editingGameMember" @onClose="closeForm">
       <template #head>
-          Edit Game
-          <span class="text-primary">{{
-            editingGameMember.selected_game?.game_name
-          }}</span>
-          for
-          <span class="text-primary">{{
-            editingGameMember.profile_name.replace('_profile', '')
-          }}</span>
+        Edit Game
+        <span class="text-primary">{{
+          editingGameMember.selected_game?.game_name
+        }}</span>
+        for
+        <span class="text-primary">{{
+          editingGameMember.profile_name.replace('_profile', '')
+        }}</span>
       </template>
       <GameSettingsEditor
         :leagueId="league.id"
@@ -185,8 +184,8 @@
     <!-- Form to select a game -->
     <FormLayout v-if="selectingGameMember" @onClose="closeForm">
       <template #head>
-          Select a game for
-          <span class="text-primary">{{ selectingGameMember.username }}</span>
+        Select a game for
+        <span class="text-primary">{{ selectingGameMember.username }}</span>
       </template>
 
       <GameSelector
@@ -199,9 +198,14 @@
     <!--      Form to post match results-->
     <FormLayout @onClose="closeForm" v-if="postResultForSelGame">
       <template #head>
-        Post Match Results for <span class="text-primary"> {{ postResultForSelGame.game_name }} </span>
+        Post Match Results for
+        <span class="text-primary"> {{ postResultForSelGame.game_name }} </span>
       </template>
-      <MatchResultForm :selectedGameId="postResultForSelGame.id" :leagueId="league.id" @submitted="closeForm"/>
+      <MatchResultForm
+        :selectedGameId="postResultForSelGame.id"
+        :leagueId="league.id"
+        @submitted="closeForm"
+      />
     </FormLayout>
     <!--      Form to edit match results-->
     <div v-if="editResultForSelGameId"></div>
@@ -212,7 +216,7 @@
 import { fetchLeagueDetails } from 'src/services/leagueService';
 import { fetchSeason } from 'src/services/seasonService';
 import ErrorDisplay from 'components/base/ErrorDisplay.vue';
-import { computed, onMounted, ref } from 'vue';
+import { computed, onMounted, ref, watch } from 'vue';
 import { TLeagueMember, TSeason } from 'src/types';
 import { useRoute } from 'vue-router';
 import LoadingSpinner from 'components/base/LoadingSpinner.vue';
@@ -312,7 +316,7 @@ function hasResult(member: TLeagueMember) {
   if (member.selected_game === null) return false;
   if (matchResults.value.length === 0) return false;
   return matchResults.value
-    .map((mr) => mr.selectedGameId)
+    .map((mr) => mr.selected_game)
     .includes(member.selected_game.id);
 }
 
