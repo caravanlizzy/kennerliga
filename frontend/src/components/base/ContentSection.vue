@@ -4,10 +4,7 @@
     :style="{
       borderRadius: '13px',
       padding: '1rem',
-      border: '3px solid transparent',
-      backgroundImage: `linear-gradient(white, white), linear-gradient(to right, var(--q-${color}), transparent)`,
-      backgroundOrigin: 'border-box',
-      backgroundClip: 'padding-box, border-box',
+      border: `3px solid var(--q-${color})`,
     }"
   >
     <q-expansion-item
