@@ -1,14 +1,14 @@
 <template>
   <div
     class="column"
-    :style="[isMobile ? 'min-width: 280px; max-width: 500px' : 'min-width: 450px']"
+    :style="[
+      isMobile ? 'min-width: 280px; max-width: 500px' : 'min-width: 450px',
+    ]"
   >
-    <q-card :bordered="!isMobile" flat :class="{'q-pa-xl': !isMobile}">
+    <q-card :bordered="!isMobile" flat :class="{ 'q-pa-xl': !isMobile }">
       <q-form ref="formRef" @submit="doRegister" @keyup.enter="doRegister">
         <q-card-section class="q-mb-md">
-          <span class="text-h4 text-accent">
-            Register
-          </span>
+          <span class="text-h4 text-accent"> Register </span>
         </q-card-section>
 
         <q-card-section>
@@ -25,13 +25,6 @@
             type="password"
             class="q-pt-md"
             autocomplete="new-password"
-          />
-          <KennerInput
-            v-model="otp"
-            :rules="[rules.required]"
-            label="One-Time Password (OTP)"
-            class="q-pt-md"
-            autocomplete="one-time-code"
           />
         </q-card-section>
 
@@ -65,45 +58,68 @@
 import KennerInput from 'components/base/KennerInput.vue';
 import KennerButton from 'components/base/KennerButton.vue';
 import { useResponsive } from 'src/composables/reponsive';
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
 import { useQuasar } from 'quasar';
-import { useRouter } from 'vue-router';
+import { useRouter, useRoute } from 'vue-router';
+import { api } from 'boot/axios';
 
 const { isMobile } = useResponsive();
 const $q = useQuasar();
 const router = useRouter();
+const route = useRoute();
 
 const formRef = ref();
 const username = ref('');
 const password = ref('');
-const otp = ref('');
+const inviteKey = ref('');
 const isSubmitting = ref(false);
 
 const rules = {
   required: (v: string) => !!v || 'This field is required',
-  usernameLen: (v: string) => (v?.length >= 3) || 'At least 3 characters required',
-  passwordLen: (v: string) => (v?.length >= 6) || 'At least 6 characters required',
+  usernameLen: (v: string) =>
+    v?.length >= 3 || 'At least 3 characters required',
+  passwordLen: (v: string) =>
+    v?.length >= 6 || 'At least 6 characters required',
 };
+
+onMounted(() => {
+  // Extract the key from URL query parameters
+  const key = route.query.key as string;
+  if (!key) {
+    $q.notify({
+      type: 'negative',
+      message: 'Invalid or missing invitation key.',
+    });
+    goToLogin();
+    return;
+  }
+  inviteKey.value = key;
+});
 
 async function doRegister(): Promise<void> {
   const valid = await formRef.value?.validate?.();
   if (!valid) return;
 
+  if (!inviteKey.value) {
+    $q.notify({
+      type: 'negative',
+      message: 'Invitation key is missing.',
+    });
+    return;
+  }
+
   isSubmitting.value = true;
   try {
-    const res = await fetch('/api/user/register', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        username: username.value,
-        password: password.value,
-        otp: otp.value,
-      }),
+    const res = await api.post('/user/register/', {
+      username: username.value,
+      password: password.value,
+      invite_key: inviteKey.value,
     });
 
-    const data = await res.json().catch(() => ({}));
+    // Axios automatically parses JSON and puts the response in .data
+    const data = res.data;
 
-    if (!res.ok) {
+    if (res.status >= 400) {
       throw new Error(data?.detail || 'Registration failed.');
     }
 
@@ -119,8 +135,7 @@ async function doRegister(): Promise<void> {
     // const { login } = useUserStore();
     // await login(username.value, password.value);
     // router.push({ name: 'home' });
-
-  } catch (err: string) {
+  } catch (err: any) {
     $q.notify({
       type: 'negative',
       message: err?.message || 'Unknown error during registration.',
