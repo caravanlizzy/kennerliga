@@ -18,13 +18,11 @@
   <!-- Loading -->
   <LoadingSpinner v-if="loading" />
 
-  <ErrorDisplay v-if="error" :error="error" class="q-mb-md" />
+  <ErrorDisplay v-else-if="error" :error="error" class="q-mb-md" />
 
   <!-- Empty state -->
   <q-card
-    v-if="
-      !loading && !error && (!league?.members || league.members.length === 0)
-    "
+    v-else-if="!league?.members || league.members.length === 0"
     flat
     bordered
     class="q-pa-xl flex items-center justify-center"
@@ -90,6 +88,24 @@
 
         <q-separator />
 
+
+        <template v-if="hasResult(member)">
+          <q-card-section>
+            <MatchResult v-if="hasResult(member)" :selectedGame="member.selected_game" />
+          </q-card-section>
+          <q-card-actions align="right" class="bg-grey-3">
+            <KennerButton
+              v-if="hasResult(member)"
+              outline
+              label="Edit Result"
+              icon="edit_note"
+              color="accent"
+              @click="() => (editResultForSelGameId = member.selected_game.id)"
+            />
+
+          </q-card-actions>
+        </template>
+
         <q-card-section>
           <q-expansion-item
             dense
@@ -109,7 +125,7 @@
 
         <q-separator />
 
-        <q-card-actions align="right" class="bg-grey-2">
+        <q-card-actions align="right" class="bg-grey-3">
           <KennerButton
             outline
             v-if="member.selected_game"
@@ -133,31 +149,16 @@
             icon="delete"
             color="negative"
             @click="onDeleteSelectedGame(member)"
-          >
-          </KennerButton>
+          />
+          <KennerButton
+            v-if="member.selected_game && !hasResult(member)"
+            outline
+            label="Post Result"
+            icon="post_add"
+            color="primary"
+            @click="() => (postResultForSelGame = member.selected_game)"
+          />
         </q-card-actions>
-
-        <template v-if="member.selected_game">
-          <q-card-section> Result </q-card-section>
-          <q-card-actions align="right" class="bg-grey-2">
-            <KennerButton
-              v-if="hasResult(member)"
-              outline
-              label="Post Result"
-              icon="post_add"
-              color="primary"
-              @click="() => (postResultForSelGame = member.selected_game)"
-            />
-            <KennerButton
-              v-else
-              outline
-              label="Edit Result"
-              icon="edit_note"
-              color="accent"
-              @click="() => (editResultForSelGameId = member.selected_game.id)"
-            />
-          </q-card-actions>
-        </template>
       </q-card>
     </div>
     <!--    Form to edit a members game selection-->
@@ -216,7 +217,7 @@
 import { fetchLeagueDetails } from 'src/services/leagueService';
 import { fetchSeason } from 'src/services/seasonService';
 import ErrorDisplay from 'components/base/ErrorDisplay.vue';
-import { computed, onMounted, ref, watch } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 import { TLeagueMember, TSeason } from 'src/types';
 import { useRoute } from 'vue-router';
 import LoadingSpinner from 'components/base/LoadingSpinner.vue';
@@ -227,6 +228,7 @@ import FormLayout from 'components/league/manager/FormLayout.vue';
 import GameSelector from 'components/game/selectedGame/GameSelector.vue';
 import GameSettingsEditor from 'components/game/selectedGame/GameSettingsEditor.vue';
 import MatchResultForm from 'components/league/MatchResultForm.vue';
+import MatchResult from 'components/league/MatchResult.vue';
 
 const route = useRoute();
 const $q = useQuasar();
@@ -234,7 +236,7 @@ const $q = useQuasar();
 // league and season data
 const league = ref<any | null>(null);
 const season = ref<TSeason | null>(null);
-const matchResults = ref([]);
+const matchResults = ref({});
 
 const loading = ref(false);
 const error = ref<string | null>(null);
@@ -249,9 +251,7 @@ const showPlayerGrid = computed(
     !selectingGameMember.value &&
     !editingGameMember.value &&
     !postResultForSelGame.value &&
-    !editResultForSelGameId.value &&
-    !loading.value &&
-    !error.value
+    !editResultForSelGameId.value
 );
 
 /**
@@ -266,7 +266,6 @@ async function load() {
   try {
     const leagueId = Number(route.params.id);
     league.value = await fetchLeagueDetails(leagueId);
-    await new Promise((resolve) => setTimeout(resolve, 2000));
     if (!league.value) throw new Error('Failed to load league data.');
     season.value = await fetchSeason(league.value.season);
     await fetchMatchResults();
@@ -280,17 +279,17 @@ async function load() {
 async function fetchMatchResults() {
   for (const member of league.value?.members || []) {
     if (member.selected_game) {
-      await fetchMatchResult(member.selected_game.id);
+      await fetchMatchResult(member);
     }
   }
 }
 
-async function fetchMatchResult(selectedGameId: number) {
+async function fetchMatchResult(member: TLeagueMember) {
   try {
     const { data } = await api.get(
-      `result/results/?season=${season.value?.id}&league=${league.value?.id}&selected_game=${selectedGameId}`
+      `result/results/?season=${season.value?.id}&league=${league.value?.id}&selected_game=${member.selected_game.id}`
     );
-    matchResults.value.push({ selectedGameId, ...data });
+    matchResults.value[member.profile] = data;
   } catch (e: any) {
     console.log('No results uploaded', e);
   }
@@ -313,12 +312,16 @@ async function setActivePlayer(profileId) {
 }
 
 function hasResult(member: TLeagueMember) {
-  if (member.selected_game === null) return false;
-  if (matchResults.value.length === 0) return false;
-  return matchResults.value
-    .map((mr) => mr.selected_game)
-    .includes(member.selected_game.id);
+  const selGame = member.selected_game;
+  if (!selGame) return false;
+
+  const results = matchResults.value[member.profile];
+  if (!results || results.length === 0) return false;
+
+  return results.some((mr) => mr.selected_game === selGame.id);
 }
+
+
 
 function closeForm() {
   selectingGameMember.value = null;
@@ -343,13 +346,13 @@ async function onDeleteSelectedGame(member: any) {
 // Create Game Selection
 function onSuccessfulGameSubmit() {
   selectingGameMember.value = null;
-  load();
+  void load();
 }
 
 // Edit Game Selection
 function onSuccessfulGameEdit() {
   editingGameMember.value = null;
-  load();
+  void load();
 }
 
 onMounted(load);

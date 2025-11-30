@@ -20,7 +20,7 @@
     v-if="currentFormSelectedGameId"
     @submitted="handleSubmit"
     :selected-game-id="currentFormSelectedGameId"
-    :leagueId="leagueId"
+    :leagueId="user.myCurrentLeagueId"
   />
 </template>
 
@@ -31,12 +31,15 @@ import { useLeagueStore } from 'stores/leagueStore';
 import { ref } from 'vue';
 import { useResponsive } from 'src/composables/reponsive';
 import { truncateString } from 'src/helpers';
-const { selectedGamesFetchedEmpty } = storeToRefs(useLeagueStore());
-const { refreshResultsForGame } = useLeagueStore();
+import { useUserStore } from 'stores/userStore';
+
+const { user } = storeToRefs(useUserStore());
+const myLeagueStore = useLeagueStore(user.value.myCurrentLeagueId)();
+const { selectedGamesFetchedEmpty } = storeToRefs(myLeagueStore);
+const { refreshResultsForGame } = myLeagueStore;
 const { isMobile } = useResponsive();
 
 const currentFormSelectedGameId = ref(null);
-const leagueId = inject('leagueId');
 
 function handleSubmit(selectedGameId: number) {
   currentFormSelectedGameId.value = null;

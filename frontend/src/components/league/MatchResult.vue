@@ -1,5 +1,5 @@
 <template>
-  <q-card flat class="">
+  <q-card flat>
     <div class="row items-center justify-around q-mb-md">
       <div class="text-h6 text-primary">{{ selectedGame.game_name }}</div>
       <!--      <q-badge color="primary" label="Ergebnis" />-->
@@ -95,10 +95,8 @@ import { QTableProps } from 'quasar';
 import { useUserStore } from 'stores/userStore';
 
 const props = defineProps<{ selectedGame: any }>();
-
 const { user } = storeToRefs(useUserStore());
 const myLeagueStore = useLeagueStore(user.value.myCurrentLeagueId)();
-console.log(myLeagueStore, 'myLeagueStore');
 const { matchResultsBySelectedGame, membersById } = storeToRefs(myLeagueStore);
 
 // Results for this game are already sorted in setResultsForGame()
