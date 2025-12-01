@@ -1,20 +1,20 @@
 <template>
   <div class="row q-col-gutter-lg">
-
-    <!-- RIGHT: SELECTED GAME DETAILS -->
-    <div class="col-12 col-md-6">
+    <!-- LEFT: SELECTED GAME DETAILS -->
+    <div v-if="gameSelection.game.id > 0" class="col-12 col-md-6">
       <GameSelectionForm
         :isLoading="isLoading"
         :isValid="isValid"
         :gameSelection="gameSelection"
         :gameInformation="gameInformation"
         :onSubmit="onSubmit"
+        class="bg-teal-1"
       />
     </div>
 
-    <div class="selector col-12 col-md-6">
+    <div class="selector col-12" :class="{ 'col-md-6': gameSelection.game.id > 0 }">
       <!-- FILTER CARD -->
-      <q-card flat bordered class="q-pa-md rounded-borders">
+      <q-card flat class="q-pa-md rounded-borders">
         <div class="row items-center q-gutter-sm q-mb-sm">
           <q-icon name="tune" size="18px" class="text-grey-7" />
           <div class="text-caption text-uppercase text-grey-7">Filters</div>
@@ -33,7 +33,7 @@
       </q-card>
 
       <!-- GAME GRID CARD -->
-      <q-card flat bordered class="q-pa-sm q-mt-md rounded-borders">
+      <q-card flat class="q-pa-sm q-mt-md rounded-borders">
         <div class="row items-center q-gutter-sm q-px-sm q-pt-sm q-pb-xs">
           <q-icon name="grid_view" size="16px" class="text-grey-7" />
           <div class="text-caption text-uppercase text-grey-7">
@@ -56,7 +56,6 @@
         </div>
       </q-card>
     </div>
-
 
   </div>
 </template>
@@ -186,4 +185,5 @@ async function onSubmit() {
   color: var(--q-dark);
   opacity: 0.65;
 }
+
 </style>

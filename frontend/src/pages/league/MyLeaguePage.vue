@@ -39,7 +39,6 @@
             @selectionValid="(valid: boolean ) => selectionValid = valid"
             @set-submitter="(s: () => {}) => submitter = s"
             @onSuccess="updateLeagueData"
-            class="q-mt-md q-pa-xs"
           />
         </ContentSection>
       </template>
