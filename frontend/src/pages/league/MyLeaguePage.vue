@@ -67,7 +67,7 @@
       <!-- Player Cards Grid -->
       <ContentSection
         title="Players"
-        color="info"
+        color="grey"
         :is-opened="sectionVisibilityStates['players']"
       >
         <div class="row q-col-gutter-md">
