@@ -35,9 +35,7 @@
 const features = [
   { title: 'Upload Past Leagues', desc: 'Manage previous seasons.', icon: 'calendar_month' },
   { title: 'Announcement Display', desc: 'League news and updates.', icon: 'campaign' },
-  { title: 'Register for Season', desc: 'Join upcoming seasons.', icon: 'how_to_reg' },
-  { title: 'Feedback Options', desc: 'Share thoughts in chat.', icon: 'chat_bubble' },
-  { title: 'Yearly Standings', desc: 'Ranks by year.', icon: 'leaderboard' },
+  { title: 'Automated leage management', desc: 'I.e. open registraion, create leagues etc.', icon: 'auto-awesome' },
   { title: 'Profile Details', desc: 'Player profile & stats.', icon: 'person' }
 ]
 </script>
