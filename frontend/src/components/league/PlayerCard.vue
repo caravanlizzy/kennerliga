@@ -1,15 +1,22 @@
 <template>
-  <q-card flat class="player-card" :class="{ 'active-player': member.is_active_player }">
+  <q-card
+    flat
+    class="player-card"
+    :class="{ 'active-player': member.is_active_player }"
+  >
     <!-- Header with gradient -->
     <div class="card-header">
       <div class="header-content">
         <!-- Avatar/Initial Circle -->
-        <div class="player-avatar">
-          <span class="avatar-text">{{ userInitial }}</span>
+        <UserAvatar
+          :display-username="member.username"
+          size="48px"
+          shape="circle"
+        >
           <div v-if="member.is_active_player" class="active-indicator">
             <q-icon name="bolt" size="12px" />
           </div>
-        </div>
+        </UserAvatar>
 
         <!-- Name and Status -->
         <div class="player-info">
@@ -71,18 +78,18 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import SelectedGameInfo from 'components/league/SelectedGameInfo.vue';
+import UserAvatar from 'components/ui/UserAvatar.vue';
 
-const props = withDefaults(
-  defineProps<{ member: any; color?: string }>(),
-  { color: 'var(--q-primary)' }
-);
+const props = withDefaults(defineProps<{ member: any; color?: string }>(), {
+  color: 'var(--q-primary)',
+});
 
 const userInitial = computed(() => {
   return props.member.username?.charAt(0).toUpperCase() || '?';
 });
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .player-card {
   border-radius: 12px;
   overflow: hidden;
@@ -91,7 +98,6 @@ const userInitial = computed(() => {
   background: var(--q-card-bg, #fff);
 }
 
-
 .player-card.active-player {
   border-color: var(--q-positive);
   box-shadow: 0 0 0 1px var(--q-positive);
@@ -99,7 +105,11 @@ const userInitial = computed(() => {
 
 /* Header Section */
 .card-header {
-  background: linear-gradient(135deg, rgba(var(--q-primary-rgb), 0.08) 0%, rgba(var(--q-secondary-rgb), 0.12) 100%);
+  background: linear-gradient(
+    135deg,
+    rgba(var(--q-primary-rgb), 0.08) 0%,
+    rgba(var(--q-secondary-rgb), 0.12) 100%
+  );
   padding: 20px 16px;
   position: relative;
   overflow: hidden;
@@ -125,26 +135,6 @@ const userInitial = computed(() => {
   z-index: 1;
 }
 
-/* Avatar */
-.player-avatar {
-  position: relative;
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, var(--q-primary) 0%, var(--q-secondary) 100%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
-
-.avatar-text {
-  font-size: 20px;
-  font-weight: 600;
-  color: white;
-}
-
 .active-indicator {
   position: absolute;
   bottom: -2px;
@@ -161,7 +151,8 @@ const userInitial = computed(() => {
 }
 
 @keyframes pulse {
-  0%, 100% {
+  0%,
+  100% {
     transform: scale(1);
   }
   50% {

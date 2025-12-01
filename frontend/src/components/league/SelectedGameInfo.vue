@@ -41,7 +41,7 @@
               </q-chip>
 
               <div v-else-if="banners.length" class="row items-center q-gutter-xs">
-                <UserName
+                <UserAvatar
                   v-for="(name, idx) in banners"
                   :key="idx"
                   :display-username="name"
@@ -77,7 +77,7 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue';
-import UserName from 'components/ui/UserName.vue';
+import UserAvatar from 'components/ui/UserAvatar.vue';
 import { truncateString } from 'src/helpers';
 import GameSettingsDisplay from 'components/game/selectedGame/GameSettingsDisplay.vue';
 

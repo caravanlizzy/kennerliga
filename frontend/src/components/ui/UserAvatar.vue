@@ -8,6 +8,7 @@
     @click="router.push({ name: 'user-detail', params: { username: displayUsername } })"
   >
     <span class="avatar-text" :class="textClass">{{ initials }}</span>
+    <slot />
   </q-avatar>
 </template>
 
@@ -77,13 +78,8 @@ const shapeClass = computed(() => {
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   cursor: pointer;
   transition: transform 0.2s ease;
-}
-
-.user-avatar:hover {
-  transform: scale(1.05);
 }
 
 .avatar-text {

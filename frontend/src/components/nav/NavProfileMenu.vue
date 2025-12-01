@@ -3,7 +3,7 @@
     class="row items-center q-pa-xs no-wrap q-gutter-x-sm bg-grey-2 nav-item-radius"
     style="z-index: 1"
   >
-    <UserName
+    <UserAvatar
       v-if="isAuthenticated"
       :display-username="user?.username || ''"
       class="q-ml-xs q-mr-xs"
@@ -32,7 +32,7 @@
   </div>
 </template>
 <script setup lang="ts">
-import UserName from 'components/ui/UserName.vue';
+import UserAvatar from 'components/ui/UserAvatar.vue';
 import { useUserStore } from 'stores/userStore';
 import { storeToRefs } from 'pinia';
 
