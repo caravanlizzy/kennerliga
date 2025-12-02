@@ -2,7 +2,6 @@ import {
   BanDecisionDtoPayload,
   GameOptionChoiceDto,
   GameOptionDto,
-  SelectedGameDto,
   SelectedGameDtoPayload,
   TPlatform,
 } from 'src/models/gameModels';
@@ -10,7 +9,6 @@ import { api } from 'boot/axios';
 import {
   TGameOption,
   TGameOptionChoice,
-  TGameSelection,
   TResultConfig,
 } from 'src/types';
 
@@ -19,16 +17,18 @@ import { useIDStorage } from 'src/composables/IDStorage';
 const { addStorageItem, getStorageItem } = useIDStorage();
 
 export async function banGame(banDecision: BanDecisionDtoPayload) {
-  console.log({ banDecision });
   const data: Record<string, string | number | boolean> = {
     username: banDecision.username,
     league: banDecision.leagueId,
   };
-  if (banDecision.decline) {
-    data.declined_ban = banDecision.decline;
+  if (banDecision.skip) {
+    data.skipped_ban = banDecision.skip;
   }
-  if (banDecision.selectedGameId) {
+  else if (banDecision.selectedGameId) {
     data.selected_game_id = banDecision.selectedGameId;
+  }
+  else {
+    console.log('Something went wrong, no decision was made.');
   }
 
   try {

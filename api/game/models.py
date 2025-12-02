@@ -77,6 +77,7 @@ class BanDecision(models.Model):
     league = models.ForeignKey("league.League", on_delete=models.CASCADE, related_name='ban_decisions')
     player_banning = models.ForeignKey(PlayerProfile, on_delete=models.CASCADE, related_name='ban_decisions')
     selected_game = models.ForeignKey(SelectedGame, null=True, blank=True, on_delete=models.SET_NULL)
+    skipped_ban = models.BooleanField(default=False)
 
     created_at = models.DateTimeField(auto_now_add=True)
 
