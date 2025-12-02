@@ -30,7 +30,7 @@ def get_players_to_repick(league: League) -> List:
     min_bans = 2 if league.members.count() > 2 else 1
 
     for member in league.members.all():
-        qs = SelectedGame.objects.filter(player=member.profile, league=league)
+        qs = SelectedGame.objects.filter(profile=member.profile, league=league)
         sgs = list(qs.only('id')[:2])           # 1 query, avoids count()+first() double hit
         if len(sgs) == 1:
             sg = sgs[0]

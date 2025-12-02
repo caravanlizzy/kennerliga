@@ -253,12 +253,10 @@ class BanDecisionSerializer(serializers.ModelSerializer):
         ]
 
     def validate(self, attrs):
-        print("Raw client data:", self.initial_data)
-        print("Validated so far:", attrs)
         league = attrs.get('league') or getattr(self.instance, 'league', None)
         selected_game = attrs.get('selected_game')  # populated via source='selected_game'
 
-        if selected_game and league and selected_game.league != league.id:
+        if selected_game and league and selected_game.league_id != league.id:
             raise serializers.ValidationError({
                 'selected_game_id': 'Selected game must belong to the same league.'
             })

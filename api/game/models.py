@@ -84,7 +84,7 @@ class BanDecision(models.Model):
         unique_together = ('league', 'player_banning')
 
     def __str__(self):
-        return f"{self.player_banning} {'banned ' + str(self.game) if self.selected_game else 'skipped banning'} in {self.league}"
+        return f"{self.player_banning} {'banned ' + str(self.selected_game) if self.selected_game else 'skipped banning'} in {self.league}"
 
 
 class StartingPointSystem(models.Model):
