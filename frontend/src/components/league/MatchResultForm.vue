@@ -154,7 +154,6 @@ import { api } from 'boot/axios';
 import { useQuasar } from 'quasar';
 import { storeToRefs } from 'pinia';
 import { useLeagueStore } from 'stores/leagueStore';
-import KennerInput from 'components/base/KennerInput.vue';
 import KennerSelect from 'components/base/KennerSelect.vue';
 
 type Faction = { id: number; name: string };

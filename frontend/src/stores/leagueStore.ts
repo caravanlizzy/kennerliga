@@ -193,7 +193,7 @@ export const useLeagueStore = (id: number) => {
     async function banNothing() {
       if (!user || !leagueId.value) return;
       try {
-        await banGame({ username: user.username, leagueId: leagueId.value, decline: true });
+        await banGame({ username: user.username, leagueId: leagueId.value, skip: true });
         await updateLeagueData();
       } catch (e) {
         console.error(e);

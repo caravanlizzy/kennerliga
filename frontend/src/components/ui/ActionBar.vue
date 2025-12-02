@@ -2,83 +2,97 @@
   <q-card
     bordered
     flat
-    class="q-ma-md q-mx-auto q-pa-sm q-px-md rounded-borders bg-grey-2"
-    style="max-width: 600px"
+    class="action-bar-card q-mb-md"
   >
-    <!-- top row: center status + right active chip using Quasar grid -->
-    <div class="row items-center q-py-xs">
-      <div class="col"></div>
+    <!-- Status Header Row -->
+    <div class="status-header q-pa-sm">
+      <div class="row items-center no-wrap">
+        <!-- Left spacer -->
+        <div class="col"></div>
 
-      <div class="col-auto flex flex-center">
+        <!-- Center: Status chip -->
+        <div class="col-auto flex flex-center">
+          <q-chip
+            color="primary"
+            text-color="primary"
+            square
+            outline
+            dense
+            class="bg-white text-uppercase text-bold"
+          >
+            <template v-if="loading">
+              Loading
+            </template>
+            <template v-else>
+              {{ statusNoun }}
+            </template>
+          </q-chip>
+        </div>
 
-        <q-chip
-          color="primary"
-          text-color="primary"
-          square
-          outline
-          dense
-          class="bg-white text-uppercase text-bold"
-        >
-          <template v-if="loading">
-            Loading
-          </template>
-          <template v-else>
-            {{ statusNoun }}
-          </template>
-        </q-chip>
-      </div>
-
-      <div class="col flex justify-end">
-        <q-chip
-          v-if="activePlayer"
-          color="info"
-          square
-          outline
-          dense
-          class="q-mr-xs text-weight-bold"
-        >
-          <span v-if="isMeActivePlayer">Your turn</span>
-          <span v-else>{{ activePlayer?.username }}'s turn</span>
-        </q-chip>
+        <!-- Right: Active player chip -->
+        <div class="col flex justify-end">
+          <q-chip
+            v-if="activePlayer"
+            color="positive"
+            text-color="white"
+            square
+            dense
+            class="text-weight-bold"
+          >
+            <q-icon name="schedule" size="14px" class="q-mr-xs" />
+            <span v-if="isMeActivePlayer">Your turn</span>
+            <span v-else>{{ activePlayer?.username }}'s turn</span>
+          </q-chip>
+        </div>
       </div>
     </div>
 
-    <q-separator v-if="isMeActivePlayer" inset spaced />
+    <!-- Separator when active -->
+    <q-separator v-if="isMeActivePlayer" />
 
-    <!-- action row -->
+    <!-- Action Content (only when it's your turn) -->
     <div
       v-if="isMeActivePlayer"
-      :class="[
-        isMobile ? 'column' : 'row q-py-sm',
-        'justify-between items-center no-wrap',
-      ]"
+      class="action-content q-pa-md"
     >
-      <div v-if="leadText" class="text-body2 text-primary q-mr-md">
-        <component :is="leadText" />
-      </div>
-
       <div
-        v-if="subject"
-        class="text-body1 text-primary text-weight-bold q-mr-md"
+        :class="[
+          isMobile ? 'column q-gutter-sm' : 'row items-center justify-between',
+        ]"
       >
-        <component :is="subject" />
-      </div>
-
-      <div
-        class="row items-center no-wrap q-gutter-xs"
-        :class="{ 'q-mt-xs': isMobile }"
-      >
-        <KennerButton
-          v-for="a in actions"
-          :key="a.name"
-          :disabled="a.disabled"
-          :color="a.buttonVariant || 'primary'"
-          class="q-px-sm q-py-xs text-caption"
-          @click="handleAction(a)"
+        <!-- Text Content -->
+        <div
+          v-if="leadText || subject"
+          class="text-section"
+          :class="{ 'q-mb-sm': isMobile && !leadText }"
         >
-          <q-icon v-if="a.icon" :name="a.icon" size="16px" class="q-mr-xs" />
-          <span class="btn-label">{{ a.name }}</span>
-        </KennerButton>
+          <div v-if="leadText" class="text-body2 text-grey-7 q-mb-xs">
+            <component :is="leadText" />
+          </div>
+          <div
+            v-if="subject"
+            class="text-h6 text-primary text-weight-bold"
+          >
+            <component :is="subject" />
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div
+          v-if="actions.length"
+          class="row items-center no-wrap q-gutter-xs"
+        >
+          <KennerButton
+            v-for="a in actions"
+            :key="a.name"
+            :disabled="a.disabled"
+            :color="a.buttonVariant || 'primary'"
+            :icon="a.icon"
+            @click="handleAction(a)"
+          >
+            {{ a.name }}
+          </KennerButton>
+        </div>
       </div>
     </div>
   </q-card>
@@ -94,8 +108,9 @@ import { useUserStore } from 'stores/userStore';
 
 const { actions, leadText, subject, reset } = useActionBar();
 const { user } = storeToRefs(useUserStore());
-const myLeagueStore = useLeagueStore(user.value!.myCurrentLeagueId)()
-const { activePlayer, isMeActivePlayer, statusNoun, loading } = storeToRefs(myLeagueStore);
+const myLeagueStore = useLeagueStore(user.value!.myCurrentLeagueId)();
+const { activePlayer, isMeActivePlayer, statusNoun, loading } =
+  storeToRefs(myLeagueStore);
 const { isMobile } = useResponsive();
 
 async function handleAction(action: any) {
@@ -107,3 +122,38 @@ async function handleAction(action: any) {
   }
 }
 </script>
+
+<style scoped lang="scss">
+.action-bar-card {
+  border-radius: 8px;
+  overflow: hidden;
+  background: white;
+}
+
+.status-header {
+  background: linear-gradient(
+      135deg,
+      rgba(var(--q-primary-rgb), 0.06) 0%,
+      rgba(var(--q-secondary-rgb), 0.08) 100%
+  );
+}
+
+.action-content {
+  background: white;
+}
+
+.text-section {
+  flex: 1;
+  min-width: 0;
+}
+
+@media (max-width: 599px) {
+  .action-content .row.q-gutter-xs {
+    width: 100%;
+
+    :deep(.q-btn) {
+      flex: 1;
+    }
+  }
+}
+</style>

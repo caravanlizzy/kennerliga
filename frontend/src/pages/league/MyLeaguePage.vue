@@ -51,13 +51,18 @@
           :is-opened="sectionVisibilityStates['results']"
         >
           <div class="row">
-            <MatchResult
-              v-for="member of members"
-              :key="member.profile"
-              :selectedGame="member.selected_game"
-              :showEmptyResultMessage="false"
-              class="col-12 col-md-6"
-            />
+            <template v-for="member of members" :key="member.profile">
+              <div
+                v-if="member.selected_game && hasSelectedGameResult(member.selected_game.id)"
+                class="q-pa-xs col-12 col-md-6"
+              >
+                <MatchResult
+                  :selectedGame="member.selected_game"
+                  :showEmptyResultMessage="false"
+                  :displayGameName="true"
+                />
+              </div>
+            </template>
           </div>
         </ContentSection>
       </template>
@@ -113,7 +118,6 @@ import LeagueStandings from 'components/league/LeagueStandings.vue';
 import MatchResultTabs from 'components/league/MatchResultTabs.vue';
 import SideBarLayout from 'layouts/SideBarLayout.vue';
 import LoadingSpinner from 'components/base/LoadingSpinner.vue';
-import MyLeagueResults from 'components/league/MyLeagueResults.vue';
 import { banGame } from 'src/services/gameService';
 import { TGameSelection } from 'src/types';
 import MatchResult from 'components/league/MatchResult.vue';
@@ -130,7 +134,7 @@ const {
   leagueId,
   loading,
 } = storeToRefs(myLeagueStore);
-const { updateLeagueData } = myLeagueStore;
+const { updateLeagueData, hasSelectedGameResult } = myLeagueStore;
 
 const { setActions, setLeadText, setSubject, reset } = useActionBar();
 
@@ -162,6 +166,7 @@ function manageActionBar() {
           name: 'Save',
           callback: submitGameSelection,
           disabled: !selectionValid.value,
+          buttonVariant: 'accent',
         },
       ]);
       setLeadText(() => h('div', 'Confirm your game selection'));

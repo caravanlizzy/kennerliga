@@ -1,7 +1,7 @@
 <script setup lang="ts">
 const props = withDefaults(
-  defineProps<{ color?: string }>(),
-  { color: 'primary' }
+  defineProps<{ color?: string, fullBorder?: boolean }>(),
+  { color: 'primary', fullBorder: true }
 )
 
 function resolveColor(c: string) {
@@ -14,8 +14,8 @@ function resolveColor(c: string) {
 
 <template>
   <div
-    class="bordered-container q-mt-md side-accent-border shadow-1"
-    :style="{ borderLeft: `3px solid ${resolveColor(props.color)}` }"
+    class="bordered-container q-mt-md side-accent-border"
+    :style="{ borderLeft: `3px solid ${resolveColor(props.color)}`, borderTop: `1px solid ${resolveColor(props.color)}`, borderBottom: props.fullBorder ? `1px solid ${resolveColor(props.color)}` : '', borderRight: props.fullBorder ? `1px solid ${resolveColor(props.color)}` : '' }"
   >
     <slot />
   </div>

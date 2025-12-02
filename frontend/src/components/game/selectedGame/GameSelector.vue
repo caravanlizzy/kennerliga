@@ -8,7 +8,7 @@
         :gameSelection="gameSelection"
         :gameInformation="gameInformation"
         :onSubmit="onSubmit"
-        class="bg-teal-1"
+        class="bg-blue-grey-2"
       />
     </div>
 

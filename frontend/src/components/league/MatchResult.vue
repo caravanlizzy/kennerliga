@@ -2,10 +2,6 @@
   <q-card
     flat
     v-if="results.length > 0 || showEmptyResultMessage"
-    :style="{
-      border: displayGameName ? '1px solid rgba(0, 0, 0, 0.12)' : 'none',
-      'border-radius': '4px',
-    }"
   >
     <div v-if="displayGameName" class="row items-center justify-center q-mb-xs">
       <div class="text-h6 text-weight-bold q-px-md q-py-sm">
