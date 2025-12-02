@@ -1,6 +1,6 @@
 <template>
   <q-card class="q-pa-md" flat bordered rounded>
-    <div class="row items-center q-mb-sm">
+    <div class="row items-center q-mb-md">
       <div class="col">
         <div class="text-h6 text-primary">Match Result</div>
         <div class="text-caption text-grey-7">{{ members.length }} players</div>
@@ -18,7 +18,7 @@
     <!-- Tie-breaker banner -->
     <q-banner
       v-if="tieBreakerRequired && requiredTieBreaker"
-      class="q-mb-md"
+      class="q-mb-md bg-warning text-dark"
       rounded
       dense
     >
@@ -26,137 +26,120 @@
         <q-icon name="toll" />
       </template>
       <div class="text-body2">
-        Tie-breaker required: <b>{{ requiredTieBreaker.name }}</b>
-      </div>
-      <div class="text-caption q-mt-xs">
-        Players needing tie-breakers:
-        <div
-          v-for="grp in tieGroupDisplay"
-          :key="grp.key"
-        >
-          <q-badge outline color="grey-8" text-color="grey-2" class="q-mr-xs">Points {{ grp.points }}</q-badge>
-          {{ grp.names.join(', ') }}
-        </div>
+        <b>{{ requiredTieBreaker.name }}</b> needed for:
+        <span v-for="(grp, idx) in tieGroupDisplay" :key="grp.key">
+          {{ grp.names.join(', ')
+          }}<span v-if="idx < tieGroupDisplay.length - 1">; </span>
+        </span>
       </div>
     </q-banner>
 
     <div class="q-pa-sm">
       <q-form v-if="formData.length" @submit.prevent="submitResults">
-        <div class="row q-col-gutter-sm q-mb-xl">
+        <div class="row q-col-gutter-md q-mb-md">
           <div
             v-for="member in displayMembers"
             :key="member.id"
-            class="col-12 col-sm-6 col-md-4 col-lg-3"
+            class="col-12 col-sm-6 col-lg-3"
           >
             <q-card flat bordered class="member-card">
-              <q-card-section class="row items-center justify-between q-py-xs q-px-sm">
-                <div class="text-subtitle2 ellipsis">{{ member.username }}</div>
-                <q-chip
-                  v-if="getEntry(member.id).starting_position"
-                  dense outline square size="sm"
-                >
-                  #{{ getEntry(member.id).starting_position }}
-                </q-chip>
-              </q-card-section>
-
-              <q-separator spaced inset />
-
-              <q-card-section class="q-gutter-xs q-pt-sm q-pb-sm">
-                <!-- Points -->
-                <KennerInput
-                  v-if="resultConfig?.has_points"
-                  v-model.number="getEntry(member.id).points"
-                  type="number"
-                  inputmode="numeric"
-                  label="Points"
-                  dense
-                  outlined
-                  hide-bottom-space
-                  :suffix="'pts'"
-                  :rules="[(v:string|number|null) => v !== null && v !== '' || 'Points required']"
-                >
-                  <template #prepend>
-                    <q-icon name="score" size="16px" class="q-mr-xs" />
-                  </template>
-                </KennerInput>
-
-                <!-- Starting position -->
-                <div class="row items-center no-wrap justify-between">
-                  <div>
-                    <q-badge color="grey-8" text-color="grey-2" class="q-mr-xs" outline>Start</q-badge>
-                    <span class="text-caption text-grey-7">Position</span>
+              <q-card-section class="q-pa-sm">
+                <div class="row items-center justify-between q-mb-sm">
+                  <div class="text-subtitle2 text-weight-medium ellipsis">
+                    {{ member.username }}
                   </div>
-                  <div class="row items-center q-gutter-xs">
-                    <div
-                      v-for="pos in members.length"
-                      :key="pos"
-                      class="col-auto"
-                    >
+                </div>
+
+                <div class="column q-gutter-sm">
+                  <!-- Points -->
+                  <q-input
+                    v-if="resultConfig?.has_points"
+                    v-model.number="getEntry(member.id).points"
+                    type="number"
+                    inputmode="numeric"
+                    label="Points"
+                    dense
+                    outlined
+                    hide-bottom-space
+                    class="points-input"
+                    bg-color="grey-2"
+                    :rules="[(v:string|number|null) => v !== null && v !== '' || 'Required']"
+                  />
+
+                  <!-- Faction -->
+                  <KennerSelect
+                    v-if="resultConfig?.is_asymmetric"
+                    v-model="getEntry(member.id).faction_id"
+                    :options="factions"
+                    option-label="name"
+                    option-value="id"
+                    emit-value
+                    map-options
+                    label="Faction"
+                    dense
+                    outlined
+                    hide-bottom-space
+                    clearable
+                    options-dense
+                  />
+
+                  <!-- Starting position -->
+                  <div>
+                    <div class="text-caption text-grey-7 q-mb-xs">
+                      Starting Position
+                    </div>
+                    <div class="row q-gutter-sm justify-center">
                       <q-btn
-                        size="sm"
-                        no-caps
-                        outline
-                        :color="getEntry(member.id).starting_position === pos ? 'white' : 'grey-6'"
-                        :class="[{'bg-secondary' : getEntry(member.id).starting_position === pos}]"
-                        :label="pos"
+                        v-for="pos in members.length"
+                        :key="pos"
+                        size="md"
+                        round
+                        :outline="getEntry(member.id).starting_position !== pos"
+                        :unelevated="
+                          getEntry(member.id).starting_position === pos
+                        "
+                        :color="
+                          getEntry(member.id).starting_position === pos
+                            ? 'secondary'
+                            : 'grey-4'
+                        "
+                        :text-color="
+                          getEntry(member.id).starting_position === pos
+                            ? 'white'
+                            : 'grey-8'
+                        "
+                        :label="String(pos)"
+                        class="position-btn"
                         @click="swapStartingPosition(member.id, pos)"
                       />
                     </div>
                   </div>
-                </div>
 
-                <!-- Faction -->
-                <KennerSelect
-                  v-if="resultConfig?.is_asymmetric"
-                  v-model="getEntry(member.id).faction_id"
-                  :options="factions"
-                  option-label="name"
-                  option-value="id"
-                  emit-value
-                  map-options
-                  label="Faction"
-                  dense
-                  outlined
-                  hide-bottom-space
-                  clearable
-                  options-dense
-                >
-                  <template #prepend>
-                    <q-icon name="groups" size="16px" class="q-mr-xs" />
-                  </template>
-                </KennerSelect>
-
-                <!-- Tie-Breaker (only for players that need it) -->
-                <q-input
-                  v-if="tieBreakerRequired && needsTieBreaker(member.id)"
-                  v-model.number="getEntry(member.id).tie_breaker_value"
-                  :label="tieBreakerLabel"
-                  type="number"
-                  inputmode="decimal"
-                  dense
-                  outlined
-                  hide-bottom-space
-                >
-                  <template #prepend>
-                    <q-icon name="toll" size="16px" class="q-mr-xs" />
-                  </template>
-                </q-input>
-
-                <!-- Optional hint -->
-                <div
-                  v-else-if="tieBreakerRequired && !needsTieBreaker(member.id)"
-                  class="text-caption text-grey-6"
-                >
-                  No tie-breaker needed for this player.
+                  <!-- Tie-Breaker -->
+                  <q-input
+                    v-if="tieBreakerRequired && needsTieBreaker(member.id)"
+                    v-model.number="getEntry(member.id).tie_breaker_value"
+                    :label="requiredTieBreaker?.name || 'Tie-breaker'"
+                    type="number"
+                    inputmode="decimal"
+                    dense
+                    outlined
+                    hide-bottom-space
+                  />
                 </div>
               </q-card-section>
             </q-card>
           </div>
         </div>
 
-        <div class="row justify-end q-gutter-sm q-pt-xs q-pb-sm bg-white">
-          <q-btn flat color="secondary" icon="refresh" label="Reset" @click="initFormData" />
-          <q-btn type="submit" :label="submitLabel" color="primary" unelevated />
+        <div class="row justify-end q-gutter-sm">
+          <q-btn flat color="secondary" label="Reset" @click="initFormData" />
+          <q-btn
+            type="submit"
+            :label="submitLabel"
+            color="primary"
+            unelevated
+          />
         </div>
       </q-form>
 
@@ -180,8 +163,8 @@ type Member = { id: number; username: string };
 const emit = defineEmits<{ (e: 'submitted', selectedGameId: number): void }>();
 const $q = useQuasar();
 
-const props = defineProps<{ selectedGameId: number, leagueId: number }>();
-const leagueStore = useLeagueStore(props.leagueId)()
+const props = defineProps<{ selectedGameId: number; leagueId: number }>();
+const leagueStore = useLeagueStore(props.leagueId)();
 const { members } = storeToRefs(leagueStore); // Member[]
 
 const resultConfig = ref<any>(null);
@@ -190,16 +173,24 @@ const formData = ref<any[]>([]);
 
 // tie-breaker UI state
 const tieBreakerRequired = ref(false);
-const requiredTieBreaker = ref<{ id: number; name?: string; order?: number } | null>(null);
+const requiredTieBreaker = ref<{
+  id: number;
+  name?: string;
+  order?: number;
+} | null>(null);
 const tieBreakerPlayers = ref<Set<number>>(new Set()); // ids needing value now
 const tieGroups = ref<Array<{ points: number; players: number[] }>>([]); // for banner
 
 const orderByStartingPos = ref(true);
 
 const tieBreakerLabel = computed(() =>
-  requiredTieBreaker.value?.name ? `Tie-breaker: ${requiredTieBreaker.value.name}` : 'Tie-breaker'
+  requiredTieBreaker.value?.name
+    ? `Tie-breaker: ${requiredTieBreaker.value.name}`
+    : 'Tie-breaker'
 );
-const submitLabel = computed(() => (tieBreakerRequired.value ? 'Submit Tie-Breakers' : 'Save Result'));
+const submitLabel = computed(() =>
+  tieBreakerRequired.value ? 'Submit Tie-Breakers' : 'Save Result'
+);
 
 function getEntry(memberId: number) {
   let found = formData.value.find((e) => e.player_profile === memberId);
@@ -228,7 +219,9 @@ function swapStartingPosition(memberId: number, newPos: number) {
   const currentPos = getEntry(memberId).starting_position ?? null;
   if (currentPos === newPos) return;
 
-  const owner = (members.value as Member[]).find((m) => getEntry(m.id).starting_position === newPos);
+  const owner = (members.value as Member[]).find(
+    (m) => getEntry(m.id).starting_position === newPos
+  );
   getEntry(memberId).starting_position = newPos;
   if (owner && owner.id !== memberId) {
     getEntry(owner.id).starting_position = currentPos;
@@ -250,7 +243,9 @@ const displayMembers = computed(() => {
 });
 
 async function fetchResultConfig() {
-  const { data: selectedGame } = await api.get(`game/selected-games/${props.selectedGameId}/`);
+  const { data: selectedGame } = await api.get(
+    `game/selected-games/${props.selectedGameId}/`
+  );
   const gameId = selectedGame.game;
   if (!gameId) return;
   const { data } = await api.get(`game/result-configs/?game=${gameId}`);
@@ -258,7 +253,9 @@ async function fetchResultConfig() {
 }
 
 async function fetchFactions() {
-  const { data } = await api.get(`game/selected-games/${props.selectedGameId}/`);
+  const { data } = await api.get(
+    `game/selected-games/${props.selectedGameId}/`
+  );
   const gameId = data.game;
   const factionRes = await api.get(`game/factions/?game=${gameId}`);
   factions.value = (factionRes.data ?? []) as Faction[];
@@ -318,7 +315,10 @@ function handleTieBreaker202(data: any) {
 
   const nextPlayers = new Set<number>();
   if (Array.isArray(data?.tie_groups)) {
-    tieGroups.value = data.tie_groups as Array<{ points: number; players: number[] }>;
+    tieGroups.value = data.tie_groups as Array<{
+      points: number;
+      players: number[];
+    }>;
     for (const g of data.tie_groups) {
       for (const pid of g.players ?? []) nextPlayers.add(pid);
     }
@@ -333,7 +333,9 @@ function handleTieBreaker202(data: any) {
 
   tieBreakerPlayers.value = nextPlayers;
 
-  const tbName = requiredTieBreaker.value?.name ? ` (${requiredTieBreaker.value.name})` : '';
+  const tbName = requiredTieBreaker.value?.name
+    ? ` (${requiredTieBreaker.value.name})`
+    : '';
   const list = [...nextPlayers].map(idToName).join(', ') || 'unknown';
   $q.notify({
     type: 'warning',
@@ -351,7 +353,9 @@ async function submitResults() {
     if (missing.length) {
       $q.notify({
         type: 'negative',
-        message: `Please enter a tie-breaker value for: ${missing.map(idToName).join(', ')}`,
+        message: `Please enter a tie-breaker value for: ${missing
+          .map(idToName)
+          .join(', ')}`,
       });
       return;
     }
@@ -395,7 +399,10 @@ async function submitResults() {
     }
 
     // Any unexpected success code
-    $q.notify({ type: 'warning', message: `Unexpected status ${response.status}.` });
+    $q.notify({
+      type: 'warning',
+      message: `Unexpected status ${response.status}.`,
+    });
   } catch (err: any) {
     const data = err?.response?.data;
     if (data?.detail) {
@@ -406,10 +413,22 @@ async function submitResults() {
     }
   }
 }
-
 </script>
 
 <style scoped>
-.member-card { border-radius: 10px; background: #fff; }
-.ellipsis { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.member-card {
+  border-radius: 10px;
+  background: #fff;
+}
+.ellipsis {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.position-btn {
+  min-width: 40px;
+  min-height: 40px;
+  font-weight: 500;
+  font-size: 15px;
+}
 </style>

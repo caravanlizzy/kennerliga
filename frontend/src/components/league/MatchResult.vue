@@ -1,88 +1,108 @@
 <template>
-  <q-card flat>
-    <div class="row items-center justify-around q-mb-md">
-      <div class="text-h6 text-primary">{{ selectedGame.game_name }}</div>
-      <!--      <q-badge color="primary" label="Ergebnis" />-->
+  <q-card
+    flat
+    v-if="results.length > 0 || showEmptyResultMessage"
+    :style="{
+      border: displayGameName ? '1px solid rgba(0, 0, 0, 0.12)' : 'none',
+      'border-radius': '4px',
+    }"
+  >
+    <div v-if="displayGameName" class="row items-center justify-center q-mb-xs">
+      <div class="text-h6 text-weight-bold q-px-md q-py-sm">
+        {{ selectedGame.game_name }}
+      </div>
     </div>
 
     <template v-if="results.length === 0">
-      <div class="text-caption text-grey-7">No results uploaded.</div>
+      <div class="text-center text-caption text-grey-7 q-py-md">
+        No results uploaded.
+      </div>
     </template>
 
     <template v-else>
-      <q-table
-        flat
-        dense
-        :rows="results"
-        :columns="columns"
-        row-key="id"
-        hide-bottom
-      >
-        <!-- Player column -->
-        <template v-slot:body-cell-player="props">
-          <q-td :props="props">
-            <q-chip :class="props.row.colorClass">
-              {{ props.row.username }}
+      <q-list bordered separator class="rounded-borders">
+        <q-item
+          v-for="(result, index) in results"
+          :key="result.id"
+          :class="['q-py-md', index === 0 ? 'bg-amber-1' : '']"
+        >
+          <!-- Rank Badge -->
+          <q-item-section side class="q-pr-md">
+            <q-avatar
+              :color="index === 0 ? 'amber' : 'grey-4'"
+              :text-color="index === 0 ? 'amber-10' : 'grey-8'"
+              size="42px"
+              :class="index === 0 ? 'shadow-2' : ''"
+            >
+              <span
+                :class="index === 0 ? 'text-weight-bold text-h6' : 'text-body1'"
+              >
+                {{ index + 1 }}
+              </span>
+            </q-avatar>
+          </q-item-section>
+
+          <!-- Player Name -->
+          <q-item-section>
+            <q-item-label
+              :class="[
+                'text-body1',
+                index === 0
+                  ? 'text-weight-bold text-amber-10'
+                  : 'text-weight-medium',
+              ]"
+            >
+              <q-icon
+                v-if="index === 0"
+                name="emoji_events"
+                color="amber"
+                size="20px"
+                class="q-mr-xs"
+              />
+              {{ result.username }}
+            </q-item-label>
+          </q-item-section>
+
+          <!-- Stats -->
+          <q-item-section side class="row q-gutter-xs items-center">
+            <!-- Points -->
+            <q-chip
+              v-if="result.points != null"
+              dense
+              :color="index === 0 ? 'amber' : 'grey-3'"
+              :text-color="index === 0 ? 'amber-10' : 'black'"
+              :class="index === 0 ? 'text-weight-bold' : ''"
+            >
+              <q-icon name="star" size="16px" class="q-mr-xs" />
+              {{ result.points }}
             </q-chip>
-          </q-td>
-        </template>
-        <!-- Points -->
-        <template v-slot:header-cell-points="props">
-          <q-th :props="props" class="text-center">
-            <q-icon name="star" size="sm" />
-          </q-th>
-        </template>
-        <template v-slot:body-cell-points="props">
-          <q-td :props="props">
+
+            <!-- Starting Position -->
             <q-chip
-              v-if="props.row.points != null"
+              v-if="result.starting_position"
               dense
-              square
               color="grey-3"
-              text-color="black"
-              :label="props.row.points"
-            />
-          </q-td>
-        </template>
+              text-color="grey-8"
+              size="sm"
+            >
+              <q-icon name="flag" size="14px" class="q-mr-xs" />
+              {{ result.starting_position }}
+            </q-chip>
 
-        <!-- Startpos -->
-        <template v-slot:header-cell-starting_position="props">
-          <q-th :props="props" class="text-center">
-            <q-icon name="flag" size="sm" />
-          </q-th>
-        </template>
-        <template v-slot:body-cell-starting_position="props">
-          <q-td :props="props">
+            <!-- Faction -->
             <q-chip
-              v-if="props.row.starting_position"
+              v-if="result.faction_name"
               dense
-              square
-              color="grey-2"
-              text-color="black"
-              :label="props.row.starting_position"
-            />
-          </q-td>
-        </template>
-
-        <!-- faction -->
-        <template v-slot:header-cell-faction_name="props">
-          <q-th :props="props" class="text-center">
-            <q-icon name="diversity_2" size="sm" />
-          </q-th>
-        </template>
-        <template v-slot:body-cell-faction_name="props">
-          <q-td :props="props">
-            <q-chip
-              v-if="props.row.faction_name"
-              dense
-              square
-              color="indigo-1"
-              text-color="indigo-10"
-              :label="props.row.faction_name"
-            />
-          </q-td>
-        </template>
-      </q-table>
+              color="indigo-2"
+              text-color="indigo-9"
+              size="sm"
+            >
+              <q-icon name="shield" size="14px" class="q-mr-xs" />
+              {{ result.faction_name }}
+            </q-chip>
+          </q-item-section>
+        </q-item>
+      </q-list>
     </template>
   </q-card>
 </template>
@@ -94,7 +114,17 @@ import { useLeagueStore } from 'stores/leagueStore';
 import { QTableProps } from 'quasar';
 import { useUserStore } from 'stores/userStore';
 
-const props = defineProps<{ selectedGame: any }>();
+const props = withDefaults(
+  defineProps<{
+    selectedGame: any;
+    displayGameName: boolean;
+    showEmptyResultMessage: boolean;
+  }>(),
+  {
+    displayGameName: true,
+    showEmptyResultMessage: true,
+  }
+);
 const { user } = storeToRefs(useUserStore());
 const myLeagueStore = useLeagueStore(user.value.myCurrentLeagueId)();
 const { matchResultsBySelectedGame, membersById } = storeToRefs(myLeagueStore);

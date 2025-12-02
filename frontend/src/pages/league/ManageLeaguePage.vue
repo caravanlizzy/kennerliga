@@ -51,13 +51,13 @@
               {{ member.username }}
             </q-item-label>
           </q-item-section>
-          <q-item-section side>
+          <q-item-section v-if="league.status === 'PICKING' || league.status === 'REPICKING' || league.status === 'BANNING'" side>
             <q-badge
               v-if="member.profile === league.active_player"
               outline
               text-color="positive"
             >
-              <q-icon size="xs" name="star" /> Active Player
+              <q-icon size="xs" name="star" /> Active
             </q-badge>
             <q-badge
               v-else
@@ -66,7 +66,7 @@
               class="q-py-xs q-px-sm cursor-pointer"
               @click="setActivePlayer(member.profile)"
             >
-              Set as Active Player
+              Set Active
             </q-badge>
           </q-item-section>
 
@@ -91,6 +91,7 @@
         <div v-if="hasResult(member)">
           <q-card-section>
             <MatchResult
+              :displayGameName="false"
               v-if="hasResult(member)"
               :selectedGame="member.selected_game"
             />

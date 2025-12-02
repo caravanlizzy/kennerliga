@@ -19,6 +19,7 @@ import { useIDStorage } from 'src/composables/IDStorage';
 const { addStorageItem, getStorageItem } = useIDStorage();
 
 export async function banGame(banDecision: BanDecisionDtoPayload) {
+  console.log({ banDecision });
   const data: Record<string, string | number | boolean> = {
     username: banDecision.username,
     league: banDecision.leagueId,

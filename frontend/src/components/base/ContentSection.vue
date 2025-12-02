@@ -1,6 +1,6 @@
 <template>
   <SideAccentBox
-    class="q-my-xs shadow-1"
+    class="q-my-xs"
     :color="color"
   >
     <q-expansion-item

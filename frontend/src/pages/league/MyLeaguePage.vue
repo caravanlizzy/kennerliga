@@ -44,24 +44,32 @@
       </template>
 
       <!-- Match Results Section -->
+      <template v-if="leagueStatus === 'PLAYING' || leagueStatus === 'DONE'">
+        <ContentSection
+          title="Results"
+          color="positive"
+          :is-opened="sectionVisibilityStates['results']"
+        >
+          <div class="row">
+            <MatchResult
+              v-for="member of members"
+              :key="member.profile"
+              :selectedGame="member.selected_game"
+              :showEmptyResultMessage="false"
+              class="col-12 col-md-6"
+            />
+          </div>
+        </ContentSection>
+      </template>
+
       <template v-if="leagueStatus === 'PLAYING'">
         <ContentSection
           title="Upload Results"
           color="secondary"
-          :is-opened="sectionVisibilityStates['upload']"
+          :isOpened="sectionVisibilityStates['upload']"
         >
           <MatchResultTabs />
         </ContentSection>
-
-        <template v-if="leagueStatus === 'PLAYING' || leagueStatus === 'DONE'">
-          <ContentSection
-            title="Results"
-            color="positive"
-            :is-opened="sectionVisibilityStates['results']"
-          >
-            <MyLeagueResults />
-          </ContentSection>
-        </template>
       </template>
 
       <!-- Player Cards Grid -->
@@ -90,7 +98,7 @@
 </template>
 
 <script setup lang="ts">
-import { h, inject, onMounted, provide, ref, watch, watchEffect } from 'vue';
+import { h, ref, watch, watchEffect } from 'vue';
 import GameSelector from 'components/game/selectedGame/GameSelector.vue';
 import { useLeagueStore } from 'stores/leagueStore';
 import { storeToRefs } from 'pinia';
@@ -108,7 +116,7 @@ import LoadingSpinner from 'components/base/LoadingSpinner.vue';
 import MyLeagueResults from 'components/league/MyLeagueResults.vue';
 import { banGame } from 'src/services/gameService';
 import { TGameSelection } from 'src/types';
-
+import MatchResult from 'components/league/MatchResult.vue';
 
 const { user } = storeToRefs(useUserStore());
 const myLeagueStore = useLeagueStore(user.value.myCurrentLeagueId)();
@@ -123,8 +131,6 @@ const {
   loading,
 } = storeToRefs(myLeagueStore);
 const { updateLeagueData } = myLeagueStore;
-
-provide('leagueId', leagueId);
 
 const { setActions, setLeadText, setSubject, reset } = useActionBar();
 
@@ -191,7 +197,7 @@ const { setDialog } = useDialog();
 const $q = useQuasar();
 
 function handleBanGame(selectedGameId: number, gameName: string) {
-  const notifyType = undefined;
+  const notifyType = 'info';
   setDialog(
     'Confirm Ban',
     `Are you sure you want to ban ${gameName.toUpperCase()}?`,
@@ -200,7 +206,7 @@ function handleBanGame(selectedGameId: number, gameName: string) {
       try {
         await banGame({
           leagueId: leagueId.value!,
-          username: user!.username,
+          username: user.value.username,
           selectedGameId,
         });
         await updateLeagueData();

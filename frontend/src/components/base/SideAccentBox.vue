@@ -14,7 +14,7 @@ function resolveColor(c: string) {
 
 <template>
   <div
-    class="bordered-container q-mt-md side-accent-border"
+    class="bordered-container q-mt-md side-accent-border shadow-1"
     :style="{ borderLeft: `3px solid ${resolveColor(props.color)}` }"
   >
     <slot />
