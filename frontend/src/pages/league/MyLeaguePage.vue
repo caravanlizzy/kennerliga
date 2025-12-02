@@ -155,6 +155,7 @@ function manageActionBar() {
             .map((game) => ({
               name: `${game.game_name}`,
               callback: () => handleBanGame(game.id, game.game_name),
+              buttonVariant: 'negative',
               autoReset: false,
             }))
         );
@@ -202,7 +203,7 @@ const { setDialog } = useDialog();
 const $q = useQuasar();
 
 function handleBanGame(selectedGameId: number, gameName: string) {
-  const notifyType = 'info';
+  const notifyType = 'primary';
   setDialog(
     'Confirm Ban',
     `Are you sure you want to ban ${gameName.toUpperCase()}?`,

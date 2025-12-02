@@ -58,7 +58,8 @@ class SeasonParticipantSerializer(ModelSerializer):
         required=True,
     )
     selected_game = SerializerMethodField()
-    banned_selected_game = SerializerMethodField()
+    first_game_selection = SerializerMethodField()
+    my_banned_game = SerializerMethodField()
     has_banned = BooleanField(read_only=True)
     is_active_player = SerializerMethodField()
 
@@ -67,8 +68,24 @@ class SeasonParticipantSerializer(ModelSerializer):
         fields = [
             'id', 'season', 'profile', 'rank',  # write
             'username', 'profile_name', 'selected_game',  # read
-            'banned_selected_game', 'has_banned', 'is_active_player',
+            'first_game_selection', 'has_banned', 'is_active_player',
+            'my_banned_game',
         ]
+
+    def get_my_banned_game(self, obj):
+        league = self.context.get('league')
+        if not league:
+            return None
+
+        ban_decision = BanDecision.objects.filter(
+            league=league,
+            player_banning=obj.profile
+        ).select_related('selected_game').first()
+
+        if not ban_decision or not ban_decision.selected_game:
+            return None
+
+        return SelectedGameSerializer(ban_decision.selected_game, context=self.context).data
 
     # ---- internal helper & cache -------------------------------------------
     def _resolve_games_for_participant(self, obj):
@@ -135,7 +152,7 @@ class SeasonParticipantSerializer(ModelSerializer):
         selected, _ = self._resolve_games_for_participant(obj)
         return SelectedGameSerializer(selected, context=self.context).data if selected else None
 
-    def get_banned_selected_game(self, obj):
+    def get_first_game_selection(self, obj):
         _, banned = self._resolve_games_for_participant(obj)
         return SelectedGameSerializer(banned, context=self.context).data if banned else None
 
