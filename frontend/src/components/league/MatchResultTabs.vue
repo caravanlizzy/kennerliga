@@ -1,19 +1,20 @@
 <template>
-  <!-- Game Tabs for Entering Results -->
-  <q-tabs
-    v-model="currentFormSelectedGameId"
-    active-color="primary"
-    indicator-color="primary"
-    :vertical="isMobile"
+<q-tabs
+  v-model="currentFormSelectedGameId"
+  active-color="white"
+  active-bg-color="primary"
+  indicator-color="primary"
+  :vertical="isMobile"
+>
+  <q-tab
+    v-for="selectedGame in selectedGamesFetchedEmpty"
+    :key="selectedGame.id"
+    :name="selectedGame.id"
+    class="text-weight-medium"
   >
-    <q-tab
-      v-for="selectedGame in selectedGamesFetchedEmpty"
-      :key="selectedGame.id"
-      :name="selectedGame.id"
-    >
-      {{ truncateString(selectedGame.game_name) }}
-    </q-tab>
-  </q-tabs>
+    {{ truncateString(selectedGame.game_name) }}
+  </q-tab>
+</q-tabs>
 
   <!-- Match Result Entry Form -->
   <MatchResultForm

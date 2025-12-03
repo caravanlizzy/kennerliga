@@ -133,8 +133,8 @@
         </div>
 
         <div class="row justify-end q-gutter-sm">
-          <q-btn flat color="secondary" label="Reset" @click="initFormData" />
-          <q-btn
+          <q-btn rounded flat color="secondary" label="Reset" @click="initFormData" />
+          <KennerButton
             type="submit"
             :label="submitLabel"
             color="primary"
@@ -155,6 +155,7 @@ import { useQuasar } from 'quasar';
 import { storeToRefs } from 'pinia';
 import { useLeagueStore } from 'stores/leagueStore';
 import KennerSelect from 'components/base/KennerSelect.vue';
+import KennerButton from 'components/base/KennerButton.vue';
 
 type Faction = { id: number; name: string };
 type Member = { id: number; username: string };
@@ -182,11 +183,6 @@ const tieGroups = ref<Array<{ points: number; players: number[] }>>([]); // for 
 
 const orderByStartingPos = ref(true);
 
-const tieBreakerLabel = computed(() =>
-  requiredTieBreaker.value?.name
-    ? `Tie-breaker: ${requiredTieBreaker.value.name}`
-    : 'Tie-breaker'
-);
 const submitLabel = computed(() =>
   tieBreakerRequired.value ? 'Submit Tie-Breakers' : 'Save Result'
 );
