@@ -1,7 +1,7 @@
 <template>
   <q-btn
     unelevated
-    outline
+    filled
     rounded
     :dense="isMobile"
     class="q-mx-xs"

@@ -97,10 +97,20 @@
               <div class="ban-row">
                 <div class="bans-label">
                   <q-icon name="group" size="16px" />
-                  <span>Banned By</span>
+                  <span>{{ firstGameSelection ? 'Banned Game' : 'Banned By' }}</span>
                 </div>
                 <div class="bans-content">
-                  <template v-if="banners.length">
+                  <template v-if="firstGameSelection">
+                    <q-chip
+                      dense
+                      class="first-selection-chip"
+                      icon="looks_one"
+                    >
+                      {{ firstGameSelection }}
+                      <q-tooltip>First game selection that was banned by others</q-tooltip>
+                    </q-chip>
+                  </template>
+                  <template v-else-if="banners.length">
                     <div class="banners-avatars">
                       <UserAvatar
                         v-for="(name, idx) in banners"
@@ -111,15 +121,6 @@
                       />
                       <q-tooltip>Players who banned this game</q-tooltip>
                     </div>
-                    <q-chip
-                      v-if="firstGameSelection"
-                      dense
-                      class="first-selection-chip q-ml-sm"
-                      icon="looks_one"
-                    >
-                      {{ firstGameSelection }}
-                      <q-tooltip>First game selection</q-tooltip>
-                    </q-chip>
                   </template>
                   <span v-else class="no-bans">None</span>
                 </div>

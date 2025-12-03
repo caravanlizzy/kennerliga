@@ -47,13 +47,16 @@
       <template v-if="leagueStatus === 'PLAYING' || leagueStatus === 'DONE'">
         <ContentSection
           title="Results"
-          color="positive"
+          color="info"
           :is-opened="sectionVisibilityStates['results']"
         >
           <div class="row">
             <template v-for="member of members" :key="member.profile">
               <div
-                v-if="member.selected_game && hasSelectedGameResult(member.selected_game.id)"
+                v-if="
+                  member.selected_game &&
+                  hasSelectedGameResult(member.selected_game.id)
+                "
                 class="q-pa-xs col-12 col-md-6"
               >
                 <MatchResult
@@ -79,8 +82,8 @@
 
       <!-- Player Cards Grid -->
       <ContentSection
-        title="Players"
-        color="grey"
+        title="Games -  Picks and Bans"
+        color="primary"
         :is-opened="sectionVisibilityStates['players']"
       >
         <div class="row q-col-gutter-md">
@@ -149,16 +152,22 @@ function manageActionBar() {
     case 'BANNING':
       if (isMeBanningGame.value && leagueId.value && user.value?.username) {
         setLeadText('Select a game to ban');
-        setActions(
-          Object.values(selectedGamesById.value)
+        setActions([
+          {
+            name: 'No ban',
+            callback: () => handleSkipBan(),
+            buttonVariant: 'primary',
+            autoReset: false,
+          },
+          ...Object.values(selectedGamesById.value)
             .filter((game) => game.selected_by !== user.value?.username)
             .map((game) => ({
               name: `${game.game_name}`,
               callback: () => handleBanGame(game.id, game.game_name),
-              buttonVariant: 'negative',
+              buttonVariant: 'secondary',
               autoReset: false,
-            }))
-        );
+            })),
+        ]);
       }
       break;
     case 'PICKING':
@@ -202,12 +211,15 @@ async function submitGameSelection() {
 const { setDialog } = useDialog();
 const $q = useQuasar();
 
+function handleSkipBan() {
+  console.log('skipped ban');
+}
+
 function handleBanGame(selectedGameId: number, gameName: string) {
-  const notifyType = 'primary';
   setDialog(
     'Confirm Ban',
     `Are you sure you want to ban ${gameName.toUpperCase()}?`,
-    notifyType,
+    'primary',
     async () => {
       try {
         await banGame({
@@ -217,7 +229,7 @@ function handleBanGame(selectedGameId: number, gameName: string) {
         });
         await updateLeagueData();
         $q.notify({
-          type: notifyType,
+          type: 'primary',
           message: 'Banned!',
         });
       } catch (e) {
