@@ -34,7 +34,7 @@ const createButton: TKennerButton = {
   color: 'secondary',
   label: 'Invite',
   icon: 'add_circle',
-  forwardName: 'user-invite',
+  forwardName: 'invite-user',
 };
 
 const columns = [

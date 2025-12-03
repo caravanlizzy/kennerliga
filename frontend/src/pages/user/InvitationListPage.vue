@@ -1,44 +1,44 @@
 <template>
-  <KennerligaTable
-    v-if="isFinished"
+  <KennerTable
+    v-if="data"
     flat
     title="Invitations"
     :rows="data"
     :columns="columns"
     :rows-per-page-options="[10, 20, 50]"
+    :createButton="createBtn"
   />
 </template>
 
 <script setup lang="ts">
-import KennerligaTable from 'components/tables/KennerTable.vue';
-import { useAxios } from '@vueuse/integrations/useAxios';
+import KennerTable from 'components/tables/KennerTable.vue';
 import { api } from 'boot/axios';
+import type { TKennerButton } from 'src/types';
 
-const { data, isFinished } = useAxios('user/invitations/', api);
+const { data } = await api('user/invitations/');
+
+const createBtn: TKennerButton = {
+  color: 'secondary',
+  label: 'Invite',
+  icon: 'add_circle',
+  forwardName: 'invite-user',
+};
 
 const columns = [
   {
-    name: 'username',
+    name: 'label',
     required: true,
     align: 'left',
-    label: 'Username',
-    field: (x) => x.username,
+    label: 'Internal Note',
+    field: (x) => x.label,
     sortable: true,
   },
   {
-    name: 'otp',
+    name: 'invite_url',
     required: true,
-    align: 'center',
-    label: 'OTP',
-    field: (x) => x.otp,
-    sortable: true,
-  },
-  {
-    name: 'failed_attempts',
-    required: true,
-    align: 'right',
-    label: 'Failed Attempts',
-    field: (x) => x.failed_attempts,
+    align: 'left',
+    label: 'Invite URL',
+    field: (x) => x.invite_url,
     sortable: true,
   },
 ];

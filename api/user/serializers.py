@@ -1,4 +1,6 @@
+from django.conf import settings
 from django.contrib.auth import get_user_model
+from django.utils.http import urlencode
 from rest_framework.serializers import ModelSerializer, Serializer
 from rest_framework import serializers
 
@@ -19,10 +21,20 @@ class PlayerProfileSerializer(ModelSerializer):
 
 
 class UserInviteLinkSerializer(serializers.ModelSerializer):
+    invite_url = serializers.SerializerMethodField()
+
     class Meta:
         model = UserInviteLink
-        fields = ["id", "label", "created_by", "created_at", "expires_at"]
-        read_only_fields = ["id", "created_by", "created_at"]
+        fields = ["id", "key", "label", "created_by", "created_at", "expires_at", "invite_url"]
+        read_only_fields = ["id", "key", "created_by", "created_at", "invite_url"]
+
+    def get_invite_url(self, obj):
+        frontend_base = getattr(settings, "FRONTEND_REGISTER_URL", None)
+        if frontend_base:
+            query = urlencode({"key": obj.key})
+            sep = "&" if "?" in frontend_base else "?"
+            return f"{frontend_base}{sep}{query}"
+        return None
 
 
 class UserRegistrationSerializer(serializers.Serializer):

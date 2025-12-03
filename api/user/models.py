@@ -1,4 +1,3 @@
-import hashlib
 import secrets
 
 from django.conf import settings
@@ -78,15 +77,10 @@ class PlatformPlayer(models.Model):
     def __str__(self):
         return f"{self.player_profile} @ {self.platform} as {self.name}"
 
-
-def _hash_key(raw: str) -> str:
-    return hashlib.sha256(raw.encode("utf-8")).hexdigest()
-
 class UserInviteLink(models.Model):
-    # store only the hash; share the raw key in the URL
-    key_hash   = models.CharField(max_length=64, unique=True, db_index=True)
-    label      = models.CharField(max_length=100, blank=True,
-                   help_text="Admin note to remember who this invite is for.")
+    key = models.CharField(max_length=32, unique=True, db_index=True)
+    label = models.CharField(max_length=300, blank=True,
+              help_text="Admin note to remember who this invite is for.")
     created_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
@@ -99,24 +93,14 @@ class UserInviteLink(models.Model):
         ordering = ["-created_at"]
 
     def save(self, *args, **kwargs):
-        # only set expires_at if it isn't already provided
+        if not self.key:
+            self.key = secrets.token_urlsafe(20)
         if not self.expires_at:
             self.expires_at = timezone.now() + relativedelta(months=1)
         super().save(*args, **kwargs)
 
     def is_expired(self) -> bool:
         return bool(self.expires_at and timezone.now() > self.expires_at)
-
-    @classmethod
-    def create_with_random_key(cls, *, created_by, label="", expires_at=None):
-        raw = secrets.token_urlsafe(20)   # URL-safe secret
-        obj = cls.objects.create(
-            key_hash=_hash_key(raw),
-            label=label,
-            created_by=created_by,
-            expires_at=expires_at,
-        )
-        return obj, raw  # return the raw key so you can share it
 
 
 class Feedback(models.Model):

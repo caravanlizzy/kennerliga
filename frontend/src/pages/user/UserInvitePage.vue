@@ -3,17 +3,15 @@
     <div class="row q-col-gutter-md">
       <div class="col-12 col-sm-6">
         <q-input
-          v-model="username"
-          label="Username"
+          v-model="note"
+          label="Internal note (remember who you invited)"
           outlined
-          :rules="[(val) => !!val || 'Username is required']"
         />
       </div>
       <div class="col-12">
         <kenner-button
           color="positive"
           :loading="loading"
-          :disabled="!username"
           @click="handleInvite"
         >
           Invite User
@@ -31,23 +29,21 @@ import KennerButton from 'components/base/KennerButton.vue';
 import { useRouter } from 'vue-router';
 
 const $q = useQuasar();
-const username = ref('');
+const note = ref('');
 const loading = ref(false);
 const router = useRouter();
 
 const handleInvite = async () => {
-  if (!username.value) return;
-
   loading.value = true;
   try {
     await api.post('/user/invitations/', {
-      username: username.value,
+      label: note.value,
     });
 
-    await router.push({ name: 'list-invitations' });
+    await router.push({ name: 'invitations' });
     $q.notify({
       type: 'positive',
-      message: `${username.value} can now register`,
+      message: `User can now register. Internal note: ${note.value}`,
     });
   } catch (error) {
     $q.notify({

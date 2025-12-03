@@ -459,7 +459,7 @@ function handleKeydown(event: KeyboardEvent) {
   }
 
   .message-bubble {
-    padding: 10px 14px;
+    padding: 5px 7px;
     background: var(--q-accent);
     color: #ffffff;
     border-radius: 18px 18px 4px 18px;
@@ -487,9 +487,9 @@ function handleKeydown(event: KeyboardEvent) {
 }
 
 .message-bubble {
-  padding: 10px 14px;
+  padding: 5px 7px;
   background: #f7f7f7;
-  border-radius: 18px 18px 18px 4px;
+  border-radius: 4px 18px 18px 18px;
   transition: all 0.2s ease-in-out;
 }
 

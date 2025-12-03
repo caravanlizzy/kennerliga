@@ -17,6 +17,11 @@
           <DrawerItem icon="casino" label="Games" forward-name="games" />
           <DrawerItem icon="group" label="Members" forward-name="users" />
           <DrawerItem
+            icon="forward_to_inbox"
+            label="Invitations"
+            forward-name="invitations"
+          />
+          <DrawerItem
             icon="calendar_month"
             label="Seasons"
             forward-name="seasons"
@@ -54,7 +59,7 @@ const { isAdmin } = storeToRefs(useUserStore());
 const { isMobile } = responsive;
 const router = useRouter();
 
-provide('closeDrawer', () => drawerState.value = false)
+provide('closeDrawer', () => (drawerState.value = false));
 
 async function doLogout(): Promise<void> {
   await logout();

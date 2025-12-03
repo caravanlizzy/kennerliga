@@ -15,7 +15,7 @@ from result.models import Result
 from result.serializers import ResultSerializer
 from season.models import Season, SeasonParticipant
 from season.serializer import SeasonSerializer
-from user.models import User, PlayerProfile, Platform, PlatformPlayer, _hash_key, UserInviteLink, Feedback
+from user.models import User, PlayerProfile, Platform, PlatformPlayer, UserInviteLink, Feedback
 from user.serializers import UserSerializer, UserInviteLinkSerializer, UserRegistrationSerializer, \
     PlayerProfileSerializer, FeedbackSerializer
 
@@ -106,8 +106,8 @@ class MeViewSet(ViewSet):
 class UserInviteLinkViewSet(ModelViewSet):
     """
     Admin-only:
-      - GET    /invite-links/        list
-      - POST   /invite-links/        create (returns raw invite_key once)
+      - GET    /invite-links/        list (includes invite_url)
+      - POST   /invite-links/        create
       - GET    /invite-links/{id}/   retrieve
       - DELETE /invite-links/{id}/   destroy
     """
@@ -116,36 +116,8 @@ class UserInviteLinkViewSet(ModelViewSet):
     permission_classes = [IsAdminUser]
     http_method_names = ["get", "post", "delete", "head", "options"]
 
-    def create(self, request, *args, **kwargs):
-        ser = self.get_serializer(data=request.data)
-        ser.is_valid(raise_exception=True)
-
-        label = ser.validated_data.get("label", "")
-        expires_at = ser.validated_data.get("expires_at")
-
-        invite, raw_key = UserInviteLink.create_with_random_key(
-            created_by=request.user,
-            label=label,
-            expires_at=expires_at,
-        )
-
-        frontend_base = getattr(settings, "FRONTEND_REGISTER_URL", None)
-        invite_url = None
-        if frontend_base:
-            query = urlencode({"key": raw_key})
-            sep = "&" if "?" in frontend_base else "?"
-            invite_url = f"{frontend_base}{sep}{query}"
-
-        data = self.get_serializer(invite).data
-        data.update({"invite_key": raw_key, "invite_url": invite_url})
-        return Response(data, status=status.HTTP_201_CREATED)
-
-    def update(self, request, *args, **kwargs):
-        return Response({"detail": "Updates are not allowed."}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
-
-    def partial_update(self, request, *args, **kwargs):
-        return Response({"detail": "Updates are not allowed."}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
-
+    def perform_create(self, serializer):
+        serializer.save(created_by=self.request.user)
 
 
 class UserRegistrationViewSet(ViewSet):
@@ -164,11 +136,9 @@ class UserRegistrationViewSet(ViewSet):
         password = serializer.validated_data["password"]
         invite_key = serializer.validated_data["invite_key"]
 
-        key_hash = _hash_key(invite_key)
-
         try:
             with transaction.atomic():
-                invite = UserInviteLink.objects.select_for_update().get(key_hash=key_hash)
+                invite = UserInviteLink.objects.select_for_update().get(key=invite_key)
 
                 if invite.is_expired():
                     invite.delete()

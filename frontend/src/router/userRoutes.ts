@@ -15,12 +15,12 @@ export default {
     },
     {
       path: 'invite',
-      name: 'user-invite',
+      name: 'invite-user',
       component: () => import('pages/user/UserInvitePage.vue'),
     },
     {
       path: 'invitations',
-      name: 'list-invitations',
+      name: 'invitations',
       component: () => import('pages/user/InvitationListPage.vue'),
     },
   ],

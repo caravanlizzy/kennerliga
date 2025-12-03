@@ -50,10 +50,12 @@ class PlatformPlayerAdmin(admin.ModelAdmin):
 
 @admin.register(UserInviteLink)
 class UserInviteLinkAdmin(admin.ModelAdmin):
-    list_display = ('label', 'created_by', 'created_at', 'expires_at', 'is_expired')
-    list_filter = ('created_at', 'expires_at')
-    search_fields = ('label', 'created_by__username')
-    readonly_fields = ('key_hash', 'created_at')
+    list_display = ('label', 'created_by', 'created_at', 'expires_at', 'is_expired', 'key')
+    list_filter = ('created_at', 'expires_at', 'created_by')
+    search_fields = ('label', 'created_by__username', 'key')
+    readonly_fields = ('created_at', 'key')
+    ordering = ('-created_at',)
+    date_hierarchy = 'created_at'
 
 
 @admin.register(Feedback)
