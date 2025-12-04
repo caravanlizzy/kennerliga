@@ -44,89 +44,103 @@
       class="col-12 col-md-6"
     >
       <q-card flat bordered class="fit" v-if="showPlayerGrid">
-        <q-item class="row justify-between">
-          <q-item-section side>
-            <q-item-label class="text-weight-medium">
-              <q-icon name="person"></q-icon>
-              {{ member.username }}
-            </q-item-label>
-          </q-item-section>
-          <q-item-section v-if="league.status === 'PICKING' || league.status === 'REPICKING' || league.status === 'BANNING'" side>
-            <q-badge
-              v-if="member.profile === league.active_player"
-              outline
-              text-color="positive"
-            >
-              <q-icon size="xs" name="star" /> Active
-            </q-badge>
-            <q-badge
-              v-else
-              outline
-              color="primary"
-              class="q-py-xs q-px-sm cursor-pointer"
-              @click="setActivePlayer(member.profile)"
-            >
-              Set Active
-            </q-badge>
-          </q-item-section>
-
-          <q-item-section side>
-            <div v-if="member.selected_game" class="text-bold text-subtitle2">
+        <!-- Player Header Section -->
+        <q-card-section class="bg-primary text-white q-pa-md">
+          <div class="row items-center justify-between">
+            <div class="col">
+              <div class="text-h6 text-weight-medium">
+                <q-icon name="person" size="sm" class="q-mr-xs" />
+                {{ member.username }}
+              </div>
+            </div>
+            <div class="col-auto" v-if="league.status === 'PICKING' || league.status === 'REPICKING' || league.status === 'BANNING'">
+              <q-badge
+                v-if="member.profile === league.active_player"
+                color="positive"
+                class="q-py-xs q-px-sm"
+              >
+                <q-icon size="xs" name="star" class="q-mr-xs" /> Active Player
+              </q-badge>
+              <q-btn
+                v-else
+                dense
+                outline
+                color="white"
+                label="Set Active"
+                size="sm"
+                @click="setActivePlayer(member.profile)"
+              />
+            </div>
+          </div>
+          <div class="q-mt-sm">
+            <div v-if="member.selected_game" class="text-subtitle1 text-weight-medium">
+              <q-icon name="sports_esports" size="sm" class="q-mr-xs" />
               {{ member.selected_game.game_name }}
-              <q-icon class="q-ml-xs" name="sports_esports" />
             </div>
             <q-badge
               v-else
-              color="grey-5"
+              color="grey-4"
               text-color="dark"
-              outline
               class="text-uppercase"
-              >No game yet</q-badge
             >
-          </q-item-section>
-        </q-item>
+              No game selected
+            </q-badge>
+          </div>
+        </q-card-section>
 
         <q-separator />
 
-        <div v-if="hasResult(member)">
-          <q-card-section>
+        <!-- Match Result Section -->
+        <div v-if="hasResult(member)" class="bg-grey-2">
+          <q-card-section class="q-pb-none">
+            <div class="text-subtitle2 text-weight-bold text-grey-8 q-mb-sm">
+              <q-icon name="emoji_events" size="sm" class="q-mr-xs" />
+              Match Result
+            </div>
             <MatchResult
               :displayGameName="false"
-              v-if="hasResult(member)"
               :selectedGame="member.selected_game"
             />
           </q-card-section>
-          <q-card-actions align="right" class="bg-grey-3">
+          <q-card-actions align="right" class="q-px-md q-pb-md">
             <KennerButton
-              v-if="hasResult(member)"
               outline
               label="Edit Result"
               icon="edit_note"
               color="accent"
+              size="sm"
               @click="() => (editResultForSelGameId = member.selected_game.id)"
             />
           </q-card-actions>
+          <q-separator />
         </div>
-        <q-card-section>
+
+        <!-- Game Settings Section -->
+        <q-card-section class="q-pa-none">
           <q-expansion-item
             dense
             default-opened
-            icon="info"
+            icon="settings"
             label="Game Settings"
+            header-class="text-weight-bold text-grey-8 bg-grey-1"
             expand-icon="expand_more"
-            class="q-mx-sm q-mb-sm"
           >
-            <q-card-section class="bg-grey-1">
+            <q-card-section class="bg-grey-1 q-pt-sm">
               <GameSettingsDisplay
                 v-if="member.selected_game"
                 :selectedOptions="member.selected_game.selected_options"
               />
-              <div v-else>No game settings available</div>
+              <div v-else class="text-grey-6 text-center q-py-md">
+                No game settings available
+              </div>
             </q-card-section>
           </q-expansion-item>
         </q-card-section>
 
-        <q-card-actions align="right" class="bg-grey-3">
+        <q-separator />
+
+        <!-- Actions Section -->
+        <q-card-actions align="right" class="bg-grey-3 q-pa-md">
           <KennerButton
             outline
             v-if="member.selected_game"
