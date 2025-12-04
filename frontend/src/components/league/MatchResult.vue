@@ -1,7 +1,7 @@
 <template>
   <q-card
     flat
-    v-if="results.length > 0 || showEmptyResultMessage"
+    v-if="results.length > 0 || ptyResultMessage"
   >
     <div v-if="displayGameName" class="row items-center justify-center q-mb-xs">
       <div class="text-h6 text-weight-bold q-px-md q-py-sm">
@@ -55,7 +55,7 @@
                 size="20px"
                 class="q-mr-xs"
               />
-              {{ result.username }}
+              {{ result.profile_name }}
             </q-item-label>
           </q-item-section>
 
@@ -114,11 +114,9 @@ const props = withDefaults(
   defineProps<{
     selectedGame: any;
     displayGameName: boolean;
-    showEmptyResultMessage: boolean;
   }>(),
   {
     displayGameName: true,
-    showEmptyResultMessage: true,
   }
 );
 const { user } = storeToRefs(useUserStore());
@@ -136,38 +134,11 @@ const results = computed(() => {
     const m = membersById.value[r.player_profile];
     return {
       id: r.id,
-      username: r.player_profile_name,
+      profile_name: r.player_profile_name,
       points: r.points ?? null,
       starting_position: r.starting_position ?? null,
       faction_name: r.faction_name ?? null,
     };
   });
 });
-
-const columns: QTableProps['columns'] = [
-  {
-    name: 'player',
-    label: '',
-    field: 'username',
-    align: 'left',
-  },
-  {
-    name: 'points',
-    label: '',
-    field: 'points',
-    align: 'center',
-  },
-  {
-    name: 'starting_position',
-    label: '',
-    field: 'starting_position',
-    align: 'center',
-  },
-  {
-    name: 'faction_name',
-    label: '',
-    field: 'faction_name',
-    align: 'center',
-  },
-];
 </script>

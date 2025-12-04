@@ -62,7 +62,6 @@
               >
                 <MatchResult
                   :selectedGame="member.selected_game"
-                  :showEmptyResultMessage="false"
                   :displayGameName="true"
                 />
               </div>

@@ -26,7 +26,7 @@ const rows = computed(() => {
   // 1) Seed every member with zeros so they always show up
   const standings: Record<
     number,
-    { id: number; league_player: string; league_points: number; wins: number }
+    { id: number; profile_name: string; league_points: number; wins: number }
   > = {};
 
   for (const idStr in membersById.value) {
@@ -34,7 +34,7 @@ const rows = computed(() => {
     const m = membersById.value[id];
     standings[id] = {
       id,
-      league_player: m?.username ?? `#${id}`,
+      profile_name: m.profile_name,
       league_points: 0,
       wins: 0,
     };
@@ -55,7 +55,7 @@ const rows = computed(() => {
         // fallback in case a result references a non-member (shouldn't happen)
         standings[pid] = {
           id: pid,
-          league_player: membersById.value[pid]?.username ?? `#${pid}`,
+          profile_name: membersById.value[pid]?.username ?? `#${pid}`,
           league_points: 0,
           wins: 0,
         };
@@ -70,15 +70,15 @@ const rows = computed(() => {
     if (b.league_points !== a.league_points)
       return b.league_points - a.league_points;
     if (b.wins !== a.wins) return b.wins - a.wins;
-    return a.league_player.localeCompare(b.league_player);
+    return a.profile_name.localeCompare(b.profile_name);
   });
 });
 
 const columns: QTableProps['columns'] = [
   {
-    name: 'league_player',
+    name: 'profile_name',
     label: 'Player',
-    field: 'league_player',
+    field: 'profile_name',
     align: 'left',
   },
   {
