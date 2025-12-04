@@ -48,7 +48,7 @@
           <div v-else class="row q-col-gutter-md">
             <div
               v-for="gameOption of gameOptions"
-              :key="gameOption.itemId"
+              :key="gameOption.id"
               class="col-12 col-sm-6 col-md-4"
             >
               <GameOption :gameOption="gameOption" />
