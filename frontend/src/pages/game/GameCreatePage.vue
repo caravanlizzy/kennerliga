@@ -64,7 +64,6 @@
         <KennerButton
           class="q-my-xl"
           type="submit"
-          push
           color="positive"
           label="Save"
           icon="save"
