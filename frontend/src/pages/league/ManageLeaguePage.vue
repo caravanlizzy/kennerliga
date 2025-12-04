@@ -50,7 +50,7 @@
             <div class="col">
               <div class="text-h6 text-weight-medium">
                 <q-icon name="person" size="sm" class="q-mr-xs" />
-                {{ member.username }}
+                {{ member.profile_name }}
               </div>
             </div>
             <div class="col-auto" v-if="league.status === 'PICKING' || league.status === 'REPICKING' || league.status === 'BANNING'">
@@ -201,7 +201,7 @@
     <FormLayout v-if="selectingGameMember" @onClose="closeForm">
       <template #head>
         Select a game for
-        <span class="text-primary">{{ selectingGameMember.username }}</span>
+        <span class="text-primary">{{ selectingGameMember.profile_name }}</span>
       </template>
 
       <GameSelector
