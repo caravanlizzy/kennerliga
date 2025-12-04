@@ -46,7 +46,7 @@
               <q-card-section class="q-pa-sm">
                 <div class="row items-center justify-between q-mb-sm">
                   <div class="text-subtitle2 text-weight-medium ellipsis">
-                    {{ member.username }}
+                    {{ member.profile_name }}
                   </div>
                 </div>
 
@@ -158,14 +158,13 @@ import KennerSelect from 'components/base/KennerSelect.vue';
 import KennerButton from 'components/base/KennerButton.vue';
 
 type Faction = { id: number; name: string };
-type Member = { id: number; username: string };
 
 const emit = defineEmits<{ (e: 'submitted', selectedGameId: number): void }>();
 const $q = useQuasar();
 
 const props = defineProps<{ selectedGameId: number; leagueId: number }>();
 const leagueStore = useLeagueStore(props.leagueId)();
-const { members } = storeToRefs(leagueStore); // Member[]
+const { members } = storeToRefs(leagueStore);
 
 const resultConfig = ref<any>(null);
 const factions = ref<Faction[]>([]);
@@ -204,7 +203,7 @@ function getEntry(memberId: number) {
 }
 
 function preselectStartingPositions() {
-  (members.value as Member[]).forEach((m, i) => {
+  (members.value).forEach((m, i) => {
     getEntry(m.id).starting_position = i + 1;
   });
 }
@@ -214,7 +213,7 @@ function swapStartingPosition(memberId: number, newPos: number) {
   const currentPos = getEntry(memberId).starting_position ?? null;
   if (currentPos === newPos) return;
 
-  const owner = (members.value as Member[]).find(
+  const owner = (members.value).find(
     (m) => getEntry(m.id).starting_position === newPos
   );
   getEntry(memberId).starting_position = newPos;
@@ -224,14 +223,14 @@ function swapStartingPosition(memberId: number, newPos: number) {
 }
 
 const displayMembers = computed(() => {
-  if (!orderByStartingPos.value) return members.value as Member[];
-  const byStart = [...(members.value as Member[])].sort((a, b) => {
+  if (!orderByStartingPos.value) return members.value;
+  const byStart = [...(members.value)].sort((a, b) => {
     const pa = getEntry(a.id).starting_position ?? Infinity;
     const pb = getEntry(b.id).starting_position ?? Infinity;
     if (pa !== pb) return pa - pb;
     return (
-      (members.value as Member[]).findIndex((m) => m.id === a.id) -
-      (members.value as Member[]).findIndex((m) => m.id === b.id)
+      (members.value).findIndex((m) => m.id === a.id) -
+      (members.value).findIndex((m) => m.id === b.id)
     );
   });
   return byStart;
@@ -257,7 +256,7 @@ async function fetchFactions() {
 }
 
 function initFormData() {
-  formData.value = (members.value as Member[]).map((p) => ({
+  formData.value = (members.value).map((p) => ({
     player_profile: p.id,
     selected_game: props.selectedGameId,
     points: null as number | null,
@@ -287,8 +286,8 @@ watch(
 );
 
 function idToName(pid: number) {
-  const m = (members.value as Member[]).find((x) => x.id === pid);
-  return m?.username ?? `#${pid}`;
+  const m = (members.value).find((x) => x.id === pid);
+  return m?.profile_name;
 }
 
 const tieGroupDisplay = computed(() =>
