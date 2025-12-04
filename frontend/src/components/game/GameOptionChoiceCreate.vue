@@ -21,6 +21,7 @@
   </div>
 </template>
 
+
 <script setup lang="ts">
 import { inject, computed } from 'vue';
 import ListCreator from 'components/lists/ListCreator.vue';
@@ -43,19 +44,13 @@ const initialNames = computed<string[]>(() =>
 const choiceCount = computed(() => props.gameOption.choices?.length ?? 0);
 
 /**
- * Map ListCreator's string[] to TGameOptionChoice[] while keeping stable IDs.
+ * Map ListCreator's items to TGameOptionChoice[].
+ * ListCreator emits { itemId, name }[] not string[]
  */
-function onUpdate(updatedNames: string[]) {
-  const existingByName = new Map(
-    (props.gameOption.choices || []).map((c) => [c.name, c.id])
-  );
-
-  const nextChoices: TGameOptionChoice[] = updatedNames.map((name, i) => ({
-    id:
-      existingByName.get(name) ??
-      props.gameOption.choices?.[i]?.id ??
-      createRandomId(),
-    name,
+function onUpdate(updatedItems: { itemId: number; name: string }[]) {
+  const nextChoices: TGameOptionChoice[] = updatedItems.map((item) => ({
+    id: item.itemId,
+    name: item.name,
   }));
 
   updateItem(props.gameOption, 'choices', nextChoices);
