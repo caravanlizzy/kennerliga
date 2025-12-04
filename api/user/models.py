@@ -86,6 +86,14 @@ class UserInviteLink(models.Model):
         on_delete=models.CASCADE,
         related_name="invite_links",
     )
+    player_profile = models.ForeignKey(
+        'PlayerProfile',
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name="invite_links",
+        help_text="Optional: Link this invite to an existing PlayerProfile"
+    )
     created_at = models.DateTimeField(auto_now_add=True)
     expires_at = models.DateTimeField(null=True, blank=True)
 

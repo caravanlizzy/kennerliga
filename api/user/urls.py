@@ -1,11 +1,14 @@
+from profile import Profile
+
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 
-from user.views import UserViewSet, MeViewSet, UserRegistrationViewSet, UserInviteLinkViewSet, FeedbackViewSet
+from user.views import UserViewSet, MeViewSet, UserRegistrationViewSet, UserInviteLinkViewSet, FeedbackViewSet, \
+    PlayerProfileViewSet
 
 router = DefaultRouter()
 router.register('users', UserViewSet, basename='users')
-router.register('profiles', UserViewSet, basename='profiles')
+router.register('profiles', PlayerProfileViewSet, basename='profiles')
 router.register('me', MeViewSet, basename='me')
 router.register('invitations', UserInviteLinkViewSet, basename='invitations')
 router.register('register', UserRegistrationViewSet, basename='register')

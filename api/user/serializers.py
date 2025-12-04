@@ -8,24 +8,26 @@ from user.models import PlayerProfile, UserInviteLink, Feedback
 
 User = get_user_model()
 
+
 class UserSerializer(ModelSerializer):
     class Meta:
         model = User
-        fields = '__all__'
+        fields = ['id', 'username']
 
 
 class PlayerProfileSerializer(ModelSerializer):
     class Meta:
         model = PlayerProfile
-        fields = ['id', 'username', 'profile_name']
+        fields = ['id', 'user', 'profile_name']
 
 
 class UserInviteLinkSerializer(serializers.ModelSerializer):
     invite_url = serializers.SerializerMethodField()
+    player_profile_details = PlayerProfileSerializer(source='player_profile', read_only=True)
 
     class Meta:
         model = UserInviteLink
-        fields = ["id", "key", "label", "created_by", "created_at", "expires_at", "invite_url"]
+        fields = ["id", "key", "label", "player_profile", "player_profile_details", "created_by", "created_at", "expires_at", "invite_url"]
         read_only_fields = ["id", "key", "created_by", "created_at", "invite_url"]
 
     def get_invite_url(self, obj):

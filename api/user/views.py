@@ -144,18 +144,25 @@ class UserRegistrationViewSet(ViewSet):
                     invite.delete()
                     return Response({"detail": "Invite expired."}, status=400)
 
-                # Create user + related models
                 user = User.objects.create_user(username=username, password=password)
 
-                profile_name = f"{username}_profile"
-                player_profile = PlayerProfile.objects.create(user=user, profile_name=profile_name)
+                # Check if invite has an existing PlayerProfile
+                if invite.player_profile:
+                    # Link user to existing profile
+                    player_profile = invite.player_profile
+                    player_profile.user = user
+                    player_profile.save()
+                else:
+                    # Create a new PlayerProfile
+                    player_profile = PlayerProfile.objects.create(user=user, profile_name=username)
 
-                BGA = Platform.objects.get(name="BGA")
-                PlatformPlayer.objects.create(
-                    player_profile=player_profile,
-                    platform=BGA,
-                    name=user.username,
-                )
+                    # Remove PlatformPlayer handling for now
+                    # BGA = Platform.objects.get(name="BGA")
+                    # PlatformPlayer.objects.create(
+                    #     player_profile=player_profile,
+                    #     platform=BGA,
+                    #     name=user.username,
+                    # )
 
                 # Delete invite after success
                 invite.delete()
@@ -169,34 +176,51 @@ class UserRegistrationViewSet(ViewSet):
         except Exception as e:
             return Response({"detail": str(e)}, status=400)
 
-    @action(detail=False, methods=["get"], url_path="validate")
-    def validate_invite(self, request):
-        raw_key = request.query_params.get("invite") or request.query_params.get("key")
-        if not raw_key:
-            return Response({"valid": False, "reason": "missing_key"}, status=400)
-
-        key_hash = _hash_key(raw_key)
-
-        try:
-            invite = UserInviteLink.objects.get(key_hash=key_hash)
-        except UserInviteLink.DoesNotExist:
-            return Response({"valid": False, "reason": "not_found"}, status=404)
-
-        if invite.is_expired():
-            invite.delete()
-            return Response({"valid": False, "reason": "expired"}, status=410)
-
-        return Response({
-            "valid": True,
-            "label": invite.label,
-            "expires_at": invite.expires_at,
-        }, status=200)
+    # @action(detail=False, methods=["get"], url_path="validate")
+    # def validate_invite(self, request):
+    #     raw_key = request.query_params.get("invite") or request.query_params.get("key")
+    #     if not raw_key:
+    #         return Response({"valid": False, "reason": "missing_key"}, status=400)
+    #
+    #     key_hash = _hash_key(raw_key)
+    #
+    #     try:
+    #         invite = UserInviteLink.objects.get(key_hash=key_hash)
+    #     except UserInviteLink.DoesNotExist:
+    #         return Response({"valid": False, "reason": "not_found"}, status=404)
+    #
+    #     if invite.is_expired():
+    #         invite.delete()
+    #         return Response({"valid": False, "reason": "expired"}, status=410)
+    #
+    #     return Response({
+    #         "valid": True,
+    #         "label": invite.label,
+    #         "expires_at": invite.expires_at,
+    #     }, status=200)
 
 
 class PlayerProfileViewSet(ModelViewSet):
     queryset = PlayerProfile.objects.all()
     serializer_class = PlayerProfileSerializer
     permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        queryset = PlayerProfile.objects.all()
+
+        # Check for user__isnull query parameter
+        user_isnull = self.request.query_params.get('user__isnull', None)
+
+        if user_isnull is not None:
+            # Strip whitespace and slashes, then convert to lowercase
+            user_isnull = user_isnull.strip().strip('/').lower()
+
+            if user_isnull in ['true', '1', 'yes']:
+                queryset = queryset.filter(user__isnull=True)
+            elif user_isnull in ['false', '0', 'no']:
+                queryset = queryset.filter(user__isnull=False)
+
+        return queryset
 
 
 class FeedbackViewSet(ModelViewSet):
