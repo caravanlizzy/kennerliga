@@ -6,6 +6,7 @@ from .models import Result
 class ResultSerializer(serializers.ModelSerializer):
     faction_id = serializers.IntegerField(required=False, allow_null=True, write_only=True)
     faction_name = serializers.SerializerMethodField(read_only=True)
+    player_profile_name = serializers.SerializerMethodField(read_only=True)
     decisive_tie_breaker = serializers.SerializerMethodField(required=False, read_only=True)
 
     class Meta:
@@ -13,6 +14,7 @@ class ResultSerializer(serializers.ModelSerializer):
         fields = [
             'id',
             'player_profile',
+            'player_profile_name',
             'selected_game',
             'points',
             'starting_position',
@@ -24,6 +26,9 @@ class ResultSerializer(serializers.ModelSerializer):
 
     def get_faction_name(self, obj):
         return obj.faction.name if getattr(obj, 'faction', None) else None
+
+    def get_player_profile_name(self, obj):
+        return obj.player_profile.profile_name
 
     def get_decisive_tie_breaker(self, obj):
         if isinstance(obj, dict):

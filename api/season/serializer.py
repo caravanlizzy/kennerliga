@@ -33,13 +33,13 @@ class SeasonSerializer(ModelSerializer):
 
 
 class SeasonParticipantMiniSerializer(ModelSerializer):
-    display_name = CharField(source="profile.profile_name", read_only=True)
+    profile_name = CharField(source="profile.profile_name", read_only=True)
     username = SerializerMethodField()
 
     class Meta:
         model = SeasonParticipant
-        fields = ("id", "display_name", "username")
-        read_only_fields = ("id", "display_name", "username")
+        fields = ("id", "profile_name", "username")
+        read_only_fields = ("id", "profile_name", "username")
 
     def get_username(self, obj):
         user = getattr(obj.profile, "user", None)

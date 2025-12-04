@@ -43,19 +43,19 @@ class LeagueSerializer(serializers.ModelSerializer):
         return league
 
 class LeagueStandingSerializer(serializers.ModelSerializer):
-    player = serializers.CharField(source="player_profile.profile_name", read_only=True)
+    profile_name = serializers.CharField(source="player_profile.profile_name", read_only=True)
 
     class Meta:
         model = LeagueStanding
-        fields = ("player_profile", "player", "wins", "league_points")
+        fields = ("player_profile", "profile_name", "wins", "league_points")
 
 
 class GameStandingSerializer(serializers.ModelSerializer):
-    player = serializers.CharField(source="player_profile.profile_name", read_only=True)
+    profile_name = serializers.CharField(source="player_profile.profile_name", read_only=True)
 
     class Meta:
         model = GameStanding
-        fields = ("player_profile", "player", "selected_game", "points", "rank", "league_points", "win_share")
+        fields = ("player_profile", "profile_name", "selected_game", "points", "rank", "league_points", "win_share")
 
 
 class LeagueDetailSerializer(serializers.ModelSerializer):
