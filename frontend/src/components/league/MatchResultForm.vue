@@ -17,7 +17,7 @@
 
     <!-- Tie-breaker banner -->
     <q-banner
-      v-if="tieBreakerRequired && requiredTieBreaker"
+      v-if="tieBreakerRequired"
       class="q-mb-md bg-warning text-dark"
       rounded
       dense
@@ -26,7 +26,12 @@
         <q-icon name="toll" />
       </template>
       <div class="text-body2">
-        <b>{{ requiredTieBreaker.name }}</b> needed for:
+        <template v-if="requiredTieBreaker?.name">
+          <b>{{ requiredTieBreaker.name }}</b> needed for:
+        </template>
+        <template v-else>
+          <b>Tie-breaker</b> needed for:
+        </template>
         <span v-for="(grp, idx) in tieGroupDisplay" :key="grp.key">
           {{ grp.names.join(', ')
           }}<span v-if="idx < tieGroupDisplay.length - 1">; </span>
@@ -326,6 +331,18 @@ function handleTieBreaker202(data: any) {
   }
 
   tieBreakerPlayers.value = nextPlayers;
+
+  // Check if this is an unresolved tie with no more tie-breakers available
+  if (data?.unresolved_tie && !data?.required_tie_breaker) {
+    $q.notify({
+      type: 'warning',
+      message: data?.detail || 'Tie detected but no more tie-breakers available.',
+      timeout: 5000,
+    });
+    // Reset tie-breaker state since there's nothing more to do
+    tieBreakerRequired.value = false;
+    return;
+  }
 
   const tbName = requiredTieBreaker.value?.name
     ? ` (${requiredTieBreaker.value.name})`
