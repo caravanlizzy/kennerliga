@@ -1,7 +1,7 @@
 <template>
   <q-card
     flat
-    v-if="results.length > 0 || ptyResultMessage"
+    v-if="results.length > 0"
   >
     <div v-if="displayGameName" class="row items-center justify-center q-mb-xs">
       <div class="text-h6 text-weight-bold q-px-md q-py-sm">
@@ -107,7 +107,6 @@
 import { computed } from 'vue';
 import { storeToRefs } from 'pinia';
 import { useLeagueStore } from 'stores/leagueStore';
-import { QTableProps } from 'quasar';
 import { useUserStore } from 'stores/userStore';
 
 const props = withDefaults(
@@ -121,7 +120,7 @@ const props = withDefaults(
 );
 const { user } = storeToRefs(useUserStore());
 const myLeagueStore = useLeagueStore(user.value.myCurrentLeagueId)();
-const { matchResultsBySelectedGame, membersById } = storeToRefs(myLeagueStore);
+const { matchResultsBySelectedGame } = storeToRefs(myLeagueStore);
 
 // Results for this game are already sorted in setResultsForGame()
 const resultsForGame = computed(
@@ -131,7 +130,6 @@ const resultsForGame = computed(
 // Join once → template stays dumb & fast
 const results = computed(() => {
   return resultsForGame.value.map((r) => {
-    const m = membersById.value[r.player_profile];
     return {
       id: r.id,
       profile_name: r.player_profile_name,

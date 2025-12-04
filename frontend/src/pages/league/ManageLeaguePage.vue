@@ -220,7 +220,7 @@
       <MatchResultForm
         :selectedGameId="postResultForSelGame.id"
         :leagueId="league.id"
-        @submitted="closeForm"
+        @submitted="closeForm && load"
       />
     </FormLayout>
     <!--      Form to edit match results-->
