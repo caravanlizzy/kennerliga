@@ -15,6 +15,12 @@
       </div>
       <q-space />
       <q-badge
+        v-if="season?.status"
+        color="teal"
+        :label="season.status"
+        class="q-mr-sm"
+      />
+      <q-badge
         v-if="leagues?.length"
         color="primary"
         :label="`${leagues.length} ${leagues.length === 1 ? 'league' : 'leagues'}`"
@@ -89,8 +95,6 @@ const leagues = ref<League[]>([]);
 const season = ref<Season>({});
 const loading = ref(true);
 const error = ref<string | null>(null);
-
-
 
 onMounted(async () => {
   try {
