@@ -57,7 +57,8 @@
                   member.selected_game &&
                   hasSelectedGameResult(member.selected_game.id)
                 "
-                class="q-pa-xs col-12 col-md-6"
+                class="q-pa-xs col-12"
+                :class="{'col-md-6': selectedGamesWithResults.length > 1}"
               >
                 <MatchResult
                   :selectedGame="member.selected_game"
@@ -136,8 +137,9 @@ const {
   members,
   leagueId,
   loading,
+  selectedGamesWithResults
 } = storeToRefs(myLeagueStore);
-const { updateLeagueData, hasSelectedGameResult } = myLeagueStore;
+const { updateLeagueData, hasSelectedGameResult  } = myLeagueStore;
 
 const { setActions, setLeadText, setSubject, reset } = useActionBar();
 

@@ -136,7 +136,7 @@ const results = computed(() => {
     const m = membersById.value[r.player_profile];
     return {
       id: r.id,
-      username: m?.username ?? `#${r.player_profile}`,
+      username: r.player_profile_name,
       points: r.points ?? null,
       starting_position: r.starting_position ?? null,
       faction_name: r.faction_name ?? null,

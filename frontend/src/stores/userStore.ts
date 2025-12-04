@@ -10,7 +10,7 @@ export type TUser = {
   username: string;
   token: string;
   admin: boolean;
-  platform_players: { name: string }[];
+  // platform_players: { name: string }[];
   profile: TProfile;
   myCurrentLeagueId: number|null;
 };

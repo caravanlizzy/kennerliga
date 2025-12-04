@@ -25,7 +25,7 @@
           icon="person"
           class="q-mr-xs q-mb-xs"
         >
-          {{ m.username || m.name }}
+          {{ m.profile_name }}
         </q-chip>
       </div>
     </q-card-section>
