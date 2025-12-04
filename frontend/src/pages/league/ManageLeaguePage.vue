@@ -1,13 +1,13 @@
 <template>
   <!-- Header -->
-  <div class="row items-center q-mb-lg">
+  <div v-if="!loading" class="row items-center q-mb-lg">
     <div class="col-grow">
       <div class="text-h5 text-weight-bold">
         Manage {{ loading ? '' : 'L' + league?.level }}
         <q-badge class="q-ml-sm" outline>League</q-badge>
       </div>
       <div class="text-subtitle2 text-grey-7">
-        Season: <q-chip dense square>{{ loading ? '' : season?.name }}</q-chip>
+        Season: <q-chip dense square>{{ loading ? '' : season?.name }} - {{season?.status}}</q-chip>
       </div>
     </div>
     <div class="col-auto">
@@ -53,7 +53,7 @@
                 {{ member.profile_name }}
               </div>
             </div>
-            <div class="col-auto" v-if="league.status === 'PICKING' || league.status === 'REPICKING' || league.status === 'BANNING'">
+            <div class="col-auto" v-if="['PICKING', 'REPICKING', 'BANNING'].includes(league.status) && season.status === 'RUNNING'">
               <q-badge
                 v-if="member.profile === league.active_player"
                 color="positive"
