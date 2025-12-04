@@ -95,6 +95,7 @@
   </q-card>
 </template>
 
+
 <script setup lang="ts">
 import { computed } from 'vue';
 import { storeToRefs } from 'pinia';
@@ -105,9 +106,11 @@ const props = withDefaults(
   defineProps<{
     selectedGame: any;
     displayGameName: boolean;
+    matchResults?: Record<number, any[]>; // Make optional
   }>(),
   {
     displayGameName: true,
+    matchResults: undefined, // Default to undefined
   }
 );
 
@@ -117,6 +120,27 @@ const { user } = storeToRefs(useUserStore());
 const leagueStore = computed(() => useLeagueStore(user.value.myCurrentLeagueId)());
 
 const results = computed(() => {
+  // If matchResults prop is provided and has data for this game, use it
+  if (props.matchResults) {
+    // matchResults is keyed by player_profile, so we need to find entries for this selected_game
+    const propsResults = Object.values(props.matchResults)
+      .flat()
+      .filter((r: any) => r.selected_game === props.selectedGame.id)
+      .map((r: any) => ({
+        id: r.id,
+        profile_name: r.player_profile_name,
+        points: r.points ?? null,
+        starting_position: r.starting_position ?? null,
+        faction_name: r.faction_name ?? null,
+      }))
+      .sort((a, b) => (b.points ?? 0) - (a.points ?? 0));
+
+    if (propsResults.length > 0) {
+      return propsResults;
+    }
+  }
+
+  // Fall back to store data
   const resultsForGame = leagueStore.value.matchResultsBySelectedGame[props.selectedGame.id] ?? [];
 
   return resultsForGame.map((r) => ({

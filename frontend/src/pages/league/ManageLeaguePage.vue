@@ -100,6 +100,7 @@
             <MatchResult
               :displayGameName="false"
               :selectedGame="member.selected_game"
+              :matchResults="matchResults"
             />
           </q-card-section>
           <q-card-actions align="right" class="q-px-md q-pb-md">
