@@ -217,7 +217,6 @@ async function createAll() {
 
   const s = await createSeason(year.value!, month.value!);
   const seasonId = s.id;
-  console.log(memberList.value, preparedLeagues.value);
   const seasonParticipants = await ensureParticipants(seasonId, memberList.value.map(Number));
 
   for (const lg of preparedLeagues.value) {

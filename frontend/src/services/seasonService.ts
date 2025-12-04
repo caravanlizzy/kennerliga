@@ -32,7 +32,7 @@ export async function createSeason(targetYear: number, targetMonth: number) {
   if (!season) {
     const res = await api('/season/seasons/', {
       method: 'POST',
-      data: { year: targetYear, month: targetMonth },
+      data: { year: targetYear, month: targetMonth, status: 'DONE' },
     });
     season = res.data;
   }
