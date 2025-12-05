@@ -77,7 +77,7 @@
       <q-separator />
 
       <!-- Composer -->
-      <q-card-section class="composer-section">
+      <q-card-section v-if="isAuthenticated" class="composer-section">
         <div class="composer-wrapper">
           <q-input
             ref="inputRef"
@@ -134,7 +134,7 @@ import { TMessage } from 'src/types';
 import { useUserStore } from 'stores/userStore';
 import { storeToRefs } from 'pinia';
 
-const { user } = storeToRefs(useUserStore());
+const { user, isAuthenticated } = storeToRefs(useUserStore());
 
 // ---------- State ----------
 let lastDateTime: string | undefined;
