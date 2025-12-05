@@ -6,14 +6,6 @@
         <div class="text-h6 text-primary">Match Result</div>
         <div class="text-caption text-grey-7">{{ members.length }} players</div>
       </div>
-      <div class="col-auto">
-        <q-toggle
-          v-model="orderByStartingPos"
-          label="Order by starting position"
-          color="secondary"
-          dense
-        />
-      </div>
     </div>
 
     <!-- Tie-breaker banner -->
@@ -44,7 +36,7 @@
       <q-form v-if="!isLoading && formData.length" @submit.prevent="submitResults">
         <div class="row q-col-gutter-md q-mb-md">
           <div
-            v-for="member in displayMembers"
+            v-for="member in members"
             :key="member.id"
             class="col-12 col-sm-6 col-lg-3"
           >
@@ -57,7 +49,7 @@
                 </div>
 
                 <div class="column q-gutter-sm">
-                  <!-- Points -->
+                  <!-- Points (for points-based games) -->
                   <q-input
                     v-if="resultConfig?.has_points"
                     v-model.number="getEntry(member.id).points"
@@ -71,6 +63,49 @@
                     bg-color="grey-2"
                     :rules="[(v:string|number|null) => v !== null && v !== '' || 'Required']"
                   />
+
+                  <!-- Position (for non-points games) -->
+                  <div v-else>
+                    <div class="text-caption text-grey-7 q-mb-xs">
+                      Final Position
+                    </div>
+                    <div class="row q-gutter-sm justify-center">
+                      <q-btn
+                        v-for="pos in members.length"
+                        :key="pos"
+                        size="md"
+                        round
+                        :outline="getEntry(member.id).position !== pos"
+                        :unelevated="getEntry(member.id).position === pos"
+                        :color="
+                              getEntry(member.id).position === pos
+                                ? 'primary'
+                                : 'grey-4'
+                            "
+                        :text-color="
+                              getEntry(member.id).position === pos
+                                ? 'white'
+                                : 'grey-8'
+                            "
+                        :label="String(pos)"
+                        class="position-btn"
+                        @click="setPosition(member.id, pos)"
+                      />
+                    </div>
+                    <!-- Notes for position -->
+                    <q-input
+                      v-model="getEntry(member.id).notes"
+                      label="Position Note"
+                      placeholder="Explain position reason..."
+                      dense
+                      outlined
+                      hide-bottom-space
+                      class="q-mt-sm"
+                      type="textarea"
+                      autogrow
+                      :input-style="{ minHeight: '40px' }"
+                    />
+                  </div>
 
                   <!-- Faction -->
                   <KennerSelect
@@ -91,31 +126,29 @@
 
                   <!-- Starting position -->
                   <div>
-                    <div class="text-caption text-grey-7 q-mb-xs">
+                    <div class="text-caption text-grey-7 q-mb-xs" style="font-size: 11px;">
                       Starting Position
                     </div>
-                    <div class="row q-gutter-sm justify-center">
+                    <div class="row q-gutter-xs justify-center">
                       <q-btn
                         v-for="pos in members.length"
                         :key="pos"
-                        size="md"
+                        size="sm"
                         round
                         :outline="getEntry(member.id).starting_position !== pos"
-                        :unelevated="
-                          getEntry(member.id).starting_position === pos
-                        "
+                        :unelevated="getEntry(member.id).starting_position === pos"
                         :color="
-                          getEntry(member.id).starting_position === pos
-                            ? 'secondary'
-                            : 'grey-4'
-                        "
+                              getEntry(member.id).starting_position === pos
+                                ? 'secondary'
+                                : 'grey-5'
+                            "
                         :text-color="
-                          getEntry(member.id).starting_position === pos
-                            ? 'white'
-                            : 'grey-8'
-                        "
+                              getEntry(member.id).starting_position === pos
+                                ? 'white'
+                                : 'grey-7'
+                            "
                         :label="String(pos)"
-                        class="position-btn"
+                        class="starting-position-btn"
                         @click="swapStartingPosition(member.id, pos)"
                       />
                     </div>
@@ -184,10 +217,8 @@ const requiredTieBreaker = ref<{
   name?: string;
   order?: number;
 } | null>(null);
-const tieBreakerPlayers = ref<Set<number>>(new Set()); // ids needing value now
-const tieGroups = ref<Array<{ points: number; players: number[] }>>([]); // for banner
-
-const orderByStartingPos = ref(true);
+const tieBreakerPlayers = ref<Set<number>>(new Set());
+const tieGroups = ref<Array<{ points: number | null; position: number | null; players: number[] }>>([]);
 
 const submitLabel = computed(() =>
   tieBreakerRequired.value ? 'Submit Tie-Breakers' : 'Save Result'
@@ -200,8 +231,10 @@ function getEntry(memberId: number) {
       player_profile: memberId,
       selected_game: props.selectedGameId,
       points: null as number | null,
+      position: null as number | null,
+      notes: '' as string,
       starting_position: null as number | null,
-      faction_id: null as number | null, // ID (emit-value + map-options)
+      faction_id: null as number | null,
       tie_breaker_value: null as number | null,
     };
     formData.value.push(found);
@@ -215,7 +248,6 @@ function preselectStartingPositions() {
   });
 }
 
-/** Swap start positions */
 function swapStartingPosition(memberId: number, newPos: number) {
   const currentPos = getEntry(memberId).starting_position ?? null;
   if (currentPos === newPos) return;
@@ -229,19 +261,15 @@ function swapStartingPosition(memberId: number, newPos: number) {
   }
 }
 
-const displayMembers = computed(() => {
-  if (!orderByStartingPos.value) return members.value;
-  const byStart = [...(members.value)].sort((a, b) => {
-    const pa = getEntry(a.id).starting_position ?? Infinity;
-    const pb = getEntry(b.id).starting_position ?? Infinity;
-    if (pa !== pb) return pa - pb;
-    return (
-      (members.value).findIndex((m) => m.id === a.id) -
-      (members.value).findIndex((m) => m.id === b.id)
-    );
-  });
-  return byStart;
-});
+function setPosition(memberId: number, pos: number) {
+  const entry = getEntry(memberId);
+  // Toggle off if clicking the same position, otherwise set it
+  if (entry.position === pos) {
+    entry.position = null;
+  } else {
+    entry.position = pos;
+  }
+}
 
 async function fetchResultConfig() {
   const { data: selectedGame } = await api.get(
@@ -263,7 +291,6 @@ async function fetchFactions() {
 }
 
 function initFormData() {
-  // Guard: don't initialize if members aren't loaded yet
   if (!members.value || members.value.length === 0) {
     formData.value = [];
     return;
@@ -273,13 +300,14 @@ function initFormData() {
     player_profile: p.id,
     selected_game: props.selectedGameId,
     points: null as number | null,
+    position: null as number | null,
+    notes: '' as string,
     starting_position: null as number | null,
     faction_id: null as number | null,
     tie_breaker_value: null as number | null,
   }));
   preselectStartingPositions();
 
-  // reset tie-breaker UI
   tieBreakerRequired.value = false;
   requiredTieBreaker.value = null;
   tieBreakerPlayers.value = new Set();
@@ -296,7 +324,6 @@ watch(
           fetchResultConfig(),
           fetchFactions()
         ]);
-        // Initialize form data after fetches complete AND members are available
         initFormData();
       } catch (error) {
         console.error('Error loading form data:', error);
@@ -312,11 +339,9 @@ watch(
   { immediate: true }
 );
 
-// Watch for members loading after the component initializes
 watch(
   () => members.value,
   (newMembers) => {
-    // If members become available and we have no form data yet, initialize
     if (newMembers && newMembers.length > 0 && formData.value.length === 0 && !isLoading.value) {
       initFormData();
     }
@@ -330,8 +355,8 @@ function idToName(pid: number) {
 }
 
 const tieGroupDisplay = computed(() =>
-  tieGroups.value.map((g) => ({
-    key: `${g.points}-${g.players.join('-')}`,
+  tieGroups.value.map((g, index) => ({
+    key: `${index}-${g.players.join('-')}`,
     points: g.points,
     names: g.players.map(idToName),
   }))
@@ -341,7 +366,6 @@ function needsTieBreaker(memberId: number) {
   return tieBreakerRequired.value && tieBreakerPlayers.value.has(memberId);
 }
 
-/** Parse backend 202 payload and update UI */
 function handleTieBreaker202(data: any) {
   tieBreakerRequired.value = true;
   requiredTieBreaker.value = data?.required_tie_breaker ?? null;
@@ -349,7 +373,8 @@ function handleTieBreaker202(data: any) {
   const nextPlayers = new Set<number>();
   if (Array.isArray(data?.tie_groups)) {
     tieGroups.value = data.tie_groups as Array<{
-      points: number;
+      points: number | null;
+      position: number | null;
       players: number[];
     }>;
     for (const g of data.tie_groups) {
@@ -359,21 +384,18 @@ function handleTieBreaker202(data: any) {
     tieGroups.value = [];
   }
 
-  // fallback legacy key
   if (!data?.tie_groups && Array.isArray(data?.tied_players)) {
     for (const pid of data.tied_players) nextPlayers.add(pid);
   }
 
   tieBreakerPlayers.value = nextPlayers;
 
-  // Check if this is an unresolved tie with no more tie-breakers available
   if (data?.unresolved_tie && !data?.required_tie_breaker) {
     $q.notify({
       type: 'warning',
       message: data?.detail || 'Tie detected but no more tie-breakers available.',
       timeout: 5000,
     });
-    // Reset tie-breaker state since there's nothing more to do
     tieBreakerRequired.value = false;
     return;
   }
@@ -389,7 +411,6 @@ function handleTieBreaker202(data: any) {
 }
 
 async function submitResults() {
-  // If in tie-breaker step, ensure all required players provided a value
   if (tieBreakerRequired.value) {
     const missing = [...tieBreakerPlayers.value].filter((pid) => {
       const v = getEntry(pid).tie_breaker_value;
@@ -409,7 +430,9 @@ async function submitResults() {
   const results = formData.value.map((entry) => ({
     player_profile: entry.player_profile,
     selected_game: entry.selected_game,
-    points: entry.points,
+    points: resultConfig.value?.has_points ? entry.points : null,
+    position: !resultConfig.value?.has_points ? entry.position : null,
+    notes: entry.notes || null,
     starting_position: entry.starting_position,
     faction_id: entry.faction_id ?? null,
     tie_breaker_value: entry.tie_breaker_value ?? null,
@@ -430,7 +453,6 @@ async function submitResults() {
     if (response.status === 201) {
       $q.notify({ type: 'positive', message: 'Result saved.' });
       emit('submitted', props.selectedGameId);
-      // reset tie UI
       tieBreakerRequired.value = false;
       requiredTieBreaker.value = null;
       tieBreakerPlayers.value = new Set();
@@ -443,7 +465,6 @@ async function submitResults() {
       return;
     }
 
-    // Any unexpected success code
     $q.notify({
       type: 'warning',
       message: `Unexpected status ${response.status}.`,
@@ -459,6 +480,7 @@ async function submitResults() {
   }
 }
 </script>
+
 
 <style scoped>
 .member-card {

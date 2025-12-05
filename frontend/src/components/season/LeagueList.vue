@@ -15,14 +15,14 @@
             text-color="white"
             class="text-weight-bold text-h6"
           >
-            L{{ league.level }}
+            L{{ league?.level }}
           </q-avatar>
           <div>
             <div class="text-subtitle1 text-weight-bold text-grey-9">
-              League {{ league.level }}
+              League {{ league?.level }}
             </div>
             <div class="text-caption text-grey-6">
-              {{ league.members?.length || 0 }} participants
+              {{ league?.members?.length || 0 }} participants
             </div>
           </div>
         </div>

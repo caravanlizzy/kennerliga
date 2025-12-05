@@ -53,23 +53,29 @@ class MatchResultViewSet(ViewSet):
     """
     permission_classes = [IsAuthenticated]
 
-    def create(self, request):
+    def create(self, request, *args, **kwargs):
         selected_game_id = request.data.get("selected_game")
         data = request.data.get("results", [])
         requested_tb_id = (request.data.get("tiebreaker") or {}).get("id")
 
         if not selected_game_id or not isinstance(data, list) or len(data) < 2:
-            return Response({"detail": "You must submit a selected_game and at least two results."},
-                            status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                {"detail": "You must submit a selected_game and at least two results."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
 
+        # ---- Load SelectedGame + related
         try:
             selected_game = (
                 SelectedGame.objects
-                .select_related('game', 'league__season')
+                .select_related("game", "league__season")
                 .get(pk=selected_game_id)
             )
         except SelectedGame.DoesNotExist:
-            return Response({"detail": "SelectedGame not found."}, status=status.HTTP_404_NOT_FOUND)
+            return Response(
+                {"detail": "SelectedGame not found."},
+                status=status.HTTP_404_NOT_FOUND,
+            )
 
         league = selected_game.league
         season = league.season
@@ -77,26 +83,38 @@ class MatchResultViewSet(ViewSet):
 
         expected_result_count = league.members.count()
         if len(data) != expected_result_count:
-            return Response({"detail": f"Expected {expected_result_count} results, got {len(data)}."},
-                            status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                {"detail": f"Expected {expected_result_count} results, got {len(data)}."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
 
+        # ---- Load ResultConfig
         try:
             result_config = ResultConfig.objects.get(game=game)
         except ResultConfig.DoesNotExist:
-            return Response({"detail": "ResultConfig not found for this game."}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                {"detail": "ResultConfig not found for this game."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        use_points = result_config.has_points
+        base_field = "points" if use_points else "position"
 
         # ---- Validate rows via serializer
         serializers = []
         seen = set()
         for entry in data:
-            entry['selected_game'] = selected_game.id
-            entry['league'] = league.id
-            entry['season'] = season.id
+            # these are implicit in ResultSerializer.create but harmless here
+            entry["selected_game"] = selected_game.id
+            entry["league"] = league.id
+            entry["season"] = season.id
 
             pid = entry.get("player_profile")
             if pid in seen:
-                return Response({"detail": f"Duplicate player_profile {pid} in payload."},
-                                status=status.HTTP_400_BAD_REQUEST)
+                return Response(
+                    {"detail": f"Duplicate player_profile {pid} in payload."},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
             seen.add(pid)
 
             s = ResultSerializer(data=entry, context={"request": request})
@@ -106,8 +124,49 @@ class MatchResultViewSet(ViewSet):
 
         rows = [s.validated_data for s in serializers]
 
+        # ---- Extra validation for points vs position
+        if use_points:
+            # serializer.validate ensures "points" is present, but we can check None
+            missing_points = [r["player_profile"].id for r in rows if r.get("points") is None]
+            if missing_points:
+                return Response(
+                    {
+                        "detail": "This game uses points. Missing 'points' for some players.",
+                        "missing_players": missing_points,
+                    },
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+        else:
+            positions = [r.get("position") for r in rows]
+            if any(p is None for p in positions):
+                return Response(
+                    {
+                        "detail": "This game does not use points. You must submit 'position' for all players."
+                    },
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+
+            # optional strict check: positions are 1..N and unique
+            try:
+                int_positions = [int(p) for p in positions]
+            except (TypeError, ValueError):
+                return Response(
+                    {"detail": "Positions must be integers."},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+
+            if len(set(int_positions)) != expected_result_count or not all(
+                1 <= p <= expected_result_count for p in int_positions
+            ):
+                return Response(
+                    {
+                        "detail": "Positions must be a unique sequence from 1 to number of players."
+                    },
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+
         # ---- Tie-breakers (highest order first)
-        tbs = list(TieBreaker.objects.filter(result_config=result_config).order_by('-order'))
+        tbs = list(TieBreaker.objects.filter(result_config=result_config).order_by("-order"))
         tb_index_by_id = {tb.id: idx for idx, tb in enumerate(tbs)}
 
         def fnum(x, default=None):
@@ -117,28 +176,41 @@ class MatchResultViewSet(ViewSet):
                 return default
 
         # Build a key for sorting/grouping up to a given TB level (inclusive)
-        # level=-1 => only points
-        def key_up_to(row, level):
-            key = [-fnum(row["points"], 0)]  # descending points
+        # level=-1 => only base metric (points or position)
+        def key_up_to(row, level: int):
+            base_val = fnum(row.get(base_field), 0)
+
+            # For points: higher is better (sort descending)
+            # For position: lower is better (sort ascending)
+            if use_points:
+                key = [-base_val]
+            else:
+                key = [base_val]
+
             for i in range(level + 1):
-                if i < 0:  # no TBs yet
+                if i < 0:
                     continue
                 val = fnum(row.get("tie_breaker_value"))
-                # Missing values sort as smallest so they group as ties until provided
-                key.append(-val if val is not None else float('inf'))
+                # Missing values sort as largest so they group as ties until provided
+                key.append(-val if val is not None else float("inf"))
             return tuple(key)
 
         # Group rows by a given level's key; return groups (list of lists)
-        def tie_groups_at_level(level):
+        def tie_groups_at_level(level: int):
             groups = defaultdict(list)
             for r in rows:
                 groups[key_up_to(r, level)].append(r)
             # Only return groups with ties (size > 1)
             return [g for g in groups.values() if len(g) > 1]
 
-        # Determine which TB level we are processing now
+        # Helper for sorting tie groups (for response)
+        def group_sort_key(grp):
+            base_val = fnum(grp[0].get(base_field), 0)
+            return -base_val if use_points else base_val
+
+        # ---- First pass: no specific tie-breaker requested yet
         if requested_tb_id is None:
-            # First pass: did we tie on raw points anywhere?
+            # Did we tie on raw base metric anywhere?
             g = tie_groups_at_level(-1)
             if not g:
                 # No ties at any position → persist, mark resolved
@@ -147,6 +219,8 @@ class MatchResultViewSet(ViewSet):
                     for s in serializers:
                         s.validated_data["tie_breaker_resolved"] = True
                         saved.append(s.save())
+
+                    # you might later want a different win_mode for position-based games
                     rebuild_game_snapshot(selected_game, win_mode="count_top_block")
                     rebuild_league_snapshot(league, win_mode="count_top_block")
 
@@ -161,7 +235,7 @@ class MatchResultViewSet(ViewSet):
                         "results": ResultSerializer(saved, many=True).data,
                         "game_standings": GameStandingSerializer(standings, many=True).data,
                     },
-                    status=status.HTTP_201_CREATED
+                    status=status.HTTP_201_CREATED,
                 )
 
             if not tbs:
@@ -171,11 +245,15 @@ class MatchResultViewSet(ViewSet):
                         "detail": "Tie detected but no tie-breakers configured.",
                         "unresolved_tie": True,
                         "tie_groups": [
-                            {"points": grp[0]["points"], "players": [r["player_profile"].id for r in grp]}
-                            for grp in sorted(g, key=lambda gg: -gg[0]["points"])
+                            {
+                                "points": grp[0].get("points"),
+                                "position": grp[0].get("position"),
+                                "players": [r["player_profile"].id for r in grp],
+                            }
+                            for grp in sorted(g, key=group_sort_key)
                         ],
                     },
-                    status=status.HTTP_202_ACCEPTED
+                    status=status.HTTP_202_ACCEPTED,
                 )
 
             # Ask for the highest-order TB for ALL tie groups
@@ -183,31 +261,42 @@ class MatchResultViewSet(ViewSet):
             return Response(
                 {
                     "detail": "Tie detected. Provide values for the required tie-breaker.",
-                    "required_tie_breaker": {"id": next_tb.id, "name": next_tb.name, "order": next_tb.order},
+                    "required_tie_breaker": {
+                        "id": next_tb.id,
+                        "name": next_tb.name,
+                        "order": next_tb.order,
+                    },
                     "unresolved_tie": True,
                     "tie_groups": [
-                        {"points": grp[0]["points"], "players": [r["player_profile"].id for r in grp]}
-                        for grp in sorted(g, key=lambda gg: -gg[0]["points"])
+                        {
+                            "points": grp[0].get("points"),
+                            "position": grp[0].get("position"),
+                            "players": [r["player_profile"].id for r in grp],
+                        }
+                        for grp in sorted(g, key=group_sort_key)
                     ],
                 },
-                status=status.HTTP_202_ACCEPTED
+                status=status.HTTP_202_ACCEPTED,
             )
 
-        # We are applying a specific TB level
+        # ---- We are applying a specific TB level
         if requested_tb_id not in tb_index_by_id:
-            return Response({"detail": "Requested tie-breaker is invalid for this game."},
-                            status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                {"detail": "Requested tie-breaker is invalid for this game."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
 
         level = tb_index_by_id[requested_tb_id]
 
-        # Ensure ALL players that are currently tied at this level-1 supplied a value
-        # 1) find the groups that need this level
+        # Ensure ALL players that are currently tied at level-1 supplied a value
         needing_values = tie_groups_at_level(level - 1)
         needing_pids = {r["player_profile"].id for grp in needing_values for r in grp}
 
-        # 2) check values exist for those pids
-        missing = [r["player_profile"].id for r in rows
-                   if r["player_profile"].id in needing_pids and fnum(r.get("tie_breaker_value")) is None]
+        missing = [
+            r["player_profile"].id
+            for r in rows
+            if r["player_profile"].id in needing_pids and fnum(r.get("tie_breaker_value")) is None
+        ]
         if missing:
             return Response(
                 {
@@ -215,11 +304,15 @@ class MatchResultViewSet(ViewSet):
                     "required_tie_breaker": {"id": requested_tb_id},
                     "missing_players": missing,
                     "tie_groups": [
-                        {"points": grp[0]["points"], "players": [r["player_profile"].id for r in grp]}
-                        for grp in sorted(needing_values, key=lambda gg: -gg[0]["points"])
+                        {
+                            "points": grp[0].get("points"),
+                            "position": grp[0].get("position"),
+                            "players": [r["player_profile"].id for r in grp],
+                        }
+                        for grp in sorted(needing_values, key=group_sort_key)
                     ],
                 },
-                status=status.HTTP_400_BAD_REQUEST
+                status=status.HTTP_400_BAD_REQUEST,
             )
 
         # After values provided, check if any ties remain at this level
@@ -231,14 +324,22 @@ class MatchResultViewSet(ViewSet):
                 return Response(
                     {
                         "detail": "Still tied after this tie-breaker. Provide the next one.",
-                        "required_tie_breaker": {"id": next_tb.id, "name": next_tb.name, "order": next_tb.order},
+                        "required_tie_breaker": {
+                            "id": next_tb.id,
+                            "name": next_tb.name,
+                            "order": next_tb.order,
+                        },
                         "unresolved_tie": True,
                         "tie_groups": [
-                            {"points": grp[0]["points"], "players": [r["player_profile"].id for r in grp]}
-                            for grp in sorted(remaining, key=lambda gg: -gg[0]["points"])
+                            {
+                                "points": grp[0].get("points"),
+                                "position": grp[0].get("position"),
+                                "players": [r["player_profile"].id for r in grp],
+                            }
+                            for grp in sorted(remaining, key=group_sort_key)
                         ],
                     },
-                    status=status.HTTP_202_ACCEPTED
+                    status=status.HTTP_202_ACCEPTED,
                 )
             # No more TBs to apply; accept unresolved tie
             return Response(
@@ -246,31 +347,33 @@ class MatchResultViewSet(ViewSet):
                     "detail": "Still tied after all tie-breakers.",
                     "unresolved_tie": True,
                     "tie_groups": [
-                        {"points": grp[0]["points"], "players": [r["player_profile"].id for r in grp]}
-                        for grp in sorted(remaining, key=lambda gg: -gg[0]["points"])
+                        {
+                            "points": grp[0].get("points"),
+                            "position": grp[0].get("position"),
+                            "players": [r["player_profile"].id for r in grp],
+                        }
+                        for grp in sorted(remaining, key=group_sort_key)
                     ],
                 },
-                status=status.HTTP_202_ACCEPTED
+                status=status.HTTP_202_ACCEPTED,
             )
 
-        # No ties remain anywhere → persist. Mark decisive_tie_breaker for any row
-        # that *first* broke its prior tie (optional: here we mark the TB used on this step
-        # for all players that were part of any group needing_values and are now separated).
+        # ---- No ties remain anywhere → persist
         needing_set = {r["player_profile"].id for grp in needing_values for r in grp}
         decisive_tb = tbs[level]
 
         with transaction.atomic():
             saved = []
-            # Sort rows for storage consistency (optional)
-            # full key includes all TB levels present
+
             def full_key(r):
-                k = [-fnum(r["points"], 0)]
+                base_val = fnum(r.get(base_field), 0)
+                key = [-base_val] if use_points else [base_val]
                 for tb_idx in range(level + 1):
                     v = fnum(r.get("tie_breaker_value"), -1.0)
-                    k.append(-v)
-                return tuple(k)
+                    key.append(-v)
+                return tuple(key)
 
-            # Mark flags
+            # Mark flags and save
             for s in serializers:
                 pid = s.validated_data["player_profile"].id
                 if pid in needing_set:
@@ -292,7 +395,7 @@ class MatchResultViewSet(ViewSet):
                 "results": ResultSerializer(saved, many=True).data,
                 "game_standings": GameStandingSerializer(standings, many=True).data,
             },
-            status=status.HTTP_201_CREATED
+            status=status.HTTP_201_CREATED,
         )
 
     def list(self, request):

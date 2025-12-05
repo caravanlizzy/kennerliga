@@ -27,6 +27,8 @@ class Result(models.Model):
     )
     points = models.IntegerField(blank=True, null=True)
     starting_position = models.IntegerField(blank=True, null=True)
+    position = models.PositiveIntegerField(blank=True, null=True)
+    notes = models.TextField(blank=True, null=True)
     decisive_tie_breaker = models.ForeignKey(
         TieBreaker,
         on_delete=models.SET_NULL,
@@ -38,5 +40,8 @@ class Result(models.Model):
     faction = models.ForeignKey('game.Faction', on_delete=models.SET_NULL, null=True, blank=True)
     tie_breaker_resolved = models.BooleanField(default=False)
 
-    def __string__(self):
-        return self.player_profile.profile_name + str(self.selected_game) + str(self.season) + str(self.league)
+    def __str__(self):
+        return (
+            f"{self.player_profile.profile_name} - "
+            f"{self.selected_game} - {self.season} - {self.league}"
+        )

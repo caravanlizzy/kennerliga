@@ -18,6 +18,8 @@ class ResultSerializer(serializers.ModelSerializer):
             'selected_game',
             'points',
             'starting_position',
+            "position",
+            "notes",
             'tie_breaker_value',
             'decisive_tie_breaker',
             'faction_id',

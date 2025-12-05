@@ -1,7 +1,8 @@
 <template>
   <!-- Header -->
+  <!-- Header -->
   <div
-    v-if="!loading"
+    v-if="!loading && league"
     class="row items-center q-mb-lg q-pa-md bg-grey-1 rounded-borders"
   >
     <div class="col-grow">
@@ -12,7 +13,7 @@
         text-color="white"
         class="q-ml-xs text-weight-medium"
       >
-        {{ loading ? '' : season?.name }} · {{ season?.status }}
+        {{ season?.name }} · {{ season?.status }}
       </q-chip>
       <q-chip
         dense
@@ -20,7 +21,7 @@
         color="info"
         text-color="white"
         class="q-ml-xs text-weight-medium"
-        >L {{ league.level }}
+      >L {{ league.level }}
       </q-chip>
     </div>
     <div class="col-auto">

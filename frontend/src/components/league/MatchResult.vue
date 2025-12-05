@@ -31,7 +31,7 @@
           </q-avatar>
         </q-item-section>
 
-        <!-- Player Name -->
+        <!-- Player Name + optional note under it -->
         <q-item-section>
           <q-item-label
             :class="[
@@ -50,11 +50,25 @@
             />
             {{ result.profile_name }}
           </q-item-label>
+
+          <!-- Notes (only if present) -->
+          <q-item-label
+            v-if="result.notes"
+            caption
+            class="q-mt-xs text-grey-7"
+          >
+            <q-icon
+              name="notes"
+              size="16px"
+              class="q-mr-xs"
+            />
+            {{ result.notes }}
+          </q-item-label>
         </q-item-section>
 
         <!-- Stats -->
         <q-item-section side class="row q-gutter-xs items-center">
-          <!-- Points -->
+          <!-- Points (for points-based games) -->
           <q-chip
             v-if="result.points != null"
             dense
@@ -66,6 +80,18 @@
             {{ result.points }}
           </q-chip>
 
+          <!-- Position (for non-points games, or if you still track it) -->
+          <q-chip
+            v-if="result.position != null"
+            dense
+            color="grey-3"
+            text-color="grey-8"
+            size="sm"
+          >
+            <q-icon name="looks_one" size="14px" class="q-mr-xs" />
+            Pos {{ result.position }}
+          </q-chip>
+
           <!-- Starting Position -->
           <q-chip
             v-if="result.starting_position"
@@ -75,7 +101,7 @@
             size="sm"
           >
             <q-icon name="flag" size="14px" class="q-mr-xs" />
-            {{ result.starting_position }}
+            Start {{ result.starting_position }}
           </q-chip>
 
           <!-- Faction -->
@@ -95,7 +121,6 @@
   </q-card>
 </template>
 
-
 <script setup lang="ts">
 import { computed } from 'vue';
 import { storeToRefs } from 'pinia';
@@ -106,11 +131,11 @@ const props = withDefaults(
   defineProps<{
     selectedGame: any;
     displayGameName: boolean;
-    matchResults?: Record<number, any[]>; // Make optional
+    matchResults?: Record<number, any[]>; // optional
   }>(),
   {
     displayGameName: true,
-    matchResults: undefined, // Default to undefined
+    matchResults: undefined,
   }
 );
 
@@ -119,36 +144,49 @@ const { user } = storeToRefs(useUserStore());
 // Store instance, reactive to league ID changes
 const leagueStore = computed(() => useLeagueStore(user.value.myCurrentLeagueId)());
 
-const results = computed(() => {
-  // If matchResults prop is provided and has data for this game, use it
-  if (props.matchResults) {
-    // matchResults is keyed by player_profile, so we need to find entries for this selected_game
-    const propsResults = Object.values(props.matchResults)
-      .flat()
-      .filter((r: any) => r.selected_game === props.selectedGame.id)
-      .map((r: any) => ({
-        id: r.id,
-        profile_name: r.player_profile_name,
-        points: r.points ?? null,
-        starting_position: r.starting_position ?? null,
-        faction_name: r.faction_name ?? null,
-      }))
-      .sort((a, b) => (b.points ?? 0) - (a.points ?? 0));
+// First build a normalized list of results (from prop or store)
+const rawResults = computed(() => {
+  let src: any[] = [];
 
-    if (propsResults.length > 0) {
-      return propsResults;
-    }
+  if (props.matchResults) {
+    // matchResults is keyed by player_profile, we need entries for this selected_game
+    src = Object.values(props.matchResults)
+      .flat()
+      .filter((r: any) => r.selected_game === props.selectedGame.id);
+  } else {
+    src = leagueStore.value.matchResultsBySelectedGame[props.selectedGame.id] ?? [];
   }
 
-  // Fall back to store data
-  const resultsForGame = leagueStore.value.matchResultsBySelectedGame[props.selectedGame.id] ?? [];
-
-  return resultsForGame.map((r) => ({
+  return src.map((r: any) => ({
     id: r.id,
     profile_name: r.player_profile_name,
     points: r.points ?? null,
+    position: r.position ?? null,
+    notes: r.notes ?? null,
     starting_position: r.starting_position ?? null,
     faction_name: r.faction_name ?? null,
   }));
+});
+
+// Final, sorted results:
+// - If there are any points: sort by points desc
+// - Otherwise: sort by position asc (nulls last)
+const results = computed(() => {
+  const mapped = rawResults.value.slice();
+
+  const hasAnyPoints = mapped.some((r) => r.points != null);
+
+  if (hasAnyPoints) {
+    mapped.sort((a, b) => (b.points ?? 0) - (a.points ?? 0));
+  } else {
+    mapped.sort((a, b) => {
+      if (a.position == null && b.position == null) return 0;
+      if (a.position == null) return 1;
+      if (b.position == null) return -1;
+      return (a.position as number) - (b.position as number);
+    });
+  }
+
+  return mapped;
 });
 </script>
