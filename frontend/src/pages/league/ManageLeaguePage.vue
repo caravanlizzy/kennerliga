@@ -14,12 +14,9 @@
       <q-btn flat icon="refresh" round @click="load" />
     </div>
   </div>
-
   <!-- Loading -->
   <LoadingSpinner v-if="loading" />
-
   <ErrorDisplay v-else-if="error" :error="error" class="q-mb-md" />
-
   <!-- Empty state -->
   <q-card
     v-else-if="!league?.members || league.members.length === 0"
@@ -35,7 +32,6 @@
       </div>
     </div>
   </q-card>
-
   <!-- Members grid -->
   <div v-else class="row q-col-gutter-md">
     <div
@@ -48,85 +44,60 @@
         <q-card-section class="bg-primary text-white q-pa-md">
           <div class="row items-center justify-between">
             <div class="col">
-              <div class="text-h6 text-weight-medium">
-                <q-icon name="person" size="sm" class="q-mr-xs" />
-                {{ member.profile_name }}
+              <div class="text-h6 text-weight-bold">
+                <q-icon name="sports_esports" size="sm" class="q-mr-xs" />
+                {{ member.selected_game ? member.selected_game.game_name : 'No Game Selected' }}
               </div>
             </div>
-            <div class="col-auto" v-if="['PICKING', 'REPICKING', 'BANNING'].includes(league.status) && season.status === 'RUNNING'">
-              <q-badge
-                v-if="member.profile === league.active_player"
-                color="positive"
-                class="q-py-xs q-px-sm"
-              >
-                <q-icon size="xs" name="star" class="q-mr-xs" /> Active Player
+            <div class="col-auto row items-center q-gutter-sm">
+              <q-badge color="white" text-color="primary">
+                <q-icon name="person" size="xs" class="q-mr-xs" />
+                {{ member.profile_name }}
               </q-badge>
+              <div v-if="['PICKING', 'REPICKING', 'BANNING'].includes(league.status) && season.status === 'RUNNING'">
+                <q-badge
+                  v-if="member.profile === league.active_player"
+                  color="positive"
+                  class="q-py-xs q-px-sm"
+                >
+                  <q-icon size="xs" name="star" class="q-mr-xs" /> Active Player
+                </q-badge>
+                <q-btn
+                  v-else
+                  dense
+                  outline
+                  color="white"
+                  label="Set Active"
+                  size="sm"
+                  @click="setActivePlayer(member.profile)"
+                />
+              </div>
               <q-btn
-                v-else
+                v-if="member.selected_game"
                 dense
-                outline
-                color="white"
-                label="Set Active"
+                unelevated
+                color="negative"
+                icon="delete"
                 size="sm"
-                @click="setActivePlayer(member.profile)"
+                @click="onDeleteSelectedGame(member)"
               />
             </div>
-          </div>
-          <div class="q-mt-sm">
-            <div v-if="member.selected_game" class="text-subtitle1 text-weight-medium">
-              <q-icon name="sports_esports" size="sm" class="q-mr-xs" />
-              {{ member.selected_game.game_name }}
-            </div>
-            <q-badge
-              v-else
-              color="grey-4"
-              text-color="dark"
-              class="text-uppercase"
-            >
-              No game selected
-            </q-badge>
           </div>
         </q-card-section>
 
         <q-separator />
 
-        <!-- Match Result Section -->
-        <div v-if="hasResult(member)" class="bg-grey-2">
-          <q-card-section class="q-pb-none">
-            <div class="text-subtitle2 text-weight-bold text-grey-8 q-mb-sm">
-              <q-icon name="emoji_events" size="sm" class="q-mr-xs" />
-              Match Result
-            </div>
-            <MatchResult
-              :displayGameName="false"
-              :selectedGame="member.selected_game"
-              :matchResults="matchResults"
-            />
-          </q-card-section>
-          <q-card-actions align="right" class="q-px-md q-pb-md">
-            <KennerButton
-              outline
-              label="Edit Result"
-              icon="edit_note"
-              color="accent"
-              size="sm"
-              @click="() => (editResultForSelGameId = member.selected_game.id)"
-            />
-          </q-card-actions>
-          <q-separator />
-        </div>
-
         <!-- Game Settings Section -->
         <q-card-section class="q-pa-none">
           <q-expansion-item
             dense
-            default-opened
+            default-closed
             icon="settings"
             label="Game Settings"
-            header-class="text-weight-bold text-grey-8 bg-grey-1"
+            header-class="text-weight-bold text-grey-8 bg-blue-grey-1"
             expand-icon="expand_more"
           >
-            <q-card-section class="bg-grey-1 q-pt-sm">
+            <q-card-section class="bg-blue-grey-1 q-pt-sm">
               <GameSettingsDisplay
                 v-if="member.selected_game"
                 :selectedOptions="member.selected_game.selected_options"
@@ -135,46 +106,75 @@
                 No game settings available
               </div>
             </q-card-section>
+            <q-card-actions align="right" class="bg-blue-grey-1 q-px-md q-pb-md q-pt-none">
+              <KennerButton
+                outline
+                v-if="member.selected_game"
+                label="Edit Settings"
+                icon="edit"
+                color="accent"
+                size="sm"
+                @click="() => (editingGameMember = member)"
+              />
+              <KennerButton
+                v-else
+                outline
+                label="Select Game"
+                icon="add"
+                color="primary"
+                size="sm"
+                @click="() => (selectingGameMember = member)"
+              />
+            </q-card-actions>
           </q-expansion-item>
         </q-card-section>
 
-        <q-separator />
 
-        <!-- Actions Section -->
-        <q-card-actions align="right" class="bg-grey-3 q-pa-md">
-          <KennerButton
-            outline
-            v-if="member.selected_game"
-            label="Edit Settings"
-            icon="edit"
-            color="accent"
-            @click="() => (editingGameMember = member)"
-          />
-          <KennerButton
-            v-else
-            outline
-            label="Select Game"
-            icon="add"
-            color="primary"
-            @click="() => (selectingGameMember = member)"
-          />
-          <KennerButton
-            outline
-            v-if="member.selected_game"
-            label="Delete Game"
-            icon="delete"
-            color="negative"
-            @click="onDeleteSelectedGame(member)"
-          />
-          <KennerButton
-            v-if="member.selected_game && !hasResult(member)"
-            outline
-            label="Post Result"
-            icon="post_add"
-            color="primary"
-            @click="() => (postResultForSelGame = member.selected_game)"
-          />
-        </q-card-actions>
+        <!-- Match Result Section -->
+        <q-card-section class="q-pa-none">
+          <q-expansion-item
+            dense
+            :default-opened="hasResult(member)"
+            icon="emoji_events"
+            label="Match Result"
+            header-class="text-weight-bold text-grey-8 bg-amber-1"
+            expand-icon="expand_more"
+          >
+            <q-card-section class="bg-amber-1 q-pt-sm" v-if="hasResult(member)">
+              <MatchResult
+                :displayGameName="false"
+                :selectedGame="member.selected_game"
+                :matchResults="matchResults"
+              />
+            </q-card-section>
+            <q-card-section class="bg-amber-1 q-py-md" v-else>
+              <div class="text-grey-7 text-center">
+                <q-icon name="info" size="sm" class="q-mr-xs" />
+                No results posted yet
+              </div>
+            </q-card-section>
+            <q-card-actions align="right" class="bg-amber-1 q-px-md q-pb-md q-pt-none">
+              <KennerButton
+                v-if="hasResult(member)"
+                outline
+                label="Edit Result"
+                icon="edit_note"
+                color="accent"
+                size="sm"
+                @click="() => (editResultForSelGameId = member.selected_game.id)"
+              />
+              <KennerButton
+                v-else-if="member.selected_game"
+                outline
+                label="Post Result"
+                icon="post_add"
+                color="positive"
+                size="sm"
+                @click="() => (postResultForSelGame = member.selected_game)"
+              />
+            </q-card-actions>
+          </q-expansion-item>
+        </q-card-section>
       </q-card>
     </div>
     <!--    Form to edit a members game selection-->
@@ -221,7 +221,7 @@
       <MatchResultForm
         :selectedGameId="postResultForSelGame.id"
         :leagueId="league.id"
-        @submitted="closeForm && load"
+        @submitted="() => { closeForm(); load(); }"
       />
     </FormLayout>
     <!--      Form to edit match results-->
@@ -246,9 +246,11 @@ import GameSettingsEditor from 'components/game/selectedGame/GameSettingsEditor.
 import MatchResultForm from 'components/league/MatchResultForm.vue';
 import MatchResult from 'components/league/MatchResult.vue';
 import GameSettingsDisplay from 'components/game/selectedGame/GameSettingsDisplay.vue';
+import { useDialog } from 'src/composables/dialog';
 
 const route = useRoute();
 const $q = useQuasar();
+const { setDialog } = useDialog();
 
 // league and season data
 const league = ref<any | null>(null);
@@ -349,13 +351,29 @@ function closeForm() {
 
 // Delete Game Selection
 async function onDeleteSelectedGame(member: any) {
-  selectingGameMember.value = null;
-  try {
-    await api.delete(`game/selected-games/${member.selected_game.id}/`);
-    await load();
-  } catch (err) {
-    console.error('Delete failed', err);
-  }
+  setDialog(
+    'Delete Game Selection',
+    `This will permanently delete the game "${member.selected_game.game_name}" and all associated results. This action cannot be undone.`,
+    'negative',
+    async () => {
+      try {
+        await api.delete(`game/selected-games/${member.selected_game.id}/`);
+        await load();
+        $q.notify({
+          type: 'positive',
+          message: 'Game selection deleted successfully',
+        });
+      } catch (err) {
+        console.error('Delete failed', err);
+        $q.notify({
+          type: 'negative',
+          message: 'Failed to delete game selection',
+        });
+      }
+    },
+    undefined,
+    'Delete'
+  );
 }
 
 // Create Game Selection
