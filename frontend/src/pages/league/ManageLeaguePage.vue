@@ -1,33 +1,30 @@
 <template>
   <!-- Header -->
-  <div v-if="!loading" class="row items-center q-mb-lg q-pa-md bg-grey-2 rounded-borders">
+  <div
+    v-if="!loading"
+    class="row items-center q-mb-lg q-pa-md bg-grey-1 rounded-borders"
+  >
     <div class="col-grow">
-      <div class="text-h4 text-weight-bold text-grey-9">
-        Manage {{ loading ? '' : 'L' + league?.level }}
-        <q-badge class="q-ml-sm q-pa-sm" color="teal-6" text-color="white">League</q-badge>
-      </div>
-      <div class="text-subtitle1 text-grey-7 q-mt-xs">
-        Season:
-        <q-chip
-          dense
-          square
-          color="grey-8"
-          text-color="white"
-          class="q-ml-xs text-weight-medium"
-        >
-          {{ loading ? '' : season?.name }} · {{ season?.status }}
-        </q-chip>
-      </div>
+      <q-chip
+        dense
+        square
+        color="grey-8"
+        text-color="white"
+        class="q-ml-xs text-weight-medium"
+      >
+        {{ loading ? '' : season?.name }} · {{ season?.status }}
+      </q-chip>
+      <q-chip
+        dense
+        square
+        color="info"
+        text-color="white"
+        class="q-ml-xs text-weight-medium"
+        >L {{ league.level }}
+      </q-chip>
     </div>
     <div class="col-auto">
-      <q-btn
-        flat
-        icon="refresh"
-        round
-        color="teal-7"
-        size="md"
-        @click="load"
-      >
+      <q-btn flat icon="refresh" round color="teal-7" size="md" @click="load">
         <q-tooltip>Refresh</q-tooltip>
       </q-btn>
     </div>
@@ -57,27 +54,43 @@
       :key="member.id"
       class="col-12 col-md-6"
     >
-      <q-card flat bordered class="fit rounded-borders overflow-hidden" v-if="showPlayerGrid">
+      <q-card
+        flat
+        bordered
+        class="fit rounded-borders overflow-hidden"
+        v-if="showPlayerGrid"
+      >
         <!-- Player Header Section -->
         <q-card-section class="q-pa-lg bg-grey-3">
           <div class="row items-center justify-between">
             <div class="col">
               <div class="text-h6 text-weight-bold text-grey-9">
-                <q-icon name="sports_esports" size="sm" class="q-mr-sm text-teal-7" />
-                {{ member.selected_game ? member.selected_game.game_name : 'No Game Selected' }}
+                <q-icon name="sports_esports" size="sm" class="q-mr-sm" />
+                {{
+                  member.selected_game
+                    ? member.selected_game.game_name
+                    : 'No Game Selected'
+                }}
               </div>
             </div>
             <div class="col-auto row items-center q-gutter-md">
-              <q-badge color="teal-7" text-color="white" class="q-py-sm q-px-md">
+              <q-badge color="primary" text-color="white" class="">
                 <q-icon name="person" size="xs" class="q-mr-xs" />
-                <span class="text-weight-medium">{{ member.profile_name }}</span>
+                <span class="text-weight-medium">{{
+                  member.profile_name
+                }}</span>
               </q-badge>
-              <div v-if="['PICKING', 'REPICKING', 'BANNING'].includes(league.status) && season.status === 'RUNNING'">
+              <div
+                v-if="
+                  ['PICKING', 'REPICKING', 'BANNING'].includes(league.status) &&
+                  season.status === 'RUNNING'
+                "
+              >
                 <q-badge
                   v-if="member.profile === league.active_player"
-                  color="amber-7"
+                  color="positive"
                   text-color="white"
-                  class="q-py-sm q-px-md"
+                  class="q-py-xs q-px-sm"
                 >
                   <q-icon size="xs" name="star" class="q-mr-xs" />
                   <span class="text-weight-bold">Active</span>
@@ -183,7 +196,9 @@
                 icon="edit_note"
                 color="amber-9"
                 size="md"
-                @click="() => (editResultForSelGameId = member.selected_game.id)"
+                @click="
+                  () => (editResultForSelGameId = member.selected_game.id)
+                "
               />
               <KennerButton
                 v-else-if="member.selected_game"
@@ -204,12 +219,12 @@
       <template #head>
         Edit Game
         <span class="text-teal-7">{{
-            editingGameMember.selected_game?.game_name
-          }}</span>
+          editingGameMember.selected_game?.game_name
+        }}</span>
         for
         <span class="text-teal-7">{{
-            editingGameMember.profile_name.replace('_profile', '')
-          }}</span>
+          editingGameMember.profile_name.replace('_profile', '')
+        }}</span>
       </template>
       <GameSettingsEditor
         :leagueId="league.id"
@@ -241,7 +256,12 @@
       <MatchResultForm
         :selectedGameId="postResultForSelGame.id"
         :leagueId="league.id"
-        @submitted="() => { closeForm(); load(); }"
+        @submitted="
+          () => {
+            closeForm();
+            load();
+          }
+        "
       />
     </FormLayout>
     <!--      Form to edit match results-->
@@ -410,5 +430,3 @@ function onSuccessfulGameEdit() {
 
 onMounted(load);
 </script>
-
-
