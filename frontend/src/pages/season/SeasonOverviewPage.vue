@@ -1,70 +1,77 @@
-
 <template>
-  <div>
+  <div class="q-pa-md bg-white">
     <!-- Header -->
-    <div class="row items-center q-mb-lg">
+    <div class="row items-center q-mb-md">
       <q-btn
         flat
+        dense
         round
         icon="arrow_back"
+        color="grey-7"
         @click="router.back()"
-        class="q-mr-md"
+        class="q-mr-sm"
       />
-      <div class="text-h5 text-weight-bold">
+      <div class="text-subtitle1 text-weight-medium text-grey-8">
         Manage Season {{ season?.name || '...' }}
       </div>
       <q-space />
       <q-badge
         v-if="season?.status"
-        color="teal"
+        outline
+        color="teal-6"
         :label="season.status"
-        class="q-mr-sm"
+        class="q-mr-xs text-caption"
       />
       <q-badge
         v-if="leagues?.length"
-        color="primary"
+        outline
+        color="grey-6"
         :label="`${leagues.length} ${leagues.length === 1 ? 'league' : 'leagues'}`"
+        class="text-caption"
       />
     </div>
+
+    <q-separator class="q-mb-md" />
 
     <!-- Error State -->
     <q-banner
       v-if="error && !loading"
+      dense
       rounded
-      class="bg-negative text-white q-mb-md"
+      class="bg-red-1 text-red-8 q-mb-sm"
     >
       <template v-slot:avatar>
-        <q-icon name="error" />
+        <q-icon name="error_outline" color="red-5" size="xs" />
       </template>
-      {{ error }}
+      <span class="text-caption">{{ error }}</span>
     </q-banner>
 
     <!-- Loading State -->
-    <div v-if="loading" class="row q-col-gutter-md">
+    <div v-if="loading" class="row q-col-gutter-sm">
       <div
         v-for="i in 3"
         :key="i"
         class="col-12 col-sm-6 col-md-4"
       >
-        <q-skeleton type="rect" height="280px" />
+        <q-skeleton type="rect" height="180px" class="rounded-borders" />
       </div>
     </div>
 
     <!-- Content -->
     <div v-else-if="!error">
       <!-- Empty State -->
-      <div v-if="leagues.length === 0" class="text-center q-mt-xl q-mb-xl q-pa-xl">
-        <q-icon name="sports" size="80px" color="grey-5" class="q-mb-md" />
-        <div class="text-h6 text-weight-medium text-grey-7 q-mb-sm">
+      <div v-if="leagues.length === 0" class="text-center q-py-xl">
+        <q-icon name="sports" size="48px" color="grey-4" class="q-mb-sm" />
+        <div class="text-body2 text-grey-6 q-mb-xs">
           No leagues found for this season
         </div>
-        <div class="text-body2 text-grey-6">
+        <div class="text-caption text-grey-5">
           Create a league to get started
         </div>
       </div>
 
       <!-- Leagues Grid -->
-      <div v-else class="row q-col-gutter-md">
+      <div v-else class="row q-col-gutter-sm">
         <div
           v-for="league in leagues"
           :key="league.id"
@@ -85,7 +92,7 @@ import LeagueList from 'components/season/LeagueList.vue';
 
 interface Member { id: number|string; username?: string; name?: string }
 interface League { id: number|string; level: number|string; members?: Member[] }
-interface Season { id?: number|string; name?: string }
+interface Season { id?: number|string; name?: string; status?: string }
 
 const route = useRoute();
 const router = useRouter();

@@ -1,78 +1,93 @@
 <template>
   <q-card
-    bordered
     flat
-    class="league-card cursor-pointer transition-all"
+    bordered
+    class="cursor-pointer rounded-borders overflow-hidden"
     @click="goToLeague(league)"
   >
-    <!-- Header with gradient background -->
-    <q-card-section
-      class="bg-primary from-primary to-secondary text-white"
-    >
-      <div class="row items-center justify-between q-gutter-sm">
-        <q-avatar
-          color="white"
-          text-color="primary"
-          size="56px"
-          class="shadow-2"
-        >
-          <div class="text-h6 text-weight-bold">L{{ league.level }}</div>
-        </q-avatar>
-        <q-chip
-          square
-          color="white"
-          text-color="primary"
-          icon="group"
-          class="shadow-1"
-        >
-          <span class="text-weight-bold">{{
-            league.members?.length || 0
-          }}</span>
-        </q-chip>
-      </div>
-    </q-card-section>
-
-    <!-- Members section with better spacing -->
-    <q-card-section class="q-pt-md">
-      <div class="row items-center q-mb-sm">
-        <q-icon name="people" color="grey-7" size="18px" class="q-mr-xs" />
-        <span
-          class="text-caption text-grey-7 text-weight-medium text-uppercase"
-        >
-          Members ({{ league.members?.length || 0 }})
-        </span>
-      </div>
-
-      <!-- Empty state for no members -->
-      <div
-        v-if="!league.members?.length"
-        class="text-center q-pa-md text-grey-5"
-      >
-        <q-icon name="person_off" size="32px" class="q-mb-xs" />
-        <div class="text-caption">No members yet</div>
-      </div>
-
-      <!-- Member chips with avatar style -->
-      <div v-else class="row q-col-gutter-xs">
-        <q-chip
-          v-for="m in league.members"
-          :key="m.id"
-          clickable
-          @click.stop
-          color="grey-2"
-          text-color="grey-9"
-          class="q-mb-xs"
-        >
-          <q-avatar color="primary" text-color="white" size="24px">
-            <q-icon name="person" size="16px" />
+    <!-- Header -->
+    <q-card-section class="bg-grey-2 q-py-md">
+      <div class="row items-center justify-between">
+        <div class="row items-center q-gutter-md">
+          <q-avatar
+            size="52px"
+            color="primary"
+            text-color="white"
+            class="text-weight-bold text-h6"
+          >
+            L{{ league.level }}
           </q-avatar>
-          <span class="q-ml-xs">{{ m.profile_name }}</span>
-        </q-chip>
+          <div>
+            <div class="text-subtitle1 text-weight-bold text-grey-9">
+              League {{ league.level }}
+            </div>
+            <div class="text-caption text-grey-6">
+              {{ league.members?.length || 0 }} participants
+            </div>
+          </div>
+        </div>
+        <q-badge
+          color="primary"
+          text-color="white"
+          class="q-pa-sm"
+        >
+          <q-icon name="group" size="16px" class="q-mr-xs" />
+          <span class="text-weight-bold">{{ league.members?.length || 0 }}</span>
+        </q-badge>
       </div>
     </q-card-section>
 
     <q-separator />
 
+    <!-- Members section -->
+    <q-card-section class="bg-white">
+      <div class="row items-center q-mb-md">
+        <q-icon name="people" color="grey-7" size="18px" class="q-mr-xs" />
+        <span class="text-caption text-grey-7 text-weight-bold text-uppercase">
+          Members
+        </span>
+      </div>
+
+      <!-- Empty state -->
+      <div
+        v-if="!league.members?.length"
+        class="text-center q-pa-lg rounded-borders bg-grey-1"
+      >
+        <q-icon name="person_off" size="36px" color="grey-5" class="q-mb-sm" />
+        <div class="text-body2 text-grey-6">No members yet</div>
+      </div>
+
+      <!-- Member chips -->
+      <div v-else class="row q-gutter-sm">
+        <q-chip
+          v-for="m in league.members"
+          :key="m.id"
+          clickable
+          outline
+          color="primary"
+          text-color="grey-9"
+          @click.stop
+        >
+          <q-avatar
+            size="24px"
+            color="primary"
+            text-color="white"
+          >
+            <q-icon name="person" size="14px" />
+          </q-avatar>
+          <span class="q-ml-sm text-weight-medium">{{ m.profile_name }}</span>
+        </q-chip>
+      </div>
+    </q-card-section>
+
+    <!-- Footer -->
+    <q-separator />
+    <q-card-section class="bg-grey-1 q-py-sm">
+      <div class="row items-center justify-end text-grey-6">
+        <span class="text-caption text-weight-medium">View details</span>
+        <q-icon name="chevron_right" size="20px" />
+      </div>
+    </q-card-section>
   </q-card>
 </template>
 
@@ -92,10 +107,3 @@ function goToLeague(league: TLeague) {
   }
 }
 </script>
-
-<style scoped lang="scss">
-
-.opacity-80 {
-  opacity: 0.8;
-}
-</style>
