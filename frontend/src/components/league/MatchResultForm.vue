@@ -1,3 +1,4 @@
+
 <template>
   <q-card class="q-pa-md" flat bordered rounded>
     <div class="row items-center q-mb-md">
@@ -40,7 +41,7 @@
     </q-banner>
 
     <div class="q-pa-sm">
-      <q-form v-if="formData.length" @submit.prevent="submitResults">
+      <q-form v-if="!isLoading && formData.length" @submit.prevent="submitResults">
         <div class="row q-col-gutter-md q-mb-md">
           <div
             v-for="member in displayMembers"
@@ -174,6 +175,7 @@ const { members } = storeToRefs(leagueStore);
 const resultConfig = ref<any>(null);
 const factions = ref<Faction[]>([]);
 const formData = ref<any[]>([]);
+const isLoading = ref(false);
 
 // tie-breaker UI state
 const tieBreakerRequired = ref(false);
@@ -261,6 +263,12 @@ async function fetchFactions() {
 }
 
 function initFormData() {
+  // Guard: don't initialize if members aren't loaded yet
+  if (!members.value || members.value.length === 0) {
+    formData.value = [];
+    return;
+  }
+
   formData.value = (members.value).map((p) => ({
     player_profile: p.id,
     selected_game: props.selectedGameId,
@@ -282,8 +290,34 @@ watch(
   () => props.selectedGameId,
   async () => {
     if (props.selectedGameId) {
-      await fetchResultConfig();
-      await fetchFactions();
+      isLoading.value = true;
+      try {
+        await Promise.all([
+          fetchResultConfig(),
+          fetchFactions()
+        ]);
+        // Initialize form data after fetches complete AND members are available
+        initFormData();
+      } catch (error) {
+        console.error('Error loading form data:', error);
+        $q.notify({
+          type: 'negative',
+          message: 'Error loading match result form.'
+        });
+      } finally {
+        isLoading.value = false;
+      }
+    }
+  },
+  { immediate: true }
+);
+
+// Watch for members loading after the component initializes
+watch(
+  () => members.value,
+  (newMembers) => {
+    // If members become available and we have no form data yet, initialize
+    if (newMembers && newMembers.length > 0 && formData.value.length === 0 && !isLoading.value) {
       initFormData();
     }
   },
