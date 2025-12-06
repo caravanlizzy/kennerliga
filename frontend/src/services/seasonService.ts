@@ -63,7 +63,7 @@ export async function ensureParticipants(
   seasonId: number,
   profiles: ProfileLike[]
 ) {
-  // Normalize incoming profiles to a unique list of numeric IDs
+  // Normalize incoming profiles to a unique list of numeric IDs, preserving order
   const incomingIds = Array.from(
     new Set(
       (profiles || [])
@@ -71,7 +71,6 @@ export async function ensureParticipants(
         .filter((id): id is number => Number.isInteger(id))
     )
   );
-  console.log('incomingIds:', incomingIds);
 
   // Fetch existing participants and index by profile id
   const existing = await fetchSeasonParticipants(seasonId);
@@ -83,13 +82,13 @@ export async function ensureParticipants(
 
   // Compute which incoming profiles are missing from this season
   const missing = incomingIds.filter((pid) => !byProfile[pid]);
-  console.log({ missing });
-  // Create SeasonParticipant for any missing profiles
+
+  // Create SeasonParticipant for any missing profiles with rank based on position
   for (const pid of missing) {
-    console.log('creating missing participant:', pid, 'for season:', seasonId);
+    const rank = incomingIds.indexOf(pid) + 1; // 1-based rank
     await api('/season/season-participants/', {
       method: 'POST',
-      data: { season: seasonId, profile: pid },
+      data: { season: seasonId, profile: pid, rank },
     });
   }
 
@@ -108,7 +107,6 @@ export async function createLeagueForSeason(
     .filter((sp: any) => memberProfileIds.includes(sp.profile))
     .map((sp: any) => sp.id);
 
-  console.log({ seasonParticipants, memberProfileIds, spIds });
   const { data } = await api('/league/leagues/', {
     method: 'POST',
     data: { season: seasonId, level, member_ids: spIds },
