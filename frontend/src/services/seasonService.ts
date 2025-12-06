@@ -109,7 +109,7 @@ export async function createLeagueForSeason(
 
   const { data } = await api('/league/leagues/', {
     method: 'POST',
-    data: { season: seasonId, level, member_ids: spIds },
+    data: { season: seasonId, level, member_ids: spIds, status: 'DONE' },
   });
   return data;
 }
