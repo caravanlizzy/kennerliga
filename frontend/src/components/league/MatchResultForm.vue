@@ -225,10 +225,12 @@ const submitLabel = computed(() =>
 );
 
 function getEntry(memberId: number) {
-  let found = formData.value.find((e) => e.player_profile === memberId);
+  const member = members.value.find((m) => m.id === memberId);
+  const profileId = member?.profile;
+  let found = formData.value.find((e) => e.player_profile === profileId);
   if (!found) {
     found = {
-      player_profile: memberId,
+      player_profile: profileId,
       selected_game: props.selectedGameId,
       points: null as number | null,
       position: null as number | null,
@@ -297,7 +299,7 @@ function initFormData() {
   }
 
   formData.value = (members.value).map((p) => ({
-    player_profile: p.id,
+    player_profile: p.profile,  // Use profile ID, not member ID
     selected_game: props.selectedGameId,
     points: null as number | null,
     position: null as number | null,
@@ -349,8 +351,8 @@ watch(
   { immediate: true }
 );
 
-function idToName(pid: number) {
-  const m = (members.value).find((x) => x.id === pid);
+function idToName(profileId: number) {
+  const m = (members.value).find((x) => x.profile === profileId);
   return m?.profile_name;
 }
 
@@ -363,7 +365,9 @@ const tieGroupDisplay = computed(() =>
 );
 
 function needsTieBreaker(memberId: number) {
-  return tieBreakerRequired.value && tieBreakerPlayers.value.has(memberId);
+  const member = members.value.find((m) => m.id === memberId);
+  const profileId = member?.profile;
+  return tieBreakerRequired.value && profileId && tieBreakerPlayers.value.has(profileId);
 }
 
 function handleTieBreaker202(data: any) {
