@@ -51,13 +51,13 @@
                 v-else-if="props.rowIndex === 1"
                 class="rank-badge rank-silver"
               >
-                2
+                {{ props.row.total_league_points }}
               </div>
               <div
                 v-else-if="props.rowIndex === 2"
                 class="rank-badge rank-bronze"
               >
-                3
+                {{ props.row.total_league_points }}
               </div>
               <div
                 v-else-if="props.rowIndex === tableRows.length - 1"
@@ -69,7 +69,7 @@
                 />
               </div>
               <div v-else class="rank-badge rank-default">
-                {{ props.rowIndex + 1 }}
+                {{ props.row.total_league_points }}
               </div>
               <span class="player-name">{{ props.value }}</span>
             </div>
