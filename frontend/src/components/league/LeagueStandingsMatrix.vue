@@ -1,5 +1,5 @@
 <template>
-  <div class="q-mb-md">
+  <div class="">
     <!-- Optional league badge (no 'Standings' text) -->
     <div class="row items-center justify-end q-mb-xs">
       <q-badge

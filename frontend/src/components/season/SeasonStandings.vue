@@ -50,7 +50,7 @@
         No leagues for this season. (Should not happen if filters are correct.)
       </div>
 
-      <div v-else class="column q-gutter-lg">
+      <div v-else class="column q-gutter-sm">
         <div
           v-for="league in leagues"
           :key="league.id"

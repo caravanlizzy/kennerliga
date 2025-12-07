@@ -5,13 +5,14 @@
       :key="announcement.id"
       :class="[bannerClasses[announcement.type], 'q-py-md']"
     >
+      <!-- Center the content container -->
       <div class="full-width flex flex-center">
         <div
-          class="column items-center text-center"
-          style="max-width:780px;"
+          class="column"
+          style="max-width: 880px; width: 100%;"
         >
-          <!-- Avatar + title row -->
-          <div class="row items-center justify-center q-gutter-sm">
+          <!-- Icon next to title, but text left-aligned -->
+          <div class="row items-center q-gutter-sm">
             <q-icon
               :name="announcementIcons[announcement.type]"
               size="md"
@@ -22,8 +23,11 @@
             </div>
           </div>
 
-          <!-- Optional content -->
-          <div v-if="announcement.content" class="q-mt-sm">
+          <!-- Body text (left aligned) -->
+          <div
+            v-if="announcement.content"
+            class="q-mt-sm text-body1"
+          >
             {{ announcement.content }}
           </div>
         </div>
