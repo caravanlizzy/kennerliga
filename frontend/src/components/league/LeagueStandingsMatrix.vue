@@ -41,36 +41,6 @@
         <template #body-cell-profile_name="props">
           <q-td :props="props" class="player-cell">
             <div class="row items-center no-wrap">
-              <div
-                v-if="props.rowIndex === 0"
-                class="rank-badge rank-gold"
-              >
-                <q-icon name="emoji_events" size="16px" />
-              </div>
-              <div
-                v-else-if="props.rowIndex === 1"
-                class="rank-badge rank-silver"
-              >
-                {{ props.row.total_league_points }}
-              </div>
-              <div
-                v-else-if="props.rowIndex === 2"
-                class="rank-badge rank-bronze"
-              >
-                {{ props.row.total_league_points }}
-              </div>
-              <div
-                v-else-if="props.rowIndex === tableRows.length - 1"
-                class="rank-badge rank-last"
-              >
-                <q-icon
-                  name="img:https://cdn.jsdelivr.net/npm/emoji-datasource-apple/img/apple/64/1f422.png"
-                  size="14px"
-                />
-              </div>
-              <div v-else class="rank-badge rank-default">
-                {{ props.row.total_league_points }}
-              </div>
               <span class="player-name">{{ props.value }}</span>
             </div>
           </q-td>
@@ -80,7 +50,7 @@
         <template #body-cell-total="props">
           <q-td :props="props" class="total-cell">
             <div class="total-value">
-              {{ props.value }}
+              {{ formatNumber(props.value) }}
             </div>
           </q-td>
         </template>
@@ -89,7 +59,9 @@
         <template #body-cell="props">
           <q-td
             :props="props"
-            v-if="props.col.name !== 'profile_name' && props.col.name !== 'total'"
+            v-if="
+              props.col.name !== 'profile_name' && props.col.name !== 'total'
+            "
             class="game-cell"
           >
             <div v-if="props.value" class="game-stats">
@@ -137,7 +109,8 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue';
 import { api } from 'boot/axios';
-import type { QTableColumn } from 'quasar';
+import { QTableColumn } from 'quasar';
+import { useResponsive } from 'src/composables/reponsive';
 
 const props = defineProps<{
   leagueId: number;
@@ -247,9 +220,11 @@ const tableRows = computed(() => {
 
 const formatNumber = (value: string | number): string => {
   const num = typeof value === 'string' ? parseFloat(value) : value;
-  if (isNaN(num)) return '-';
+  if (!num) return '-';
   return num % 1 === 0 ? num.toFixed(0) : num.toString();
 };
+
+const { isMobile } = useResponsive();
 </script>
 
 <style lang="scss" scoped>
@@ -437,9 +412,9 @@ const formatNumber = (value: string | number): string => {
 /* Leading row subtle highlight */
 :deep(tbody tr:first-child) {
   background: linear-gradient(
-      90deg,
-      rgba(255, 215, 0, 0.03) 0%,
-      transparent 100%
+    90deg,
+    rgba(255, 215, 0, 0.03) 0%,
+    transparent 100%
   );
 }
 

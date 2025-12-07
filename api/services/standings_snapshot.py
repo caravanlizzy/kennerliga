@@ -103,17 +103,43 @@ def rebuild_game_snapshot(selected_game, win_mode: str = "count_top_block") -> N
         row["win_share"] = Decimal("0.00")
         row["league_points"] = Decimal("0.00")
 
+    # First: win_share (your existing rule)
     if win_mode == "count_top_block":
-        # Only rank 1 gets win share; shared among all first-place players
         first_group = rank_groups.get(1, [])
         if first_group:
             share = Decimal("1.00") / Decimal(len(first_group))
-            # Round to 2 decimal places to match GameStanding fields
             share = share.quantize(Decimal("0.01"))
-
             for row in first_group:
                 row["win_share"] = share
-                row["league_points"] = share
+
+    # Then: league points 6 / 3 / 1 / 0 based on "place", with tie handling
+    POINTS_TABLE = {
+        1: Decimal("6"),
+        2: Decimal("3"),
+        3: Decimal("1"),
+        # 4+ implicitly 0
+    }
+
+    # We walk rank groups in order and assign places 1..N
+    current_place = 1
+    for rank in sorted(rank_groups.keys()):
+        group = rank_groups[rank]
+        group_size = len(group)
+
+        # Points for the places this tied group occupies
+        raw_points = []
+        for offset in range(group_size):
+            place = current_place + offset
+            raw_points.append(POINTS_TABLE.get(place, Decimal("0")))
+
+        avg_points = (
+            sum(raw_points, Decimal("0")) / group_size
+        ).quantize(Decimal("0.01"))
+
+        for row in group:
+            row["league_points"] = avg_points
+
+        current_place += group_size
 
     # ------------------------------------------------------------------
     # Persist standings
