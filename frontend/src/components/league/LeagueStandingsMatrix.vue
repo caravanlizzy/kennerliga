@@ -122,6 +122,8 @@ import { ref, computed } from 'vue';
 import { api } from 'boot/axios';
 import type { QTableColumn } from 'quasar';
 
+const props = defineProps<{leagueId: number}>();
+
 interface GameStats {
   points: string;
   league_points: string;
@@ -154,7 +156,7 @@ const fetchStandings = async () => {
   loading.value = true;
   error.value = false;
   try {
-    const { data } = await api.get<StandingsData>('league/leagues/1/full-standings/');
+    const { data } = await api.get<StandingsData>(`league/leagues/${props.leagueId}/full-standings/`);
     standings.value = data;
   } catch (e) {
     console.error('Error fetching standings:', e);
