@@ -1,117 +1,134 @@
-
 <template>
-  <div class="full-width">
-    <q-table
-      v-if="standings"
-      :rows="tableRows"
-      :columns="tableColumns"
-      row-key="player_profile_id"
-      flat
-      hide-pagination
-      :pagination="{ rowsPerPage: 0 }"
-      class="standings-table"
-    >
-      <!-- Header cells -->
-      <template #header="props">
-        <q-tr :props="props" class="standings-header">
-          <q-th
-            v-for="col in props.cols"
-            :key="col.name"
-            :props="props"
-            class="standings-header-cell"
-          >
-            {{ col.label }}
-          </q-th>
-        </q-tr>
-      </template>
-
-      <!-- Player name column -->
-      <template #body-cell-profile_name="props">
-        <q-td :props="props" class="player-cell">
-          <div class="row items-center no-wrap">
-            <div
-              v-if="props.rowIndex === 0"
-              class="rank-badge rank-gold"
-            >
-              <q-icon name="emoji_events" size="16px" />
-            </div>
-            <div
-              v-else-if="props.rowIndex === 1"
-              class="rank-badge rank-silver"
-            >
-              2
-            </div>
-            <div
-              v-else-if="props.rowIndex === 2"
-              class="rank-badge rank-bronze"
-            >
-              3
-            </div>
-            <div
-              v-else-if="props.rowIndex === tableRows.length - 1"
-              class="rank-badge rank-last"
-            >
-              <q-icon
-                name="img:https://cdn.jsdelivr.net/npm/emoji-datasource-apple/img/apple/64/1f422.png"
-                size="14px"
-              />
-            </div>
-            <div v-else class="rank-badge rank-default">
-              {{ props.rowIndex + 1 }}
-            </div>
-            <span class="player-name">{{ props.value }}</span>
-          </div>
-        </q-td>
-      </template>
-
-      <!-- Total column -->
-      <template #body-cell-total="props">
-        <q-td :props="props" class="total-cell">
-          <div class="total-value">
-            {{ props.value }}
-          </div>
-        </q-td>
-      </template>
-
-      <!-- Game columns -->
-      <template #body-cell="props">
-        <q-td
-          :props="props"
-          v-if="props.col.name !== 'profile_name' && props.col.name !== 'total'"
-          class="game-cell"
-        >
-          <div v-if="props.value" class="game-stats">
-            <span class="lp-value">{{ formatNumber(props.value.league_points) }}</span>
-            <span class="pts-value">{{ formatNumber(props.value.points) }} pts</span>
-          </div>
-          <div v-else class="no-data">
-            <span class="dot"></span>
-          </div>
-        </q-td>
-      </template>
-    </q-table>
-
-    <!-- Loading State -->
-    <div v-else-if="loading" class="state-container">
-      <div class="state-card">
-        <q-spinner-dots color="primary" size="32px" />
-        <span class="state-text">Loading standings...</span>
-      </div>
+  <div class="standings-root">
+    <div class="standings-header-bar">
+      <div class="standings-title">Standings</div>
+      <q-badge
+        v-if="leagueLevel"
+        color="primary"
+        text-color="white"
+        class="league-badge"
+      >
+        L{{ leagueLevel }}
+      </q-badge>
     </div>
 
-    <!-- Error State -->
-    <div v-else-if="error" class="state-container">
-      <div class="state-card state-error">
-        <q-icon name="error_outline" size="32px" class="text-negative" />
-        <span class="state-text text-negative">Error loading standings</span>
-        <q-btn
-          outline
-          color="primary"
-          label="Retry"
-          size="sm"
-          class="q-mt-md"
-          @click="fetchStandings"
-        />
+    <div class="standings-table-wrapper">
+      <q-table
+        v-if="standings"
+        :rows="tableRows"
+        :columns="tableColumns"
+        row-key="player_profile_id"
+        flat
+        hide-pagination
+        :pagination="{ rowsPerPage: 0 }"
+        class="standings-table"
+      >
+        <!-- Header cells -->
+        <template #header="props">
+          <q-tr :props="props" class="standings-header">
+            <q-th
+              v-for="col in props.cols"
+              :key="col.name"
+              :props="props"
+              class="standings-header-cell"
+            >
+              {{ col.label }}
+            </q-th>
+          </q-tr>
+        </template>
+
+        <!-- Player name column -->
+        <template #body-cell-profile_name="props">
+          <q-td :props="props" class="player-cell">
+            <div class="row items-center no-wrap">
+              <div
+                v-if="props.rowIndex === 0"
+                class="rank-badge rank-gold"
+              >
+                <q-icon name="emoji_events" size="16px" />
+              </div>
+              <div
+                v-else-if="props.rowIndex === 1"
+                class="rank-badge rank-silver"
+              >
+                2
+              </div>
+              <div
+                v-else-if="props.rowIndex === 2"
+                class="rank-badge rank-bronze"
+              >
+                3
+              </div>
+              <div
+                v-else-if="props.rowIndex === tableRows.length - 1"
+                class="rank-badge rank-last"
+              >
+                <q-icon
+                  name="img:https://cdn.jsdelivr.net/npm/emoji-datasource-apple/img/apple/64/1f422.png"
+                  size="14px"
+                />
+              </div>
+              <div v-else class="rank-badge rank-default">
+                {{ props.rowIndex + 1 }}
+              </div>
+              <span class="player-name">{{ props.value }}</span>
+            </div>
+          </q-td>
+        </template>
+
+        <!-- Total column -->
+        <template #body-cell-total="props">
+          <q-td :props="props" class="total-cell">
+            <div class="total-value">
+              {{ props.value }}
+            </div>
+          </q-td>
+        </template>
+
+        <!-- Game columns -->
+        <template #body-cell="props">
+          <q-td
+            :props="props"
+            v-if="props.col.name !== 'profile_name' && props.col.name !== 'total'"
+            class="game-cell"
+          >
+            <div v-if="props.value" class="game-stats">
+              <span class="lp-value">
+                {{ formatNumber(props.value.league_points) }}
+              </span>
+              <span class="pts-value">
+                {{ formatNumber(props.value.points) }} pts
+              </span>
+            </div>
+            <div v-else class="no-data">
+              <span class="dot"></span>
+            </div>
+          </q-td>
+        </template>
+      </q-table>
+
+      <!-- Loading State -->
+      <div v-else-if="loading" class="state-container">
+        <div class="state-card">
+          <q-spinner-dots size="24px" />
+          <span class="state-text">Loading standings...</span>
+        </div>
+      </div>
+
+      <!-- Error State -->
+      <div v-else-if="error" class="state-container">
+        <div class="state-card state-error">
+          <q-icon name="error_outline" size="24px" class="text-negative" />
+          <span class="state-text text-negative">Error loading standings</span>
+          <q-btn
+            outline
+            color="primary"
+            label="Retry"
+            size="sm"
+            class="q-mt-md"
+            @click="fetchStandings"
+          />
+        </div>
       </div>
     </div>
   </div>
@@ -122,7 +139,12 @@ import { ref, computed } from 'vue';
 import { api } from 'boot/axios';
 import type { QTableColumn } from 'quasar';
 
-const props = defineProps<{leagueId: number}>();
+const props = defineProps<{
+  leagueId: number;
+  leagueLevel?: number; // pass league.level from parent
+}>();
+
+const leagueLevel = computed(() => props.leagueLevel ?? null);
 
 interface GameStats {
   points: string;
@@ -156,7 +178,9 @@ const fetchStandings = async () => {
   loading.value = true;
   error.value = false;
   try {
-    const { data } = await api.get<StandingsData>(`league/leagues/${props.leagueId}/full-standings/`);
+    const { data } = await api.get<StandingsData>(
+      `league/leagues/${props.leagueId}/full-standings/`
+    );
     standings.value = data;
   } catch (e) {
     console.error('Error fetching standings:', e);
@@ -182,7 +206,6 @@ const tableColumns = computed<QTableColumn[]>(() => {
     },
   ];
 
-  // Add a column for each game
   standings.value.selected_games.forEach((game) => {
     columns.push({
       name: `game_${game.id}`,
@@ -192,7 +215,6 @@ const tableColumns = computed<QTableColumn[]>(() => {
     });
   });
 
-  // Add total column
   columns.push({
     name: 'total',
     label: 'Total LP',
@@ -214,7 +236,6 @@ const tableRows = computed(() => {
       total_league_points: standing.total_league_points,
     };
 
-    // Add game data
     standings.value!.selected_games.forEach((game) => {
       const gameData = standing.games[game.id.toString()];
       row[`game_${game.id}`] = gameData || null;
@@ -232,11 +253,45 @@ const formatNumber = (value: string | number): string => {
 </script>
 
 <style lang="scss" scoped>
+.standings-root {
+  max-width: 100%;
+}
+
+/* Header bar with badge */
+.standings-header-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+
+.standings-title {
+  font-size: 0.9rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #616161;
+}
+
+.league-badge {
+  font-weight: 600;
+  border-radius: 999px;
+  padding: 2px 10px;
+  font-size: 0.75rem;
+}
+
+/* Wrapper to allow horizontal scroll on small screens */
+.standings-table-wrapper {
+  background: #f9f9f9;
+  padding: 4px;
+  overflow-x: auto;
+}
+
+/* Compact table */
 .standings-table {
-  background: white;
-  border: 1px dotted rgba(0, 0, 0, 0.12);
-  border-radius: 12px;
-  overflow: hidden;
+  background: #fdfdfd;
+  border-radius: 8px;
+  font-size: 0.8rem;
 
   :deep(.q-table) {
     border-spacing: 0;
@@ -249,41 +304,48 @@ const formatNumber = (value: string | number): string => {
   :deep(td) {
     border: none;
   }
+
+  /* Make table not shrink columns too much,
+     enable scrolling instead on very narrow screens */
+  :deep(.q-table__middle) {
+    min-width: 560px;
+  }
 }
 
 .standings-header {
-  background: white;
+  background: #f3f3f3;
 }
 
 .standings-header-cell {
   font-weight: 600;
-  font-size: 0.75rem;
+  font-size: 0.72rem;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
-  color: #9e9e9e;
-  padding: 16px 12px;
-  border-bottom: 1px dotted rgba(0, 0, 0, 0.12) !important;
+  letter-spacing: 0.06em;
+  color: #757575;
+  padding: 8px 8px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08) !important;
 }
 
 .player-cell {
-  padding: 12px;
-  border-bottom: 1px dotted rgba(0, 0, 0, 0.06);
+  padding: 8px 8px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
 }
 
 .player-name {
   font-weight: 500;
   color: #424242;
-  margin-left: 12px;
+  margin-left: 8px;
+  font-size: 0.85rem;
 }
 
 .rank-badge {
-  width: 28px;
-  height: 28px;
+  width: 24px;
+  height: 24px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 600;
   flex-shrink: 0;
 }
@@ -291,7 +353,7 @@ const formatNumber = (value: string | number): string => {
 .rank-gold {
   background: linear-gradient(135deg, #ffd700 0%, #ffb300 100%);
   color: white;
-  box-shadow: 0 2px 8px rgba(255, 179, 0, 0.3);
+  box-shadow: 0 1px 4px rgba(255, 179, 0, 0.4);
 }
 
 .rank-silver {
@@ -306,36 +368,36 @@ const formatNumber = (value: string | number): string => {
 
 .rank-last {
   background: #f5f5f5;
-  border: 1px dotted #e0e0e0;
+  border: 1px solid #e0e0e0;
 }
 
 .rank-default {
   background: #fafafa;
   color: #9e9e9e;
-  border: 1px dotted #e0e0e0;
+  border: 1px solid #e0e0e0;
 }
 
 .game-cell {
-  padding: 12px 8px;
-  border-bottom: 1px dotted rgba(0, 0, 0, 0.06);
-  border-left: 1px dotted rgba(0, 0, 0, 0.06);
+  padding: 8px 6px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+  border-left: 1px solid rgba(0, 0, 0, 0.04);
 }
 
 .game-stats {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 2px;
+  gap: 1px;
 }
 
 .lp-value {
   font-weight: 600;
-  font-size: 0.95rem;
+  font-size: 0.82rem;
   color: var(--q-primary);
 }
 
 .pts-value {
-  font-size: 0.7rem;
+  font-size: 0.68rem;
   color: #9e9e9e;
 }
 
@@ -347,56 +409,60 @@ const formatNumber = (value: string | number): string => {
 }
 
 .no-data .dot {
-  width: 6px;
-  height: 6px;
+  width: 5px;
+  height: 5px;
   border-radius: 50%;
-  background: #e0e0e0;
+  background: #d6d6d6;
 }
 
 .total-cell {
-  padding: 12px;
-  border-bottom: 1px dotted rgba(0, 0, 0, 0.06);
-  border-left: 1px dotted rgba(0, 0, 0, 0.06);
-  background: #fafafa;
+  padding: 8px 6px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+  border-left: 1px solid rgba(0, 0, 0, 0.04);
+  background: #f5f5f5;
 }
 
 .total-value {
   font-weight: 700;
-  font-size: 1.1rem;
+  font-size: 0.9rem;
   color: var(--q-primary);
   text-align: center;
 }
 
-// Hover effect
+/* Hover row */
 :deep(tbody tr:hover) {
-  background-color: #fafafa;
+  background-color: #f5f5f5;
 }
 
-// First row highlight for leader
+/* Leading row subtle highlight */
 :deep(tbody tr:first-child) {
-  background: linear-gradient(90deg, rgba(255, 215, 0, 0.05) 0%, transparent 100%);
+  background: linear-gradient(
+      90deg,
+      rgba(255, 215, 0, 0.03) 0%,
+      transparent 100%
+  );
 }
 
-// State containers
+/* State containers */
 .state-container {
   display: flex;
   justify-content: center;
-  padding: 48px 24px;
+  padding: 24px 12px;
 }
 
 .state-card {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 32px 48px;
-  background: white;
-  border: 1px dotted rgba(0, 0, 0, 0.12);
-  border-radius: 12px;
+  padding: 20px 28px;
+  background: #ffffff;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 10px;
 }
 
 .state-text {
-  margin-top: 12px;
-  font-size: 0.9rem;
+  margin-top: 8px;
+  font-size: 0.8rem;
   color: #757575;
 }
 

@@ -62,6 +62,7 @@
 
           <LeagueStandingsMatrix
             :leagueId="league.id"
+            :leagueLevel="league.level"
             class="q-pa-md"
           />
         </div>
