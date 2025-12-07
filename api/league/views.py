@@ -9,7 +9,7 @@ from rest_framework.viewsets import ReadOnlyModelViewSet, ModelViewSet
 from game.models import SelectedGame, BanDecision
 from league.models import League, LeagueStanding, GameStanding
 from league.serializer import LeagueDetailSerializer, LeagueStandingSerializer, GameStandingSerializer, LeagueSerializer
-from services.standings_snapshot import rebuild_league_snapshot
+from services.standings_snapshot import rebuild_league_snapshot, rebuild_game_snapshot
 
 
 class LeagueViewSet(ModelViewSet):
@@ -143,8 +143,27 @@ class LeagueViewSet(ModelViewSet):
 
     @action(detail=True, methods=['post'], url_path='rebuild-standings')
     def rebuild_standings(self, request, pk=None):
+        """
+        Rebuilds ALL per-game standings (GameStanding) for this league,
+        then rebuilds the overall league standings (LeagueStanding),
+        and returns the fresh LeagueStanding list.
+        """
         league = self.get_object()
-        rebuild_league_snapshot(league)
+
+
+
+        # Optional: allow client to specify win_mode, defaulting to "count_top_block"
+        win_mode = request.data.get("win_mode", "count_top_block")
+
+        # 1) Rebuild per-game snapshots for all SelectedGames in this league
+        selected_games = SelectedGame.objects.filter(league=league).select_related("game")
+        for sg in selected_games:
+            rebuild_game_snapshot(sg, win_mode=win_mode)
+
+        # 2) Rebuild league snapshot (LeagueStanding) based on all results
+        rebuild_league_snapshot(league, win_mode=win_mode)
+
+        # 3) Return refreshed league standings
         qs = (
             LeagueStanding.objects
             .filter(league=league)
