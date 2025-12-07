@@ -8,9 +8,9 @@
 
     <q-page-container class="flex column justify-center">
       <q-page>
-        <div class="q-px-md q-py-xs">
+<!--        <div class="q-px-md q-py-xs">-->
           <router-view />
-        </div>
+<!--        </div>-->
       </q-page>
       <ConfirmDialog />
     </q-page-container>

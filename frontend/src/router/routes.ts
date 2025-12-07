@@ -55,6 +55,18 @@ const routes: RouteRecordRaw[] = [
     ],
   },
   {
+    path: '/announcements',
+    component: () => import('layouts/MainLayout.vue'),
+    meta: { requiresAuth: true, requiresAdmin: true },
+    children: [
+      {
+        path: '',
+        name: 'announcements',
+        component: () => import('pages/AnnouncementManagementPage.vue'),
+      },
+    ],
+  },
+  {
     path: '/',
     component: () => import('layouts/MainLayout.vue'),
     children: [

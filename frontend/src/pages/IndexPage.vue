@@ -1,6 +1,7 @@
 <template>
+  <AnnouncementDisplay />
   <SideBarLayout side-title="Infos">
-    <div class="row">
+    <div class="row q-px-md q-py-xs">
       <CurrentSeason v-if="seasonId" :seasonId="seasonId" class="col-12" />
       <SeasonStandings class="col-12" />
       <KennerChat class="col-12" />
@@ -19,5 +20,5 @@ import CurrentSeason from 'components/season/CurrentSeason.vue';
 import SideBarLayout from 'layouts/SideBarLayout.vue';
 import FeaturesList from 'components/dev/FeaturesList.vue';
 import SeasonStandings from 'components/season/SeasonStandings.vue';
-
+import AnnouncementDisplay from 'components/ui/AnnouncementDisplay.vue';
 </script>
