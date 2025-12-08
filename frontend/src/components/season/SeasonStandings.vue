@@ -50,11 +50,10 @@
         No leagues for this season. (Should not happen if filters are correct.)
       </div>
 
-      <div v-else class="column q-gutter-sm">
+      <div v-else class="column">
         <div
           v-for="league in leagues"
           :key="league.id"
-          class="q-pa-sm bg-grey-1 rounded-borders"
         >
           <div class="text-subtitle1 q-mb-sm">
             {{ league.name }}
@@ -63,7 +62,6 @@
           <LeagueStandingsMatrix
             :leagueId="league.id"
             :leagueLevel="league.level"
-            class="q-pa-md"
           />
         </div>
       </div>

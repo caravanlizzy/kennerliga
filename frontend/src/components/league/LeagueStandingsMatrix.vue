@@ -1,7 +1,7 @@
 <template>
-  <div class="">
+  <div>
     <!-- Optional league badge (no 'Standings' text) -->
-    <div class="row items-center justify-end q-mb-xs">
+    <div class="row items-center justify-end">
       <q-badge
         v-if="leagueLevel"
         color="primary"
@@ -14,7 +14,7 @@
     </div>
 
     <!-- Table / states -->
-    <div class="q-pa-xs overflow-auto rounded-borders">
+    <div class="overflow-auto">
       <q-table
         v-if="standings"
         :rows="tableRows"
@@ -85,17 +85,16 @@
               "
               class="column items-center"
             >
+              <span v-if="props.value.points" class="text-caption">
+                {{ formatNumber(props.value.points) }} pts
+              </span>
               <div
                 v-if="props.value.league_points"
-                class="q-px-xs q-py-none text-weight-medium text-teal-7 text-body2"
-                style="border: 1px solid var(--q-info);"
+		class="text-grey-8 floating"
               >
                 {{ formatNumber(props.value.league_points) }}
               </div>
 
-              <span v-if="props.value.points" class="text-caption">
-                {{ formatNumber(props.value.points) }} pts
-              </span>
             </div>
             <div v-else class="flex flex-center">
               <q-icon name="circle" size="6px" color="grey-4" />
@@ -219,7 +218,7 @@ const tableColumns = computed<QTableColumn[]>(() => {
   cols.push({
     name: 'total',
     label: 'Total LP',
-    field: 'total_league_points',
+    field: 'total',
     align: 'center',
     sortable: true,
   });
