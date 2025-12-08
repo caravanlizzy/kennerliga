@@ -3,6 +3,7 @@
     <q-card
       flat
       class="chat-card"
+      :class="isMobile ? 'chat-card--mobile' : 'chat-card--desktop'"
     >
 <!--      &lt;!&ndash; Header &ndash;&gt;-->
 <!--      <q-card-section-->
@@ -411,7 +412,7 @@ function handleKeydown(event: KeyboardEvent) {
 .chat-card {
   display: flex;
   flex-direction: column;
-  min-height: 500px
+  height: 500px;
 }
 
 .header-section {
