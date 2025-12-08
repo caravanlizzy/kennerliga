@@ -1,46 +1,97 @@
 <template>
-  <div>
-    <q-banner
-      v-for="announcement in announcements"
-      :key="announcement.id"
-      :class="[bannerClasses[announcement.type], 'q-py-md']"
-    >
-      <!-- Center the content container -->
-      <div class="full-width flex flex-center">
+  <div v-if="announcements.length" class="q-mt-xs q-mb-sm">
+    <div class="row justify-center">
+      <!-- centered, not full width -->
+      <div class="col-12 col-md-10 col-lg-8">
         <div
-          class="column"
-          style="max-width: 880px; width: 100%;"
+          v-for="a in announcements"
+          :key="a.id"
+          class="q-mb-sm"
         >
-          <!-- Icon next to title, but text left-aligned -->
-          <div class="row items-center q-gutter-sm">
-            <q-icon
-              :name="announcementIcons[announcement.type]"
-              size="md"
-            />
-
-            <div class="text-subtitle1 text-weight-bold">
-              {{ announcement.title }}
-            </div>
-          </div>
-
-          <!-- Body text (left aligned) -->
-          <div
-            v-if="announcement.content"
-            class="q-mt-sm text-body1"
+          <q-banner
+            dense
+            rounded
+            class="q-px-md q-py-sm shadow-1 bg-white border-left"
+            :style="{
+              borderLeftWidth: '3px',
+              borderLeftStyle: 'solid',
+              borderLeftColor: borderColors[a.type]
+            }"
           >
-            {{ announcement.content }}
-          </div>
+            <div class="row items-center no-wrap">
+              <!-- Icon with subtle colored background -->
+              <div
+                class="q-pa-xs q-mr-sm flex flex-center rounded-borders"
+                :class="iconBgClasses[a.type]"
+              >
+                <q-icon
+                  :name="announcementIcons[a.type]"
+                  size="16px"
+                  :class="textColors[a.type]"
+                />
+              </div>
+
+              <!-- Text -->
+              <div class="col">
+                <div class="text-body2 text-weight-medium">
+                  {{ a.title }}
+                </div>
+
+                <div
+                  v-if="a.content"
+                  class="text-caption q-mt-xs text-grey-7"
+                >
+                  {{ a.content }}
+                </div>
+              </div>
+
+              <!-- Right action slot (optional) -->
+              <div v-if="$slots.actions" class="q-ml-sm">
+                <slot name="actions" :announcement="a" />
+              </div>
+            </div>
+          </q-banner>
         </div>
       </div>
-    </q-banner>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { storeToRefs } from 'pinia';
 import { useAnnouncementStore } from 'stores/announcementStore';
+// if you have the type available, you can import it:
+// import type { AnnouncementType } from 'src/models/announcementModel';
 
-const announcementStore = useAnnouncementStore();
-const { announcements } = storeToRefs(announcementStore);
-const { bannerClasses, announcementIcons } = announcementStore;
+const store = useAnnouncementStore();
+const { announcements } = storeToRefs(store);
+const { announcementIcons } = store;
+
+// keys assume a.type is one of: 'INFO' | 'WINNER' | 'REGISTER' | 'WARNING' | 'NEUTRAL'
+// adjust if your enum/string values differ
+const borderColors: Record<string, string> = {
+  INFO: 'var(--q-info)',
+  WINNER: 'var(--q-secondary)',
+  REGISTER: 'var(--q-positive)',
+  WARNING: 'var(--q-negative)',
+  NEUTRAL: 'var(--q-grey-5)',
+};
+
+const textColors: Record<string, string> = {
+  INFO: 'text-info',
+  WINNER: 'text-secondary',
+  REGISTER: 'text-positive',
+  WARNING: 'text-negative',
+  NEUTRAL: 'text-grey-7',
+};
+
+// subtle pastel background just for the icon circle
+const iconBgClasses: Record<string, string> = {
+  INFO: 'bg-info-1',
+  WINNER: 'bg-secondary-1',
+  REGISTER: 'bg-positive-1',
+  WARNING: 'bg-negative-1',
+  NEUTRAL: 'bg-grey-3',
+};
 </script>
+
