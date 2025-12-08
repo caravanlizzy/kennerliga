@@ -2,7 +2,7 @@
   <div v-if="announcements.length" >
     <div class="row justify-center">
       <!-- centered, not full width -->
-      <div class="col-12 col-md-10 col-lg-8">
+      <div class="col-12">
         <div
           v-for="a in announcements"
           :key="a.id"
@@ -11,11 +11,12 @@
           <q-banner
             dense
             rounded
-            class="q-px-md q-py-sm shadow-1 bg-white border-left"
+            class="q-px-md q-py-sm bg-white border-left"
             :style="{
+              borderWidth: '1px',
+              borderStyle: 'solid',
+              borderColor: borderColors[a.type],
               borderLeftWidth: '3px',
-              borderLeftStyle: 'solid',
-              borderLeftColor: borderColors[a.type]
             }"
           >
             <div class="row items-center no-wrap">
