@@ -73,56 +73,6 @@ watch(
     if (id == null) return;
     const { data } = await api(`season/season-scoreboards/${id}/scoreboards/`);
     seasonData.value = data;
-
-    // If backend not ready, keep or replace with your mock here:
-    seasonData.value = {
-      season: { id: 34, name: '2025_S10' },
-      leagues: [
-        {
-          league: { id: 101, level: 1 },
-          columns: ['Game', 'Alice', 'Bob'],
-          rows: [
-            {
-              type: 'game',
-              selected_game_id: 1001,
-              game: 'Catan',
-              cells: [
-                {
-                  player_id: 1,
-                  profile_name: 'Alice',
-                  value: 83,
-                  display: '83 pts',
-                },
-                {
-                  player_id: 2,
-                  profile_name: 'Bob',
-                  value: 75,
-                  display: '75 pts',
-                },
-              ],
-            },
-            {
-              type: 'league_totals',
-              label: 'League Points',
-              cells: [
-                {
-                  player_id: 1,
-                  profile_name: 'Alice',
-                  value: 3,
-                  display: '3 pts',
-                },
-                {
-                  player_id: 2,
-                  profile_name: 'Bob',
-                  value: 1,
-                  display: '1 pts',
-                },
-              ],
-            },
-          ],
-        },
-      ],
-    };
   },
   { immediate: true }
 );

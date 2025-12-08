@@ -8,12 +8,21 @@
         @keydown.enter.stop.prevent
         class="q-gutter-md"
       >
+        <!-- Game name -->
         <KennerInput
           class="max-w"
           label="Game name"
           v-model="name"
           :rules="[(val: string) => !!val || 'Please enter a game name']"
         />
+
+        <KennerInput
+          class="max-w"
+          label="Short name"
+          v-model="shortName"
+          hint="Optional – used in compact / mobile views. Defaults to Game name."
+        />
+
         <KennerSelect
           class="max-w"
           label="Platform"
@@ -99,6 +108,8 @@ const { addItem: addOption, items: gameOptions } = useGameOptions;
 provide('useGameOptions', useGameOptions);
 
 const name = ref('');
+const shortName = ref('');
+
 const platform: Ref<TPlatform | undefined> = ref(undefined);
 
 let resultConfig: TResultConfig | undefined = undefined;
@@ -121,13 +132,17 @@ const onSubmit = async () => {
   try {
     if (!platform.value) return;
 
+    // 🔹 use shortName if provided, otherwise fall back to full name
+    const effectiveShortName =
+      shortName.value.trim() !== '' ? shortName.value.trim() : name.value;
+
     const payload = {
       name: name.value,
+      short_name: effectiveShortName,
       platform: platform.value.id,
       options: gameOptions.value.map((option) => ({
         name: option.title,
         has_choices: option.hasChoices,
-        // keep your existing keys as-is:
         only_if_option: option.onlyIfOption || null,
         only_if_choice: option.onlyIfChoice || null,
         only_if_value: option.onlyIfValue ?? null,
@@ -138,7 +153,7 @@ const onSubmit = async () => {
     const { data: game } = await api.post('/game/games-full/', payload);
 
     if (resultConfig !== undefined) {
-      await createResultConfigData(game.id, resultConfig); // keep this separate for now
+      await createResultConfigData(game.id, resultConfig);
     } else {
       console.warn('Missing result config');
       return;

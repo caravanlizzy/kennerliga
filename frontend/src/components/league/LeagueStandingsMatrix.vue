@@ -86,7 +86,7 @@
               class="column items-center"
             >
               <span v-if="props.value.points" class="text-caption">
-                {{ formatNumber(props.value.points) }} pts
+                {{ formatNumber(props.value.points) }} VP
               </span>
               <div
                 v-if="props.value.league_points"
@@ -138,6 +138,7 @@
 import { ref, computed } from 'vue';
 import { api } from 'boot/axios';
 import type { QTableColumn } from 'quasar';
+import { useResponsive } from 'src/composables/reponsive';
 
 const props = defineProps<{
   leagueId: number;
@@ -145,6 +146,7 @@ const props = defineProps<{
 }>();
 
 const leagueLevel = computed(() => props.leagueLevel ?? null);
+const { isMobile } = useResponsive();
 
 interface GameStats {
   points: string;
@@ -163,6 +165,7 @@ interface Standing {
 interface SelectedGame {
   id: number;
   game_name: string;
+  game_short_name: string; // 🔹 now available
 }
 
 interface StandingsData {
@@ -209,7 +212,8 @@ const tableColumns = computed<QTableColumn[]>(() => {
   standings.value.selected_games.forEach((game) => {
     cols.push({
       name: `game_${game.id}`,
-      label: game.game_name,
+      // 🔹 short name on mobile, full name otherwise
+      label: (isMobile && game.game_short_name) ? game.game_short_name : game.game_name,
       field: `game_${game.id}`,
       align: 'center',
     });

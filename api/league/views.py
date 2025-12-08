@@ -82,7 +82,7 @@ class LeagueViewSet(ModelViewSet):
             .order_by('id')
         )
         selected_game_list = [
-            {"id": sg.id, "game_name": sg.game.name}
+            {"id": sg.id, "game_name": sg.game.name, "game_short_name": sg.game.short_name}
             for sg in selected_games
         ]
         selected_game_ids = [sg.id for sg in selected_games]
