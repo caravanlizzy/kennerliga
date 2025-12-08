@@ -1,6 +1,7 @@
 <template>
-  <SideAccentBox color="teal">
+  <ContentSection title="Seasons" color="grey">
     <div :class="isMobile ? '' : 'q-pa-md q-gutter-md'" class="column">
+      <!-- Filters -->
       <!-- Filters -->
       <div class="row q-gutter-sm items-end">
         <KennerSelect
@@ -27,7 +28,12 @@
           :loading="loadingSeasons"
           style="max-width: 180px"
         />
+
+        <div class="text-caption text-grey-7 q-ml-sm q-mt-xs">
+          See current standings for all active leagues. Use the selects to view past seasons.
+        </div>
       </div>
+
 
       <!-- State info -->
       <div v-if="loadingSeasons" class="text-grey-7">Loading seasons…</div>
@@ -55,7 +61,7 @@
         </div>
       </div>
     </div>
-  </SideAccentBox>
+  </ContentSection>
 </template>
 
 <script setup lang="ts">
@@ -64,7 +70,8 @@ import SideAccentBox from 'components/base/SideAccentBox.vue';
 import LeagueStandingsMatrix from 'components/league/LeagueStandingsMatrix.vue';
 import { api } from 'boot/axios';
 import KennerSelect from 'components/base/KennerSelect.vue';
-import { useResponsive } from 'src/composables/responsive'; // adjust to your axios boot file
+import { useResponsive } from 'src/composables/responsive';
+import ContentSection from 'components/base/ContentSection.vue'; // adjust to your axios boot file
 
 const { isMobile } = useResponsive();
 

@@ -1,21 +1,20 @@
 <template>
-  <SideAccentBox color="accent">
+  <ContentSection :isOpened="true" title="Kennerchat" color="accent">
     <q-card
       flat
       class="chat-card"
-      :class="isMobile ? 'chat-card--mobile' : 'chat-card--desktop'"
     >
-      <!-- Header -->
-      <q-card-section
-        class="header-section"
-        :class="isMobile ? 'header-section--mobile' : 'header-section--desktop'"
-      >
-        <div class="header-content">
-          <div class="text-subtitle1 text-weight-light">Kennerchat</div>
-        </div>
-      </q-card-section>
+<!--      &lt;!&ndash; Header &ndash;&gt;-->
+<!--      <q-card-section-->
+<!--        class="header-section"-->
+<!--        :class="isMobile ? 'header-section&#45;&#45;mobile' : 'header-section&#45;&#45;desktop'"-->
+<!--      >-->
+<!--        <div class="header-content">-->
+<!--          <div class="text-subtitle1 text-weight-light">Kennerchat</div>-->
+<!--        </div>-->
+<!--      </q-card-section>-->
 
-      <q-separator spaced />
+<!--      <q-separator spaced />-->
 
       <!-- Chat list -->
       <q-scroll-area
@@ -141,7 +140,7 @@
         </div>
       </q-card-section>
     </q-card>
-  </SideAccentBox>
+  </ContentSection>
 </template>
 
 <script setup lang="ts">
@@ -162,6 +161,7 @@ import { QInput, QScrollArea } from 'quasar';
 import { TMessage } from 'src/types';
 import { useUserStore } from 'stores/userStore';
 import { storeToRefs } from 'pinia';
+import ContentSection from 'components/base/ContentSection.vue';
 
 const { user, isAuthenticated } = storeToRefs(useUserStore());
 const $q = useQuasar();
@@ -411,15 +411,7 @@ function handleKeydown(event: KeyboardEvent) {
 .chat-card {
   display: flex;
   flex-direction: column;
-}
-
-/* shorter, tighter cards */
-.chat-card--desktop {
-  height: 420px;
-}
-
-.chat-card--mobile {
-  height: 360px;
+  min-height: 500px
 }
 
 .header-section {
@@ -672,12 +664,5 @@ function handleKeydown(event: KeyboardEvent) {
 
 .hint-text--mobile {
   font-size: 0.68rem;
-}
-
-/* You already have some mobile styles, but most of the separation is now via classes */
-@media (max-width: 600px) {
-  .chat-card--mobile {
-    height: 340px;
-  }
 }
 </style>

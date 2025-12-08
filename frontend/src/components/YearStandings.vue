@@ -7,7 +7,7 @@
     v-else-if="error"
     class="column items-center q-pa-md bg-white rounded-borders"
   >
-    <q-icon name="error_outline" size="24px" color="negative" />
+    <q-icon name="error_outline" size="22px" color="negative" />
     <span class="q-mt-xs text-negative text-body2">
       Error loading yearly standings
     </span>
@@ -24,14 +24,14 @@
   <!-- Content -->
   <div
     v-else-if="standings"
-    class="year-standings bg-white rounded-borders q-pa-md"
+    class="year-standings bg-white rounded-borders q-pa-sm"
   >
-    <!-- Header row -->
-    <div class="row items-baseline justify-between q-mb-md">
-      <div class="text-subtitle1 text-weight-medium">
+    <!-- Header -->
+    <div class="row items-baseline justify-between q-mb-sm">
+      <div class="text-subtitle2 text-weight-medium">
         Yearly standings matrix
       </div>
-      <div class="text-body2 text-grey-7">
+      <div class="text-caption text-grey-7">
         Year {{ standings.year }}
       </div>
     </div>
@@ -40,27 +40,32 @@
     <q-markup-table
       flat
       separator="horizontal"
-      class="text-body2 year-matrix"
+      class="text-caption year-matrix bg-white"
     >
       <thead>
       <tr>
-        <th class="text-left text-uppercase text-weight-medium q-py-sm q-px-md">
+        <th class="text-left text-uppercase text-weight-medium q-py-xs q-px-sm">
           Player
         </th>
-        <th class="text-center text-uppercase text-weight-medium q-py-sm q-px-md">
-          Highest league
+
+        <th class="text-center text-uppercase text-weight-medium q-py-xs q-px-sm">
+          Highest L
         </th>
-        <th class="text-center text-uppercase text-weight-medium q-py-sm q-px-md">
-          1st place
+
+        <th class="text-center text-uppercase text-weight-medium q-py-xs q-px-sm">
+          1st
         </th>
-        <th class="text-center text-uppercase text-weight-medium q-py-sm q-px-md">
-          2nd place
+
+        <th class="text-center text-uppercase text-weight-medium q-py-xs q-px-sm">
+          2nd
         </th>
-        <th class="text-center text-uppercase text-weight-medium q-py-sm q-px-md">
-          3rd place
+
+        <th class="text-center text-uppercase text-weight-medium q-py-xs q-px-sm">
+          3rd
         </th>
-        <th class="text-center text-uppercase text-weight-medium q-py-sm q-px-md">
-          4th place
+
+        <th class="text-center text-uppercase text-weight-medium q-py-xs q-px-sm">
+          4th
         </th>
       </tr>
       </thead>
@@ -72,80 +77,72 @@
         :class="[{ 'bg-yellow-1': index === 0 }]"
       >
         <!-- Player -->
-        <td class="text-left q-py-sm q-px-md">
-          <div class="text-body1 text-weight-medium">
+        <td class="text-left q-py-xs q-px-sm">
+          <div class="text-body2 text-weight-medium">
             {{ row.profile_name }}
           </div>
         </td>
 
-        <!-- Highest league (explicit) -->
-        <td class="text-center q-py-sm q-px-md">
+        <!-- Highest league -->
+        <td class="text-center q-py-xs q-px-sm">
           <div v-if="bestLeague(row)" class="text-body2 text-weight-medium">
             L{{ bestLeague(row) }}
           </div>
-          <div v-else class="text-grey-5 text-body2">
+          <div v-else class="text-grey-5 text-caption">
             –
           </div>
         </td>
 
         <!-- 1st -->
-        <td class="text-center q-py-sm q-px-md">
+        <td class="text-center q-py-xs q-px-sm">
           <div
             v-if="row.totals.first > 0"
-            class="text-body1 text-positive text-weight-bold"
+            class="text-body2 text-positive text-weight-medium"
           >
             {{ row.totals.first }}
           </div>
-          <div v-else class="text-grey-5 text-body2">
-            0
-          </div>
+          <div v-else class="text-grey-5 text-caption">0</div>
         </td>
 
         <!-- 2nd -->
-        <td class="text-center q-py-sm q-px-md">
+        <td class="text-center q-py-xs q-px-sm">
           <div
             v-if="row.totals.second > 0"
-            class="text-body1 text-primary text-weight-bold"
+            class="text-body2 text-primary text-weight-medium"
           >
             {{ row.totals.second }}
           </div>
-          <div v-else class="text-grey-5 text-body2">
-            0
-          </div>
+          <div v-else class="text-grey-5 text-caption">0</div>
         </td>
 
         <!-- 3rd -->
-        <td class="text-center q-py-sm q-px-md">
+        <td class="text-center q-py-xs q-px-sm">
           <div
             v-if="row.totals.third > 0"
-            class="text-body1 text-accent text-weight-bold"
+            class="text-body2 text-accent text-weight-medium"
           >
             {{ row.totals.third }}
           </div>
-          <div v-else class="text-grey-5 text-body2">
-            0
-          </div>
+          <div v-else class="text-grey-5 text-caption">0</div>
         </td>
 
-        <!-- 4th (worst) -->
-        <td class="text-center q-py-sm q-px-md">
+        <!-- 4th -->
+        <td class="text-center q-py-xs q-px-sm">
           <div
             v-if="row.totals.fourth > 0"
-            class="text-body1 text-negative text-weight-bold"
+            class="text-body2 text-negative text-weight-medium"
           >
             {{ row.totals.fourth }}
           </div>
-          <div v-else class="text-grey-5 text-body2">
-            0
-          </div>
+          <div v-else class="text-grey-5 text-caption">0</div>
         </td>
       </tr>
       </tbody>
     </q-markup-table>
   </div>
 
-  <!-- No data, no error -->
-  <div v-else class="text-body2 text-grey-7">
+  <!-- No data -->
+  <div v-else class="text-caption text-grey-7">
     No standings available.
   </div>
 </template>
@@ -155,11 +152,7 @@ import { api } from 'boot/axios';
 import { ref, watch } from 'vue';
 import LoadingSpinner from 'components/base/LoadingSpinner.vue';
 
-const props = defineProps<{
-  year: number;
-}>();
-
-type PositionKey = 'first' | 'second' | 'third' | 'fourth';
+const props = defineProps<{ year: number }>();
 
 interface PerLevelCounts {
   first: number;
@@ -196,46 +189,30 @@ async function fetchStandings(): Promise<void> {
     );
     standings.value = data;
   } catch (e) {
-    console.error('Error fetching yearly standings:', e);
+    console.error('Error loading yearly standings:', e);
     error.value = true;
   } finally {
     loading.value = false;
   }
 }
 
-/**
- * Highest (best) league level where the player has *any* placements.
- * Lower number = better league (L1 > L2).
- */
 function bestLeague(row: PlayerYearStanding): number | null {
-  const levelsWithResults: number[] = [];
+  const levels = Object.entries(row.per_level)
+    .filter(([, c]) => c.first || c.second || c.third || c.fourth)
+    .map(([level]) => Number(level));
 
-  for (const [levelKey, counts] of Object.entries(row.per_level || {})) {
-    const c = counts as PerLevelCounts;
-    if (c.first || c.second || c.third || c.fourth) {
-      levelsWithResults.push(Number(levelKey));
-    }
-  }
-
-  if (levelsWithResults.length === 0) return null;
-  return Math.min(...levelsWithResults);
+  if (levels.length === 0) return null;
+  return Math.min(...levels);
 }
 
-// fetch once and whenever year changes
 watch(
   () => props.year,
-  () => {
-    fetchStandings();
-  },
+  () => fetchStandings(),
   { immediate: true }
 );
 </script>
 
 <style scoped>
-.year-standings {
-  width: 100%;
-}
-
 .year-matrix tbody tr:hover {
   background: rgba(0, 0, 0, 0.03);
 }

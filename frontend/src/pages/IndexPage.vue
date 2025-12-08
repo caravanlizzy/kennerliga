@@ -1,37 +1,34 @@
 <template>
-  <SideBarLayout side-title="Infos">
+  <div>
     <div :class="isMobile ? 'q-pa-xs' : 'q-pa-md'">
       <AnnouncementDisplay />
-      <div class="row q-py-xs">
-        <SplitLayout>
-          <template #left>
-            <KennerChat />
-          </template>
-          <template #right>
-          <SideAccentBox>
-            <YearStandings :year="2021"/>
-          </SideAccentBox>
-          </template>
-        </SplitLayout>
-        <SeasonStandings class="col-12" />
+      <div class="row">
+        <div class="col-12 col-md-8 q-pr-xs" :class="{ 'q-pr-xs': isMdUp }">
+          <SeasonStandings class="col-12" />
+          <ContentSection
+            title="Year Standings"
+            class="col-12"
+            color="secondary"
+          >
+            <YearStandings :year="2021" />
+          </ContentSection>
+        </div>
+        <KennerChat class="col-12 col-md-4" />
       </div>
     </div>
-    <template #side>
-      <FeaturesList />
-    </template>
-  </SideBarLayout>
+  </div>
 </template>
 
 <script setup lang="ts">
 import KennerChat from 'components/chat/KennerChat.vue';
-import SideBarLayout from 'layouts/SideBarLayout.vue';
-import FeaturesList from 'components/dev/FeaturesList.vue';
 import SeasonStandings from 'components/season/SeasonStandings.vue';
 import AnnouncementDisplay from 'components/ui/AnnouncementDisplay.vue';
 import { useResponsive } from 'src/composables/responsive';
-import SplitLayout from 'layouts/SplitLayout.vue';
-import SideAccentBox from 'components/base/SideAccentBox.vue';
 import YearStandings from 'components/YearStandings.vue';
+import ContentSection from 'components/base/ContentSection.vue';
+import { useQuasar } from 'quasar';
 
 const { isMobile } = useResponsive();
+const $q = useQuasar();
+const isMdUp = $q.screen.gt.sm;
 </script>
