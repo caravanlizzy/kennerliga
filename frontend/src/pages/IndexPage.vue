@@ -10,7 +10,7 @@
             class="col-12"
             color="secondary"
           >
-            <YearStandings :year="2021" />
+            <YearStandings :year="2023" />
           </ContentSection>
         </div>
         <KennerChat class="col-12 col-md-4" />
