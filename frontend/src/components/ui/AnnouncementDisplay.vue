@@ -1,5 +1,5 @@
 <template>
-  <div v-if="announcements.length" class="q-mt-xs q-mb-sm">
+  <div v-if="announcements.length" >
     <div class="row justify-center">
       <!-- centered, not full width -->
       <div class="col-12 col-md-10 col-lg-8">

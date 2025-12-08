@@ -1,18 +1,5 @@
 <template>
   <div>
-    <!-- Optional league badge (no 'Standings' text) -->
-    <div class="row items-center justify-end">
-      <q-badge
-        v-if="leagueLevel"
-        color="primary"
-        text-color="white"
-        class="q-px-sm q-py-xs text-caption text-weight-bold"
-        rounded
-      >
-        L{{ leagueLevel }}
-      </q-badge>
-    </div>
-
     <!-- Table / states -->
     <div class="overflow-auto">
       <q-table
@@ -35,7 +22,7 @@
               :key="col.name"
               :props="props"
               :class="[
-                'q-px-xs q-py-xs text-uppercase text-weight-medium',
+                'text-uppercase text-weight-medium',
                 col.name === 'profile_name' ? 'text-left' : 'text-center',
               ]"
               :style="
@@ -53,7 +40,7 @@
         <template #body-cell-profile_name="props">
           <q-td
             :props="props"
-            class="q-px-xs q-py-xs text-left text-body2 text-weight-medium"
+            class="text-left text-body2 text-weight-medium"
           >
             <div class="row items-center no-wrap">
               <span>{{ props.value }}</span>
@@ -63,7 +50,7 @@
 
         <!-- Total column -->
         <template #body-cell-total="props">
-          <q-td :props="props" class="q-px-xs q-py-xs text-center">
+          <q-td :props="props" class="text-center">
             <div class="text-primary text-weight-bold text-body2">
               {{ formatNumber(props.value) }}
             </div>
@@ -142,10 +129,8 @@ import { useResponsive } from 'src/composables/reponsive';
 
 const props = defineProps<{
   leagueId: number;
-  leagueLevel?: number;
 }>();
 
-const leagueLevel = computed(() => props.leagueLevel ?? null);
 const { isMobile } = useResponsive();
 
 interface GameStats {

@@ -1,7 +1,6 @@
 <template>
   <SideAccentBox color="teal">
-    <div class="q-pa-md column q-gutter-md">
-
+    <div :class="isMobile ? '' : 'q-pa-md q-gutter-md'" class="column">
       <!-- Filters -->
       <div class="row q-gutter-sm items-end">
         <KennerSelect
@@ -31,9 +30,7 @@
       </div>
 
       <!-- State info -->
-      <div v-if="loadingSeasons" class="text-grey-7">
-        Loading seasons…
-      </div>
+      <div v-if="loadingSeasons" class="text-grey-7">Loading seasons…</div>
 
       <q-separator />
 
@@ -42,26 +39,18 @@
         Please select year and month that contain a league.
       </div>
 
-      <div v-else-if="loadingLeagues" class="text-grey-7">
-        Loading leagues…
-      </div>
+      <div v-else-if="loadingLeagues" class="text-grey-7">Loading leagues…</div>
 
       <div v-else-if="leagues.length === 0" class="text-grey-7">
         No leagues for this season. (Should not happen if filters are correct.)
       </div>
 
       <div v-else class="column">
-        <div
-          v-for="league in leagues"
-          :key="league.id"
-        >
-          <div class="text-subtitle1 q-mb-sm">
-            {{ league.name }}
-          </div>
-
+        <div v-for="league in leagues" :key="league.id">
+          <q-badge class="q-ml-md q-mt-xs" outlined dense> League{{league.level}}</q-badge>
           <LeagueStandingsMatrix
+            class="q-mb-md"
             :leagueId="league.id"
-            :leagueLevel="league.level"
           />
         </div>
       </div>
@@ -74,7 +63,10 @@ import { ref, computed, onMounted, watch } from 'vue';
 import SideAccentBox from 'components/base/SideAccentBox.vue';
 import LeagueStandingsMatrix from 'components/league/LeagueStandingsMatrix.vue';
 import { api } from 'boot/axios';
-import KennerSelect from 'components/base/KennerSelect.vue'; // adjust to your axios boot file
+import KennerSelect from 'components/base/KennerSelect.vue';
+import { useResponsive } from 'src/composables/reponsive'; // adjust to your axios boot file
+
+const { isMobile } = useResponsive();
 
 interface Season {
   id: number;
@@ -100,16 +92,24 @@ const leagues = ref<League[]>([]);
 const loadingLeagues = ref(false);
 
 const monthNames = [
-  'January', 'February', 'March', 'April', 'May', 'June',
-  'July', 'August', 'September', 'October', 'November', 'December',
+  'January',
+  'February',
+  'March',
+  'April',
+  'May',
+  'June',
+  'July',
+  'August',
+  'September',
+  'October',
+  'November',
+  'December',
 ];
 
 const yearOptions = computed(() =>
-  Array.from(
-    new Set(seasonsWithLeagues.value.map((s) => s.year)),
-  )
+  Array.from(new Set(seasonsWithLeagues.value.map((s) => s.year)))
     .sort((a, b) => b - a)
-    .map((y) => ({ label: String(y), value: y })),
+    .map((y) => ({ label: String(y), value: y }))
 );
 
 const monthOptions = computed(() => {
@@ -136,8 +136,8 @@ async function loadSeasonsWithLeagues() {
     // For each season, check if it has leagues
     const leagueResponses = await Promise.all(
       allSeasons.map((s) =>
-        api.get<League[]>('league/leagues', { params: { season: s.id } }),
-      ),
+        api.get<League[]>('league/leagues', { params: { season: s.id } })
+      )
     );
 
     const withLeagues: Season[] = [];
@@ -185,7 +185,7 @@ watch([selectedYear, selectedMonth], ([year, month]) => {
   }
 
   const season = seasonsWithLeagues.value.find(
-    (s) => s.year === year && s.month === month,
+    (s) => s.year === year && s.month === month
   );
 
   selectedSeasonId.value = season ? season.id : null;
