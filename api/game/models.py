@@ -5,15 +5,24 @@ from user.models import PlayerProfile, Platform
 
 class Game(models.Model):
     name = models.CharField(max_length=88)
+    short_name = models.CharField(max_length=33, blank=True, default='')
     platform = models.ForeignKey(Platform, on_delete=models.CASCADE)
 
     class Meta:
         constraints = [
-            models.UniqueConstraint(fields=['name', 'platform'], name='unique_game_per_platform')
+            models.UniqueConstraint(
+                fields=['name', 'platform'],
+                name='unique_game_per_platform'
+            )
         ]
 
+    def save(self, *args, **kwargs):
+        if not self.short_name:
+            self.short_name = self.name
+        super().save(*args, **kwargs)
+
     def __str__(self):
-        return str(self.name)
+        return self.name
 
 
 class GameOption(models.Model):
