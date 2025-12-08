@@ -221,7 +221,7 @@ const tableColumns = computed<QTableColumn[]>(() => {
 
   cols.push({
     name: 'total',
-    label: 'Total LP',
+    label: 'LP',
     field: 'total',
     align: 'center',
     sortable: true,

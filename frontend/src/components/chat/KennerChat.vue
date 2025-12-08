@@ -1,10 +1,17 @@
 <template>
   <SideAccentBox color="accent">
-    <q-card flat class="chat-card">
+    <q-card
+      flat
+      class="chat-card"
+      :class="isMobile ? 'chat-card--mobile' : 'chat-card--desktop'"
+    >
       <!-- Header -->
-      <q-card-section class="header-section">
+      <q-card-section
+        class="header-section"
+        :class="isMobile ? 'header-section--mobile' : 'header-section--desktop'"
+      >
         <div class="header-content">
-          <div class="text-h6 text-weight-light">Kennerchat</div>
+          <div class="text-subtitle1 text-weight-light">Kennerchat</div>
         </div>
       </q-card-section>
 
@@ -18,12 +25,16 @@
         @mousedown="markAsRead"
         @wheel="markAsRead"
       >
-        <div class="chat-messages q-pa-md">
+        <div class="chat-messages q-pa-sm">
           <div
             v-for="(message, i) in messages"
             :key="message.id ?? `${message.datetime}-${i}`"
             class="message-wrapper"
-            :class="{ 'message-mine': isMine(message) }"
+            :class="{
+              'message-mine': isMine(message),
+              'message-wrapper--mobile': isMobile,
+              'message-wrapper--desktop': !isMobile
+            }"
           >
             <!-- Unread marker -->
             <transition name="marker-fade">
@@ -38,22 +49,31 @@
               </div>
             </transition>
 
-            <!-- Username -->
+            <!-- Username / timestamp -->
             <div class="message-header">
               <span
                 class="username"
+                :class="isMobile ? 'username--mobile' : 'username--desktop'"
                 :style="{ color: userColor(message.sender) }"
               >
                 {{ message.sender }}
               </span>
-              <span class="timestamp">
+              <span
+                class="timestamp"
+                :class="isMobile ? 'timestamp--mobile' : 'timestamp--desktop'"
+              >
                 {{ formatDateTime(message.datetime) }}
               </span>
             </div>
 
             <!-- Message bubble -->
-            <div class="message-bubble">
-              <div class="message-text">{{ message.text }}</div>
+            <div
+              class="message-bubble"
+              :class="isMobile ? 'message-bubble--mobile' : 'message-bubble--desktop'"
+            >
+              <div class="message-text">
+                {{ message.text }}
+              </div>
             </div>
           </div>
         </div>
@@ -64,20 +84,25 @@
         <div
           v-if="hasUnreadMessages && !isScrolledToBottom"
           class="unread-badge"
+          :class="isMobile ? 'unread-badge--mobile' : 'unread-badge--desktop'"
           @click="scrollToBottomAndRead"
         >
           <q-badge color="accent" floating rounded>
             {{ unreadCount }}
           </q-badge>
           <q-icon name="keyboard_arrow_down" size="sm" />
-          <span class="unread-badge-text">New messages</span>
+          <span class="unread-badge-text" v-if="!isMobile">New messages</span>
         </div>
       </transition>
 
       <q-separator />
 
       <!-- Composer -->
-      <q-card-section v-if="isAuthenticated" class="composer-section">
+      <q-card-section
+        v-if="isAuthenticated"
+        class="composer-section"
+        :class="isMobile ? 'composer-section--mobile' : 'composer-section--desktop'"
+      >
         <div class="composer-wrapper">
           <q-input
             ref="inputRef"
@@ -108,7 +133,10 @@
             </template>
           </q-input>
         </div>
-        <div class="text-caption text-grey-6 hint-text">
+        <div
+          class="text-caption text-grey-6 hint-text"
+          :class="isMobile ? 'hint-text--mobile' : 'hint-text--desktop'"
+        >
           Press Enter to send
         </div>
       </q-card-section>
@@ -126,6 +154,7 @@ import {
   computed,
   watch,
 } from 'vue';
+import { useQuasar } from 'quasar';
 import { formatDateTime } from 'src/helpers';
 import { postMessage, fetchMessages } from 'src/services/chatService';
 import SideAccentBox from 'components/base/SideAccentBox.vue';
@@ -135,6 +164,9 @@ import { useUserStore } from 'stores/userStore';
 import { storeToRefs } from 'pinia';
 
 const { user, isAuthenticated } = storeToRefs(useUserStore());
+const $q = useQuasar();
+
+const isMobile = computed(() => $q.screen.lt.md);
 
 // ---------- State ----------
 let lastDateTime: string | undefined;
@@ -183,15 +215,13 @@ const unreadCount = computed(() => {
 // Watch for when unread messages disappear to trigger fade out
 watch(hasUnreadMessages, (newVal, oldVal) => {
   if (oldVal === true && newVal === false) {
-    // Unread messages just disappeared, start fade out timer
     if (markerFadeTimer) {
       clearTimeout(markerFadeTimer);
     }
     markerFadeTimer = window.setTimeout(() => {
       showUnreadMarker.value = false;
-    }, 3000); // 3 second delay before fading
+    }, 3000);
   } else if (newVal === true) {
-    // Unread messages appeared, show marker immediately
     showUnreadMarker.value = true;
     if (markerFadeTimer) {
       clearTimeout(markerFadeTimer);
@@ -218,7 +248,6 @@ function handleScroll(info: {
     info.verticalSize - info.verticalPosition - info.verticalContainerSize <
     threshold;
 
-  // Only update isScrolledToBottom if this is not an automatic scroll
   if (!isAutoScrolling.value) {
     isScrolledToBottom.value = isAtBottom;
   }
@@ -229,7 +258,6 @@ function markAsRead() {
     userHasInteracted.value = true;
   }
 
-  // Mark all messages as read
   if (messages.value.length > 0) {
     lastReadIndex.value = messages.value.length - 1;
   }
@@ -246,7 +274,6 @@ function scrollToBottom(smooth = true) {
         smooth ? 300 : 0
       );
     }
-    // Reset after scroll animation completes
     setTimeout(
       () => {
         isAutoScrolling.value = false;
@@ -262,28 +289,22 @@ function scrollToKeepMarkerAtTop() {
     if (scrollAreaRef.value && unreadMarkerRef.value) {
       const scrollTarget = scrollAreaRef.value.getScrollTarget();
 
-      // Get the position of the unread marker relative to the scroll container
       const markerRect = unreadMarkerRef.value.getBoundingClientRect();
       const containerRect = scrollTarget.getBoundingClientRect();
 
-      // Calculate how far from the top of the container the marker is
       const markerOffsetInContainer = markerRect.top - containerRect.top;
-
-      // Target position: keep marker at top with some padding (e.g., 80px from top)
-      const targetPadding = 80;
+      const targetPadding = 60; // slightly tighter
       const currentScrollTop = scrollTarget.scrollTop;
       const targetScrollTop =
         currentScrollTop + markerOffsetInContainer - targetPadding;
 
-      // Only scroll if marker is not already at the target position
       if (Math.abs(markerOffsetInContainer - targetPadding) > 10) {
-        scrollAreaRef.value.setScrollPosition('vertical', targetScrollTop, 300);
+        scrollAreaRef.value.setScrollPosition('vertical', targetScrollTop, 250);
       }
     }
-    // Reset after scroll animation completes
     setTimeout(() => {
       isAutoScrolling.value = false;
-    }, 350);
+    }, 300);
   });
 }
 
@@ -302,12 +323,10 @@ async function send() {
     await postMessage(text);
     newMessage.value = '';
 
-    // Mark as interaction BEFORE loading new messages
     userHasInteracted.value = true;
 
     await loadMessages();
 
-    // After loading, mark everything as read (including your own message)
     lastReadIndex.value = messages.value.length - 1;
 
     scrollToBottom();
@@ -321,37 +340,27 @@ async function loadMessages() {
   const { data } = await fetchMessages(lastDateTime);
   if (!data || data.length === 0) return;
 
-  const previousLength = messages.value.length;
   const newMessages = data.reverse();
 
-  // Append in chronological order
   messages.value = [...messages.value, ...newMessages];
   lastDateTime = messages.value[messages.value.length - 1].datetime;
 
-  // Check if any new messages are from other users
   const hasNewMessagesFromOthers = newMessages.some((msg) => !isMine(msg));
 
-  // Only update lastReadIndex if:
-  // 1. User is at bottom and already has read everything
-  // 2. OR if the new messages are only from the current user
   if (isScrolledToBottom.value) {
     if (!hasNewMessagesFromOthers) {
-      // All new messages are from you, mark as read
       lastReadIndex.value = messages.value.length - 1;
     }
   }
 
-  // Smart scrolling behavior:
   if (isScrolledToBottom.value && !hasUnreadMessages.value) {
-    // User is at bottom, no unread messages - keep following
     scrollToBottom();
   } else if (hasUnreadMessages.value && unreadMarkerRef.value) {
-    // There are unread messages - keep the marker at the top
     scrollToKeepMarkerAtTop();
   }
 }
 
-// helpers for username → stable color
+// username → stable color
 function userColor(name?: string | null) {
   const s = (name ?? '').trim();
   if (!s) return 'hsl(0, 0%, 70%)';
@@ -365,18 +374,15 @@ function userColor(name?: string | null) {
 onMounted(() => {
   loadMessages().then(() => {
     scrollToBottom(false);
-    // Initially mark as read on mount
     if (messages.value.length > 0) {
       lastReadIndex.value = messages.value.length - 1;
     }
   });
 
-  // polling for new messages
   pollTimer = window.setInterval(async () => {
     await loadMessages();
   }, 5000);
 
-  // Listen for keyboard events on the whole component
   window.addEventListener('keydown', handleKeydown);
 });
 
@@ -395,7 +401,6 @@ onUnmounted(() => {
 });
 
 function handleKeydown(event: KeyboardEvent) {
-  // Mark as read on any keyboard input when chat is visible
   if (event.key) {
     markAsRead();
   }
@@ -406,11 +411,27 @@ function handleKeydown(event: KeyboardEvent) {
 .chat-card {
   display: flex;
   flex-direction: column;
-  height: 600px;
+}
+
+/* shorter, tighter cards */
+.chat-card--desktop {
+  height: 420px;
+}
+
+.chat-card--mobile {
+  height: 360px;
 }
 
 .header-section {
-  padding: 16px 20px;
+  padding: 10px 14px;
+}
+
+.header-section--desktop {
+  padding: 10px 16px;
+}
+
+.header-section--mobile {
+  padding: 8px 10px;
 }
 
 .header-content {
@@ -428,22 +449,30 @@ function handleKeydown(event: KeyboardEvent) {
 .chat-messages {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 12px;
   min-height: 100%;
 }
 
 .message-wrapper {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 2px;
   max-width: 75%;
-  animation: slideIn 0.2s ease-out;
+  animation: slideIn 0.15s ease-out;
+}
+
+.message-wrapper--mobile {
+  max-width: 85%;
+}
+
+.message-wrapper--desktop {
+  max-width: 70%;
 }
 
 @keyframes slideIn {
   from {
     opacity: 0;
-    transform: translateY(10px);
+    transform: translateY(6px);
   }
   to {
     opacity: 1;
@@ -459,53 +488,75 @@ function handleKeydown(event: KeyboardEvent) {
   }
 
   .message-bubble {
-    padding: 5px 7px;
+    padding: 4px 7px;
     background: var(--q-accent);
     color: #ffffff;
-    border-radius: 18px 18px 4px 18px;
-    transition: all 0.2s ease-in-out;
+    border-radius: 14px 14px 3px 14px;
+    transition: all 0.15s ease-in-out;
   }
 }
 
 .message-header {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 0 4px;
-  margin-bottom: 2px;
+  gap: 6px;
+  padding: 0 2px;
+  margin-bottom: 1px;
 }
 
 .username {
-  font-size: 0.85rem;
   font-weight: 500;
   letter-spacing: 0.2px;
 }
 
+.username--desktop {
+  font-size: 0.82rem;
+}
+
+.username--mobile {
+  font-size: 0.78rem;
+}
+
 .timestamp {
-  font-size: 0.75rem;
   color: #9e9e9e;
 }
 
+.timestamp--desktop {
+  font-size: 0.74rem;
+}
+
+.timestamp--mobile {
+  font-size: 0.7rem;
+}
+
 .message-bubble {
-  padding: 5px 7px;
+  padding: 4px 6px;
   background: #f7f7f7;
-  border-radius: 4px 18px 18px 18px;
-  transition: all 0.2s ease-in-out;
+  border-radius: 3px 14px 14px 14px;
+  transition: all 0.15s ease-in-out;
+}
+
+.message-bubble--desktop {
+  font-size: 0.9rem;
+}
+
+.message-bubble--mobile {
+  font-size: 0.86rem;
 }
 
 .message-text {
   white-space: pre-wrap;
   word-wrap: break-word;
-  line-height: 1.5;
-  font-size: 0.9rem;
+  line-height: 1.4;
+  font-size: inherit;
 }
 
 /* Unread marker */
 .unread-marker {
   display: flex;
   align-items: center;
-  gap: 12px;
-  margin: 16px 0;
+  gap: 8px;
+  margin: 10px 0;
   width: 100%;
 }
 
@@ -516,7 +567,7 @@ function handleKeydown(event: KeyboardEvent) {
 }
 
 .unread-text {
-  font-size: 0.75rem;
+  font-size: 0.7rem;
   color: #26a69a;
   font-weight: 600;
   text-transform: uppercase;
@@ -526,11 +577,11 @@ function handleKeydown(event: KeyboardEvent) {
 
 /* Marker fade transition */
 .marker-fade-enter-active {
-  transition: opacity 0.3s ease;
+  transition: opacity 0.2s ease;
 }
 
 .marker-fade-leave-active {
-  transition: opacity 3s ease;
+  transition: opacity 2s ease;
 }
 
 .marker-fade-enter-from,
@@ -541,85 +592,92 @@ function handleKeydown(event: KeyboardEvent) {
 /* Unread badge floating button */
 .unread-badge {
   position: absolute;
-  bottom: 16px;
+  bottom: 10px;
   left: 50%;
   transform: translateX(-50%);
   background: white;
-  padding: 8px 16px;
-  border-radius: 24px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  padding: 6px 12px;
+  border-radius: 20px;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.15);
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   cursor: pointer;
   z-index: 10;
-  transition: all 0.2s ease;
+  transition: all 0.15s ease;
 
   &:hover {
-    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
-    transform: translateX(-50%) translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.18);
+    transform: translateX(-50%) translateY(-1px);
   }
 }
 
+.unread-badge--mobile {
+  bottom: 8px;
+}
+
 .unread-badge-text {
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   font-weight: 500;
   color: #424242;
 }
 
 .fade-enter-active,
 .fade-leave-active {
-  transition: opacity 0.3s ease, transform 0.3s ease;
+  transition: opacity 0.2s ease, transform 0.2s ease;
 }
 
 .fade-enter-from,
 .fade-leave-to {
   opacity: 0;
-  transform: translateX(-50%) translateY(10px);
+  transform: translateX(-50%) translateY(8px);
 }
 
 .composer-section {
-  padding: 16px 20px;
   background: #fafafa;
 }
 
+.composer-section--desktop {
+  padding: 10px 14px;
+}
+
+.composer-section--mobile {
+  padding: 8px 10px;
+}
+
 .composer-wrapper {
-  margin-bottom: 4px;
+  margin-bottom: 2px;
 }
 
 .message-input {
   :deep(.q-field__control) {
-    border-radius: 20px;
+    border-radius: 16px;
     background: white;
+    min-height: 36px;
   }
 
   :deep(textarea) {
-    max-height: 100px;
+    max-height: 80px;
+    font-size: 0.85rem;
   }
 }
 
 .hint-text {
-  padding-left: 12px;
+  padding-left: 8px;
+}
+
+.hint-text--desktop {
   font-size: 0.7rem;
 }
 
-/* Mobile responsive */
+.hint-text--mobile {
+  font-size: 0.68rem;
+}
+
+/* You already have some mobile styles, but most of the separation is now via classes */
 @media (max-width: 600px) {
-  .chat-card {
-    height: 500px;
-  }
-
-  .message-wrapper {
-    max-width: 85%;
-  }
-
-  .header-section,
-  .composer-section {
-    padding: 12px 16px;
-  }
-
-  .unread-badge-text {
-    display: none;
+  .chat-card--mobile {
+    height: 340px;
   }
 }
 </style>
