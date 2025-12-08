@@ -2,7 +2,7 @@ from django.db.models import Prefetch
 from django.db.models import prefetch_related_objects
 from rest_framework import status
 from rest_framework.decorators import action
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAdminUser
 from rest_framework.response import Response
 from rest_framework.viewsets import ReadOnlyModelViewSet, ModelViewSet
 
@@ -15,8 +15,12 @@ from services.standings_snapshot import rebuild_league_snapshot, rebuild_game_sn
 class LeagueViewSet(ModelViewSet):
     queryset = League.objects.all().prefetch_related("members__profile", "members__profile__user")
     serializer_class = LeagueSerializer
-    permission_classes = [IsAuthenticated]  # adjust to your needs
     filterset_fields = ['season']
+
+    def get_permissions(self):
+        if self.action == 'rebuild_standings':
+            return [IsAdminUser()]
+        return super().get_permissions()
 
     @action(detail=True, methods=['get'], url_path='standings')
     def standings(self, request, pk=None):
