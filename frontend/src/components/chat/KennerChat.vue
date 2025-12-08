@@ -15,7 +15,7 @@
         </div>
       </q-card-section>
 
-      <q-separator />
+      <q-separator spaced />
 
       <!-- Chat list -->
       <q-scroll-area

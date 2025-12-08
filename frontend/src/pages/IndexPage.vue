@@ -9,9 +9,7 @@
           </template>
           <template #right>
           <SideAccentBox>
-            <q-card class="column">
-              This will display the yearly standings
-            </q-card>
+            <YearStandings :year="2021"/>
           </SideAccentBox>
           </template>
         </SplitLayout>
@@ -33,6 +31,7 @@ import AnnouncementDisplay from 'components/ui/AnnouncementDisplay.vue';
 import { useResponsive } from 'src/composables/responsive';
 import SplitLayout from 'layouts/SplitLayout.vue';
 import SideAccentBox from 'components/base/SideAccentBox.vue';
+import YearStandings from 'components/YearStandings.vue';
 
 const { isMobile } = useResponsive();
 </script>
