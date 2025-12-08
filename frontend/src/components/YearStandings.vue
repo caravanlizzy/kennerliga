@@ -1,113 +1,242 @@
 <template>
-  <q-card flat bordered>
-    <q-card-section class="q-pb-sm">
-      <div class="text-subtitle1">Yearly standings matrix</div>
-      <div class="text-caption text-grey-7">
-        Dummy view – Need to think about a good display and more data required
+  <!-- Loading -->
+  <LoadingSpinner v-if="loading" />
+
+  <!-- Error -->
+  <div
+    v-else-if="error"
+    class="column items-center q-pa-md bg-white rounded-borders"
+  >
+    <q-icon name="error_outline" size="24px" color="negative" />
+    <span class="q-mt-xs text-negative text-body2">
+      Error loading yearly standings
+    </span>
+    <q-btn
+      outline
+      color="primary"
+      label="Retry"
+      size="sm"
+      class="q-mt-sm"
+      @click="fetchStandings"
+    />
+  </div>
+
+  <!-- Content -->
+  <div
+    v-else-if="standings"
+    class="year-standings bg-white rounded-borders q-pa-md"
+  >
+    <!-- Header row -->
+    <div class="row items-baseline justify-between q-mb-md">
+      <div class="text-subtitle1 text-weight-medium">
+        Yearly standings matrix
       </div>
-    </q-card-section>
+      <div class="text-body2 text-grey-7">
+        Year {{ standings.year }}
+      </div>
+    </div>
 
-    <q-separator />
+    <!-- Table -->
+    <q-markup-table
+      flat
+      separator="horizontal"
+      class="text-body2 year-matrix"
+    >
+      <thead>
+      <tr>
+        <th class="text-left text-uppercase text-weight-medium q-py-sm q-px-md">
+          Player
+        </th>
+        <th class="text-center text-uppercase text-weight-medium q-py-sm q-px-md">
+          Highest league
+        </th>
+        <th class="text-center text-uppercase text-weight-medium q-py-sm q-px-md">
+          1st place
+        </th>
+        <th class="text-center text-uppercase text-weight-medium q-py-sm q-px-md">
+          2nd place
+        </th>
+        <th class="text-center text-uppercase text-weight-medium q-py-sm q-px-md">
+          3rd place
+        </th>
+        <th class="text-center text-uppercase text-weight-medium q-py-sm q-px-md">
+          4th place
+        </th>
+      </tr>
+      </thead>
 
-    <q-card-section class="q-pa-none">
-      <q-markup-table flat dense class="q-pa-sm">
-        <thead>
-        <tr>
-          <th class="text-left">Player</th>
-          <th class="text-center">1st place</th>
-          <th class="text-center">2nd place</th>
-          <th class="text-center">3rd place</th>
-          <th class="text-center">4th place</th>
-        </tr>
-        </thead>
-        <tbody>
-        <!-- Dummy rows – adjust counts however you like -->
-        <tr>
-          <td class="text-left text-weight-medium">MissM1</td>
-          <td class="text-center"><q-badge color="primary"  rounded>3</q-badge></td>
-          <td class="text-center"><q-badge color="secondary" rounded>1</q-badge></td>
-          <td class="text-center"><q-badge color="orange"   rounded>0</q-badge></td>
-          <td class="text-center"><q-badge color="grey-5"   rounded>0</q-badge></td>
-        </tr>
-        <tr>
-          <td class="text-left text-weight-medium">Ginooo</td>
-          <td class="text-center"><q-badge color="primary"  rounded>2</q-badge></td>
-          <td class="text-center"><q-badge color="secondary" rounded>2</q-badge></td>
-          <td class="text-center"><q-badge color="orange"   rounded>1</q-badge></td>
-          <td class="text-center"><q-badge color="grey-5"   rounded>0</q-badge></td>
-        </tr>
-        <tr>
-          <td class="text-left text-weight-medium">haligh</td>
-          <td class="text-center"><q-badge color="primary"  rounded>1</q-badge></td>
-          <td class="text-center"><q-badge color="secondary" rounded>2</q-badge></td>
-          <td class="text-center"><q-badge color="orange"   rounded>2</q-badge></td>
-          <td class="text-center"><q-badge color="grey-5"   rounded>1</q-badge></td>
-        </tr>
-        <tr>
-          <td class="text-left text-weight-medium">isiundossi</td>
-          <td class="text-center"><q-badge color="primary"  rounded>1</q-badge></td>
-          <td class="text-center"><q-badge color="secondary" rounded>1</q-badge></td>
-          <td class="text-center"><q-badge color="orange"   rounded>3</q-badge></td>
-          <td class="text-center"><q-badge color="grey-5"   rounded>2</q-badge></td>
-        </tr>
-        <tr>
-          <td class="text-left text-weight-medium">Palladium2000</td>
-          <td class="text-center"><q-badge color="primary"  rounded>2</q-badge></td>
-          <td class="text-center"><q-badge color="secondary" rounded>1</q-badge></td>
-          <td class="text-center"><q-badge color="orange"   rounded>1</q-badge></td>
-          <td class="text-center"><q-badge color="grey-5"   rounded>0</q-badge></td>
-        </tr>
-        <tr>
-          <td class="text-left text-weight-medium">Bienchen2000</td>
-          <td class="text-center"><q-badge color="primary"  rounded>1</q-badge></td>
-          <td class="text-center"><q-badge color="secondary" rounded>2</q-badge></td>
-          <td class="text-center"><q-badge color="orange"   rounded>1</q-badge></td>
-          <td class="text-center"><q-badge color="grey-5"   rounded>1</q-badge></td>
-        </tr>
-        <tr>
-          <td class="text-left text-weight-medium">eumel247</td>
-          <td class="text-center"><q-badge color="primary"  rounded>1</q-badge></td>
-          <td class="text-center"><q-badge color="secondary" rounded>1</q-badge></td>
-          <td class="text-center"><q-badge color="orange"   rounded>2</q-badge></td>
-          <td class="text-center"><q-badge color="grey-5"   rounded>1</q-badge></td>
-        </tr>
-        <tr>
-          <td class="text-left text-weight-medium">Feuterim</td>
-          <td class="text-center"><q-badge color="primary"  rounded>0</q-badge></td>
-          <td class="text-center"><q-badge color="secondary" rounded>2</q-badge></td>
-          <td class="text-center"><q-badge color="orange"   rounded>3</q-badge></td>
-          <td class="text-center"><q-badge color="grey-5"   rounded>1</q-badge></td>
-        </tr>
-        <tr>
-          <td class="text-left text-weight-medium">Zimbaland</td>
-          <td class="text-center"><q-badge color="primary"  rounded>1</q-badge></td>
-          <td class="text-center"><q-badge color="secondary" rounded>0</q-badge></td>
-          <td class="text-center"><q-badge color="orange"   rounded>2</q-badge></td>
-          <td class="text-center"><q-badge color="grey-5"   rounded>3</q-badge></td>
-        </tr>
-        <tr>
-          <td class="text-left text-weight-medium">Bob</td>
-          <td class="text-center"><q-badge color="primary"  rounded>0</q-badge></td>
-          <td class="text-center"><q-badge color="secondary" rounded>1</q-badge></td>
-          <td class="text-center"><q-badge color="orange"   rounded>2</q-badge></td>
-          <td class="text-center"><q-badge color="grey-5"   rounded>4</q-badge></td>
-        </tr>
-        <tr>
-          <td class="text-left text-weight-medium">MobMob3</td>
-          <td class="text-center"><q-badge color="primary"  rounded>0</q-badge></td>
-          <td class="text-center"><q-badge color="secondary" rounded>1</q-badge></td>
-          <td class="text-center"><q-badge color="orange"   rounded>1</q-badge></td>
-          <td class="text-center"><q-badge color="grey-5"   rounded>3</q-badge></td>
-        </tr>
-        <tr>
-          <td class="text-left text-weight-medium">chefkoch07</td>
-          <td class="text-center"><q-badge color="primary"  rounded>0</q-badge></td>
-          <td class="text-center"><q-badge color="secondary" rounded>0</q-badge></td>
-          <td class="text-center"><q-badge color="orange"   rounded>2</q-badge></td>
-          <td class="text-center"><q-badge color="grey-5"   rounded>4</q-badge></td>
-        </tr>
-        </tbody>
-      </q-markup-table>
-    </q-card-section>
-  </q-card>
+      <tbody>
+      <tr
+        v-for="(row, index) in standings.standings"
+        :key="row.player_profile_id"
+        :class="[{ 'bg-yellow-1': index === 0 }]"
+      >
+        <!-- Player -->
+        <td class="text-left q-py-sm q-px-md">
+          <div class="text-body1 text-weight-medium">
+            {{ row.profile_name }}
+          </div>
+        </td>
+
+        <!-- Highest league (explicit) -->
+        <td class="text-center q-py-sm q-px-md">
+          <div v-if="bestLeague(row)" class="text-body2 text-weight-medium">
+            L{{ bestLeague(row) }}
+          </div>
+          <div v-else class="text-grey-5 text-body2">
+            –
+          </div>
+        </td>
+
+        <!-- 1st -->
+        <td class="text-center q-py-sm q-px-md">
+          <div
+            v-if="row.totals.first > 0"
+            class="text-body1 text-positive text-weight-bold"
+          >
+            {{ row.totals.first }}
+          </div>
+          <div v-else class="text-grey-5 text-body2">
+            0
+          </div>
+        </td>
+
+        <!-- 2nd -->
+        <td class="text-center q-py-sm q-px-md">
+          <div
+            v-if="row.totals.second > 0"
+            class="text-body1 text-primary text-weight-bold"
+          >
+            {{ row.totals.second }}
+          </div>
+          <div v-else class="text-grey-5 text-body2">
+            0
+          </div>
+        </td>
+
+        <!-- 3rd -->
+        <td class="text-center q-py-sm q-px-md">
+          <div
+            v-if="row.totals.third > 0"
+            class="text-body1 text-accent text-weight-bold"
+          >
+            {{ row.totals.third }}
+          </div>
+          <div v-else class="text-grey-5 text-body2">
+            0
+          </div>
+        </td>
+
+        <!-- 4th (worst) -->
+        <td class="text-center q-py-sm q-px-md">
+          <div
+            v-if="row.totals.fourth > 0"
+            class="text-body1 text-negative text-weight-bold"
+          >
+            {{ row.totals.fourth }}
+          </div>
+          <div v-else class="text-grey-5 text-body2">
+            0
+          </div>
+        </td>
+      </tr>
+      </tbody>
+    </q-markup-table>
+  </div>
+
+  <!-- No data, no error -->
+  <div v-else class="text-body2 text-grey-7">
+    No standings available.
+  </div>
 </template>
+
+<script setup lang="ts">
+import { api } from 'boot/axios';
+import { ref, watch } from 'vue';
+import LoadingSpinner from 'components/base/LoadingSpinner.vue';
+
+const props = defineProps<{
+  year: number;
+}>();
+
+type PositionKey = 'first' | 'second' | 'third' | 'fourth';
+
+interface PerLevelCounts {
+  first: number;
+  second: number;
+  third: number;
+  fourth: number;
+}
+
+interface PlayerYearStanding {
+  player_profile_id: number;
+  profile_name: string;
+  per_level: Record<string, PerLevelCounts>;
+  totals: PerLevelCounts;
+}
+
+interface YearMatrixResponse {
+  year: number;
+  levels: number[];
+  standings: PlayerYearStanding[];
+}
+
+const standings = ref<YearMatrixResponse | null>(null);
+const loading = ref(false);
+const error = ref(false);
+
+async function fetchStandings(): Promise<void> {
+  loading.value = true;
+  error.value = false;
+  standings.value = null;
+
+  try {
+    const { data } = await api.get<YearMatrixResponse>(
+      `year-standings/?year=${props.year}`
+    );
+    standings.value = data;
+  } catch (e) {
+    console.error('Error fetching yearly standings:', e);
+    error.value = true;
+  } finally {
+    loading.value = false;
+  }
+}
+
+/**
+ * Highest (best) league level where the player has *any* placements.
+ * Lower number = better league (L1 > L2).
+ */
+function bestLeague(row: PlayerYearStanding): number | null {
+  const levelsWithResults: number[] = [];
+
+  for (const [levelKey, counts] of Object.entries(row.per_level || {})) {
+    const c = counts as PerLevelCounts;
+    if (c.first || c.second || c.third || c.fourth) {
+      levelsWithResults.push(Number(levelKey));
+    }
+  }
+
+  if (levelsWithResults.length === 0) return null;
+  return Math.min(...levelsWithResults);
+}
+
+// fetch once and whenever year changes
+watch(
+  () => props.year,
+  () => {
+    fetchStandings();
+  },
+  { immediate: true }
+);
+</script>
+
+<style scoped>
+.year-standings {
+  width: 100%;
+}
+
+.year-matrix tbody tr:hover {
+  background: rgba(0, 0, 0, 0.03);
+}
+</style>
