@@ -64,7 +64,7 @@ import SideAccentBox from 'components/base/SideAccentBox.vue';
 import LeagueStandingsMatrix from 'components/league/LeagueStandingsMatrix.vue';
 import { api } from 'boot/axios';
 import KennerSelect from 'components/base/KennerSelect.vue';
-import { useResponsive } from 'src/composables/reponsive'; // adjust to your axios boot file
+import { useResponsive } from 'src/composables/responsive'; // adjust to your axios boot file
 
 const { isMobile } = useResponsive();
 

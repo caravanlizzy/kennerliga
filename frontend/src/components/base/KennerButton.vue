@@ -15,7 +15,7 @@
 </template>
 
 <script setup lang="ts">
-import { useResponsive } from 'src/composables/reponsive';
+import { useResponsive } from 'src/composables/responsive';
 import { TKennerButton } from 'src/types';
 
 withDefaults(defineProps<TKennerButton>(), {

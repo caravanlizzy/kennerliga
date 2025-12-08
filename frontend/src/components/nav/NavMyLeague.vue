@@ -15,7 +15,7 @@
   </div>
 </template>
 <script setup lang="ts">
-import { useResponsive } from 'src/composables/reponsive';
+import { useResponsive } from 'src/composables/responsive';
 import { storeToRefs } from 'pinia';
 import { useLeagueStore } from 'stores/leagueStore';
 import { useUserStore } from 'stores/userStore';

@@ -50,7 +50,7 @@
 import KennerInput from 'components/base/KennerInput.vue';
 import KennerButton from 'components/base/KennerButton.vue';
 import { useUserStore } from 'stores/userStore';
-import { useResponsive } from 'src/composables/reponsive';
+import { useResponsive } from 'src/composables/responsive';
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { useQuasar } from 'quasar';

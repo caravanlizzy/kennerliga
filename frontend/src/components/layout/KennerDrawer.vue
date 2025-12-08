@@ -44,7 +44,7 @@
 <script setup lang="ts">
 import DrawerItem from 'components/base/DrawerItem.vue';
 import { useUserStore } from 'stores/userStore';
-import { useResponsive } from 'src/composables/reponsive';
+import { useResponsive } from 'src/composables/responsive';
 import DrawerSubGroup from 'components/base/DrawerSubGroup.vue';
 import { storeToRefs } from 'pinia';
 import { useRouter } from 'vue-router';

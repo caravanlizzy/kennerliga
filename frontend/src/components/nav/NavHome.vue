@@ -26,7 +26,7 @@
   </div>
 </template>
 <script setup lang="ts">
-import { useResponsive } from 'src/composables/reponsive';
+import { useResponsive } from 'src/composables/responsive';
 
 const { isMobile } = useResponsive();
 

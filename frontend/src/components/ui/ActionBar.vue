@@ -103,7 +103,7 @@ import { useActionBar } from 'src/composables/actionBar';
 import KennerButton from 'components/base/KennerButton.vue';
 import { useLeagueStore } from 'stores/leagueStore';
 import { storeToRefs } from 'pinia';
-import { useResponsive } from 'src/composables/reponsive';
+import { useResponsive } from 'src/composables/responsive';
 import { useUserStore } from 'stores/userStore';
 
 const { actions, leadText, subject, reset } = useActionBar();

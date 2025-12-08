@@ -125,7 +125,7 @@
 import { ref, computed } from 'vue';
 import { api } from 'boot/axios';
 import type { QTableColumn } from 'quasar';
-import { useResponsive } from 'src/composables/reponsive';
+import { useResponsive } from 'src/composables/responsive';
 
 const props = defineProps<{
   leagueId: number;

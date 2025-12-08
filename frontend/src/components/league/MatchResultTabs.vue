@@ -30,7 +30,7 @@ import MatchResultForm from 'components/league/MatchResultForm.vue';
 import { storeToRefs } from 'pinia';
 import { useLeagueStore } from 'stores/leagueStore';
 import { ref } from 'vue';
-import { useResponsive } from 'src/composables/reponsive';
+import { useResponsive } from 'src/composables/responsive';
 import { truncateString } from 'src/helpers';
 import { useUserStore } from 'stores/userStore';
 

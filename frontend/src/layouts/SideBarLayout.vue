@@ -79,7 +79,7 @@
 
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue';
-import { useResponsive } from 'src/composables/reponsive';
+import { useResponsive } from 'src/composables/responsive';
 
 type Break = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
 
