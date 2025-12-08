@@ -1,6 +1,6 @@
 <template>
-  <AnnouncementDisplay />
   <SideBarLayout side-title="Infos">
+    <AnnouncementDisplay />
     <div class="row q-px-md q-py-xs">
       <SeasonStandings class="col-12" />
       <KennerChat class="col-12" />
