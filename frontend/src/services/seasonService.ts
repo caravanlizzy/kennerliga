@@ -1,10 +1,31 @@
 import { api } from 'boot/axios';
 
-export async function registerForCurrentSeason(): Promise<void> {
+export async function registerForSeason(): Promise<any> {
   try {
-    const { data } = await api('/season/register/', { method: 'POST' });
+    return await api('/season/register/', { method: 'POST' });
   } catch (error) {
     console.error(error);
+  }
+}
+
+export async function fetchIsRegisteredForSeason(): Promise<boolean> {
+  try {
+    const { data } = await api.get('/season/seasons/registration-status/');
+    return data.registered;
+  } catch (error) {
+    console.log(error);
+    return false;
+  }
+}
+
+
+export async function fetchOpenSeasonParticipants(): Promise<any[]> {
+  try {
+    const { data } = await api.get('/season/season-participants/current/');
+    return data;
+  } catch (error) {
+    console.error("Failed to fetch open season participants:", error);
+    return []; // safe fallback
   }
 }
 
