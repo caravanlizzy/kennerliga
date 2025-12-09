@@ -14,8 +14,7 @@ from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet, ViewSet
 
 from league.models import League, LeagueStanding, GameStanding
-from season.queries import register, is_profile_registered
-from season_manager import SeasonManager
+from season.queries import register, is_profile_registered, get_open_season
 from season.models import Season, SeasonParticipant
 from season.serializer import SeasonSerializer, SeasonParticipantSerializer
 from user.models import PlayerProfile
@@ -30,9 +29,9 @@ class SeasonRegistrationView(APIView):
             player_profile = PlayerProfile.objects.get(user=self.request.user)
         except PlayerProfile.DoesNotExist:
             return HttpResponseNotFound("Player profile not found.")
-        current_season = SeasonManager.get_current_season()
+        open_season = get_open_season()
         # if not player_profile in current_season.participants.all():
-        if not is_profile_registered(player_profile, current_season):
+        if not is_profile_registered(player_profile, open_season):
             register(player_profile)
             return Response(f'Participant {player_profile.profile_name} has been added to the current season.')
         return Response(f'Player {player_profile.profile_name} is already registered')
@@ -42,6 +41,62 @@ class SeasonViewSet(ModelViewSet):
     queryset = Season.objects.all()
     serializer_class = SeasonSerializer
     filterset_fields = ['year', 'month', 'status']
+
+    @action(detail=False, methods=['get'], url_path='registration-status')
+    def registration_status(self, request):
+        """
+        Check if the current user is registered in the open season.
+        Returns:
+        {
+          "has_open_season": bool,
+          "registered": bool,
+          "season_id": int | null
+        }
+        """
+        user = request.user
+        if not user or not user.is_authenticated:
+            return Response(
+                {"detail": "Authentication credentials were not provided."},
+                status=status.HTTP_401_UNAUTHORIZED,
+            )
+
+        # Get the player's profile
+        try:
+            profile = PlayerProfile.objects.get(user=user)
+        except PlayerProfile.DoesNotExist:
+            return Response(
+                {
+                    "has_open_season": False,
+                    "registered": False,
+                    "season_id": None,
+                    "detail": "No PlayerProfile found for this user.",
+                },
+                status=status.HTTP_200_OK,
+            )
+
+        # Get the open season (if any)
+        open_season = get_open_season()
+        if not open_season:
+            return Response(
+                {
+                    "has_open_season": False,
+                    "registered": False,
+                    "season_id": None,
+                },
+                status=status.HTTP_200_OK,
+            )
+
+        # Check if the profile is registered in the open season
+        registered = is_profile_registered(profile=profile, season=open_season)
+
+        return Response(
+            {
+                "has_open_season": True,
+                "registered": registered,
+                "season_id": open_season.id,
+            },
+            status=status.HTTP_200_OK,
+        )
 
 
 def build_league_scoreboard_payload(league: League) -> dict:
@@ -217,5 +272,21 @@ class SeasonParticipantViewSet(ModelViewSet):
     """
     queryset = SeasonParticipant.objects.select_related("season", "profile")
     serializer_class = SeasonParticipantSerializer
-    permission_classes = [IsAuthenticated]  # adjust if needed
     filterset_fields = ["season", "profile__profile_name"]
+
+    @action(detail=False, methods=["get"], url_path="current")
+    def current(self, request):
+        """
+        GET /season-participants/current/
+
+        Returns all participants of the *current open season*.
+        If no open season exists, returns an empty list.
+        """
+        season = get_open_season()
+        if not season:
+            # frontend can just treat this as "no participants / no open season"
+            return Response([], status=200)
+
+        qs = self.get_queryset().filter(season=season)
+        serializer = self.get_serializer(qs, many=True)
+        return Response(serializer.data)
