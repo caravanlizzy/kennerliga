@@ -3,7 +3,7 @@
     <div :class="isMobile ? 'q-pa-xs' : 'q-pa-md'">
       <AnnouncementDisplay />
       <div class="row">
-        <div class="col-12 col-md-8 q-pr-xs" :class="{ 'q-pr-xs': isMdUp }">
+        <div class="col-12 col-md-8" :class="{ 'q-pr-xs': isMdUp }">
           <SeasonStandings class="col-12" />
           <ContentSection
             title="Year Standings"
