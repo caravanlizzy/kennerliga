@@ -1,5 +1,5 @@
 <template>
-  <ContentSection title="Seasons" color="grey">
+  <ContentSection title="Seasons" color="secondary">
     <div :class="isMobile ? '' : 'q-pa-md q-gutter-md'" class="column">
       <!-- Filters -->
       <!-- Filters -->

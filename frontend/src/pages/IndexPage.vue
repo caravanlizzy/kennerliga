@@ -8,7 +8,7 @@
           <ContentSection
             title="Year Standings"
             class="col-12"
-            color="secondary"
+            color="accent"
           >
             <YearStandings :year="2023" />
           </ContentSection>

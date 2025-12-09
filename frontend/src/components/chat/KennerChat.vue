@@ -1,5 +1,5 @@
 <template>
-  <ContentSection :isOpened="true" title="Kennerchat" color="accent">
+  <ContentSection :isOpened="true" title="Kennerchat" color="info">
     <q-card
       flat
       class="chat-card"
@@ -87,7 +87,7 @@
           :class="isMobile ? 'unread-badge--mobile' : 'unread-badge--desktop'"
           @click="scrollToBottomAndRead"
         >
-          <q-badge color="accent" floating rounded>
+          <q-badge color="info" floating rounded>
             {{ unreadCount }}
           </q-badge>
           <q-icon name="keyboard_arrow_down" size="sm" />
@@ -110,7 +110,7 @@
             outlined
             dense
             placeholder="Type a message..."
-            color="accent"
+            color="info"
             type="textarea"
             autogrow
             :maxlength="500"
@@ -126,7 +126,7 @@
                 round
                 dense
                 icon="send"
-                color="accent"
+                color="info"
                 size="sm"
                 @click="send"
               />
@@ -157,7 +157,6 @@ import {
 import { useQuasar } from 'quasar';
 import { formatDateTime } from 'src/helpers';
 import { postMessage, fetchMessages } from 'src/services/chatService';
-import SideAccentBox from 'components/base/SideAccentBox.vue';
 import { QInput, QScrollArea } from 'quasar';
 import { TMessage } from 'src/types';
 import { useUserStore } from 'stores/userStore';
@@ -482,7 +481,7 @@ function handleKeydown(event: KeyboardEvent) {
 
   .message-bubble {
     padding: 4px 7px;
-    background: var(--q-accent);
+    background: var(--q-info);
     color: #ffffff;
     border-radius: 14px 14px 3px 14px;
     transition: all 0.15s ease-in-out;
@@ -524,7 +523,8 @@ function handleKeydown(event: KeyboardEvent) {
 
 .message-bubble {
   padding: 4px 6px;
-  background: #f7f7f7;
+  background: #2f6781;
+  color: white;
   border-radius: 3px 14px 14px 14px;
   transition: all 0.15s ease-in-out;
 }
