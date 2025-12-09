@@ -8,4 +8,3 @@ from announcement.serializers import AnnouncementSerializer
 class AnnouncementViewSet(ModelViewSet):
     queryset = Announcement.objects.filter(visible_until__gt=timezone.now())
     serializer_class = AnnouncementSerializer
-    authentication_classes = []
