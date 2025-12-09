@@ -76,7 +76,6 @@ export const useAnnouncementStore = defineStore('announcement', () => {
     announcementIcons,
 
     // actions
-    fetchAnnouncements,
     addAnnouncement,
     removeAnnouncement,
   };
