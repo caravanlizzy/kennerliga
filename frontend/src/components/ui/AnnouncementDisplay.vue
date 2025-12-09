@@ -1,7 +1,6 @@
 <template>
   <div v-if="announcements.length" >
     <div class="row justify-center">
-      <!-- centered, not full width -->
       <div class="col-12">
         <div
           v-for="a in announcements"
@@ -11,36 +10,30 @@
           <q-banner
             dense
             rounded
-            class="q-px-md q-py-sm bg-white border-left"
-            :style="{
-              borderWidth: '1px',
-              borderStyle: 'solid',
-              borderColor: borderColors[a.type],
-              borderLeftWidth: '3px',
-            }"
+            class="q-px-md q-py-sm border-left"
+            :class="backgroundColors[a.type]"
           >
             <div class="row items-center no-wrap">
               <!-- Icon with subtle colored background -->
               <div
                 class="q-pa-xs q-mr-sm flex flex-center rounded-borders"
-                :class="iconBgClasses[a.type]"
               >
                 <q-icon
                   :name="announcementIcons[a.type]"
                   size="16px"
-                  :class="textColors[a.type]"
+                  class="text-white"
                 />
               </div>
 
               <!-- Text -->
               <div class="col">
-                <div class="text-body2 text-weight-medium">
+                <div class="text-body2 text-white text-weight-medium">
                   {{ a.title }}
                 </div>
 
                 <div
                   v-if="a.content"
-                  class="text-caption q-mt-xs text-grey-7"
+                  class="text-caption q-mt-xs text-white"
                 >
                   {{ a.content }}
                 </div>
@@ -68,31 +61,12 @@ const store = useAnnouncementStore();
 const { announcements } = storeToRefs(store);
 const { announcementIcons } = store;
 
-// keys assume a.type is one of: 'INFO' | 'WINNER' | 'REGISTER' | 'WARNING' | 'NEUTRAL'
-// adjust if your enum/string values differ
-const borderColors: Record<string, string> = {
-  INFO: 'var(--q-info)',
-  WINNER: 'var(--q-secondary)',
-  REGISTER: 'var(--q-positive)',
-  WARNING: 'var(--q-negative)',
-  NEUTRAL: 'var(--q-grey-5)',
-};
-
-const textColors: Record<string, string> = {
-  INFO: 'text-info',
-  WINNER: 'text-secondary',
-  REGISTER: 'text-positive',
-  WARNING: 'text-negative',
-  NEUTRAL: 'text-grey-7',
-};
-
-// subtle pastel background just for the icon circle
-const iconBgClasses: Record<string, string> = {
-  INFO: 'bg-info-1',
-  WINNER: 'bg-secondary-1',
-  REGISTER: 'bg-positive-1',
-  WARNING: 'bg-negative-1',
-  NEUTRAL: 'bg-grey-3',
-};
+const backgroundColors = {
+  INFO: 'bg-info',
+  WINNER: 'bg-secondary',
+  REGISTER: 'bg-positive',
+  WARNING: 'bg-negative',
+  NEUTRAL: 'bg-grey-7',
+}
 </script>
 
