@@ -1,12 +1,8 @@
 <template>
-  <div v-if="announcements.length" >
+  <div v-if="announcements.length">
     <div class="row justify-center">
       <div class="col-12">
-        <div
-          v-for="a in announcements"
-          :key="a.id"
-          class="q-mb-sm"
-        >
+        <div v-for="a in announcements" :key="a.id" class="q-mb-sm">
           <q-banner
             dense
             rounded
@@ -14,10 +10,8 @@
             :class="backgroundColors[a.type]"
           >
             <div class="row items-center no-wrap">
-              <!-- Icon with subtle colored background -->
-              <div
-                class="q-pa-xs q-mr-sm flex flex-center rounded-borders"
-              >
+              <!-- Icon -->
+              <div class="q-pa-xs q-mr-sm flex flex-center rounded-borders">
                 <q-icon
                   :name="announcementIcons[a.type]"
                   size="16px"
@@ -31,19 +25,70 @@
                   {{ a.title }}
                 </div>
 
-                <div
-                  v-if="a.content"
-                  class="text-caption q-mt-xs text-white"
-                >
+                <div v-if="a.content" class="text-caption q-mt-xs text-white">
                   {{ a.content }}
                 </div>
-              </div>
 
-              <!-- Right action slot (optional) -->
-              <div v-if="$slots.actions" class="q-ml-sm">
-                <slot name="actions" :announcement="a" />
+                <!-- Participants section INSIDE the banner -->
+                <q-slide-transition v-if="a.type === 'REGISTER'">
+                  <div v-show="showParticipants" class="q-mt-sm">
+                    <q-separator dark class="q-mb-xs" />
+
+                    <div class="row items-center justify-between q-mb-xs">
+                      <q-spinner v-if="participantsLoading" size="16px" color="white" />
+                    </div>
+
+                    <div v-if="participantsLoaded && participants.length">
+                      <q-list dense class="bg-transparent">
+                        <q-item
+                          v-for="p in participants"
+                          :key="p.id"
+                          class="q-pa-none"
+                        >
+                          <q-item-section class="text-caption text-white">
+                            {{ p.profile?.profile_name || p.profile_name || 'Unknown' }}
+                          </q-item-section>
+                        </q-item>
+                      </q-list>
+                    </div>
+
+                    <div
+                      v-else-if="participantsLoaded && !participants.length"
+                      class="text-caption text-grey-4"
+                    >
+                      No participants registered yet. Be the first!
+                    </div>
+                  </div>
+                </q-slide-transition>
               </div>
             </div>
+
+            <template #action>
+              <div class="row items-center q-gutter-sm">
+                <!-- Toggle participants list -->
+                <KennerButton
+                  v-if="a.type === 'REGISTER'"
+                  flat
+                  color="white"
+                  class="text-caption"
+                  @click="toggleParticipants"
+                >
+                  {{ showParticipants ? 'Hide Players' : 'Show Players' }}
+                </KennerButton>
+                <KennerButton
+                  v-if="a.type === 'REGISTER' && !isRegisteredForOpenSeason"
+                  flat
+                  color="white"
+                  :disable="!isAuthenticated"
+                  @click="register"
+                >
+                  Register
+                  <q-tooltip v-if="!isAuthenticated">
+                    Login to register for upcoming season
+                  </q-tooltip>
+                </KennerButton>
+              </div>
+            </template>
           </q-banner>
         </div>
       </div>
@@ -54,12 +99,64 @@
 <script setup lang="ts">
 import { storeToRefs } from 'pinia';
 import { useAnnouncementStore } from 'stores/announcementStore';
-// if you have the type available, you can import it:
-// import type { AnnouncementType } from 'src/models/announcementModel';
+import KennerButton from 'components/base/KennerButton.vue';
+import { useUserStore } from 'stores/userStore';
+import {
+  fetchIsRegisteredForSeason,
+  fetchOpenSeasonParticipants,
+  registerForSeason,
+} from 'src/services/seasonService';
+import { ref } from 'vue';
 
 const store = useAnnouncementStore();
+const { isAuthenticated } = useUserStore();
 const { announcements } = storeToRefs(store);
 const { announcementIcons } = store;
+
+const isRegisteredForOpenSeason = ref(false);
+isRegisteredForOpenSeason.value = await fetchIsRegisteredForSeason();
+
+// participants for current open season
+const participants = ref<any[]>([]);
+const participantsLoading = ref(false);
+const participantsLoaded = ref(false);
+const showParticipants = ref(false);
+
+async function loadParticipants() {
+  if (participantsLoaded.value || participantsLoading.value) return;
+
+  participantsLoading.value = true;
+  try {
+    participants.value = await fetchOpenSeasonParticipants();
+  } catch (err) {
+    console.error('Failed to load participants', err);
+    participants.value = [];
+  } finally {
+    participantsLoading.value = false;
+    participantsLoaded.value = true;
+  }
+}
+
+async function toggleParticipants() {
+  if (!showParticipants.value) {
+    // opening
+    await loadParticipants();
+    showParticipants.value = true;
+  } else {
+    // closing
+    showParticipants.value = false;
+  }
+}
+
+async function register() {
+  const { status } = await registerForSeason();
+  if (status === 200) {
+    isRegisteredForOpenSeason.value = true;
+    // optionally refresh participants when user registers
+    participantsLoaded.value = false;
+    await loadParticipants();
+  }
+}
 
 const backgroundColors = {
   INFO: 'bg-info',
@@ -67,6 +164,5 @@ const backgroundColors = {
   REGISTER: 'bg-positive',
   WARNING: 'bg-negative',
   NEUTRAL: 'bg-grey-7',
-}
+};
 </script>
-
