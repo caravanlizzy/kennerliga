@@ -7,7 +7,7 @@
           <ContentSection :isOpened="true" title="Seasons" color="primary">
             <SeasonStandings class="col-12" />
           </ContentSection>
-          <ContentSection title="Year Standings" class="col-12" color="accent">
+          <ContentSection title="Year Standings" class="col-12" color="primary">
             <YearStandings :year="2021" />
           </ContentSection>
         </div>

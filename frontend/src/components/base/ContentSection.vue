@@ -17,8 +17,8 @@
           {{ title }}
         </div>
       </template>
-      <q-separator :color="color" />
-      <div class="q-pa-md">
+      <q-separator inset :color="color" />
+      <div>
         <slot />
       </div>
     </q-expansion-item>
