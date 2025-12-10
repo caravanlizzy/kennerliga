@@ -1,5 +1,4 @@
 <template>
-  <ContentSection title="Seasons" color="primary">
     <div :class="isMobile ? '' : 'q-pa-md q-gutter-md'" class="column">
       <!-- Filters -->
       <div class="row q-gutter-sm items-end">
@@ -60,7 +59,6 @@
         </div>
       </div>
     </div>
-  </ContentSection>
 </template>
 
 <script setup lang="ts">

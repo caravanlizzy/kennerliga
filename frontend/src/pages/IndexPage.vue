@@ -4,16 +4,21 @@
       <AnnouncementDisplay />
       <div class="row">
         <div class="col-12 col-md-8" :class="{ 'q-pr-md': isMdUp }">
-          <SeasonStandings class="col-12" />
-          <ContentSection
-            title="Year Standings"
-            class="col-12"
-            color="primary"
-          >
-            <YearStandings :year="2023" />
+          <ContentSection :isOpened="true" title="Seasons" color="primary">
+            <SeasonStandings class="col-12" />
+          </ContentSection>
+          <ContentSection title="Year Standings" class="col-12" color="accent">
+            <YearStandings :year="2021" />
           </ContentSection>
         </div>
-        <KennerChat class="col-12 col-md-4" />
+        <ContentSection
+          class="col-12 col-md-4"
+          :isOpened="true"
+          title="Kennerchat"
+          color="grey"
+        >
+          <KennerChat />
+        </ContentSection>
       </div>
     </div>
   </div>
