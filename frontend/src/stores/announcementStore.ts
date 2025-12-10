@@ -19,7 +19,7 @@ const bannerClasses: Record<AnnouncementType, string> = {
 };
 
 const announcementIcons: Record<AnnouncementType, string> = {
-  [AnnouncementType.INFO]: 'info',
+  [AnnouncementType.INFO]: 'primary',
   [AnnouncementType.WINNER]: 'emoji_events',
   [AnnouncementType.REGISTER]: 'how_to_reg',
   [AnnouncementType.WARNING]: 'warning',

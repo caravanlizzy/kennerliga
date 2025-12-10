@@ -2,14 +2,14 @@
   <q-table
     flat
     :rows-per-page-options="[10, 20, 50]"
-    table-header-class="text-primary text-weight-medium bg-grey-2"
+    table-header-class="text-dark text-weight-medium bg-grey-2"
     class="rounded-borders"
     table-class="text-grey-8"
   >
     <template v-if="createButton" v-slot:top-right>
       <KennerButton
-        :color="createButton.color"
-        :icon="createButton.icon"
+        color="primary"
+        icon="add"
         :label="createButton.label"
         :to="{ name: createButton.forwardName }"
         class="q-ml-sm"

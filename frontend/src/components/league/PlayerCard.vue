@@ -3,7 +3,7 @@
 
     <q-card-section class="card-body">
 
-      <div class="game-info-section">
+      <div class="game-primary-section">
         <div v-if="member.selected_game" class="selected-game-card">
 
           <!-- Game Header -->
@@ -118,7 +118,7 @@ import { truncateString } from 'src/helpers';
 import GameSettingsDisplay from 'components/game/selectedGame/GameSettingsDisplay.vue';
 
 const props = withDefaults(defineProps<{ member: any; color?: string }>(), {
-  color: 'var(--q-primary)',
+  color: 'var(--q-dark)',
 });
 
 const isExpanded = ref(false);
@@ -168,7 +168,7 @@ const firstGameSelection = computed(() => {
   right: 0;
   bottom: 0;
   height: 3px;
-  background: #3dadea; /* info color */
+  background: #3dadea; /* primary color */
   border-radius: 3px;
 }
 

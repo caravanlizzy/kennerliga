@@ -19,7 +19,7 @@ import { useResponsive } from 'src/composables/responsive';
 import { TKennerButton } from 'src/types';
 
 withDefaults(defineProps<TKennerButton>(), {
-  color: 'primary',
+  color: 'dark',
 });
 const { isMobile } = useResponsive();
 </script>

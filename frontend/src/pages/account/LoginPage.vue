@@ -8,7 +8,7 @@
     <q-card :bordered="!isMobile" flat :class="{ 'q-pa-xl': !isMobile }">
       <q-form @submit="doLogin" @keyup.enter="doLogin">
         <q-card-section class="q-mb-md">
-          <span class="text-h4 text-primary"> Login </span>
+          <span class="text-h4 text-dark"> Login </span>
         </q-card-section>
 
         <!-- Inline error message -->

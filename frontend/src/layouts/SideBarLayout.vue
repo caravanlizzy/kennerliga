@@ -38,7 +38,7 @@
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          backgroundColor: 'var(--q-primary)', // or use a class
+          backgroundColor: 'var(--q-dark)', // or use a class
           color: 'white',
           fontWeight: '600',
           writingMode: 'vertical-rl',

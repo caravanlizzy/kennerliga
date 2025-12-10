@@ -10,7 +10,7 @@ export default {
       path: ':id',
       name: 'game-detail',
       component: () => import('pages/game/GameDetailPage.vue'),
-        meta: { icon: 'info_i', label: 'Details'}
+        meta: { icon: 'primary_i', label: 'Details'}
     },
     {
       path: 'create',

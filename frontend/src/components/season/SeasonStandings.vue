@@ -1,7 +1,6 @@
 <template>
-  <ContentSection title="Seasons" color="secondary">
+  <ContentSection title="Seasons" color="primary">
     <div :class="isMobile ? '' : 'q-pa-md q-gutter-md'" class="column">
-      <!-- Filters -->
       <!-- Filters -->
       <div class="row q-gutter-sm items-end">
         <KennerSelect
@@ -35,7 +34,7 @@
       </div>
 
 
-      <!-- State info -->
+      <!-- State primary -->
       <div v-if="loadingSeasons" class="text-grey-7">Loading seasons…</div>
 
       <q-separator />
@@ -53,7 +52,7 @@
 
       <div v-else class="column">
         <div v-for="league in leagues" :key="league.id">
-          <q-badge class="q-ml-md q-mt-xs" outlined dense> League{{league.level}}</q-badge>
+          <q-badge class="q-ml-md q-pa-xs" color="primary" outlined dense> League{{league.level}}</q-badge>
           <LeagueStandingsMatrix
             class="q-mb-md"
             :leagueId="league.id"
@@ -66,7 +65,6 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, watch } from 'vue';
-import SideAccentBox from 'components/base/SideAccentBox.vue';
 import LeagueStandingsMatrix from 'components/league/LeagueStandingsMatrix.vue';
 import { api } from 'boot/axios';
 import KennerSelect from 'components/base/KennerSelect.vue';

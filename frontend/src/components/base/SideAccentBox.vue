@@ -20,18 +20,18 @@
 <script setup lang="ts">
 const props = withDefaults(
   defineProps<{ color?: string; fullBorder?: boolean }>(),
-  { color: 'primary', fullBorder: true }
+  { color: 'dark', fullBorder: true }
 );
 
 function resolveColor(c: string) {
   return [
-    'primary',
+    'dark',
     'secondary',
     'accent',
     'dark',
     'positive',
     'negative',
-    'info',
+    'primary',
     'warning',
   ].includes(c)
     ? `var(--q-${c})`

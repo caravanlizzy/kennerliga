@@ -6,20 +6,20 @@
       unelevated
       bordered
       color="white"
-      class="info-border nav-item-radius text-weight-medium"
+      class="primary-border nav-item-radius text-weight-medium"
     >
-      <q-icon  color="info" name="psychology" />
+      <q-icon  color="primary" name="psychology" />
     </q-btn>
     <q-btn
       v-else
       :to="{ name: 'home' }"
       unelevated
       color="white"
-      text-color="info"
-      class="info-border nav-item-radius text-weight-medium"
+      text-color="primary"
+      class="primary-border nav-item-radius text-weight-medium"
       no-caps
     >
-      <q-icon color="info" name="psychology" />
+      <q-icon color="primary" name="psychology" />
       <span v-show="!isMobile" class="q-ml-xs">Kennerliga</span>
     </q-btn>
 

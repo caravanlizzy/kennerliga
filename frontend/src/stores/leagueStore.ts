@@ -12,13 +12,13 @@ import { banGame } from 'src/services/gameService';
  * Represents a Vue Store for managing league-related data and state.
  *
  * This store is responsible for fetching, maintaining, and providing access to
- * information about leagues, their members, games, statuses, and match results.
+ * primaryrmation about leagues, their members, games, statuses, and match results.
  *
  * A range of state properties, computed values, and actions are provided to
  * manage or derive data associated with leagues.
  *
  * The store provides comprehensive utilities including:
- * - State variables for holding league info, members, and match results.
+ * - State variables for holding league primary, members, and match results.
  * - Computed properties for efficient access to specific structured data.
  * - Actions for initialization, data fetching, and updates.
  *

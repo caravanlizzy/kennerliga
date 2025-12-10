@@ -29,7 +29,7 @@
     />
 
     <div v-if="restrictToOption" class="row items-center q-gutter-xs q-pl-xs q-mb-sm">
-      <q-badge outline class="text-caption text-primary">
+      <q-badge outline class="text-caption text-dark">
         {{ restrictToOption.hasChoices ? 'Choice-based' : 'Boolean' }}
       </q-badge>
     </div>

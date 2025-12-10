@@ -65,12 +65,12 @@
       </div>
     </div>
 
-    <q-btn flat color="primary" label="+ Add League" @click="addLeague" />
+    <q-btn flat color="dark" label="+ Add League" @click="addLeague" />
 
     <div class="row q-col-gutter-sm q-mt-md">
       <div class="col-auto">
         <q-btn
-          color="primary"
+          color="dark"
           label="Create Season & Leagues"
           :disable="!canSubmit"
           @click="createAll"

@@ -42,7 +42,7 @@
           <div class="q-mt-md text-center">
             <q-btn
               flat
-              color="primary"
+              color="dark"
               icon="login"
               label="Already have an account? Login"
               @click="goToLogin"

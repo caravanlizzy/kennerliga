@@ -100,7 +100,7 @@ export function useGameSelection(leagueId: number, profileId: number) {
     gameData.value = data;
   }
 
-  // --- game selection / info ---
+  // --- game selection / primary ---
 
   async function initGameInformation(game: GameDto) {
     // avoid reloading if same game

@@ -4,7 +4,7 @@
       <div class="card-header row items-start justify-between">
         <div class="column">
           <div class="row items-center no-wrap">
-            <q-avatar size="24px" class="q-mr-sm bg-primary text-white">
+            <q-avatar size="24px" class="q-mr-sm bg-dark text-white">
               <q-icon name="sports_esports" />
             </q-avatar>
 
@@ -64,7 +64,7 @@
           class="transition-all"
           :class="{ 'rotate-180': isExpanded }"
           @click="isExpanded = !isExpanded"
-          color="primary"
+          color="dark"
         />
       </div>
 

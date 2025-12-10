@@ -51,7 +51,7 @@
               <q-card-section class="row items-center no-wrap">
                 <q-avatar
                   icon="event"
-                  color="primary"
+                  color="dark"
                   text-color="white"
                   class="q-mr-md"
                 />

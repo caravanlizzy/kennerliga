@@ -1,22 +1,10 @@
 <template>
-  <ContentSection :isOpened="true" title="Kennerchat" color="info">
+  <ContentSection :isOpened="true" title="Kennerchat" color="primary">
     <q-card
       flat
-      class="chat-card"
+      class="chat-card column"
       :class="isMobile ? 'chat-card--mobile' : 'chat-card--desktop'"
     >
-<!--      &lt;!&ndash; Header &ndash;&gt;-->
-<!--      <q-card-section-->
-<!--        class="header-section"-->
-<!--        :class="isMobile ? 'header-section&#45;&#45;mobile' : 'header-section&#45;&#45;desktop'"-->
-<!--      >-->
-<!--        <div class="header-content">-->
-<!--          <div class="text-subtitle1 text-weight-light">Kennerchat</div>-->
-<!--        </div>-->
-<!--      </q-card-section>-->
-
-<!--      <q-separator spaced />-->
-
       <!-- Chat list -->
       <q-scroll-area
         ref="scrollAreaRef"
@@ -25,11 +13,11 @@
         @mousedown="markAsRead"
         @wheel="markAsRead"
       >
-        <div class="chat-messages q-pa-sm">
+        <div class="chat-messages q-pa-sm column">
           <div
             v-for="(message, i) in messages"
             :key="message.id ?? `${message.datetime}-${i}`"
-            class="message-wrapper"
+            class="message-wrapper q-mb-xs"
             :class="{
               'message-mine': isMine(message),
               'message-wrapper--mobile': isMobile,
@@ -40,7 +28,7 @@
             <transition name="marker-fade">
               <div
                 v-if="i === firstUnreadIndex && showUnreadMarker"
-                :ref="(el: unknown) => unreadMarkerRef = el as HTMLElement"
+                :ref="(el: unknown) => (unreadMarkerRef = el as HTMLElement)"
                 class="unread-marker"
               >
                 <div class="unread-line"></div>
@@ -50,17 +38,17 @@
             </transition>
 
             <!-- Username / timestamp -->
-            <div class="message-header">
+            <div class="message-header row items-center no-wrap q-px-xs q-mb-xs">
               <span
-                class="username"
-                :class="isMobile ? 'username--mobile' : 'username--desktop'"
+                class="username text-weight-medium"
+                :class="isMobile ? 'text-caption' : 'text-body2'"
                 :style="{ color: userColor(message.sender) }"
               >
                 {{ message.sender }}
               </span>
               <span
-                class="timestamp"
-                :class="isMobile ? 'timestamp--mobile' : 'timestamp--desktop'"
+                class="timestamp text-grey-5"
+                :class="isMobile ? 'text-caption' : 'text-caption'"
               >
                 {{ formatDateTime(message.datetime) }}
               </span>
@@ -68,8 +56,11 @@
 
             <!-- Message bubble -->
             <div
-              class="message-bubble"
-              :class="isMobile ? 'message-bubble--mobile' : 'message-bubble--desktop'"
+              class="message-bubble q-pa-sm q-mt-xs text-white rounded-borders"
+              :class="[
+                isMine(message) ? 'bg-primary' : 'bg-info',
+                isMobile ? 'text-body2' : 'text-body1'
+              ]"
             >
               <div class="message-text">
                 {{ message.text }}
@@ -83,11 +74,11 @@
       <transition name="fade">
         <div
           v-if="hasUnreadMessages && !isScrolledToBottom"
-          class="unread-badge"
+          class="unread-badge row items-center"
           :class="isMobile ? 'unread-badge--mobile' : 'unread-badge--desktop'"
           @click="scrollToBottomAndRead"
         >
-          <q-badge color="info" floating rounded>
+          <q-badge color="primary" floating rounded>
             {{ unreadCount }}
           </q-badge>
           <q-icon name="keyboard_arrow_down" size="sm" />
@@ -110,7 +101,7 @@
             outlined
             dense
             placeholder="Type a message..."
-            color="info"
+            color="primary"
             type="textarea"
             autogrow
             :maxlength="500"
@@ -126,7 +117,7 @@
                 round
                 dense
                 icon="send"
-                color="info"
+                color="primary"
                 size="sm"
                 @click="send"
               />
@@ -154,10 +145,9 @@ import {
   computed,
   watch,
 } from 'vue';
-import { useQuasar } from 'quasar';
+import { useQuasar, QInput, QScrollArea } from 'quasar';
 import { formatDateTime } from 'src/helpers';
 import { postMessage, fetchMessages } from 'src/services/chatService';
-import { QInput, QScrollArea } from 'quasar';
 import { TMessage } from 'src/types';
 import { useUserStore } from 'stores/userStore';
 import { storeToRefs } from 'pinia';
@@ -238,14 +228,16 @@ function isMine(m: TMessage) {
   return false;
 }
 
-function handleScroll(info: {
+function handleScroll(primary: {
   verticalPosition: number;
   verticalSize: number;
   verticalContainerSize: number;
 }) {
   const threshold = 50;
   const isAtBottom =
-    info.verticalSize - info.verticalPosition - info.verticalContainerSize <
+    primary.verticalSize -
+    primary.verticalPosition -
+    primary.verticalContainerSize <
     threshold;
 
   if (!isAutoScrolling.value) {
@@ -414,24 +406,6 @@ function handleKeydown(event: KeyboardEvent) {
   height: 500px;
 }
 
-.header-section {
-  padding: 10px 14px;
-}
-
-.header-section--desktop {
-  padding: 10px 16px;
-}
-
-.header-section--mobile {
-  padding: 8px 10px;
-}
-
-.header-content {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
 .chat-area {
   flex: 1;
   height: 100%;
@@ -439,18 +413,13 @@ function handleKeydown(event: KeyboardEvent) {
 }
 
 .chat-messages {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
   min-height: 100%;
 }
 
 .message-wrapper {
   display: flex;
   flex-direction: column;
-  gap: 2px;
   max-width: 75%;
-  animation: slideIn 0.15s ease-out;
 }
 
 .message-wrapper--mobile {
@@ -461,87 +430,21 @@ function handleKeydown(event: KeyboardEvent) {
   max-width: 70%;
 }
 
-@keyframes slideIn {
-  from {
-    opacity: 0;
-    transform: translateY(6px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
 .message-mine {
   align-self: flex-end;
-
-  .message-header {
-    justify-content: flex-end;
-  }
-
-  .message-bubble {
-    padding: 4px 7px;
-    background: var(--q-info);
-    color: #ffffff;
-    border-radius: 14px 14px 3px 14px;
-    transition: all 0.15s ease-in-out;
-  }
+  text-align: right;
 }
 
 .message-header {
   display: flex;
   align-items: center;
   gap: 6px;
-  padding: 0 2px;
-  margin-bottom: 1px;
-}
-
-.username {
-  font-weight: 500;
-  letter-spacing: 0.2px;
-}
-
-.username--desktop {
-  font-size: 0.82rem;
-}
-
-.username--mobile {
-  font-size: 0.78rem;
-}
-
-.timestamp {
-  color: #9e9e9e;
-}
-
-.timestamp--desktop {
-  font-size: 0.74rem;
-}
-
-.timestamp--mobile {
-  font-size: 0.7rem;
-}
-
-.message-bubble {
-  padding: 4px 6px;
-  background: #2f6781;
-  color: white;
-  border-radius: 3px 14px 14px 14px;
-  transition: all 0.15s ease-in-out;
-}
-
-.message-bubble--desktop {
-  font-size: 0.9rem;
-}
-
-.message-bubble--mobile {
-  font-size: 0.86rem;
 }
 
 .message-text {
   white-space: pre-wrap;
   word-wrap: break-word;
   line-height: 1.4;
-  font-size: inherit;
 }
 
 /* Unread marker */
@@ -592,17 +495,15 @@ function handleKeydown(event: KeyboardEvent) {
   padding: 6px 12px;
   border-radius: 20px;
   box-shadow: 0 3px 10px rgba(0, 0, 0, 0.15);
-  display: flex;
-  align-items: center;
   gap: 6px;
   cursor: pointer;
   z-index: 10;
   transition: all 0.15s ease;
+}
 
-  &:hover {
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.18);
-    transform: translateX(-50%) translateY(-1px);
-  }
+.unread-badge:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.18);
+  transform: translateX(-50%) translateY(-1px);
 }
 
 .unread-badge--mobile {
@@ -642,17 +543,15 @@ function handleKeydown(event: KeyboardEvent) {
   margin-bottom: 2px;
 }
 
-.message-input {
-  :deep(.q-field__control) {
-    border-radius: 16px;
-    background: white;
-    min-height: 36px;
-  }
+.message-input :deep(.q-field__control) {
+  border-radius: 16px;
+  background: white;
+  min-height: 36px;
+}
 
-  :deep(textarea) {
-    max-height: 80px;
-    font-size: 0.85rem;
-  }
+.message-input :deep(textarea) {
+  max-height: 80px;
+  font-size: 0.85rem;
 }
 
 .hint-text {

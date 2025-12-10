@@ -1,6 +1,6 @@
 <template>
   <div class="q-pa-sm">
-    <div class="text-subtitle1 text-weight-medium text-primary q-mb-sm">Result configuration</div>
+    <div class="text-subtitle1 text-weight-medium text-dark q-mb-sm">Result configuration</div>
 
     <div class="column q-gutter-sm">
 

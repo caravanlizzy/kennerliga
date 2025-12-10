@@ -3,7 +3,7 @@
   <q-card class="q-pa-md" flat bordered rounded>
     <div class="row items-center q-mb-md">
       <div class="col">
-        <div class="text-h6 text-primary">Match Result</div>
+        <div class="text-h6 text-dark">Match Result</div>
         <div class="text-caption text-grey-7">{{ members.length }} players</div>
       </div>
     </div>
@@ -79,7 +79,7 @@
                         :unelevated="getEntry(member.id).position === pos"
                         :color="
                               getEntry(member.id).position === pos
-                                ? 'primary'
+                                ? 'dark'
                                 : 'grey-4'
                             "
                         :text-color="
@@ -176,13 +176,13 @@
           <KennerButton
             type="submit"
             :label="submitLabel"
-            color="primary"
+            color="dark"
             unelevated
           />
         </div>
       </q-form>
 
-      <q-spinner v-else color="primary" size="md" class="q-my-xl" />
+      <q-spinner v-else color="dark" size="md" class="q-my-xl" />
     </div>
   </q-card>
 </template>

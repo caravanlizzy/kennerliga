@@ -18,7 +18,7 @@
       <q-chip
         dense
         square
-        color="info"
+        color="primary"
         text-color="white"
         class="q-ml-xs text-weight-medium"
       >L {{ league.level }}
@@ -75,7 +75,7 @@
               </div>
             </div>
             <div class="col-auto row items-center q-gutter-md">
-              <q-badge color="primary" text-color="white" class="">
+              <q-badge color="dark" text-color="white" class="">
                 <q-icon name="person" size="xs" class="q-mr-xs" />
                 <span class="text-weight-medium">{{
                   member.profile_name
@@ -185,7 +185,7 @@
             </q-card-section>
             <q-card-section class="bg-white q-py-lg" v-else>
               <div class="text-grey-5 text-center text-body1">
-                <q-icon name="info_outline" size="sm" class="q-mr-sm" />
+                <q-icon name="primary_outline" size="sm" class="q-mr-sm" />
                 No results posted yet
               </div>
             </q-card-section>

@@ -5,7 +5,7 @@
       :key="user"
       clickable
       square
-      color="info"
+      color="primary"
       @click="impersonate(user, 'test')"
       text-color="white"
       icon="person"

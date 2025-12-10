@@ -8,13 +8,13 @@
     </q-input>
     <div v-for="(item, index) of listItems" :key="item.id">
       <div v-if="item.isEditable">
-        <q-input square bottom-slots hide-bottom-space label="editieren" color="info" class="text-white"
+        <q-input square bottom-slots hide-bottom-space label="editieren" color="primary" class="text-white"
                  v-model="item.name">
           <template v-slot:prepend>
             <kenner-counter v-if="ranked" :content="index"/>
           </template>
           <template v-slot:append>
-            <KennerButton color="info" dense flat icon="check" @click="item.isEditable=false"
+            <KennerButton color="primary" dense flat icon="check" @click="item.isEditable=false"
                            @blur="item.isEditable=false"/>
           </template>
         </q-input>

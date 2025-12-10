@@ -47,7 +47,7 @@
       <template v-if="leagueStatus === 'PLAYING' || leagueStatus === 'DONE'">
         <ContentSection
           title="Results"
-          color="info"
+          color="primary"
           :is-opened="sectionVisibilityStates['results']"
         >
           <div class="row">
@@ -83,7 +83,7 @@
       <!-- Player Cards Grid -->
       <ContentSection
         title="Games -  Picks and Bans"
-        color="primary"
+        color="dark"
         :is-opened="sectionVisibilityStates['players']"
       >
         <div class="row q-col-gutter-md">
@@ -157,7 +157,7 @@ function manageActionBar() {
           {
             name: 'No ban',
             callback: () => handleSkipBan(),
-            buttonVariant: 'primary',
+            buttonVariant: 'dark',
             autoReset: false,
           },
           ...Object.values(selectedGamesById.value)
@@ -220,7 +220,7 @@ function handleBanGame(selectedGameId: number, gameName: string) {
   setDialog(
     'Confirm Ban',
     `Are you sure you want to ban ${gameName.toUpperCase()}?`,
-    'primary',
+    'dark',
     async () => {
       try {
         await banGame({
@@ -230,7 +230,7 @@ function handleBanGame(selectedGameId: number, gameName: string) {
         });
         await updateLeagueData();
         $q.notify({
-          type: 'primary',
+          type: 'dark',
           message: 'Banned!',
         });
       } catch (e) {

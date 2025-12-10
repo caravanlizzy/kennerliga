@@ -9,7 +9,7 @@
         :rules="[(val) => !!val || 'Feedback is required']"
       />
 
-      <q-btn label="Submit" type="submit" color="primary" class="q-mt-md" />
+      <KennerButton label="Submit" type="submit" color="primary" class="q-mt-md" />
     </q-form>
   </div>
 </template>
@@ -19,6 +19,7 @@ import { ref } from 'vue';
 import { api } from 'boot/axios';
 import { useQuasar } from 'quasar';
 import { useRouter } from 'vue-router';
+import KennerButton from 'components/base/KennerButton.vue';
 
 const $q = useQuasar();
 const router = useRouter();

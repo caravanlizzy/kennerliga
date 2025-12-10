@@ -13,7 +13,7 @@
     </span>
     <q-btn
       outline
-      color="primary"
+      color="dark"
       label="Retry"
       size="sm"
       class="q-mt-sm"
@@ -108,7 +108,7 @@
         <td class="text-center q-py-xs q-px-sm">
           <div
             v-if="row.totals.second > 0"
-            class="text-body2 text-primary text-weight-medium"
+            class="text-body2 text-dark text-weight-medium"
           >
             {{ row.totals.second }}
           </div>

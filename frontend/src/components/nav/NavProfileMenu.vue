@@ -15,7 +15,7 @@
       flat
       dense
       round
-      color="primary"
+      color="dark"
       icon="menu"
       @click="onToggle"
     />

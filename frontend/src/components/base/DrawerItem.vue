@@ -1,10 +1,10 @@
 <template>
   <q-item :to="{name: forwardName}" @click="closeDrawer" clickable>
     <q-item-section>
-      <KennerButton  color="primary" flat :icon="icon" />
+      <KennerButton  color="dark" flat :icon="icon" />
     </q-item-section>
     <q-item-section >
-      <q-item-label class="text-primary" caption> {{label}} </q-item-label>
+      <q-item-label class="text-dark" caption> {{label}} </q-item-label>
     </q-item-section>
   </q-item>
 </template>

@@ -2,8 +2,8 @@
 <q-tabs
   v-model="currentFormSelectedGameId"
   active-color="white"
-  active-bg-color="primary"
-  indicator-color="primary"
+  active-bg-color="dark"
+  indicator-color="dark"
   :vertical="isMobile"
 >
   <q-tab

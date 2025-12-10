@@ -1,5 +1,5 @@
 <template>
-  <q-input hide-bottom-space  :dark="dark"  color="primary" v-model="modelValue" :label="label" lazy-rules :rules="rules">
+  <q-input hide-bottom-space  :dark="dark"  color="dark" v-model="modelValue" :label="label" lazy-rules :rules="rules">
     <template #prepend><slot name="prepend" /></template>
     <template #append><slot name="append" /></template>
     <template #before><slot name="before" /></template>

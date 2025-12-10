@@ -10,7 +10,7 @@
       <!-- Header Section -->
       <div class="q-mb-lg">
         <p class="text-h5 q-mb-xs">{{ game.name }}</p>
-        <q-badge color="primary" outline class="q-pa-sm">
+        <q-badge color="dark" outline class="q-pa-sm">
           {{ platform.name }}
         </q-badge>
       </div>

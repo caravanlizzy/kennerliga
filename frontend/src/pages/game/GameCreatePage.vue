@@ -39,7 +39,7 @@
             <span class="text-h6">Game options</span>
             <KennerButton
               class="q-ml-lg"
-              color="primary"
+              color="dark"
               label="Add option"
               icon="add"
               @click="addEmptyOption"

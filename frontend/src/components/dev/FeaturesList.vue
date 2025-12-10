@@ -1,7 +1,7 @@
 <!-- PlannedFeatures.vue -->
 <template>
   <section class="q-pa-sm">
-    <div class="text-subtitle1 text-weight-medium text-primary q-mb-sm">
+    <div class="text-subtitle1 text-weight-medium text-dark q-mb-sm">
       Planned Features
     </div>
 
@@ -13,7 +13,7 @@
         class="q-hoverable"
       >
         <q-item-section avatar>
-          <q-avatar color="primary" text-color="white" size="32px">
+          <q-avatar color="dark" text-color="white" size="32px">
             <q-icon :name="f.icon" />
           </q-avatar>
         </q-item-section>

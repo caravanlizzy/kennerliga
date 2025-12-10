@@ -9,7 +9,7 @@
       no-caps
     >
       <q-icon color="amber-6" name="emoji_events" />
-      <span v-show="!isMobile" class="q-ml-xs text-primary">My League</span>
+      <span v-show="!isMobile" class="q-ml-xs text-dark">My League</span>
       <q-badge v-if="isMeActivePlayer" floating rounded color="positive" />
     </q-btn>
   </div>

@@ -48,7 +48,7 @@
         <!-- Total column -->
         <template #body-cell-total="props">
           <q-td :props="props" class="text-center">
-            <div class="text-primary text-weight-bold text-body2">
+            <div class="text-dark text-weight-bold text-body2">
               {{ formatNumber(props.value) }}
             </div>
           </q-td>
@@ -106,7 +106,7 @@
         </span>
         <q-btn
           outline
-          color="primary"
+          color="dark"
           label="Retry"
           size="sm"
           class="q-mt-sm"

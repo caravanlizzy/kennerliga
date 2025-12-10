@@ -13,8 +13,8 @@
         <!-- Center: Status chip -->
         <div class="col-auto flex flex-center">
           <q-chip
-            color="primary"
-            text-color="primary"
+            color="dark"
+            text-color="dark"
             square
             outline
             dense
@@ -71,7 +71,7 @@
           </div>
           <div
             v-if="subject"
-            class="text-h6 text-primary text-weight-bold"
+            class="text-h6 text-dark text-weight-bold"
           >
             <component :is="subject" />
           </div>
@@ -86,7 +86,7 @@
             v-for="a in actions"
             :key="a.name"
             :disabled="a.disabled"
-            :color="a.buttonVariant || 'primary'"
+            :color="a.buttonVariant || 'dark'"
             :icon="a.icon"
             @click="handleAction(a)"
           >
@@ -133,7 +133,7 @@ async function handleAction(action: any) {
 .status-header {
   background: linear-gradient(
       135deg,
-      rgba(var(--q-primary-rgb), 0.06) 0%,
+      rgba(var(--q-dark-rgb), 0.06) 0%,
       rgba(var(--q-secondary-rgb), 0.08) 100%
   );
 }

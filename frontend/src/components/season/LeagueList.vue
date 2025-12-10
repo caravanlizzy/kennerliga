@@ -11,7 +11,7 @@
         <div class="row items-center q-gutter-md">
           <q-avatar
             size="52px"
-            color="primary"
+            color="dark"
             text-color="white"
             class="text-weight-bold text-h6"
           >
@@ -27,7 +27,7 @@
           </div>
         </div>
         <q-badge
-          color="primary"
+          color="dark"
           text-color="white"
           class="q-pa-sm"
         >
@@ -64,13 +64,13 @@
           :key="m.id"
           clickable
           outline
-          color="primary"
+          color="dark"
           text-color="grey-9"
           @click.stop
         >
           <q-avatar
             size="24px"
-            color="primary"
+            color="dark"
             text-color="white"
           >
             <q-icon name="person" size="14px" />

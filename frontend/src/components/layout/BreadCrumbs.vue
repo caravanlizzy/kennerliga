@@ -1,9 +1,9 @@
 <template>
   <q-toolbar class="breadcrumbs-container" >
     <div class="q-pa-xs row items-center justify-between no-wrap " style="width: 100%">
-      <KennerButton flat color="primary" size="small" icon="arrow_back" @click="()=>router.go(-1)" />
+      <KennerButton flat color="dark" size="small" icon="arrow_back" @click="()=>router.go(-1)" />
       <div>
-        <q-breadcrumbs separator=">" :class="`text-primary`" :active-color="color">
+        <q-breadcrumbs separator=">" :class="`text-dark`" :active-color="color">
           <q-breadcrumbs-el :to="{ name:crumb.forwardRouteName }" v-for="crumb in breadCrumbs" :key="crumb.label"
                             :label="crumb.label"
                             :icon="crumb.icon"
@@ -11,7 +11,7 @@
           />
         </q-breadcrumbs>
       </div>
-      <KennerButton class="" flat color="primary" size="small" icon="arrow_forward" @click="()=>router.go(1)" />
+      <KennerButton class="" flat color="dark" size="small" icon="arrow_forward" @click="()=>router.go(1)" />
     </div>
   </q-toolbar>
 </template>
