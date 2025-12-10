@@ -15,7 +15,7 @@
           class="col-12 col-md-4"
           :isOpened="true"
           title="Kennerchat"
-          color="grey"
+          color="primary"
         >
           <KennerChat />
         </ContentSection>

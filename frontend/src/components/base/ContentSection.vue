@@ -1,7 +1,6 @@
 <template>
-  <SideAccentBox
+  <div
     class="q-my-xs"
-    :color="color"
   >
     <q-expansion-item
       v-model="model"
@@ -23,13 +22,11 @@
         <slot />
       </div>
     </q-expansion-item>
-  </SideAccentBox>
+  </div>
 </template>
 
 <script setup lang="ts">
 import { ref, computed } from 'vue';
-import SideAccentBox from 'components/base/SideAccentBox.vue';
-
 // external (optional) model
 const isOpened = defineModel<boolean>('isOpened');
 
