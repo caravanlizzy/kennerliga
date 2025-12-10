@@ -1,138 +1,111 @@
 <template>
-  <ContentSection :isOpened="true" title="Kennerchat" color="primary">
-    <q-card
-      flat
-      class="chat-card column"
-      :class="isMobile ? 'chat-card--mobile' : 'chat-card--desktop'"
+  <q-card
+    flat
+    class="chat-card column"
+    :class="isMobile ? 'chat-card--mobile' : 'chat-card--desktop'"
+  >
+    <!-- Chat list -->
+    <q-scroll-area
+      ref="scrollAreaRef"
+      class="chat-area"
+      @scroll="handleScroll"
+      @mousedown="markAsRead"
+      @wheel="markAsRead"
     >
-      <!-- Chat list -->
-      <q-scroll-area
-        ref="scrollAreaRef"
-        class="chat-area"
-        @scroll="handleScroll"
-        @mousedown="markAsRead"
-        @wheel="markAsRead"
-      >
-        <div class="chat-messages q-pa-sm column">
-          <div
-            v-for="(message, i) in messages"
-            :key="message.id ?? `${message.datetime}-${i}`"
-            class="message-wrapper q-mb-xs"
-            :class="{
-              'message-mine': isMine(message),
-              'message-wrapper--mobile': isMobile,
-              'message-wrapper--desktop': !isMobile
-            }"
-          >
-            <!-- Unread marker -->
-            <transition name="marker-fade">
-              <div
-                v-if="i === firstUnreadIndex && showUnreadMarker"
-                :ref="(el: unknown) => (unreadMarkerRef = el as HTMLElement)"
-                class="unread-marker"
-              >
-                <div class="unread-line"></div>
-                <div class="unread-text">New messages</div>
-                <div class="unread-line"></div>
-              </div>
-            </transition>
-
-            <!-- Username / timestamp -->
-            <div class="message-header row items-center no-wrap q-px-xs q-mb-xs">
-              <span
-                class="username text-weight-medium"
-                :class="isMobile ? 'text-caption' : 'text-body2'"
-                :style="{ color: userColor(message.sender) }"
-              >
-                {{ message.sender }}
-              </span>
-              <span
-                class="timestamp text-grey-5"
-                :class="isMobile ? 'text-caption' : 'text-caption'"
-              >
-                {{ formatDateTime(message.datetime) }}
-              </span>
-            </div>
-
-            <!-- Message bubble -->
+      <div class="chat-messages q-pa-sm column">
+        <div
+          v-for="(message, i) in messages"
+          :key="message.id ?? `${message.datetime}-${i}`"
+          class="message-wrapper q-mb-xs"
+        >
+          <!-- Unread marker -->
+          <transition name="marker-fade">
             <div
-              class="message-bubble q-pa-sm q-mt-xs text-white rounded-borders"
-              :class="[
-                isMine(message) ? 'bg-primary' : 'bg-info',
-                isMobile ? 'text-body2' : 'text-body1'
-              ]"
+              v-if="i === firstUnreadIndex && showUnreadMarker"
+              :ref="(el: unknown) => (unreadMarkerRef = el as HTMLElement)"
+              class="unread-marker"
             >
-              <div class="message-text">
-                {{ message.text }}
-              </div>
+              <div class="unread-line"></div>
+              <div class="unread-text">New messages</div>
+              <div class="unread-line"></div>
             </div>
-          </div>
+          </transition>
+
+          <!-- Chat message bubble -->
+          <q-chat-message
+            :name="message.sender"
+            :text="[message.text]"
+            :stamp="timeAgo(message.datetime)"
+            :sent="isMine(message)"
+            :bg-color="isMine(message) ? 'positive' : 'primary'"
+            text-color="white"
+          />
         </div>
-      </q-scroll-area>
+      </div>
+    </q-scroll-area>
 
-      <!-- Unread indicator badge -->
-      <transition name="fade">
-        <div
-          v-if="hasUnreadMessages && !isScrolledToBottom"
-          class="unread-badge row items-center"
-          :class="isMobile ? 'unread-badge--mobile' : 'unread-badge--desktop'"
-          @click="scrollToBottomAndRead"
-        >
-          <q-badge color="primary" floating rounded>
-            {{ unreadCount }}
-          </q-badge>
-          <q-icon name="keyboard_arrow_down" size="sm" />
-          <span class="unread-badge-text" v-if="!isMobile">New messages</span>
-        </div>
-      </transition>
-
-      <q-separator />
-
-      <!-- Composer -->
-      <q-card-section
-        v-if="isAuthenticated"
-        class="composer-section"
-        :class="isMobile ? 'composer-section--mobile' : 'composer-section--desktop'"
+    <!-- Unread indicator badge -->
+    <transition name="fade">
+      <div
+        v-if="hasUnreadMessages && !isScrolledToBottom"
+        class="unread-badge row items-center"
+        :class="isMobile ? 'unread-badge--mobile' : 'unread-badge--desktop'"
+        @click="scrollToBottomAndRead"
       >
-        <div class="composer-wrapper">
-          <q-input
-            ref="inputRef"
-            v-model="newMessage"
-            outlined
-            dense
-            placeholder="Type a message..."
-            color="primary"
-            type="textarea"
-            autogrow
-            :maxlength="500"
-            :disable="sending"
-            class="message-input"
-            @keydown.enter.exact.prevent="send"
-            @focus="markAsRead"
-          >
-            <template #append>
-              <q-btn
-                :loading="sending"
-                flat
-                round
-                dense
-                icon="send"
-                color="primary"
-                size="sm"
-                @click="send"
-              />
-            </template>
-          </q-input>
-        </div>
-        <div
-          class="text-caption text-grey-6 hint-text"
-          :class="isMobile ? 'hint-text--mobile' : 'hint-text--desktop'"
+        <q-badge color="primary" floating rounded>
+          {{ unreadCount }}
+        </q-badge>
+        <q-icon name="keyboard_arrow_down" size="sm" />
+        <span class="unread-badge-text" v-if="!isMobile">New messages</span>
+      </div>
+    </transition>
+
+    <q-separator />
+
+    <!-- Composer -->
+    <q-card-section
+      v-if="isAuthenticated"
+      class="composer-section"
+      :class="isMobile ? 'composer-section--mobile' : 'composer-section--desktop'"
+    >
+      <div class="composer-wrapper">
+        <q-input
+          ref="inputRef"
+          v-model="newMessage"
+          outlined
+          dense
+          placeholder="Type a message..."
+          color="primary"
+          type="textarea"
+          autogrow
+          :maxlength="500"
+          :disable="sending"
+          class="message-input"
+          @keydown.enter.exact.prevent="send"
+          @focus="markAsRead"
         >
-          Press Enter to send
-        </div>
-      </q-card-section>
-    </q-card>
-  </ContentSection>
+          <template #append>
+            <q-btn
+              :loading="sending"
+              flat
+              round
+              dense
+              icon="send"
+              color="primary"
+              size="sm"
+              @click="send"
+            />
+          </template>
+        </q-input>
+      </div>
+      <div
+        class="text-caption text-grey-6 hint-text"
+        :class="isMobile ? 'hint-text--mobile' : 'hint-text--desktop'"
+      >
+        Press Enter to send
+      </div>
+    </q-card-section>
+  </q-card>
 </template>
 
 <script setup lang="ts">
@@ -146,12 +119,10 @@ import {
   watch,
 } from 'vue';
 import { useQuasar, QInput, QScrollArea } from 'quasar';
-import { formatDateTime } from 'src/helpers';
 import { postMessage, fetchMessages } from 'src/services/chatService';
 import { TMessage } from 'src/types';
 import { useUserStore } from 'stores/userStore';
 import { storeToRefs } from 'pinia';
-import ContentSection from 'components/base/ContentSection.vue';
 
 const { user, isAuthenticated } = storeToRefs(useUserStore());
 const $q = useQuasar();
@@ -285,7 +256,7 @@ function scrollToKeepMarkerAtTop() {
       const containerRect = scrollTarget.getBoundingClientRect();
 
       const markerOffsetInContainer = markerRect.top - containerRect.top;
-      const targetPadding = 60; // slightly tighter
+      const targetPadding = 60;
       const currentScrollTop = scrollTarget.scrollTop;
       const targetScrollTop =
         currentScrollTop + markerOffsetInContainer - targetPadding;
@@ -303,6 +274,28 @@ function scrollToKeepMarkerAtTop() {
 function scrollToBottomAndRead() {
   markAsRead();
   scrollToBottom();
+}
+
+// Very simple "time ago" helper for stamp
+function timeAgo(isoString: string): string {
+  const now = new Date();
+  const then = new Date(isoString);
+  const diffMs = now.getTime() - then.getTime();
+  if (Number.isNaN(diffMs)) return '';
+
+  const sec = Math.floor(diffMs / 1000);
+  const min = Math.floor(sec / 60);
+  const hr = Math.floor(min / 60);
+  const day = Math.floor(hr / 24);
+
+  if (sec < 10) return 'just now';
+  if (sec < 60) return `${sec} seconds ago`;
+  if (min < 60) return `${min} minute${min === 1 ? '' : 's'} ago`;
+  if (hr < 24) return `${hr} hour${hr === 1 ? '' : 's'} ago`;
+  if (day < 7) return `${day} day${day === 1 ? '' : 's'} ago`;
+
+  // fallback: simple date
+  return then.toLocaleDateString();
 }
 
 // ---------- Actions ----------
@@ -350,16 +343,6 @@ async function loadMessages() {
   } else if (hasUnreadMessages.value && unreadMarkerRef.value) {
     scrollToKeepMarkerAtTop();
   }
-}
-
-// username → stable color
-function userColor(name?: string | null) {
-  const s = (name ?? '').trim();
-  if (!s) return 'hsl(0, 0%, 70%)';
-  let h = 0;
-  for (let i = 0; i < s.length; i++) h = ((h << 5) - h + s.charCodeAt(i)) | 0;
-  const hue = Math.abs(h) % 360;
-  return `hsl(${hue}, 70%, 50%)`;
 }
 
 // ---------- Lifecycle ----------
@@ -410,41 +393,6 @@ function handleKeydown(event: KeyboardEvent) {
   flex: 1;
   height: 100%;
   position: relative;
-}
-
-.chat-messages {
-  min-height: 100%;
-}
-
-.message-wrapper {
-  display: flex;
-  flex-direction: column;
-  max-width: 75%;
-}
-
-.message-wrapper--mobile {
-  max-width: 85%;
-}
-
-.message-wrapper--desktop {
-  max-width: 70%;
-}
-
-.message-mine {
-  align-self: flex-end;
-  text-align: right;
-}
-
-.message-header {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.message-text {
-  white-space: pre-wrap;
-  word-wrap: break-word;
-  line-height: 1.4;
 }
 
 /* Unread marker */
