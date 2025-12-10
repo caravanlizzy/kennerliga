@@ -38,10 +38,7 @@
 
         <!-- Player name column -->
         <template #body-cell-profile_name="props">
-          <q-td
-            :props="props"
-            class="text-left text-body2 text-weight-medium"
-          >
+          <q-td :props="props" class="text-left text-body2 text-weight-medium">
             <div class="row items-center no-wrap">
               <span>{{ props.value }}</span>
             </div>
@@ -73,15 +70,14 @@
               class="column items-center"
             >
               <span v-if="props.value.points" class="text-caption">
-                {{ formatNumber(props.value.points) }} VP
+                {{ displayPoints(props.value.points) }}
               </span>
               <div
                 v-if="props.value.league_points"
-		class="text-grey-8 floating"
+                class="text-grey-7 text-caption floating"
               >
-                {{ formatNumber(props.value.league_points) }}
+                {{ formatNumber(props.value.league_points) }} LP
               </div>
-
             </div>
             <div v-else class="flex flex-center">
               <q-icon name="circle" size="6px" color="grey-4" />
@@ -198,7 +194,10 @@ const tableColumns = computed<QTableColumn[]>(() => {
     cols.push({
       name: `game_${game.id}`,
       // 🔹 short name on mobile, full name otherwise
-      label: (isMobile && game.game_short_name) ? game.game_short_name : game.game_name,
+      label:
+        isMobile && game.game_short_name
+          ? game.game_short_name
+          : game.game_name,
       field: `game_${game.id}`,
       align: 'center',
     });
@@ -244,4 +243,19 @@ const formatNumber = (value: string | number): string => {
   if (!num) return '-';
   return (num as number) % 1 === 0 ? (num as number).toFixed(0) : String(num);
 };
+
+function displayPoints(points: string) {
+  switch (points) {
+    case "-1.00":
+      return '1st';
+    case "-2.00":
+      return '2nd';
+    case "-3.00":
+      return '3rd';
+    case "-4.00":
+      return '4th';
+    default:
+      return formatNumber(points) + ' VP';
+  }
+}
 </script>
