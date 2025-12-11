@@ -1,5 +1,5 @@
 <template>
-    <div :class="isMobile ? '' : 'q-pa-md q-gutter-md'" class="column">
+    <div :class="isMobile ? '' : 'q-pa-md'" class="column">
       <!-- Filters -->
       <div class="row q-gutter-sm items-end">
         <KennerSelect
