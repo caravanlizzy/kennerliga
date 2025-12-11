@@ -1,22 +1,19 @@
 <template>
-  <q-card
-    flat
-    class="chat-card column"
-    :class="isMobile ? 'chat-card--mobile' : 'chat-card--desktop'"
-  >
+  <q-card flat class="full-height column" style="min-width: 333px">
     <!-- Chat list -->
     <q-scroll-area
+      class="col"
+      style="min-height: 450px"
       ref="scrollAreaRef"
-      class="chat-area"
       @scroll="handleScroll"
       @mousedown="markAsRead"
       @wheel="markAsRead"
     >
-      <div class="chat-messages q-pa-sm column">
+      <div class="full-height q-px-md">
         <div
           v-for="(message, i) in messages"
           :key="message.id ?? `${message.datetime}-${i}`"
-          class="message-wrapper q-mb-xs"
+          class="q-mb-xs"
         >
           <!-- Unread marker -->
           <transition name="marker-fade">
@@ -37,7 +34,7 @@
             :text="[message.text]"
             :stamp="timeAgo(message.datetime)"
             :sent="isMine(message)"
-            :bg-color="isMine(message) ? 'positive' : 'primary'"
+            :bg-color="isMine(message) ? 'secondary' : 'primary'"
             text-color="white"
           />
         </div>
@@ -66,7 +63,9 @@
     <q-card-section
       v-if="isAuthenticated"
       class="composer-section"
-      :class="isMobile ? 'composer-section--mobile' : 'composer-section--desktop'"
+      :class="
+        isMobile ? 'composer-section--mobile' : 'composer-section--desktop'
+      "
     >
       <div class="composer-wrapper">
         <q-input
@@ -75,7 +74,7 @@
           outlined
           dense
           placeholder="Type a message..."
-          color="primary"
+          color="secondary"
           type="textarea"
           autogrow
           :maxlength="500"
@@ -91,7 +90,7 @@
               round
               dense
               icon="send"
-              color="primary"
+              color="secondary"
               size="sm"
               @click="send"
             />
@@ -207,8 +206,8 @@ function handleScroll(primary: {
   const threshold = 50;
   const isAtBottom =
     primary.verticalSize -
-    primary.verticalPosition -
-    primary.verticalContainerSize <
+      primary.verticalPosition -
+      primary.verticalContainerSize <
     threshold;
 
   if (!isAutoScrolling.value) {
@@ -383,18 +382,6 @@ function handleKeydown(event: KeyboardEvent) {
 </script>
 
 <style scoped lang="scss">
-.chat-card {
-  display: flex;
-  flex-direction: column;
-  height: 500px;
-}
-
-.chat-area {
-  flex: 1;
-  height: 100%;
-  position: relative;
-}
-
 /* Unread marker */
 .unread-marker {
   display: flex;
@@ -473,44 +460,5 @@ function handleKeydown(event: KeyboardEvent) {
 .fade-leave-to {
   opacity: 0;
   transform: translateX(-50%) translateY(8px);
-}
-
-.composer-section {
-  background: #fafafa;
-}
-
-.composer-section--desktop {
-  padding: 10px 14px;
-}
-
-.composer-section--mobile {
-  padding: 8px 10px;
-}
-
-.composer-wrapper {
-  margin-bottom: 2px;
-}
-
-.message-input :deep(.q-field__control) {
-  border-radius: 16px;
-  background: white;
-  min-height: 36px;
-}
-
-.message-input :deep(textarea) {
-  max-height: 80px;
-  font-size: 0.85rem;
-}
-
-.hint-text {
-  padding-left: 8px;
-}
-
-.hint-text--desktop {
-  font-size: 0.7rem;
-}
-
-.hint-text--mobile {
-  font-size: 0.68rem;
 }
 </style>

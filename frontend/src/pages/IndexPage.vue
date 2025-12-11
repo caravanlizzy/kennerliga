@@ -1,25 +1,24 @@
 <template>
-  <div>
-    <div :class="isMobile ? 'q-pa-xs' : 'q-pa-md'">
-      <AnnouncementDisplay />
-      <div class="row">
-        <div class="col-12 col-md-8" :class="{ 'q-pr-md': isMdUp }">
-          <ContentSection :isOpened="true" title="Seasons" color="primary">
-            <SeasonStandings class="col-12" />
-          </ContentSection>
-          <ContentSection title="Year Standings" class="col-12" color="primary">
-            <YearStandings :year="2021" />
-          </ContentSection>
-        </div>
-        <ContentSection
-          class="col-12 col-md-4"
-          :isOpened="true"
-          title="Kennerchat"
-          color="primary"
-        >
-          <KennerChat />
+  <div :class="isMobile ? 'q-pa-xs' : 'q-pa-md'" class="column col">
+    <AnnouncementDisplay class="col-auto" />
+    <div class="row col">
+      <div class="col-12 col-md" :class="{ 'q-pr-md': isMdUp }">
+        <ContentSection :isOpened="true" titleEnd :bordered="false" title="Seasons" color="dark">
+          <SeasonStandings class="col-12" />
+        </ContentSection>
+        <ContentSection :bordered="false" titleEnd  title="Year Standings" class="col-12" color="dark">
+          <YearStandings :year="2021" />
         </ContentSection>
       </div>
+      <ContentSection
+        class="col-12 col-md-auto column bg-grey-2"
+        isOpened
+        bordered
+        title="Kennerchat"
+        color="dark"
+      >
+        <KennerChat class="col" />
+      </ContentSection>
     </div>
   </div>
 </template>

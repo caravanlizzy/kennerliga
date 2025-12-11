@@ -31,6 +31,7 @@
           title="Game Selection"
           color="accent"
           :is-opened="sectionVisibilityStates['selection']"
+          expandable
         >
           <GameSelector
             :leagueId="leagueId"
@@ -49,6 +50,7 @@
           title="Results"
           color="primary"
           :is-opened="sectionVisibilityStates['results']"
+          expandable
         >
           <div class="row">
             <template v-for="member of members" :key="member.profile">
@@ -58,7 +60,7 @@
                   hasSelectedGameResult(member.selected_game.id)
                 "
                 class="q-pa-xs col-12"
-                :class="{'col-md-6': selectedGamesWithResults.length > 1}"
+                :class="{ 'col-md-6': selectedGamesWithResults.length > 1 }"
               >
                 <MatchResult
                   :selectedGame="member.selected_game"
@@ -75,6 +77,7 @@
           title="Upload Results"
           color="secondary"
           :isOpened="sectionVisibilityStates['upload']"
+          expandable
         >
           <MatchResultTabs />
         </ContentSection>
@@ -85,6 +88,7 @@
         title="Games -  Picks and Bans"
         color="dark"
         :is-opened="sectionVisibilityStates['players']"
+        expandable
       >
         <div class="row q-col-gutter-md">
           <div
@@ -136,9 +140,9 @@ const {
   members,
   leagueId,
   loading,
-  selectedGamesWithResults
+  selectedGamesWithResults,
 } = storeToRefs(myLeagueStore);
-const { updateLeagueData, hasSelectedGameResult  } = myLeagueStore;
+const { updateLeagueData, hasSelectedGameResult } = myLeagueStore;
 
 const { setActions, setLeadText, setSubject, reset } = useActionBar();
 

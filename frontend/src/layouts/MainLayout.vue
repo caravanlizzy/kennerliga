@@ -1,17 +1,13 @@
 <template>
   <q-layout class="column" view="hHh Lpr lFf">
-    <q-header bordered class="text-dark bg-white">
+    <q-header bordered class="text-dark bg-white col-auto">
       <NavBar :onToggle="toggleDrawer" />
     </q-header>
 
     <KennerDrawer v-model="drawerState" />
 
-    <q-page-container class="flex column justify-center">
-      <q-page>
-<!--        <div class="q-px-md q-py-xs">-->
-          <router-view />
-<!--        </div>-->
-      </q-page>
+    <q-page-container class="col column">
+      <router-view />
       <ConfirmDialog />
     </q-page-container>
   </q-layout>
