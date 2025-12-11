@@ -1,6 +1,6 @@
 <template>
+  <AnnouncementDisplay class="col-auto" />
   <div :class="isMobile ? 'q-pa-xs' : 'q-pa-md'" class="column col">
-    <AnnouncementDisplay class="col-auto" />
     <div class="row col">
       <div class="col-12 col-md" :class="{ 'q-pr-md': isMdUp }">
         <ContentSection :isOpened="true" titleEnd :bordered="false" title="Seasons" color="dark">
