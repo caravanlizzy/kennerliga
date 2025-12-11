@@ -2,7 +2,7 @@
   <AnnouncementDisplay class="col-auto" />
   <div :class="isMobile ? '' : 'q-pa-md'" class="column col">
     <div class="row col">
-      <div class="col-12 col-md" :class="{ 'q-pr-md': isMdUp }">
+      <div class="col-12 col-md" :class="{ 'q-pr-lg': isMdUp }">
         <ContentSection :isOpened="true" titleEnd :bordered="false" title="Seasons" color="dark">
           <SeasonStandings class="col-12" />
         </ContentSection>
