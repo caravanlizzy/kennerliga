@@ -3,7 +3,7 @@
     <!-- Chat list -->
     <q-scroll-area
       class="col"
-      style="min-height: 450px"
+      style="min-height: 350px"
       ref="scrollAreaRef"
       @scroll="handleScroll"
       @mousedown="markAsRead"
