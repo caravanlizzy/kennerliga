@@ -4,8 +4,12 @@
     <div v-if="isMobile" class="column col">
       <div class="col column">
         <KennerChat v-if="mobileContent === 'chat'" class="column"/>
-        <SeasonStandings v-else-if="mobileContent === 'seasons'" />
-        <YearStandings v-else-if="mobileContent === 'yearly'" year="2023" />
+        <ScrollContainer v-else-if="mobileContent === 'seasons'">
+          <SeasonStandings  />
+        </ScrollContainer>
+        <ScrollContainer v-else-if="mobileContent === 'yearly'">
+          <YearStandings :year="2023"/>
+        </ScrollContainer>
       </div>
       <q-toolbar class="col-auto bg-primary text-secondary">
         <q-tabs v-model="mobileContent">
@@ -62,6 +66,7 @@ import ContentSection from 'components/base/ContentSection.vue';
 import { useQuasar } from 'quasar';
 import { ref } from 'vue';
 import ScrollTest from 'components/ScrollTest.vue';
+import ScrollContainer from 'components/base/ScrollContainer.vue';
 
 const { isMobile } = useResponsive();
 const $q = useQuasar();
