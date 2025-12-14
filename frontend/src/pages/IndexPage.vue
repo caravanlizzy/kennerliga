@@ -1,18 +1,12 @@
 <template>
-  <q-page>
+  <q-page class="column col">
     <AnnouncementDisplay class="col-auto" />
-    <div v-if="isMobile" class="column fit col">
-      <q-tab-panels keep-alive class="column col fit" v-model="mobileContent">
-        <q-tab-panel name="chat" class="column col fit">
-          <KennerChat class="col" />
-        </q-tab-panel>
-        <q-tab-panel name="seasons">
-          <SeasonStandings />
-        </q-tab-panel>
-        <q-tab-panel name="yearly">
-          <YearStandings :year="2023" />
-        </q-tab-panel>
-      </q-tab-panels>
+    <div v-if="isMobile" class="column col">
+      <div class="col column">
+        <KennerChat v-if="mobileContent === 'chat'" class="column"/>
+        <SeasonStandings v-else-if="mobileContent === 'seasons'" />
+        <YearStandings v-else-if="mobileContent === 'yearly'" year="2023" />
+      </div>
       <q-toolbar class="col-auto bg-primary text-secondary">
         <q-tabs v-model="mobileContent">
           <q-tab icon="chat" name="chat" label="Chat" />
