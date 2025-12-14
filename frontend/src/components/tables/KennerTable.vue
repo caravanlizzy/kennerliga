@@ -6,6 +6,10 @@
     class="rounded-borders"
     table-class="text-grey-8"
   >
+    <!-- forward ALL incoming slots (including scoped slots like body-cell-*) -->
+    <template v-for="(_, slotName) in $slots" v-slot:[slotName]="slotProps">
+      <slot :name="slotName" v-bind="slotProps" />
+    </template>
     <template v-if="createButton" v-slot:top-right>
       <KennerButton
         color="primary"
