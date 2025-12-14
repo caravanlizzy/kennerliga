@@ -1,25 +1,22 @@
 <template>
   <LoadingSpinner v-if="loading" />
-  <q-card
-    v-else
-    flat
-    class="column col"
-    style="min-width: 350px;"
-  >
+  <q-card v-else flat class="column col" style="min-width: 350px">
     <!-- Messages -->
-    <q-card-section class="q-pa-none col column relative-position" >
-      <ScrollContainer class="q-mx-md">
-        <q-chat-message
-          v-for="m in messages"
-          :key="m.datetime"
-          :sent="isMine(m)"
-          :text="[m.text]"
-          :name="m.sender"
-          :stamp="timeAgo(m.datetime)"
-          :bg-color="isMine(m) ? 'secondary' : 'primary'"
-          text-color="white"
-        />
-      </ScrollContainer>
+    <q-card-section class="q-pa-none col column relative-position">
+      <div class="relative-position col">
+        <q-scroll-area :visible="false" class="absolute-full q-pa-md" ref="scrollAreaRef">
+          <q-chat-message
+            v-for="m in messages"
+            :key="m.datetime"
+            :sent="isMine(m)"
+            :text="[m.text]"
+            :name="m.sender"
+            :stamp="timeAgo(m.datetime)"
+            :bg-color="isMine(m) ? 'secondary' : 'primary'"
+            text-color="white"
+          />
+        </q-scroll-area>
+      </div>
     </q-card-section>
 
     <!-- Composer -->
@@ -57,7 +54,6 @@ import type { TMessage } from 'src/types';
 import { useUserStore } from 'stores/userStore';
 import { storeToRefs } from 'pinia';
 import LoadingSpinner from 'components/base/LoadingSpinner.vue';
-import ScrollContainer from 'components/base/ScrollContainer.vue';
 
 const { user, isAuthenticated } = storeToRefs(useUserStore());
 
