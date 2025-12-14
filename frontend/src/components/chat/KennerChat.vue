@@ -7,8 +7,8 @@
     style="min-width: 350px;"
   >
     <!-- Messages -->
-    <q-card-section class="q-pa-none col column " style="min-height: 0;">
-      <div class="q-px-md col" style="overflow-y: auto; min-height: 0;">
+    <q-card-section class="q-pa-none col column relative-position" >
+      <q-scroll-area class="q-pa-md absolute-full">
         <q-chat-message
           v-for="m in messages"
           :key="m.datetime"
@@ -19,7 +19,7 @@
           :bg-color="isMine(m) ? 'secondary' : 'primary'"
           text-color="white"
         />
-      </div>
+      </q-scroll-area>
     </q-card-section>
 
     <!-- Composer -->

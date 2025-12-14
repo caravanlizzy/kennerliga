@@ -49,6 +49,7 @@
       </div>
     </div>
   </q-page>
+
 </template>
 
 <script setup lang="ts">
@@ -60,6 +61,7 @@ import YearStandings from 'components/YearStandings.vue';
 import ContentSection from 'components/base/ContentSection.vue';
 import { useQuasar } from 'quasar';
 import { ref } from 'vue';
+import ScrollTest from 'components/ScrollTest.vue';
 
 const { isMobile } = useResponsive();
 const $q = useQuasar();
@@ -67,3 +69,19 @@ const isMdUp = $q.screen.gt.sm;
 
 const mobileContent = ref('chat');
 </script>
+
+<style scoped>
+.content {
+  flex: 1 1 auto; /* takes remaining space */
+  min-height: 0; /* CRITICAL */
+  overflow-y: auto; /* enables scrolling */
+  background: #f5f5f5;
+  padding: 8px;
+}
+
+.my-page {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+</style>
