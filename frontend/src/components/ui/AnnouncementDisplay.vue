@@ -68,7 +68,7 @@
                 <KennerButton
                   v-if="a.type === 'REGISTER'"
                   flat
-                  color="accent"
+                  color="warning"
                   class="text-caption"
                   @click="toggleParticipants"
                 >
@@ -160,7 +160,7 @@ async function register() {
 const backgroundColors = {
   INFO: 'bg-blue-grey-8',
   WINNER: 'bg-secondary',
-  REGISTER: 'bg-green-6',
+  REGISTER: 'bg-brown-6',
   WARNING: 'bg-negative',
   NEUTRAL: 'bg-grey-7',
 };
