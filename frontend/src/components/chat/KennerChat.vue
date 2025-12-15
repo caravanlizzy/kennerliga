@@ -1,6 +1,6 @@
 <template>
   <LoadingSpinner v-if="loading" />
-  <q-card v-else flat class="column col" style="min-width: 350px">
+  <q-card v-else flat class="column col" style="min-width: 350px; min-height: 400px;">
     <!-- Messages -->
     <q-card-section class="q-pa-none col column relative-position">
       <div class="relative-position col">
