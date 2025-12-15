@@ -8,7 +8,7 @@
           <SeasonStandings  />
         </ScrollContainer>
         <ScrollContainer v-else-if="mobileContent === 'leaderboard'">
-          <LeaderBoard :year="2021"/>
+          <LeaderBoard :year="2023"/>
         </ScrollContainer>
       </div>
       <q-toolbar class="col-auto bg-primary text-secondary flex-center">

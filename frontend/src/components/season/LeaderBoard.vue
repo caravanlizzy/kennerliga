@@ -20,7 +20,7 @@
         </th>
 
         <th class="text-center text-grey-6 text-weight-light q-py-xs q-px-sm">
-          Highest L
+          Best League
         </th>
 
         <th class="text-center text-uppercase text-weight-medium q-py-xs q-px-sm">
