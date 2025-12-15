@@ -1,64 +1,57 @@
 <template>
-    <div :class="isMobile ? '' : 'q-pa-md'" class="column">
-      <!-- Filters -->
-      <div class="row q-gutter-sm items-end">
-        <KennerSelect
-          v-model="selectedYear"
-          :options="yearOptions"
-          label="Year"
-          dense
-          outlined
-          emit-value
-          map-options
-          :loading="loadingSeasons"
-          style="max-width: 140px"
-        />
+  <div :class="isMobile ? '' : 'q-pa-md'" class="column">
+    <!-- Filters -->
+    <div class="row q-pa-sm q-gutter-sm items-center justify-end">
+      <KennerSelect
+        v-model="selectedYear"
+        :options="yearOptions"
+        label="Year"
+        dense
+        outlined
+        emit-value
+        map-options
+        :disable="loadingSeasons"
+        style="max-width: 140px"
+      />
 
-        <KennerSelect
-          v-model="selectedMonth"
-          :options="monthOptions"
-          label="Month"
-          dense
-          outlined
-          emit-value
-          map-options
-          :disable="!selectedYear || monthOptions.length === 0"
-          :loading="loadingSeasons"
-          style="max-width: 180px"
-        />
+      <KennerSelect
+        v-model="selectedMonth"
+        :options="monthOptions"
+        label="Month"
+        dense
+        outlined
+        emit-value
+        map-options
+        :disable="loadingSeasons || !selectedYear || monthOptions.length === 0"
+        style="max-width: 180px"
+      />
+    </div>
 
-        <div class="text-caption text-grey-7 q-ml-sm q-mt-xs">
-          See current standings for all active leagues. Use the selects to view past seasons.
-        </div>
-      </div>
+    <!-- State primary -->
+    <div v-if="loadingSeasons" class="text-grey-7">Loading seasons…</div>
 
+    <q-separator />
 
-      <!-- State primary -->
-      <div v-if="loadingSeasons" class="text-grey-7">Loading seasons…</div>
+    <!-- Leagues + matrices -->
+    <div v-if="!selectedSeasonId" class="text-grey-7">
+      Please select year and month that contain a league.
+    </div>
 
-      <q-separator />
+    <div v-else-if="loadingLeagues" class="text-grey-7">Loading leagues…</div>
 
-      <!-- Leagues + matrices -->
-      <div v-if="!selectedSeasonId" class="text-grey-7">
-        Please select year and month that contain a league.
-      </div>
+    <div v-else-if="leagues.length === 0" class="text-grey-7">
+      No leagues for this season. (Should not happen if filters are correct.)
+    </div>
 
-      <div v-else-if="loadingLeagues" class="text-grey-7">Loading leagues…</div>
-
-      <div v-else-if="leagues.length === 0" class="text-grey-7">
-        No leagues for this season. (Should not happen if filters are correct.)
-      </div>
-
-      <div v-else class="column">
-        <div v-for="league in leagues" :key="league.id">
-          <q-badge class="q-ml-md q-pa-xs" color="primary" outlined dense> League{{league.level}}</q-badge>
-          <LeagueStandingsMatrix
-            class="q-mb-md"
-            :leagueId="league.id"
-          />
-        </div>
+    <div v-else class="column">
+      <div v-for="league in leagues" :key="league.id">
+        <q-badge class="q-ml-md q-pa-xs" color="primary" outlined dense>
+          League{{ league.level }}</q-badge
+        >
+        <LeagueStandingsMatrix class="q-mb-md" :leagueId="league.id" />
       </div>
     </div>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -134,24 +127,10 @@ const monthOptions = computed(() => {
 async function loadSeasonsWithLeagues() {
   loadingSeasons.value = true;
   try {
-    const { data: allSeasons } = await api.get<Season[]>('season/seasons');
-
-    // For each season, check if it has leagues
-    const leagueResponses = await Promise.all(
-      allSeasons.map((s) =>
-        api.get<League[]>('league/leagues', { params: { season: s.id } })
-      )
+    const { data } = await api.get(
+      'result/match-results/seasons-with-results/'
     );
-
-    const withLeagues: Season[] = [];
-    allSeasons.forEach((season, idx) => {
-      if (leagueResponses[idx].data.length > 0) {
-        withLeagues.push(season);
-      }
-    });
-
-    seasonsWithLeagues.value = withLeagues;
-
+    seasonsWithLeagues.value = data;
     // Preselect the latest (year, month) that actually has leagues
     if (seasonsWithLeagues.value.length > 0) {
       const latest = [...seasonsWithLeagues.value].sort((a, b) => {
@@ -162,6 +141,8 @@ async function loadSeasonsWithLeagues() {
       selectedYear.value = latest.year;
       selectedMonth.value = latest.month;
     }
+  } catch (err) {
+    console.log(err);
   } finally {
     loadingSeasons.value = false;
   }

@@ -1,5 +1,6 @@
 from collections import defaultdict
 
+from rest_framework.decorators import action
 from rest_framework.viewsets import ModelViewSet, ViewSet
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -9,6 +10,8 @@ from django.db import transaction
 from game.models import SelectedGame, ResultConfig, TieBreaker
 from league.models import GameStanding
 from league.serializer import GameStandingSerializer
+from season.models import Season
+from season.serializer import SeasonSerializer
 from services.standings_snapshot import rebuild_game_snapshot, rebuild_league_snapshot
 from .models import Result
 from .serializers import ResultSerializer
@@ -430,6 +433,15 @@ class MatchResultViewSet(ViewSet):
         except Result.DoesNotExist:
             return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
         return Response(ResultSerializer(obj).data, status=status.HTTP_200_OK)
+
+    @action(detail=False, methods=["get"], url_path="seasons-with-results")
+    def seasons_with_results(self, request):
+        """
+        GET /api/result/match-results/seasons-with-results/
+        Returns all Season records that have at least one Result.
+        """
+        seasons = Season.objects.filter(results__isnull=False).distinct()
+        return Response(SeasonSerializer(seasons, many=True).data, status=status.HTTP_200_OK)
 
 
 
