@@ -25,7 +25,7 @@
       </q-chip>
     </div>
     <div class="col-auto">
-      <q-btn flat icon="refresh" round color="teal-7" size="md" @click="load">
+      <q-btn flat icon="refresh" round color="secondary" size="md" @click="load">
         <q-tooltip>Refresh</q-tooltip>
       </q-btn>
     </div>
@@ -130,8 +130,8 @@
             default-closed
             icon="tune"
             label="Game Settings"
-            header-class="text-weight-bold text-grey-8 bg-grey-1 q-py-md"
-            expand-icon-class="text-teal-7"
+            :header-class="['text-weight-bold bg-grey-1 q-py-md', member.selected_game ? 'text-grey-8' : 'text-grey-5']"
+            expand-icon-class="text-primary"
           >
             <q-separator />
             <q-card-section class="bg-white q-pa-md">
@@ -149,7 +149,7 @@
                 v-if="member.selected_game"
                 label="Edit Settings"
                 icon="edit"
-                color="teal-7"
+                color="secondary"
                 size="md"
                 @click="() => (editingGameMember = member)"
               />
@@ -158,7 +158,7 @@
                 flat
                 label="Select Game"
                 icon="add"
-                color="teal-7"
+                color="primary"
                 size="md"
                 @click="() => (selectingGameMember = member)"
               />
@@ -169,11 +169,11 @@
         <!-- Match Result Section -->
         <q-card-section class="q-pa-none">
           <q-expansion-item
-            :default-opened="hasResult(member)"
+            :default-opened="false"
             icon="emoji_events"
             label="Match Result"
-            header-class="text-weight-bold text-grey-8 bg-grey-1 q-py-md"
-            expand-icon-class="text-teal-7"
+            :header-class="['text-weight-bold bg-grey-1 q-py-md', hasResult(member) ? 'text-grey-5' : 'text-grey-8']"
+            expand-icon-class="text-primary"
           >
             <q-separator />
             <q-card-section class="bg-white q-pa-md" v-if="hasResult(member)">
@@ -195,7 +195,7 @@
                 flat
                 label="Edit Result"
                 icon="edit_note"
-                color="amber-9"
+                color="secondary"
                 size="md"
                 @click="
                   () => (editResultForSelGameId = member.selected_game.id)
@@ -206,7 +206,7 @@
                 flat
                 label="Post Result"
                 icon="post_add"
-                color="teal-7"
+                color="primary"
                 size="md"
                 @click="() => (postResultForSelGame = member.selected_game)"
               />
@@ -219,11 +219,11 @@
     <FormLayout v-if="editingGameMember" @onClose="closeForm">
       <template #head>
         Edit Game
-        <span class="text-teal-7">{{
+        <span class="text-primary">{{
           editingGameMember.selected_game?.game_name
         }}</span>
         for
-        <span class="text-teal-7">{{
+        <span class="text-primary">{{
           editingGameMember.profile_name.replace('_profile', '')
         }}</span>
       </template>
@@ -239,7 +239,7 @@
     <FormLayout v-if="selectingGameMember" @onClose="closeForm">
       <template #head>
         Select a game for
-        <span class="text-teal-7">{{ selectingGameMember.profile_name }}</span>
+        <span class="text-primary">{{ selectingGameMember.profile_name }}</span>
       </template>
       <GameSelector
         manageOnly
@@ -252,7 +252,7 @@
     <FormLayout @onClose="closeForm" v-if="postResultForSelGame">
       <template #head>
         Post Match Results for
-        <span class="text-teal-7"> {{ postResultForSelGame.game_name }} </span>
+        <span class="text-primary"> {{ postResultForSelGame.game_name }} </span>
       </template>
       <MatchResultForm
         :selectedGameId="postResultForSelGame.id"
