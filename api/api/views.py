@@ -196,10 +196,21 @@ class LeaderboardViewSet(APIView):
                 "totals": p["totals"],
             })
 
-        # Sort players: most 1st places, then 2nd, 3rd, 4th, then name
+        # Sort players:
+        # 1) per_level (level order from `levels`, then 1st/2nd/3rd/4th within each level)
+        # 2) then overall totals (as before)
+        # 3) then name
         def sort_key(item):
+            per_level = item["per_level"]
+            per_level_tuple = []
+            for lvl in levels:
+                c = per_level.get(str(lvl), {"first": 0, "second": 0, "third": 0, "fourth": 0})
+                per_level_tuple.extend([-c["first"], -c["second"], -c["third"], -c["fourth"]])
+
             t = item["totals"]
-            return (-t["first"], -t["second"], -t["third"], -t["fourth"], item["profile_name"].lower())
+            totals_tuple = (-t["first"], -t["second"], -t["third"], -t["fourth"])
+
+            return (*per_level_tuple, *totals_tuple, item["profile_name"].lower())
 
         standings_list.sort(key=sort_key)
 
