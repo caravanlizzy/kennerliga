@@ -7,15 +7,15 @@
         <ScrollContainer v-else-if="mobileContent === 'seasons'">
           <SeasonStandings  />
         </ScrollContainer>
-        <ScrollContainer v-else-if="mobileContent === 'yearly'">
-          <YearStandings :year="2023"/>
+        <ScrollContainer v-else-if="mobileContent === 'leaderboard'">
+          <LeaderBoard :year="2021"/>
         </ScrollContainer>
       </div>
-      <q-toolbar class="col-auto bg-primary text-secondary">
+      <q-toolbar class="col-auto bg-primary text-secondary flex-center">
         <q-tabs v-model="mobileContent">
-          <q-tab icon="chat" name="chat" label="Chat" />
           <q-tab icon="history" name="seasons" label="Season" />
-          <q-tab icon="year" name="yearly" label="Year" />
+          <q-tab icon="chat" name="chat" label="Chat" />
+          <q-tab icon="leaderboard" name="leaderboard" label="Leaderboard" />
         </q-tabs>
       </q-toolbar>
     </div>
@@ -34,11 +34,11 @@
           <ContentSection
             :bordered="false"
             titleEnd
-            title="Year Standings"
+            title="Leaderboard"
             class="col-12"
             color="dark"
           >
-            <YearStandings :year="2023" />
+            <LeaderBoard :year="2023" />
           </ContentSection>
         </div>
         <ContentSection
@@ -61,7 +61,7 @@ import KennerChat from 'components/chat/KennerChat.vue';
 import SeasonStandings from 'components/season/SeasonStandings.vue';
 import AnnouncementDisplay from 'components/ui/AnnouncementDisplay.vue';
 import { useResponsive } from 'src/composables/responsive';
-import YearStandings from 'components/YearStandings.vue';
+import LeaderBoard from 'components/season/LeaderBoard.vue';
 import ContentSection from 'components/base/ContentSection.vue';
 import { useQuasar } from 'quasar';
 import { ref } from 'vue';
@@ -71,5 +71,5 @@ const { isMobile } = useResponsive();
 const $q = useQuasar();
 const isMdUp = $q.screen.gt.sm;
 
-const mobileContent = ref('chat');
+const mobileContent = ref('seasons');
 </script>
