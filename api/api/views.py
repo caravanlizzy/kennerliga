@@ -54,7 +54,7 @@ class LogoutApiView(APIView):
 
 
 # no better place to put currently, maybe lateron in a statistic module
-class YearStandingMatrixView(APIView):
+class LeaderboardViewSet(APIView):
     """
     Returns a yearly matrix of league positions per player.
 
@@ -107,7 +107,11 @@ class YearStandingMatrixView(APIView):
                 league__season__year=year,
             )
             .select_related("league", "league__season", "player_profile")
-            .order_by("league_id", "-league_points", "-wins", "-points")
+            .order_by(
+                "league__level",  # level first (1 = best)
+                "league_id",  # then league within that level
+                "-league_points", "-wins", "-points"  # then positions within the league
+            )
         )
 
         if not standings_qs.exists():

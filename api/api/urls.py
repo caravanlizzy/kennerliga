@@ -8,7 +8,7 @@ from drf_spectacular.views import (
     SpectacularRedocView,
 )
 
-from api.views import LoginApiView, LogoutApiView, YearStandingMatrixView
+from api.views import LoginApiView, LogoutApiView, LeaderboardViewSet
 
 router = DefaultRouter()
 
@@ -23,7 +23,7 @@ urlpatterns = [
     path('announcement/', include('announcement.urls')),
     path('chat/', include('chat.urls')),
     path('result/', include('result.urls')),
-    path('year-standings/', YearStandingMatrixView.as_view(), name="year-standing"),
+    path('leaderboard/', LeaderboardViewSet.as_view(), name='leaderboard'),
     path('api-token-auth/', views.obtain_auth_token),
 
     # swagger endpoints
