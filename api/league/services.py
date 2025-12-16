@@ -35,6 +35,9 @@ class LeagueService:
                 self.league.active_player = q.get_members_ordered(self.league).last()
                 self.league.save(update_fields=["status", "active_player"])
             else:
+                if q.is_two_player_league(self.league):
+                    if q.both_players_exactly_one_pick(self.league):
+                        return
                 self.rotate_active_player()
 
         elif self.league.status == LeagueStatus.REPICKING:

@@ -57,8 +57,8 @@ class SeasonParticipantSerializer(ModelSerializer):
         queryset=Season.objects.all(),
         required=True,
     )
-    selected_game = SerializerMethodField()
-    first_game_selection = SerializerMethodField()
+    selected_games = SerializerMethodField()
+    first_game_selection_banned_by_others = SerializerMethodField()
     my_banned_game = SerializerMethodField()
     has_banned = BooleanField(read_only=True)
     is_active_player = SerializerMethodField()
@@ -67,8 +67,9 @@ class SeasonParticipantSerializer(ModelSerializer):
         model = SeasonParticipant
         fields = [
             'id', 'season', 'profile', 'rank',  # write
-            'username', 'profile_name', 'selected_game',  # read
-            'first_game_selection', 'has_banned', 'is_active_player',
+            'username', 'profile_name',
+            'selected_games',  # read
+            'first_game_selection_banned_by_others', 'has_banned', 'is_active_player',
             'my_banned_game',
         ]
 
@@ -88,72 +89,160 @@ class SeasonParticipantSerializer(ModelSerializer):
         return SelectedGameSerializer(ban_decision.selected_game, context=self.context).data
 
     # ---- internal helper & cache -------------------------------------------
+    def _league_member_count(self):
+        """
+        Cached member count for the league in context.
+        """
+        if hasattr(self, "_cached_league_member_count"):
+            return self._cached_league_member_count
+
+        league = self.context.get("league")
+        self._cached_league_member_count = league.members.count() if league else 0
+        return self._cached_league_member_count
+
     def _resolve_games_for_participant(self, obj):
         """
-        Returns a tuple: (selected_sg, banned_sg)
-        - selected_sg: preferred unbanned-by-others pick; fallback deterministic.
-        - banned_sg: the "other" pick if present; otherwise None.
+        For 3+ member leagues:
+            returns (selected_sg, banned_sg)
+
+        For 2 member leagues:
+            returns (selected_sg, selected_two_sg, banned_sg)
+
+        NOTE:
+        "Banned-by-others" means "successfully banned":
+            - 2 players: 1 BanDecision by the other player
+            - 3+ players: 2 BanDecisions by other players
         """
         # Per-serializer cache so both getters don't redo work
         cache = getattr(self, '_sg_cache', None)
         if cache is None:
             cache = self._sg_cache = {}
 
-        key = obj.pk
+        league = self.context.get('league')
+        member_count = self._league_member_count()
+
+        key = (obj.pk, member_count)
         if key in cache:
             return cache[key]
 
-        league = self.context.get('league')
         if not league:
-            cache[key] = (None, None)
+            cache[key] = (None, None) if member_count != 2 else (None, None, None)
             return cache[key]
 
         qs = SelectedGame.objects.filter(profile=obj.profile, league=league)
 
         count = qs.count()
         if count == 0:
-            cache[key] = (None, None)
+            cache[key] = (None, None) if member_count != 2 else (None, None, None)
             return cache[key]
 
-        if count == 1:
-            sg = qs.select_related('game').first()
-            cache[key] = (sg, None)
-            return cache[key]
+        successful_ban_threshold = 1 if member_count == 2 else 2
 
-        # count >= 2: annotate bans by others and pick
-        bans_by_others = BanDecision.objects.filter(
-            league=league,
-            selected_game=OuterRef('pk')
-        ).exclude(player_banning=obj.profile)
-
+        from django.db.models import Count, Q  # local import to keep file-level imports minimal
         annotated = (qs
-                     .annotate(has_ban_by_others=Exists(bans_by_others))
+                     .annotate(
+            bans_by_others_count=Count(
+                "bandecision",
+                filter=Q(
+                    bandecision__league=league,
+                    bandecision__player_banning__isnull=False,
+                ) & ~Q(bandecision__player_banning=obj.profile),
+                distinct=True,
+            )
+        )
+                     .annotate(
+            has_successful_ban_by_others=Q(bans_by_others_count__gte=successful_ban_threshold)
+        )
                      .select_related('game')
                      .order_by('id'))
 
-        # Preferred selected: first unbanned-by-others
-        selected = next((sg for sg in annotated if not sg.has_ban_by_others), None)
+        if count == 1:
+            sg = annotated.first()
 
+            # If the only pick is successfully banned-by-others, it must not be returned as selected_game.
+            if sg and getattr(sg, "has_successful_ban_by_others", False):
+                if member_count == 2:
+                    cache[key] = (None, None, sg)
+                    return cache[key]
+                cache[key] = (None, sg)
+                return cache[key]
+
+            cache[key] = (sg, None) if member_count != 2 else (sg, None, None)
+            return cache[key]
+
+        # count >= 2: pick based on successful bans
+        selected = next((sg for sg in annotated if not sg.has_successful_ban_by_others), None)
+
+        # If everything is successfully banned-by-others, selected_game must be None.
         if selected is None:
-            # All banned (or no unbanned found): deterministic fallback is smallest id
-            selected = annotated.first()
+            banned_any = next((sg for sg in annotated if sg.has_successful_ban_by_others), None)
+            if member_count == 2:
+                cache[key] = (None, None, banned_any)
+                return cache[key]
+            cache[key] = (None, banned_any)
+            return cache[key]
 
-        # banned candidate: the "other" one, prefer one that IS banned-by-others
-        banned = next((sg for sg in annotated if sg.pk != selected.pk and getattr(sg, 'has_ban_by_others', False)), None)
-        if banned is None:
-            # If none explicitly banned (e.g., >2 picks all unbanned), pick a different one deterministically
-            banned = next((sg for sg in annotated if sg.pk != selected.pk), None)
+        banned = next(
+            (sg for sg in annotated
+             if sg.pk != selected.pk and getattr(sg, 'has_successful_ban_by_others', False)),
+            None
+        )
+
+        if member_count == 2:
+            selected_two = next((sg for sg in annotated if sg.pk != selected.pk), None)
+            if selected_two and getattr(selected_two, "has_successful_ban_by_others", False):
+                selected_two = None
+            cache[key] = (selected, selected_two, banned)
+            return cache[key]
 
         cache[key] = (selected, banned)
         return cache[key]
 
-    # ---- public getters -----------------------------------------------------
-    def get_selected_game(self, obj):
-        selected, _ = self._resolve_games_for_participant(obj)
-        return SelectedGameSerializer(selected, context=self.context).data if selected else None
+    def _unpack_resolved(self, obj):
+        """
+        Normalizes _resolve_games_for_participant output to:
+            (selected, selected_two, banned)
+        where selected_two is None for 3+ leagues.
+        """
+        resolved = self._resolve_games_for_participant(obj)
+        if len(resolved) == 2:
+            selected, banned = resolved
+            return selected, None, banned
+        selected, selected_two, banned = resolved
+        return selected, selected_two, banned
 
-    def get_first_game_selection(self, obj):
-        _, banned = self._resolve_games_for_participant(obj)
+    # ---- public getters -----------------------------------------------------
+    def get_selected_games(self, obj):
+        league = self.context.get('league')
+        if not league:
+            return []
+
+        member_count = self._league_member_count()
+        successful_ban_threshold = 1 if member_count == 2 else 2
+
+        from django.db.models import Count, Q  # local import to keep file-level imports minimal
+        qs = (
+            SelectedGame.objects
+            .filter(profile=obj.profile, league=league)
+            .annotate(
+                bans_by_others_count=Count(
+                    "bandecision",
+                    filter=Q(
+                        bandecision__league=league,
+                        bandecision__player_banning__isnull=False,
+                    ) & ~Q(bandecision__player_banning=obj.profile),
+                    distinct=True,
+                )
+            )
+            .filter(bans_by_others_count__lt=successful_ban_threshold)
+            .select_related('game')
+            .order_by('id')
+        )
+
+        return SelectedGameSerializer(qs, many=True, context=self.context).data
+
+    def get_first_game_selection_banned_by_others(self, obj):
+        _, _, banned = self._unpack_resolved(obj)
         return SelectedGameSerializer(banned, context=self.context).data if banned else None
 
     def get_is_active_player(self, obj):

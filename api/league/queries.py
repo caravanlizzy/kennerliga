@@ -8,6 +8,21 @@ def get_members_ordered(league: League):
     return league.members.all().select_related("profile").order_by("rank")
 
 
+def all_players_have_picked(league: League) -> bool:
+    """Check if all league members have selected a game."""
+    two_player_league = is_two_player_league(league)
+    expected_count = 2 if two_player_league else 1
+
+    for participant in league.members.all():
+        pick_count = SelectedGame.objects.filter(
+            league=league,
+            profile=participant.profile
+        ).count()
+        if pick_count < expected_count:
+            return False
+    return True
+
+
 def all_players_have_banned(league: League) -> bool:
     """Check if all league members have submitted at least one ban."""
     two_player_league = is_two_player_league(league)
@@ -24,21 +39,29 @@ def all_players_have_banned(league: League) -> bool:
 
 
 def get_players_to_repick(league: League) -> List:
-    """Return members who must repick because their only game was banned."""
+    """Return members who must repick because at least one of their games was banned."""
+    from django.db.models import Count  # local import to keep file-level imports minimal
+
     repick_players = []
     min_bans = 2 if league.members.count() > 2 else 1
 
     for member in league.members.all():
         qs = SelectedGame.objects.filter(profile=member.profile, league=league)
-        sgs = list(qs.only('id')[:2])           # 1 query, avoids count()+first() double hit
-        if len(sgs) == 1:
-            sg = sgs[0]
-            ban_count = BanDecision.objects.filter(
-                league=league,
-                selected_game=sg               # or: selected_game_id=sg.id
-            ).count()
-            if ban_count >= min_bans:
-                repick_players.append(member)
+        sgs = list(qs.only("id")[:2])  # in 2-player leagues, a player can have 2 picks
+
+        if not sgs:
+            continue
+
+        # Count bans per selected game for this member (in this league)
+        banned_counts = (
+            BanDecision.objects.filter(league=league, selected_game__in=sgs)
+            .values("selected_game_id")
+            .annotate(c=Count("id"))
+        )
+
+        if any(row["c"] >= min_bans for row in banned_counts):
+            repick_players.append(member)
+
     return repick_players
 
 
@@ -49,12 +72,16 @@ def all_repickers_have_repicked(league: League) -> bool:
         # For 2-player leagues, players should have 3 games if they had to repick
         # For other leagues, they should have more than 1 game
         actual_count = SelectedGame.objects.filter(
-            player=player.profile,
+            profile=player.profile,
             league=league
         ).count()
         if actual_count < expected_count:
             return False
     return True
 
+
 def is_two_player_league(league: League) -> bool:
     return league.members.count() == 2
+
+def both_players_exactly_one_pick(league: League) -> bool:
+    return SelectedGame.objects.filter(league=league).count() == 2

@@ -263,7 +263,6 @@ class BanDecisionSerializer(serializers.ModelSerializer):
         return attrs
 
     def create(self, validated_data):
-        print("Final validated_data in create:", validated_data)
         username = validated_data.pop('username')
         validated_data['player_banning'] = get_profile_by_username(username)
         obj, _ = BanDecision.objects.update_or_create(

@@ -1,4 +1,4 @@
-from season.queries import get_running_season, get_registered_participants, get_open_season
+from season.queries import get_registered_participants, get_open_season
 from season.services import SeasonService
 from season.services import RankingService
 
