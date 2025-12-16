@@ -1,120 +1,100 @@
 <template>
-  <q-card
-    flat
-    v-if="results.length > 0"
-  >
-    <div v-if="displayGameName" class="row items-center justify-center q-mb-xs">
-      <div class="text-h6 text-weight-bold q-px-md q-py-sm">
+  <q-card v-if="results.length > 0" flat>
+    <q-card-section
+      v-if="displayGameName"
+      class="q-py-sm q-px-md row items-center"
+    >
+      <div class="text-subtitle1 text-weight-medium ellipsis">
         {{ selectedGame.game_name }}
       </div>
-    </div>
+      <q-space />
+      <q-badge outline color="grey-7" class="q-ml-sm">
+        {{ results.length }} players
+      </q-badge>
+    </q-card-section>
 
-    <q-list bordered separator class="rounded-borders">
+    <q-separator v-if="displayGameName" />
+
+    <q-list class="q-py-xs">
       <q-item
         v-for="(result, index) in results"
         :key="result.id"
-        :class="['q-py-md', index === 0 ? 'bg-amber-1' : '']"
+        class="match-result-item"
+        :class="rowClass(index)"
       >
-        <!-- Rank Badge -->
-        <q-item-section side class="q-pr-md">
+        <!-- Rank -->
+        <q-item-section side class="q-pr-sm">
           <q-avatar
-            :color="index === 0 ? 'amber' : 'grey-4'"
-            :text-color="index === 0 ? 'amber-10' : 'grey-8'"
-            size="42px"
-            :class="index === 0 ? 'shadow-2' : ''"
+            size="34px"
+            :color="rankColor(index)"
+            :text-color="rankTextColor(index)"
+            class="rank-avatar"
           >
-            <span
-              :class="index === 0 ? 'text-weight-bold text-h6' : 'text-body1'"
-            >
-              {{ index + 1 }}
-            </span>
+            <span class="text-weight-bold">{{ index + 1 }}</span>
           </q-avatar>
         </q-item-section>
 
-        <!-- Player Name + optional note under it -->
+        <!-- Name + optional note -->
         <q-item-section>
-          <q-item-label
-            :class="[
-              'text-body1',
-              index === 0
-                ? 'text-weight-bold text-amber-10'
-                : 'text-weight-medium',
-            ]"
-          >
+          <q-item-label class="row items-center no-wrap">
             <q-icon
-              v-if="index === 0"
-              name="emoji_events"
-              color="amber"
-              size="20px"
+              v-if="index < 3"
+              :name="rankIcon(index)"
+              :color="rankColor(index)"
+              size="18px"
               class="q-mr-xs"
             />
-            {{ result.profile_name }}
+            <span class="text-weight-medium ellipsis">
+              {{ result.profile_name }}
+            </span>
           </q-item-label>
 
-          <!-- Notes (only if present) -->
-          <q-item-label
-            v-if="result.notes"
-            caption
-            class="q-mt-xs text-grey-7"
-          >
-            <q-icon
-              name="notes"
-              size="16px"
-              class="q-mr-xs"
-            />
+          <q-item-label v-if="result.notes" caption class="text-grey-7 ellipsis">
+            <q-icon name="notes" size="14px" class="q-mr-xs" />
             {{ result.notes }}
           </q-item-label>
         </q-item-section>
 
         <!-- Stats -->
-        <q-item-section side class="row q-gutter-xs items-center">
-          <!-- Points (for points-based games) -->
-          <q-chip
-            v-if="result.points != null"
-            dense
-            :color="index === 0 ? 'amber' : 'grey-3'"
-            :text-color="index === 0 ? 'amber-10' : 'black'"
-            :class="index === 0 ? 'text-weight-bold' : ''"
-          >
-            <q-icon name="star" size="16px" class="q-mr-xs" />
-            {{ result.points }}
-          </q-chip>
+        <q-item-section side class="stats-col">
+          <div class="row items-center justify-end q-gutter-xs">
+            <q-badge
+              v-if="result.points != null"
+              :color="index === 0 ? 'amber-7' : 'grey-6'"
+              class="stat-badge"
+            >
+              <q-icon name="star" size="14px" class="q-mr-xs" />
+              {{ result.points }}
+            </q-badge>
 
-          <!-- Position (for non-points games, or if you still track it) -->
-          <q-chip
-            v-if="result.position != null"
-            dense
-            color="grey-3"
-            text-color="grey-8"
-            size="sm"
-          >
-            <q-icon name="looks_one" size="14px" class="q-mr-xs" />
-            Pos {{ result.position }}
-          </q-chip>
+            <q-badge
+              v-if="result.position != null"
+              color="grey-5"
+              class="stat-badge"
+            >
+              Pos {{ result.position }}
+            </q-badge>
 
-          <!-- Starting Position -->
-          <q-chip
-            v-if="result.starting_position"
-            dense
-            color="grey-3"
-            text-color="grey-8"
-            size="sm"
-          >
-            <q-icon name="flag" size="14px" class="q-mr-xs" />
-            Start {{ result.starting_position }}
-          </q-chip>
+            <q-badge
+              v-if="result.starting_position"
+              color="grey-5"
+              class="stat-badge"
+            >
+              <q-icon name="flag" size="14px" class="q-mr-xs" />
+              {{ result.starting_position }}
+            </q-badge>
 
-          <!-- Faction -->
-          <q-chip
-            v-if="result.faction_name"
-            dense
-            color="indigo-2"
-            text-color="indigo-9"
-            size="sm"
-          >
-            <q-icon name="shield" size="14px" class="q-mr-xs" />
-            {{ result.faction_name }}
-          </q-chip>
+            <q-badge
+              v-if="result.faction_name"
+              color="indigo-6"
+              class="stat-badge"
+            >
+              <q-icon name="shield" size="14px" class="q-mr-xs" />
+              <span class="ellipsis" style="max-width: 120px">
+                {{ result.faction_name }}
+              </span>
+            </q-badge>
+          </div>
         </q-item-section>
       </q-item>
     </q-list>
@@ -141,8 +121,11 @@ const props = withDefaults(
 
 const { user } = storeToRefs(useUserStore());
 
-// Store instance, reactive to league ID changes
-const leagueStore = computed(() => useLeagueStore(user.value.myCurrentLeagueId)());
+// Guard against user being null + leagueId being null
+const leagueStore = computed(() => {
+  const leagueId = user.value?.myCurrentLeagueId;
+  return leagueId != null ? useLeagueStore(leagueId)() : null;
+});
 
 // First build a normalized list of results (from prop or store)
 const rawResults = computed(() => {
@@ -154,7 +137,9 @@ const rawResults = computed(() => {
       .flat()
       .filter((r: any) => r.selected_game === props.selectedGame.id);
   } else {
-    src = leagueStore.value.matchResultsBySelectedGame[props.selectedGame.id] ?? [];
+    src =
+      leagueStore.value?.matchResultsBySelectedGame?.[props.selectedGame.id] ??
+      [];
   }
 
   return src.map((r: any) => ({
@@ -189,4 +174,50 @@ const results = computed(() => {
 
   return mapped;
 });
+
+function rankColor(index: number) {
+  if (index === 0) return 'amber-7';
+  if (index === 1) return 'blue-grey-5';
+  if (index === 2) return 'brown-5';
+  return 'grey-4';
+}
+
+function rankTextColor(index: number) {
+  return index < 3 ? 'white' : 'grey-9';
+}
+
+function rankIcon(index: number) {
+  if (index === 0) return 'emoji_events';
+  if (index === 1) return 'workspace_premium';
+  return 'military_tech';
+}
+
+function rowClass(index: number) {
+  return {
+    'is-first': index === 0,
+    'is-podium': index < 3,
+  };
+}
 </script>
+
+<style scoped>
+.match-result-item {
+  padding: 10px 12px;
+  border-radius: 8px;
+  margin: 6px 8px;
+}
+
+.match-result-item.is-first {
+  box-shadow: inset 0 0 0 1px rgba(251, 192, 45, 0.45);
+  background: rgba(251, 192, 45, 0.08);
+}
+
+.rank-avatar {
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+}
+
+.stat-badge {
+  padding: 4px 8px;
+  border-radius: 999px;
+}
+</style>

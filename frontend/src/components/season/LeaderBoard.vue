@@ -68,7 +68,7 @@
 
         <!-- Highest league -->
         <td class="text-center q-py-xs q-px-sm">
-          <q-badge v-if="bestLeague(row)" class="text-body2 text-weight-medium">
+          <q-badge v-if="bestLeague(row)" outline class="text-body2 text-weight-medium">
             L{{ bestLeague(row) }}
           </q-badge>
           <div v-else class="text-grey-5 text-caption">–</div>

@@ -60,12 +60,16 @@ export const useLeagueStore = (id: number) => {
 
     const selectedGames = computed(() => {
       if (!members.value.length) return [];
+
       return members.value
-        .map((member) =>
-          member.selected_game &&
-          ({ ...member.selected_game, selected_by: member.username })
-        )
-        .filter(Boolean) as Array<TMember['selected_game'] & { selected_by: string }>;
+        .flatMap((member) => {
+          if (!member.selected_games) return [];
+          return member.selected_games.map((game) => ({
+            ...game,
+            selected_by: member.username,
+          }));
+        })
+        .filter((game) => game !== null && game !== undefined);
     });
 
     const selectedGamesById = computed<

@@ -22,16 +22,17 @@
     </template>
 
     <!-- ==================== NORMAL CONTENT ==================== -->
-    <div v-else class="q-pa-md relative-position">
-      <ActionBar />
+    <div v-else class="q-pa-md relative-position league-page">
+      <ActionBar class="q-mb-md" />
 
-      <!-- Game Selector - shown when user needs to pick games -->
       <template v-if="isMePickingGame">
         <ContentSection
           title="Game Selection"
           color="accent"
           :is-opened="sectionVisibilityStates['selection']"
           expandable
+          bordered
+          class="league-section"
         >
           <GameSelector
             :leagueId="leagueId"
@@ -44,29 +45,30 @@
         </ContentSection>
       </template>
 
-      <!-- Match Results Section -->
       <template v-if="leagueStatus === 'PLAYING' || leagueStatus === 'DONE'">
         <ContentSection
           title="Results"
           color="primary"
           :is-opened="sectionVisibilityStates['results']"
           expandable
+          bordered
+          class="league-section"
         >
-          <div class="row">
+          <div class="row q-col-gutter-md">
             <template v-for="member of members" :key="member.profile">
-              <div
-                v-if="
-                  member.selected_game &&
-                  hasSelectedGameResult(member.selected_game.id)
-                "
-                class="q-pa-xs col-12"
-                :class="{ 'col-md-6': selectedGamesWithResults.length > 1 }"
-              >
-                <MatchResult
-                  :selectedGame="member.selected_game"
-                  :displayGameName="true"
-                />
-              </div>
+              <template v-for="game of member.selected_games ?? []" :key="game.id">
+                <div
+                  v-if="hasSelectedGameResult(game.id)"
+                  class="col-12"
+                  :class="{ 'col-md-6': selectedGamesWithResults.length > 1 }"
+                >
+                  <q-card class="result-card" flat >
+                    <q-card-section class="q-pa-sm">
+                      <MatchResult :selectedGame="game" :displayGameName="true" />
+                    </q-card-section>
+                  </q-card>
+                </div>
+              </template>
             </template>
           </div>
         </ContentSection>
@@ -76,19 +78,22 @@
         <ContentSection
           title="Upload Results"
           color="secondary"
-          :isOpened="sectionVisibilityStates['upload']"
+          :is-opened="sectionVisibilityStates['upload']"
           expandable
+          bordered
+          class="league-section"
         >
           <MatchResultTabs />
         </ContentSection>
       </template>
 
-      <!-- Player Cards Grid -->
       <ContentSection
-        title="Games -  Picks and Bans"
+        title="Games - Picks and Bans"
         color="dark"
         :is-opened="sectionVisibilityStates['players']"
         expandable
+        bordered
+        class="league-section"
       >
         <div class="row q-col-gutter-md">
           <div
@@ -284,3 +289,13 @@ watchEffect(() => {
   }
 });
 </script>
+
+<style scoped>
+.league-section {
+  margin-bottom: 16px;
+}
+
+.result-card {
+  border-radius: 10px;
+}
+</style>

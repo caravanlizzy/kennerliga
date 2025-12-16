@@ -3,19 +3,23 @@
     <AnnouncementDisplay class="col-auto" />
     <div v-if="isMobile" class="column col">
       <div class="col column">
-        <KennerChat v-if="mobileContent === 'chat'" class="column"/>
+        <KennerChat v-if="mobileContent === 'chat'" class="column" />
         <ScrollContainer v-else-if="mobileContent === 'seasons'">
-          <SeasonStandings  />
+          <SeasonStandings />
         </ScrollContainer>
         <ScrollContainer v-else-if="mobileContent === 'leaderboard'">
-          <LeaderBoard :year="2023"/>
+          <LeaderBoard :year="2023" />
         </ScrollContainer>
       </div>
-      <q-toolbar class="col-auto bg-primary text-secondary flex-center">
-        <q-tabs v-model="mobileContent">
-          <q-tab icon="history" name="seasons" label="Season" />
-          <q-tab icon="chat" name="chat" label="Chat" />
-          <q-tab icon="leaderboard" name="leaderboard" label="Leaderboard" />
+      <q-toolbar class="col-auto bg-grey-4 text-primary flex-center">
+        <q-tabs switch-indicator v-model="mobileContent" class="full-width">
+          <q-tab icon="history" name="seasons" label="Season"  />
+          <q-tab icon="chat" name="chat" label="Chat"  />
+          <q-tab
+            icon="leaderboard"
+            name="leaderboard"
+            label="Leaderboard"
+          />
         </q-tabs>
       </q-toolbar>
     </div>
@@ -53,7 +57,6 @@
       </div>
     </div>
   </q-page>
-
 </template>
 
 <script setup lang="ts">

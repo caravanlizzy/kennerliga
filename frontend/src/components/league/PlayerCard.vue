@@ -1,46 +1,55 @@
 <template>
   <q-card flat unelevated class="player-card">
-
     <q-card-section class="card-body">
-
       <div class="game-primary-section">
-        <div v-if="member.selected_game" class="selected-game-card">
+        <template v-if="member.selected_games.length">
+          <!-- Games list (per game) -->
+          <div
+            v-for="(game, idx) in member.selected_games"
+            :key="gameKey(game, idx)"
+            class="selected-game-card q-mb-md"
+          >
+            <!-- Game Header -->
+            <div class="game-title-row">
+              <UserAvatar
+                class="player-avatar-inline"
+                :display-username="member.username"
+                size="32px"
+                shape="circle"
+              />
 
-          <!-- Game Header -->
-          <div class="game-title-row">
-
-            <!-- Inline Avatar -->
-            <UserAvatar
-              class="player-avatar-inline"
-              :display-username="member.username"
-              size="32px"
-              shape="circle"
-            />
-
-            <!-- Game Title Highlight -->
-            <div class="game-title-highlight">
-              <div class="game-title">
-                <span class="game-name-text">
-                  {{ member.selected_game.game_name }}
-                  <q-tooltip v-if="(member.selected_game.game_name || '').length > 28">
-                    {{ member.selected_game.game_name }}
-                  </q-tooltip>
-                </span>
+              <div class="game-title-highlight">
+                <div class="game-title">
+                  <span class="game-name-text">
+                    {{ game.game_name }}
+                    <q-tooltip v-if="(game.game_name || '').length > 28">
+                      {{ game.game_name }}
+                    </q-tooltip>
+                  </span>
+                </div>
               </div>
+
+              <q-btn
+                flat
+                round
+                size="sm"
+                icon="expand_more"
+                class="expand-btn"
+                :class="{ expanded: isExpanded(idx) }"
+                @click="toggleExpanded(idx)"
+              />
             </div>
 
-            <q-btn
-              flat
-              round
-              size="sm"
-              icon="expand_more"
-              class="expand-btn"
-              :class="{ expanded: isExpanded }"
-              @click="isExpanded = !isExpanded"
-            />
+            <!-- Expandable Settings (per game) -->
+            <transition name="expand">
+              <div v-if="isExpanded(idx)" class="game-settings-wrapper">
+                <div class="settings-divider"></div>
+                <GameSettingsDisplay :selectedOptions="game.selected_options" />
+              </div>
+            </transition>
           </div>
 
-          <!-- Bans Section -->
+          <!-- Bans Section (ONCE per player) -->
           <div class="bans-section">
             <div class="ban-row">
               <div class="bans-label">
@@ -48,11 +57,7 @@
                 <span>My Ban</span>
               </div>
               <div class="bans-content">
-                <q-chip
-                  v-if="myBannedGameName"
-                  dense
-                  class="my-ban-chip"
-                >
+                <q-chip v-if="myBannedGameName" dense class="my-ban-chip">
                   {{ myBannedGameName }}
                 </q-chip>
                 <span v-else class="no-bans"></span>
@@ -62,23 +67,25 @@
             <div class="ban-row">
               <div class="bans-label">
                 <q-icon name="group" size="16px" />
-                <span>{{ firstGameSelection ? 'First Game Pick' : 'Banned By' }}</span>
+                <span>{{
+                    firstGameSelectionBannedByOthers ? 'Banned Pick' : 'Banned By'
+                  }}</span>
               </div>
               <div class="bans-content">
-                <template v-if="firstGameSelection">
+                <template v-if="firstGameSelectionBannedByOthers">
                   <q-chip dense class="first-selection-chip" icon="looks_one">
-                    {{ firstGameSelection }}
+                    {{ firstGameSelectionBannedByOthers }}
                   </q-chip>
                 </template>
 
                 <template v-else-if="banners.length">
                   <div class="banners-avatars">
                     <UserAvatar
-                      v-for="(name, idx) in banners"
-                      :key="idx"
+                      v-for="(name, bIdx) in banners"
+                      :key="bIdx"
                       :display-username="name"
                       size="28px"
-              	      shape="circle"
+                      shape="circle"
                     />
                   </div>
                 </template>
@@ -87,41 +94,48 @@
               </div>
             </div>
           </div>
-
-          <!-- Expandable Settings -->
-          <transition name="expand">
-            <div v-if="isExpanded" class="game-settings-wrapper">
-              <div class="settings-divider"></div>
-              <GameSettingsDisplay
-                :selectedOptions="member.selected_game.selected_options"
-              />
-            </div>
-          </transition>
-        </div>
+        </template>
 
         <!-- Empty State -->
-        <div v-else class="no-game-selected">
+        <div v-else class="no-game-selected row items-center">
           <q-icon name="videogame_asset_off" size="32px" />
-          <span>No game selected</span>
+          <div class="q-ml-sm">
+            <div class="text-grey-8">{{ member.profile_name }}</div>
+            No game selected
+          </div>
         </div>
       </div>
-
     </q-card-section>
   </q-card>
 </template>
 
-
 <script setup lang="ts">
-import { ref, computed } from 'vue';
+import { computed, ref } from 'vue';
 import UserAvatar from 'components/ui/UserAvatar.vue';
-import { truncateString } from 'src/helpers';
 import GameSettingsDisplay from 'components/game/selectedGame/GameSettingsDisplay.vue';
+
+type SelectedGame = {
+  id?: number | string;
+  game_name?: string;
+  selected_options?: any[];
+};
 
 const props = withDefaults(defineProps<{ member: any; color?: string }>(), {
   color: 'var(--q-dark)',
 });
 
-const isExpanded = ref(false);
+const expandedByIndex = ref<Record<number, boolean>>({});
+
+function toggleExpanded(idx: number) {
+  expandedByIndex.value[idx] = !expandedByIndex.value[idx];
+}
+function isExpanded(idx: number) {
+  return !!expandedByIndex.value[idx];
+}
+function gameKey(game: SelectedGame, idx: number) {
+  return game?.id ?? idx;
+}
+
 const banners = computed(() => props.member.banned_by ?? []);
 
 const myBannedGameName = computed(() => {
@@ -129,14 +143,13 @@ const myBannedGameName = computed(() => {
   return mbg?.game_name ?? null;
 });
 
-const firstGameSelection = computed(() => {
-  const fgs = props.member?.first_game_selection;
+const firstGameSelectionBannedByOthers = computed(() => {
+  const fgs = props.member?.first_game_selection_banned_by_others;
   return fgs?.game_name ?? fgs?.game?.game_name ?? null;
 });
 </script>
 
 <style scoped lang="scss">
-
 .player-card {
   border-radius: 14px;
   padding: 16px;
@@ -162,7 +175,7 @@ const firstGameSelection = computed(() => {
 }
 
 .game-title-highlight::after {
-  content: "";
+  content: '';
   position: absolute;
   left: 0;
   right: 0;
@@ -227,7 +240,4 @@ const firstGameSelection = computed(() => {
   color: #9ca3af;
   font-style: italic;
 }
-
-
 </style>
-
