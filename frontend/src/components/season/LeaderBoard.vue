@@ -4,47 +4,41 @@
   <ErrorDisplay v-if="error" error="error" />
 
   <!-- Content -->
-  <div v-else-if="standings" class="rounded-borders q-pa-md">
+  <div v-else-if="standings" class="leaderboard">
     <!-- Header -->
-    <div class="row items-baseline justify-between q-mb-sm">
-      <div class="text-subtitle2 text-weight-medium">Leaderboard</div>
-      <div class="text-caption text-grey-7">Year {{ standings.year }}</div>
+    <div class="leaderboard__header">
+      <div class="leaderboard__title">Leaderboard</div>
+      <div class="leaderboard__meta">Year {{ standings.year }}</div>
     </div>
 
     <!-- Table -->
-    <q-markup-table flat separator="horizontal" class="text-caption year-matrix bg-white">
+    <q-markup-table flat separator="horizontal" class="leaderboard__table">
       <thead>
       <tr>
-        <th class="text-left text-uppercase text-weight-medium q-py-xs q-px-sm">
-          Player
-        </th>
+        <th class="th th--player">Player</th>
 
-        <th class="text-center text-grey-6 text-weight-light q-py-xs q-px-sm">
-          Best League
-        </th>
-
-        <th class="text-center text-uppercase text-weight-medium q-py-xs q-px-sm">
+        <th class="th th--place">
             <span class="place-head">
               <q-icon name="emoji_events" class="text-amber-8" size="16px" />
               1st
             </span>
         </th>
 
-        <th class="text-center text-uppercase text-weight-medium q-py-xs q-px-sm">
+        <th class="th th--place">
             <span class="place-head">
               <q-icon name="military_tech" class="text-blue-grey-5" size="16px" />
               2nd
             </span>
         </th>
 
-        <th class="text-center text-uppercase text-weight-medium q-py-xs q-px-sm">
+        <th class="th th--place">
             <span class="place-head">
               <q-icon name="military_tech" class="text-brown-6" size="16px" />
               3rd
             </span>
         </th>
 
-        <th class="text-center text-uppercase text-weight-medium q-py-xs q-px-sm">
+        <th class="th th--place">
             <span class="place-head">
               <q-icon name="flag" class="text-red-6" size="16px" />
               4th
@@ -57,65 +51,56 @@
       <tr
         v-for="(row, index) in standings.standings"
         :key="row.player_profile_id"
-        :class="[{ 'bg-yellow-1': index === 0 }]"
+        class="leaderboard__row"
+        :class="{ 'leaderboard__row--top': index === 0 }"
       >
         <!-- Player -->
-        <td class="text-left q-py-xs q-px-sm">
-          <div class="text-body2 text-weight-medium">
+        <td class="td td--player">
+          <div class="player-name">
             {{ row.profile_name }}
           </div>
-        </td>
 
-        <!-- Highest league -->
-        <td class="text-center q-py-xs q-px-sm">
-          <q-badge v-if="bestLeague(row)" outline class="text-body2 text-weight-medium">
+          <!-- Floating badge: positioned relative to the whole row (not a column) -->
+          <q-badge
+            v-if="bestLeague(row) !== null"
+            outline
+            color="primary"
+            class="best-league-badge"
+          >
             L{{ bestLeague(row) }}
           </q-badge>
-          <div v-else class="text-grey-5 text-caption">–</div>
         </td>
 
         <!-- 1st -->
-        <td class="text-center q-py-xs q-px-sm">
-          <div
-            v-if="row.totals.first > 0"
-            class="text-body2 text-positive text-weight-medium place-cell"
-          >
-            <span>{{ row.totals.first }}</span>
+        <td class="td td--place">
+          <div v-if="row.totals.first > 0" class="place place--pos">
+            {{ row.totals.first }}
           </div>
-          <div v-else class="text-grey-5 text-caption">0</div>
+          <div v-else class="place place--zero">0</div>
         </td>
 
         <!-- 2nd -->
-        <td class="text-center q-py-xs q-px-sm">
-          <div
-            v-if="row.totals.second > 0"
-            class="text-body2 text-dark text-weight-medium place-cell"
-          >
-            <span>{{ row.totals.second }}</span>
+        <td class="td td--place">
+          <div v-if="row.totals.second > 0" class="place place--dark">
+            {{ row.totals.second }}
           </div>
-          <div v-else class="text-grey-5 text-caption">0</div>
+          <div v-else class="place place--zero">0</div>
         </td>
 
         <!-- 3rd -->
-        <td class="text-center q-py-xs q-px-sm">
-          <div
-            v-if="row.totals.third > 0"
-            class="text-body2 text-accent text-weight-medium place-cell"
-          >
-            <span>{{ row.totals.third }}</span>
+        <td class="td td--place">
+          <div v-if="row.totals.third > 0" class="place place--accent">
+            {{ row.totals.third }}
           </div>
-          <div v-else class="text-grey-5 text-caption">0</div>
+          <div v-else class="place place--zero">0</div>
         </td>
 
         <!-- 4th -->
-        <td class="text-center q-py-xs q-px-sm">
-          <div
-            v-if="row.totals.fourth > 0"
-            class="text-body2 text-negative text-weight-medium place-cell"
-          >
-            <span>{{ row.totals.fourth }}</span>
+        <td class="td td--place">
+          <div v-if="row.totals.fourth > 0" class="place place--neg">
+            {{ row.totals.fourth }}
           </div>
-          <div v-else class="text-grey-5 text-caption">0</div>
+          <div v-else class="place place--zero">0</div>
         </td>
       </tr>
       </tbody>
@@ -123,7 +108,7 @@
   </div>
 
   <!-- No data -->
-  <div v-else class="text-caption text-grey-7">No Leaderboard available.</div>
+  <div v-else class="leaderboard__empty">No Leaderboard available.</div>
 </template>
 
 <script setup lang="ts">
@@ -193,8 +178,87 @@ watch(
 </script>
 
 <style scoped>
-.year-matrix tbody tr:hover {
+.leaderboard {
+  background: #fff;
+  border-radius: 8px;
+  padding: 12px;
+}
+
+.leaderboard__header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.leaderboard__title {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.leaderboard__meta {
+  font-size: 12px;
+  color: #6b7280;
+}
+
+.leaderboard__table {
+  font-size: 12px;
+}
+
+.th,
+.td {
+  padding: 6px 8px;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+.th {
+  text-transform: uppercase;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+
+.th--player,
+.td--player {
+  text-align: left;
+  width: 100%;
+  white-space: normal;
+}
+
+.th--place,
+.td--place {
+  text-align: center;
+  width: 64px;
+}
+
+.leaderboard__row {
+  position: relative; /* anchor for floating badge */
+}
+
+.leaderboard__row:hover {
   background: rgba(0, 0, 0, 0.03);
+}
+
+.leaderboard__row--top {
+  background: #fff9c4;
+}
+
+.player-name {
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+/* This is the key: badge floats over the row, not inside a "column" */
+.best-league-badge {
+  position: absolute;
+  top: 50%;
+  right: 8px;
+  transform: translateY(-50%);
+  font-size: 11px;
+  border-radius: 999px;
+  padding: 2px 8px;
+  pointer-events: none; /* avoids interfering with row hover/clicks */
 }
 
 .place-head {
@@ -203,10 +267,37 @@ watch(
   gap: 6px;
 }
 
-.place-cell {
+.place {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
+  min-width: 20px;
+  font-weight: 600;
+}
+
+.place--zero {
+  color: #9ca3af;
+  font-weight: 500;
+}
+
+.place--pos {
+  color: #16a34a;
+}
+
+.place--dark {
+  color: #111827;
+}
+
+.place--accent {
+  color: #7c3aed;
+}
+
+.place--neg {
+  color: #dc2626;
+}
+
+.leaderboard__empty {
+  font-size: 12px;
+  color: #6b7280;
 }
 </style>
