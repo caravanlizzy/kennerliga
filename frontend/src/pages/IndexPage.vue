@@ -51,8 +51,9 @@
           bordered
           title="Kennerchat"
           color="dark"
+          style="max-height: calc(100vh - 200px); position: sticky; top: 100px;"
         >
-          <KennerChat class="col" />
+          <KennerChat class="col"  />
         </ContentSection>
       </div>
     </div>
