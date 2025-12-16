@@ -8,18 +8,17 @@ def get_members_ordered(league: League):
     return league.members.all().select_related("profile").order_by("rank")
 
 
-def all_players_have_picked(league: League) -> bool:
-    """Check if all league members have selected a game."""
-    for participant in league.members.all():
-        if not SelectedGame.objects.filter(league=league, profile=participant.profile).exists():
-            return False
-    return True
-
-
 def all_players_have_banned(league: League) -> bool:
     """Check if all league members have submitted at least one ban."""
+    two_player_league = is_two_player_league(league)
+    expected_count = 1 if two_player_league else 2
+
     for participant in league.members.all():
-        if not BanDecision.objects.filter(league=league, player_banning=participant.profile).exists():
+        ban_count = BanDecision.objects.filter(
+            league=league,
+            player_banning=participant.profile
+        ).count()
+        if ban_count < expected_count:
             return False
     return True
 
@@ -42,9 +41,20 @@ def get_players_to_repick(league: League) -> List:
                 repick_players.append(member)
     return repick_players
 
+
 def all_repickers_have_repicked(league: League) -> bool:
+    expected_count = 3 if is_two_player_league(league) else 2
     """Check if all players who must repick have done so."""
     for player in get_players_to_repick(league):
-        if not SelectedGame.objects.filter(player=player.profile, league=league).count() > 1:
+        # For 2-player leagues, players should have 3 games if they had to repick
+        # For other leagues, they should have more than 1 game
+        actual_count = SelectedGame.objects.filter(
+            player=player.profile,
+            league=league
+        ).count()
+        if actual_count < expected_count:
             return False
     return True
+
+def is_two_player_league(league: League) -> bool:
+    return league.members.count() == 2
