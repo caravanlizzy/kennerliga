@@ -29,8 +29,8 @@
           <q-separator class="q-my-sm" />
         </template>
 
-        <DrawerSubGroup>Dev</DrawerSubGroup>
-        <DrawerItem icon="build" label="Hijack" forward-name="dev" />
+        <DrawerSubGroup v-if="isAdmin">Dev</DrawerSubGroup>
+        <DrawerItem v-if="isAdmin" icon="build" label="Hijack" forward-name="dev" />
 
         <q-separator class="q-my-sm" />
 
