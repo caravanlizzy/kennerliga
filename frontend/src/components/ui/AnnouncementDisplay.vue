@@ -34,20 +34,26 @@
                     <q-separator dark class="q-mb-xs" />
 
                     <div class="row items-center justify-between q-mb-xs">
-                      <q-spinner v-if="participantsLoading" size="16px" color="white" />
+                      <q-spinner
+                        v-if="participantsLoading"
+                        size="16px"
+                        color="white"
+                      />
                     </div>
 
                     <div v-if="participantsLoaded && participants.length">
                       <q-list dense class="bg-transparent">
-                        <q-item
-                          v-for="p in participants"
-                          :key="p.id"
-                          class="q-pa-none"
-                        >
-                          <q-item-section class="text-caption text-white">
-                            {{ p.profile?.profile_name || p.profile_name || 'Unknown' }}
-                          </q-item-section>
-                        </q-item>
+                        <div class="row">
+                          <div
+                            class="col-6"
+                            v-for="p in participants"
+                            :key="p.id"
+                          >
+                            <span class="text-caption text-white">
+                              {{ p.profile_name || 'Unknown' }}
+                            </span>
+                          </div>
+                        </div>
                       </q-list>
                     </div>
 
@@ -160,7 +166,7 @@ async function register() {
 const backgroundColors = {
   INFO: 'bg-blue-grey-8',
   WINNER: 'bg-secondary',
-  REGISTER: 'bg-grey-9',
+  REGISTER: 'bg-deep-purple-7',
   WARNING: 'bg-negative',
   NEUTRAL: 'bg-grey-7',
 };
