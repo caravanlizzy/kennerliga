@@ -45,8 +45,8 @@
 
     <div v-else class="column">
       <div v-for="league in leagues" :key="league.id">
-        <q-badge class="q-ml-md q-pa-xs" color="primary" outlined dense>
-          League{{ league.level }}</q-badge
+        <q-badge class="q-ml-xs q-mt-sm q-pa-xs" color="primary" outlined dense>
+          L{{ league.level }}</q-badge
         >
         <LeagueStandingsMatrix class="q-mb-md" :leagueId="league.id" />
       </div>
@@ -60,7 +60,6 @@ import LeagueStandingsMatrix from 'components/league/LeagueStandingsMatrix.vue';
 import { api } from 'boot/axios';
 import KennerSelect from 'components/base/KennerSelect.vue';
 import { useResponsive } from 'src/composables/responsive';
-import ContentSection from 'components/base/ContentSection.vue'; // adjust to your axios boot file
 
 const { isMobile } = useResponsive();
 
