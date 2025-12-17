@@ -2,10 +2,10 @@
   <q-card flat unelevated class="player-card">
     <q-card-section class="card-body">
       <div class="game-primary-section">
-        <template v-if="member.selected_games.length">
+        <template v-if="hasSelectedOrBanInfo">
           <!-- Games list (per game) -->
           <div
-            v-for="(game, idx) in member.selected_games"
+            v-for="(game, idx) in displayedSelectedGames"
             :key="gameKey(game, idx)"
             class="selected-game-card q-mb-md"
           >
@@ -17,7 +17,6 @@
                 size="32px"
                 shape="circle"
               />
-
               <div class="game-title-highlight">
                 <div class="game-title">
                   <span class="game-name-text">
@@ -28,7 +27,6 @@
                   </span>
                 </div>
               </div>
-
               <q-btn
                 flat
                 round
@@ -54,7 +52,7 @@
             <div class="ban-row">
               <div class="bans-label">
                 <q-icon name="gavel" size="16px" />
-                <span>My Ban</span>
+                <span>Ban</span>
               </div>
               <div class="bans-content">
                 <q-chip v-if="myBannedGameName" dense class="my-ban-chip">
@@ -64,12 +62,10 @@
               </div>
             </div>
 
-            <div class="ban-row">
+            <div v-if="firstGameSelectionBannedByOthers" class="ban-row">
               <div class="bans-label">
                 <q-icon name="group" size="16px" />
-                <span>{{
-                    firstGameSelectionBannedByOthers ? 'Banned Pick' : 'Banned By'
-                  }}</span>
+                <span>Banned Pick</span>
               </div>
               <div class="bans-content">
                 <template v-if="firstGameSelectionBannedByOthers">
@@ -77,26 +73,12 @@
                     {{ firstGameSelectionBannedByOthers }}
                   </q-chip>
                 </template>
-
-                <template v-else-if="banners.length">
-                  <div class="banners-avatars">
-                    <UserAvatar
-                      v-for="(name, bIdx) in banners"
-                      :key="bIdx"
-                      :display-username="name"
-                      size="28px"
-                      shape="circle"
-                    />
-                  </div>
-                </template>
-
-                <span v-else class="no-bans"></span>
               </div>
             </div>
           </div>
         </template>
 
-        <!-- Empty State -->
+        <!-- Empty State (only when no selected games AND no ban info) -->
         <div v-else class="no-game-selected row items-center">
           <q-icon name="videogame_asset_off" size="32px" />
           <div class="q-ml-sm">
@@ -147,6 +129,35 @@ const firstGameSelectionBannedByOthers = computed(() => {
   const fgs = props.member?.first_game_selection_banned_by_others;
   return fgs?.game_name ?? fgs?.game?.game_name ?? null;
 });
+
+const hasSelectedGames = computed(() => (props.member?.selected_games?.length ?? 0) > 0);
+
+const displayedSelectedGames = computed<SelectedGame[]>(() => {
+  const selected = (props.member?.selected_games ?? []) as SelectedGame[];
+  if (selected.length > 0) return selected;
+
+  if (firstGameSelectionBannedByOthers.value) {
+    return [
+      {
+        id: 'banned-pick-placeholder',
+        game_name: firstGameSelectionBannedByOthers.value,
+        selected_options: [],
+      },
+    ];
+  }
+
+  return [];
+});
+
+const hasBanInfo = computed(() => {
+  return (
+    Boolean(myBannedGameName.value) ||
+    Boolean(firstGameSelectionBannedByOthers.value) ||
+    (banners.value?.length ?? 0) > 0
+  );
+});
+
+const hasSelectedOrBanInfo = computed(() => hasSelectedGames.value || hasBanInfo.value);
 </script>
 
 <style scoped lang="scss">

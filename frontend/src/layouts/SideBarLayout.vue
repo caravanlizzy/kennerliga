@@ -8,7 +8,6 @@
 
     <!-- Large screens: separator + fixed panel -->
     <template v-if="!isSmall">
-      <q-separator vertical />
       <div
         class="col-auto"
         :style="{ width: props.sideWidth + 'px', flex: '0 0 auto' }"
@@ -53,7 +52,7 @@
         side="right"
         behavior="mobile"
         overlay
-        :width="Math.min(props.sideWidth, 480)"
+        :width="sideWidth"
         :elevated="true"
       >
         <q-toolbar class="q-px-md">
@@ -98,7 +97,7 @@ type Props = {
 
 const props = withDefaults(defineProps<Props>(), {
   sideTitle: 'Details',
-  sideWidth: 300,
+  sideWidth: 350,
   railWidth: 28,
   switchAt: 'sm',
   collapsedSmallByDefault: true,

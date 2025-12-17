@@ -1,7 +1,7 @@
 // src/composables/dialog.ts
 import { ref } from 'vue'
 
-export type DialogType = 'primary' | 'warning' | 'error' | 'success'
+export type DialogType = 'primary' | 'warning' | 'error' | 'success' | 'dark'
 
 const showDialog = ref(false)
 const dialogTitle = ref('')

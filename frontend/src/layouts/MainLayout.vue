@@ -7,8 +7,13 @@
     <KennerDrawer v-model="drawerState" />
 
     <q-page-container class="col column">
-      <router-view />
-      <ConfirmDialog />
+      <div
+        class="q-mx-auto"
+        style="max-width: 1300px; width: 100%; "
+      >
+        <router-view />
+        <ConfirmDialog />
+      </div>
     </q-page-container>
   </q-layout>
 </template>
