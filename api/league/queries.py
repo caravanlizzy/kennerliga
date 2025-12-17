@@ -10,9 +10,7 @@ def get_members_ordered(league: League):
 
 def all_players_have_picked(league: League) -> bool:
     """Check if all league members have selected a game."""
-    two_player_league = is_two_player_league(league)
-    expected_count = 2 if two_player_league else 1
-
+    expected_count = 2 if is_two_player_league(league) else 1
     for participant in league.members.all():
         pick_count = SelectedGame.objects.filter(
             league=league,
@@ -25,15 +23,14 @@ def all_players_have_picked(league: League) -> bool:
 
 def all_players_have_banned(league: League) -> bool:
     """Check if all league members have submitted at least one ban."""
-    two_player_league = is_two_player_league(league)
-    expected_count = 1 if two_player_league else 2
+    expected_ban_count = 1
 
     for participant in league.members.all():
         ban_count = BanDecision.objects.filter(
             league=league,
             player_banning=participant.profile
         ).count()
-        if ban_count < expected_count:
+        if ban_count < expected_ban_count:
             return False
     return True
 

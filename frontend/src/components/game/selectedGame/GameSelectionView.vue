@@ -3,12 +3,12 @@
     <!-- LEFT: SELECTED GAME DETAILS -->
     <div v-if="gameSelection.game.id > 0" class="col-12 col-md-6">
       <GameSelectionForm
-        :isLoading="isLoading"
-        :isValid="isValid"
-        :gameSelection="gameSelection"
-        :gameInformation="gameInformation"
-        :onSubmit="onSubmit"
-        class="bg-blue-grey-1 q-mx-md"
+        :game-information="gameInformation"
+        :game-selection="gameSelection"
+        :is-loading="isLoading"
+        :is-valid="isValid"
+        :on-submit="submitGame"
+        :visible-options="visibleOptions"
       />
     </div>
 
@@ -93,6 +93,7 @@ const {
   platforms,
   isValid,
   availableGames,
+  visibleOptions,
   initGameInformation,
   togglePlatform,
   isPlatformSelected,
@@ -117,6 +118,7 @@ async function onSubmit() {
   try {
     await submitGame(props.manageOnly);
     emit('on-success');
+    console.log('here');
     await props.onSuccess?.();
   } catch (e) {
     console.error(e);
