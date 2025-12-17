@@ -74,7 +74,7 @@ class LeagueDetailSerializer(serializers.ModelSerializer):
                 has_banned=Exists(
                     BanDecision.objects.filter(
                         league=league,
-                        player_banning_id=OuterRef('profile'),
+                        player_banning_id=OuterRef('profile_id'),
                     )
                 )
             )
@@ -87,35 +87,25 @@ class LeagueDetailSerializer(serializers.ModelSerializer):
         )
         data = serializer.data
 
-        # Collect selected_game IDs that appear in the payload
-        sg_ids = []
-        for m in data:
-            sg = m.get('selected_game') or {}
-            sg_id = sg.get('id')
-            if sg_id:
-                sg_ids.append(sg_id)
-
-        # Build: selected_game_id -> [banning_profile_name, ...]
-        bans_map = defaultdict(list)
-        if sg_ids:
-            for sg_id, name in (
-                    BanDecision.objects
-                            .filter(league=league, selected_game_id__in=sg_ids)
-                            .select_related('player_banning')
-                            .values_list('selected_game_id', 'player_banning__user__username')
-            ):
-                bans_map[sg_id].append(name)
-
-        # Enrich each member with banned_by (and position + selected_game_id)
+        # Enrich each member with position only
         for i, member in enumerate(data, 1):
             member['position'] = i
-            sg = member.get('selected_game') or {}
-            sg_id = sg.get('id')
-            member['selected_game_id'] = sg_id  # optional, handy for FE actions
-            member['banned_by'] = bans_map.get(sg_id, [])
 
             # If you don't want to send heavy banned_game details anymore:
             if 'banned_game' in member:
-                member.pop('banned_game', None)  # or keep only an id if you prefer
+                member.pop('banned_game', None)
+
+            # Ensure we don't expose these fields if they were previously added
+            member.pop('selected_game_id', None)
+            member.pop('banned_by', None)
+
+            # In case you previously injected banned_by into nested objects
+            for sg in (member.get("selected_games") or []):
+                if isinstance(sg, dict):
+                    sg.pop("banned_by", None)
+
+            banned_sg = member.get("first_game_selection_banned_by_others")
+            if isinstance(banned_sg, dict):
+                banned_sg.pop("banned_by", None)
 
         return data
