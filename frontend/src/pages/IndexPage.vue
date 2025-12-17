@@ -22,7 +22,7 @@
           <q-tab icon="history" name="seasons" label="Season" />
           <q-tab icon="chat" name="chat" label="Chat" />
           <q-tab icon="emoji_events" name="pokal" label="Winners" />
-          <q-tab icon="leaderboard" name="leaderboard" label="Leaderboard" />
+          <q-tab icon="leaderboard" name="leaderboard" label="Rank" />
         </q-tabs>
       </q-toolbar>
     </div>
@@ -42,7 +42,7 @@
           <ContentSection
             :bordered="false"
             titleEnd
-            title="Rank"
+            title="Leaderboard"
             class="col-12"
             color="dark"
           >
