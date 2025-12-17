@@ -1,26 +1,37 @@
 <template>
   <section class="season-winners">
     <header class="season-winners__header">
-      <h2 class="season-winners__title">Season Winners</h2>
-      <div class="season-winners__season">{{ season }}</div>
-    </header>
-    {{data}}
+      <h2
+        class="season-winners__title q-ma-none text-h5 text-dark text-weight-bold"
+      >
+        Winners Season {{ season }}
+      </h2>
 
-    <div v-if="winners.length === 0" class="season-winners__empty">
+      <div class="season-winners__season text-caption text-grey-7">
+        {{ season }}
+      </div>
+    </header>
+
+    <div
+      v-if="winners.length === 0"
+      class="season-winners__empty q-pa-sm text-grey-8"
+    >
       No winners recorded yet.
     </div>
 
     <template v-else>
       <!-- Podium (top 3) -->
-      <div class="podium" aria-label="Podium">
+      <div class="podium q-gutter-sm" aria-label="Podium">
         <div
           v-if="top3[1]"
           class="podium__spot podium__spot--second"
           aria-label="Second place"
         >
-          <div class="podium__rank">2</div>
-          <div class="podium__name">{{ top3[1] }}</div>
-          <div class="podium__base">2nd</div>
+          <div class="podium__rank bg-grey-3 text-weight-bold">L2</div>
+          <div class="podium__name text-weight-bold text-capitalize">
+            {{ top3[1] }}
+          </div>
+          <div class="podium__base q-pa-sm text-weight-bold">L2</div>
         </div>
 
         <div
@@ -28,9 +39,11 @@
           class="podium__spot podium__spot--first"
           aria-label="First place"
         >
-          <div class="podium__rank">1</div>
-          <div class="podium__name">{{ top3[0] }}</div>
-          <div class="podium__base">1st</div>
+          <div class="podium__rank bg-grey-3 text-weight-bold">L1</div>
+          <div class="podium__name text-weight-bold text-capitalize">
+            {{ top3[0] }}
+          </div>
+          <div class="podium__base q-pa-sm text-weight-bold">L1</div>
         </div>
 
         <div
@@ -38,18 +51,30 @@
           class="podium__spot podium__spot--third"
           aria-label="Third place"
         >
-          <div class="podium__rank">3</div>
-          <div class="podium__name">{{ top3[2] }}</div>
-          <div class="podium__base">3rd</div>
+          <div class="podium__rank bg-grey-3 text-weight-bold">L3</div>
+          <div class="podium__name text-weight-bold text-capitalize">
+            {{ top3[2] }}
+          </div>
+          <div class="podium__base q-pa-sm text-weight-bold">L3</div>
         </div>
       </div>
 
       <!-- Next in line -->
-      <div v-if="rest.length" class="next">
-        <h3 class="next__title">Next in line</h3>
-        <ol class="next__list" :start="4">
-          <li v-for="(name, idx) in rest" :key="`${name}-${idx}`" class="next__item">
-            <span class="next__name">{{ name }}</span>
+      <div v-if="rest.length" class="next q-mt-sm">
+        <ol class="next__list q-pa-none q-ma-none q-mt-xs">
+          <li
+            v-for="(name, idx) in rest"
+            :key="`${name}-${idx}`"
+            class="next__item q-pa-sm q-gutter-sm"
+            :class="{
+              'next__item--pos4': idx === 0,
+              'next__item--pos5': idx === 1,
+            }"
+          >
+            <span class="next__badge bg-grey-3 text-weight-bolder">
+              {{ levelLabel(idx + 4) }}
+            </span>
+            <span class="next__name text-capitalize">{{ name }}</span>
           </li>
         </ol>
       </div>
@@ -58,13 +83,40 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { computed, onMounted, ref } from 'vue';
+import { api } from 'boot/axios';
 
-const winners = ref<string[]>(['marc', 'john', 'peter']);
-const season = ref('2025_S1');
+type LeagueWinnerApiResponse = {
+  season: { id: number; name: string; status: string };
+  winners: Array<{
+    league: { id: number; level: number };
+    winner: string | null;
+    league_points: number | null;
+  }>;
+};
+
+const season = ref<string>('');
+const winners = ref<string[]>([]);
+
+onMounted(async () => {
+  const seasonId = 1; // change if you get it from route/props
+  const { data } = await api.get<LeagueWinnerApiResponse>(
+    `season/seasons/${seasonId}/league-winners/`
+  );
+
+  season.value = data.season?.name ?? '';
+
+  // winners list (only non-null winners), ordered by league.level
+  winners.value = (data.winners ?? [])
+    .slice()
+    .sort((a, b) => a.league.level - b.league.level)
+    .map((x) => x.winner)
+    .filter((x): x is string => Boolean(x));
+});
 
 const top3 = computed(() => winners.value.slice(0, 3));
 const rest = computed(() => winners.value.slice(3));
+const levelLabel = (pos: number) => `L${pos}`;
 </script>
 
 <style scoped>
@@ -81,21 +133,13 @@ const rest = computed(() => winners.value.slice(3));
 }
 
 .season-winners__title {
-  margin: 0;
   font-size: 20px;
-  font-weight: 700;
-}
-
-.season-winners__season {
-  font-size: 12px;
-  opacity: 0.75;
 }
 
 .season-winners__empty {
-  padding: 12px;
   border: 1px dashed rgba(0, 0, 0, 0.2);
   border-radius: 10px;
-  opacity: 0.8;
+  opacity: 0.9;
 }
 
 /* Podium */
@@ -103,7 +147,6 @@ const rest = computed(() => winners.value.slice(3));
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
   align-items: end;
-  gap: 12px;
 }
 
 .podium__spot {
@@ -119,19 +162,11 @@ const rest = computed(() => winners.value.slice(3));
   display: grid;
   place-items: center;
   border-radius: 999px;
-  font-weight: 800;
-  background: rgba(0, 0, 0, 0.06);
-}
-
-.podium__name {
-  font-weight: 700;
-  text-transform: capitalize;
 }
 
 .podium__base {
   width: 100%;
   border-radius: 12px;
-  padding: 12px 10px;
   font-weight: 800;
   letter-spacing: 0.3px;
 }
@@ -158,37 +193,48 @@ const rest = computed(() => winners.value.slice(3));
   gap: 8px;
 }
 
-.next__title {
-  margin: 0;
-  font-size: 14px;
-  font-weight: 700;
-  opacity: 0.9;
-}
-
 .next__list {
-  margin: 0;
-  padding-left: 20px;
+  list-style: none;
   display: grid;
   gap: 6px;
 }
 
 .next__item {
-  padding: 8px 10px;
   border-radius: 10px;
   background: rgba(0, 0, 0, 0.04);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border: 1px solid transparent;
 }
 
-.next__name {
-  text-transform: capitalize;
+.next__badge {
+  flex: 0 0 auto;
+  min-width: 42px;
+  height: 26px;
+  display: inline-grid;
+  place-items: center;
+  border-radius: 999px;
+  letter-spacing: 0.3px;
+  font-size: 12px;
+}
+
+/* Give positions 4 and 5 a bit more highlight */
+.next__item--pos4 {
+  background: rgba(246, 211, 101, 0.18);
+  border-color: rgba(246, 211, 101, 0.45);
+}
+
+.next__item--pos4 .next__badge {
+  background: rgba(246, 211, 101, 0.6);
+}
+
+.next__item--pos5 {
+  background: rgba(215, 221, 232, 0.22);
+  border-color: rgba(215, 221, 232, 0.8);
+}
+
+.next__item--pos5 .next__badge {
+  background: rgba(215, 221, 232, 0.95);
 }
 </style>
-
-<script setup lang="ts">
-import { ref } from 'vue';
-
-async function fetchWinners() {
-  const { data } = api('season/seasons/1/league-winners')
-}
-const winners = ref( [ 'marc', 'john', 'peter'])
-const season = ref("2025_S1")
-</script>

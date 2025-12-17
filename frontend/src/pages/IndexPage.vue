@@ -1,6 +1,7 @@
 <template>
   <q-page class="column col">
     <AnnouncementDisplay class="col-auto" />
+    <SeasonWinners class="q-pa-md" />
     <div v-if="isMobile" class="column col">
       <div class="col column">
         <KennerChat v-if="mobileContent === 'chat'" class="column" />
@@ -70,6 +71,7 @@ import ContentSection from 'components/base/ContentSection.vue';
 import { useQuasar } from 'quasar';
 import { ref } from 'vue';
 import ScrollContainer from 'components/base/ScrollContainer.vue';
+import SeasonWinners from 'components/season/SeasonWinners.vue';
 
 const { isMobile } = useResponsive();
 const $q = useQuasar();
