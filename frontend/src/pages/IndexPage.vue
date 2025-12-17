@@ -42,7 +42,7 @@
           <ContentSection
             :bordered="false"
             titleEnd
-            title="Leaderboard"
+            title="Rank"
             class="col-12"
             color="dark"
           >

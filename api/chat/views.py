@@ -1,5 +1,6 @@
 from django.utils.dateparse import parse_datetime
 from rest_framework.exceptions import ValidationError
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.viewsets import ModelViewSet
 
 from chat.models import Chat
@@ -7,6 +8,11 @@ from chat.serializer import ChatSerializer
 
 
 class ChatViewSet(ModelViewSet):
+    def get_permissions(self):
+        if self.action == 'create':
+            return [IsAuthenticated()]
+        return [AllowAny()]
+
     def get_queryset(self):
         limit = self.request.query_params.get('limit', None)
         last_datetime = self.request.query_params.get('last_datetime')
