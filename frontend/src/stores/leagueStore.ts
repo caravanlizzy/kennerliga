@@ -194,16 +194,6 @@ export const useLeagueStore = (id: number) => {
       () => leagueStatus.value === 'BANNING' && isMeActivePlayer.value
     );
 
-    async function banNothing() {
-      if (!user || !leagueId.value) return;
-      try {
-        await banGame({ username: user.username, leagueId: leagueId.value, skip: true });
-        await updateLeagueData();
-      } catch (e) {
-        console.error(e);
-      }
-    }
-
     void init();
 
     return {
@@ -232,10 +222,7 @@ export const useLeagueStore = (id: number) => {
 
 
       // actions
-      init,
       updateLeagueData,
-      banNothing,
-      getMatchResults,
       refreshResultsForGame,
       hasSelectedGameResult,
     };

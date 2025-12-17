@@ -34,7 +34,7 @@
           bordered
           class="league-section"
         >
-          <GameSelector
+          <GameSelectionView
             :leagueId="leagueId"
             :profileId="user.profile.id"
             @selection-updated="(updated:TGameSelection) => updateGameSelection(updated)"
@@ -56,15 +56,21 @@
         >
           <div class="row q-col-gutter-md">
             <template v-for="member of members" :key="member.profile">
-              <template v-for="game of member.selected_games ?? []" :key="game.id">
+              <template
+                v-for="game of member.selected_games ?? []"
+                :key="game.id"
+              >
                 <div
                   v-if="hasSelectedGameResult(game.id)"
                   class="col-12"
                   :class="{ 'col-md-6': selectedGamesWithResults.length > 1 }"
                 >
-                  <q-card class="result-card" flat >
+                  <q-card class="result-card" flat>
                     <q-card-section class="q-pa-sm">
-                      <MatchResult :selectedGame="game" :displayGameName="true" />
+                      <MatchResult
+                        :selectedGame="game"
+                        :displayGameName="true"
+                      />
                     </q-card-section>
                   </q-card>
                 </div>
@@ -99,7 +105,7 @@
           <div
             v-for="member in members"
             :key="member.id"
-            class="col-12 col-md-6 col-xl-3"
+            class="col-12 col-md-6"
           >
             <PlayerCard :member="member" />
           </div>
@@ -116,7 +122,7 @@
 
 <script setup lang="ts">
 import { h, ref, watch, watchEffect } from 'vue';
-import GameSelector from 'components/game/selectedGame/GameSelector.vue';
+import GameSelectionView from 'components/game/selectedGame/GameSelectionView.vue';
 import { useLeagueStore } from 'stores/leagueStore';
 import { storeToRefs } from 'pinia';
 import PlayerCard from 'components/league/PlayerCard.vue';
@@ -222,7 +228,33 @@ const { setDialog } = useDialog();
 const $q = useQuasar();
 
 function handleSkipBan() {
-  console.log('skipped ban');
+  setDialog(
+    'Confirm Ban',
+    `Are you sure you want to skip banning?`,
+    'dark',
+    async () => {
+      try {
+        await banGame({
+          leagueId: leagueId.value!,
+          username: user.value.username,
+          skip: true,
+        });
+        await updateLeagueData();
+        $q.notify({
+          type: 'dark',
+          message: 'Skipped Ban!',
+        });
+      } catch (e) {
+        console.log('Could not ban game', e);
+      } finally {
+        reset();
+      }
+    },
+    () => {
+      console.log('Ban cancelled');
+    },
+    'Skip Ban'
+  );
 }
 
 function handleBanGame(selectedGameId: number, gameName: string) {

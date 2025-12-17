@@ -7,7 +7,7 @@
         :game-selection="gameSelection"
         :is-loading="isLoading"
         :is-valid="isValid"
-        :on-submit="submitGame"
+        :on-submit="onSubmit"
         :visible-options="visibleOptions"
       />
     </div>

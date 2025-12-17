@@ -1,5 +1,6 @@
 import {
   BanDecisionDtoPayload,
+  FullGameDto,
   GameOptionChoiceDto,
   GameOptionDto,
   SelectedGameDtoPayload,
@@ -298,5 +299,14 @@ export async function fetchGameOptionChoices(optionId: number) {
     throw new Error(
       `Error retrieving game option choices for game with id: ${optionId} \n ${error}`
     );
+  }
+}
+
+export async function fetchFullGame(gameId: number): Promise<FullGameDto> {
+  try {
+    const { data } = await api(`game/games-full/${gameId}/`);
+    return data;
+  } catch (error) {
+    throw new Error(`Error fetching full game with id ${gameId}: ${error}`);
   }
 }

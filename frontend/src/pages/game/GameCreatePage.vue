@@ -1,5 +1,5 @@
 <template>
-  <div class="q-pa-md">
+  <q-card flat bordered :class="['q-pa-md', isMobile ? '' : 'q-mt-md']">
     <p class="text-h5">New Game</p>
 
     <div class="q-py-md">
@@ -226,7 +226,7 @@
         <KennerButton class="q-my-xl" type="submit" color="positive" label="Save" icon="save" />
       </q-form>
     </div>
-  </div>
+  </q-card>
 </template>
 
 <script setup lang="ts">
@@ -241,6 +241,7 @@ import CreateResultConfig from 'components/game/CreateResultConfig.vue';
 import { TPlatform } from 'src/models/gameModels';
 import { TResultConfig } from 'src/types';
 import { createResultConfigData } from 'src/services/gameService';
+import { useResponsive } from 'src/composables/responsive';
 
 type ConditionKind = 'value' | 'choice';
 
@@ -273,6 +274,7 @@ type UiOption = {
 
 const router = useRouter();
 const $q = useQuasar();
+const { isMobile } = useResponsive();
 
 const { data: platforms } = await api('game/platforms/');
 

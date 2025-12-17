@@ -6,7 +6,7 @@
     </div>
 
     <div v-else class="row justify-center">
-      <div class="col-12" style="max-width: 1100px;">
+      <div class="col-12">
         <!-- Header -->
         <q-card flat bordered class="q-mb-lg">
           <q-card-section class="q-pb-sm">

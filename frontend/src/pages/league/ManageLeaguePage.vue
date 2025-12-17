@@ -281,7 +281,7 @@
         Select a game for
         <span class="text-primary">{{ selectingGameMember.profile_name }}</span>
       </template>
-      <GameSelector
+      <GameSelectionView
         manageOnly
         :leagueId="league.id"
         :profileId="selectingGameMember.profile"
@@ -323,7 +323,7 @@ import ErrorDisplay from 'components/base/ErrorDisplay.vue';
 import LoadingSpinner from 'components/base/LoadingSpinner.vue';
 import KennerButton from 'components/base/KennerButton.vue';
 import FormLayout from 'components/league/manager/FormLayout.vue';
-import GameSelector from 'components/game/selectedGame/GameSelector.vue';
+import GameSelectionView from 'components/game/selectedGame/GameSelectionView.vue';
 import GameSettingsEditor from 'components/game/selectedGame/GameSettingsEditor.vue';
 import GameSettingsDisplay from 'components/game/selectedGame/GameSettingsDisplay.vue';
 import MatchResultForm from 'components/league/MatchResultForm.vue';

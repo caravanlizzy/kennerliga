@@ -48,8 +48,8 @@
 
       <q-separator spaced />
 
-      <!-- No settings -->
-      <div v-if="!gameInformation.options.length" class="text-italic text-grey">
+      <!-- No settings (use conditional visibility) -->
+      <div v-if="!visibleOptionsSafe.length" class="text-italic text-grey">
         This game has no additional settings.
       </div>
 
@@ -59,19 +59,17 @@
 
         <!-- Choices -->
         <div
-          v-if="gameInformation.options.some((o) => o.has_choices)"
+          v-if="visibleOptionsSafe.some((o) => o.has_choices)"
           class="q-mb-md"
         >
           <div class="row q-col-gutter-md">
             <div
-              v-for="option in gameInformation.options.filter(
-                (o) => o.has_choices
-              )"
+              v-for="option in visibleOptionsSafe.filter((o) => o.has_choices)"
               :key="option.id"
               class="col-12 col-sm-6"
             >
               <KennerSelect
-                :options="findChoicesByOption(option.id)"
+                :options="option.choices || null"
                 :label="option.name"
                 option-label="name"
                 color="accent"
@@ -89,13 +87,11 @@
         </div>
 
         <!-- Toggles -->
-        <div v-if="gameInformation.options.some((o) => !o.has_choices)">
+        <div v-if="visibleOptionsSafe.some((o) => !o.has_choices)">
           <div class="section-subtitle q-mb-xs">Toggles</div>
           <div class="row q-col-gutter-sm">
             <q-toggle
-              v-for="option in gameInformation.options.filter(
-                (o) => !o.has_choices
-              )"
+              v-for="option in visibleOptionsSafe.filter((o) => !o.has_choices)"
               :key="option.id"
               v-model="findSelectedOption(option.id).value"
               :label="option.name"
@@ -113,33 +109,32 @@
 <script setup lang="ts">
 import KennerSelect from 'components/base/KennerSelect.vue';
 import KennerButton from 'components/base/KennerButton.vue';
-import {
-  getPlatformColor,
-  getPlatformName,
-} from 'src/composables/gameSelection';
+import { getPlatformColor, getPlatformName } from 'src/composables/gameSelection';
 import { TPlatform } from 'src/models/gameModels';
-import { inject } from 'vue';
+import { computed, inject } from 'vue';
 
 const platforms = inject<TPlatform[]>('platforms', []);
 
-const props = defineProps<{
-  gameInformation: any;
-  gameSelection: any;
-  isLoading: boolean;
-  isValid: boolean;
-  onSubmit: () => void;
-}>();
+const props = withDefaults(
+  defineProps<{
+    gameInformation: any;
+    gameSelection: any;
+    isLoading: boolean;
+    isValid: boolean;
+    onSubmit: () => void;
+
+    // comes from useGameSelection(...).visibleOptions
+    visibleOptions?: any[];
+  }>(),
+  {
+    visibleOptions: () => [],
+  }
+);
+
+const visibleOptionsSafe = computed(() => props.visibleOptions ?? []);
 
 function findSelectedOption(optionId: number) {
   // find selected option by game option id
   return props.gameSelection.selectedOptions.find((o) => o.id === optionId);
-}
-
-function findChoicesByOption(optionId: number) {
-  // get choices for a given option id
-  return (
-    props.gameInformation.options.find((option) => option.id === optionId)
-      ?.choices || null
-  );
 }
 </script>

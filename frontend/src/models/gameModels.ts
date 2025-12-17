@@ -7,7 +7,47 @@ export type GameDto = {
   id: number;
   name: string;
   platform: number;
-}
+};
+
+// --- Full game (games-full endpoint) ---
+
+export type FullGameConditionDto = {
+  negate?: boolean;
+
+  // depending on your read serializer, these may be ids or objects
+  depends_on_option?: number | { id: number };
+
+  expected_value?: unknown;
+  expected_choice?: number | { id: number };
+};
+
+export type FullGameAvailabilityGroupDto = {
+  conditions?: FullGameConditionDto[];
+};
+
+export type FullGameOptionChoiceDto = {
+  id: number;
+  name: string;
+
+  // games-full example does NOT include this, so keep it optional
+  option?: number;
+};
+
+export type FullGameOptionDto = {
+  id: number;
+  name: string;
+  has_choices: boolean;
+
+  choices?: FullGameOptionChoiceDto[];
+  availability_groups?: FullGameAvailabilityGroupDto[];
+};
+
+export type FullGameDto = {
+  id: number;
+  name: string;
+  platform: number;
+  options: FullGameOptionDto[];
+};
 
 export type GameOptionDto = {
   id: number;
