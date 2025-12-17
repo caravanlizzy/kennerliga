@@ -9,13 +9,18 @@ class ChatSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Chat
-        fields = ['text', 'user', 'datetime', 'sender']
-        read_only_fields = ['user', 'datetime', 'sender']
+        fields = ['text', 'user', 'datetime', 'sender', 'label']
+        read_only_fields = ['user', 'datetime', 'sender', 'label']
 
     @staticmethod
     def get_sender(obj):
         # Assuming that the 'user' field in the Chat model is a ForeignKey to a User model
         return obj.user.username if obj.user else None
+
+    def validate_text(self, value):
+        if not value or value.strip() == "":
+            raise serializers.ValidationError("Message text cannot be empty.")
+        return value
 
     def create(self, validated_data):
         validated_data['user'] = self.context['request'].user

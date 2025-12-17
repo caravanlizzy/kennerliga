@@ -1,18 +1,34 @@
 <template>
   <LoadingSpinner v-if="loading" />
-  <q-card v-else flat class="column col" style="min-width: 350px; min-height: 400px;">
+  <q-card
+    v-else
+    flat
+    class="column col"
+    style="min-width: 350px; min-height: 400px"
+  >
     <!-- Messages -->
     <q-card-section class="q-pa-none col column relative-position">
       <div class="relative-position col">
-        <q-scroll-area :visible="false" class="absolute-full q-pa-md" ref="scrollAreaRef">
-          <q-chat-message
-            v-for="m in messages"
-            :key="m.datetime"
-            :sent="isMine(m)"
-            :text="[m.text]"
-            :name="m.sender"
-            :stamp="timeAgo(m.datetime)"
-          />
+        <q-scroll-area
+          :visible="false"
+          class="absolute-full q-pa-md"
+          ref="scrollAreaRef"
+        >
+          <template v-for="m in messages" :key="m.datetime">
+            <q-chat-message
+              v-if="m.label"
+              :label="m.label"
+              class="text-deep-purple-7 text-weight-bold"
+            />
+            <q-chat-message
+              v-else
+              :sent="isMine(m)"
+              :text="[m.text]"
+              :name="m.sender"
+              :stamp="timeAgo(m.datetime)"
+            />
+          </template>
+
         </q-scroll-area>
       </div>
     </q-card-section>

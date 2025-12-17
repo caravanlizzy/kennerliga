@@ -176,29 +176,6 @@ class UserRegistrationViewSet(ViewSet):
         except Exception as e:
             return Response({"detail": str(e)}, status=400)
 
-    # @action(detail=False, methods=["get"], url_path="validate")
-    # def validate_invite(self, request):
-    #     raw_key = request.query_params.get("invite") or request.query_params.get("key")
-    #     if not raw_key:
-    #         return Response({"valid": False, "reason": "missing_key"}, status=400)
-    #
-    #     key_hash = _hash_key(raw_key)
-    #
-    #     try:
-    #         invite = UserInviteLink.objects.get(key_hash=key_hash)
-    #     except UserInviteLink.DoesNotExist:
-    #         return Response({"valid": False, "reason": "not_found"}, status=404)
-    #
-    #     if invite.is_expired():
-    #         invite.delete()
-    #         return Response({"valid": False, "reason": "expired"}, status=410)
-    #
-    #     return Response({
-    #         "valid": True,
-    #         "label": invite.label,
-    #         "expires_at": invite.expires_at,
-    #     }, status=200)
-
 
 class PlayerProfileViewSet(ModelViewSet):
     queryset = PlayerProfile.objects.all()
