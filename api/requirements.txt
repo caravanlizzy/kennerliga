@@ -1,4 +1,4 @@
-django
+Django==4.2.9
 djangorestframework
 django-nested-admin
 django-cors-headers
@@ -7,6 +7,5 @@ django-extensions
 setuptools
 python-dotenv
 python-dateutil
-
-drf_spectacular
-drf_spectacular_sidecar
+drf-spectacular
+drf-spectacular-sidecar
