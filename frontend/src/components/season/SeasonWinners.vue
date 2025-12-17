@@ -6,10 +6,6 @@
       >
         Winners Season {{ season }}
       </h2>
-
-      <div class="season-winners__season text-caption text-grey-7">
-        {{ season }}
-      </div>
     </header>
 
     <div
@@ -27,9 +23,8 @@
           class="podium__spot podium__spot--second"
           aria-label="Second place"
         >
-          <div class="podium__rank bg-grey-3 text-weight-bold">L2</div>
           <div class="podium__name text-weight-bold text-capitalize">
-            {{ top3[1] }}
+            {{ top3[1].profile_name }}
           </div>
           <div class="podium__base q-pa-sm text-weight-bold">L2</div>
         </div>
@@ -39,9 +34,8 @@
           class="podium__spot podium__spot--first"
           aria-label="First place"
         >
-          <div class="podium__rank bg-grey-3 text-weight-bold">L1</div>
           <div class="podium__name text-weight-bold text-capitalize">
-            {{ top3[0] }}
+            {{ top3[0].profile_name }}
           </div>
           <div class="podium__base q-pa-sm text-weight-bold">L1</div>
         </div>
@@ -51,9 +45,8 @@
           class="podium__spot podium__spot--third"
           aria-label="Third place"
         >
-          <div class="podium__rank bg-grey-3 text-weight-bold">L3</div>
           <div class="podium__name text-weight-bold text-capitalize">
-            {{ top3[2] }}
+            {{ top3[2].profile_name }}
           </div>
           <div class="podium__base q-pa-sm text-weight-bold">L3</div>
         </div>

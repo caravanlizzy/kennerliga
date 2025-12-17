@@ -1,10 +1,15 @@
 <template>
   <q-page class="column col">
     <AnnouncementDisplay class="col-auto" />
-    <SeasonWinners class="q-pa-md" />
     <div v-if="isMobile" class="column col">
       <div class="col column">
         <KennerChat v-if="mobileContent === 'chat'" class="column" />
+
+        <SeasonWinners
+          v-else-if="mobileContent === 'pokal'"
+          class="q-pa-md"
+        />
+
         <ScrollContainer v-else-if="mobileContent === 'seasons'">
           <SeasonStandings />
         </ScrollContainer>
@@ -14,17 +19,15 @@
       </div>
       <q-toolbar class="col-auto bg-grey-4 text-primary flex-center">
         <q-tabs switch-indicator v-model="mobileContent" class="full-width">
-          <q-tab icon="history" name="seasons" label="Season"  />
-          <q-tab icon="chat" name="chat" label="Chat"  />
-          <q-tab
-            icon="leaderboard"
-            name="leaderboard"
-            label="Leaderboard"
-          />
+          <q-tab icon="history" name="seasons" label="Season" />
+          <q-tab icon="chat" name="chat" label="Chat" />
+          <q-tab icon="emoji_events" name="pokal" label="Winners" />
+          <q-tab icon="leaderboard" name="leaderboard" label="Leaderboard" />
         </q-tabs>
       </q-toolbar>
     </div>
     <div v-else class="column col q-pa-md">
+      <SeasonWinners class="q-pa-md" />
       <div class="row col">
         <div class="col-12 col-md" :class="{ 'q-pr-lg': isMdUp }">
           <ContentSection
@@ -52,9 +55,9 @@
           bordered
           title="Kennerchat"
           color="dark"
-          style="max-height: calc(100vh - 200px); position: sticky; top: 100px;"
+          style="max-height: calc(100vh - 200px); position: sticky; top: 100px"
         >
-          <KennerChat class="col"  />
+          <KennerChat class="col" />
         </ContentSection>
       </div>
     </div>
