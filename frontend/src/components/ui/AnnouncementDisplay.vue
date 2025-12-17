@@ -166,7 +166,7 @@ async function register() {
 const backgroundColors = {
   INFO: 'bg-blue-grey-8',
   WINNER: 'bg-secondary',
-  REGISTER: 'bg-deep-purple-7',
+  REGISTER: 'bg-accent',
   WARNING: 'bg-negative',
   NEUTRAL: 'bg-grey-7',
 };

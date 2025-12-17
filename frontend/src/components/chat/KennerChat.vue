@@ -13,12 +13,13 @@
           :visible="false"
           class="absolute-full q-pa-md"
           ref="scrollAreaRef"
+          @scroll="onScroll"
         >
           <template v-for="m in messages" :key="m.datetime">
             <q-chat-message
               v-if="m.label"
               :label="m.label"
-              class="text-deep-purple-7 text-weight-bold"
+              class="text-accent text-weight-bold"
             />
             <q-chat-message
               v-else
@@ -28,8 +29,24 @@
               :stamp="timeAgo(m.datetime)"
             />
           </template>
-
         </q-scroll-area>
+
+        <div
+          v-if="showScrollDown"
+          class="absolute-bottom full-width flex flex-center q-pb-sm"
+          style="pointer-events: none; z-index: 1"
+        >
+          <q-btn
+            flat
+            round
+            dense
+            color="white"
+            text-color="accent"
+            icon="expand_more"
+            style="pointer-events: auto"
+            @click="scrollToBottom(true, true)"
+          />
+        </div>
       </div>
     </q-card-section>
 
@@ -78,6 +95,7 @@ const loading = ref(false);
 const messages: Ref<TMessage[]> = ref([]);
 const newMessage = ref('');
 const sending = ref(false);
+const showScrollDown = ref(false);
 
 const inputRef = ref<QInput | null>(null);
 const scrollAreaRef = ref<QScrollArea | null>(null);
@@ -85,6 +103,16 @@ const scrollAreaRef = ref<QScrollArea | null>(null);
 let pollTimer: number | undefined;
 
 // ---------- Helpers ----------
+function onScroll(info: {
+  verticalPosition: number;
+  verticalSize: number;
+  verticalContainerSize: number;
+}) {
+  const diff =
+    info.verticalSize - info.verticalPosition - info.verticalContainerSize;
+  showScrollDown.value = diff > 200;
+}
+
 function isMine(m: TMessage) {
   if (m.sender != null && user.value?.username != null) {
     return m.sender === user.value.username;
@@ -113,13 +141,20 @@ function timeAgo(isoString: string): string {
   return then.toLocaleDateString();
 }
 
-async function scrollToBottom(smooth = true) {
+async function scrollToBottom(smooth = true, force = false) {
   await nextTick(); // wait for DOM update
 
   if (!scrollAreaRef.value) return;
 
   const target = scrollAreaRef.value.getScrollTarget();
   if (!target) return;
+
+  const scrollInfo = scrollAreaRef.value.getScroll();
+  const isNearBottom =
+    target.scrollHeight - scrollInfo.verticalPosition - target.offsetHeight <
+    100;
+
+  if (!isNearBottom && smooth && !force) return;
 
   const duration = smooth ? 300 : 0;
 
