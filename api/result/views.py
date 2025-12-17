@@ -201,9 +201,20 @@ class MatchResultViewSet(ViewSet):
             for i in range(level + 1):
                 if i < 0:
                     continue
+
+                tb = tbs[i]
                 val = fnum(row.get("tie_breaker_value"))
-                # Missing values sort as largest so they group as ties until provided
-                key.append(-val if val is not None else float("inf"))
+
+                # Missing values should keep players grouped as "still tied" until provided
+                if val is None:
+                    key.append(float("inf"))
+                    continue
+
+                # Apply TB direction:
+                # - higher_wins=True  => larger value should rank first (sort desc => negative)
+                # - higher_wins=False => smaller value should rank first (sort asc => positive)
+                key.append(-val if tb.higher_wins else val)
+
             return tuple(key)
 
         # Group rows by a given level's key; return groups (list of lists)
@@ -276,6 +287,7 @@ class MatchResultViewSet(ViewSet):
                         "id": next_tb.id,
                         "name": next_tb.name,
                         "order": next_tb.order,
+                        "higher_wins": next_tb.higher_wins,
                     },
                     "unresolved_tie": True,
                     "tie_groups": [
@@ -339,6 +351,7 @@ class MatchResultViewSet(ViewSet):
                             "id": next_tb.id,
                             "name": next_tb.name,
                             "order": next_tb.order,
+                            "higher_wins": next_tb.higher_wins,
                         },
                         "unresolved_tie": True,
                         "tie_groups": [
@@ -380,8 +393,12 @@ class MatchResultViewSet(ViewSet):
                 base_val = fnum(r.get(base_field), 0)
                 key = [-base_val] if use_points else [base_val]
                 for tb_idx in range(level + 1):
-                    v = fnum(r.get("tie_breaker_value"), -1.0)
-                    key.append(-v)
+                    tb = tbs[tb_idx]
+                    v = fnum(r.get("tie_breaker_value"))
+                    if v is None:
+                        key.append(float("inf"))
+                    else:
+                        key.append(-v if tb.higher_wins else v)
                 return tuple(key)
 
             # Mark flags and save
