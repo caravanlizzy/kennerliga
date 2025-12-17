@@ -47,9 +47,9 @@ const isOpened = defineModel<boolean>('isOpened');
 const props = withDefaults(
   defineProps<{
     title: string;
-    titleEnd: boolean;
     color: string;
-    bordered: boolean;
+    bordered?: boolean;
+    titleEnd?: boolean;
     defaultOpen?: boolean;
     expandable?: boolean;
   }>(),
