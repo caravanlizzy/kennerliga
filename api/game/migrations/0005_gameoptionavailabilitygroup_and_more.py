@@ -29,7 +29,16 @@ class Migration(migrations.Migration):
                 ('group', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='conditions', to='game.gameoptionavailabilitygroup')),
             ],
             options={
-                'constraints': [models.CheckConstraint(condition=models.Q(models.Q(('expected_value__isnull', False), ('expected_choice__isnull', True)), models.Q(('expected_value__isnull', True), ('expected_choice__isnull', False)), _connector='OR'), name='availability_condition_exactly_one_expected')],
+                'constraints': [
+                    models.CheckConstraint(
+                        name='availability_condition_exactly_one_expected',
+                        check=models.Q(
+                            models.Q(('expected_value__isnull', False), ('expected_choice__isnull', True)),
+                            models.Q(('expected_value__isnull', True), ('expected_choice__isnull', False)),
+                            _connector='OR',
+                        ),
+                    )
+                ],
             },
         ),
     ]
