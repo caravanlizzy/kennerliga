@@ -81,7 +81,6 @@
                   <q-icon name="person" size="xs" class="q-mr-xs" />
                   <span class="text-weight-medium">{{ member.profile_name }}</span>
                 </q-badge>
-
                 <div
                   v-if="
                     ['PICKING', 'REPICKING', 'BANNING'].includes(league.status) &&
@@ -243,6 +242,33 @@
                   <q-icon name="person" size="xs" class="q-mr-xs" />
                   <span class="text-weight-medium">{{ member.profile_name }}</span>
                 </q-badge>
+                <div
+                  v-if="
+                    ['PICKING', 'REPICKING', 'BANNING'].includes(league.status) &&
+                    season?.status === 'RUNNING'
+                  "
+                >
+                  <q-badge
+                    v-if="member.profile === league.active_player"
+                    color="positive"
+                    text-color="white"
+                    class="q-py-xs q-px-sm"
+                  >
+                    <q-icon size="xs" name="star" class="q-mr-xs" />
+                    <span class="text-weight-bold">Active</span>
+                  </q-badge>
+                  <q-btn
+                    v-else
+                    dense
+                    unelevated
+                    color="grey-5"
+                    text-color="white"
+                    label="Set Active"
+                    size="sm"
+                    class="q-px-sm"
+                    @click="setActivePlayer(member.profile)"
+                  />
+                </div>
                 <KennerButton
                   flat
                   label="Select Game"
