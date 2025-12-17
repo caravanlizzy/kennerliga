@@ -99,11 +99,12 @@ class SeasonViewSet(ModelViewSet):
         )
 
     @action(detail=True, methods=["get"], url_path="league-winners")
+    @action(detail=True, methods=["get"], url_path="league-winners")
     def league_winners(self, request, pk=None):
         """
         GET /seasons/{id}/league-winners/
 
-        Returns the winner (rank=1) for each league in the season.
+        Returns the winner (most league_points) for each league in the season.
 
         Shape:
         {
@@ -131,10 +132,15 @@ class SeasonViewSet(ModelViewSet):
 
         standings = (
             LeagueStanding.objects
-            .filter(league__in=leagues, points=1)
+            .filter(league__in=leagues)
             .select_related("league", "player_profile", "player_profile__user")
+            .order_by("league_id", "-league_points", "-points", "id")
         )
-        winner_by_league_id = {ls.league_id: ls for ls in standings}
+
+        winner_by_league_id = {}
+        for ls in standings:
+            if ls.league_id not in winner_by_league_id:
+                winner_by_league_id[ls.league_id] = ls
 
         winners_payload = []
         for league in leagues:
