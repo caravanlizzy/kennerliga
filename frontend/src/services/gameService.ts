@@ -216,21 +216,22 @@ export async function createFactions(
   }
 }
 
-export async function createTieBreakers(
-  resultConfigId: number,
-  resultConfig: TResultConfig
-): Promise<void> {
+export async function createTieBreakers(resultConfigId: number, resultConfig: TResultConfig): Promise<void> {
+  console.log(resultConfigId, resultConfig);
   if (resultConfig === undefined) return;
   if (resultConfig.tieBreakers === undefined) return;
   if (!resultConfig.hasTieBreaker) return;
+
   for (const [index, tieBreaker] of resultConfig.tieBreakers.entries()) {
+    console.log(index, tieBreaker);
     try {
-      api('game/tie-breakers/', {
+      await api('game/tie-breakers/', {
         method: 'POST',
         data: {
           result_config: resultConfigId,
           name: tieBreaker.name,
           order: index * 10,
+          higher_wins: tieBreaker.higher_wins,
         },
       });
     } catch (e) {
@@ -238,6 +239,8 @@ export async function createTieBreakers(
     }
   }
 }
+
+
 export async function createSelectedGame(
   selectedGame: SelectedGameDtoPayload,
   manageOnly = false

@@ -208,7 +208,13 @@ class ResultConfig(models.Model):
 class TieBreaker(models.Model):
     result_config = models.ForeignKey(ResultConfig, on_delete=models.CASCADE)
     name = models.CharField(max_length=255)
-    order = models.PositiveIntegerField()
+    order = models.PositiveIntegerField(
+        help_text="Higher order is more important."
+    )
+    higher_wins = models.BooleanField(
+        default=True,
+        help_text="If True, higher values win. If False, lower values win."
+    )
 
     class Meta:
         ordering = ['order']

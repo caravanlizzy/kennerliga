@@ -29,8 +29,8 @@ export type TFaction = {
   name: string;
 };
 export type TTieBreaker = {
-  id: number;
   name: string;
+  higher_wins: boolean;
 };
 export type TGameOption = {
   id: number;
@@ -48,7 +48,7 @@ export type TResultConfig = {
   hasStartingPlayerOrder: boolean; // Assuming it's a number for order/index
   factions?: TFaction[]; // Assuming it's an array of faction names or identifiers
   hasTieBreaker: boolean;
-  tieBreakers?: TTieBreaker[]; // Assuming array of tie breaker rules or identifiers
+  tieBreakers?: TTieBreaker[];
 };
 export type TUser = {
   id: number;
