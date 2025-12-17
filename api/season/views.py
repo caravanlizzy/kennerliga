@@ -98,6 +98,74 @@ class SeasonViewSet(ModelViewSet):
             status=status.HTTP_200_OK,
         )
 
+    @action(detail=True, methods=["get"], url_path="league-winners")
+    def league_winners(self, request, pk=None):
+        """
+        GET /seasons/{id}/league-winners/
+
+        Returns the winner (rank=1) for each league in the season.
+
+        Shape:
+        {
+          "season": {"id": 1, "name": "2025_S10", "status": "RUNNING"},
+          "winners": [
+            {
+              "league": {"id": 10, "level": 1},
+              "winner": {"profile_id": 7, "profile_name": "Alice", "username": "alice"},
+              "league_points": 42
+            },
+            ...
+          ]
+        }
+        """
+        season = get_object_or_404(
+            Season.objects.only("id", "year", "month", "status"),
+            pk=pk,
+        )
+
+        leagues = (
+            League.objects
+            .filter(season_id=season.id)
+            .order_by("level", "id")
+        )
+
+        standings = (
+            LeagueStanding.objects
+            .filter(league__in=leagues, points=1)
+            .select_related("league", "player_profile", "player_profile__user")
+        )
+        winner_by_league_id = {ls.league_id: ls for ls in standings}
+
+        winners_payload = []
+        for league in leagues:
+            ls = winner_by_league_id.get(league.id)
+            profile = getattr(ls, "player_profile", None) if ls else None
+            user = getattr(profile, "user", None) if profile else None
+
+            winners_payload.append(
+                {
+                    "league": {"id": league.id, "level": league.level},
+                    "winner": (
+                        {
+                            "profile_id": profile.id,
+                            "profile_name": profile.profile_name,
+                            "username": getattr(user, "username", None),
+                        }
+                        if profile
+                        else None
+                    ),
+                    "league_points": getattr(ls, "league_points", None) if ls else None,
+                }
+            )
+
+        return Response(
+            {
+                "season": {"id": season.id, "name": season.name, "status": season.status},
+                "winners": winners_payload,
+            },
+            status=status.HTTP_200_OK,
+        )
+
 
 def build_league_scoreboard_payload(league: League) -> dict:
     """
