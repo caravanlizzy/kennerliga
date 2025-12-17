@@ -5,6 +5,7 @@
         <div v-for="a in announcements" :key="a.id" class="q-mb-sm">
           <q-banner
             dense
+            rounded
             class="q-px-md q-py-sm border-left"
             :class="backgroundColors[a.type]"
           >
