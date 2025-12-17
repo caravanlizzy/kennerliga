@@ -28,11 +28,12 @@
           />
           <q-separator class="q-my-sm" />
         </template>
+        <template v-if="isAdmin">
+          <DrawerSubGroup>Dev</DrawerSubGroup>
+          <DrawerItem icon="build" label="Hijack" forward-name="dev" />
 
-        <DrawerSubGroup v-if="isAdmin">Dev</DrawerSubGroup>
-        <DrawerItem v-if="isAdmin" icon="build" label="Hijack" forward-name="dev" />
-
-        <q-separator class="q-my-sm" />
+          <q-separator class="q-my-sm" />
+        </template>
 
         <DrawerItem icon="logout" label="Logout" @click="doLogout" />
       </q-list>

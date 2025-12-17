@@ -1,4 +1,5 @@
 from django.db import models
+from rest_framework.exceptions import ValidationError
 
 from user.models import PlayerProfile, Platform
 
@@ -27,16 +28,25 @@ class Game(models.Model):
 
 class GameOption(models.Model):
     name = models.CharField(max_length=88)
-    game = models.ForeignKey(Game, null=True, blank=True, on_delete=models.CASCADE, related_name='options')
+    game = models.ForeignKey("Game", null=True, blank=True, on_delete=models.CASCADE, related_name="options")
     has_choices = models.BooleanField(default=False)
-    only_if_option = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True,
-                                       related_name='only_if_options')
-    only_if_choice = models.ForeignKey('GameOptionChoice', on_delete=models.CASCADE, null=True, blank=True,
-                                       related_name='only_if_options')
-    only_if_value = models.BooleanField(
+
+    # Legacy fields (keep for now, but consider deprecating after a data migration)
+    only_if_option = models.ForeignKey(
+        "self",
+        on_delete=models.CASCADE,
         null=True,
-        default=None
+        blank=True,
+        related_name="only_if_options",
     )
+    only_if_choice = models.ForeignKey(
+        "GameOptionChoice",
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name="only_if_options",
+    )
+    only_if_value = models.BooleanField(null=True, default=None)
 
     def __str__(self):
         return str(self.name)
@@ -52,6 +62,85 @@ class GameOptionChoice(models.Model):
 
     def __str__(self):
         return f"{self.name or '(Unnamed)'} for {self.option.name}"
+
+
+class GameOptionAvailabilityGroup(models.Model):
+    """
+    A group is one OR-branch.
+    All conditions inside the group must match (AND).
+    If any group matches, the option is available (OR across groups).
+    """
+    option = models.ForeignKey(
+        GameOption,
+        on_delete=models.CASCADE,
+        related_name="availability_groups",
+    )
+
+    def __str__(self):
+        return f"Availability group for {self.option.name}"
+
+
+class GameOptionAvailabilityCondition(models.Model):
+    """
+    A single atomic requirement inside a group.
+    Exactly one of expected_value or expected_choice must be set.
+    """
+    group = models.ForeignKey(
+        GameOptionAvailabilityGroup,
+        on_delete=models.CASCADE,
+        related_name="conditions",
+    )
+
+    depends_on_option = models.ForeignKey(
+        GameOption,
+        on_delete=models.CASCADE,
+        related_name="required_by_conditions",
+    )
+
+    expected_value = models.BooleanField(null=True, blank=True)
+    expected_choice = models.ForeignKey(
+        "GameOptionChoice",
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name="required_by_conditions",
+    )
+
+    negate = models.BooleanField(
+        default=False,
+        help_text="If true, invert the condition (NOT).",
+    )
+
+    class Meta:
+        constraints = [
+            models.CheckConstraint(
+                name="availability_condition_exactly_one_expected",
+                check=(
+                    # (expected_value is null) XOR (expected_choice is null)
+                    (models.Q(expected_value__isnull=False) & models.Q(expected_choice__isnull=True))
+                    | (models.Q(expected_value__isnull=True) & models.Q(expected_choice__isnull=False))
+                ),
+            ),
+        ]
+
+    def clean(self):
+        super().clean()
+
+        # If you set expected_choice, it must belong to depends_on_option.
+        if self.expected_choice_id and self.depends_on_option_id:
+            if self.expected_choice.option_id != self.depends_on_option_id:
+                raise ValidationError(
+                    {"expected_choice": "expected_choice must belong to depends_on_option."}
+                )
+
+    def __str__(self):
+        exp = (
+            f"value={self.expected_value}"
+            if self.expected_choice_id is None
+            else f"choice_id={self.expected_choice_id}"
+        )
+        prefix = "NOT " if self.negate else ""
+        return f"{prefix}{self.depends_on_option.name} requires {exp}"
 
 
 class SelectedGame(models.Model):

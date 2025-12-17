@@ -1,8 +1,9 @@
+from django.db import transaction
 from rest_framework import serializers
 from rest_framework.serializers import ModelSerializer
 
 from game.models import Game, GameOption, GameOptionChoice, Faction, TieBreaker, ResultConfig, StartingPointSystem, \
-    Platform, SelectedGame, SelectedOption, BanDecision
+    Platform, SelectedGame, SelectedOption, BanDecision, GameOptionAvailabilityGroup, GameOptionAvailabilityCondition
 from league.models import League
 from user.models import PlayerProfile
 from user.service import get_profile_by_username, find_users_current_league
@@ -178,6 +179,107 @@ class FullGameOptionSerializer(serializers.ModelSerializer):
         ]
 
 
+class FullGameOptionAvailabilityConditionWriteSerializer(serializers.Serializer):
+    depends_on_option_ref = serializers.CharField()
+    expected_value = serializers.BooleanField(required=False, allow_null=True)
+    expected_choice_ref = serializers.CharField(required=False, allow_null=True)
+    negate = serializers.BooleanField(required=False, default=False)
+
+    def validate(self, attrs):
+        expected_value = attrs.get("expected_value", None)
+        expected_choice_ref = attrs.get("expected_choice_ref", None)
+
+        # Exactly one of expected_value / expected_choice_ref must be provided
+        if (expected_value is None) == (expected_choice_ref is None):
+            raise serializers.ValidationError(
+                "Provide exactly one of expected_value or expected_choice_ref."
+            )
+        return attrs
+
+
+class FullGameOptionAvailabilityGroupWriteSerializer(serializers.Serializer):
+    conditions = FullGameOptionAvailabilityConditionWriteSerializer(many=True)
+
+
+class FullGameOptionAvailabilityConditionReadSerializer(serializers.ModelSerializer):
+    """
+    Read format uses real DB ids (because refs are not stored).
+    """
+    depends_on_option_id = serializers.IntegerField()
+    expected_choice_id = serializers.IntegerField(allow_null=True)
+
+    depends_on_option_name = serializers.CharField(source="depends_on_option.name", read_only=True)
+    expected_choice_name = serializers.CharField(source="expected_choice.name", allow_null=True, read_only=True)
+
+    class Meta:
+        model = GameOptionAvailabilityCondition
+        fields = [
+            "id",
+            "depends_on_option_id",
+            "depends_on_option_name",
+            "expected_value",
+            "expected_choice_id",
+            "expected_choice_name",
+            "negate",
+        ]
+
+
+class FullGameOptionAvailabilityGroupReadSerializer(serializers.ModelSerializer):
+    conditions = FullGameOptionAvailabilityConditionReadSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = GameOptionAvailabilityGroup
+        fields = ["id", "conditions"]
+
+
+class AvailabilityGroupsField(serializers.Field):
+    """
+    Single JSON key `availability_groups` that supports:
+      - write: ref-based format (validated by *Write* serializers)
+      - read: DB-backed format (serialized by *Read* serializers)
+    """
+
+    def to_internal_value(self, data):
+        s = FullGameOptionAvailabilityGroupWriteSerializer(data=data, many=True)
+        s.is_valid(raise_exception=True)
+        return s.validated_data
+
+    def to_representation(self, value):
+        # `value` will be a RelatedManager (option.availability_groups) or iterable
+        qs = value.all() if hasattr(value, "all") else value
+        return FullGameOptionAvailabilityGroupReadSerializer(qs, many=True).data
+
+
+class FullGameOptionChoiceSerializer(serializers.ModelSerializer):
+    # Client-only reference used for linking conditions during create/update
+    ref = serializers.CharField(write_only=True, required=False)
+
+    class Meta:
+        model = GameOptionChoice
+        fields = ['id', 'ref', 'name']
+
+
+class FullGameOptionSerializer(serializers.ModelSerializer):
+    # Client-only reference used for linking conditions during create/update
+    ref = serializers.CharField(write_only=True, required=False)
+
+    choices = FullGameOptionChoiceSerializer(many=True, required=False)
+
+    # IMPORTANT: same field name for read + write
+    availability_groups = AvailabilityGroupsField(required=False)
+
+    class Meta:
+        model = GameOption
+        fields = [
+            'id',
+            'ref',
+            'name',
+            'has_choices',
+            'choices',
+            'availability_groups',
+        ]
+
+
 class FullGameSerializer(serializers.ModelSerializer):
     options = FullGameOptionSerializer(many=True)
 
@@ -185,33 +287,237 @@ class FullGameSerializer(serializers.ModelSerializer):
         model = Game
         fields = ['id', 'name', 'platform', 'options']
 
+    @transaction.atomic
     def create(self, validated_data):
         options_data = validated_data.pop('options', [])
         game = Game.objects.create(**validated_data)
 
-        for option_data in options_data:
-            choices_data = option_data.pop('choices', [])
-            option = GameOption.objects.create(game=game, **option_data)
-            for choice_data in choices_data:
-                GameOptionChoice.objects.create(option=option, **choice_data)
+        option_by_ref = {}
+        choice_by_ref = {}
+        deferred_groups = []  # list[(option_obj, availability_groups_data)]
+
+        # Pass 1: create options + choices, build ref maps
+        for option_payload in options_data:
+            choices_data = option_payload.pop('choices', [])
+            availability_groups_data = option_payload.pop('availability_groups', [])
+            option_ref = option_payload.pop('ref', None)
+
+            option = GameOption.objects.create(game=game, **option_payload)
+
+            if option_ref:
+                if option_ref in option_by_ref:
+                    raise serializers.ValidationError({"options": f"Duplicate option ref: {option_ref}"})
+                option_by_ref[option_ref] = option
+
+            for choice_payload in choices_data:
+                choice_ref = choice_payload.pop('ref', None)
+                choice = GameOptionChoice.objects.create(option=option, **choice_payload)
+
+                if choice_ref:
+                    if choice_ref in choice_by_ref:
+                        raise serializers.ValidationError({"options": f"Duplicate choice ref: {choice_ref}"})
+                    choice_by_ref[choice_ref] = choice
+
+            deferred_groups.append((option, availability_groups_data))
+
+        # Pass 2: create availability groups + conditions
+        for option, groups_data in deferred_groups:
+            for group_data in groups_data:
+                group = GameOptionAvailabilityGroup.objects.create(option=option)
+
+                for cond in group_data.get("conditions", []):
+                    depends_on_option_ref = cond.get("depends_on_option_ref")
+                    if not depends_on_option_ref:
+                        raise serializers.ValidationError({"options": "Condition missing depends_on_option_ref."})
+
+                    depends_on_option = option_by_ref.get(depends_on_option_ref)
+                    if not depends_on_option:
+                        raise serializers.ValidationError(
+                            {"options": f"Unknown depends_on_option_ref: {depends_on_option_ref}"}
+                        )
+
+                    expected_value = cond.get("expected_value", None)
+                    expected_choice_ref = cond.get("expected_choice_ref", None)
+                    negate = bool(cond.get("negate", False))
+
+                    if (expected_value is None) == (expected_choice_ref is None):
+                        raise serializers.ValidationError(
+                            {"options": "Condition must provide exactly one of expected_value or expected_choice_ref."}
+                        )
+
+                    expected_choice = None
+                    if expected_choice_ref is not None:
+                        expected_choice = choice_by_ref.get(expected_choice_ref)
+                        if not expected_choice:
+                            raise serializers.ValidationError(
+                                {"options": f"Unknown expected_choice_ref: {expected_choice_ref}"}
+                            )
+                        if expected_choice.option_id != depends_on_option.id:
+                            raise serializers.ValidationError(
+                                {
+                                    "options": (
+                                        f"expected_choice_ref {expected_choice_ref} does not belong to "
+                                        f"depends_on_option_ref {depends_on_option_ref}."
+                                    )
+                                }
+                            )
+
+                    GameOptionAvailabilityCondition.objects.create(
+                        group=group,
+                        depends_on_option=depends_on_option,
+                        expected_value=expected_value if expected_choice is None else None,
+                        expected_choice=expected_choice,
+                        negate=negate,
+                    )
 
         return game
 
+    @transaction.atomic
     def update(self, instance, validated_data):
+        """
+        PUT-style "replace" semantics:
+        - Upsert options (update if id provided, else create)
+        - Upsert choices per option (update if id provided, else create)
+        - Replace availability_groups for each option from payload
+        - Delete options/choices missing from payload
+        """
         options_data = validated_data.pop('options', [])
 
         instance.name = validated_data.get('name', instance.name)
         instance.platform = validated_data.get('platform', instance.platform)
         instance.save()
 
-        # Replace all existing options and choices (naive approach)
-        instance.options.all().delete()
+        existing_options_by_id = {opt.id: opt for opt in instance.options.all()}
 
-        for option_data in options_data:
-            choices_data = option_data.pop('choices', [])
-            option = GameOption.objects.create(game=instance, **option_data)
-            for choice_data in choices_data:
-                GameOptionChoice.objects.create(option=option, **choice_data)
+        option_by_ref = {}
+        choice_by_ref = {}
+
+        seen_option_ids = set()
+        seen_choice_ids_by_option_id = {}
+        deferred_groups = []  # list[(option_obj, availability_groups_data)]
+
+        # 1) Upsert options + choices
+        for option_payload in options_data:
+            choices_data = option_payload.pop('choices', [])
+            availability_groups_data = option_payload.pop('availability_groups', [])
+            option_ref = option_payload.pop('ref', None)
+
+            option_id = option_payload.get('id')
+
+            if option_id:
+                option = existing_options_by_id.get(option_id)
+                if option is None:
+                    raise serializers.ValidationError(
+                        {"options": f"Option id={option_id} does not belong to this game."}
+                    )
+                option.name = option_payload.get('name', option.name)
+                option.has_choices = option_payload.get('has_choices', option.has_choices)
+                option.save()
+            else:
+                option = GameOption.objects.create(game=instance, **option_payload)
+
+            seen_option_ids.add(option.id)
+
+            if option_ref:
+                if option_ref in option_by_ref:
+                    raise serializers.ValidationError({"options": f"Duplicate option ref: {option_ref}"})
+                option_by_ref[option_ref] = option
+
+            existing_choices_by_id = {c.id: c for c in option.choices.all()}
+            seen_choice_ids = set()
+
+            for choice_payload in choices_data:
+                choice_ref = choice_payload.pop('ref', None)
+                choice_id = choice_payload.get('id')
+
+                if choice_id:
+                    choice = existing_choices_by_id.get(choice_id)
+                    if choice is None:
+                        raise serializers.ValidationError(
+                            {"options": f"Choice id={choice_id} does not belong to option id={option.id}."}
+                        )
+                    choice.name = choice_payload.get('name', choice.name)
+                    choice.save()
+                else:
+                    choice = GameOptionChoice.objects.create(option=option, **choice_payload)
+
+                seen_choice_ids.add(choice.id)
+
+                if choice_ref:
+                    if choice_ref in choice_by_ref:
+                        raise serializers.ValidationError({"options": f"Duplicate choice ref: {choice_ref}"})
+                    choice_by_ref[choice_ref] = choice
+
+            seen_choice_ids_by_option_id[option.id] = seen_choice_ids
+            deferred_groups.append((option, availability_groups_data))
+
+        # 2) Delete options missing from payload (replace semantics)
+        instance.options.exclude(id__in=seen_option_ids).delete()
+
+        # 3) Delete choices missing from payload per remaining option (replace semantics)
+        for opt_id in seen_option_ids:
+            opt = GameOption.objects.get(id=opt_id)
+            keep_choice_ids = seen_choice_ids_by_option_id.get(opt_id, set())
+            opt.choices.exclude(id__in=keep_choice_ids).delete()
+
+        # 4) Replace availability groups for each option
+        for option, groups_data in deferred_groups:
+            option.availability_groups.all().delete()
+
+            for group_data in groups_data:
+                group = GameOptionAvailabilityGroup.objects.create(option=option)
+
+                for cond in group_data.get("conditions", []):
+                    depends_on_option_ref = cond.get("depends_on_option_ref")
+                    if not depends_on_option_ref:
+                        raise serializers.ValidationError(
+                            {"options": "Condition missing depends_on_option_ref."}
+                        )
+
+                    depends_on_option = option_by_ref.get(depends_on_option_ref)
+                    if not depends_on_option:
+                        raise serializers.ValidationError(
+                            {"options": f"Unknown depends_on_option_ref: {depends_on_option_ref}"}
+                        )
+
+                    expected_value = cond.get("expected_value", None)
+                    expected_choice_ref = cond.get("expected_choice_ref", None)
+                    negate = bool(cond.get("negate", False))
+
+                    if (expected_value is None) == (expected_choice_ref is None):
+                        raise serializers.ValidationError(
+                            {
+                                "options": (
+                                    "Condition must provide exactly one of "
+                                    "expected_value or expected_choice_ref."
+                                )
+                            }
+                        )
+
+                    expected_choice = None
+                    if expected_choice_ref is not None:
+                        expected_choice = choice_by_ref.get(expected_choice_ref)
+                        if not expected_choice:
+                            raise serializers.ValidationError(
+                                {"options": f"Unknown expected_choice_ref: {expected_choice_ref}"}
+                            )
+                        if expected_choice.option_id != depends_on_option.id:
+                            raise serializers.ValidationError(
+                                {
+                                    "options": (
+                                        f"expected_choice_ref {expected_choice_ref} does not belong to "
+                                        f"depends_on_option_ref {depends_on_option_ref}."
+                                    )
+                                }
+                            )
+
+                    GameOptionAvailabilityCondition.objects.create(
+                        group=group,
+                        depends_on_option=depends_on_option,
+                        expected_value=expected_value if expected_choice is None else None,
+                        expected_choice=expected_choice,
+                        negate=negate,
+                    )
 
         return instance
 
