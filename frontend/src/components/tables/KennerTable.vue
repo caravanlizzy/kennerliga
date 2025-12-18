@@ -1,6 +1,8 @@
 <template>
   <q-table
     flat
+    :title="title"
+    :filter="filter"
     :rows-per-page-options="[10, 20, 50]"
     table-header-class="text-dark text-weight-medium bg-grey-2"
     class="rounded-borders"
@@ -10,23 +12,44 @@
     <template v-for="(_, slotName) in $slots" v-slot:[slotName]="slotProps">
       <slot :name="slotName" v-bind="slotProps" />
     </template>
-    <template v-if="createButton" v-slot:top-right>
-      <KennerButton
-        color="primary"
-        icon="add"
-        :label="createButton.label"
-        :to="{ name: createButton.forwardName }"
-        class="q-ml-sm"
-      />
+
+    <template v-slot:top-right>
+      <div class="row q-gutter-sm no-wrap">
+        <q-input
+          v-model="filter"
+          placeholder="Search..."
+          debounce="300"
+          outlined
+          dense
+          class="bg-white"
+          style="min-width: 250px"
+        >
+          <template v-slot:append>
+            <q-icon name="search" />
+          </template>
+        </q-input>
+
+        <KennerButton
+          v-if="createButton"
+          color="primary"
+          icon="add"
+          :label="createButton.label"
+          :to="{ name: createButton.forwardName }"
+        />
+      </div>
     </template>
   </q-table>
 </template>
 
 <script setup lang="ts">
+import { ref } from 'vue';
 import { TKennerButton } from 'src/types';
 import KennerButton from 'components/base/KennerButton.vue';
 
 defineProps<{
+  title?: string;
   createButton?: TKennerButton;
 }>();
+
+const filter = ref('');
 </script>
