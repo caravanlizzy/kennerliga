@@ -5,9 +5,9 @@ from league.models import League, LeagueResult, LeagueStanding, GameStanding
 @admin.register(League)
 class LeagueAdmin(admin.ModelAdmin):
     list_display = ('__str__', 'season', 'level', 'status')
-    list_filter = ('season', 'level', 'status')
+    list_filter = ('season', 'level', 'status', 'active_player')
     search_fields = ('season__year', 'season__month', 'level')
-    raw_id_fields = ('season', 'active_player')
+    raw_id_fields = ('season',)
     filter_horizontal = ('members',)
 
 
