@@ -3,7 +3,8 @@ from nested_admin.nested import NestedModelAdmin, NestedStackedInline, NestedTab
 
 # Register your models here.
 from game.models import Game, GameOption, GameOptionChoice, StartingPointSystem, Faction, TieBreaker, \
-    ResultConfig, SelectedGame, BanDecision, SelectedOption
+    ResultConfig, SelectedGame, BanDecision, SelectedOption, GameOptionAvailabilityCondition, \
+    GameOptionAvailabilityGroup
 
 
 # @admin.register(GameOption)
@@ -16,10 +17,24 @@ class ChoicesAdmin(NestedTabularInline):
     extra = 0
 
 
+class AvailabilityConditionInline(NestedTabularInline):
+    model = GameOptionAvailabilityCondition
+    extra = 0
+    fk_name = 'group'
+
+
+class AvailabilityGroupInline(NestedStackedInline):
+    model = GameOptionAvailabilityGroup
+    extra = 0
+    inlines = (AvailabilityConditionInline,)
+
+
 class OptionsAdmin(NestedStackedInline):
     model = GameOption
     extra = 0
-    inlines = (ChoicesAdmin,)
+    inlines = (ChoicesAdmin, AvailabilityGroupInline)
+    # Exclude legacy fields from the nested view to keep it clean
+    exclude = ('only_if_option', 'only_if_choice', 'only_if_value')
 
 
 @admin.register(Game)
