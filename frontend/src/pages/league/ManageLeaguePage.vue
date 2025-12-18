@@ -88,7 +88,7 @@
                   "
                 >
                   <q-badge
-                    v-if="member.profile === league.active_player"
+                    v-if="member.id === league.active_player"
                     color="positive"
                     text-color="white"
                     class="q-py-xs q-px-sm"
@@ -454,7 +454,7 @@ async function setActivePlayer(profileId: number) {
       { profile_id: profileId },
       { headers: { 'Content-Type': 'application/json' } }
     );
-    league.value.active_player = data.profile;
+    league.value.active_player = data.participant_id;
   } catch (e) {
     $q.notify({
       type: 'negative',

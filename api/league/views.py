@@ -204,7 +204,7 @@ class LeagueViewSet(ModelViewSet):
         league.active_player = season_participant
         league.save(update_fields=['active_player'])
 
-        return Response({"profile": profile_id}, status=status.HTTP_200_OK)
+        return Response({"participant_id": season_participant.id}, status=status.HTTP_200_OK)
 
 
 class LeagueDetailViewSet(ReadOnlyModelViewSet):
