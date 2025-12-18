@@ -32,3 +32,9 @@ export function truncateString(input: string, maxLength = 17): string {
   }
   return input.substring(0, maxLength) + '...';
 }
+
+export function formatNumbers(value: string | number): string {
+  const num = typeof value === 'string' ? parseFloat(value) : value;
+  if (isNaN(num)) return '';
+  return num.toString();
+}
