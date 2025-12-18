@@ -79,7 +79,7 @@
                   class="text-caption"
                   @click="toggleParticipants"
                 >
-                  {{ showParticipants ? 'Hide Players' : 'Show Players' }}
+                  {{ showParticipants ? 'Hide list' : 'Who is playing?' }}
                 </KennerButton>
                 <KennerButton
                   v-if="a.type === 'REGISTER' && !isRegisteredForOpenSeason"
