@@ -9,6 +9,6 @@ scp -r dist $SSH_SERVER:$PATH_TO_DIST
 ssh $SSH_SERVER << 'EOF'
 source .virtualenvs/kennerliga-venv/bin/activate
 cd kennerliga/api
-./manage_production.py collectstatic --no-input
+./prod_manage.py collectstatic --no-input
 EOF
 
