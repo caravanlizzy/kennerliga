@@ -18,13 +18,24 @@ from season.serializer import SeasonSerializer
 from user.models import User, PlayerProfile, Platform, PlatformPlayer, UserInviteLink, Feedback
 from user.serializers import UserSerializer, UserInviteLinkSerializer, UserRegistrationSerializer, \
     PlayerProfileSerializer, FeedbackSerializer
+from rest_framework.permissions import IsAuthenticated, IsAdminUser
 
 
 # Create your views here.
 class UserViewSet(ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
-    permission_classes = [IsAuthenticated]
+
+    class UserViewSet(ModelViewSet):
+        queryset = User.objects.all()
+        serializer_class = UserSerializer
+
+        def get_permissions(self):
+            if self.action in ['list', 'retrieve', 'user_leagues', 'user_seasons', 'user_results']:
+                permission_classes = [IsAuthenticated]
+            else:
+                permission_classes = [IsAdminUser]
+            return [permission() for permission in permission_classes]
 
     def get_object(self):
         lookup = self.kwargs["pk"]  # Django REST by default uses pk

@@ -44,6 +44,11 @@ class SeasonViewSet(ModelViewSet):
     serializer_class = SeasonSerializer
     filterset_fields = ['year', 'month', 'status']
 
+    def get_permissions(self):
+        if self.action in ['list', 'retrieve', 'registration_status', 'league_winners']:
+            return [IsAuthenticated()]
+        return [IsAdminUser()]
+
     @action(detail=False, methods=['get'], url_path='registration-status')
     def registration_status(self, request):
         """

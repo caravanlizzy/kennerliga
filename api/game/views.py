@@ -55,28 +55,32 @@ class TieBreakerViewSet(ModelViewSet):
     queryset = TieBreaker.objects.all()
     serializer_class = TieBreakerSerializer
     filterset_fields = ['result_config']
-
+    permission_classes = [IsAuthenticated]
 
 class ResultConfigViewSet(ModelViewSet):
     queryset = ResultConfig.objects.all()
     serializer_class = ResultConfigSerializer
     filterset_fields = ['game']
+    permission_classes = [IsAuthenticated]
 
 
 class StartingPointSystemViewSet(ModelViewSet):
     queryset = StartingPointSystem.objects.all()
     serializer_class = StartingPointSystemSerializer
+    permission_classes = [IsAuthenticated]
 
 
 class PlatformViewSet(ModelViewSet):
     queryset = Platform.objects.all()
     serializer_class = PlatformSerializer
+    permission_classes = [IsAuthenticated]
 
 
 class SelectedGameViewSet(ModelViewSet):
     queryset = SelectedGame.objects.all()
     serializer_class = SelectedGameSerializer
     filterset_fields = ['league']
+    permission_classes = [IsAuthenticated]
 
     def perform_create(self, serializer):
         selected_game = serializer.save()
@@ -95,6 +99,7 @@ class BanDecisionViewSet(ModelViewSet):
     queryset = BanDecision.objects.all()
     serializer_class = BanDecisionSerializer
     filterset_fields = ['league']
+    permission_classes = [IsAuthenticated]
 
     def perform_create(self, serializer):
         ban_decision = serializer.save()
@@ -112,6 +117,7 @@ class BanDecisionViewSet(ModelViewSet):
 class SelectedOptionViewSet(ModelViewSet):
     queryset = SelectedOption.objects.all()
     serializer_class = SelectedOptionSerializer
+    permission_classes = [IsAuthenticated]
 
 
 class FullGameViewSet(ModelViewSet):

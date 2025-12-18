@@ -39,6 +39,17 @@ class ResultViewSet(ModelViewSet):
     serializer_class = ResultSerializer
     filterset_fields = ['selected_game']
 
+    def get_permissions(self):
+        """
+        Instantiates and returns the list of permissions that this view requires.
+        """
+        if self.action == 'create':
+            permission_classes = [IsAuthenticated]
+        else:
+            permission_classes = []
+        return [permission() for permission in permission_classes]
+
+
 
 class MatchResultViewSet(ViewSet):
     """
