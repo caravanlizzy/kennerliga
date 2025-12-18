@@ -4,69 +4,56 @@
     flat
     :rows="rows"
     :columns="columns"
-    row-key="id"
+    row-key="player_profile"
     hide-bottom
     class="bg-transparent"
+    :loading="loading"
   />
 </template>
 
 <script setup lang="ts">
 import { QTableProps } from 'quasar';
 import { storeToRefs } from 'pinia';
-import { computed } from 'vue';
+import { computed, ref, onMounted } from 'vue';
 import { useLeagueStore } from 'stores/leagueStore';
 import { useUserStore } from 'stores/userStore';
+import { api } from 'boot/axios';
+import { formatNumbers } from 'src/helpers';
+
 const { user } = storeToRefs(useUserStore());
-
 const myLeagueStore = useLeagueStore(user.value.myCurrentLeagueId)();
-const { matchResultsBySelectedGame, membersById } = storeToRefs(myLeagueStore);
+const { leagueId } = storeToRefs(myLeagueStore);
 
-// compute league standings
+interface LeagueStanding {
+  player_profile: number;
+  profile_name: string;
+  wins: number;
+  league_points: number;
+}
+
+const standings = ref<LeagueStanding[]>([]);
+const loading = ref(false);
+
+const fetchStandings = async () => {
+  if (!leagueId.value) return;
+  loading.value = true;
+  try {
+    const { data } = await api.get<LeagueStanding[]>(
+      `league/leagues/${leagueId.value}/standings/`
+    );
+    standings.value = data;
+  } catch (e) {
+    console.error('Error fetching standings:', e);
+  } finally {
+    loading.value = false;
+  }
+};
+
+onMounted(fetchStandings);
+
+formatNumbers()
 const rows = computed(() => {
-  // 1) Seed every member with zeros so they always show up
-  const standings: Record<
-    number,
-    { id: number; profile_name: string; league_points: number; wins: number }
-  > = {};
-
-  for (const idStr in membersById.value) {
-    const id = Number(idStr);
-    const m = membersById.value[id];
-    standings[id] = {
-      id,
-      profile_name: m.profile_name,
-      league_points: 0,
-      wins: 0,
-    };
-  }
-
-  // 2) Aggregate league points & wins from finished games
-  const placementPoints = [6, 3, 1, 0]; // extend/adjust if needed
-  for (const gameId in matchResultsBySelectedGame.value) {
-    const results = [...(matchResultsBySelectedGame.value[gameId] ?? [])];
-    if (results.length === 0) continue;
-
-    // Sort by raw points desc; null/undefined sink to bottom
-    results.sort((a, b) => (b.points ?? -Infinity) - (a.points ?? -Infinity));
-
-    results.forEach((res, idx) => {
-      const pid = res.player_profile;
-      if (!(pid in standings)) {
-        // fallback in case a result references a non-member (shouldn't happen)
-        standings[pid] = {
-          id: pid,
-          profile_name: membersById.value[pid]?.username ?? `#${pid}`,
-          league_points: 0,
-          wins: 0,
-        };
-      }
-      standings[pid].league_points += placementPoints[idx] ?? 0;
-      if (idx === 0) standings[pid].wins += 1;
-    });
-  }
-
-  // 3) Sort: league points desc, then wins desc, then name asc
-  return Object.values(standings).sort((a, b) => {
+  return [...standings.value].sort((a, b) => {
     if (b.league_points !== a.league_points)
       return b.league_points - a.league_points;
     if (b.wins !== a.wins) return b.wins - a.wins;
@@ -86,12 +73,14 @@ const columns: QTableProps['columns'] = [
     label: 'League Points',
     field: 'league_points',
     align: 'center',
+    format: (val: number) => formatNumbers(val),
   },
   {
     name: 'wins',
     label: 'Wins',
     field: 'wins',
     align: 'center',
+    format: (val: number) => formatNumbers(val),
   },
 ];
 </script>
