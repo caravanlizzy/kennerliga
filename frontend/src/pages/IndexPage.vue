@@ -5,10 +5,7 @@
       <div class="col column">
         <KennerChat v-if="mobileContent === 'chat'" class="column" />
 
-        <SeasonWinners
-          v-else-if="mobileContent === 'pokal'"
-          class="q-pa-md"
-        />
+        <SeasonWinners v-else-if="mobileContent === 'pokal'" class="q-pa-md" />
 
         <ScrollContainer v-else-if="mobileContent === 'seasons'">
           <SeasonStandings />
@@ -27,14 +24,21 @@
       </q-toolbar>
     </div>
     <div v-else class="column col q-pa-md">
-      <SeasonWinners class="q-pa-md" />
       <div class="row col">
         <div class="col-12 col-md" :class="{ 'q-pr-lg': isMdUp }">
           <ContentSection
-            :isOpened="true"
+            title="Winners"
+            color="dark"
+            titleEnd
+            :bordered="false"
+          >
+            <SeasonWinners class="q-pa-md" />
+          </ContentSection>
+          <ContentSection
             titleEnd
             :bordered="false"
             title="Seasons"
+            class="col-12"
             color="dark"
           >
             <SeasonStandings class="col-12" />
@@ -51,7 +55,6 @@
         </div>
         <ContentSection
           class="col-12 col-md-auto column bg-grey-2"
-          isOpened
           bordered
           title="Kennerchat"
           color="dark"

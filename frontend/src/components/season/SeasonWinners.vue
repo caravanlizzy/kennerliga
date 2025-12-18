@@ -4,7 +4,7 @@
       <h2
         class="season-winners__title q-ma-none text-h5 text-dark text-weight-bold"
       >
-        Winners Season {{ season }}
+        Season {{ season }}
       </h2>
     </header>
 

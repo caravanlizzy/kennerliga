@@ -5,7 +5,7 @@
   >
     <template v-if="expandable">
       <q-expansion-item
-        v-model="model"
+        v-model="isOpened"
         dense-toggle
         expand-separator
         expand-icon="expand_more"
@@ -39,37 +39,21 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue';
-// external (optional) model
-const isOpened = defineModel<boolean>('isOpened');
 
-// props
-const props = withDefaults(
+const isOpened = defineModel<boolean>('isOpened', { default: true });
+
+withDefaults(
   defineProps<{
     title: string;
     color: string;
     bordered?: boolean;
     titleEnd?: boolean;
-    defaultOpen?: boolean;
     expandable?: boolean;
   }>(),
   {
     titleEnd: false,
     expandable: false,
-    defaultOpen: true,
     bordered: true,
   }
 );
-
-// internal fallback state
-const internal = ref<boolean>(props.defaultOpen);
-
-// computed model that falls back to internal when external is absent
-const model = computed({
-  get: () => isOpened.value ?? internal.value,
-  set: (v: boolean) => {
-    if (isOpened.value === undefined) internal.value = v;
-    else isOpened.value = v;
-  },
-});
 </script>
