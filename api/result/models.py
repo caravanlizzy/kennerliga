@@ -38,6 +38,11 @@ class Result(models.Model):
     )
     tie_breaker_value = models.CharField(max_length=255, null=True, blank=True)
     faction = models.ForeignKey('game.Faction', on_delete=models.SET_NULL, null=True, blank=True)
+    factions = models.ManyToManyField(
+        'game.Faction',
+        blank=True,
+        related_name='results'
+    )
     tie_breaker_resolved = models.BooleanField(default=False)
 
     def __str__(self):
