@@ -56,8 +56,8 @@ class StartingPointSystemAdmin(admin.ModelAdmin):
 
 @admin.register(Faction)
 class FactionAdmin(admin.ModelAdmin):
-    list_display = ('name', 'game')
-    list_filter = ('game',)
+    list_display = ('name', 'game', 'level')
+    list_filter = ('game', 'level')
     search_fields = ('name',)
 
 
