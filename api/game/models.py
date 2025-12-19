@@ -226,6 +226,13 @@ class TieBreaker(models.Model):
 class Faction(models.Model):
     game = models.ForeignKey(Game, on_delete=models.CASCADE)
     name = models.CharField(max_length=255)
+    level = models.PositiveIntegerField(
+        default=0,
+        help_text="The sequence level: 0 for Country, 1 for Leader, etc."
+    )
 
     def __str__(self):
-        return f"{self.name} ({self.game.name})"
+        return f"{self.name} (Lvl {self.level} - {self.game.name})"
+
+    class Meta:
+        ordering = ['level', 'name']
