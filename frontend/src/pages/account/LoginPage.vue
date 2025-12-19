@@ -53,7 +53,6 @@ import { useUserStore } from 'stores/userStore';
 import { useResponsive } from 'src/composables/responsive';
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
-import { useQuasar } from 'quasar';
 
 const { login } = useUserStore();
 const router = useRouter();

@@ -1,69 +1,87 @@
 <template>
   <q-page class="column col">
-    <AnnouncementDisplay class="col-auto" />
-    <div v-if="isMobile" class="column col">
-      <div class="col column">
-        <KennerChat v-if="mobileContent === 'chat'" class="column" />
-
-        <SeasonWinners v-else-if="mobileContent === 'pokal'" class="q-pa-md" />
-
-        <ScrollContainer v-else-if="mobileContent === 'seasons'">
-          <SeasonStandings />
-        </ScrollContainer>
-        <ScrollContainer v-else-if="mobileContent === 'leaderboard'">
-          <LeaderBoard :year="2023" />
-        </ScrollContainer>
+    <template v-if="!isAuthenticated">
+      <div class="flex flex-center col q-pa-lg text-center">
+        <div style="max-width: 400px">
+          <q-icon name="lock" size="100px" color="grey-5" class="q-mb-md" />
+          <div class="text-h4 text-weight-bold q-mb-md">Registered Only</div>
+          <div class="text-subtitle1 text-grey-8 q-mb-xl">
+            This site contains private content. Please sign in or create an
+            account to access the seasons, chat, and leaderboards.
+          </div>
+          <div class="row q-gutter-md justify-center">
+            <q-btn color="primary" label="Login" icon="login" to="/login" />
+          </div>
+        </div>
       </div>
-      <q-toolbar class="col-auto bg-grey-4 text-primary flex-center">
-        <q-tabs switch-indicator v-model="mobileContent" class="full-width">
-          <q-tab icon="history" name="seasons" label="Season" />
-          <q-tab icon="chat" name="chat" label="Chat" />
-          <q-tab icon="emoji_events" name="pokal" label="Winners" />
-          <q-tab icon="leaderboard" name="leaderboard" label="Rank" />
-        </q-tabs>
-      </q-toolbar>
-    </div>
-    <div v-else class="column col q-pa-md">
-      <div class="row col">
-        <div class="col-12 col-md" :class="{ 'q-pr-lg': isMdUp }">
-          <ContentSection
-            title="Winners"
-            color="dark"
-            titleEnd
-            :bordered="false"
-          >
-            <SeasonWinners class="q-pa-md" />
-          </ContentSection>
-          <ContentSection
-            titleEnd
-            :bordered="false"
-            title="Seasons"
-            class="col-12"
-            color="dark"
-          >
-            <SeasonStandings class="col-12" />
-          </ContentSection>
-          <ContentSection
-            :bordered="false"
-            titleEnd
-            title="Leaderboard"
-            class="col-12"
-            color="dark"
-          >
+    </template>
+    <template v-else>
+      <AnnouncementDisplay class="col-auto" />
+      <div v-if="isMobile" class="column col">
+        <div class="col column">
+          <KennerChat v-if="mobileContent === 'chat'" class="column" />
+
+          <SeasonWinners v-else-if="mobileContent === 'pokal'" class="q-pa-md" />
+
+          <ScrollContainer v-else-if="mobileContent === 'seasons'">
+            <SeasonStandings />
+          </ScrollContainer>
+          <ScrollContainer v-else-if="mobileContent === 'leaderboard'">
             <LeaderBoard :year="2023" />
+          </ScrollContainer>
+        </div>
+        <q-toolbar class="col-auto bg-grey-4 text-primary flex-center">
+          <q-tabs switch-indicator v-model="mobileContent" class="full-width">
+            <q-tab icon="history" name="seasons" label="Season" />
+            <q-tab icon="chat" name="chat" label="Chat" />
+            <q-tab icon="emoji_events" name="pokal" label="Winners" />
+            <q-tab icon="leaderboard" name="leaderboard" label="Rank" />
+          </q-tabs>
+        </q-toolbar>
+      </div>
+      <div v-else class="column col q-pa-md">
+        <div class="row col">
+          <div class="col-12 col-md" :class="{ 'q-pr-lg': isMdUp }">
+            <ContentSection
+              title="Winners"
+              color="dark"
+              titleEnd
+              :bordered="false"
+            >
+              <SeasonWinners class="q-pa-md" />
+            </ContentSection>
+            <ContentSection
+              titleEnd
+              :bordered="false"
+              title="Seasons"
+              class="col-12"
+              color="dark"
+            >
+              <SeasonStandings class="col-12" />
+            </ContentSection>
+            <ContentSection
+              :bordered="false"
+              titleEnd
+              title="Leaderboard"
+              class="col-12"
+              color="dark"
+            >
+              <LeaderBoard :year="2023" />
+            </ContentSection>
+          </div>
+          <ContentSection
+            class="col-12 col-md-auto column bg-grey-2"
+            bordered
+            title="Kennerchat"
+            color="dark"
+            style="max-height: calc(100vh - 200px); position: sticky; top: 100px"
+          >
+            <KennerChat class="col" />
           </ContentSection>
         </div>
-        <ContentSection
-          class="col-12 col-md-auto column bg-grey-2"
-          bordered
-          title="Kennerchat"
-          color="dark"
-          style="max-height: calc(100vh - 200px); position: sticky; top: 100px"
-        >
-          <KennerChat class="col" />
-        </ContentSection>
       </div>
-    </div>
+    </template>
+
   </q-page>
 </template>
 
@@ -78,8 +96,10 @@ import { useQuasar } from 'quasar';
 import { ref } from 'vue';
 import ScrollContainer from 'components/base/ScrollContainer.vue';
 import SeasonWinners from 'components/season/SeasonWinners.vue';
+import { useUserStore } from 'stores/userStore';
 
 const { isMobile } = useResponsive();
+const { isAuthenticated } = useUserStore();
 const $q = useQuasar();
 const isMdUp = $q.screen.gt.sm;
 
