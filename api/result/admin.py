@@ -1,5 +1,6 @@
 from django.contrib import admin
 from result.models import Result
+from game.models import Faction
 
 
 @admin.register(Result)
@@ -28,6 +29,10 @@ class ResultAdmin(admin.ModelAdmin):
 
     readonly_fields = ('tie_breaker_resolved',)
 
+    # Hide the legacy single faction field and use a better UI for Many-to-Many
+    exclude = ('faction',)
+    filter_horizontal = ('factions',)
+
     # Optimizes Foreign Key lookups in the list view (prevents N+1 queries)
     list_select_related = (
         'player_profile',
@@ -43,6 +48,22 @@ class ResultAdmin(admin.ModelAdmin):
         """
         queryset = super().get_queryset(request)
         return queryset.prefetch_related('factions')
+
+    def formfield_for_manytomany(self, db_field, request, **kwargs):
+        """
+        Filters the factions available in the dropdown to only show
+        those belonging to the game associated with this result.
+        """
+        if db_field.name == "factions":
+            # Get the result object ID from the URL if we are in the change form
+            obj_id = request.resolver_match.kwargs.get('object_id')
+            if obj_id:
+                try:
+                    result = Result.objects.get(id=obj_id)
+                    kwargs["queryset"] = Faction.objects.filter(game=result.selected_game.game)
+                except Result.DoesNotExist:
+                    pass
+        return super().formfield_for_manytomany(db_field, request, **kwargs)
 
     def get_selected_game(self, obj):
         return str(obj.selected_game)

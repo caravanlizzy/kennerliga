@@ -96,7 +96,7 @@ function removeItem(item: TItem): void {
 }
 
 function updateList() {
-  emit('updateList', listItems.value.map(({ isEditable, ...rest }) => rest));
+  emit('updateList', listItems.value.map((item) => item.name));
 }
 </script>
 

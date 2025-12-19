@@ -34,10 +34,13 @@
       </div>
 
       <div v-if="isAsymmetric" class="q-pt-xs">
-        <div class="text-caption text-grey-7 q-mb-xs">Factions</div>
-        <div class="row q-col-gutter-xs">
-          <div v-for="faction in factions" :key="faction.id" class="col-auto">
-            <q-chip dense outline>{{ faction.name }}</q-chip>
+        <div class="text-caption text-grey-8 q-mb-xs">Factions</div>
+        <div v-for="(factionsAtLevel, level) in groupedFactions" :key="level" class="q-mb-sm">
+          <div class="text-caption text-weight-light text-grey-7">Level {{ level }}</div>
+          <div class="row q-col-gutter-xs">
+            <div v-for="faction in factionsAtLevel" :key="faction.id" class="col-auto">
+              <q-chip dense outline>{{ faction.name }}</q-chip>
+            </div>
           </div>
         </div>
       </div>
@@ -66,8 +69,9 @@
 
 <script setup lang="ts">
 import YesNoItem from 'components/base/YesNoItem.vue';
+import { computed } from 'vue';
 
-defineProps<{
+const props = defineProps<{
   hasPoints: boolean;
   startingPointSystem: { code: string; description: string };
   hasStartingPlayerOrder: boolean;
@@ -75,8 +79,14 @@ defineProps<{
   factions: { id: number; name: string }[];
   tieBreakers: { id: number; name: string }[];
 }>();
-</script>
 
-<style scoped>
-/* Keep styles minimal; layout handled via Quasar utility classes */
-</style>
+const groupedFactions = computed(() => {
+  const groups: Record<number, typeof props.factions> = {};
+  props.factions.forEach((f) => {
+    const level = f.level ?? 0;
+    if (!groups[level]) groups[level] = [];
+    groups[level].push(f);
+  });
+  return groups;
+});
+</script>

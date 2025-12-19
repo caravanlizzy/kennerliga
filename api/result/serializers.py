@@ -4,8 +4,12 @@ from .models import Result
 
 
 class ResultSerializer(serializers.ModelSerializer):
-    faction_id = serializers.IntegerField(required=False, allow_null=True, write_only=True)
-    faction_name = serializers.SerializerMethodField(read_only=True)
+    faction_ids = serializers.ListField(
+        child=serializers.IntegerField(),
+        required=False,
+        write_only=True
+    )
+    factions = serializers.SerializerMethodField(read_only=True)
     player_profile_name = serializers.SerializerMethodField(read_only=True)
     decisive_tie_breaker = serializers.SerializerMethodField(required=False, read_only=True)
 
@@ -22,12 +26,18 @@ class ResultSerializer(serializers.ModelSerializer):
             "notes",
             'tie_breaker_value',
             'decisive_tie_breaker',
-            'faction_id',
-            'faction_name',
+            'faction_ids',
+            'factions',
         ]
 
-    def get_faction_name(self, obj):
-        return obj.faction.name if getattr(obj, 'faction', None) else None
+    def get_factions(self, obj):
+        return [
+            {
+                "id": f.id,
+                "name": f.name,
+                "level": f.level
+            } for f in obj.factions.all()
+        ]
 
     def get_player_profile_name(self, obj):
         return obj.player_profile.profile_name
@@ -55,8 +65,8 @@ class ResultSerializer(serializers.ModelSerializer):
 
         # ✅ Validate faction requirement
         if result_config.is_asymmetric:
-            if 'faction_id' not in self.initial_data:
-                raise serializers.ValidationError("Faction is required for asymmetric games.")
+            if 'faction_ids' not in self.initial_data or not self.initial_data['faction_ids']:
+                raise serializers.ValidationError("At least one faction is required for asymmetric games.")
 
         # ✅ Validate starting position requirement
         if not result_config.has_starting_player_order:
@@ -73,14 +83,17 @@ class ResultSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         selected_game = validated_data['selected_game']
+        faction_ids = validated_data.pop('faction_ids', [])
 
         # Auto-fill league and season
         validated_data['league'] = selected_game.league
         validated_data['season'] = selected_game.league.season
 
-        # Set faction if provided
-        faction_id = self.initial_data.get('faction_id')
-        if faction_id:
-            validated_data['faction'] = Faction.objects.get(id=faction_id)
+        instance = super().create(validated_data)
 
-        return super().create(validated_data)
+        # Set factions (Many-to-Many)
+        if faction_ids:
+            factions = Faction.objects.filter(id__in=faction_ids)
+            instance.factions.set(factions)
+
+        return instance

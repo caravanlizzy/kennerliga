@@ -209,6 +209,7 @@ export async function createFactions(
         data: {
           game: gameId,
           name: faction.name,
+          level: faction.level
         },
       });
     } catch (e) {

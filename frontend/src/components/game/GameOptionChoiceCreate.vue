@@ -26,7 +26,6 @@
 import { inject, computed } from 'vue';
 import ListCreator from 'components/lists/ListCreator.vue';
 import { TGameOption, TGameOptionChoice } from 'src/types';
-import { createRandomId } from 'src/helpers';
 
 const { updateItem } = inject('useGameOptions') as {
   updateItem: (

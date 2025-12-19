@@ -67,12 +67,33 @@
           </div>
 
           <div v-if="isAsymmetric" class="q-pl-sm q-pr-sm q-mt-sm">
+            <div class="text-subtitle2 q-mb-xs">Primary Factions (Level 0)</div>
             <ListCreator
-              button-label="New faction"
-              @update-list="(updatedList: string[]) => (factions = updatedList)"
+              button-label="Add level 0 faction"
+              @update-list="(updatedList: string[]) => (factionsLevel0 = updatedList)"
             />
+
+            <div class="q-mt-md">
+              <div class="row items-center justify-between q-mb-xs">
+                <div class="text-subtitle2">Secondary Factions (Level 1)</div>
+                <q-toggle
+                  v-model="hasSecondLevel"
+                  dense
+                  label="Enable Level 1"
+                  left-label
+                />
+              </div>
+
+              <div v-if="hasSecondLevel">
+                <ListCreator
+                  button-label="Add level 1 faction"
+                  @update-list="(updatedList: string[]) => (factionsLevel1 = updatedList)"
+                />
+              </div>
+            </div>
+
             <div
-              v-if="!factions.length"
+              v-if="!factionsLevel0.length && !factionsLevel1.length"
               class="text-caption text-grey-7 q-mt-xs"
             >
               No factions added yet.
@@ -154,8 +175,6 @@
               </div>
             </div>
           </div>
-
-          <!-- ... existing code ... -->
         </div>
       </q-card>
     </div>
@@ -163,12 +182,12 @@
 </template>
 
 <script setup lang="ts">
-import { Ref, ref, watch, computed } from 'vue';
+import { ref, watch, computed } from 'vue';
 import KennerSelect from 'components/base/KennerSelect.vue';
 import KennerInput from 'components/base/KennerInput.vue';
 import ListCreator from 'components/lists/ListCreator.vue';
 import { api } from 'boot/axios';
-import { TResultConfig, TTieBreaker } from 'src/types';
+import { TFaction, TResultConfig, TTieBreaker } from 'src/types';
 
 const emit = defineEmits<{
   (event: 'updateResultConfig', resultConfig: TResultConfig): void;
@@ -192,8 +211,10 @@ const isAsymmetric = ref(false);
 const hasStartingPlayerOrder = ref(true);
 const hasPoints = ref(true);
 const hasTieBreaker = ref(false);
+const hasSecondLevel = ref(false);
 
-const factions: Ref<string[]> = ref([]);
+const factionsLevel0 = ref<string[]>([]);
+const factionsLevel1 = ref<string[]>([]);
 const tieBreakersUi = ref<UiTieBreaker[]>([]);
 
 const loadingSystems = ref(true);
@@ -235,6 +256,20 @@ const tieBreakers = computed<TTieBreaker[]>(() => {
   }));
 });
 
+const factions = computed<TFaction[]>(() => {
+  if (!isAsymmetric.value) return [];
+  const level0: TFaction[] = factionsLevel0.value.map((name) => ({
+    name,
+    level: 0,
+  }));
+
+  const level1: TFaction[] = hasSecondLevel.value
+    ? factionsLevel1.value.map((name) => ({ name, level: 1 }))
+    : [];
+
+  return [...level0, ...level1];
+});
+
 const resultConfig = computed<TResultConfig>(() => ({
   isAsymmetric: isAsymmetric.value,
   hasPoints: hasPoints.value,
@@ -245,7 +280,14 @@ const resultConfig = computed<TResultConfig>(() => ({
   tieBreakers: tieBreakers.value,
 }));
 
-watch(resultConfig, (val) => emit('updateResultConfig', val), {
-  immediate: true,
-});
+watch(
+  resultConfig,
+  (val) => {
+    emit('updateResultConfig', val);
+  },
+  {
+    immediate: true,
+    deep: true,
+  }
+);
 </script>

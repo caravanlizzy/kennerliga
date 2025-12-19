@@ -84,14 +84,16 @@
               {{ result.starting_position }}
             </q-badge>
 
+            <!-- Multiple Factions Displayed by Level -->
             <q-badge
-              v-if="result.faction_name"
+              v-for="faction in result.factions"
+              :key="faction.id"
               color="indigo-6"
               class="stat-badge"
             >
               <q-icon name="shield" size="14px" class="q-mr-xs" />
               <span class="ellipsis" style="max-width: 120px">
-                {{ result.faction_name }}
+                {{ faction.name }}
               </span>
             </q-badge>
           </div>
@@ -121,18 +123,15 @@ const props = withDefaults(
 
 const { user } = storeToRefs(useUserStore());
 
-// Guard against user being null + leagueId being null
 const leagueStore = computed(() => {
   const leagueId = user.value?.myCurrentLeagueId;
   return leagueId != null ? useLeagueStore(leagueId)() : null;
 });
 
-// First build a normalized list of results (from prop or store)
 const rawResults = computed(() => {
   let src: any[] = [];
 
   if (props.matchResults) {
-    // matchResults is keyed by player_profile, we need entries for this selected_game
     src = Object.values(props.matchResults)
       .flat()
       .filter((r: any) => r.selected_game === props.selectedGame.id);
@@ -149,16 +148,15 @@ const rawResults = computed(() => {
     position: r.position ?? null,
     notes: r.notes ?? null,
     starting_position: r.starting_position ?? null,
-    faction_name: r.faction_name ?? null,
+    // The API now returns 'factions' as a list of objects with id, faction_name, level
+    factions: (r.factions ?? [])
+      .slice()
+      .sort((a: any, b: any) => (a.level ?? 0) - (b.level ?? 0)),
   }));
 });
 
-// Final, sorted results:
-// - If there are any points: sort by points desc
-// - Otherwise: sort by position asc (nulls last)
 const results = computed(() => {
   const mapped = rawResults.value.slice();
-
   const hasAnyPoints = mapped.some((r) => r.points != null);
 
   if (hasAnyPoints) {
@@ -171,7 +169,6 @@ const results = computed(() => {
       return (a.position as number) - (b.position as number);
     });
   }
-
   return mapped;
 });
 
@@ -206,16 +203,13 @@ function rowClass(index: number) {
   border-radius: 8px;
   margin: 6px 8px;
 }
-
 .match-result-item.is-first {
   box-shadow: inset 0 0 0 1px rgba(251, 192, 45, 0.45);
   background: rgba(251, 192, 45, 0.08);
 }
-
 .rank-avatar {
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
 }
-
 .stat-badge {
   padding: 4px 8px;
   border-radius: 999px;

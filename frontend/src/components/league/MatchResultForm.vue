@@ -1,4 +1,3 @@
-
 <template>
   <q-card class="q-pa-md" flat bordered rounded>
     <div class="row items-center q-mb-md">
@@ -107,22 +106,26 @@
                     />
                   </div>
 
-                  <!-- Faction -->
-                  <KennerSelect
-                    v-if="resultConfig?.is_asymmetric"
-                    v-model="getEntry(member.id).faction_id"
-                    :options="factions"
-                    option-label="name"
-                    option-value="id"
-                    emit-value
-                    map-options
-                    label="Faction"
-                    dense
-                    outlined
-                    hide-bottom-space
-                    clearable
-                    options-dense
-                  />
+                  <!-- Factions by Level -->
+                  <div v-if="resultConfig?.is_asymmetric">
+                    <KennerSelect
+                      v-for="level in sortedFactionLevels"
+                      :key="level"
+                      v-model="getEntry(member.id).faction_ids[level]"
+                      :options="factionsByLevel[level]"
+                      option-label="name"
+                      option-value="id"
+                      emit-value
+                      map-options
+                      :label="level === 0 ? 'Faction' : `Level ${level} Faction`"
+                      dense
+                      outlined
+                      hide-bottom-space
+                      clearable
+                      options-dense
+                      class="q-mb-xs"
+                    />
+                  </div>
 
                   <!-- Starting position -->
                   <div>
@@ -196,7 +199,7 @@ import { useLeagueStore } from 'stores/leagueStore';
 import KennerSelect from 'components/base/KennerSelect.vue';
 import KennerButton from 'components/base/KennerButton.vue';
 
-type Faction = { id: number; name: string };
+type Faction = { id: number; name: string; level: number };
 
 const emit = defineEmits<{ (e: 'submitted', selectedGameId: number): void }>();
 const $q = useQuasar();
@@ -224,6 +227,20 @@ const submitLabel = computed(() =>
   tieBreakerRequired.value ? 'Submit Tie-Breakers' : 'Save Result'
 );
 
+const factionsByLevel = computed(() => {
+  const groups: Record<number, Faction[]> = {};
+  factions.value.forEach((f) => {
+    const lvl = f.level ?? 0;
+    if (!groups[lvl]) groups[lvl] = [];
+    groups[lvl].push(f);
+  });
+  return groups;
+});
+
+const sortedFactionLevels = computed(() =>
+  Object.keys(factionsByLevel.value).map(Number).sort((a, b) => a - b)
+);
+
 function getEntry(memberId: number) {
   const member = members.value.find((m) => m.id === memberId);
   const profileId = member?.profile;
@@ -236,7 +253,7 @@ function getEntry(memberId: number) {
       position: null as number | null,
       notes: '' as string,
       starting_position: null as number | null,
-      faction_id: null as number | null,
+      faction_ids: {} as Record<number, number | null>,
       tie_breaker_value: null as number | null,
     };
     formData.value.push(found);
@@ -305,7 +322,7 @@ function initFormData() {
     position: null as number | null,
     notes: '' as string,
     starting_position: null as number | null,
-    faction_id: null as number | null,
+    faction_ids: {} as Record<number, number | null>,
     tie_breaker_value: null as number | null,
   }));
   preselectStartingPositions();
@@ -431,16 +448,22 @@ async function submitResults() {
     }
   }
 
-  const results = formData.value.map((entry) => ({
-    player_profile: entry.player_profile,
-    selected_game: entry.selected_game,
-    points: resultConfig.value?.has_points ? entry.points : null,
-    position: !resultConfig.value?.has_points ? entry.position : null,
-    notes: entry.notes || null,
-    starting_position: entry.starting_position,
-    faction_id: entry.faction_id ?? null,
-    tie_breaker_value: entry.tie_breaker_value ?? null,
-  }));
+  const results = formData.value.map((entry) => {
+    // Collect all selected factions from different levels
+    const selectedFactionIds = Object.values(entry.faction_ids || [])
+      .filter(id => id !== null && id !== undefined) as number[];
+
+    return {
+      player_profile: entry.player_profile,
+      selected_game: entry.selected_game,
+      points: resultConfig.value?.has_points ? entry.points : null,
+      position: !resultConfig.value?.has_points ? entry.position : null,
+      notes: entry.notes || null,
+      starting_position: entry.starting_position,
+      faction_ids: selectedFactionIds,
+      tie_breaker_value: entry.tie_breaker_value ?? null,
+    };
+  });
 
   const payload: any = {
     selected_game: props.selectedGameId,
