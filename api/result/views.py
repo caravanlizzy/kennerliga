@@ -16,6 +16,38 @@ from services.standings_snapshot import rebuild_game_snapshot, rebuild_league_sn
 from .models import Result
 from .serializers import ResultSerializer
 
+
+class IsAdminOrMemberInCurrentLeague(permissions.BasePermission):
+    def has_permission(self, request, view):
+        if not request.user or not request.user.is_authenticated:
+            return False
+
+        if request.user.is_superuser:
+            return True
+
+        # For 'create' action, we need to check the SelectedGame in the payload
+        if view.action == 'create':
+            selected_game_id = request.data.get('selected_game')
+            if not selected_game_id:
+                return False
+
+            try:
+                selected_game = SelectedGame.objects.select_related('league__season').get(id=selected_game_id)
+                season = selected_game.league.season
+
+                # Check if season is current  or RUNNING)
+                if season.status != Season.SeasonStatus.RUNNING:
+                    return False
+
+                # Check if user is a member of the league
+                # League.members is M2M to SeasonParticipant. SeasonParticipant.profile.user = user
+                return selected_game.league.members.filter(profile__user=request.user).exists()
+            except SelectedGame.DoesNotExist:
+                return False
+
+        return True
+
+
 # ViewSet to manage a users result, mainly useful for admins
 # The frontend would usually post a set of results => 1 result per player in the league
 # which is handled in a separate ViewSet (MathResultViewSet)
@@ -44,11 +76,10 @@ class ResultViewSet(ModelViewSet):
         Instantiates and returns the list of permissions that this view requires.
         """
         if self.action == 'create':
-            permission_classes = [IsAuthenticated]
+            permission_classes = [IsAdminOrMemberInCurrentLeague]
         else:
             permission_classes = []
         return [permission() for permission in permission_classes]
-
 
 
 class MatchResultViewSet(ViewSet):
@@ -65,12 +96,13 @@ class MatchResultViewSet(ViewSet):
     Attributes:
         permission_classes: Specifies the permission classes required to access this viewset.
     """
+
     def get_permissions(self):
         """
         Instantiates and returns the list of permissions that this view requires.
         """
         if self.action == 'create':
-            permission_classes = [IsAuthenticated]
+            permission_classes = [IsAdminOrMemberInCurrentLeague]
         else:
             permission_classes = []
         return [permission() for permission in permission_classes]
@@ -178,7 +210,7 @@ class MatchResultViewSet(ViewSet):
                 )
 
             if len(set(int_positions)) != expected_result_count or not all(
-                1 <= p <= expected_result_count for p in int_positions
+                    1 <= p <= expected_result_count for p in int_positions
             ):
                 return Response(
                     {
@@ -478,6 +510,3 @@ class MatchResultViewSet(ViewSet):
         """
         seasons = Season.objects.filter(results__isnull=False).distinct()
         return Response(SeasonSerializer(seasons, many=True).data, status=status.HTTP_200_OK)
-
-
-
