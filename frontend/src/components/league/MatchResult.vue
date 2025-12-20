@@ -17,30 +17,30 @@
 
     <q-list class="q-py-xs">
       <q-item
-        v-for="(result, index) in results"
+        v-for="result in results"
         :key="result.id"
         class="match-result-item"
-        :class="rowClass(index)"
+        :class="rowClass(result.position)"
       >
-        <!-- Rank -->
+        <!-- Rank / Position -->
         <q-item-section side class="q-pr-sm">
           <q-avatar
             size="34px"
-            :color="rankColor(index)"
-            :text-color="rankTextColor(index)"
+            :color="rankColor(result.position)"
+            :text-color="rankTextColor(result.position)"
             class="rank-avatar"
           >
-            <span class="text-weight-bold">{{ index + 1 }}</span>
+            <span class="text-weight-bold">{{ result.position ?? '-' }}</span>
           </q-avatar>
         </q-item-section>
 
-        <!-- Name + optional note -->
+        <!-- Name + optional note + tie-breaker -->
         <q-item-section>
           <q-item-label class="row items-center no-wrap">
             <q-icon
-              v-if="index < 3"
-              :name="rankIcon(index)"
-              :color="rankColor(index)"
+              v-if="result.position != null && result.position <= 3"
+              :name="rankIcon(result.position)"
+              :color="rankColor(result.position)"
               size="18px"
               class="q-mr-xs"
             />
@@ -49,9 +49,16 @@
             </span>
           </q-item-label>
 
-          <q-item-label v-if="result.notes" caption class="text-grey-7 ellipsis">
-            <q-icon name="notes" size="14px" class="q-mr-xs" />
-            {{ result.notes }}
+          <q-item-label v-if="result.notes || result.decisive_tie_breaker" caption class="text-grey-7 ellipsis">
+            <template v-if="result.notes">
+              <q-icon name="notes" size="14px" class="q-mr-xs" />
+              {{ result.notes }}
+            </template>
+            <span v-if="result.notes && result.decisive_tie_breaker" class="q-mx-xs">•</span>
+            <template v-if="result.decisive_tie_breaker">
+              <q-icon name="Equalizer" size="14px" class="q-mr-xs" />
+              TB: {{ result.decisive_tie_breaker }} ({{ result.tie_breaker_value }})
+            </template>
           </q-item-label>
         </q-item-section>
 
@@ -60,19 +67,11 @@
           <div class="row items-center justify-end q-gutter-xs">
             <q-badge
               v-if="result.points != null"
-              :color="index === 0 ? 'amber-7' : 'grey-6'"
+              :color="result.position === 1 ? 'amber-7' : 'grey-6'"
               class="stat-badge"
             >
               <q-icon name="star" size="14px" class="q-mr-xs" />
               {{ result.points }}
-            </q-badge>
-
-            <q-badge
-              v-if="result.position != null"
-              color="grey-5"
-              class="stat-badge"
-            >
-              Pos {{ result.position }}
             </q-badge>
 
             <q-badge
@@ -148,6 +147,8 @@ const rawResults = computed(() => {
     position: r.position ?? null,
     notes: r.notes ?? null,
     starting_position: r.starting_position ?? null,
+    tie_breaker_value: r.tie_breaker_value ?? null,
+    decisive_tie_breaker: r.decisive_tie_breaker?.name ?? null,
     // The API now returns 'factions' as a list of objects with id, faction_name, level
     factions: (r.factions ?? [])
       .slice()
@@ -157,42 +158,42 @@ const rawResults = computed(() => {
 
 const results = computed(() => {
   const mapped = rawResults.value.slice();
-  const hasAnyPoints = mapped.some((r) => r.points != null);
 
-  if (hasAnyPoints) {
-    mapped.sort((a, b) => (b.points ?? 0) - (a.points ?? 0));
-  } else {
-    mapped.sort((a, b) => {
-      if (a.position == null && b.position == null) return 0;
-      if (a.position == null) return 1;
-      if (b.position == null) return -1;
-      return (a.position as number) - (b.position as number);
-    });
-  }
+  // Primary sort by position (which handles ties/shared places), secondary by points
+  mapped.sort((a, b) => {
+    if (a.position != null && b.position != null) {
+      return a.position - b.position;
+    }
+    if (a.points != null && b.points != null) {
+      return b.points - a.points;
+    }
+    return 0;
+  });
+
   return mapped;
 });
 
-function rankColor(index: number) {
-  if (index === 0) return 'amber-7';
-  if (index === 1) return 'blue-grey-5';
-  if (index === 2) return 'brown-5';
+function rankColor(position: number | null) {
+  if (position === 1) return 'amber-7';
+  if (position === 2) return 'blue-grey-5';
+  if (position === 3) return 'brown-5';
   return 'grey-4';
 }
 
-function rankTextColor(index: number) {
-  return index < 3 ? 'white' : 'grey-9';
+function rankTextColor(position: number | null) {
+  return position != null && position <= 3 ? 'white' : 'grey-9';
 }
 
-function rankIcon(index: number) {
-  if (index === 0) return 'emoji_events';
-  if (index === 1) return 'workspace_premium';
+function rankIcon(position: number | null) {
+  if (position === 1) return 'emoji_events';
+  if (position === 2) return 'workspace_premium';
   return 'military_tech';
 }
 
-function rowClass(index: number) {
+function rowClass(position: number | null) {
   return {
-    'is-first': index === 0,
-    'is-podium': index < 3,
+    'is-first': position === 1,
+    'is-podium': position != null && position <= 3,
   };
 }
 </script>

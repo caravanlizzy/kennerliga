@@ -157,6 +157,21 @@
                     </div>
                   </div>
 
+                  <!-- Starting Points (Required if System is DYNAMIC) -->
+                  <q-input
+                    v-if="resultConfig?.starting_point_system === 'DYNAMIC'"
+                    v-model.number="getEntry(member.id).starting_points"
+                    type="number"
+                    inputmode="numeric"
+                    label="Starting Points"
+                    dense
+                    outlined
+                    hide-bottom-space
+                    class="q-mt-xs"
+                    bg-color="blue-1"
+                    :rules="[(v:any) => v !== null && v !== '' || 'Required']"
+                  />
+
                   <!-- Tie-Breaker -->
                   <q-input
                     v-if="tieBreakerRequired && needsTieBreaker(member.id)"
@@ -253,6 +268,7 @@ function getEntry(memberId: number) {
       position: null as number | null,
       notes: '' as string,
       starting_position: null as number | null,
+      starting_points: null as number | null,
       faction_ids: {} as Record<number, number | null>,
       tie_breaker_value: null as number | null,
     };
@@ -322,6 +338,7 @@ function initFormData() {
     position: null as number | null,
     notes: '' as string,
     starting_position: null as number | null,
+    starting_points: null as number | null,
     faction_ids: {} as Record<number, number | null>,
     tie_breaker_value: null as number | null,
   }));
@@ -460,6 +477,7 @@ async function submitResults() {
       position: !resultConfig.value?.has_points ? entry.position : null,
       notes: entry.notes || null,
       starting_position: entry.starting_position,
+      starting_points: entry.starting_points,
       faction_ids: selectedFactionIds,
       tie_breaker_value: entry.tie_breaker_value ?? null,
     };
@@ -507,7 +525,6 @@ async function submitResults() {
   }
 }
 </script>
-
 
 <style scoped>
 .member-card {
