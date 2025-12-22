@@ -43,7 +43,7 @@
         </div>
 
         <div class="col">
-          <q-select
+          <KennerSelect
             v-model="lg.memberProfileIds"
             :options="optionsForLeague(idx)"
             option-label="label"

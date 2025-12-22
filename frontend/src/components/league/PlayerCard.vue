@@ -58,7 +58,9 @@
                 <q-chip v-if="myBannedGameName" dense class="my-ban-chip">
                   {{ myBannedGameName }}
                 </q-chip>
-                <span v-else class="no-bans"></span>
+                <span v-else-if="member.has_banned" class="no-bans">
+                  Ban skipped
+                </span>
               </div>
             </div>
 
@@ -130,7 +132,9 @@ const firstGameSelectionBannedByOthers = computed(() => {
   return fgs?.game_name ?? fgs?.game?.game_name ?? null;
 });
 
-const hasSelectedGames = computed(() => (props.member?.selected_games?.length ?? 0) > 0);
+const hasSelectedGames = computed(
+  () => (props.member?.selected_games?.length ?? 0) > 0
+);
 
 const displayedSelectedGames = computed<SelectedGame[]>(() => {
   const selected = (props.member?.selected_games ?? []) as SelectedGame[];
@@ -157,7 +161,9 @@ const hasBanInfo = computed(() => {
   );
 });
 
-const hasSelectedOrBanInfo = computed(() => hasSelectedGames.value || hasBanInfo.value);
+const hasSelectedOrBanInfo = computed(
+  () => hasSelectedGames.value || hasBanInfo.value
+);
 </script>
 
 <style scoped lang="scss">
