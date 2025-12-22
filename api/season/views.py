@@ -40,7 +40,7 @@ class SeasonRegistrationView(APIView):
 
 
 class SeasonViewSet(ModelViewSet):
-    queryset = Season.objects.all()
+    queryset = Season.objects.all().order_by('-year', '-month')
     serializer_class = SeasonSerializer
     filterset_fields = ['year', 'month', 'status']
 

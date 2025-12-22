@@ -2,6 +2,7 @@ from urllib.parse import urlencode
 
 from django.conf import settings
 from django.db import transaction
+from django.db.models.functions import Lower
 from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.exceptions import NotFound
@@ -23,7 +24,7 @@ from rest_framework.permissions import IsAuthenticated, IsAdminUser
 
 # Create your views here.
 class UserViewSet(ModelViewSet):
-    queryset = User.objects.all()
+    queryset = User.objects.all().order_by(Lower('username'))
     serializer_class = UserSerializer
 
     class UserViewSet(ModelViewSet):
@@ -208,7 +209,7 @@ class PlayerProfileViewSet(ModelViewSet):
             elif user_isnull in ['false', '0', 'no']:
                 queryset = queryset.filter(user__isnull=False)
 
-        return queryset
+        return queryset.order_by(Lower('profile_name'))
 
 
 class FeedbackViewSet(ModelViewSet):

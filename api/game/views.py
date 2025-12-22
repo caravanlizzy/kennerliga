@@ -1,3 +1,4 @@
+from django.db.models.functions import Lower
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
 from datetime import datetime
@@ -12,7 +13,7 @@ from league.services import LeagueService
 
 
 class GameViewSet(ModelViewSet):
-    queryset = Game.objects.all()
+    queryset = Game.objects.all().order_by(Lower('name'))
     serializer_class = GameSerializer
     permission_classes = [IsAuthenticated]
 
