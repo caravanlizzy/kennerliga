@@ -27,7 +27,7 @@
             <SeasonStandings />
           </ScrollContainer>
           <ScrollContainer v-else-if="mobileContent === 'leaderboard'">
-            <LeaderBoard :year="2023" />
+            <LeaderBoard :year="2025" />
           </ScrollContainer>
         </div>
         <q-toolbar class="col-auto bg-grey-4 text-primary flex-center">
@@ -66,7 +66,7 @@
               class="col-12"
               color="dark"
             >
-              <LeaderBoard :year="2023" />
+              <LeaderBoard :year="2025" />
             </ContentSection>
           </div>
           <ContentSection
