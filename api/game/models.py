@@ -30,6 +30,7 @@ class GameOption(models.Model):
     name = models.CharField(max_length=88)
     game = models.ForeignKey("Game", null=True, blank=True, on_delete=models.CASCADE, related_name="options")
     has_choices = models.BooleanField(default=False)
+    order = models.PositiveIntegerField(default=0)
 
     # Legacy fields (keep for now, but consider deprecating after a data migration)
     only_if_option = models.ForeignKey(
@@ -51,6 +52,9 @@ class GameOption(models.Model):
     def __str__(self):
         return str(self.name)
 
+    class Meta:
+        ordering = ['order']
+
 
 class GameOptionChoice(models.Model):
     name = models.CharField(max_length=139, blank=True, null=True)
@@ -59,9 +63,13 @@ class GameOptionChoice(models.Model):
         on_delete=models.CASCADE,
         related_name='choices'
     )
+    order = models.PositiveIntegerField(default=0)
 
     def __str__(self):
         return f"{self.name or '(Unnamed)'} for {self.option.name}"
+
+    class Meta:
+        ordering = ['order']
 
 
 class GameOptionAvailabilityGroup(models.Model):
