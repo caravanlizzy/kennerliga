@@ -86,6 +86,23 @@ class BanDecisionAdmin(admin.ModelAdmin):
     list_filter = ('league', 'player_banning')
     date_hierarchy = 'created_at'
 
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        if db_field.name == "selected_game":
+            # Check if we are editing an existing object
+            obj_id = request.resolver_match.kwargs.get('object_id')
+            if obj_id:
+                ban_decision = self.get_object(request, obj_id)
+                if ban_decision and ban_decision.league:
+                    kwargs["queryset"] = SelectedGame.objects.filter(league=ban_decision.league)
+            else:
+                # If it's a new object, you can check for league_id in GET params
+                # (useful if navigating from a link like /admin/.../add/?league=1)
+                league_id = request.GET.get('league')
+                if league_id:
+                    kwargs["queryset"] = SelectedGame.objects.filter(league_id=league_id)
+
+        return super().formfield_for_foreignkey(db_field, request, **kwargs)
+
 
 @admin.register(SelectedOption)
 class SelectedOptionAdmin(admin.ModelAdmin):
