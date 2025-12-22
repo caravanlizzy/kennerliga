@@ -1,7 +1,6 @@
 from django.db.models.functions import Lower
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
-from datetime import datetime
+from rest_framework.viewsets import ModelViewSet
 
 from game.models import Game, GameOption, GameOptionChoice, Faction, TieBreaker, ResultConfig, StartingPointSystem, \
     Platform, SelectedGame, SelectedOption, BanDecision
@@ -29,7 +28,7 @@ class GameViewSet(ModelViewSet):
             ).values_list("game_id", flat=True)
             queryset = queryset.exclude(id__in=selected_games)
 
-        return queryset
+        return queryset.order_by(Lower('name'))
 
 
 class GameOptionViewSet(ModelViewSet):
