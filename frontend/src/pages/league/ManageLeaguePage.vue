@@ -89,9 +89,29 @@
                 size="xs"
                 icon="close"
                 class="q-ml-xs"
-                @click="onDeleteBannedGame(member.my_banned_game.id)"
               >
                 <q-tooltip>Remove Ban</q-tooltip>
+              </q-btn>
+            </q-chip>
+            <q-chip
+              v-else-if="member.has_banned"
+              outline
+              square
+              color="grey-7"
+              text-color="grey-7"
+              icon="skip_next"
+              class="q-ml-sm"
+            >
+              Ban Skipped
+              <q-btn
+                flat
+                round
+                dense
+                size="xs"
+                icon="close"
+                class="q-ml-xs"
+              >
+                <q-tooltip>Remove Skip</q-tooltip>
               </q-btn>
             </q-chip>
             <q-space />
