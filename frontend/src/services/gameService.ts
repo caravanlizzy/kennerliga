@@ -19,16 +19,15 @@ const { addStorageItem, getStorageItem } = useIDStorage();
 
 export async function banGame(banDecision: BanDecisionDtoPayload) {
   const data: Record<string, string | number | boolean> = {
-    username: banDecision.username,
+    player_banning: banDecision.profileId,
     league: banDecision.leagueId,
   };
+
   if (banDecision.skip) {
     data.skipped_ban = banDecision.skip;
-  }
-  else if (banDecision.selectedGameId) {
+  } else if (banDecision.selectedGameId) {
     data.selected_game_id = banDecision.selectedGameId;
-  }
-  else {
+  } else {
     console.log('Something went wrong, no decision was made.');
   }
 

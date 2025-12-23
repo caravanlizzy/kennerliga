@@ -105,7 +105,7 @@ export type SelectedGameOptionPayload = {
 
 
 export type BanDecisionDtoPayload = {
-  username: string;
+  profileId: string|number;
   selectedGameId?: number;
   leagueId: number;
   skip?: boolean;

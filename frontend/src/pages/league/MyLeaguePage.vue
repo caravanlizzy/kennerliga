@@ -24,7 +24,7 @@
     <!-- ==================== NORMAL CONTENT ==================== -->
     <div v-else class="q-pa-md relative-position league-page">
       <ActionBar class="q-mb-md" />
-
+      {{league}}
       <template v-if="isMePickingGame">
         <ContentSection
           title="Game Selection"
@@ -149,6 +149,7 @@ const {
   leagueStatus,
   selectedGamesById,
   members,
+  myProfileId,
   leagueId,
   loading,
   selectedGamesWithResults,
@@ -236,7 +237,7 @@ function handleSkipBan() {
       try {
         await banGame({
           leagueId: leagueId.value!,
-          username: user.value.username,
+          profileId: myProfileId.value,
           skip: true,
         });
         await updateLeagueData();
@@ -266,7 +267,7 @@ function handleBanGame(selectedGameId: number, gameName: string) {
       try {
         await banGame({
           leagueId: leagueId.value!,
-          username: user.value.username,
+          profileId: 3,
           selectedGameId,
         });
         await updateLeagueData();

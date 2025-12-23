@@ -440,7 +440,9 @@ class FullGameSerializer(serializers.ModelSerializer):
 
 
 class BanDecisionSerializer(serializers.ModelSerializer):
-    player_banning = serializers.PrimaryKeyRelatedField(read_only=True)
+    player_banning = serializers.PrimaryKeyRelatedField(
+        queryset=PlayerProfile.objects.all()
+    )
     player_banning_name = serializers.CharField(
         source='player_banning.profile_name', read_only=True
     )
@@ -457,21 +459,19 @@ class BanDecisionSerializer(serializers.ModelSerializer):
     )
 
     league = serializers.PrimaryKeyRelatedField(queryset=League.objects.all(), required=True)
-    username = serializers.CharField(write_only=True, required=True)
 
     class Meta:
         model = BanDecision
         fields = [
             'id',
             'player_banning', 'player_banning_name',
-            'selected_game_id', 'selected_game_name',  # <-- use _id here
+            'selected_game_id', 'selected_game_name',
             'league',
             'created_at',
-            'username',
         ]
         read_only_fields = [
             'id', 'created_at',
-            'player_banning', 'player_banning_name',
+            'player_banning_name',
             'selected_game_name',
         ]
 
@@ -486,8 +486,6 @@ class BanDecisionSerializer(serializers.ModelSerializer):
         return attrs
 
     def create(self, validated_data):
-        username = validated_data.pop('username')
-        validated_data['player_banning'] = get_profile_by_username(username)
         obj, _ = BanDecision.objects.update_or_create(
             league=validated_data['league'],
             player_banning=validated_data['player_banning'],

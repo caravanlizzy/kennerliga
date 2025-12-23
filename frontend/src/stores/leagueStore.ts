@@ -182,9 +182,13 @@ export const useLeagueStore = (id: number) => {
       members.value.find((m) => m.is_active_player)
     );
 
-    const { isMe, user } = useUserStore();
+    const { isMe } = useUserStore();
     const isMeActivePlayer = computed(() =>
       activePlayer.value ? isMe(activePlayer.value.username) : false
+    );
+
+    const myProfileId = computed(
+      () => members.value.find((m) => isMe(m.username))?.id
     );
 
     const isMePickingGame = computed(
@@ -213,6 +217,7 @@ export const useLeagueStore = (id: number) => {
       isMeActivePlayer,
       isMePickingGame,
       isMeBanningGame,
+      myProfileId,
       selectedGamesWithResults,
       selectedGamesFetchedEmpty,
       membersById,
