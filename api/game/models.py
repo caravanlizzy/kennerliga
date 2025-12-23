@@ -225,7 +225,7 @@ class TieBreaker(models.Model):
     )
 
     class Meta:
-        ordering = ['order']
+        ordering = ['-order']
 
     def __str__(self):
         return str(self.name)
