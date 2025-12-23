@@ -32,7 +32,7 @@ class LeagueService:
         if self.league.status == LeagueStatus.PICKING:
             if q.all_players_have_picked(self.league):
                 self.league.status = LeagueStatus.BANNING
-                self.league.active_player = q.get_members_ordered(self.league).last()
+                self.league.active_player = q.get_members_ordered(self.league).first()
                 self.league.save(update_fields=["status", "active_player"])
             else:
                 if q.is_two_player_league(self.league):
