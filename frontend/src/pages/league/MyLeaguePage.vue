@@ -267,7 +267,7 @@ function handleBanGame(selectedGameId: number, gameName: string) {
       try {
         await banGame({
           leagueId: leagueId.value!,
-          profileId: 3,
+          profileId: myProfileId.value,
           selectedGameId,
         });
         await updateLeagueData();
