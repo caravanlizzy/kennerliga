@@ -61,7 +61,7 @@ class LeagueService:
                     self.league.active_player = None
                     self.league.save(update_fields=["status", "active_player"])
             else:
-                self.rotate_active_player(reverse_order=True)
+                self.rotate_active_player()
 
         # PLAYING/DONE → do nothing
 
