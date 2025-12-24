@@ -133,6 +133,7 @@ export type TMember = {
   id: number; // player_profile id, also referenced in results
   username: string;
   profile_name: string;
+  profile: number;
   selected_games: SelectedGame[] | null;
   banned_game: BannedGame;
   is_active_player: boolean;

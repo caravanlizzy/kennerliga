@@ -5,7 +5,6 @@ import { fetchLeagueDetails } from 'src/services/leagueService';
 import { useUserStore } from 'stores/userStore';
 import { api } from 'boot/axios';
 import { MatchResult, TMember, TLeague, TLeagueStatus } from 'src/types';
-import { banGame } from 'src/services/gameService';
 
 
 /**
@@ -188,7 +187,7 @@ export const useLeagueStore = (id: number) => {
     );
 
     const myProfileId = computed(
-      () => members.value.find((m) => isMe(m.username))?.id
+      () => members.value.find((m) => isMe(m.username))?.profile
     );
 
     const isMePickingGame = computed(
