@@ -1,26 +1,13 @@
 <template>
   <div class="row items-center no-wrap">
     <q-btn
-      v-if="isMobile"
       :to="{ name: 'home' }"
       unelevated
       bordered
       color="white"
       class="primary-border nav-item-radius text-weight-medium"
     >
-      <q-icon  color="primary" name="psychology" />
-    </q-btn>
-    <q-btn
-      v-else
-      :to="{ name: 'home' }"
-      unelevated
-      color="white"
-      text-color="primary"
-      class="primary-border nav-item-radius text-weight-medium"
-      no-caps
-    >
-      <q-icon color="primary" name="psychology" />
-      <span v-show="!isMobile" class="q-ml-xs">Kennerliga</span>
+      <q-icon size="sm" name="img:icons/favicon.svg" />
     </q-btn>
 
   </div>

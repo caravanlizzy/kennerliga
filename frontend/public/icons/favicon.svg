@@ -1,0 +1,8 @@
+<svg width="1024" height="1024" viewBox="0 0 1024 1024" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Outer Crest Circle -->
+  <circle cx="512" cy="512" r="450" stroke="#5e35b1" stroke-width="60"/>
+
+  <!-- Sharp Geometric K - Resized to fit within the circle -->
+  <path d="M380 320V704" stroke="#5e35b1" stroke-width="80" stroke-linecap="butt"/>
+  <path d="M680 320L440 512L680 704" stroke="#5e35b1" stroke-width="80" stroke-linecap="butt" stroke-linejoin="miter"/>
+</svg>
