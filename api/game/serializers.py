@@ -40,9 +40,15 @@ class TieBreakerSerializer(ModelSerializer):
 
 
 class ResultConfigSerializer(ModelSerializer):
+    starting_points_system = serializers.SerializerMethodField()
+
     class Meta:
         model = ResultConfig
         fields = '__all__'
+
+    def get_starting_points_system(self, obj):
+        return obj.starting_points_system.code if obj.starting_points_system else None
+
 
 
 class StartingPointSystemSerializer(ModelSerializer):
