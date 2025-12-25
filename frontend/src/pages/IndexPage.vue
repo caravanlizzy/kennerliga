@@ -21,7 +21,7 @@
         <div class="col column">
           <KennerChat v-if="mobileContent === 'chat'" class="column" />
 
-          <SeasonWinners v-else-if="mobileContent === 'pokal'" class="q-pa-md" />
+<!--          <SeasonWinners v-else-if="mobileContent === 'pokal'" class="q-pa-md" />-->
 
           <ScrollContainer v-else-if="mobileContent === 'seasons'">
             <SeasonStandings />
@@ -34,7 +34,7 @@
           <q-tabs switch-indicator v-model="mobileContent" class="full-width">
             <q-tab icon="history" name="seasons" label="Season" />
             <q-tab icon="chat" name="chat" label="Chat" />
-            <q-tab icon="emoji_events" name="pokal" label="Winners" />
+<!--            <q-tab icon="emoji_events" name="pokal" label="Winners" />-->
             <q-tab icon="leaderboard" name="leaderboard" label="Rank" />
           </q-tabs>
         </q-toolbar>
@@ -42,14 +42,14 @@
       <div v-else class="column col q-pa-md">
         <div class="row col">
           <div class="col-12 col-md" :class="{ 'q-pr-lg': isMdUp }">
-            <ContentSection
-              title="Winners"
-              color="dark"
-              titleEnd
-              :bordered="false"
-            >
-              <SeasonWinners class="q-pa-md" />
-            </ContentSection>
+<!--            <ContentSection-->
+<!--              title="Winners"-->
+<!--              color="dark"-->
+<!--              titleEnd-->
+<!--              :bordered="false"-->
+<!--            >-->
+<!--              <SeasonWinners class="q-pa-md" />-->
+<!--            </ContentSection>-->
             <ContentSection
               titleEnd
               :bordered="false"
