@@ -1,123 +1,125 @@
 <template>
-  <SideBarLayout side-title="Standings">
-    <!-- ==================== LOADING STATE ==================== -->
-    <template v-if="loading || !user">
-      <LoadingSpinner text="Loading league data...">
-        <template #skeleton>
-          <q-skeleton type="rect" height="28px" class="q-mb-sm" />
-          <q-skeleton type="text" class="q-mb-xs" />
-          <q-skeleton type="text" width="70%" class="q-mb-md" />
+  <q-page>
+    <SideBarLayout side-title="Standings">
+      <!-- ==================== LOADING STATE ==================== -->
+      <template v-if="loading || !user">
+        <LoadingSpinner text="Loading league data...">
+          <template #skeleton>
+            <q-skeleton type="rect" height="28px" class="q-mb-sm" />
+            <q-skeleton type="text" class="q-mb-xs" />
+            <q-skeleton type="text" width="70%" class="q-mb-md" />
 
+            <div class="row q-col-gutter-md">
+              <div
+                v-for="n in 4"
+                :key="n"
+                class="col-12 col-sm-6 col-md-4 col-lg-3"
+              >
+                <q-skeleton height="160px" square />
+              </div>
+            </div>
+          </template>
+        </LoadingSpinner>
+      </template>
+
+      <!-- ==================== NORMAL CONTENT ==================== -->
+      <div v-else class="q-pa-md relative-position league-page">
+        <ActionBar class="q-mb-md" />
+        {{ league }}
+        <template v-if="isMePickingGame">
+          <ContentSection
+            title="Game Selection"
+            color="accent"
+            :is-opened="sectionVisibilityStates['selection']"
+            expandable
+            bordered
+            class="league-section"
+          >
+            <GameSelectionView
+              :leagueId="leagueId"
+              :profileId="user.profile.id"
+              @selection-updated="(updated:TGameSelection) => updateGameSelection(updated)"
+              @selectionValid="(valid: boolean ) => selectionValid = valid"
+              @set-submitter="(s: () => {}) => submitter = s"
+              @onSuccess="updateLeagueData"
+            />
+          </ContentSection>
+        </template>
+
+        <template v-if="leagueStatus === 'PLAYING' || leagueStatus === 'DONE'">
+          <ContentSection
+            title="Results"
+            color="primary"
+            :is-opened="sectionVisibilityStates['results']"
+            expandable
+            bordered
+            class="league-section"
+          >
+            <div class="row q-col-gutter-md">
+              <template v-for="member of members" :key="member.profile">
+                <template
+                  v-for="game of member.selected_games ?? []"
+                  :key="game.id"
+                >
+                  <div
+                    v-if="hasSelectedGameResult(game.id)"
+                    class="col-12"
+                    :class="{ 'col-md-6': selectedGamesWithResults.length > 1 }"
+                  >
+                    <q-card class="result-card" flat>
+                      <q-card-section class="q-pa-sm">
+                        <MatchResult
+                          :selectedGame="game"
+                          :displayGameName="true"
+                        />
+                      </q-card-section>
+                    </q-card>
+                  </div>
+                </template>
+              </template>
+            </div>
+          </ContentSection>
+        </template>
+
+        <template v-if="leagueStatus === 'PLAYING'">
+          <ContentSection
+            title="Upload Results"
+            color="secondary"
+            :is-opened="sectionVisibilityStates['upload']"
+            expandable
+            bordered
+            class="league-section"
+          >
+            <MatchResultTabs />
+          </ContentSection>
+        </template>
+
+        <ContentSection
+          title="Games - Picks and Bans"
+          color="dark"
+          :is-opened="sectionVisibilityStates['players']"
+          expandable
+          bordered
+          class="league-section"
+        >
           <div class="row q-col-gutter-md">
             <div
-              v-for="n in 4"
-              :key="n"
-              class="col-12 col-sm-6 col-md-4 col-lg-3"
+              v-for="member in members"
+              :key="member.id"
+              class="col-12 col-md-6"
             >
-              <q-skeleton height="160px" square />
+              <PlayerCard :member="member" />
             </div>
           </div>
-        </template>
-      </LoadingSpinner>
-    </template>
-
-    <!-- ==================== NORMAL CONTENT ==================== -->
-    <div v-else class="q-pa-md relative-position league-page">
-      <ActionBar class="q-mb-md" />
-      {{league}}
-      <template v-if="isMePickingGame">
-        <ContentSection
-          title="Game Selection"
-          color="accent"
-          :is-opened="sectionVisibilityStates['selection']"
-          expandable
-          bordered
-          class="league-section"
-        >
-          <GameSelectionView
-            :leagueId="leagueId"
-            :profileId="user.profile.id"
-            @selection-updated="(updated:TGameSelection) => updateGameSelection(updated)"
-            @selectionValid="(valid: boolean ) => selectionValid = valid"
-            @set-submitter="(s: () => {}) => submitter = s"
-            @onSuccess="updateLeagueData"
-          />
         </ContentSection>
+      </div>
+
+      <template #side>
+        <!-- You can also hide the sidebar while loading; if you want that, wrap with v-if="!loading" -->
+        <LeagueStandings v-if="!loading" />
       </template>
-
-      <template v-if="leagueStatus === 'PLAYING' || leagueStatus === 'DONE'">
-        <ContentSection
-          title="Results"
-          color="primary"
-          :is-opened="sectionVisibilityStates['results']"
-          expandable
-          bordered
-          class="league-section"
-        >
-          <div class="row q-col-gutter-md">
-            <template v-for="member of members" :key="member.profile">
-              <template
-                v-for="game of member.selected_games ?? []"
-                :key="game.id"
-              >
-                <div
-                  v-if="hasSelectedGameResult(game.id)"
-                  class="col-12"
-                  :class="{ 'col-md-6': selectedGamesWithResults.length > 1 }"
-                >
-                  <q-card class="result-card" flat>
-                    <q-card-section class="q-pa-sm">
-                      <MatchResult
-                        :selectedGame="game"
-                        :displayGameName="true"
-                      />
-                    </q-card-section>
-                  </q-card>
-                </div>
-              </template>
-            </template>
-          </div>
-        </ContentSection>
-      </template>
-
-      <template v-if="leagueStatus === 'PLAYING'">
-        <ContentSection
-          title="Upload Results"
-          color="secondary"
-          :is-opened="sectionVisibilityStates['upload']"
-          expandable
-          bordered
-          class="league-section"
-        >
-          <MatchResultTabs />
-        </ContentSection>
-      </template>
-
-      <ContentSection
-        title="Games - Picks and Bans"
-        color="dark"
-        :is-opened="sectionVisibilityStates['players']"
-        expandable
-        bordered
-        class="league-section"
-      >
-        <div class="row q-col-gutter-md">
-          <div
-            v-for="member in members"
-            :key="member.id"
-            class="col-12 col-md-6"
-          >
-            <PlayerCard :member="member" />
-          </div>
-        </div>
-      </ContentSection>
-    </div>
-
-    <template #side>
-      <!-- You can also hide the sidebar while loading; if you want that, wrap with v-if="!loading" -->
-      <LeagueStandings v-if="!loading" />
-    </template>
-  </SideBarLayout>
+    </SideBarLayout>
+  </q-page>
 </template>
 
 <script setup lang="ts">

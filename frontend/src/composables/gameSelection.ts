@@ -242,7 +242,7 @@ export function useGameSelection(leagueId: number, profileId: number) {
   }
 
   async function fetchGames() {
-    const { data } = await api('game/games/');
+    const { data } = await api(`game/games/?league=${leagueId}`);
     gameData.value = data;
   }
 
