@@ -159,7 +159,7 @@
 
                   <!-- Starting Points (Required if System is DYNAMIC) -->
                   <q-input
-                    v-if="resultConfig?.starting_point_system === 'DYNAMIC'"
+                    v-if="resultConfig?.starting_points_system && resultConfig.startings_point_system !== 'NONE'"
                     v-model.number="getEntry(member.id).starting_points"
                     type="number"
                     inputmode="numeric"
@@ -168,8 +168,11 @@
                     outlined
                     hide-bottom-space
                     class="q-mt-xs"
-                    bg-color="blue-1"
-                    :rules="[(v:any) => v !== null && v !== '' || 'Required']"
+                    :bg-color="resultConfig.starting_point_system === 'DYNAMIC' ? 'blue-1' : 'grey-2'"
+                    :readonly="resultConfig.starting_point_system === 'FIX'"
+                    :rules="[
+                      (v:any) => resultConfig.starting_point_system !== 'DYNAMIC' || (v !== null && v !== '') || 'Required'
+                    ]"
                   />
 
                   <!-- Tie-Breaker -->
