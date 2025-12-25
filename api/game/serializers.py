@@ -50,7 +50,6 @@ class ResultConfigSerializer(ModelSerializer):
         return obj.starting_points_system.code if obj.starting_points_system else None
 
 
-
 class StartingPointSystemSerializer(ModelSerializer):
     class Meta:
         model = StartingPointSystem
@@ -169,20 +168,11 @@ class SelectedGameSerializer(serializers.ModelSerializer):
 
 
 class FullGameOptionChoiceSerializer(serializers.ModelSerializer):
+    order = serializers.IntegerField(required=False, default=0)
+
     class Meta:
         model = GameOptionChoice
-        fields = ['id', 'name']
-
-
-class FullGameOptionSerializer(serializers.ModelSerializer):
-    choices = FullGameOptionChoiceSerializer(many=True)
-
-    class Meta:
-        model = GameOption
-        fields = [
-            'id', 'name', 'has_choices', 'only_if_option',
-            'only_if_choice', 'only_if_value', 'choices'
-        ]
+        fields = ['id', 'name', 'order']
 
 
 class FullGameOptionAvailabilityConditionWriteSerializer(serializers.Serializer):
@@ -256,19 +246,11 @@ class AvailabilityGroupsField(serializers.Field):
         return FullGameOptionAvailabilityGroupReadSerializer(qs, many=True).data
 
 
-class FullGameOptionChoiceSerializer(serializers.ModelSerializer):
-    # Client-only reference used for linking conditions during create/update
-    ref = serializers.CharField(write_only=True, required=False)
-
-    class Meta:
-        model = GameOptionChoice
-        fields = ['id', 'ref', 'name']
-
-
 class FullGameOptionSerializer(serializers.ModelSerializer):
     # Client-only reference used for linking conditions during create/update
     ref = serializers.CharField(write_only=True, required=False)
 
+    order = serializers.IntegerField(required=False, default=0)
     choices = FullGameOptionChoiceSerializer(many=True, required=False)
 
     # IMPORTANT: same field name for read + write
@@ -283,6 +265,7 @@ class FullGameOptionSerializer(serializers.ModelSerializer):
             'has_choices',
             'choices',
             'availability_groups',
+            'order'
         ]
 
 
