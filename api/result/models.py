@@ -26,6 +26,7 @@ class Result(models.Model):
         related_name='results'
     )
     points = models.IntegerField(blank=True, null=True)
+    starting_points = models.IntegerField(blank=True, null=True)
     starting_position = models.IntegerField(blank=True, null=True)
     position = models.PositiveIntegerField(blank=True, null=True)
     notes = models.TextField(blank=True, null=True)

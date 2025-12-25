@@ -21,9 +21,10 @@ class ResultSerializer(serializers.ModelSerializer):
             'player_profile_name',
             'selected_game',
             'points',
+            'starting_points',
             'starting_position',
-            "position",
-            "notes",
+            'position',
+            'notes',
             'tie_breaker_value',
             'decisive_tie_breaker',
             'faction_ids',
@@ -67,6 +68,11 @@ class ResultSerializer(serializers.ModelSerializer):
         if result_config.is_asymmetric:
             if 'faction_ids' not in self.initial_data or not self.initial_data['faction_ids']:
                 raise serializers.ValidationError("At least one faction is required for asymmetric games.")
+
+        # ✅ Validate starting points system
+        if result_config.starting_points_system and result_config.starting_points_system.code == "DYNAMIC":
+            if 'starting_points' not in data or data['starting_points'] is None:
+                raise serializers.ValidationError("Starting points are required when the system is DYNAMIC.")
 
         # ✅ Validate starting position requirement
         if not result_config.has_starting_player_order:
