@@ -14,8 +14,7 @@
       <div class="row items-baseline justify-between">
         <div class="text-weight-medium q-mr-md">Starting point system</div>
         <div class="text-right">
-          <div class="text-body2">{{ startingPointSystem.code }}</div>
-          <div class="text-caption text-grey-7">{{ startingPointSystem.description }}</div>
+          <div class="text-body2">{{ startingPointSystem }}</div>
         </div>
       </div>
 
@@ -73,7 +72,7 @@ import { computed } from 'vue';
 
 const props = defineProps<{
   hasPoints: boolean;
-  startingPointSystem: { code: string; description: string };
+  startingPointSystem: string;
   hasStartingPlayerOrder: boolean;
   isAsymmetric: boolean;
   factions: { id: number; name: string }[];
