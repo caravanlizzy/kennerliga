@@ -13,16 +13,14 @@ from game.models import SelectedGame, ResultConfig
 def rebuild_game_snapshot(selected_game, win_mode: str = "count_top_block") -> None:
     """
     Rebuild per-game standings for a single SelectedGame.
-
+    - Uses Result.position for sorting and ranking (pre-calculated with tie-breakers).
     - If ResultConfig.has_points is True:
-        * Uses Result.points as the score (higher is better).
+        * Stores Result.points in GameStanding.points.
     - If has_points is False:
-        * Uses -position as the score (lower position => higher score).
-    - Stores the score in GameStanding.points (Decimal).
-    - Computes dense ranks.
+        * Stores -position in GameStanding.points.
+    - Computes dense ranks based on position.
     - For win_mode == "count_top_block":
         * Rank 1 players share win_share = 1 / number_of_first_place_players.
-        * league_points equals win_share (adjust if you have a different rule).
     """
     # Load all results for this selected game
     results = (
@@ -48,48 +46,39 @@ def rebuild_game_snapshot(selected_game, win_mode: str = "count_top_block") -> N
     use_points = result_config.has_points
 
     # ------------------------------------------------------------------
-    # Build rows with a numeric score for each player
+    # Build rows based on pre-calculated position
     # ------------------------------------------------------------------
     rows: list[dict] = []
-
     for r in results:
+        pos = r.position if r.position is not None else 999
         if use_points:
-            raw = r.points if r.points is not None else 0
+            score = Decimal(r.points if r.points is not None else 0)
         else:
-            # Position-based: smaller position is better
-            if r.position is None:
-                # if this happens something went wrong in validation; treat as worst
-                raw = 999999
-            else:
-                # Store negative position so "higher is better"
-                raw = -int(r.position)
-
-        try:
-            score = Decimal(raw)
-        except (InvalidOperation, TypeError, ValueError):
-            score = Decimal("0")
+            # Store negative position so sorting/points remain consistent with "score"
+            score = Decimal(-int(pos))
 
         rows.append(
             {
                 "profile": r.player_profile,
                 "score": score,
+                "position": int(pos),
             }
         )
 
-    # Sort descending by score (because higher = better in both modes)
-    rows.sort(key=lambda x: x["score"], reverse=True)
+    # Sort by position (ascending, lower is better)
+    rows.sort(key=lambda x: x["position"])
 
     # ------------------------------------------------------------------
-    # Dense rank assignment
+    # Dense rank assignment based on position
     # ------------------------------------------------------------------
     dense_rank = 0
-    last_score: Decimal | None = None
+    last_pos: int | None = None
 
     for index, row in enumerate(rows):
-        if last_score is None or row["score"] != last_score:
+        if last_pos is None or row["position"] != last_pos:
             dense_rank = index + 1
         row["rank"] = dense_rank
-        last_score = row["score"]
+        last_pos = row["position"]
 
     # ------------------------------------------------------------------
     # League points / win share
@@ -103,7 +92,7 @@ def rebuild_game_snapshot(selected_game, win_mode: str = "count_top_block") -> N
         row["win_share"] = Decimal("0.00")
         row["league_points"] = Decimal("0.00")
 
-    # First: win_share (your existing rule)
+    # First: win_share
     if win_mode == "count_top_block":
         first_group = rank_groups.get(1, [])
         if first_group:
@@ -117,7 +106,6 @@ def rebuild_game_snapshot(selected_game, win_mode: str = "count_top_block") -> N
         1: Decimal("6"),
         2: Decimal("3"),
         3: Decimal("1"),
-        # 4+ implicitly 0
     }
 
     # We walk rank groups in order and assign places 1..N
@@ -184,7 +172,7 @@ def rebuild_league_snapshot(league: League, *, win_mode: str = "count_top_block"
     rows = [
         Row(
             selected_game_id=r.selected_game_id,
-            player_id=r.player_profile,                # keep as you had it
+            player_id=r.player_profile.id,
             player_name=r.player_profile.profile_name,
             points=dec_or_zero(r.points),              # <-- safe conversion
         )
