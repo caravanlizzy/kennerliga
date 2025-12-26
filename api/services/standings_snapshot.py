@@ -174,7 +174,8 @@ def rebuild_league_snapshot(league: League, *, win_mode: str = "count_top_block"
             selected_game_id=r.selected_game_id,
             player_id=r.player_profile.id,
             player_name=r.player_profile.profile_name,
-            points=dec_or_zero(r.points),              # <-- safe conversion
+            points=dec_or_zero(r.points),
+            position=r.position,  # Add this line
         )
         for r in qs
     ]
@@ -182,7 +183,7 @@ def rebuild_league_snapshot(league: League, *, win_mode: str = "count_top_block"
     table = compute_league_table(rows, win_mode=win_mode, return_decimals=True)
 
     # upsert LeagueStanding (NO raw points)
-    existing = {ls.player_profile: ls for ls in LeagueStanding.objects.filter(league=league)}
+    existing = {ls.player_profile_id: ls for ls in LeagueStanding.objects.filter(league=league)}
     to_create, to_update = [], []
 
     for r in table:
@@ -190,7 +191,7 @@ def rebuild_league_snapshot(league: League, *, win_mode: str = "count_top_block"
         if obj is None:
             to_create.append(LeagueStanding(
                 league=league,
-                player_profile=r["player_id"],
+                player_profile_id=r["player_id"],
                 wins=r["wins"],
                 league_points=r["league_points"],
             ))
