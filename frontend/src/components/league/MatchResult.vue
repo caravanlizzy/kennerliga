@@ -49,15 +49,25 @@
             </span>
           </q-item-label>
 
-          <q-item-label v-if="result.notes || result.decisive_tie_breaker" caption class="text-grey-7 ellipsis">
+          <q-item-label
+            v-if="result.notes || result.decisive_tie_breaker"
+            caption
+            class="text-grey-7 ellipsis"
+          >
             <template v-if="result.notes">
               <q-icon name="notes" size="14px" class="q-mr-xs" />
               {{ result.notes }}
             </template>
-            <span v-if="result.notes && result.decisive_tie_breaker" class="q-mx-xs">•</span>
+            <span
+              v-if="result.notes && result.decisive_tie_breaker"
+              class="q-mx-xs"
+              >•</span
+            >
             <template v-if="result.decisive_tie_breaker">
               <q-icon name="Equalizer" size="14px" class="q-mr-xs" />
-              TB: {{ result.decisive_tie_breaker }} ({{ result.tie_breaker_value }})
+              TB: {{ result.decisive_tie_breaker }} ({{
+                result.tie_breaker_value
+              }})
             </template>
           </q-item-label>
         </q-item-section>
@@ -81,6 +91,15 @@
             >
               <q-icon name="flag" size="14px" class="q-mr-xs" />
               {{ result.starting_position }}
+            </q-badge>
+
+            <q-badge
+              v-if="result.starting_points != null"
+              color="blue-grey-4"
+              class="stat-badge"
+            >
+              <q-icon name="bolt" size="14px" class="q-mr-xs" />
+              {{ result.starting_points }}
             </q-badge>
 
             <!-- Multiple Factions Displayed by Level -->
@@ -147,6 +166,7 @@ const rawResults = computed(() => {
     position: r.position ?? null,
     notes: r.notes ?? null,
     starting_position: r.starting_position ?? null,
+    starting_points: r.starting_points ?? null,
     tie_breaker_value: r.tie_breaker_value ?? null,
     decisive_tie_breaker: r.decisive_tie_breaker?.name ?? null,
     // The API now returns 'factions' as a list of objects with id, faction_name, level
