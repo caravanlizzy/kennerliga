@@ -19,7 +19,6 @@
                   Game overview
                 </div>
               </div>
-
               <div class="col-auto">
                 <q-chip
                   outline
@@ -38,7 +37,13 @@
 
           <q-card-section class="q-pt-sm">
             <div class="row items-center q-gutter-sm">
-              <q-chip dense square color="primary" text-color="white" icon="tune">
+              <q-chip
+                dense
+                square
+                color="primary"
+                text-color="white"
+                icon="tune"
+              >
                 Options: {{ game.options?.length ?? 0 }}
               </q-chip>
               <q-chip
@@ -74,7 +79,13 @@
               <q-icon name="tune" class="text-primary" />
               <div class="text-h6">Game Options</div>
             </div>
-            <q-chip dense outline color="primary" text-color="primary" icon="rule">
+            <q-chip
+              dense
+              outline
+              color="primary"
+              text-color="primary"
+              icon="rule"
+            >
               Settings
             </q-chip>
           </q-card-section>
@@ -101,7 +112,12 @@
                           Enabled / Disabled
                         </div>
                       </div>
-                      <q-chip dense color="secondary" text-color="white" icon="done_all">
+                      <q-chip
+                        dense
+                        color="secondary"
+                        text-color="white"
+                        icon="done_all"
+                      >
                         {{ yesNoOptions.length }}
                       </q-chip>
                     </div>
@@ -119,8 +135,16 @@
                         :key="option.id"
                         class="q-px-sm rounded-borders q-mb-xs"
                       >
-                        <q-item-section avatar class="items-center" style="min-width: 28px;">
-                          <q-icon name="check_circle" color="positive" size="sm" />
+                        <q-item-section
+                          avatar
+                          class="items-center"
+                          style="min-width: 28px"
+                        >
+                          <q-icon
+                            name="check_circle"
+                            color="positive"
+                            size="sm"
+                          />
                         </q-item-section>
 
                         <q-item-section>
@@ -155,7 +179,10 @@
                                   :key="grp.id"
                                   class="q-mt-sm"
                                 >
-                                  <q-list dense class="rounded-borders bg-white">
+                                  <q-list
+                                    dense
+                                    class="rounded-borders bg-white"
+                                  >
                                     <q-item
                                       v-for="cond in grp.conditions"
                                       :key="cond.id"
@@ -164,7 +191,7 @@
                                       <q-item-section
                                         avatar
                                         class="items-center"
-                                        style="min-width: 28px;"
+                                        style="min-width: 28px"
                                       >
                                         <q-icon
                                           name="subdirectory_arrow_right"
@@ -173,7 +200,9 @@
                                         />
                                       </q-item-section>
                                       <q-item-section>
-                                        <q-item-label>{{ formatCondition(cond) }}</q-item-label>
+                                        <q-item-label>{{
+                                          formatCondition(cond)
+                                        }}</q-item-label>
                                       </q-item-section>
                                     </q-item>
                                   </q-list>
@@ -196,12 +225,21 @@
               >
                 <q-card flat bordered class="full-height">
                   <q-card-section class="q-pb-sm">
-                    <div class="row items-center justify-between q-col-gutter-sm">
-                      <div class="col text-subtitle1 text-weight-medium ellipsis">
+                    <div
+                      class="row items-center justify-between q-col-gutter-sm"
+                    >
+                      <div
+                        class="col text-subtitle1 text-weight-medium ellipsis"
+                      >
                         {{ option.name }}
                       </div>
                       <div class="col-auto">
-                        <q-chip dense color="primary" text-color="white" icon="list">
+                        <q-chip
+                          dense
+                          color="primary"
+                          text-color="white"
+                          icon="list"
+                        >
                           {{ option.choices?.length ?? 0 }}
                         </q-chip>
                       </div>
@@ -230,11 +268,17 @@
                         :key="choice.id ?? choice.name"
                         class="q-px-sm rounded-borders q-mb-xs"
                       >
-                        <q-item-section avatar class="items-center" style="min-width: 28px;">
+                        <q-item-section
+                          avatar
+                          class="items-center"
+                          style="min-width: 28px"
+                        >
                           <q-icon name="circle" color="secondary" size="6px" />
                         </q-item-section>
                         <q-item-section>
-                          <q-item-label class="ellipsis">{{ choice.name }}</q-item-label>
+                          <q-item-label class="ellipsis">{{
+                            choice.name
+                          }}</q-item-label>
                         </q-item-section>
                       </q-item>
                     </q-list>
@@ -251,7 +295,9 @@
                       >
                         <div class="q-pb-sm">
                           <div
-                            v-for="(grp, grpIndex) in option.availability_groups"
+                            v-for="(
+                              grp, grpIndex
+                            ) in option.availability_groups"
                             :key="grp.id"
                             class="q-mt-sm"
                           >
@@ -266,7 +312,11 @@
                               OR group #{{ grpIndex + 1 }}
                             </q-chip>
 
-                            <q-list dense bordered class="rounded-borders bg-white">
+                            <q-list
+                              dense
+                              bordered
+                              class="rounded-borders bg-white"
+                            >
                               <q-item
                                 v-for="cond in grp.conditions"
                                 :key="cond.id"
@@ -275,7 +325,7 @@
                                 <q-item-section
                                   avatar
                                   class="items-center"
-                                  style="min-width: 28px;"
+                                  style="min-width: 28px"
                                 >
                                   <q-icon
                                     name="subdirectory_arrow_right"
@@ -284,7 +334,9 @@
                                   />
                                 </q-item-section>
                                 <q-item-section>
-                                  <q-item-label>{{ formatCondition(cond) }}</q-item-label>
+                                  <q-item-label>{{
+                                    formatCondition(cond)
+                                  }}</q-item-label>
                                 </q-item-section>
                               </q-item>
                             </q-list>
@@ -306,7 +358,12 @@
               <q-icon name="emoji_events" class="text-primary" />
               <div class="text-h6">Result Configuration</div>
             </div>
-            <q-chip dense color="secondary" text-color="white" icon="emoji_events">
+            <q-chip
+              dense
+              color="secondary"
+              text-color="white"
+              icon="emoji_events"
+            >
               Scoring
             </q-chip>
           </q-card-section>
@@ -317,7 +374,7 @@
             <ResultConfiguration
               :isHighlighed="true"
               :hasPoints="resultConfig.has_points"
-              :startingPointSystem="startingPointSystem"
+              :startingPointSystem="resultConfig.starting_points_system"
               :hasStartingPlayerOrder="resultConfig.has_starting_player_order"
               :isAsymmetric="resultConfig.is_asymmetric"
               :factions="factions"
@@ -340,13 +397,14 @@ const route = useRoute();
 const isLoading = ref(true);
 
 const { data: game } = await api(`game/games-full/${route.params.id}`);
-const { data: [resultConfig] } = await api(`game/result-configs/?game=${route.params.id}`);
-const { data: tieBreakers } = await api(`game/tie-breakers/?result_config=${resultConfig.id}`);
+const {
+  data: [resultConfig],
+} = await api(`game/result-configs/?game=${route.params.id}`);
+const { data: tieBreakers } = await api(
+  `game/tie-breakers/?result_config=${resultConfig.id}`
+);
 const { data: factions } = await api(`game/factions/?game=${route.params.id}`);
 const { data: platform } = await api(`game/platforms/${game.platform}`);
-const { data: startingPointSystem } = await api(
-  `game/starting-point-systems/${resultConfig.starting_points_system}`
-);
 
 isLoading.value = false;
 
@@ -361,12 +419,15 @@ const choiceOptions = computed(() =>
 );
 
 // Check if there are any options
-const hasOptions = computed(() =>
-  yesNoOptions.value.length > 0 || choiceOptions.value.length > 0
+const hasOptions = computed(
+  () => yesNoOptions.value.length > 0 || choiceOptions.value.length > 0
 );
 
 function hasAvailability(option: any): boolean {
-  return Array.isArray(option.availability_groups) && option.availability_groups.length > 0;
+  return (
+    Array.isArray(option.availability_groups) &&
+    option.availability_groups.length > 0
+  );
 }
 
 function formatCondition(cond: any): string {
