@@ -159,7 +159,7 @@
 
                   <!-- Starting Points (Required if System is DYNAMIC) -->
                   <q-input
-                    v-if="resultConfig?.starting_points_system && resultConfig.startings_point_system !== 'NONE'"
+                    v-if="resultConfig?.starting_points_system && resultConfig.startings_point_system === 'DYNAMIC'"
                     v-model.number="getEntry(member.id).starting_points"
                     type="number"
                     inputmode="numeric"
@@ -168,24 +168,30 @@
                     outlined
                     hide-bottom-space
                     class="q-mt-xs"
-                    :bg-color="resultConfig.starting_point_system === 'DYNAMIC' ? 'blue-1' : 'grey-2'"
-                    :readonly="resultConfig.starting_point_system === 'FIX'"
+                    bg-color="blue1"
                     :rules="[
-                      (v:any) => resultConfig.starting_point_system !== 'DYNAMIC' || (v !== null && v !== '') || 'Required'
+                      (v:any) => (v !== null && v !== '') || 'Required'
                     ]"
                   />
 
-                  <!-- Tie-Breaker -->
-                  <q-input
-                    v-if="tieBreakerRequired && needsTieBreaker(member.id)"
-                    v-model.number="getEntry(member.id).tie_breaker_value"
-                    :label="requiredTieBreaker?.name || 'Tie-breaker'"
-                    type="number"
-                    inputmode="decimal"
-                    dense
-                    outlined
-                    hide-bottom-space
-                  />
+                  <div v-if="tieBreakerRequired && needsTieBreaker(member.id)" class="q-mt-sm">
+                    <q-input
+                      v-model.number="getEntry(member.id).tie_breaker_value"
+                      :label="requiredTieBreaker?.name || 'Tie-breaker Value'"
+                      type="number"
+                      inputmode="decimal"
+                      dense
+                      outlined
+                      color="orange-8"
+                      bg-color="orange-1"
+                      hide-bottom-space
+                      :rules="[(v) => v !== null && v !== '' || 'Tie-breaker value required']"
+                    >
+                      <template #prepend>
+                        <q-icon name="balance" size="xs" color="orange-9" />
+                      </template>
+                    </q-input>
+                  </div>
                 </div>
               </q-card-section>
             </q-card>
