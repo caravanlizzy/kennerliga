@@ -301,7 +301,7 @@
         @update:model-value="closeForm"
         persistent
       >
-        <div style="min-width: 450px; max-width: 90vw">
+        <div style="min-width: 320px; max-width: 90vw">
           <FormLayout v-if="editingGame" @onClose="closeForm">
             <template #head>
               Edit Game
