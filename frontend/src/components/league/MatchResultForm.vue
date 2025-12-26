@@ -171,7 +171,7 @@
                   <q-input
                     v-if="
                       resultConfig?.starting_points_system &&
-                      resultConfig.starting_points_system === 'FIX'
+                      resultConfig.starting_points_system === 'DYNAMIC'
                     "
                     v-model.number="getEntry(member.profile).starting_points"
                     type="number"
