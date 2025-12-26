@@ -13,6 +13,7 @@ class Row:
     player_id: int
     player_name: str
     points: Decimal | int | float  # raw match points
+    position: int | None = None    # rank/position from the game
 
 # Default place->league points mapping (edit as needed)
 DEFAULT_PLACE_POINTS: Dict[int, Decimal] = {
@@ -117,8 +118,8 @@ def _dense_rank_and_share(
     Given rows for a single selected_game, return per-player dicts:
       player, player_id, points (Decimal), rank (int), league_points (Decimal), wins (Decimal)
     """
-    # Sort by raw points desc
-    lst = sorted(lst, key=lambda x: Decimal(x.points), reverse=True)
+    # Sort by position asc (1st place first)
+    lst = sorted(lst, key=lambda x: x.position if x.position is not None else 999)
 
     out: List[Dict] = []
     i = 0
@@ -126,10 +127,10 @@ def _dense_rank_and_share(
     n = len(lst)
 
     while i < n:
-        # Build tie block [i:j] of same points
+        # Build tie block [i:j] of same position
         j = i + 1
-        p0 = Decimal(lst[i].points)
-        while j < n and Decimal(lst[j].points) == p0:
+        p0 = lst[i].position
+        while j < n and lst[j].position == p0:
             j += 1
         block = lst[i:j]
         block_size = len(block)
@@ -159,7 +160,8 @@ def _dense_rank_and_share(
             out.append({
                 "player": r.player_name,
                 "player_id": r.player_id,
-                "points": Decimal(r.points),
+                "points": Decimal(r.points) if r.points is not None else Decimal("0"),
+                "position": r.position,
                 "rank": place,                # dense rank
                 "league_points": share,       # shared by the block
                 "wins": win_shares[k],
