@@ -21,9 +21,7 @@
         <template v-if="requiredTieBreaker?.name">
           <b>{{ requiredTieBreaker.name }}</b> needed for:
         </template>
-        <template v-else>
-          <b>Tie-breaker</b> needed for:
-        </template>
+        <template v-else> <b>Tie-breaker</b> needed for: </template>
         <span v-for="(grp, idx) in tieGroupDisplay" :key="grp.key">
           {{ grp.names.join(', ')
           }}<span v-if="idx < tieGroupDisplay.length - 1">; </span>
@@ -32,7 +30,10 @@
     </q-banner>
 
     <div class="q-pa-sm">
-      <q-form v-if="!isLoading && formData.length" @submit.prevent="submitResults">
+      <q-form
+        v-if="!isLoading && formData.length"
+        @submit.prevent="submitResults"
+      >
         <div class="row q-col-gutter-md q-mb-md">
           <div
             v-for="member in members"
@@ -51,7 +52,7 @@
                   <!-- Points (for points-based games) -->
                   <q-input
                     v-if="resultConfig?.has_points"
-                    v-model.number="getEntry(member.id).points"
+                    v-model.number="getEntry(member.profile).points"
                     type="number"
                     inputmode="numeric"
                     label="Points"
@@ -60,7 +61,7 @@
                     hide-bottom-space
                     class="points-input"
                     bg-color="grey-2"
-                    :rules="[(v:string|number|null) => v !== null && v !== '' || 'Required']"
+                    :rules="[(v:any) => v !== null && v !== '' || 'Required']"
                   />
 
                   <!-- Position (for non-points games) -->
@@ -74,18 +75,18 @@
                         :key="pos"
                         size="md"
                         round
-                        :outline="getEntry(member.id).position !== pos"
-                        :unelevated="getEntry(member.id).position === pos"
+                        :outline="getEntry(member.profile).position !== pos"
+                        :unelevated="getEntry(member.profile).position === pos"
                         :color="
-                              getEntry(member.id).position === pos
-                                ? 'dark'
-                                : 'grey-4'
-                            "
+                          getEntry(member.profile).position === pos
+                            ? 'dark'
+                            : 'grey-4'
+                        "
                         :text-color="
-                              getEntry(member.id).position === pos
-                                ? 'white'
-                                : 'grey-8'
-                            "
+                          getEntry(member.profile).position === pos
+                            ? 'white'
+                            : 'grey-8'
+                        "
                         :label="String(pos)"
                         class="position-btn"
                         @click="setPosition(member.id, pos)"
@@ -93,7 +94,7 @@
                     </div>
                     <!-- Notes for position -->
                     <q-input
-                      v-model="getEntry(member.id).notes"
+                      v-model="getEntry(member.profile).notes"
                       label="Position Note"
                       placeholder="Explain position reason..."
                       dense
@@ -111,13 +112,15 @@
                     <KennerSelect
                       v-for="level in sortedFactionLevels"
                       :key="level"
-                      v-model="getEntry(member.id).faction_ids[level]"
+                      v-model="getEntry(member.profile).faction_ids[level]"
                       :options="factionsByLevel[level]"
                       option-label="name"
                       option-value="id"
                       emit-value
                       map-options
-                      :label="level === 0 ? 'Faction' : `Level ${level} Faction`"
+                      :label="
+                        level === 0 ? 'Faction' : `Level ${level} Faction`
+                      "
                       dense
                       outlined
                       hide-bottom-space
@@ -129,7 +132,10 @@
 
                   <!-- Starting position -->
                   <div>
-                    <div class="text-caption text-grey-7 q-mb-xs" style="font-size: 11px;">
+                    <div
+                      class="text-caption text-grey-7 q-mb-xs"
+                      style="font-size: 11px"
+                    >
                       Starting Position
                     </div>
                     <div class="row q-gutter-xs justify-center">
@@ -138,18 +144,22 @@
                         :key="pos"
                         size="sm"
                         round
-                        :outline="getEntry(member.id).starting_position !== pos"
-                        :unelevated="getEntry(member.id).starting_position === pos"
+                        :outline="
+                          getEntry(member.profile).starting_position !== pos
+                        "
+                        :unelevated="
+                          getEntry(member.profile).starting_position === pos
+                        "
                         :color="
-                              getEntry(member.id).starting_position === pos
-                                ? 'secondary'
-                                : 'grey-5'
-                            "
+                          getEntry(member.profile).starting_position === pos
+                            ? 'secondary'
+                            : 'grey-5'
+                        "
                         :text-color="
-                              getEntry(member.id).starting_position === pos
-                                ? 'white'
-                                : 'grey-7'
-                            "
+                          getEntry(member.profile).starting_position === pos
+                            ? 'white'
+                            : 'grey-7'
+                        "
                         :label="String(pos)"
                         class="starting-position-btn"
                         @click="swapStartingPosition(member.id, pos)"
@@ -157,10 +167,13 @@
                     </div>
                   </div>
 
-                  <!-- Starting Points (Required if System is DYNAMIC) -->
+                  <!-- Starting Points -->
                   <q-input
-                    v-if="resultConfig?.starting_points_system && resultConfig.startings_point_system === 'DYNAMIC'"
-                    v-model.number="getEntry(member.id).starting_points"
+                    v-if="
+                      resultConfig?.starting_points_system &&
+                      resultConfig.starting_points_system !== 'NONE'
+                    "
+                    v-model.number="getEntry(member.profile).starting_points"
                     type="number"
                     inputmode="numeric"
                     label="Starting Points"
@@ -168,15 +181,26 @@
                     outlined
                     hide-bottom-space
                     class="q-mt-xs"
-                    bg-color="blue1"
+                    :bg-color="
+                      resultConfig.starting_points_system === 'DYNAMIC'
+                        ? 'blue-1'
+                        : 'grey-2'
+                    "
+                    :readonly="resultConfig.starting_points_system === 'FIX'"
                     :rules="[
-                      (v:any) => (v !== null && v !== '') || 'Required'
+                      (v:any) => resultConfig.starting_points_system !== 'DYNAMIC' || (v !== null && v !== '') || 'Required'
                     ]"
                   />
 
-                  <div v-if="tieBreakerRequired && needsTieBreaker(member.id)" class="q-mt-sm">
+                  <!-- Tie-Breaker (Appears only when a tie needs resolving) -->
+                  <div
+                    v-if="tieBreakerRequired && needsTieBreaker(member.profile)"
+                    class="q-mt-sm"
+                  >
                     <q-input
-                      v-model.number="getEntry(member.id).tie_breaker_value"
+                      v-model.number="
+                        getEntry(member.profile).tie_breaker_value
+                      "
                       :label="requiredTieBreaker?.name || 'Tie-breaker Value'"
                       type="number"
                       inputmode="decimal"
@@ -185,7 +209,7 @@
                       color="orange-8"
                       bg-color="orange-1"
                       hide-bottom-space
-                      :rules="[(v) => v !== null && v !== '' || 'Tie-breaker value required']"
+                      :rules="[(v:any) => v !== null && v !== '' || 'Tie-breaker value required']"
                     >
                       <template #prepend>
                         <q-icon name="balance" size="xs" color="orange-9" />
@@ -199,7 +223,13 @@
         </div>
 
         <div class="row justify-end q-gutter-sm">
-          <q-btn rounded flat color="secondary" label="Reset" @click="initFormData" />
+          <q-btn
+            rounded
+            flat
+            color="secondary"
+            label="Reset"
+            @click="initFormData"
+          />
           <KennerButton
             type="submit"
             :label="submitLabel"
@@ -237,7 +267,6 @@ const factions = ref<Faction[]>([]);
 const formData = ref<any[]>([]);
 const isLoading = ref(false);
 
-// tie-breaker UI state
 const tieBreakerRequired = ref(false);
 const requiredTieBreaker = ref<{
   id: number;
@@ -245,7 +274,9 @@ const requiredTieBreaker = ref<{
   order?: number;
 } | null>(null);
 const tieBreakerPlayers = ref<Set<number>>(new Set());
-const tieGroups = ref<Array<{ points: number | null; position: number | null; players: number[] }>>([]);
+const tieGroups = ref<
+  Array<{ points: number | null; position: number | null; players: number[] }>
+>([]);
 
 const submitLabel = computed(() =>
   tieBreakerRequired.value ? 'Submit Tie-Breakers' : 'Save Result'
@@ -262,12 +293,12 @@ const factionsByLevel = computed(() => {
 });
 
 const sortedFactionLevels = computed(() =>
-  Object.keys(factionsByLevel.value).map(Number).sort((a, b) => a - b)
+  Object.keys(factionsByLevel.value)
+    .map(Number)
+    .sort((a, b) => a - b)
 );
 
-function getEntry(memberId: number) {
-  const member = members.value.find((m) => m.id === memberId);
-  const profileId = member?.profile;
+function getEntry(profileId: number) {
   let found = formData.value.find((e) => e.player_profile === profileId);
   if (!found) {
     found = {
@@ -287,27 +318,30 @@ function getEntry(memberId: number) {
 }
 
 function preselectStartingPositions() {
-  (members.value).forEach((m, i) => {
-    getEntry(m.id).starting_position = i + 1;
+  members.value.forEach((m, i) => {
+    getEntry(m.profile).starting_position = i + 1;
   });
 }
 
 function swapStartingPosition(memberId: number, newPos: number) {
-  const currentPos = getEntry(memberId).starting_position ?? null;
+  const member = members.value.find((m) => m.id === memberId);
+  if (!member) return;
+  const currentPos = getEntry(member.profile).starting_position ?? null;
   if (currentPos === newPos) return;
 
-  const owner = (members.value).find(
-    (m) => getEntry(m.id).starting_position === newPos
+  const owner = members.value.find(
+    (m) => getEntry(m.profile).starting_position === newPos
   );
-  getEntry(memberId).starting_position = newPos;
-  if (owner && owner.id !== memberId) {
-    getEntry(owner.id).starting_position = currentPos;
+  getEntry(member.profile).starting_position = newPos;
+  if (owner && owner.profile !== member.profile) {
+    getEntry(owner.profile).starting_position = currentPos;
   }
 }
 
 function setPosition(memberId: number, pos: number) {
-  const entry = getEntry(memberId);
-  // Toggle off if clicking the same position, otherwise set it
+  const member = members.value.find((m) => m.id === memberId);
+  if (!member) return;
+  const entry = getEntry(member.profile);
   if (entry.position === pos) {
     entry.position = null;
   } else {
@@ -340,8 +374,8 @@ function initFormData() {
     return;
   }
 
-  formData.value = (members.value).map((p) => ({
-    player_profile: p.profile,  // Use profile ID, not member ID
+  formData.value = members.value.map((p) => ({
+    player_profile: p.profile,
     selected_game: props.selectedGameId,
     points: null as number | null,
     position: null as number | null,
@@ -365,17 +399,10 @@ watch(
     if (props.selectedGameId) {
       isLoading.value = true;
       try {
-        await Promise.all([
-          fetchResultConfig(),
-          fetchFactions()
-        ]);
+        await Promise.all([fetchResultConfig(), fetchFactions()]);
         initFormData();
       } catch (error) {
         console.error('Error loading form data:', error);
-        $q.notify({
-          type: 'negative',
-          message: 'Error loading match result form.'
-        });
       } finally {
         isLoading.value = false;
       }
@@ -387,7 +414,12 @@ watch(
 watch(
   () => members.value,
   (newMembers) => {
-    if (newMembers && newMembers.length > 0 && formData.value.length === 0 && !isLoading.value) {
+    if (
+      newMembers &&
+      newMembers.length > 0 &&
+      formData.value.length === 0 &&
+      !isLoading.value
+    ) {
       initFormData();
     }
   },
@@ -395,7 +427,7 @@ watch(
 );
 
 function idToName(profileId: number) {
-  const m = (members.value).find((x) => x.profile === profileId);
+  const m = members.value.find((x) => x.profile === profileId);
   return m?.profile_name;
 }
 
@@ -407,10 +439,8 @@ const tieGroupDisplay = computed(() =>
   }))
 );
 
-function needsTieBreaker(memberId: number) {
-  const member = members.value.find((m) => m.id === memberId);
-  const profileId = member?.profile;
-  return tieBreakerRequired.value && profileId && tieBreakerPlayers.value.has(profileId);
+function needsTieBreaker(profileId: number) {
+  return tieBreakerRequired.value && tieBreakerPlayers.value.has(profileId);
 }
 
 function handleTieBreaker202(data: any) {
@@ -419,11 +449,7 @@ function handleTieBreaker202(data: any) {
 
   const nextPlayers = new Set<number>();
   if (Array.isArray(data?.tie_groups)) {
-    tieGroups.value = data.tie_groups as Array<{
-      points: number | null;
-      position: number | null;
-      players: number[];
-    }>;
+    tieGroups.value = data.tie_groups;
     for (const g of data.tie_groups) {
       for (const pid of g.players ?? []) nextPlayers.add(pid);
     }
@@ -436,16 +462,6 @@ function handleTieBreaker202(data: any) {
   }
 
   tieBreakerPlayers.value = nextPlayers;
-
-  if (data?.unresolved_tie && !data?.required_tie_breaker) {
-    $q.notify({
-      type: 'warning',
-      message: data?.detail || 'Tie detected but no more tie-breakers available.',
-      timeout: 5000,
-    });
-    tieBreakerRequired.value = false;
-    return;
-  }
 
   const tbName = requiredTieBreaker.value?.name
     ? ` (${requiredTieBreaker.value.name})`
@@ -475,9 +491,9 @@ async function submitResults() {
   }
 
   const results = formData.value.map((entry) => {
-    // Collect all selected factions from different levels
-    const selectedFactionIds = Object.values(entry.faction_ids || [])
-      .filter(id => id !== null && id !== undefined) as number[];
+    const selectedFactionIds = Object.values(entry.faction_ids || []).filter(
+      (id) => id !== null && id !== undefined
+    ) as number[];
 
     return {
       player_profile: entry.player_profile,
@@ -508,9 +524,6 @@ async function submitResults() {
       $q.notify({ type: 'positive', message: 'Result saved.' });
       emit('submitted', props.selectedGameId);
       tieBreakerRequired.value = false;
-      requiredTieBreaker.value = null;
-      tieBreakerPlayers.value = new Set();
-      tieGroups.value = [];
       return;
     }
 
@@ -518,19 +531,12 @@ async function submitResults() {
       handleTieBreaker202(response.data);
       return;
     }
-
-    $q.notify({
-      type: 'warning',
-      message: `Unexpected status ${response.status}.`,
-    });
   } catch (err: any) {
     const data = err?.response?.data;
-    if (data?.detail) {
-      $q.notify({ type: 'negative', message: data.detail });
-    } else {
-      console.error('Error submitting results:', err);
-      $q.notify({ type: 'negative', message: 'Error saving match results.' });
-    }
+    $q.notify({
+      type: 'negative',
+      message: data?.detail || 'Error saving results.',
+    });
   }
 }
 </script>
