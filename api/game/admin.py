@@ -16,11 +16,32 @@ class ChoicesAdmin(NestedTabularInline):
     model = GameOptionChoice
     extra = 0
 
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        if db_field.name == "option":
+            # Attempt to find the Game ID from the URL (e.g., /admin/game/game/5/change/)
+            resolved = request.resolver_match
+            if resolved and 'object_id' in resolved.kwargs:
+                game_id = resolved.kwargs['object_id']
+                kwargs["queryset"] = GameOption.objects.filter(game_id=game_id)
+        return super().formfield_for_foreignkey(db_field, request, **kwargs)
+
 
 class AvailabilityConditionInline(NestedTabularInline):
     model = GameOptionAvailabilityCondition
     extra = 0
     fk_name = 'group'
+
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        resolved = request.resolver_match
+        game_id = resolved.kwargs.get('object_id') if resolved else None
+
+        if game_id:
+            if db_field.name == "option":
+                kwargs["queryset"] = GameOption.objects.filter(game_id=game_id)
+            elif db_field.name == "choice":
+                kwargs["queryset"] = GameOptionChoice.objects.filter(option__game_id=game_id)
+
+        return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
 
 class AvailabilityGroupInline(NestedStackedInline):
