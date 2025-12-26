@@ -171,7 +171,7 @@
                   <q-input
                     v-if="
                       resultConfig?.starting_points_system &&
-                      resultConfig.starting_points_system !== 'NONE'
+                      resultConfig.starting_points_system === 'FIX'
                     "
                     v-model.number="getEntry(member.profile).starting_points"
                     type="number"
@@ -181,14 +181,9 @@
                     outlined
                     hide-bottom-space
                     class="q-mt-xs"
-                    :bg-color="
-                      resultConfig.starting_points_system === 'DYNAMIC'
-                        ? 'blue-1'
-                        : 'grey-2'
-                    "
-                    :readonly="resultConfig.starting_points_system === 'FIX'"
+                    bg-color="blue-1"
                     :rules="[
-                      (v:any) => resultConfig.starting_points_system !== 'DYNAMIC' || (v !== null && v !== '') || 'Required'
+                      (v:any) => (v !== null && v !== '') || 'Required'
                     ]"
                   />
 
