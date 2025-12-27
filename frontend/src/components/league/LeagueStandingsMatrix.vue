@@ -44,7 +44,11 @@
                   <UserAvatar
                     :display-username="props.row.username"
                     size="24px"
-                  />
+                  >
+                    <q-tooltip v-if="isMobile && props.row.username">
+                      {{ props.row.username }}
+                    </q-tooltip>
+                  </UserAvatar>
                   <div class="column">
                     <span
                       v-if="!isMobile && props.row.profile_name"
