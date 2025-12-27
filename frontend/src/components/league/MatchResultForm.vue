@@ -252,6 +252,7 @@ import {
   TMatchResultPayload,
   TMatchResultSubmitPayload,
 } from 'src/types';
+import KennerButton from 'components/base/KennerButton.vue';
 
 type Faction = { id: number; name: string; level: number };
 
