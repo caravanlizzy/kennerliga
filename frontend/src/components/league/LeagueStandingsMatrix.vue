@@ -76,7 +76,7 @@
 
               <!-- League Leader Celebration (First Row) -->
               <q-icon
-                v-if="props.rowIndex === 0"
+                v-if="!isMobile && props.rowIndex === 0"
                 name="emoji_events"
                 color="amber-8"
                 size="xs"
