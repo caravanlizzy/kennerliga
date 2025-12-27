@@ -1,5 +1,5 @@
 <template>
-  <div :class="isMobile ? '' : 'q-pa-md'" class="column">
+  <div :class="isMobile ? 'q-pa-sm' : 'q-pa-md'" class="column">
     <!-- Filters -->
     <div class="row q-pa-sm q-gutter-sm items-center justify-end">
       <KennerSelect
@@ -43,7 +43,7 @@
 
     <div v-else class="column q-gutter-y-md">
       <div v-for="league in leagues" :key="league.id" class="league-container">
-        <div class="row items-center q-mb-sm">
+        <div class="row items-center q-mb-sm q-pl-md">
           <div class="league-level-indicator q-mr-sm">
             L{{ league.level }}
           </div>
