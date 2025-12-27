@@ -27,8 +27,8 @@
               ]"
               :style="
                 col.name.startsWith('game_')
-                  ? 'max-width: 90px; white-space: normal; line-height: 1.15;'
-                  : ''
+                  ? 'max-width: 80px; white-space: normal; line-height: 1.1; padding: 4px 8px;'
+                  : 'padding: 4px 8px;'
               "
             >
               {{ col.label }}
@@ -37,26 +37,42 @@
         </template>
 
         <template #body-cell-profile_name="props">
-          <q-td :props="props" class="text-left">
+          <q-td :props="props" class="text-left" style="padding: 4px 8px;">
             <div class="row items-center no-wrap">
-              <q-badge
-                color="grey-3"
-                text-color="grey-9"
-                class="text-weight-bold"
+              <template v-if="isMobile">
+                <q-badge
+                  color="grey-3"
+                  text-color="grey-9"
+                  class="text-weight-bold"
+                >
+                  {{ props.value.substring(0, 3).toUpperCase() }}
+                  <q-tooltip>
+                    {{ props.value }}
+                  </q-tooltip>
+                </q-badge>
+              </template>
+              <template v-else>
+                <span class="text-weight-bold">{{ props.value }}</span>
+              </template>
+
+              <!-- League Leader Celebration (First Row) -->
+              <q-icon
+                v-if="props.rowIndex === 0"
+                name="emoji_events"
+                color="amber-8"
+                size="xs"
+                class="q-ml-xs"
               >
-                {{ props.value.substring(0, 3).toUpperCase() }}
-                <q-tooltip>
-                  {{ props.value }}
-                </q-tooltip>
-              </q-badge>
+                <q-tooltip>League Leader</q-tooltip>
+              </q-icon>
             </div>
           </q-td>
         </template>
 
         <!-- Total column -->
         <template #body-cell-total="props">
-          <q-td :props="props" class="text-right">
-            <div class="text-dark text-weight-bold text-body2">
+          <q-td :props="props" class="text-right" style="padding: 4px 8px;">
+            <div class="text-dark text-weight-bold text-caption">
               {{ formatNumber(props.value) }}
             </div>
           </q-td>
@@ -69,22 +85,42 @@
               props.col.name !== 'profile_name' && props.col.name !== 'total'
             "
             :props="props"
-            class="q-px-xs q-py-xs text-center"
+            class="q-px-xs q-py-xs text-center relative-position overflow-hidden"
+            style="padding: 4px 6px;"
+            :class="getRankBgClass(props.value?.rank)"
           >
+            <!-- Rank Indicator Bar -->
+            <div
+              v-if="props.value?.rank && props.value.rank <= 4"
+              class="rank-indicator"
+              :class="getRankIndicatorClass(props.value.rank)"
+            ></div>
+
             <div
               v-if="
                 props.value && (props.value.points || props.value.league_points)
               "
               class="column items-center"
+              style="line-height: 1.1"
             >
-              <span v-if="props.value.points" class="text-caption">
-                {{ displayPoints(props.value.points) }}
-              </span>
+              <div
+                v-if="props.value.points"
+                class="text-weight-bold text-dark row items-baseline"
+                style="font-size: 0.9rem"
+              >
+                <span>{{ displayPointsValue(props.value.points) }}</span>
+                <span
+                  v-if="!isRank(props.value.points)"
+                  class="text-weight-medium q-ml-xs"
+                  style="font-size: 0.6rem; opacity: 0.7"
+                >VP</span>
+              </div>
               <div
                 v-if="props.value.league_points"
-                class="text-grey-7 text-caption floating"
+                class="text-grey-6 text-weight-medium"
+                style="font-size: 0.65rem"
               >
-                {{ formatNumber(props.value.league_points) }} LP
+                {{ formatNumber(props.value.league_points) }}<span style="font-size: 0.55rem; margin-left: 1px; opacity: 0.8">LP</span>
               </div>
             </div>
             <div v-else class="flex flex-center">
@@ -243,7 +279,7 @@ const tableRows = computed(() => {
 
 // highlight winner row (first row) gently
 const rowClass = (_row: unknown, index: number) =>
-  index === 0 ? 'bg-yellow-1' : '';
+  index === 0 ? 'bg-orange-1 league-leader-row' : '';
 
 const formatNumber = (value: string | number): string => {
   const num = typeof value === 'string' ? parseFloat(value) : value;
@@ -252,7 +288,11 @@ const formatNumber = (value: string | number): string => {
   return (num as number) % 1 === 0 ? (num as number).toFixed(0) : String(num);
 };
 
-function displayPoints(points: string) {
+function isRank(points: string) {
+  return ["-1.00", "-2.00", "-3.00", "-4.00"].includes(points);
+}
+
+function displayPointsValue(points: string) {
   switch (points) {
     case "-1.00":
       return '1st';
@@ -263,7 +303,58 @@ function displayPoints(points: string) {
     case "-4.00":
       return '4th';
     default:
-      return formatNumber(points) + ' VP';
+      return formatNumber(points);
+  }
+}
+
+function getRankBgClass(rank: number | undefined) {
+  if (!rank) return '';
+  switch (rank) {
+    case 1:
+      return 'bg-amber-1';
+    case 2:
+      return 'bg-blue-grey-1';
+    case 3:
+      return 'bg-brown-1';
+    default:
+      return '';
+  }
+}
+
+function getRankIndicatorClass(rank: number) {
+  switch (rank) {
+    case 1:
+      return 'bg-amber-6';
+    case 2:
+      return 'bg-blue-grey-4';
+    case 3:
+      return 'bg-brown-4';
+    case 4:
+      return 'bg-red-4';
+    default:
+      return '';
   }
 }
 </script>
+
+<style scoped lang="scss">
+.rank-indicator {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: 3px;
+}
+
+.league-leader-row {
+  border-left: 3px solid var(--q-amber-7) !important;
+}
+
+/* Ensure the background doesn't override the hover effect of q-table if any */
+:deep(.q-table tbody tr:hover) td.bg-amber-1,
+:deep(.q-table tbody tr:hover) td.bg-blue-grey-1,
+:deep(.q-table tbody tr:hover) td.bg-brown-1,
+:deep(.q-table tbody tr.bg-orange-1:hover) {
+  filter: brightness(0.95);
+}
+</style>
