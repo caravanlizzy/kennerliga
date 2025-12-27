@@ -51,7 +51,12 @@ class UserRegistrationSerializer(serializers.Serializer):
 
 
 class FeedbackSerializer(serializers.ModelSerializer):
+    username = serializers.SerializerMethodField()
+
     class Meta:
         model = Feedback
-        fields = ['message', 'user', 'datetime']
-        read_only_fields = ['user', 'datetime']
+        fields = ['message', 'user', 'datetime', 'username']
+        read_only_fields = ['user', 'datetime', 'username']
+
+    def get_username(self, obj):
+        return obj.user.username
