@@ -164,6 +164,13 @@ async function loadLeaguesForSeason(seasonId: number) {
   }
 }
 
+// When year changes, reset month
+watch(selectedYear, (newVal, oldVal) => {
+  if (oldVal !== null && newVal !== oldVal) {
+    selectedMonth.value = null;
+  }
+});
+
 // When year or month changes, compute the season and load leagues
 watch([selectedYear, selectedMonth], ([year, month]) => {
   if (!year || !month) {
