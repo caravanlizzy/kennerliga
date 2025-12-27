@@ -1,4 +1,4 @@
-import { TSelectedGameDto } from './game';
+import { TSelectedGameDto, TSelectedGameOptionDto } from './game';
 
 export type TSeasonDto = {
   id: number;
@@ -59,7 +59,7 @@ export type TBannedGameFull = {
   id: number;
   game: number;
   game_name: string;
-  selected_options: any[]; // Consider more specific type if possible
+  selected_options: TSelectedGameOptionDto[];
 };
 
 export type TBannedGameEmpty = {

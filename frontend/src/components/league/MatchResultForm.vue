@@ -61,7 +61,7 @@
                     hide-bottom-space
                     class="points-input"
                     bg-color="grey-2"
-                    :rules="[(v:any) => v !== null && v !== '' || 'Required']"
+                    :rules="[(v: number | null) => v !== null && v !== '' || 'Required']"
                   />
 
                   <!-- Position (for non-points games) -->
@@ -183,7 +183,7 @@
                     class="q-mt-xs"
                     bg-color="blue-1"
                     :rules="[
-                      (v:any) => (v !== null && v !== '') || 'Required'
+                      (v: number | null) => (v !== null && v !== '') || 'Required'
                     ]"
                   />
 
@@ -204,7 +204,7 @@
                       color="orange-8"
                       bg-color="orange-1"
                       hide-bottom-space
-                      :rules="[(v:any) => v !== null && v !== '' || 'Tie-breaker value required']"
+                      :rules="[(v: number | null) => v !== null && v !== '' || 'Tie-breaker value required']"
                     >
                       <template #prepend>
                         <q-icon name="balance" size="xs" color="orange-9" />
@@ -246,9 +246,26 @@ import { useQuasar } from 'quasar';
 import { storeToRefs } from 'pinia';
 import { useLeagueStore } from 'stores/leagueStore';
 import KennerSelect from 'components/base/KennerSelect.vue';
-import KennerButton from 'components/base/KennerButton.vue';
+import {
+  TResultConfig,
+  TTieBreakerDto,
+  TMatchResultPayload,
+  TMatchResultSubmitPayload,
+} from 'src/types';
 
 type Faction = { id: number; name: string; level: number };
+
+type FormDataEntry = {
+  player_profile: number;
+  selected_game: number;
+  points: number | null;
+  position: number | null;
+  notes: string;
+  starting_position: number | null;
+  starting_points: number | null;
+  faction_ids: Record<number, number | null>;
+  tie_breaker_value: number | null;
+};
 
 const emit = defineEmits<{ (e: 'submitted', selectedGameId: number): void }>();
 const $q = useQuasar();
@@ -257,17 +274,13 @@ const props = defineProps<{ selectedGameId: number; leagueId: number }>();
 const leagueStore = useLeagueStore(props.leagueId)();
 const { members } = storeToRefs(leagueStore);
 
-const resultConfig = ref<any>(null);
+const resultConfig = ref<TResultConfig | null>(null);
 const factions = ref<Faction[]>([]);
-const formData = ref<any[]>([]);
+const formData = ref<FormDataEntry[]>([]);
 const isLoading = ref(false);
 
 const tieBreakerRequired = ref(false);
-const requiredTieBreaker = ref<{
-  id: number;
-  name?: string;
-  order?: number;
-} | null>(null);
+const requiredTieBreaker = ref<TTieBreakerDto | null>(null);
 const tieBreakerPlayers = ref<Set<number>>(new Set());
 const tieGroups = ref<
   Array<{ points: number | null; position: number | null; players: number[] }>
@@ -438,13 +451,17 @@ function needsTieBreaker(profileId: number) {
   return tieBreakerRequired.value && tieBreakerPlayers.value.has(profileId);
 }
 
-function handleTieBreaker202(data: any) {
+function handleTieBreaker202(data: {
+  required_tie_breaker?: TTieBreakerDto;
+  tie_groups?: Array<{ players: number[] }>;
+  tied_players?: number[];
+}) {
   tieBreakerRequired.value = true;
   requiredTieBreaker.value = data?.required_tie_breaker ?? null;
 
   const nextPlayers = new Set<number>();
   if (Array.isArray(data?.tie_groups)) {
-    tieGroups.value = data.tie_groups;
+    tieGroups.value = data.tie_groups as any; // tieGroups has extra fields we might not have here but it's okay for now
     for (const g of data.tie_groups) {
       for (const pid of g.players ?? []) nextPlayers.add(pid);
     }
@@ -485,7 +502,7 @@ async function submitResults() {
     }
   }
 
-  const results = formData.value.map((entry) => {
+  const results: TMatchResultPayload[] = formData.value.map((entry) => {
     const selectedFactionIds = Object.values(entry.faction_ids || []).filter(
       (id) => id !== null && id !== undefined
     ) as number[];
@@ -503,7 +520,7 @@ async function submitResults() {
     };
   });
 
-  const payload: any = {
+  const payload: TMatchResultSubmitPayload = {
     selected_game: props.selectedGameId,
     results,
   };
@@ -526,8 +543,9 @@ async function submitResults() {
       handleTieBreaker202(response.data);
       return;
     }
-  } catch (err: any) {
-    const data = err?.response?.data;
+  } catch (err: unknown) {
+    const error = err as any;
+    const data = error?.response?.data;
     $q.notify({
       type: 'negative',
       message: data?.detail || 'Error saving results.',

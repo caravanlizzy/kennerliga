@@ -58,10 +58,12 @@
 import { ref, computed } from 'vue';
 import { banGame } from 'src/services/gameService'; // Adjust path if necessary
 import { useQuasar } from 'quasar';
+import { TLeagueDto, TLeagueMemberDto } from 'src/types';
+import { TSelectedGameDto } from 'src/types/game';
 
 const props = defineProps<{
-  league: any;
-  member: any;
+  league: TLeagueDto;
+  member: TLeagueMemberDto;
 }>();
 
 const emit = defineEmits(['onSuccess']);
@@ -70,13 +72,17 @@ const $q = useQuasar();
 const selectedGameId = ref<number | null>(null);
 const submitting = ref(false);
 
+interface AvailableGame extends TSelectedGameDto {
+  owner_name: string;
+}
+
 const availableToBan = computed(() => {
-  const games: any[] = [];
-  props.league.members.forEach((m: any) => {
+  const games: AvailableGame[] = [];
+  props.league.members.forEach((m: TLeagueMemberDto) => {
     // Players usually can't ban their own picks
     if (m.id === props.member.id) return;
 
-    (m.selected_games || []).forEach((sg: any) => {
+    (m.selected_games || []).forEach((sg: TSelectedGameDto) => {
       games.push({
         ...sg,
         owner_name: m.profile_name,
@@ -102,10 +108,11 @@ async function submit(skip = false) {
       message: skip ? 'Ban skipped' : 'Game banned successfully',
     });
     emit('onSuccess');
-  } catch (e: any) {
+  } catch (e: unknown) {
+    const error = e as Error & { message?: string };
     $q.notify({
       type: 'negative',
-      message: e.message || 'Failed to process ban',
+      message: error.message || 'Failed to process ban',
     });
   } finally {
     submitting.value = false;

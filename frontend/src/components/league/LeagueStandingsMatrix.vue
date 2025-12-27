@@ -37,7 +37,7 @@
         </template>
 
         <template #body-cell-profile_name="props">
-          <q-td :props="props" class="text-left" style="padding: 4px 8px;">
+          <q-td :props="props" class="text-left" style="padding: 4px 8px">
             <div class="row items-center no-wrap">
               <template v-if="isMobile">
                 <q-badge
@@ -71,7 +71,7 @@
 
         <!-- Total column -->
         <template #body-cell-total="props">
-          <q-td :props="props" class="text-right" style="padding: 4px 8px;">
+          <q-td :props="props" class="text-right" style="padding: 4px 8px">
             <div class="text-dark text-weight-bold text-caption">
               {{ formatNumber(props.value) }}
             </div>
@@ -86,7 +86,7 @@
             "
             :props="props"
             class="q-px-xs q-py-xs text-center relative-position overflow-hidden"
-            style="padding: 4px 6px;"
+            style="padding: 4px 6px"
             :class="getRankBgClass(props.value?.rank)"
           >
             <!-- Rank Indicator Bar -->
@@ -113,14 +113,19 @@
                   v-if="!isRank(props.value.points)"
                   class="text-weight-medium q-ml-xs"
                   style="font-size: 0.6rem; opacity: 0.7"
-                >VP</span>
+                  >VP</span
+                >
               </div>
               <div
                 v-if="props.value.league_points"
                 class="text-grey-6 text-weight-medium"
                 style="font-size: 0.65rem"
               >
-                {{ formatNumber(props.value.league_points) }}<span style="font-size: 0.55rem; margin-left: 1px; opacity: 0.8">LP</span>
+                {{ formatNumber(props.value.league_points)
+                }}<span
+                  style="font-size: 0.55rem; margin-left: 1px; opacity: 0.8"
+                  >LP</span
+                >
               </div>
             </div>
             <div v-else class="flex flex-center">
@@ -289,18 +294,18 @@ const formatNumber = (value: string | number): string => {
 };
 
 function isRank(points: string) {
-  return ["-1.00", "-2.00", "-3.00", "-4.00"].includes(points);
+  return ['-1.00', '-2.00', '-3.00', '-4.00'].includes(points);
 }
 
 function displayPointsValue(points: string) {
   switch (points) {
-    case "-1.00":
+    case '-1.00':
       return '1st';
-    case "-2.00":
+    case '-2.00':
       return '2nd';
-    case "-3.00":
+    case '-3.00':
       return '3rd';
-    case "-4.00":
+    case '-4.00':
       return '4th';
     default:
       return formatNumber(points);

@@ -1,4 +1,4 @@
-export enum TAnnouncementType {
+export enum AnnouncementType {
   INFO = 'INFO',
   WINNER = 'WINNER',
   REGISTER = 'REGISTER',
@@ -8,15 +8,15 @@ export enum TAnnouncementType {
 
 export type TAnnouncementDto = {
   id: number;
-  type: TAnnouncementType;
+  type: AnnouncementType;
   title: string;
   content: string | null;
   visible_until: string;
   visible_from: string;
 };
 
-export type TAnnouncementCreate = {
-  type: TAnnouncementType;
+export type AnnouncementCreate = {
+  type: AnnouncementType;
   title: string;
   content?: string | null;
   visible_until: string;

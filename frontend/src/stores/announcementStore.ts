@@ -3,27 +3,27 @@ import { ref } from 'vue';
 import { api } from 'boot/axios';
 import {
   TAnnouncementDto,
-  TAnnouncementCreate,
-  TAnnouncementType,
+  AnnouncementCreate,
+  AnnouncementType,
 } from 'src/types';
 
 const BASE_URL = 'announcement/announcements/';
 
 // more saturated banner colors
-const bannerClasses: Record<TAnnouncementType, string> = {
-  [TAnnouncementType.INFO]: 'bg-blue-6 text-white',
-  [TAnnouncementType.WINNER]: 'bg-amber-6 text-black',
-  [TAnnouncementType.REGISTER]: 'bg-green-6 text-white',
-  [TAnnouncementType.WARNING]: 'bg-red-6 text-white',
-  [TAnnouncementType.NEUTRAL]: 'bg-grey-7 text-white',
+const bannerClasses: Record<AnnouncementType, string> = {
+  [AnnouncementType.INFO]: 'bg-blue-6 text-white',
+  [AnnouncementType.WINNER]: 'bg-amber-6 text-black',
+  [AnnouncementType.REGISTER]: 'bg-green-6 text-white',
+  [AnnouncementType.WARNING]: 'bg-red-6 text-white',
+  [AnnouncementType.NEUTRAL]: 'bg-grey-7 text-white',
 };
 
-const announcementIcons: Record<TAnnouncementType, string> = {
-  [TAnnouncementType.INFO]: 'primary',
-  [TAnnouncementType.WINNER]: 'emoji_events',
-  [TAnnouncementType.REGISTER]: 'how_to_reg',
-  [TAnnouncementType.WARNING]: 'warning',
-  [TAnnouncementType.NEUTRAL]: 'campaign',
+const announcementIcons: Record<AnnouncementType, string> = {
+  [AnnouncementType.INFO]: 'primary',
+  [AnnouncementType.WINNER]: 'emoji_events',
+  [AnnouncementType.REGISTER]: 'how_to_reg',
+  [AnnouncementType.WARNING]: 'warning',
+  [AnnouncementType.NEUTRAL]: 'campaign',
 };
 
 export const useAnnouncementStore = defineStore('announcement', () => {
@@ -42,7 +42,7 @@ export const useAnnouncementStore = defineStore('announcement', () => {
   }
 
   async function addAnnouncement(
-    announcement: TAnnouncementCreate,
+    announcement: AnnouncementCreate,
   ): Promise<TAnnouncementDto> {
     loading.value = true;
     try {

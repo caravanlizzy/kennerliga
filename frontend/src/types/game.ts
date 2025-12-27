@@ -128,13 +128,36 @@ export type TTieBreaker = {
 };
 
 export type TResultConfig = {
-  isAsymmetric: boolean;
-  hasPoints: boolean;
-  startingPointSystem: string;
-  hasStartingPlayerOrder: boolean;
-  factions?: TFaction[];
-  hasTieBreaker: boolean;
-  tieBreakers?: TTieBreaker[];
+  id: number;
+  game: number;
+  has_points: boolean;
+  is_asymmetric: boolean;
+  starting_points_system: 'NONE' | 'STATIC' | 'DYNAMIC';
+  has_starting_player_order: boolean;
+};
+
+export type TTieBreakerDto = {
+  id: number;
+  name: string;
+  order: number;
+};
+
+export type TMatchResultPayload = {
+  player_profile: number;
+  selected_game: number;
+  points: number | null;
+  position: number | null;
+  notes: string | null;
+  starting_position: number | null;
+  starting_points: number | null;
+  faction_ids: number[];
+  tie_breaker_value: number | null;
+};
+
+export type TMatchResultSubmitPayload = {
+  selected_game: number;
+  results: TMatchResultPayload[];
+  tiebreaker?: { id: number };
 };
 
 export type TMatchResult = {
