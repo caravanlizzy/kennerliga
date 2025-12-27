@@ -461,7 +461,11 @@ function handleTieBreaker202(data: {
 
   const nextPlayers = new Set<number>();
   if (Array.isArray(data?.tie_groups)) {
-    tieGroups.value = data.tie_groups as any; // tieGroups has extra fields we might not have here but it's okay for now
+    tieGroups.value = data.tie_groups as Array<{
+      points: number | null;
+      position: number | null;
+      players: number[];
+    }>;
     for (const g of data.tie_groups) {
       for (const pid of g.players ?? []) nextPlayers.add(pid);
     }
@@ -544,7 +548,7 @@ async function submitResults() {
       return;
     }
   } catch (err: unknown) {
-    const error = err as any;
+    const error = err as { response?: { data?: { detail?: string } } };
     const data = error?.response?.data;
     $q.notify({
       type: 'negative',

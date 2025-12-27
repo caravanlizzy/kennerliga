@@ -127,11 +127,13 @@ import { storeToRefs } from 'pinia';
 import { useLeagueStore } from 'stores/leagueStore';
 import { useUserStore } from 'stores/userStore';
 
+import { TSelectedGameDto, TMatchResultDto } from 'src/types';
+
 const props = withDefaults(
   defineProps<{
-    selectedGame: any;
+    selectedGame: TSelectedGameDto;
     displayGameName: boolean;
-    matchResults?: Record<number, any[]>; // optional
+    matchResults?: Record<number, TMatchResultDto[]>; // optional
   }>(),
   {
     displayGameName: true,
@@ -147,19 +149,20 @@ const leagueStore = computed(() => {
 });
 
 const rawResults = computed(() => {
-  let src: any[] = [];
+  let src: TMatchResultDto[] = [];
 
   if (props.matchResults) {
     src = Object.values(props.matchResults)
       .flat()
-      .filter((r: any) => r.selected_game === props.selectedGame.id);
+      .filter((r) => r.selected_game === props.selectedGame.id);
   } else {
     src =
-      leagueStore.value?.matchResultsBySelectedGame?.[props.selectedGame.id] ??
-      [];
+      (leagueStore.value?.matchResultsBySelectedGame?.[
+        props.selectedGame.id
+      ] as TMatchResultDto[]) ?? [];
   }
 
-  return src.map((r: any) => ({
+  return src.map((r) => ({
     id: r.id,
     profile_name: r.player_profile_name,
     points: r.points ?? null,
@@ -172,7 +175,7 @@ const rawResults = computed(() => {
     // The API now returns 'factions' as a list of objects with id, faction_name, level
     factions: (r.factions ?? [])
       .slice()
-      .sort((a: any, b: any) => (a.level ?? 0) - (b.level ?? 0)),
+      .sort((a, b) => (a.level ?? 0) - (b.level ?? 0)),
   }));
 });
 

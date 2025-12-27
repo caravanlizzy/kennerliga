@@ -66,20 +66,20 @@ export const useLeagueStore = (id: number) => {
           return member.selected_games.map((game) => ({
             ...game,
             selected_by: member.username,
-          }));
+          })) as (TSelectedGameDto & { selected_by: string })[];
         })
         .filter((game) => game !== null && game !== undefined);
     });
 
     const selectedGamesById = computed<
-      Record<number, { id: number; game_name: string; selected_by: string }>
+      Record<number, TSelectedGameDto & { selected_by: string }>
     >(() =>
       selectedGames.value.reduce(
         (acc, g) => {
           acc[g.id] = g;
           return acc;
         },
-        {} as Record<number, { id: number; game_name: string; selected_by: string }>
+        {} as Record<number, TSelectedGameDto & { selected_by: string }>
       )
     );
 

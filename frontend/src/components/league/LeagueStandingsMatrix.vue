@@ -273,7 +273,7 @@ const tableRows = computed(() => {
       total: standing.total_league_points,
     };
 
-    standings.value!.selected_games.forEach((game) => {
+    standings.value.selected_games.forEach((game) => {
       const gameData = standing.games[game.id.toString()];
       row[`game_${game.id}`] = gameData || null;
     });

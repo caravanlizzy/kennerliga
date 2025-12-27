@@ -3,7 +3,8 @@
     flat
     :title="title"
     :filter="filter"
-    :rows-per-page-options="[10, 20, 50]"
+    :rows-per-page-options="[20, 50, 0]"
+    v-model:pagination="pagination"
     table-header-class="text-dark text-weight-medium bg-grey-2"
     class="rounded-borders"
     table-class="text-grey-8"
@@ -52,4 +53,7 @@ defineProps<{
 }>();
 
 const filter = ref('');
+const pagination = ref({
+  rowsPerPage: 0,
+});
 </script>

@@ -5,7 +5,6 @@
       title="Invitations"
       :rows="data"
       :columns="columns"
-      :rows-per-page-options="[10, 20, 50]"
       :createButton="createBtn"
     >
       <template #body-cell-invite_url="props">

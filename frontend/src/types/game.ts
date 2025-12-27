@@ -34,6 +34,7 @@ export type TFullGameAvailabilityGroupDto = {
 export type TFullGameOptionDto = {
   id: number;
   name: string;
+  game: number;
   has_choices: boolean;
   choices?: TGameOptionChoiceDto[];
   availability_groups?: TFullGameAvailabilityGroupDto[];
@@ -75,6 +76,11 @@ export type TSelectedGameOptionDto = {
   value?: boolean;
 };
 
+export type TGameInformation = {
+  game: TFullGameDto;
+  options: TFullGameOptionDto[];
+};
+
 export type TGameSelection = {
   game: TGameDto;
   selectedOptions: TSelectedGameOptionPayload[];
@@ -107,7 +113,7 @@ export type TSelectedGameOptionPayload = {
   game_option: number;
   selected_game: number;
   value?: boolean;
-  choice?: number;
+  choice?: TGameOptionChoiceDto;
 };
 
 export type TBanDecisionDtoPayload = {
@@ -134,6 +140,9 @@ export type TResultConfig = {
   is_asymmetric: boolean;
   starting_points_system: 'NONE' | 'STATIC' | 'DYNAMIC';
   has_starting_player_order: boolean;
+  factions?: TFaction[];
+  tie_breakers?: TTieBreaker[];
+  has_tie_breaker?: boolean;
 };
 
 export type TTieBreakerDto = {
@@ -160,13 +169,17 @@ export type TMatchResultSubmitPayload = {
   tiebreaker?: { id: number };
 };
 
-export type TMatchResult = {
+export type TMatchResultDto = {
   id: number;
   player_profile: number;
+  player_profile_name: string;
   selected_game: number;
   points: number | null;
+  position: number | null;
+  notes: string | null;
   starting_position: number | null;
-  tie_breaker_value: string;
-  decisive_tie_breaker: string | null;
-  faction_name: string | null;
+  starting_points: number | null;
+  tie_breaker_value: number | null;
+  decisive_tie_breaker: { id: number; name: string } | null;
+  factions: { id: number; name: string; level: number }[];
 };

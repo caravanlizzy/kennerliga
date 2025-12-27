@@ -75,10 +75,7 @@
                 color="accent"
                 dense
                 outlined
-                v-model="
-                  gameSelection.selectedOptions.find((o) => o.id == option.id)
-                    .choice
-                "
+                v-model="findSelectedOption(option.id).choice"
                 :rules="[(val) => !!val || `${option.name} is required`]"
                 class="full-width"
               />
@@ -110,21 +107,26 @@
 import KennerSelect from 'components/base/KennerSelect.vue';
 import KennerButton from 'components/base/KennerButton.vue';
 import { getPlatformColor, getPlatformName } from 'src/composables/gameSelection';
-import { TPlatform } from 'src/types';
+import {
+  TPlatform,
+  TGameInformation,
+  TGameSelection,
+  TGameOptionDto,
+} from 'src/types';
 import { computed, inject } from 'vue';
 
 const platforms = inject<TPlatform[]>('platforms', []);
 
 const props = withDefaults(
   defineProps<{
-    gameInformation: any;
-    gameSelection: any;
+    gameInformation: TGameInformation;
+    gameSelection: TGameSelection;
     isLoading: boolean;
     isValid: boolean;
     onSubmit: () => void;
 
     // comes from useGameSelection(...).visibleOptions
-    visibleOptions?: any[];
+    visibleOptions?: TGameOptionDto[];
   }>(),
   {
     visibleOptions: () => [],
@@ -135,6 +137,12 @@ const visibleOptionsSafe = computed(() => props.visibleOptions ?? []);
 
 function findSelectedOption(optionId: number) {
   // find selected option by game option id
-  return props.gameSelection.selectedOptions.find((o) => o.id === optionId);
+  const found = props.gameSelection.selectedOptions.find(
+    (o) => o.id === optionId
+  );
+  if (!found) {
+    throw new Error(`Selected option not found for optionId: ${optionId}`);
+  }
+  return found;
 }
 </script>

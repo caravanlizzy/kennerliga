@@ -98,15 +98,20 @@ import { computed, ref } from 'vue';
 import UserAvatar from 'components/ui/UserAvatar.vue';
 import GameSettingsDisplay from 'components/game/selectedGame/GameSettingsDisplay.vue';
 
+import { TLeagueMemberDto, TSelectedGameOptionDto } from 'src/types';
+
 type SelectedGame = {
   id?: number | string;
   game_name?: string;
-  selected_options?: any[];
+  selected_options?: TSelectedGameOptionDto[];
 };
 
-const props = withDefaults(defineProps<{ member: any; color?: string }>(), {
-  color: 'var(--q-dark)',
-});
+const props = withDefaults(
+  defineProps<{ member: TLeagueMemberDto; color?: string }>(),
+  {
+    color: 'var(--q-dark)',
+  }
+);
 
 const expandedByIndex = ref<Record<number, boolean>>({});
 

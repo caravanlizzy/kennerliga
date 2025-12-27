@@ -8,7 +8,6 @@
     @row-click="onRowClick"
     :rows="data"
     :columns="columns"
-    :rows-per-page-options="[10, 20, 50]"
   />
 
   <div v-else class="q-pa-md">

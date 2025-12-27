@@ -65,8 +65,8 @@ export async function addRestrictions(option: TGameOption): Promise<void> {
     return;
   }
 
-  const { onlyIfOption, onlyIfChoice, onlyIfValue } = option;
-  const optionId = getStorageItem(onlyIfOption);
+  const { only_if_option, only_if_choice, only_if_value } = option as unknown as { only_if_option: number; only_if_choice: number; only_if_value: boolean };
+  const optionId = getStorageItem(only_if_option);
 
   if (optionId === undefined) {
     console.error(
@@ -83,21 +83,21 @@ export async function addRestrictions(option: TGameOption): Promise<void> {
     only_if_option: optionId,
   };
 
-  if (onlyIfValue !== undefined) {
-    data.only_if_value = onlyIfValue;
-  } else if (onlyIfChoice !== undefined) {
-    const choiceValue = getStorageItem(onlyIfChoice);
+  if (only_if_value !== undefined) {
+    data.only_if_value = only_if_value;
+  } else if (only_if_choice !== undefined) {
+    const choiceValue = getStorageItem(only_if_choice);
     if (choiceValue !== undefined) {
       data.only_if_choice = choiceValue;
     } else {
       console.error(
-        `Invalid choice: ${onlyIfChoice}. It does not exist in optionIDStorage.`
+        `Invalid choice: ${only_if_choice}. It does not exist in optionIDStorage.`
       );
       return;
     }
   } else {
     console.error(
-      'Both onlyIfValue and onlyIfChoice are undefined. To set a restriction, at least one must be provided.'
+      'Both only_if_value and only_if_choice are undefined. To set a restriction, at least one must be provided.'
     );
     return;
   }
@@ -121,7 +121,7 @@ async function createOption(
         game: gameId,
       },
     });
-    addStorageItem(option.id, newOption.id);
+    addStorageItem(option.id as number, newOption.id);
     return newOption;
   } catch (e) {
     // errorMessages.value.push('CreateGameOption');
@@ -142,7 +142,7 @@ async function createOptionChoice(
         option: optionId,
       },
     });
-    addStorageItem(choice.id, newChoice.id);
+    addStorageItem(choice.id as number, newChoice.id);
     return newChoice;
   } catch (e) {
     console.log('Error creating game option choice', e);
@@ -153,7 +153,7 @@ async function createOptionChoice(
 async function createOptionChoices(option: TGameOption): Promise<void> {
   if (!option.hasChoices) return;
   for (const choice of option.choices) {
-    const optionId = getStorageItem(option.id);
+    const optionId = getStorageItem(option.id as number);
     await createOptionChoice(choice, optionId);
   }
 }
@@ -180,10 +180,10 @@ export async function createResultConfigData(
       method: 'POST',
       data: {
         game: gameId,
-        is_asymmetric: resultConfig?.isAsymmetric,
-        has_starting_player_order: resultConfig?.hasStartingPlayerOrder,
-        has_points: resultConfig?.hasPoints,
-        starting_points_system: resultConfig?.startingPointSystem,
+        is_asymmetric: resultConfig?.is_asymmetric,
+        has_starting_player_order: resultConfig?.has_starting_player_order,
+        has_points: resultConfig?.has_points,
+        starting_points_system: resultConfig?.starting_points_system,
       },
     });
     await createFactions(gameId, resultConfig);
@@ -220,10 +220,10 @@ export async function createFactions(
 export async function createTieBreakers(resultConfigId: number, resultConfig: TResultConfig): Promise<void> {
   console.log(resultConfigId, resultConfig);
   if (resultConfig === undefined) return;
-  if (resultConfig.tieBreakers === undefined) return;
-  if (!resultConfig.hasTieBreaker) return;
+  if (resultConfig.tie_breakers === undefined) return;
+  if (!resultConfig.has_tie_breaker) return;
 
-  for (const [index, tieBreaker] of resultConfig.tieBreakers.entries()) {
+  for (const [index, tieBreaker] of resultConfig.tie_breakers.entries()) {
     console.log(index, tieBreaker);
     try {
       await api('game/tie-breakers/', {
@@ -246,7 +246,7 @@ export async function createSelectedGame(
   selectedGame: TSelectedGameDtoPayload,
   manageOnly = false
 ) {
-  const data: Record<string, any> = {
+  const data = {
     game: selectedGame.game,
     selected_options: selectedGame.selected_options,
     league: selectedGame.league,

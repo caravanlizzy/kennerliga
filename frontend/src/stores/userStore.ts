@@ -51,7 +51,7 @@ export const useUserStore = defineStore(
         const parsedData = JSON.parse(data);
         user.value = parsedData.user;
         isAuthenticated.value = parsedData.isAuthenticated;
-        isAdmin.value = parsedData.user.admin;
+        isAdmin.value = parsedData.user?.admin ?? false;
       }
     }
 

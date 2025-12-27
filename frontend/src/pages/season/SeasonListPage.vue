@@ -7,7 +7,6 @@
     row-key="id"
     :rows="seasons"
     :columns="columns"
-    :rows-per-page-options="[10, 20, 50]"
     @row-click="onRowClick"
   />
 

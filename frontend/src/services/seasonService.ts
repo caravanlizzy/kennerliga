@@ -1,9 +1,10 @@
+import { AxiosResponse } from 'axios';
 import { api } from 'boot/axios';
 import { TSeasonDto, TSeasonParticipantDto, TLeagueDto } from 'src/types';
 
-export async function registerForSeason(): Promise<any> {
+export async function registerForSeason(): Promise<AxiosResponse | undefined> {
   try {
-    return await api('/season/register/', { method: 'POST' });
+    return await api.post('/season/register/');
   } catch (error) {
     console.error(error);
   }
@@ -24,7 +25,7 @@ export async function fetchOpenSeasonParticipants(): Promise<TSeasonParticipantD
     const { data } = await api.get('/season/season-participants/current/');
     return data;
   } catch (error) {
-    console.error("Failed to fetch open season participants:", error);
+    console.error('Failed to fetch open season participants:', error);
     return []; // safe fallback
   }
 }
@@ -39,21 +40,27 @@ export async function fetchSeason(seasonId: number): Promise<TSeasonDto | undefi
 }
 
 export async function fetchCurrentSeasonId(): Promise<number | null> {
-  const { data } = await api('/season/current/');
-  return data.id ?? null;
+  try {
+    const { data } = await api.get('/season/current/');
+    return data.id ?? null;
+  } catch (error) {
+    console.error('Error fetching current season ID:', error);
+    return null;
+  }
 }
 /** Backend helpers */
 // find-or-create season
 export async function createSeason(targetYear: number, targetMonth: number): Promise<TSeasonDto> {
-  const { data: seasons } = await api('/season/seasons/');
+  const { data: seasons } = await api.get<TSeasonDto[]>('/season/seasons/');
   let season = Array.isArray(seasons)
     ? seasons.find((s: TSeasonDto) => s.year === targetYear && s.month === targetMonth)
     : null;
 
   if (!season) {
-    const res = await api('/season/seasons/', {
-      method: 'POST',
-      data: { year: targetYear, month: targetMonth, status: 'DONE' },
+    const res = await api.post<TSeasonDto>('/season/seasons/', {
+      year: targetYear,
+      month: targetMonth,
+      status: 'DONE',
     });
     season = res.data;
   }
@@ -63,7 +70,7 @@ export async function createSeason(targetYear: number, targetMonth: number): Pro
 async function fetchSeasonParticipants(seasonId: number): Promise<TSeasonParticipantDto[]> {
   // Season detail should include participants array
   console.log({ seasonId });
-  const { data } = await api(`/season/season-participants/?season=${seasonId}`);
+  const { data } = await api.get<TSeasonParticipantDto[]>(`/season/season-participants/?season=${seasonId}`);
   console.log('data in fetchSeasonParticipants: ', data);
   return data ? data : [];
 }

@@ -6,7 +6,6 @@
     @row-click="onRowClick"
     :rows="users"
     :columns="columns"
-    :rows-per-page-options="[10, 20, 50]"
   />
 </template>
 

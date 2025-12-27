@@ -1,12 +1,5 @@
 import { ref, reactive, computed, watch, Ref } from 'vue';
-import type {
-  GameDto,
-  TGameOptionDto,
-  TSelectedGameDtoPayload,
-  TPlatform,
-  TFullGameDto,
-  TGameOptionChoiceDto,
-} from 'src/types';
+import { TGameDto, TGameOptionDto, TSelectedGameDtoPayload, TPlatform, TFullGameDto, TGameOptionChoiceDto } from 'src/types';
 import { api } from 'boot/axios';
 import { createSelectedGame, fetchFullGame } from 'src/services/gameService';
 import type { TGameSelection } from 'src/types';
@@ -39,12 +32,13 @@ type OptionWithAvailability = TGameOptionDto & {
   ref?: string;
 };
 
-const EMPTY_GAME: GameDto = { id: -1, name: '', platform: -1 };
+const EMPTY_GAME: TGameDto = { id: -1, name: '', platform: -1 };
 
 function asId(v: unknown): number | undefined {
   if (typeof v === 'number') return v;
-  if (v && typeof v === 'object' && 'id' in (v as any) && typeof (v as any).id === 'number') {
-    return (v as any).id;
+  if (v && typeof v === 'object' && 'id' in v) {
+    const id = (v as { id: unknown }).id;
+    if (typeof id === 'number') return id;
   }
   return undefined;
 }
@@ -52,7 +46,7 @@ function asId(v: unknown): number | undefined {
 export function useGameSelection(leagueId: number, profileId: number) {
   // --- state ---
   const gameInformation = reactive<{
-    game: GameDto | undefined;
+    game: TGameDto | undefined;
     options: OptionWithAvailability[];
   }>({
     game: undefined,
@@ -63,7 +57,7 @@ export function useGameSelection(leagueId: number, profileId: number) {
   const platform: Ref<TPlatform | null> = ref(null);
   const filter = ref('');
   const platforms: Ref<TPlatform[]> = ref([]);
-  const gameData = ref<GameDto[]>([]);
+  const gameData = ref<TGameDto[]>([]);
   const selectedPlatforms = ref<Set<number>>(new Set());
 
   const gameSelection = reactive<TGameSelection>({
@@ -86,13 +80,13 @@ export function useGameSelection(leagueId: number, profileId: number) {
   const availableGames = computed(() => {
     const base = filteredGames.value || [];
     if (selectedPlatforms.value.size === 0) return base;
-    return base.filter((g: GameDto) => selectedPlatforms.value.has(g.platform));
+    return base.filter((g: TGameDto) => selectedPlatforms.value.has(g.platform));
   });
 
   // --- selection helpers ---
   function initGameSelection(options: OptionWithAvailability[]) {
     gameSelection.selectedOptions = options.map((option) => ({
-      id: option.id,
+      game_option: option.id,
       selected_game: gameSelection.game?.id,
       value: option.has_choices ? undefined : false,
       choice: undefined,
@@ -100,7 +94,9 @@ export function useGameSelection(leagueId: number, profileId: number) {
   }
 
   function getSelectedOption(optionId: number) {
-    return gameSelection.selectedOptions.find((so) => so.id === optionId);
+    return gameSelection.selectedOptions.find(
+      (so) => so.game_option === optionId
+    );
   }
 
   function getSelectedChoiceId(optionId: number): number | undefined {
@@ -188,18 +184,20 @@ export function useGameSelection(leagueId: number, profileId: number) {
       const visible = new Set(visibleIds);
       const prevVisible = new Set(prevVisibleIds ?? []);
 
-      const optionById = new Map(gameInformation.options.map((o) => [o.id, o] as const));
+      const optionById = new Map(
+        gameInformation.options.map((o) => [o.id, o] as const)
+      );
 
       for (const so of gameSelection.selectedOptions) {
-        if (!visible.has(so.id)) {
+        if (!visible.has(so.game_option)) {
           so.choice = undefined;
           so.value = undefined;
           continue;
         }
 
         // Newly visible: restore defaults
-        if (!prevVisible.has(so.id)) {
-          const opt = optionById.get(so.id);
+        if (!prevVisible.has(so.game_option)) {
+          const opt = optionById.get(so.game_option);
           if (opt?.has_choices) {
             // leave choice undefined (user must pick)
             so.choice = so.choice ?? undefined;
@@ -247,7 +245,7 @@ export function useGameSelection(leagueId: number, profileId: number) {
   }
 
   // --- game selection / primary ---
-  async function initGameInformation(game: GameDto) {
+  async function initGameInformation(game: TGameDto) {
     if (gameInformation.game && gameInformation.game.id === game.id) return;
 
     isLoading.value = true;
@@ -263,8 +261,9 @@ export function useGameSelection(leagueId: number, profileId: number) {
 
       gameInformation.game = { id: full.id, name: full.name, platform: full.platform };
       // ensure arrays exist
-      gameInformation.options = (full.options ?? []).map((o: any) => ({
+      gameInformation.options = (full.options ?? []).map((o) => ({
         ...o,
+        game: full.id,
         choices: (o.choices ?? []) as TGameOptionChoiceDto[],
         availability_groups: (o.availability_groups ?? []) as AvailabilityGroupLike[],
       }));
@@ -297,11 +296,13 @@ export function useGameSelection(leagueId: number, profileId: number) {
     return {
       game: selection.game.id,
       selected_options: selection.selectedOptions
-        .filter((so) => visible.has(so.id))
+        .filter((so) => visible.has(so.game_option))
         .map((option) => ({
           selected_game: selection.game.id,
-          game_option_id: option.id,
-          ...(option.choice ? { choice_id: option.choice.id } : { value: option.value }),
+          game_option_id: option.game_option,
+          ...(option.choice
+            ? { choice_id: option.choice.id }
+            : { value: option.value }),
         })),
       profile: profileId,
       league: leagueId,
@@ -346,7 +347,7 @@ export function getPlatformName(
   platforms: TPlatform[],
   platformId: number | string
 ): string {
-  const platformObj = platforms.find((p: any) => p.id === platformId);
+  const platformObj = platforms.find((p) => p.id === platformId);
   return platformObj?.name ?? `No platform found for: ${platformId}`;
 }
 

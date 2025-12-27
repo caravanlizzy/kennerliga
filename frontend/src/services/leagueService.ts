@@ -17,9 +17,10 @@ export async function fetchMyCurrentLeagueId(): Promise<number | null> {
   try {
     const response = await api.get('user/me/current-league');
     return response.data.id;
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const err = error as { response?: { status?: number } };
     // Check if the error is a 404 (Not Found) which indicates no active league
-    if (error.response?.status === 404) {
+    if (err.response?.status === 404) {
       return null;
     }
     // For other errors, log them and re-throw
