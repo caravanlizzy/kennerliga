@@ -44,7 +44,7 @@ class LeagueViewSet(ModelViewSet):
         qs = (
             GameStanding.objects
             .filter(league=pk, selected_game_id=sg_id)
-            .select_related("player_profile")
+            .select_related("player_profile__user")
             .order_by("rank", "player_profile__profile_name")
         )
         return Response(GameStandingSerializer(qs, many=True).data, status=status.HTTP_200_OK)
@@ -98,7 +98,7 @@ class LeagueViewSet(ModelViewSet):
         league_standings = (
             LeagueStanding.objects
             .filter(league=league)
-            .select_related('player_profile')
+            .select_related('player_profile__user')
             .order_by('-league_points', '-wins', 'player_profile__profile_name')
         )
 
@@ -106,7 +106,7 @@ class LeagueViewSet(ModelViewSet):
         game_standings = (
             GameStanding.objects
             .filter(league=league)
-            .select_related('player_profile')
+            .select_related('player_profile__user')
         )
 
         # Build a lookup: {player_profile_id: {selected_game_id: {...}}}
@@ -138,6 +138,8 @@ class LeagueViewSet(ModelViewSet):
             standings_list.append({
                 "player_profile_id": pid,
                 "profile_name": ls.player_profile.profile_name,
+                "user_id": ls.player_profile.user.id if ls.player_profile.user else None,
+                "username": ls.player_profile.user.username if ls.player_profile.user else None,
                 "total_league_points": str(ls.league_points),
                 "total_wins": str(ls.wins),
                 "games": games_dict,
@@ -174,7 +176,7 @@ class LeagueViewSet(ModelViewSet):
         qs = (
             LeagueStanding.objects
             .filter(league=league)
-            .select_related("player_profile")
+            .select_related("player_profile__user")
             .order_by("-league_points", "-wins", "player_profile__profile_name")
         )
         return Response(LeagueStandingSerializer(qs, many=True).data, status=status.HTTP_200_OK)

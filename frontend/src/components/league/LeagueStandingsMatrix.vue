@@ -39,20 +39,42 @@
         <template #body-cell-profile_name="props">
           <q-td :props="props" class="text-left" style="padding: 4px 8px">
             <div class="row items-center no-wrap">
-              <template v-if="isMobile">
-                <q-badge
-                  color="grey-3"
-                  text-color="grey-9"
-                  class="text-weight-bold"
-                >
-                  {{ props.value.substring(0, 3).toUpperCase() }}
-                  <q-tooltip>
-                    {{ props.value }}
-                  </q-tooltip>
-                </q-badge>
+              <template v-if="props.row.username">
+                <div class="row items-center no-wrap q-gutter-x-sm">
+                  <UserAvatar
+                    :display-username="props.row.username"
+                    size="24px"
+                  />
+                  <div class="column">
+                    <span class="text-weight-bold">{{
+                      props.row.username
+                    }}</span>
+                    <span
+                      v-if="!isMobile && props.row.profile_name"
+                      class="text-caption text-grey-7"
+                      style="font-size: 0.7rem; line-height: 1"
+                    >
+                      {{ props.row.profile_name }}
+                    </span>
+                  </div>
+                </div>
               </template>
               <template v-else>
-                <span class="text-weight-bold">{{ props.value }}</span>
+                <template v-if="isMobile">
+                  <q-badge
+                    color="grey-3"
+                    text-color="grey-9"
+                    class="text-weight-bold"
+                  >
+                    {{ props.value.substring(0, 3).toUpperCase() }}
+                    <q-tooltip>
+                      {{ props.value }}
+                    </q-tooltip>
+                  </q-badge>
+                </template>
+                <template v-else>
+                  <span class="text-weight-bold">{{ props.value }}</span>
+                </template>
               </template>
 
               <!-- League Leader Celebration (First Row) -->
@@ -171,6 +193,7 @@ import { ref, computed } from 'vue';
 import { api } from 'boot/axios';
 import type { QTableColumn } from 'quasar';
 import { useResponsive } from 'src/composables/responsive';
+import UserAvatar from 'components/ui/UserAvatar.vue';
 
 const props = defineProps<{
   leagueId: number;
@@ -187,6 +210,7 @@ interface GameStats {
 interface Standing {
   player_profile_id: number;
   profile_name: string;
+  username?: string;
   total_league_points: string;
   total_wins: string;
   games: Record<string, GameStats>;
@@ -270,6 +294,7 @@ const tableRows = computed(() => {
     const row: Record<string, unknown> = {
       player_profile_id: standing.player_profile_id,
       profile_name: standing.profile_name,
+      username: standing.username,
       total: standing.total_league_points,
     };
 
