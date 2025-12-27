@@ -10,9 +10,11 @@ User = get_user_model()
 
 
 class UserSerializer(ModelSerializer):
+    profile_id = serializers.IntegerField(source='profile.id', read_only=True)
+
     class Meta:
         model = User
-        fields = ['id', 'username']
+        fields = ['id', 'username', 'profile_id']
 
 
 class PlayerProfileSerializer(ModelSerializer):

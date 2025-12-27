@@ -79,7 +79,7 @@ class PlatformViewSet(ModelViewSet):
 class SelectedGameViewSet(ModelViewSet):
     queryset = SelectedGame.objects.all()
     serializer_class = SelectedGameSerializer
-    filterset_fields = ['league']
+    filterset_fields = ['league', 'profile']
     permission_classes = [IsAuthenticated]
 
     def perform_create(self, serializer):

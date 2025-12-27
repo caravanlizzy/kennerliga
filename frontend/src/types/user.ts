@@ -13,6 +13,7 @@ export type TUserDto = {
   date_joined: string;
   last_login: string | null;
   profile?: TProfileDto;
+  profile_id?: number;
   token?: string;
   admin?: boolean;
   myCurrentLeagueId?: number | null;

@@ -348,12 +348,12 @@ class CurrentSeasonView(APIView):
 
 class SeasonParticipantViewSet(ModelViewSet):
     """
-    list:   GET  /season-participants/?season=<id>
+    list:   GET  /season-participants/?season=<id>&profile=<id>
     create: POST /season-participants/  {season, profile, rank?}
     """
     queryset = SeasonParticipant.objects.select_related("season", "profile")
     serializer_class = SeasonParticipantSerializer
-    filterset_fields = ["season", "profile__profile_name"]
+    filterset_fields = ["season", "profile", "profile__profile_name"]
 
     @action(detail=False, methods=["get"], url_path="current")
     def current(self, request):

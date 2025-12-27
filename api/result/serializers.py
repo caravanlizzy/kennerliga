@@ -12,6 +12,7 @@ class ResultSerializer(serializers.ModelSerializer):
     factions = serializers.SerializerMethodField(read_only=True)
     player_profile_name = serializers.SerializerMethodField(read_only=True)
     decisive_tie_breaker = serializers.SerializerMethodField(required=False, read_only=True)
+    game_name = serializers.CharField(source='selected_game.game.name', read_only=True)
 
     class Meta:
         model = Result
@@ -20,6 +21,7 @@ class ResultSerializer(serializers.ModelSerializer):
             'player_profile',
             'player_profile_name',
             'selected_game',
+            'game_name',
             'points',
             'starting_points',
             'starting_position',

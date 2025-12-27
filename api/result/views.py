@@ -50,7 +50,7 @@ class IsAdminOrMemberInCurrentLeague(permissions.BasePermission):
 class ResultViewSet(ModelViewSet):
     queryset = Result.objects.all()
     serializer_class = ResultSerializer
-    filterset_fields = ['selected_game']
+    filterset_fields = ['selected_game', 'player_profile']
 
     def get_permissions(self):
         if self.action == 'create':

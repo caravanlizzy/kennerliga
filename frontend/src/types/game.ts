@@ -174,6 +174,7 @@ export type TMatchResultDto = {
   player_profile: number;
   player_profile_name: string;
   selected_game: number;
+  game_name?: string;
   points: number | null;
   position: number | null;
   notes: string | null;

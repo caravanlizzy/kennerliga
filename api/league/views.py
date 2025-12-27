@@ -17,7 +17,7 @@ class LeagueViewSet(ModelViewSet):
         "members__profile", "members__profile__user"
     ).order_by("season__year", "season__month", "level")
     serializer_class = LeagueSerializer
-    filterset_fields = ['season']
+    filterset_fields = ['season', 'members__profile']
     permission_classes = [IsAuthenticated]
 
     def get_permissions(self):
