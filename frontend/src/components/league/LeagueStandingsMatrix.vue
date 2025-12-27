@@ -46,9 +46,6 @@
                     size="24px"
                   />
                   <div class="column">
-                    <span class="text-weight-bold">{{
-                      props.row.username
-                    }}</span>
                     <span
                       v-if="!isMobile && props.row.profile_name"
                       class="text-caption text-grey-7"
