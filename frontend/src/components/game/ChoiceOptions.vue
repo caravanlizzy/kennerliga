@@ -16,10 +16,10 @@
 </template>
 <script setup lang="ts">
 import OverviewCard from 'components/cards/OverviewCard.vue';
-import { GameOptionDto } from 'src/models/gameModels';
+import { TGameOptionDto } from 'src/types';
 
 defineProps<{
-  options: GameOptionDto[];
+  options: TGameOptionDto[];
 }>();
 
 defineOptions({

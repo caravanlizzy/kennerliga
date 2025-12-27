@@ -2,18 +2,7 @@ import { defineStore } from 'pinia';
 import { ref, Ref } from 'vue';
 import { api } from 'boot/axios';
 import { fetchMyCurrentLeagueId } from 'src/services/leagueService';
-export type TProfile = {
-  id: number;
-  name: string;
-}
-export type TUser = {
-  username: string;
-  token: string;
-  admin: boolean;
-  // platform_players: { name: string }[];
-  profile: TProfile;
-  myCurrentLeagueId: number|null;
-};
+import { TUser } from 'src/types';
 
 export const useUserStore = defineStore(
   'userStore',

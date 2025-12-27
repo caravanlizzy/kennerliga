@@ -1,12 +1,12 @@
 import { ref, reactive, computed, watch, Ref } from 'vue';
 import type {
   GameDto,
-  GameOptionDto,
-  SelectedGameDtoPayload,
+  TGameOptionDto,
+  TSelectedGameDtoPayload,
   TPlatform,
-  FullGameDto,
-  GameOptionChoiceDto,
-} from 'src/models/gameModels';
+  TFullGameDto,
+  TGameOptionChoiceDto,
+} from 'src/types';
 import { api } from 'boot/axios';
 import { createSelectedGame, fetchFullGame } from 'src/services/gameService';
 import type { TGameSelection } from 'src/types';
@@ -33,7 +33,7 @@ type AvailabilityGroupLike = {
   conditions?: AvailabilityConditionLike[];
 };
 
-type OptionWithAvailability = GameOptionDto & {
+type OptionWithAvailability = TGameOptionDto & {
   availability_groups?: AvailabilityGroupLike[];
   // some serializers may include these on read; keep optional
   ref?: string;
@@ -259,13 +259,13 @@ export function useGameSelection(leagueId: number, profileId: number) {
     gameSelection.selectedOptions = [];
 
     try {
-      const full: FullGameDto = await fetchFullGame(game.id);
+      const full: TFullGameDto = await fetchFullGame(game.id);
 
       gameInformation.game = { id: full.id, name: full.name, platform: full.platform };
       // ensure arrays exist
       gameInformation.options = (full.options ?? []).map((o: any) => ({
         ...o,
-        choices: (o.choices ?? []) as GameOptionChoiceDto[],
+        choices: (o.choices ?? []) as TGameOptionChoiceDto[],
         availability_groups: (o.availability_groups ?? []) as AvailabilityGroupLike[],
       }));
 
@@ -290,7 +290,7 @@ export function useGameSelection(leagueId: number, profileId: number) {
   const isPlatformSelected = (id: number) => selectedPlatforms.value.has(id);
 
   // --- payload + submit ---
-  function toSelectedGamePayload(selection: TGameSelection): SelectedGameDtoPayload {
+  function toSelectedGamePayload(selection: TGameSelection): TSelectedGameDtoPayload {
     // Only submit selections for currently visible options
     const visible = new Set(visibleOptions.value.map((o) => o.id));
 

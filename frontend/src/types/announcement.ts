@@ -1,4 +1,4 @@
-export enum AnnouncementType {
+export enum TAnnouncementType {
   INFO = 'INFO',
   WINNER = 'WINNER',
   REGISTER = 'REGISTER',
@@ -6,19 +6,19 @@ export enum AnnouncementType {
   NEUTRAL = 'NEUTRAL',
 }
 
-export interface Announcement {
+export type TAnnouncement = {
   id: number;
-  type: AnnouncementType;
+  type: TAnnouncementType;
   title: string;
   content: string | null;
   visible_until: string;
   visible_from: string;
-}
+};
 
-export interface AnnouncementCreate {
-  type: AnnouncementType;
+export type TAnnouncementCreate = {
+  type: TAnnouncementType;
   title: string;
   content?: string | null;
   visible_until: string;
   visible_from: string;
-}
+};

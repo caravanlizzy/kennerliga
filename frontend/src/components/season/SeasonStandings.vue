@@ -205,7 +205,7 @@ onMounted(() => {
 }
 
 .league-level-indicator {
-  background: #333;
+  background: var(--q-primary);
   color: white;
   width: 32px;
   height: 32px;

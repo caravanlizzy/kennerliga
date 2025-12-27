@@ -318,7 +318,7 @@ import KennerSelect from 'components/base/KennerSelect.vue';
 import KennerButton from 'components/base/KennerButton.vue';
 import { useRouter } from 'vue-router';
 import CreateResultConfig from 'components/game/CreateResultConfig.vue';
-import { TPlatform } from 'src/models/gameModels';
+import { TPlatform } from 'src/types';
 import { TResultConfig } from 'src/types';
 import { createResultConfigData } from 'src/services/gameService';
 import { useResponsive } from 'src/composables/responsive';

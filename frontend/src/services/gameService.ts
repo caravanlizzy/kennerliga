@@ -1,11 +1,11 @@
 import {
-  BanDecisionDtoPayload,
-  FullGameDto,
-  GameOptionChoiceDto,
-  GameOptionDto,
-  SelectedGameDtoPayload,
+  TBanDecisionDtoPayload,
+  TFullGameDto,
+  TGameOptionChoiceDto,
+  TGameOptionDto,
+  TSelectedGameDtoPayload,
   TPlatform,
-} from 'src/models/gameModels';
+} from 'src/types';
 import { api } from 'boot/axios';
 import {
   TGameOption,
@@ -17,7 +17,7 @@ import { useIDStorage } from 'src/composables/IDStorage';
 
 const { addStorageItem, getStorageItem } = useIDStorage();
 
-export async function banGame(banDecision: BanDecisionDtoPayload) {
+export async function banGame(banDecision: TBanDecisionDtoPayload) {
   const data: Record<string, string | number | boolean> = {
     player_banning: banDecision.profileId,
     league: banDecision.leagueId,
@@ -111,7 +111,7 @@ export async function addRestrictions(option: TGameOption): Promise<void> {
 async function createOption(
   option: TGameOption,
   gameId: number
-): Promise<GameOptionDto> {
+): Promise<TGameOptionDto> {
   try {
     const { data: newOption } = await api('game/options/', {
       method: 'POST',
@@ -133,7 +133,7 @@ async function createOption(
 async function createOptionChoice(
   choice: TGameOptionChoice,
   optionId: number
-): Promise<GameOptionChoiceDto> {
+): Promise<TGameOptionChoiceDto> {
   try {
     const { data: newChoice } = await api('game/option-choices/', {
       method: 'POST',
@@ -243,7 +243,7 @@ export async function createTieBreakers(resultConfigId: number, resultConfig: TR
 
 
 export async function createSelectedGame(
-  selectedGame: SelectedGameDtoPayload,
+  selectedGame: TSelectedGameDtoPayload,
   manageOnly = false
 ) {
   const data: Record<string, any> = {
@@ -265,7 +265,7 @@ export async function createSelectedGame(
 }
 
 export async function editSelectedGame(
-  selectedGame: SelectedGameDtoPayload & { id: number }
+  selectedGame: TSelectedGameDtoPayload & { id: number }
 ) {
   try {
     return await api(`/game/selected-games/${selectedGame.id}/`, {
@@ -282,9 +282,10 @@ export async function editSelectedGame(
   }
 }
 
-export async function fetchGameOptions(gameId: number) {
+export async function fetchGameOptions(gameId: number): Promise<TGameOptionDto[]> {
   try {
-    return await api(`/game/options/?game=${gameId}`);
+    const { data } = await api.get<TGameOptionDto[]>(`/game/options/?game=${gameId}`);
+    return data;
   } catch (error) {
     throw new Error(
       `Error retrieving game options for game with id: ${gameId} \n ${error}`
@@ -292,9 +293,10 @@ export async function fetchGameOptions(gameId: number) {
   }
 }
 
-export async function fetchGameOptionChoices(optionId: number) {
+export async function fetchGameOptionChoices(optionId: number): Promise<TGameOptionChoiceDto[]> {
   try {
-    return await api(`/game/option-choices/?option=${optionId}`);
+    const { data } = await api.get<TGameOptionChoiceDto[]>(`/game/option-choices/?option=${optionId}`);
+    return data;
   } catch (error) {
     throw new Error(
       `Error retrieving game option choices for game with id: ${optionId} \n ${error}`
@@ -302,7 +304,7 @@ export async function fetchGameOptionChoices(optionId: number) {
   }
 }
 
-export async function fetchFullGame(gameId: number): Promise<FullGameDto> {
+export async function fetchFullGame(gameId: number): Promise<TFullGameDto> {
   try {
     const { data } = await api(`game/games-full/${gameId}/`);
     return data;

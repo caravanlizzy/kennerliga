@@ -25,7 +25,7 @@
 
 import { getPlatformColor } from 'src/composables/gameSelection';
 import { inject } from 'vue';
-import { TPlatform } from 'src/models/gameModels';
+import { TPlatform } from 'src/types';
 
 const platforms = inject<TPlatform[]>('platforms', []);
 

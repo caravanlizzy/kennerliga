@@ -18,7 +18,7 @@
 
 <script setup lang="ts">
 import { useRoute, RouteLocationNormalizedLoaded, useRouter, RouteRecord } from 'vue-router';
-import { BreadCrumb } from 'src/types';
+import { TBreadCrumb } from 'src/types';
 import { ref, Ref, watch } from 'vue';
 import KennerButton from 'components/base/KennerButton.vue';
 
@@ -28,7 +28,7 @@ const router = useRouter();
 const routeSplitRoute = useRoute();
 
 const allRoutes = router.getRoutes();
-const breadCrumbs: Ref<BreadCrumb[]> = ref([]);
+const breadCrumbs: Ref<TBreadCrumb[]> = ref([]);
 
 const getIcon = (routeString: string, routeObject: RouteRecord): string => {
   if (routeObject.meta.icon) return routeObject.meta.icon;
@@ -44,8 +44,8 @@ const getLabel = (routeString: string, routeObject: RouteRecord): string => {
   else return '';
 };
 
-const createBreadCrumb = (routeString: string, routeObject: RouteRecord): BreadCrumb => {
-  return <BreadCrumb>{
+const createBreadCrumb = (routeString: string, routeObject: RouteRecord): TBreadCrumb => {
+  return <TBreadCrumb>{
     label: getLabel(routeString, routeObject),
     icon: getIcon(routeString, routeObject),
     forwardRouteName: routeObject.name
@@ -55,7 +55,7 @@ const createBreadCrumb = (routeString: string, routeObject: RouteRecord): BreadC
 const getRouteObject = (allRoutes: RouteRecord[], currentRouteString: string): RouteRecord | undefined => {
   return allRoutes.find((r) => r.path.replaceAll('/', '') === currentRouteString);
 };
-const getBreadCrumbs = (routeSplitRoute: RouteLocationNormalizedLoaded): BreadCrumb[] => {
+const getBreadCrumbs = (routeSplitRoute: RouteLocationNormalizedLoaded): TBreadCrumb[] => {
   const breadCrumbs = [{
     label: 'Home',
     icon: 'home',

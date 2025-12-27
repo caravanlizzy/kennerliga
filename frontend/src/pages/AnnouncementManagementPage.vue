@@ -54,7 +54,7 @@
         </q-card-section>
       </q-card>
 
-      <!-- New Announcement Form -->
+      <!-- New TAnnouncement Form -->
       <q-card flat bordered>
         <q-card-section>
           <div class="text-h6 q-mb-md">Add New Announcement</div>
@@ -146,7 +146,7 @@ import { storeToRefs } from 'pinia';
 import { useAnnouncementStore } from 'stores/announcementStore';
 import LoadingSpinner from 'components/base/LoadingSpinner.vue';
 import KennerButton from 'components/base/KennerButton.vue';
-import { AnnouncementType, type AnnouncementCreate } from 'src/models/announcementModel';
+import { AnnouncementType, type AnnouncementCreate } from 'src/types';
 
 const announcementStore = useAnnouncementStore();
 const { announcements, loading } = storeToRefs(announcementStore);

@@ -37,7 +37,7 @@
 </template>
 <script setup lang="ts">
 import { getPlatformColor, getPlatformName } from 'src/composables/gameSelection';
-import { TPlatform } from 'src/models/gameModels';
+import { TPlatform } from 'src/types';
 import { inject } from 'vue';
 
 const platforms = inject<TPlatform[]>('platforms', []);

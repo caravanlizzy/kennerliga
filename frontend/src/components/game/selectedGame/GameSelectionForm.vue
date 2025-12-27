@@ -110,7 +110,7 @@
 import KennerSelect from 'components/base/KennerSelect.vue';
 import KennerButton from 'components/base/KennerButton.vue';
 import { getPlatformColor, getPlatformName } from 'src/composables/gameSelection';
-import { TPlatform } from 'src/models/gameModels';
+import { TPlatform } from 'src/types';
 import { computed, inject } from 'vue';
 
 const platforms = inject<TPlatform[]>('platforms', []);

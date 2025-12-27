@@ -1,4 +1,5 @@
 import { api } from 'boot/axios';
+import { TSeason, TSeasonParticipant, TLeague } from 'src/types';
 
 export async function registerForSeason(): Promise<any> {
   try {
@@ -18,8 +19,7 @@ export async function fetchIsRegisteredForSeason(): Promise<boolean> {
   }
 }
 
-
-export async function fetchOpenSeasonParticipants(): Promise<any[]> {
+export async function fetchOpenSeasonParticipants(): Promise<TSeasonParticipant[]> {
   try {
     const { data } = await api.get('/season/season-participants/current/');
     return data;
@@ -29,7 +29,7 @@ export async function fetchOpenSeasonParticipants(): Promise<any[]> {
   }
 }
 
-export async function fetchSeason(seasonId: number): Promise<any> {
+export async function fetchSeason(seasonId: number): Promise<TSeason | undefined> {
   try {
     const { data } = await api(`/season/seasons/${seasonId}/`);
     return data;
@@ -44,10 +44,10 @@ export async function fetchCurrentSeasonId(): Promise<number | null> {
 }
 /** Backend helpers */
 // find-or-create season
-export async function createSeason(targetYear: number, targetMonth: number) {
+export async function createSeason(targetYear: number, targetMonth: number): Promise<TSeason> {
   const { data: seasons } = await api('/season/seasons/');
   let season = Array.isArray(seasons)
-    ? seasons.find((s: any) => s.year === targetYear && s.month === targetMonth)
+    ? seasons.find((s: TSeason) => s.year === targetYear && s.month === targetMonth)
     : null;
 
   if (!season) {
@@ -57,10 +57,10 @@ export async function createSeason(targetYear: number, targetMonth: number) {
     });
     season = res.data;
   }
-  return season; // { id, year, month, ... }
+  return season as TSeason; // { id, year, month, ... }
 }
 
-async function fetchSeasonParticipants(seasonId: number) {
+async function fetchSeasonParticipants(seasonId: number): Promise<TSeasonParticipant[]> {
   // Season detail should include participants array
   console.log({ seasonId });
   const { data } = await api(`/season/season-participants/?season=${seasonId}`);
@@ -68,7 +68,7 @@ async function fetchSeasonParticipants(seasonId: number) {
   return data ? data : [];
 }
 
-export async function fetchLeaguesBySeason(seasonId: number) {
+export async function fetchLeaguesBySeason(seasonId: number): Promise<TLeague[]> {
   try {
     const { data } = await api(`/league/leagues/?season=${seasonId}`);
     return data;
@@ -83,7 +83,7 @@ type ProfileLike = { id: number } | number;
 export async function ensureParticipants(
   seasonId: number,
   profiles: ProfileLike[]
-) {
+): Promise<TSeasonParticipant[]> {
   // Normalize incoming profiles to a unique list of numeric IDs, preserving order
   const incomingIds = Array.from(
     new Set(
@@ -95,9 +95,9 @@ export async function ensureParticipants(
 
   // Fetch existing participants and index by profile id
   const existing = await fetchSeasonParticipants(seasonId);
-  const byProfile: Record<number, any> = {};
+  const byProfile: Record<number, TSeasonParticipant> = {};
   for (const sp of existing) {
-    const pid = sp?.profile?.id ?? sp?.profile ?? sp?.profile;
+    const pid = sp.profile_id;
     if (pid != null) byProfile[pid] = sp;
   }
 
@@ -120,13 +120,13 @@ export async function ensureParticipants(
 export async function createLeagueForSeason(
   seasonId: number,
   level: number,
-  seasonParticipants: any[],
+  seasonParticipants: TSeasonParticipant[],
   memberProfileIds: number[]
-) {
+): Promise<TLeague> {
   // map chosen PlayerProfile IDs -> SeasonParticipant IDs
   const spIds = seasonParticipants
-    .filter((sp: any) => memberProfileIds.includes(sp.profile))
-    .map((sp: any) => sp.id);
+    .filter((sp: TSeasonParticipant) => memberProfileIds.includes(sp.profile_id))
+    .map((sp: TSeasonParticipant) => sp.id);
 
   const { data } = await api('/league/leagues/', {
     method: 'POST',

@@ -51,29 +51,35 @@
       </thead>
 
       <tbody>
-      <tr
+      <template
         v-for="(row, index) in standings.standings"
         :key="row.player_profile_id"
-        class="leaderboard-row"
-        :class="{ 'bg-amber-1': index === 0 }"
       >
-        <!-- Player -->
-        <td class="text-left">
-          <div class="text-body2 text-weight-medium">
-            {{ row.profile_name }}
-          </div>
+        <tr
+          class="leaderboard-row"
+          :class="{
+            'bg-amber-1': index === 0,
+          }"
+        >
+          <!-- Player -->
+          <td class="text-left relative-position">
+            <div
+              v-if="bestLeague(row) !== null"
+              class="row-group-line"
+              :class="'bg-' + leagueBadgeColor(bestLeague(row)!)"
+            ></div>
+            <div
+              v-if="shouldShowGroupHeader(index) && bestLeague(row) !== null"
+              class="group-label-line"
+            >
+               <span class="group-label-text">L{{ bestLeague(row) }}</span>
+            </div>
+            <div class="text-body2 text-weight-medium q-pl-lg">
+              {{ row.profile_name }}
+            </div>
+          </td>
 
-          <!-- Floating badge -->
-          <q-badge
-            v-if="bestLeague(row) !== null"
-            :color="leagueBadgeColor(bestLeague(row)!)"
-            class="best-league-badge"
-          >
-            L{{ bestLeague(row) }}
-          </q-badge>
-        </td>
-
-        <!-- 1st -->
+          <!-- 1st -->
         <td class="text-center">
             <span
               class="text-weight-medium"
@@ -113,6 +119,7 @@
             </span>
         </td>
       </tr>
+      </template>
       </tbody>
     </q-markup-table>
   </div>
@@ -178,6 +185,16 @@ function bestLeague(row: PlayerYearStanding): number | null {
   return Math.min(...levels);
 }
 
+function shouldShowGroupHeader(index: number): boolean {
+  if (!standings.value || !standings.value.standings[index]) return false;
+  if (index === 0) return true;
+
+  const currentBest = bestLeague(standings.value.standings[index]);
+  const prevBest = bestLeague(standings.value.standings[index - 1]);
+
+  return currentBest !== prevBest;
+}
+
 // lower league number => more "winner-like" color
 function leagueBadgeColor(league: number): string {
   if (league <= 1) return 'amber-8'; // best
@@ -198,15 +215,33 @@ watch(
 
 <style scoped>
 .leaderboard-row {
-  position: relative; /* anchor for floating badge */
+  position: relative;
 }
 
-/* keep only what Quasar classes can't do (floating positioning) */
-.best-league-badge {
+.row-group-line {
   position: absolute;
-  top: 50%;
-  right: 8px;
-  transform: translateY(-50%);
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+}
+
+.group-label-line {
+  position: absolute;
+  left: 6px;
+  top: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
   pointer-events: none;
+  z-index: 1;
+}
+
+.group-label-text {
+  font-size: 10px;
+  font-weight: 900;
+  color: #555;
+  text-transform: uppercase;
+  white-space: nowrap;
 }
 </style>

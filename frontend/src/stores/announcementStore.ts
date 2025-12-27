@@ -2,38 +2,38 @@ import { defineStore } from 'pinia';
 import { ref } from 'vue';
 import { api } from 'boot/axios';
 import {
-  Announcement,
-  AnnouncementCreate,
-  AnnouncementType,
-} from 'src/models/announcementModel';
+  TAnnouncement,
+  TAnnouncementCreate,
+  TAnnouncementType,
+} from 'src/types';
 
 const BASE_URL = 'announcement/announcements/';
 
 // more saturated banner colors
-const bannerClasses: Record<AnnouncementType, string> = {
-  [AnnouncementType.INFO]: 'bg-blue-6 text-white',
-  [AnnouncementType.WINNER]: 'bg-amber-6 text-black',
-  [AnnouncementType.REGISTER]: 'bg-green-6 text-white',
-  [AnnouncementType.WARNING]: 'bg-red-6 text-white',
-  [AnnouncementType.NEUTRAL]: 'bg-grey-7 text-white',
+const bannerClasses: Record<TAnnouncementType, string> = {
+  [TAnnouncementType.INFO]: 'bg-blue-6 text-white',
+  [TAnnouncementType.WINNER]: 'bg-amber-6 text-black',
+  [TAnnouncementType.REGISTER]: 'bg-green-6 text-white',
+  [TAnnouncementType.WARNING]: 'bg-red-6 text-white',
+  [TAnnouncementType.NEUTRAL]: 'bg-grey-7 text-white',
 };
 
-const announcementIcons: Record<AnnouncementType, string> = {
-  [AnnouncementType.INFO]: 'primary',
-  [AnnouncementType.WINNER]: 'emoji_events',
-  [AnnouncementType.REGISTER]: 'how_to_reg',
-  [AnnouncementType.WARNING]: 'warning',
-  [AnnouncementType.NEUTRAL]: 'campaign',
+const announcementIcons: Record<TAnnouncementType, string> = {
+  [TAnnouncementType.INFO]: 'primary',
+  [TAnnouncementType.WINNER]: 'emoji_events',
+  [TAnnouncementType.REGISTER]: 'how_to_reg',
+  [TAnnouncementType.WARNING]: 'warning',
+  [TAnnouncementType.NEUTRAL]: 'campaign',
 };
 
 export const useAnnouncementStore = defineStore('announcement', () => {
-  const announcements = ref<Announcement[]>([]);
+  const announcements = ref<TAnnouncement[]>([]);
   const loading = ref(false);
 
-  async function fetchAnnouncements(): Promise<Announcement[]> {
+  async function fetchAnnouncements(): Promise<TAnnouncement[]> {
     loading.value = true;
     try {
-      const response = await api.get<Announcement[]>(BASE_URL);
+      const response = await api.get<TAnnouncement[]>(BASE_URL);
       announcements.value = response.data;
       return response.data;
     } finally {
@@ -42,11 +42,11 @@ export const useAnnouncementStore = defineStore('announcement', () => {
   }
 
   async function addAnnouncement(
-    announcement: AnnouncementCreate,
-  ): Promise<Announcement> {
+    announcement: TAnnouncementCreate,
+  ): Promise<TAnnouncement> {
     loading.value = true;
     try {
-      const response = await api.post<Announcement>(BASE_URL, announcement);
+      const response = await api.post<TAnnouncement>(BASE_URL, announcement);
       announcements.value.push(response.data);
       return response.data;
     } finally {

@@ -4,7 +4,7 @@ import { computed, ref, shallowRef } from 'vue';
 import { fetchLeagueDetails } from 'src/services/leagueService';
 import { useUserStore } from 'stores/userStore';
 import { api } from 'boot/axios';
-import { MatchResult, TMember, TLeague, TLeagueStatus } from 'src/types';
+import { TMatchResult, TLeagueMember, TLeague, TLeagueStatus } from 'src/types';
 
 
 /**
@@ -33,7 +33,7 @@ export const useLeagueStore = (id: number) => {
     // leagueData
     const leagueId = ref(id);
     const leagueData = shallowRef<TLeague|null>(null);
-    const members = ref<TMember[]>([]);
+    const members = ref<TLeagueMember[]>([]);
     const leagueStatus = ref<TLeagueStatus>('PICKING'); // states: PICKING, BANNING, REPICKING, PLAYING, DONE
 
     const statusMap: Record<TLeagueStatus, { noun?: string; verb?: string }> = {
@@ -50,8 +50,8 @@ export const useLeagueStore = (id: number) => {
     const statusVerb = computed(() => statusMap[leagueStatus.value]?.verb ?? '');
 
     // --- Derived maps for O(1) lookups ---
-    const membersById = computed<{ [key: number]: TMember }>(() =>
-      members.value.reduce((acc: { [key: number]: TMember }, m) => {
+    const membersById = computed<{ [key: number]: TLeagueMember }>(() =>
+      members.value.reduce((acc: { [key: number]: TLeagueMember }, m) => {
         acc[m.id] = m;
         return acc;
       }, {})
@@ -85,9 +85,9 @@ export const useLeagueStore = (id: number) => {
 
     // --- Results keyed by selected_game for fast access ---
     // Using a Record so reactivity stays simple.
-    const matchResultsBySelectedGame = ref<Record<number, MatchResult[]>>({});
+    const matchResultsBySelectedGame = ref<Record<number, TMatchResult[]>>({});
 
-    const matchResults = computed<MatchResult[]>(() =>
+    const matchResults = computed<TMatchResult[]>(() =>
       Object.values(matchResultsBySelectedGame.value).flat()
     );
 
@@ -118,8 +118,8 @@ export const useLeagueStore = (id: number) => {
     }
 
     // Helper to set results atomically & dedup on id
-    function setResultsForGame(selectedGameId: number, results: MatchResult[]) {
-      const uniq = new Map<number, MatchResult>();
+    function setResultsForGame(selectedGameId: number, results: TMatchResult[]) {
+      const uniq = new Map<number, TMatchResult>();
       results.forEach(r => uniq.set(r.id, r));
       matchResultsBySelectedGame.value = {
         ...matchResultsBySelectedGame.value,
@@ -135,7 +135,7 @@ export const useLeagueStore = (id: number) => {
       loading.value = true;
       try {
         const promises = ids.map((id) =>
-          api.get<MatchResult[]>(`/result/results/?selected_game=${id}`)
+          api.get<TMatchResult[]>(`/result/results/?selected_game=${id}`)
             .then(({ data }) => setResultsForGame(id, data))
             .catch(() => setResultsForGame(id, []))
         );
@@ -148,7 +148,7 @@ export const useLeagueStore = (id: number) => {
     async function refreshResultsForGame(selectedGameId: number) {
       loading.value = true;
       try {
-        const { data } = await api.get<MatchResult[]>(`/result/results/?selected_game=${selectedGameId}`);
+        const { data } = await api.get<TMatchResult[]>(`/result/results/?selected_game=${selectedGameId}`);
         setResultsForGame(selectedGameId, data);
       } finally {
         loading.value = false;
