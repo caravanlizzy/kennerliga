@@ -30,25 +30,29 @@
     <!-- State primary -->
     <div v-if="loadingSeasons" class="text-grey-7">Loading seasons…</div>
 
-    <q-separator />
-
     <!-- Leagues + matrices -->
-    <div v-if="!selectedSeasonId" class="text-grey-7">
+    <div v-if="!selectedSeasonId" class="text-grey-7 q-mt-md">
       Please select year and month that contain a league.
     </div>
 
-    <div v-else-if="loadingLeagues" class="text-grey-7">Loading leagues…</div>
+    <div v-else-if="loadingLeagues" class="text-grey-7 q-mt-md">Loading leagues…</div>
 
-    <div v-else-if="leagues.length === 0" class="text-grey-7">
+    <div v-else-if="leagues.length === 0" class="text-grey-7 q-mt-md">
       No leagues for this season. (Should not happen if filters are correct.)
     </div>
 
-    <div v-else class="column">
-      <div v-for="league in leagues" :key="league.id">
-        <q-badge class="q-ml-xs q-mt-sm q-pa-xs" color="primary" outlined dense>
-          L{{ league.level }}</q-badge
-        >
-        <LeagueStandingsMatrix class="q-mb-md" :leagueId="league.id" />
+    <div v-else class="column q-gutter-y-md">
+      <div v-for="league in leagues" :key="league.id" class="league-container">
+        <div class="row items-center q-mb-sm">
+          <div class="league-level-indicator q-mr-sm">
+            L{{ league.level }}
+          </div>
+          <div class="text-subtitle1 text-weight-bold text-grey-9">
+            League {{ league.level }}
+          </div>
+          <q-separator class="col q-ml-md" />
+        </div>
+        <LeagueStandingsMatrix :leagueId="league.id" />
       </div>
     </div>
   </div>
@@ -74,6 +78,7 @@ interface Season {
 interface League {
   id: number;
   name: string;
+  level: number;
 }
 
 const seasonsWithLeagues = ref<Season[]>([]);
@@ -186,3 +191,22 @@ onMounted(() => {
   loadSeasonsWithLeagues();
 });
 </script>
+
+<style scoped lang="scss">
+.league-container {
+  background: white;
+}
+
+.league-level-indicator {
+  background: #333;
+  color: white;
+  width: 32px;
+  height: 32px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 0.9rem;
+}
+</style>

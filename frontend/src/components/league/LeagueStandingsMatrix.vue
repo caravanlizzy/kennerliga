@@ -36,18 +36,26 @@
           </q-tr>
         </template>
 
-        <!-- Player name column -->
         <template #body-cell-profile_name="props">
-          <q-td :props="props" class="text-left text-body2 text-weight-medium">
+          <q-td :props="props" class="text-left">
             <div class="row items-center no-wrap">
-              <span>{{ props.value }}</span>
+              <q-badge
+                color="grey-3"
+                text-color="grey-9"
+                class="text-weight-bold"
+              >
+                {{ props.value.substring(0, 3).toUpperCase() }}
+                <q-tooltip>
+                  {{ props.value }}
+                </q-tooltip>
+              </q-badge>
             </div>
           </q-td>
         </template>
 
         <!-- Total column -->
         <template #body-cell-total="props">
-          <q-td :props="props" class="text-center">
+          <q-td :props="props" class="text-right">
             <div class="text-dark text-weight-bold text-body2">
               {{ formatNumber(props.value) }}
             </div>
@@ -183,7 +191,7 @@ const tableColumns = computed<QTableColumn[]>(() => {
   const cols: QTableColumn[] = [
     {
       name: 'profile_name',
-      label: 'Player',
+      label: '',
       field: 'profile_name',
       align: 'left',
       sortable: true,
@@ -207,7 +215,7 @@ const tableColumns = computed<QTableColumn[]>(() => {
     name: 'total',
     label: 'LP',
     field: 'total',
-    align: 'center',
+    align: 'right',
     sortable: true,
   });
 
