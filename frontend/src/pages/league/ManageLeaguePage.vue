@@ -1,376 +1,59 @@
 <template>
   <q-page class="q-pa-md">
     <!-- Header -->
-    <div
+    <LeagueHeader
       v-if="!loading && league"
-      class="row items-center q-mb-lg q-pa-md bg-grey-1 rounded-borders"
-    >
-      <div class="col-grow">
-        <q-chip
-          dense
-          square
-          color="grey-8"
-          text-color="white"
-          class="q-ml-xs text-weight-medium"
-        >
-          {{ season?.name }} · {{ season?.status }}
-        </q-chip>
-        <q-chip
-          dense
-          square
-          color="primary"
-          text-color="white"
-          class="q-ml-xs text-weight-medium"
-        >
-          L {{ league.level }}
-        </q-chip>
-      </div>
-      <div class="col-auto">
-        <q-btn
-          flat
-          icon="refresh"
-          round
-          color="secondary"
-          size="md"
-          @click="load"
-        >
-          <q-tooltip>Refresh</q-tooltip>
-        </q-btn>
-      </div>
-    </div>
+      :league="league"
+      :season="season"
+      @refresh="load"
+    />
 
     <!-- Loading / Error -->
     <LoadingSpinner v-if="loading" />
     <ErrorDisplay v-else-if="error" :error="error" class="q-mb-md" />
 
     <!-- Empty state -->
-    <q-card
+    <EmptyMembersState
       v-else-if="!league?.members || league.members.length === 0"
-      flat
-      bordered
-      class="q-pa-xl flex items-center justify-center bg-grey-1"
-    >
-      <div class="column items-center q-pa-lg">
-        <q-icon name="group_off" size="64px" color="grey-4" class="q-mb-md" />
-        <div class="text-h6 text-grey-8">No members yet</div>
-        <div class="text-body1 text-grey-6 q-mt-sm">
-          Add members to start selecting games.
-        </div>
-      </div>
-    </q-card>
+    />
 
     <!-- Members Grid -->
     <div v-else class="row q-col-gutter-xl">
-      <template v-for="member in league?.members" :key="member.id">
-        <div class="col-12">
-          <!-- Member Group Header -->
-          <div class="row items-center q-mb-sm q-gutter-sm">
-            <q-avatar color="primary" text-color="white" size="md">
-              {{ member.profile_name.charAt(0).toUpperCase() }}
-            </q-avatar>
-            <div class="text-h5 text-weight-bold text-grey-9">
-              {{ member.profile_name }}
-            </div>
-            <!-- Banned Game Display -->
-            <q-chip
-              v-if="member.my_banned_game"
-              outline
-              square
-              color="red-7"
-              text-color="red-7"
-              icon="block"
-              class="q-ml-sm"
-            >
-              Banned: {{ member.my_banned_game.game_name }}
-              <q-btn
-                flat
-                round
-                dense
-                size="xs"
-                icon="close"
-                class="q-ml-xs"
-              >
-                <q-tooltip>Remove Ban</q-tooltip>
-              </q-btn>
-            </q-chip>
-            <q-chip
-              v-else-if="member.has_banned"
-              outline
-              square
-              color="grey-7"
-              text-color="grey-7"
-              icon="skip_next"
-              class="q-ml-sm"
-            >
-              Ban Skipped
-              <q-btn
-                flat
-                round
-                dense
-                size="xs"
-                icon="close"
-                class="q-ml-xs"
-              >
-                <q-tooltip>Remove Skip</q-tooltip>
-              </q-btn>
-            </q-chip>
-            <q-space />
-            <div
-              v-if="
-                ['PICKING', 'REPICKING', 'BANNING'].includes(league.status) &&
-                season?.status === 'RUNNING'
-              "
-            >
-              <q-badge
-                v-if="member.id === league.active_player"
-                color="positive"
-                text-color="white"
-                class="q-py-xs q-px-sm"
-              >
-                <q-icon size="xs" name="star" class="q-mr-xs" />
-                <span class="text-weight-bold">Active Player</span>
-              </q-badge>
-            </div>
-          </div>
-
-          <!-- Quick Actions Bar -->
-          <div class="row q-gutter-sm q-mb-md">
-            <KennerButton
-              v-if="(member.selected_games?.length || 0) < 2"
-              outline
-              dense
-              color="primary"
-              icon="add_circle"
-              label="Add Game"
-              class="q-px-sm"
-              @click="() => (selectingGameMember = member)"
-            />
-            <KennerButton
-              v-if="!member.my_banned_game"
-              outline
-              dense
-              color="red-7"
-              icon="block"
-              label="Ban Game"
-              class="q-px-sm"
-              @click="() => (banningGameMember = member)"
-            />
-            <KennerButton
-              v-if="
-                member.id !== league.active_player &&
-                ['PICKING', 'REPICKING', 'BANNING'].includes(league.status) &&
-                season?.status === 'RUNNING'
-              "
-              outline
-              dense
-              color="secondary"
-              icon="person_outline"
-              label="Set Active"
-              class="q-px-sm"
-              @click="setActivePlayer(member.profile)"
-            />
-          </div>
-
-          <div class="row q-col-gutter-lg">
-            <!-- Card per selected game -->
-            <div
-              v-for="selGame in member.selected_games || []"
-              :key="`${member.id}-${selGame.id}`"
-              class="col-12 col-md-4"
-            >
-              <q-card flat bordered class="fit rounded-borders overflow-hidden">
-                <!-- Header Section -->
-                <q-card-section class="q-pa-md bg-grey-2">
-                  <div class="row items-center justify-between">
-                    <div class="col">
-                      <div class="text-subtitle1 text-weight-bold text-grey-9">
-                        <q-icon
-                          name="sports_esports"
-                          size="xs"
-                          class="q-mr-xs"
-                        />
-                        {{ selGame?.game_name || 'No Game Selected' }}
-                      </div>
-                    </div>
-                    <div class="col-auto">
-                      <div class="row items-center q-gutter-xs">
-                        <q-btn
-                          flat
-                          dense
-                          round
-                          color="secondary"
-                          icon="edit"
-                          size="sm"
-                          @click="() => (editingGame = { member, selGame })"
-                        >
-                          <q-tooltip>Edit Settings</q-tooltip>
-                        </q-btn>
-                        <q-btn
-                          flat
-                          dense
-                          round
-                          :color="
-                            hasResult(member, selGame) ? 'secondary' : 'primary'
-                          "
-                          :icon="
-                            hasResult(member, selGame)
-                              ? 'edit_note'
-                              : 'post_add'
-                          "
-                          size="sm"
-                          @click="
-                            () =>
-                              hasResult(member, selGame)
-                                ? (editResultForSelGameId = selGame.id)
-                                : (postResultForSelGame = selGame)
-                          "
-                        >
-                          <q-tooltip>{{
-                            hasResult(member, selGame)
-                              ? 'Edit Result'
-                              : 'Post Result'
-                          }}</q-tooltip>
-                        </q-btn>
-                        <q-btn
-                          flat
-                          dense
-                          round
-                          color="red-6"
-                          icon="delete_outline"
-                          size="sm"
-                          @click="onDeleteSelectedGame(member, selGame)"
-                        >
-                          <q-tooltip>Delete Game</q-tooltip>
-                        </q-btn>
-                      </div>
-                    </div>
-                  </div>
-                </q-card-section>
-
-                <!-- Game Content Sections (Expandables) -->
-                <q-card-section class="q-pa-none">
-                  <q-expansion-item
-                    dense
-                    icon="tune"
-                    label="Settings"
-                    header-class="text-weight-bold text-grey-7 bg-grey-1"
-                  >
-                    <q-card-section class="bg-white q-pa-md">
-                      <GameSettingsDisplay
-                        :selectedOptions="selGame.selected_options"
-                      />
-                    </q-card-section>
-                  </q-expansion-item>
-                  <q-separator />
-                  <q-expansion-item
-                    dense
-                    icon="emoji_events"
-                    label="Match Result"
-                    header-class="text-weight-bold text-grey-7 bg-grey-1"
-                  >
-                    <q-card-section class="bg-white q-pa-md">
-                      <MatchResult
-                        v-if="hasResult(member, selGame)"
-                        :displayGameName="false"
-                        :selectedGame="selGame"
-                        :matchResults="matchResultsBySelectedGameId"
-                      />
-                      <div v-else class="text-grey-5 text-center q-py-sm">
-                        No results posted
-                      </div>
-                    </q-card-section>
-                  </q-expansion-item>
-                </q-card-section>
-              </q-card>
-            </div>
-          </div>
-        </div>
-      </template>
+      <MemberGameCard
+        v-for="member in league?.members"
+        :key="member.id"
+        :member="member"
+        :league="league"
+        :season="season"
+        :matchResultsBySelectedGameId="matchResultsBySelectedGameId"
+        @add-game="m => (selectingGameMember = m)"
+        @ban-game="m => (banningGameMember = m)"
+        @set-active="profileId => setActivePlayer(profileId)"
+        @edit-game="data => (editingGame = data)"
+        @edit-result="id => (editResultForSelGameId = id)"
+        @post-result="selGame => (postResultForSelGame = selGame)"
+        @delete-game="data => onDeleteSelectedGame(data.member, data.selGame)"
+      />
 
       <!-- Unified Dialog for all Forms -->
-      <q-dialog
-        :model-value="
-          !!(
-            editingGame ||
-            selectingGameMember ||
-            banningGameMember ||
-            postResultForSelGame ||
-            editResultForSelGameId
-          )
+      <ManagerFormsDialog
+        v-if="league"
+        :league="league"
+        :editingGame="editingGame"
+        :selectingGameMember="selectingGameMember"
+        :banningGameMember="banningGameMember"
+        :postResultForSelGame="postResultForSelGame"
+        :editResultForSelGameId="editResultForSelGameId"
+        @close="closeForm"
+        @success-submit="onSuccessfulGameSubmit"
+        @success-edit="onSuccessfulGameEdit"
+        @success-result="
+          () => {
+            closeForm();
+            load();
+          }
         "
-        @update:model-value="closeForm"
-        persistent
-      >
-        <div style="min-width: 320px; max-width: 90vw">
-          <FormLayout v-if="editingGame" @onClose="closeForm">
-            <template #head>
-              Edit Game
-              <span class="text-primary">{{
-                editingGame.selGame?.game_name
-              }}</span>
-              for
-              <span class="text-primary">{{
-                editingGame.member?.profile_name
-              }}</span>
-            </template>
-            <GameSettingsEditor
-              :leagueId="league.id"
-              :profileId="editingGame.member.profile"
-              :gameId="editingGame.selGame.game"
-              :selectedGameId="editingGame.selGame.id"
-              @onSuccess="onSuccessfulGameEdit"
-            />
-          </FormLayout>
-
-          <FormLayout v-if="selectingGameMember" @onClose="closeForm">
-            <template #head>
-              Select Game for
-              <span class="text-primary">{{
-                selectingGameMember.profile_name
-              }}</span>
-            </template>
-            <GameSelectionView
-              manageOnly
-              :leagueId="league.id"
-              :profileId="selectingGameMember.profile"
-              @onSuccess="onSuccessfulGameSubmit"
-            />
-          </FormLayout>
-
-          <FormLayout v-if="banningGameMember" @onClose="closeForm">
-            <template #head>
-              Ban Game for
-              <span class="text-primary">{{
-                banningGameMember.profile_name
-              }}</span>
-            </template>
-            <BanGameForm
-              :league="league"
-              :member="banningGameMember"
-              @onSuccess="onSuccessfulGameSubmit"
-            />
-          </FormLayout>
-
-          <FormLayout v-if="postResultForSelGame" @onClose="closeForm">
-            <template #head>
-              Post Result for
-              <span class="text-primary">{{
-                postResultForSelGame.game_name
-              }}</span>
-            </template>
-            <MatchResultForm
-              :selectedGameId="postResultForSelGame.id"
-              :leagueId="league.id"
-              @submitted="
-                () => {
-                  closeForm();
-                  load();
-                }
-              "
-            />
-          </FormLayout>
-        </div>
-      </q-dialog>
+      />
 
       <div v-if="editResultForSelGameId"></div>
     </div>
@@ -386,16 +69,12 @@ import { fetchLeagueDetails } from 'src/services/leagueService';
 import { fetchSeason } from 'src/services/seasonService';
 import ErrorDisplay from 'components/base/ErrorDisplay.vue';
 import LoadingSpinner from 'components/base/LoadingSpinner.vue';
-import FormLayout from 'components/league/manager/FormLayout.vue';
-import GameSelectionView from 'components/game/selectedGame/GameSelectionView.vue';
-import GameSettingsEditor from 'components/game/selectedGame/GameSettingsEditor.vue';
-import GameSettingsDisplay from 'components/game/selectedGame/GameSettingsDisplay.vue';
-import MatchResultForm from 'components/league/MatchResultForm.vue';
-import MatchResult from 'components/league/MatchResult.vue';
+import LeagueHeader from 'components/league/manager/LeagueHeader.vue';
+import EmptyMembersState from 'components/league/manager/EmptyMembersState.vue';
+import MemberGameCard from 'components/league/manager/MemberGameCard.vue';
+import ManagerFormsDialog from 'components/league/manager/ManagerFormsDialog.vue';
 import { useDialog } from 'src/composables/dialog';
 import type { TSeason } from 'src/types';
-import BanGameForm from 'components/game/selectedGame/BanGameForm.vue';
-import KennerButton from 'components/base/KennerButton.vue';
 
 type SelectedGame = {
   id: number;
@@ -477,11 +156,6 @@ async function setActivePlayer(profileId: number) {
   } catch (e) {
     $q.notify({ type: 'negative', message: 'Failed to set active player' });
   }
-}
-
-function hasResult(_member: Member, selGame: SelectedGame) {
-  const results = matchResultsBySelectedGameId.value[selGame.id];
-  return Array.isArray(results) && results.length > 0;
 }
 
 function closeForm() {
