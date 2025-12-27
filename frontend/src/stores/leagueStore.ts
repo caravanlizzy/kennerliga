@@ -4,7 +4,7 @@ import { computed, ref, shallowRef } from 'vue';
 import { fetchLeagueDetails } from 'src/services/leagueService';
 import { useUserStore } from 'stores/userStore';
 import { api } from 'boot/axios';
-import { TMatchResult, TLeagueMember, TLeague, TLeagueStatus } from 'src/types';
+import { TMatchResult, TLeagueMemberDto, TLeagueDto, TLeagueStatus } from 'src/types';
 
 
 /**
@@ -32,8 +32,8 @@ export const useLeagueStore = (id: number) => {
 
     // leagueData
     const leagueId = ref(id);
-    const leagueData = shallowRef<TLeague|null>(null);
-    const members = ref<TLeagueMember[]>([]);
+    const leagueData = shallowRef<TLeagueDto|null>(null);
+    const members = ref<TLeagueMemberDto[]>([]);
     const leagueStatus = ref<TLeagueStatus>('PICKING'); // states: PICKING, BANNING, REPICKING, PLAYING, DONE
 
     const statusMap: Record<TLeagueStatus, { noun?: string; verb?: string }> = {
@@ -50,8 +50,8 @@ export const useLeagueStore = (id: number) => {
     const statusVerb = computed(() => statusMap[leagueStatus.value]?.verb ?? '');
 
     // --- Derived maps for O(1) lookups ---
-    const membersById = computed<{ [key: number]: TLeagueMember }>(() =>
-      members.value.reduce((acc: { [key: number]: TLeagueMember }, m) => {
+    const membersById = computed<{ [key: number]: TLeagueMemberDto }>(() =>
+      members.value.reduce((acc: { [key: number]: TLeagueMemberDto }, m) => {
         acc[m.id] = m;
         return acc;
       }, {})

@@ -1,7 +1,7 @@
 <template>
   <div v-if="announcements.length" :class="isMobile ? 'q-mb-md' : 'q-mb-lg'">
     <div v-for="a in announcements" :key="a.id" class="q-mb-md">
-      <!-- TAnnouncement Card -->
+      <!-- TAnnouncementDto Card -->
       <q-card
         flat
         bordered

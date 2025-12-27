@@ -81,7 +81,7 @@
 import { ref, type Ref, nextTick, onMounted, onUnmounted } from 'vue';
 import { QInput, QScrollArea } from 'quasar';
 import { postMessage, fetchMessages } from 'src/services/chatService';
-import type { TMessage } from 'src/types';
+import type { TMessageDto } from 'src/types';
 import { useUserStore } from 'stores/userStore';
 import { storeToRefs } from 'pinia';
 import LoadingSpinner from 'components/base/LoadingSpinner.vue';
@@ -92,7 +92,7 @@ const { user, isAuthenticated } = storeToRefs(useUserStore());
 let lastDateTime: string | undefined;
 
 const loading = ref(false);
-const messages: Ref<TMessage[]> = ref([]);
+const messages: Ref<TMessageDto[]> = ref([]);
 const newMessage = ref('');
 const sending = ref(false);
 const showScrollDown = ref(false);
@@ -113,7 +113,7 @@ function onScroll(info: {
   showScrollDown.value = diff > 200;
 }
 
-function isMine(m: TMessage) {
+function isMine(m: TMessageDto) {
   if (m.sender != null && user.value?.username != null) {
     return m.sender === user.value.username;
   }

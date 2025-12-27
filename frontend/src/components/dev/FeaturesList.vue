@@ -34,7 +34,7 @@
 <script setup lang="ts">
 const features = [
   { title: 'Upload Past Leagues', desc: 'Manage previous seasons.', icon: 'calendar_month' },
-  { title: 'TAnnouncement Display', desc: 'League news and updates.', icon: 'campaign' },
+  { title: 'TAnnouncementDto Display', desc: 'League news and updates.', icon: 'campaign' },
   { title: 'Automated leage management', desc: 'I.e. open registraion, create leagues etc.', icon: 'auto-awesome' },
   { title: 'Profile Details', desc: 'Player profile & stats.', icon: 'person' }
 ]

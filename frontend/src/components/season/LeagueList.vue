@@ -92,14 +92,14 @@
 </template>
 
 <script setup lang="ts">
-import { TLeague } from 'src/types';
+import { TLeagueDto } from 'src/types';
 import { useRouter } from 'vue-router';
 
-defineProps<{ league: TLeague }>();
+defineProps<{ league: TLeagueDto }>();
 
 const router = useRouter();
 
-function goToLeague(league: TLeague) {
+function goToLeague(league: TLeagueDto) {
   try {
     router.push({ name: 'ManageLeague', params: { id: league.id } });
   } catch (e) {

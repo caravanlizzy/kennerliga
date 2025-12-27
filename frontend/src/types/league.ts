@@ -1,6 +1,6 @@
 import { TSelectedGameDto } from './game';
 
-export type TSeason = {
+export type TSeasonDto = {
   id: number;
   year: number;
   month: number;
@@ -8,7 +8,7 @@ export type TSeason = {
   status?: string;
 };
 
-export type TSeasonParticipant = {
+export type TSeasonParticipantDto = {
   id: number;
   season: number;
   profile_id: number;
@@ -28,7 +28,7 @@ export type TLeagueStatus =
   | 'PLAYING'
   | 'DONE';
 
-export type TLeagueMember = {
+export type TLeagueMemberDto = {
   id: number;
   season: number;
   profile_id: number;
@@ -47,11 +47,11 @@ export type TLeagueMember = {
   banned_by: string[];
 };
 
-export type TLeague = {
+export type TLeagueDto = {
   id: number;
   level: number | string;
   season: number;
-  members: TLeagueMember[];
+  members: TLeagueMemberDto[];
   status?: TLeagueStatus;
 };
 

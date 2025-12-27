@@ -1,5 +1,5 @@
 import { api } from 'boot/axios';
-import { TSeason, TSeasonParticipant, TLeague } from 'src/types';
+import { TSeasonDto, TSeasonParticipantDto, TLeagueDto } from 'src/types';
 
 export async function registerForSeason(): Promise<any> {
   try {
@@ -19,7 +19,7 @@ export async function fetchIsRegisteredForSeason(): Promise<boolean> {
   }
 }
 
-export async function fetchOpenSeasonParticipants(): Promise<TSeasonParticipant[]> {
+export async function fetchOpenSeasonParticipants(): Promise<TSeasonParticipantDto[]> {
   try {
     const { data } = await api.get('/season/season-participants/current/');
     return data;
@@ -29,7 +29,7 @@ export async function fetchOpenSeasonParticipants(): Promise<TSeasonParticipant[
   }
 }
 
-export async function fetchSeason(seasonId: number): Promise<TSeason | undefined> {
+export async function fetchSeason(seasonId: number): Promise<TSeasonDto | undefined> {
   try {
     const { data } = await api(`/season/seasons/${seasonId}/`);
     return data;
@@ -44,10 +44,10 @@ export async function fetchCurrentSeasonId(): Promise<number | null> {
 }
 /** Backend helpers */
 // find-or-create season
-export async function createSeason(targetYear: number, targetMonth: number): Promise<TSeason> {
+export async function createSeason(targetYear: number, targetMonth: number): Promise<TSeasonDto> {
   const { data: seasons } = await api('/season/seasons/');
   let season = Array.isArray(seasons)
-    ? seasons.find((s: TSeason) => s.year === targetYear && s.month === targetMonth)
+    ? seasons.find((s: TSeasonDto) => s.year === targetYear && s.month === targetMonth)
     : null;
 
   if (!season) {
@@ -57,10 +57,10 @@ export async function createSeason(targetYear: number, targetMonth: number): Pro
     });
     season = res.data;
   }
-  return season as TSeason; // { id, year, month, ... }
+  return season as TSeasonDto; // { id, year, month, ... }
 }
 
-async function fetchSeasonParticipants(seasonId: number): Promise<TSeasonParticipant[]> {
+async function fetchSeasonParticipants(seasonId: number): Promise<TSeasonParticipantDto[]> {
   // Season detail should include participants array
   console.log({ seasonId });
   const { data } = await api(`/season/season-participants/?season=${seasonId}`);
@@ -68,7 +68,7 @@ async function fetchSeasonParticipants(seasonId: number): Promise<TSeasonPartici
   return data ? data : [];
 }
 
-export async function fetchLeaguesBySeason(seasonId: number): Promise<TLeague[]> {
+export async function fetchLeaguesBySeason(seasonId: number): Promise<TLeagueDto[]> {
   try {
     const { data } = await api(`/league/leagues/?season=${seasonId}`);
     return data;
@@ -83,7 +83,7 @@ type ProfileLike = { id: number } | number;
 export async function ensureParticipants(
   seasonId: number,
   profiles: ProfileLike[]
-): Promise<TSeasonParticipant[]> {
+): Promise<TSeasonParticipantDto[]> {
   // Normalize incoming profiles to a unique list of numeric IDs, preserving order
   const incomingIds = Array.from(
     new Set(
@@ -95,7 +95,7 @@ export async function ensureParticipants(
 
   // Fetch existing participants and index by profile id
   const existing = await fetchSeasonParticipants(seasonId);
-  const byProfile: Record<number, TSeasonParticipant> = {};
+  const byProfile: Record<number, TSeasonParticipantDto> = {};
   for (const sp of existing) {
     const pid = sp.profile_id;
     if (pid != null) byProfile[pid] = sp;
@@ -120,13 +120,13 @@ export async function ensureParticipants(
 export async function createLeagueForSeason(
   seasonId: number,
   level: number,
-  seasonParticipants: TSeasonParticipant[],
+  seasonParticipants: TSeasonParticipantDto[],
   memberProfileIds: number[]
-): Promise<TLeague> {
+): Promise<TLeagueDto> {
   // map chosen PlayerProfile IDs -> SeasonParticipant IDs
   const spIds = seasonParticipants
-    .filter((sp: TSeasonParticipant) => memberProfileIds.includes(sp.profile_id))
-    .map((sp: TSeasonParticipant) => sp.id);
+    .filter((sp: TSeasonParticipantDto) => memberProfileIds.includes(sp.profile_id))
+    .map((sp: TSeasonParticipantDto) => sp.id);
 
   const { data } = await api('/league/leagues/', {
     method: 'POST',

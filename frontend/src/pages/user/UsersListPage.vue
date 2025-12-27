@@ -13,12 +13,12 @@
 <script setup lang="ts">
 import KennerligaTable from 'components/tables/KennerTable.vue';
 import { useRouter } from 'vue-router';
-import { TKennerButton, TUser } from 'src/types';
+import { TKennerButton, TUserDto } from 'src/types';
 import { onMounted, ref } from 'vue';
 import { useUserStore } from 'stores/userStore';
 
 const { listUsers } = useUserStore();
-const users = ref<TUser[]>([]);
+const users = ref<TUserDto[]>([]);
 
 onMounted(async () => {
   users.value = await listUsers();
@@ -43,7 +43,7 @@ const columns = [
     required: true,
     align: 'left',
     label: 'Name',
-    field: (x: TUser) => x.username,
+    field: (x: TUserDto) => x.username,
     sortable: true,
   },
 ];

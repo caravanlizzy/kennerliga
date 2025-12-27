@@ -2,12 +2,12 @@ import { defineStore } from 'pinia';
 import { ref, Ref } from 'vue';
 import { api } from 'boot/axios';
 import { fetchMyCurrentLeagueId } from 'src/services/leagueService';
-import { TUser } from 'src/types';
+import { TUserDto } from 'src/types';
 
 export const useUserStore = defineStore(
   'userStore',
   () => {
-    const user: Ref<TUser | null> = ref(null);
+    const user: Ref<TUserDto | null> = ref(null);
     const isAdmin: Ref<boolean> = ref(false);
     const isAuthenticated: Ref<boolean> = ref(false);
 
@@ -67,7 +67,7 @@ export const useUserStore = defineStore(
       }
     }
 
-    function applyLogin(userData: TUser, ignorePermission: boolean): void {
+    function applyLogin(userData: TUserDto, ignorePermission: boolean): void {
       isAuthenticated.value = true;
       user.value = userData;
       isAdmin.value = true;

@@ -18,14 +18,14 @@
 
 <script setup lang="ts">
 import { ref } from 'vue';
-import { TUser } from 'src/types';
+import { TUserDto } from 'src/types';
 import { api } from 'boot/axios';
 import { useUserStore } from 'stores/userStore';
 import { useRouter } from 'vue-router';
 
 const { login } = useUserStore();
 
-const users = ref<TUser[]>([]);
+const users = ref<TUserDto[]>([]);
 const router = useRouter();
 async function impersonate(user: string) {
   try {
@@ -39,7 +39,7 @@ async function impersonate(user: string) {
 api
   .get('/user/users')
   .then((res) => {
-    users.value = res.data.map((user: TUser) => user.username);
+    users.value = res.data.map((user: TUserDto) => user.username);
   })
   .catch((error) => {
     console.error('Failed to fetch users:', error);

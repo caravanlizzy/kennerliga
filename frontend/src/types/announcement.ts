@@ -6,7 +6,7 @@ export enum TAnnouncementType {
   NEUTRAL = 'NEUTRAL',
 }
 
-export type TAnnouncement = {
+export type TAnnouncementDto = {
   id: number;
   type: TAnnouncementType;
   title: string;

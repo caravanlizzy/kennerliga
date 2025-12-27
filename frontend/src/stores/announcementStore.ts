@@ -2,7 +2,7 @@ import { defineStore } from 'pinia';
 import { ref } from 'vue';
 import { api } from 'boot/axios';
 import {
-  TAnnouncement,
+  TAnnouncementDto,
   TAnnouncementCreate,
   TAnnouncementType,
 } from 'src/types';
@@ -27,13 +27,13 @@ const announcementIcons: Record<TAnnouncementType, string> = {
 };
 
 export const useAnnouncementStore = defineStore('announcement', () => {
-  const announcements = ref<TAnnouncement[]>([]);
+  const announcements = ref<TAnnouncementDto[]>([]);
   const loading = ref(false);
 
-  async function fetchAnnouncements(): Promise<TAnnouncement[]> {
+  async function fetchAnnouncements(): Promise<TAnnouncementDto[]> {
     loading.value = true;
     try {
-      const response = await api.get<TAnnouncement[]>(BASE_URL);
+      const response = await api.get<TAnnouncementDto[]>(BASE_URL);
       announcements.value = response.data;
       return response.data;
     } finally {
@@ -43,10 +43,10 @@ export const useAnnouncementStore = defineStore('announcement', () => {
 
   async function addAnnouncement(
     announcement: TAnnouncementCreate,
-  ): Promise<TAnnouncement> {
+  ): Promise<TAnnouncementDto> {
     loading.value = true;
     try {
-      const response = await api.post<TAnnouncement>(BASE_URL, announcement);
+      const response = await api.post<TAnnouncementDto>(BASE_URL, announcement);
       announcements.value.push(response.data);
       return response.data;
     } finally {

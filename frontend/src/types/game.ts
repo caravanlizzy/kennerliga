@@ -9,6 +9,11 @@ export type TGameDto = {
   platform: number;
 };
 
+export type TGameOptionChoice = {
+  id: number | string;
+  name: string;
+};
+
 export type TGameOptionChoiceDto = {
   id: number;
   name: string;
@@ -41,6 +46,16 @@ export type TFullGameDto = {
   options: TFullGameOptionDto[];
 };
 
+export type TGameOption = {
+  id: number | string;
+  title: string;
+  hasChoices: boolean;
+  choices: TGameOptionChoice[];
+  onlyIfOption?: number | string;
+  onlyIfChoice?: number | string;
+  onlyIfValue?: boolean;
+};
+
 export type TGameOptionDto = {
   id: number;
   name: string;
@@ -58,6 +73,13 @@ export type TSelectedGameOptionDto = {
   game_option?: TGameOptionDto;
   choice?: TGameOptionChoiceDto;
   value?: boolean;
+};
+
+export type TGameSelection = {
+  game: TGameDto;
+  selectedOptions: TSelectedGameOptionPayload[];
+  profileId: number;
+  leagueId: number;
 };
 
 export type TSelectedGameDto = {

@@ -77,13 +77,13 @@
 import { api } from 'boot/axios';
 import { useRoute } from 'vue-router';
 import { onMounted, ref } from 'vue';
-import { TSeason, TSeasonParticipant, TUser } from 'src/types';
+import { TSeasonDto, TSeasonParticipantDto, TUserDto } from 'src/types';
 
 defineEmits<{ (e: 'open:season', seasonId: number | string): void }>();
 
-const user = ref<TUser>();
-const userSeasonList = ref<TSeasonParticipant[]>([]);
-const seasons = ref<TSeason[]>([]);
+const user = ref<TUserDto>();
+const userSeasonList = ref<TSeasonParticipantDto[]>([]);
+const seasons = ref<TSeasonDto[]>([]);
 const loading = ref(true);
 const route = useRoute();
 

@@ -38,11 +38,11 @@
 </template>
 
 <script setup lang="ts">
-import type { TSeason } from 'src/types';
+import type { TSeasonDto } from 'src/types';
 
 defineProps<{
   league: any;
-  season: TSeason | null;
+  season: TSeasonDto | null;
 }>();
 
 defineEmits(['refresh']);

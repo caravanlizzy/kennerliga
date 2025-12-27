@@ -5,19 +5,13 @@ export type TKennerButton = {
   forwardName?: string;
 };
 
-export type TBreadCrumb = {
-  label: string;
-  icon: string;
-  forwardRouteName: string;
-};
-
 export type TItem = {
   itemId: number;
   name: string;
   isEditable: boolean;
 };
 
-export type TMessage = {
+export type TMessageDto = {
   text: string;
   datetime: string;
   user: number;

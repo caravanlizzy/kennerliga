@@ -1,0 +1,4842 @@
+openapi: 3.0.3
+info:
+  title: Kennerliga API
+  version: 1.0.0
+  description: API documentation kennerliga
+paths:
+  /api/announcement/announcements/:
+    get:
+      operationId: announcement_announcements_list
+      tags:
+      - announcement
+      security:
+      - tokenAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Announcement'
+          description: ''
+    post:
+      operationId: announcement_announcements_create
+      tags:
+      - announcement
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Announcement'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Announcement'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Announcement'
+        required: true
+      security:
+      - tokenAuth: []
+      - {}
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Announcement'
+          description: ''
+  /api/announcement/announcements/{id}/:
+    get:
+      operationId: announcement_announcements_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this announcement.
+        required: true
+      tags:
+      - announcement
+      security:
+      - tokenAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Announcement'
+          description: ''
+    put:
+      operationId: announcement_announcements_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this announcement.
+        required: true
+      tags:
+      - announcement
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Announcement'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Announcement'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Announcement'
+        required: true
+      security:
+      - tokenAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Announcement'
+          description: ''
+    patch:
+      operationId: announcement_announcements_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this announcement.
+        required: true
+      tags:
+      - announcement
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedAnnouncement'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedAnnouncement'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedAnnouncement'
+      security:
+      - tokenAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Announcement'
+          description: ''
+    delete:
+      operationId: announcement_announcements_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this announcement.
+        required: true
+      tags:
+      - announcement
+      security:
+      - tokenAuth: []
+      - {}
+      responses:
+        '204':
+          description: No response body
+  /api/api-token-auth/:
+    post:
+      operationId: api_token_auth_create
+      tags:
+      - api-token-auth
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/AuthToken'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/AuthToken'
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AuthToken'
+        required: true
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthToken'
+          description: ''
+  /api/chat/messages/:
+    get:
+      operationId: chat_messages_list
+      tags:
+      - chat
+      security:
+      - tokenAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Chat'
+          description: ''
+    post:
+      operationId: chat_messages_create
+      tags:
+      - chat
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Chat'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Chat'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Chat'
+        required: true
+      security:
+      - tokenAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Chat'
+          description: ''
+  /api/chat/messages/{id}/:
+    get:
+      operationId: chat_messages_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this chat.
+        required: true
+      tags:
+      - chat
+      security:
+      - tokenAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Chat'
+          description: ''
+    put:
+      operationId: chat_messages_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this chat.
+        required: true
+      tags:
+      - chat
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Chat'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Chat'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Chat'
+        required: true
+      security:
+      - tokenAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Chat'
+          description: ''
+    patch:
+      operationId: chat_messages_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this chat.
+        required: true
+      tags:
+      - chat
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedChat'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedChat'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedChat'
+      security:
+      - tokenAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Chat'
+          description: ''
+    delete:
+      operationId: chat_messages_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this chat.
+        required: true
+      tags:
+      - chat
+      security:
+      - tokenAuth: []
+      - {}
+      responses:
+        '204':
+          description: No response body
+  /api/game/ban-decisions/:
+    get:
+      operationId: game_ban_decisions_list
+      parameters:
+      - in: query
+        name: league
+        schema:
+          type: integer
+      tags:
+      - game
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BanDecision'
+          description: ''
+    post:
+      operationId: game_ban_decisions_create
+      tags:
+      - game
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BanDecision'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/BanDecision'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/BanDecision'
+        required: true
+      security:
+      - tokenAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BanDecision'
+          description: ''
+  /api/game/ban-decisions/{id}/:
+    get:
+      operationId: game_ban_decisions_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this ban decision.
+        required: true
+      tags:
+      - game
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BanDecision'
+          description: ''
+    put:
+      operationId: game_ban_decisions_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this ban decision.
+        required: true
+      tags:
+      - game
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BanDecision'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/BanDecision'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/BanDecision'
+        required: true
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BanDecision'
+          description: ''
+    patch:
+      operationId: game_ban_decisions_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this ban decision.
+        required: true
+      tags:
+      - game
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedBanDecision'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedBanDecision'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedBanDecision'
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BanDecision'
+          description: ''
+    delete:
+      operationId: game_ban_decisions_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this ban decision.
+        required: true
+      tags:
+      - game
+      security:
+      - tokenAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/game/factions/:
+    get:
+      operationId: game_factions_list
+      parameters:
+      - in: query
+        name: game
+        schema:
+          type: integer
+      tags:
+      - game
+      security:
+      - tokenAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Faction'
+          description: ''
+    post:
+      operationId: game_factions_create
+      tags:
+      - game
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Faction'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Faction'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Faction'
+        required: true
+      security:
+      - tokenAuth: []
+      - {}
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Faction'
+          description: ''
+  /api/game/factions/{id}/:
+    get:
+      operationId: game_factions_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this faction.
+        required: true
+      tags:
+      - game
+      security:
+      - tokenAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Faction'
+          description: ''
+    put:
+      operationId: game_factions_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this faction.
+        required: true
+      tags:
+      - game
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Faction'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Faction'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Faction'
+        required: true
+      security:
+      - tokenAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Faction'
+          description: ''
+    patch:
+      operationId: game_factions_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this faction.
+        required: true
+      tags:
+      - game
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedFaction'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedFaction'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedFaction'
+      security:
+      - tokenAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Faction'
+          description: ''
+    delete:
+      operationId: game_factions_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this faction.
+        required: true
+      tags:
+      - game
+      security:
+      - tokenAuth: []
+      - {}
+      responses:
+        '204':
+          description: No response body
+  /api/game/games/:
+    get:
+      operationId: game_games_list
+      tags:
+      - game
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Game'
+          description: ''
+    post:
+      operationId: game_games_create
+      tags:
+      - game
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Game'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Game'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Game'
+        required: true
+      security:
+      - tokenAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Game'
+          description: ''
+  /api/game/games-full/:
+    get:
+      operationId: game_games_full_list
+      tags:
+      - game
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/FullGame'
+          description: ''
+    post:
+      operationId: game_games_full_create
+      tags:
+      - game
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FullGame'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/FullGame'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/FullGame'
+        required: true
+      security:
+      - tokenAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FullGame'
+          description: ''
+  /api/game/games-full/{id}/:
+    get:
+      operationId: game_games_full_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this game.
+        required: true
+      tags:
+      - game
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FullGame'
+          description: ''
+    put:
+      operationId: game_games_full_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this game.
+        required: true
+      tags:
+      - game
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FullGame'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/FullGame'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/FullGame'
+        required: true
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FullGame'
+          description: ''
+    patch:
+      operationId: game_games_full_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this game.
+        required: true
+      tags:
+      - game
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedFullGame'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedFullGame'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedFullGame'
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FullGame'
+          description: ''
+    delete:
+      operationId: game_games_full_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this game.
+        required: true
+      tags:
+      - game
+      security:
+      - tokenAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/game/games/{id}/:
+    get:
+      operationId: game_games_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this game.
+        required: true
+      tags:
+      - game
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Game'
+          description: ''
+    put:
+      operationId: game_games_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this game.
+        required: true
+      tags:
+      - game
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Game'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Game'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Game'
+        required: true
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Game'
+          description: ''
+    patch:
+      operationId: game_games_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this game.
+        required: true
+      tags:
+      - game
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedGame'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedGame'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedGame'
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Game'
+          description: ''
+    delete:
+      operationId: game_games_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this game.
+        required: true
+      tags:
+      - game
+      security:
+      - tokenAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/game/option-choices/:
+    get:
+      operationId: game_option_choices_list
+      parameters:
+      - in: query
+        name: option
+        schema:
+          type: integer
+      tags:
+      - game
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/GameOptionChoice'
+          description: ''
+    post:
+      operationId: game_option_choices_create
+      tags:
+      - game
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GameOptionChoice'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/GameOptionChoice'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/GameOptionChoice'
+        required: true
+      security:
+      - tokenAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GameOptionChoice'
+          description: ''
+  /api/game/option-choices/{id}/:
+    get:
+      operationId: game_option_choices_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this game option choice.
+        required: true
+      tags:
+      - game
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GameOptionChoice'
+          description: ''
+    put:
+      operationId: game_option_choices_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this game option choice.
+        required: true
+      tags:
+      - game
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GameOptionChoice'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/GameOptionChoice'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/GameOptionChoice'
+        required: true
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GameOptionChoice'
+          description: ''
+    patch:
+      operationId: game_option_choices_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this game option choice.
+        required: true
+      tags:
+      - game
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedGameOptionChoice'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedGameOptionChoice'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedGameOptionChoice'
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GameOptionChoice'
+          description: ''
+    delete:
+      operationId: game_option_choices_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this game option choice.
+        required: true
+      tags:
+      - game
+      security:
+      - tokenAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/game/options/:
+    get:
+      operationId: game_options_list
+      parameters:
+      - in: query
+        name: game
+        schema:
+          type: integer
+      tags:
+      - game
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/GameOption'
+          description: ''
+    post:
+      operationId: game_options_create
+      tags:
+      - game
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GameOption'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/GameOption'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/GameOption'
+        required: true
+      security:
+      - tokenAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GameOption'
+          description: ''
+  /api/game/options/{id}/:
+    get:
+      operationId: game_options_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this game option.
+        required: true
+      tags:
+      - game
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GameOption'
+          description: ''
+    put:
+      operationId: game_options_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this game option.
+        required: true
+      tags:
+      - game
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GameOption'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/GameOption'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/GameOption'
+        required: true
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GameOption'
+          description: ''
+    patch:
+      operationId: game_options_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this game option.
+        required: true
+      tags:
+      - game
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedGameOption'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedGameOption'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedGameOption'
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GameOption'
+          description: ''
+    delete:
+      operationId: game_options_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this game option.
+        required: true
+      tags:
+      - game
+      security:
+      - tokenAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/game/platforms/:
+    get:
+      operationId: game_platforms_list
+      tags:
+      - game
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Platform'
+          description: ''
+    post:
+      operationId: game_platforms_create
+      tags:
+      - game
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Platform'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Platform'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Platform'
+        required: true
+      security:
+      - tokenAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Platform'
+          description: ''
+  /api/game/platforms/{id}/:
+    get:
+      operationId: game_platforms_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this platform.
+        required: true
+      tags:
+      - game
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Platform'
+          description: ''
+    put:
+      operationId: game_platforms_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this platform.
+        required: true
+      tags:
+      - game
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Platform'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Platform'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Platform'
+        required: true
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Platform'
+          description: ''
+    patch:
+      operationId: game_platforms_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this platform.
+        required: true
+      tags:
+      - game
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedPlatform'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedPlatform'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedPlatform'
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Platform'
+          description: ''
+    delete:
+      operationId: game_platforms_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this platform.
+        required: true
+      tags:
+      - game
+      security:
+      - tokenAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/game/result-configs/:
+    get:
+      operationId: game_result_configs_list
+      parameters:
+      - in: query
+        name: game
+        schema:
+          type: integer
+      tags:
+      - game
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ResultConfig'
+          description: ''
+    post:
+      operationId: game_result_configs_create
+      tags:
+      - game
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResultConfig'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ResultConfig'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ResultConfig'
+        required: true
+      security:
+      - tokenAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResultConfig'
+          description: ''
+  /api/game/result-configs/{id}/:
+    get:
+      operationId: game_result_configs_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this result config.
+        required: true
+      tags:
+      - game
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResultConfig'
+          description: ''
+    put:
+      operationId: game_result_configs_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this result config.
+        required: true
+      tags:
+      - game
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResultConfig'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ResultConfig'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ResultConfig'
+        required: true
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResultConfig'
+          description: ''
+    patch:
+      operationId: game_result_configs_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this result config.
+        required: true
+      tags:
+      - game
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedResultConfig'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedResultConfig'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedResultConfig'
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResultConfig'
+          description: ''
+    delete:
+      operationId: game_result_configs_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this result config.
+        required: true
+      tags:
+      - game
+      security:
+      - tokenAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/game/selected-game-options/:
+    get:
+      operationId: game_selected_game_options_list
+      tags:
+      - game
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SelectedOption'
+          description: ''
+    post:
+      operationId: game_selected_game_options_create
+      tags:
+      - game
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SelectedOption'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/SelectedOption'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/SelectedOption'
+        required: true
+      security:
+      - tokenAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SelectedOption'
+          description: ''
+  /api/game/selected-game-options/{id}/:
+    get:
+      operationId: game_selected_game_options_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this selected option.
+        required: true
+      tags:
+      - game
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SelectedOption'
+          description: ''
+    put:
+      operationId: game_selected_game_options_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this selected option.
+        required: true
+      tags:
+      - game
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SelectedOption'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/SelectedOption'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/SelectedOption'
+        required: true
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SelectedOption'
+          description: ''
+    patch:
+      operationId: game_selected_game_options_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this selected option.
+        required: true
+      tags:
+      - game
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedSelectedOption'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedSelectedOption'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedSelectedOption'
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SelectedOption'
+          description: ''
+    delete:
+      operationId: game_selected_game_options_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this selected option.
+        required: true
+      tags:
+      - game
+      security:
+      - tokenAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/game/selected-games/:
+    get:
+      operationId: game_selected_games_list
+      parameters:
+      - in: query
+        name: league
+        schema:
+          type: integer
+      tags:
+      - game
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SelectedGame'
+          description: ''
+    post:
+      operationId: game_selected_games_create
+      tags:
+      - game
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SelectedGame'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/SelectedGame'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/SelectedGame'
+        required: true
+      security:
+      - tokenAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SelectedGame'
+          description: ''
+  /api/game/selected-games/{id}/:
+    get:
+      operationId: game_selected_games_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this selected game.
+        required: true
+      tags:
+      - game
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SelectedGame'
+          description: ''
+    put:
+      operationId: game_selected_games_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this selected game.
+        required: true
+      tags:
+      - game
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SelectedGame'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/SelectedGame'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/SelectedGame'
+        required: true
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SelectedGame'
+          description: ''
+    patch:
+      operationId: game_selected_games_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this selected game.
+        required: true
+      tags:
+      - game
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedSelectedGame'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedSelectedGame'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedSelectedGame'
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SelectedGame'
+          description: ''
+    delete:
+      operationId: game_selected_games_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this selected game.
+        required: true
+      tags:
+      - game
+      security:
+      - tokenAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/game/starting-point-systems/:
+    get:
+      operationId: game_starting_point_systems_list
+      tags:
+      - game
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/StartingPointSystem'
+          description: ''
+    post:
+      operationId: game_starting_point_systems_create
+      tags:
+      - game
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StartingPointSystem'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/StartingPointSystem'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/StartingPointSystem'
+        required: true
+      security:
+      - tokenAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StartingPointSystem'
+          description: ''
+  /api/game/starting-point-systems/{id}/:
+    get:
+      operationId: game_starting_point_systems_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this starting point system.
+        required: true
+      tags:
+      - game
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StartingPointSystem'
+          description: ''
+    put:
+      operationId: game_starting_point_systems_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this starting point system.
+        required: true
+      tags:
+      - game
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StartingPointSystem'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/StartingPointSystem'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/StartingPointSystem'
+        required: true
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StartingPointSystem'
+          description: ''
+    patch:
+      operationId: game_starting_point_systems_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this starting point system.
+        required: true
+      tags:
+      - game
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedStartingPointSystem'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedStartingPointSystem'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedStartingPointSystem'
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StartingPointSystem'
+          description: ''
+    delete:
+      operationId: game_starting_point_systems_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this starting point system.
+        required: true
+      tags:
+      - game
+      security:
+      - tokenAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/game/tie-breakers/:
+    get:
+      operationId: game_tie_breakers_list
+      parameters:
+      - in: query
+        name: result_config
+        schema:
+          type: integer
+      tags:
+      - game
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TieBreaker'
+          description: ''
+    post:
+      operationId: game_tie_breakers_create
+      tags:
+      - game
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TieBreaker'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TieBreaker'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/TieBreaker'
+        required: true
+      security:
+      - tokenAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TieBreaker'
+          description: ''
+  /api/game/tie-breakers/{id}/:
+    get:
+      operationId: game_tie_breakers_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this tie breaker.
+        required: true
+      tags:
+      - game
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TieBreaker'
+          description: ''
+    put:
+      operationId: game_tie_breakers_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this tie breaker.
+        required: true
+      tags:
+      - game
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TieBreaker'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TieBreaker'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/TieBreaker'
+        required: true
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TieBreaker'
+          description: ''
+    patch:
+      operationId: game_tie_breakers_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this tie breaker.
+        required: true
+      tags:
+      - game
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedTieBreaker'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedTieBreaker'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedTieBreaker'
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TieBreaker'
+          description: ''
+    delete:
+      operationId: game_tie_breakers_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this tie breaker.
+        required: true
+      tags:
+      - game
+      security:
+      - tokenAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/leaderboard/:
+    get:
+      operationId: leaderboard_retrieve
+      description: |-
+        Returns a yearly matrix of league positions per player.
+
+        Query params:
+          - year (int, required): e.g. ?year=2025
+
+        Assumptions:
+          - League has: season (FK) and level (int; 1 = best league)
+          - Season has: start_date (DateField or DateTimeField)
+
+        Response shape:
+        {
+          "year": 2025,
+          "levels": [1, 2, 3],   # distinct league levels used that year (sorted)
+          "standings": [
+            {
+              "player_profile_id": 5,
+              "profile_name": "MissM1",
+              "per_level": {
+                "1": {"first": 3, "second": 1, "third": 0, "fourth": 0},
+                "2": {"first": 1, "second": 2, "third": 0, "fourth": 0}
+              },
+              "totals": {"first": 4, "second": 3, "third": 0, "fourth": 0}
+            },
+            ...
+          ]
+        }
+      tags:
+      - leaderboard
+      security:
+      - tokenAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /api/league/league-details/:
+    get:
+      operationId: league_league_details_list
+      tags:
+      - league
+      security:
+      - tokenAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/LeagueDetail'
+          description: ''
+  /api/league/league-details/{id}/:
+    get:
+      operationId: league_league_details_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this league.
+        required: true
+      tags:
+      - league
+      security:
+      - tokenAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeagueDetail'
+          description: ''
+  /api/league/leagues/:
+    get:
+      operationId: league_leagues_list
+      parameters:
+      - in: query
+        name: season
+        schema:
+          type: integer
+      tags:
+      - league
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/League'
+          description: ''
+    post:
+      operationId: league_leagues_create
+      tags:
+      - league
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/League'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/League'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/League'
+        required: true
+      security:
+      - tokenAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/League'
+          description: ''
+  /api/league/leagues/{id}/:
+    get:
+      operationId: league_leagues_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this league.
+        required: true
+      tags:
+      - league
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/League'
+          description: ''
+    put:
+      operationId: league_leagues_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this league.
+        required: true
+      tags:
+      - league
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/League'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/League'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/League'
+        required: true
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/League'
+          description: ''
+    patch:
+      operationId: league_leagues_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this league.
+        required: true
+      tags:
+      - league
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedLeague'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedLeague'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedLeague'
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/League'
+          description: ''
+    delete:
+      operationId: league_leagues_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this league.
+        required: true
+      tags:
+      - league
+      security:
+      - tokenAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/league/leagues/{id}/full-standings/:
+    get:
+      operationId: league_leagues_full_standings_retrieve
+      description: |-
+        Returns a matrix suitable for a standings table:
+        - Rows: players ordered by total league_points (desc)
+        - Columns: per-game data (points & league_points for each selected_game)
+
+        Response shape:
+        {
+          "selected_games": [
+            {"id": 1, "game_name": "Catan"},
+            {"id": 2, "game_name": "Azul"},
+            ...
+          ],
+          "standings": [
+            {
+              "player_profile_id": 5,
+              "profile_name": "Alice",
+              "total_league_points": "18.00",
+              "total_wins": "3.00",
+              "games": {
+                "1": {"points": "120.00", "league_points": "6.00", "rank": 1},
+                "2": {"points": "85.50", "league_points": "3.00", "rank": 2},
+                ...
+              }
+            },
+            ...
+          ]
+        }
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this league.
+        required: true
+      tags:
+      - league
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/League'
+          description: ''
+  /api/league/leagues/{id}/game-standings/:
+    get:
+      operationId: league_leagues_game_standings_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this league.
+        required: true
+      tags:
+      - league
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/League'
+          description: ''
+  /api/league/leagues/{id}/rebuild-standings/:
+    post:
+      operationId: league_leagues_rebuild_standings_create
+      description: |-
+        Rebuilds ALL per-game standings (GameStanding) for this league,
+        then rebuilds the overall league standings (LeagueStanding),
+        and returns the fresh LeagueStanding list.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this league.
+        required: true
+      tags:
+      - league
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/League'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/League'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/League'
+        required: true
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/League'
+          description: ''
+  /api/league/leagues/{id}/set-active-player/:
+    post:
+      operationId: league_leagues_set_active_player_create
+      description: |-
+        Set the active player for the league using a profile_id.
+        Expects profile_id in the request data.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this league.
+        required: true
+      tags:
+      - league
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/League'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/League'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/League'
+        required: true
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/League'
+          description: ''
+  /api/league/leagues/{id}/standings/:
+    get:
+      operationId: league_leagues_standings_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this league.
+        required: true
+      tags:
+      - league
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/League'
+          description: ''
+  /api/login/:
+    post:
+      operationId: login_create
+      tags:
+      - login
+      security:
+      - tokenAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /api/logout/:
+    post:
+      operationId: logout_create
+      tags:
+      - logout
+      security:
+      - tokenAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /api/result/match-results/:
+    get:
+      operationId: result_match_results_retrieve
+      tags:
+      - result
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          description: No response body
+    post:
+      operationId: result_match_results_create
+      tags:
+      - result
+      security:
+      - tokenAuth: []
+      responses:
+        '201':
+          description: No response body
+  /api/result/match-results/{id}/:
+    get:
+      operationId: result_match_results_retrieve_2
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - result
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/result/match-results/seasons-with-results/:
+    get:
+      operationId: result_match_results_seasons_with_results_retrieve
+      tags:
+      - result
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/result/results/:
+    get:
+      operationId: result_results_list
+      parameters:
+      - in: query
+        name: selected_game
+        schema:
+          type: integer
+      tags:
+      - result
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Result'
+          description: ''
+    post:
+      operationId: result_results_create
+      tags:
+      - result
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Result'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Result'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Result'
+        required: true
+      security:
+      - tokenAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Result'
+          description: ''
+  /api/result/results/{id}/:
+    get:
+      operationId: result_results_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this result.
+        required: true
+      tags:
+      - result
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Result'
+          description: ''
+    put:
+      operationId: result_results_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this result.
+        required: true
+      tags:
+      - result
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Result'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Result'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Result'
+        required: true
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Result'
+          description: ''
+    patch:
+      operationId: result_results_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this result.
+        required: true
+      tags:
+      - result
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedResult'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedResult'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedResult'
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Result'
+          description: ''
+    delete:
+      operationId: result_results_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this result.
+        required: true
+      tags:
+      - result
+      security:
+      - tokenAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/season/current/:
+    get:
+      operationId: season_current_retrieve
+      description: |-
+        GET /season/current/
+        Returns the Season for the current year and month.
+        Example: { "id": 5, "name": "2025_S10", "status": "RUNNING" }
+      tags:
+      - season
+      security:
+      - tokenAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /api/season/register/:
+    post:
+      operationId: season_register_create
+      tags:
+      - season
+      security:
+      - tokenAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /api/season/season-participants/:
+    get:
+      operationId: season_season_participants_list
+      description: |-
+        list:   GET  /season-participants/?season=<id>
+        create: POST /season-participants/  {season, profile, rank?}
+      parameters:
+      - in: query
+        name: profile__profile_name
+        schema:
+          type: string
+      - in: query
+        name: season
+        schema:
+          type: integer
+      tags:
+      - season
+      security:
+      - tokenAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SeasonParticipant'
+          description: ''
+    post:
+      operationId: season_season_participants_create
+      description: |-
+        list:   GET  /season-participants/?season=<id>
+        create: POST /season-participants/  {season, profile, rank?}
+      tags:
+      - season
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SeasonParticipant'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/SeasonParticipant'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/SeasonParticipant'
+        required: true
+      security:
+      - tokenAuth: []
+      - {}
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SeasonParticipant'
+          description: ''
+  /api/season/season-participants/{id}/:
+    get:
+      operationId: season_season_participants_retrieve
+      description: |-
+        list:   GET  /season-participants/?season=<id>
+        create: POST /season-participants/  {season, profile, rank?}
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this season participant.
+        required: true
+      tags:
+      - season
+      security:
+      - tokenAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SeasonParticipant'
+          description: ''
+    put:
+      operationId: season_season_participants_update
+      description: |-
+        list:   GET  /season-participants/?season=<id>
+        create: POST /season-participants/  {season, profile, rank?}
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this season participant.
+        required: true
+      tags:
+      - season
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SeasonParticipant'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/SeasonParticipant'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/SeasonParticipant'
+        required: true
+      security:
+      - tokenAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SeasonParticipant'
+          description: ''
+    patch:
+      operationId: season_season_participants_partial_update
+      description: |-
+        list:   GET  /season-participants/?season=<id>
+        create: POST /season-participants/  {season, profile, rank?}
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this season participant.
+        required: true
+      tags:
+      - season
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedSeasonParticipant'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedSeasonParticipant'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedSeasonParticipant'
+      security:
+      - tokenAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SeasonParticipant'
+          description: ''
+    delete:
+      operationId: season_season_participants_destroy
+      description: |-
+        list:   GET  /season-participants/?season=<id>
+        create: POST /season-participants/  {season, profile, rank?}
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this season participant.
+        required: true
+      tags:
+      - season
+      security:
+      - tokenAuth: []
+      - {}
+      responses:
+        '204':
+          description: No response body
+  /api/season/season-participants/current/:
+    get:
+      operationId: season_season_participants_current_retrieve
+      description: |-
+        GET /season-participants/current/
+
+        Returns all participants of the *current open season*.
+        If no open season exists, returns an empty list.
+      tags:
+      - season
+      security:
+      - tokenAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SeasonParticipant'
+          description: ''
+  /api/season/season-scoreboards/{id}/scoreboards/:
+    get:
+      operationId: season_season_scoreboards_scoreboards_retrieve
+      description: |-
+        GET /season-scoreboards/{season_id}/scoreboards/
+        Returns scoreboards for every league in the season.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - season
+      security:
+      - tokenAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /api/season/seasons/:
+    get:
+      operationId: season_seasons_list
+      parameters:
+      - in: query
+        name: month
+        schema:
+          type: integer
+      - in: query
+        name: status
+        schema:
+          type: string
+          enum:
+          - DONE
+          - NEXT
+          - OPEN
+          - RUNNING
+        description: |-
+          * `NEXT` - Next
+          * `OPEN` - Open
+          * `RUNNING` - Running
+          * `DONE` - Done
+      - in: query
+        name: year
+        schema:
+          type: integer
+      tags:
+      - season
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Season'
+          description: ''
+    post:
+      operationId: season_seasons_create
+      tags:
+      - season
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Season'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Season'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Season'
+        required: true
+      security:
+      - tokenAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Season'
+          description: ''
+  /api/season/seasons/{id}/:
+    get:
+      operationId: season_seasons_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this season.
+        required: true
+      tags:
+      - season
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Season'
+          description: ''
+    put:
+      operationId: season_seasons_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this season.
+        required: true
+      tags:
+      - season
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Season'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Season'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Season'
+        required: true
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Season'
+          description: ''
+    patch:
+      operationId: season_seasons_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this season.
+        required: true
+      tags:
+      - season
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedSeason'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedSeason'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedSeason'
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Season'
+          description: ''
+    delete:
+      operationId: season_seasons_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this season.
+        required: true
+      tags:
+      - season
+      security:
+      - tokenAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/season/seasons/{id}/league-winners/:
+    get:
+      operationId: season_seasons_league_winners_retrieve
+      description: |-
+        GET /seasons/{id}/league-winners/
+
+        Returns the winner (most league_points) for each league in the season.
+
+        Shape:
+        {
+          "season": {"id": 1, "name": "2025_S10", "status": "RUNNING"},
+          "winners": [
+            {
+              "league": {"id": 10, "level": 1},
+              "winner": {"profile_id": 7, "profile_name": "Alice", "username": "alice"},
+              "league_points": 42
+            },
+            ...
+          ]
+        }
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this season.
+        required: true
+      tags:
+      - season
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Season'
+          description: ''
+  /api/season/seasons/registration-status/:
+    get:
+      operationId: season_seasons_registration_status_retrieve
+      description: |-
+        Check if the current user is registered in the open season.
+        Returns:
+        {
+          "has_open_season": bool,
+          "registered": bool,
+          "season_id": int | null
+        }
+      tags:
+      - season
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Season'
+          description: ''
+  /api/user/feedback/:
+    get:
+      operationId: user_feedback_list
+      tags:
+      - user
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Feedback'
+          description: ''
+    post:
+      operationId: user_feedback_create
+      tags:
+      - user
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Feedback'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Feedback'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Feedback'
+        required: true
+      security:
+      - tokenAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Feedback'
+          description: ''
+  /api/user/feedback/{id}/:
+    get:
+      operationId: user_feedback_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this feedback.
+        required: true
+      tags:
+      - user
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Feedback'
+          description: ''
+  /api/user/invitations/:
+    get:
+      operationId: user_invitations_list
+      description: |-
+        Admin-only:
+          - GET    /invite-links/        list (includes invite_url)
+          - POST   /invite-links/        create
+          - GET    /invite-links/{id}/   retrieve
+          - DELETE /invite-links/{id}/   destroy
+      tags:
+      - user
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UserInviteLink'
+          description: ''
+    post:
+      operationId: user_invitations_create
+      description: |-
+        Admin-only:
+          - GET    /invite-links/        list (includes invite_url)
+          - POST   /invite-links/        create
+          - GET    /invite-links/{id}/   retrieve
+          - DELETE /invite-links/{id}/   destroy
+      tags:
+      - user
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserInviteLink'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/UserInviteLink'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/UserInviteLink'
+      security:
+      - tokenAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserInviteLink'
+          description: ''
+  /api/user/invitations/{id}/:
+    get:
+      operationId: user_invitations_retrieve
+      description: |-
+        Admin-only:
+          - GET    /invite-links/        list (includes invite_url)
+          - POST   /invite-links/        create
+          - GET    /invite-links/{id}/   retrieve
+          - DELETE /invite-links/{id}/   destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this user invite link.
+        required: true
+      tags:
+      - user
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserInviteLink'
+          description: ''
+    delete:
+      operationId: user_invitations_destroy
+      description: |-
+        Admin-only:
+          - GET    /invite-links/        list (includes invite_url)
+          - POST   /invite-links/        create
+          - GET    /invite-links/{id}/   retrieve
+          - DELETE /invite-links/{id}/   destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this user invite link.
+        required: true
+      tags:
+      - user
+      security:
+      - tokenAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/user/me/current-league/:
+    get:
+      operationId: user_me_current_league_retrieve
+      tags:
+      - user
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/user/me/results/:
+    get:
+      operationId: user_me_results_retrieve
+      tags:
+      - user
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/user/profiles/:
+    get:
+      operationId: user_profiles_list
+      tags:
+      - user
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PlayerProfile'
+          description: ''
+    post:
+      operationId: user_profiles_create
+      tags:
+      - user
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PlayerProfile'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PlayerProfile'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PlayerProfile'
+        required: true
+      security:
+      - tokenAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlayerProfile'
+          description: ''
+  /api/user/profiles/{id}/:
+    get:
+      operationId: user_profiles_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this player profile.
+        required: true
+      tags:
+      - user
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlayerProfile'
+          description: ''
+    put:
+      operationId: user_profiles_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this player profile.
+        required: true
+      tags:
+      - user
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PlayerProfile'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PlayerProfile'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PlayerProfile'
+        required: true
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlayerProfile'
+          description: ''
+    patch:
+      operationId: user_profiles_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this player profile.
+        required: true
+      tags:
+      - user
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedPlayerProfile'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedPlayerProfile'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedPlayerProfile'
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlayerProfile'
+          description: ''
+    delete:
+      operationId: user_profiles_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this player profile.
+        required: true
+      tags:
+      - user
+      security:
+      - tokenAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/user/register/:
+    post:
+      operationId: user_register_create
+      description: |-
+        Public:
+          - POST /register/                 -> create user (consumes invite)
+          - GET  /register/validate/?key=.. -> check invite validity
+      tags:
+      - user
+      security:
+      - tokenAuth: []
+      - {}
+      responses:
+        '201':
+          description: No response body
+  /api/user/users/:
+    get:
+      operationId: user_users_list
+      tags:
+      - user
+      security:
+      - tokenAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+          description: ''
+    post:
+      operationId: user_users_create
+      tags:
+      - user
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/User'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/User'
+        required: true
+      security:
+      - tokenAuth: []
+      - {}
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: ''
+  /api/user/users/{id}/:
+    get:
+      operationId: user_users_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this user.
+        required: true
+      tags:
+      - user
+      security:
+      - tokenAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: ''
+    put:
+      operationId: user_users_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this user.
+        required: true
+      tags:
+      - user
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/User'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/User'
+        required: true
+      security:
+      - tokenAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: ''
+    patch:
+      operationId: user_users_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this user.
+        required: true
+      tags:
+      - user
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedUser'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedUser'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedUser'
+      security:
+      - tokenAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: ''
+    delete:
+      operationId: user_users_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this user.
+        required: true
+      tags:
+      - user
+      security:
+      - tokenAuth: []
+      - {}
+      responses:
+        '204':
+          description: No response body
+  /api/user/users/{id}/leagues/:
+    get:
+      operationId: user_users_leagues_retrieve
+      description: Custom action to return the leagues for a specific user.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this user.
+        required: true
+      tags:
+      - user
+      security:
+      - tokenAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: ''
+  /api/user/users/{id}/results/:
+    get:
+      operationId: user_users_results_retrieve
+      description: Custom action to return the leagues for a specific user.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this user.
+        required: true
+      tags:
+      - user
+      security:
+      - tokenAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: ''
+  /api/user/users/{id}/seasons/:
+    get:
+      operationId: user_users_seasons_retrieve
+      description: Custom action to return the leagues for a specific user.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this user.
+        required: true
+      tags:
+      - user
+      security:
+      - tokenAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: ''
+components:
+  schemas:
+    Announcement:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        type:
+          $ref: '#/components/schemas/TypeEnum'
+        title:
+          type: string
+          maxLength: 88
+        content:
+          type: string
+          nullable: true
+        visible_until:
+          type: string
+          format: date-time
+        visible_from:
+          type: string
+          format: date-time
+      required:
+      - id
+      - title
+      - visible_from
+      - visible_until
+    AuthToken:
+      type: object
+      properties:
+        username:
+          type: string
+          writeOnly: true
+        password:
+          type: string
+          writeOnly: true
+        token:
+          type: string
+          readOnly: true
+      required:
+      - password
+      - token
+      - username
+    BanDecision:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        player_banning:
+          type: integer
+        player_banning_name:
+          type: string
+          readOnly: true
+        selected_game_id:
+          type: integer
+          nullable: true
+        selected_game_name:
+          type: string
+          readOnly: true
+        league:
+          type: integer
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - id
+      - league
+      - player_banning
+      - player_banning_name
+      - selected_game_name
+    Chat:
+      type: object
+      properties:
+        text:
+          type: string
+        user:
+          type: integer
+          readOnly: true
+        datetime:
+          type: string
+          format: date-time
+          readOnly: true
+        sender:
+          type: string
+          readOnly: true
+        label:
+          type: string
+          readOnly: true
+      required:
+      - datetime
+      - label
+      - sender
+      - text
+      - user
+    Faction:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 255
+        level:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+          description: 'The sequence level: 0 for Country, 1 for Leader, etc.'
+        game:
+          type: integer
+      required:
+      - game
+      - id
+      - name
+    Feedback:
+      type: object
+      properties:
+        message:
+          type: string
+        user:
+          type: integer
+          readOnly: true
+        datetime:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - datetime
+      - message
+      - user
+    FullGame:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 88
+        platform:
+          type: integer
+        options:
+          type: array
+          items:
+            $ref: '#/components/schemas/FullGameOption'
+      required:
+      - id
+      - name
+      - options
+      - platform
+    FullGameOption:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        ref:
+          type: string
+          writeOnly: true
+        name:
+          type: string
+          maxLength: 88
+        has_choices:
+          type: boolean
+        choices:
+          type: array
+          items:
+            $ref: '#/components/schemas/FullGameOptionChoice'
+        availability_groups:
+          type: string
+        order:
+          type: integer
+          default: 0
+      required:
+      - id
+      - name
+    FullGameOptionChoice:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          nullable: true
+          maxLength: 139
+        order:
+          type: integer
+          default: 0
+      required:
+      - id
+    Game:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 88
+        short_name:
+          type: string
+          maxLength: 33
+        platform:
+          type: integer
+      required:
+      - id
+      - name
+      - platform
+    GameOption:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 88
+        has_choices:
+          type: boolean
+        order:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+        only_if_value:
+          type: boolean
+          nullable: true
+        game:
+          type: integer
+          nullable: true
+        only_if_option:
+          type: integer
+          nullable: true
+        only_if_choice:
+          type: integer
+          nullable: true
+      required:
+      - id
+      - name
+    GameOptionChoice:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          nullable: true
+          maxLength: 139
+        order:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+        option:
+          type: integer
+      required:
+      - id
+      - option
+    League:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        season:
+          type: integer
+          nullable: true
+        level:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: -9223372036854775808
+          format: int64
+          title: 1 for L1, 2 for L2 etc.
+        status:
+          $ref: '#/components/schemas/StatusFc6Enum'
+        active_player:
+          type: integer
+          nullable: true
+        members:
+          type: array
+          items:
+            $ref: '#/components/schemas/SeasonParticipantMini'
+          readOnly: true
+        member_ids:
+          type: array
+          items:
+            type: integer
+            writeOnly: true
+          writeOnly: true
+      required:
+      - id
+      - level
+      - members
+    LeagueDetail:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        status:
+          $ref: '#/components/schemas/StatusFc6Enum'
+        season:
+          type: integer
+          nullable: true
+        level:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: -9223372036854775808
+          format: int64
+          title: 1 for L1, 2 for L2 etc.
+        active_player:
+          type: integer
+          nullable: true
+        members:
+          type: string
+          readOnly: true
+      required:
+      - id
+      - level
+      - members
+    PatchedAnnouncement:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        type:
+          $ref: '#/components/schemas/TypeEnum'
+        title:
+          type: string
+          maxLength: 88
+        content:
+          type: string
+          nullable: true
+        visible_until:
+          type: string
+          format: date-time
+        visible_from:
+          type: string
+          format: date-time
+    PatchedBanDecision:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        player_banning:
+          type: integer
+        player_banning_name:
+          type: string
+          readOnly: true
+        selected_game_id:
+          type: integer
+          nullable: true
+        selected_game_name:
+          type: string
+          readOnly: true
+        league:
+          type: integer
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+    PatchedChat:
+      type: object
+      properties:
+        text:
+          type: string
+        user:
+          type: integer
+          readOnly: true
+        datetime:
+          type: string
+          format: date-time
+          readOnly: true
+        sender:
+          type: string
+          readOnly: true
+        label:
+          type: string
+          readOnly: true
+    PatchedFaction:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 255
+        level:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+          description: 'The sequence level: 0 for Country, 1 for Leader, etc.'
+        game:
+          type: integer
+    PatchedFullGame:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 88
+        platform:
+          type: integer
+        options:
+          type: array
+          items:
+            $ref: '#/components/schemas/FullGameOption'
+    PatchedGame:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 88
+        short_name:
+          type: string
+          maxLength: 33
+        platform:
+          type: integer
+    PatchedGameOption:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 88
+        has_choices:
+          type: boolean
+        order:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+        only_if_value:
+          type: boolean
+          nullable: true
+        game:
+          type: integer
+          nullable: true
+        only_if_option:
+          type: integer
+          nullable: true
+        only_if_choice:
+          type: integer
+          nullable: true
+    PatchedGameOptionChoice:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          nullable: true
+          maxLength: 139
+        order:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+        option:
+          type: integer
+    PatchedLeague:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        season:
+          type: integer
+          nullable: true
+        level:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: -9223372036854775808
+          format: int64
+          title: 1 for L1, 2 for L2 etc.
+        status:
+          $ref: '#/components/schemas/StatusFc6Enum'
+        active_player:
+          type: integer
+          nullable: true
+        members:
+          type: array
+          items:
+            $ref: '#/components/schemas/SeasonParticipantMini'
+          readOnly: true
+        member_ids:
+          type: array
+          items:
+            type: integer
+            writeOnly: true
+          writeOnly: true
+    PatchedPlatform:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 255
+    PatchedPlayerProfile:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        user:
+          type: integer
+          nullable: true
+        profile_name:
+          type: string
+          maxLength: 100
+    PatchedResult:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        player_profile:
+          type: integer
+        player_profile_name:
+          type: string
+          readOnly: true
+        selected_game:
+          type: integer
+        points:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: -9223372036854775808
+          format: int64
+          nullable: true
+        starting_points:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: -9223372036854775808
+          format: int64
+          nullable: true
+        starting_position:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: -9223372036854775808
+          format: int64
+          nullable: true
+        position:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+          nullable: true
+        notes:
+          type: string
+          nullable: true
+        tie_breaker_value:
+          type: string
+          nullable: true
+          maxLength: 255
+        decisive_tie_breaker:
+          type: string
+          readOnly: true
+        faction_ids:
+          type: array
+          items:
+            type: integer
+          writeOnly: true
+        factions:
+          type: string
+          readOnly: true
+    PatchedResultConfig:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        starting_points_system:
+          type: string
+          readOnly: true
+        is_asymmetric:
+          type: boolean
+        has_starting_player_order:
+          type: boolean
+        has_points:
+          type: boolean
+        game:
+          type: integer
+    PatchedSeason:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          readOnly: true
+        season_start_time:
+          type: string
+          readOnly: true
+        time_to_start:
+          type: string
+          readOnly: true
+        year:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: -9223372036854775808
+          format: int64
+        month:
+          type: integer
+          maximum: 12
+          minimum: 1
+          title: Month in the current year
+        status:
+          $ref: '#/components/schemas/SeasonStatusEnum'
+    PatchedSeasonParticipant:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        season:
+          type: integer
+        profile:
+          type: integer
+        rank:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: -9223372036854775808
+          format: int64
+          nullable: true
+        username:
+          type: string
+          readOnly: true
+        profile_name:
+          type: string
+          readOnly: true
+        selected_games:
+          type: string
+          readOnly: true
+        first_game_selection_banned_by_others:
+          type: string
+          readOnly: true
+        has_banned:
+          type: boolean
+          readOnly: true
+        is_active_player:
+          type: string
+          readOnly: true
+        my_banned_game:
+          type: string
+          readOnly: true
+    PatchedSelectedGame:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        game:
+          type: integer
+        game_name:
+          type: string
+          readOnly: true
+        selected_options:
+          type: array
+          items:
+            $ref: '#/components/schemas/SelectedOption'
+        league:
+          type: integer
+          writeOnly: true
+        profile:
+          type: integer
+          writeOnly: true
+        manage_only:
+          type: boolean
+          writeOnly: true
+    PatchedSelectedOption:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        game_option:
+          allOf:
+          - $ref: '#/components/schemas/GameOption'
+          readOnly: true
+        choice:
+          allOf:
+          - $ref: '#/components/schemas/GameOptionChoice'
+          readOnly: true
+        value:
+          type: boolean
+          nullable: true
+        game_option_id:
+          type: integer
+          writeOnly: true
+        choice_id:
+          type: integer
+          writeOnly: true
+          nullable: true
+    PatchedStartingPointSystem:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        code:
+          type: string
+          maxLength: 10
+        description:
+          type: string
+          maxLength: 255
+    PatchedTieBreaker:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 255
+        order:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+          description: Higher order is more important.
+        higher_wins:
+          type: boolean
+          description: If True, higher values win. If False, lower values win.
+        result_config:
+          type: integer
+    PatchedUser:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        username:
+          type: string
+          description: Username is used to login
+          pattern: ^[\w.@+-]+$
+          maxLength: 44
+    Platform:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 255
+      required:
+      - id
+      - name
+    PlayerProfile:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        user:
+          type: integer
+          nullable: true
+        profile_name:
+          type: string
+          maxLength: 100
+      required:
+      - id
+      - profile_name
+    Result:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        player_profile:
+          type: integer
+        player_profile_name:
+          type: string
+          readOnly: true
+        selected_game:
+          type: integer
+        points:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: -9223372036854775808
+          format: int64
+          nullable: true
+        starting_points:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: -9223372036854775808
+          format: int64
+          nullable: true
+        starting_position:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: -9223372036854775808
+          format: int64
+          nullable: true
+        position:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+          nullable: true
+        notes:
+          type: string
+          nullable: true
+        tie_breaker_value:
+          type: string
+          nullable: true
+          maxLength: 255
+        decisive_tie_breaker:
+          type: string
+          readOnly: true
+        faction_ids:
+          type: array
+          items:
+            type: integer
+          writeOnly: true
+        factions:
+          type: string
+          readOnly: true
+      required:
+      - decisive_tie_breaker
+      - factions
+      - id
+      - player_profile
+      - player_profile_name
+      - selected_game
+    ResultConfig:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        starting_points_system:
+          type: string
+          readOnly: true
+        is_asymmetric:
+          type: boolean
+        has_starting_player_order:
+          type: boolean
+        has_points:
+          type: boolean
+        game:
+          type: integer
+      required:
+      - game
+      - id
+      - starting_points_system
+    Season:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          readOnly: true
+        season_start_time:
+          type: string
+          readOnly: true
+        time_to_start:
+          type: string
+          readOnly: true
+        year:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: -9223372036854775808
+          format: int64
+        month:
+          type: integer
+          maximum: 12
+          minimum: 1
+          title: Month in the current year
+        status:
+          $ref: '#/components/schemas/SeasonStatusEnum'
+      required:
+      - id
+      - month
+      - name
+      - season_start_time
+      - time_to_start
+      - year
+    SeasonParticipant:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        season:
+          type: integer
+        profile:
+          type: integer
+        rank:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: -9223372036854775808
+          format: int64
+          nullable: true
+        username:
+          type: string
+          readOnly: true
+        profile_name:
+          type: string
+          readOnly: true
+        selected_games:
+          type: string
+          readOnly: true
+        first_game_selection_banned_by_others:
+          type: string
+          readOnly: true
+        has_banned:
+          type: boolean
+          readOnly: true
+        is_active_player:
+          type: string
+          readOnly: true
+        my_banned_game:
+          type: string
+          readOnly: true
+      required:
+      - first_game_selection_banned_by_others
+      - has_banned
+      - id
+      - is_active_player
+      - my_banned_game
+      - profile
+      - profile_name
+      - season
+      - selected_games
+      - username
+    SeasonParticipantMini:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        profile_name:
+          type: string
+          readOnly: true
+        username:
+          type: string
+          readOnly: true
+      required:
+      - id
+      - profile_name
+      - username
+    SeasonStatusEnum:
+      enum:
+      - NEXT
+      - OPEN
+      - RUNNING
+      - DONE
+      type: string
+      description: |-
+        * `NEXT` - Next
+        * `OPEN` - Open
+        * `RUNNING` - Running
+        * `DONE` - Done
+    SelectedGame:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        game:
+          type: integer
+        game_name:
+          type: string
+          readOnly: true
+        selected_options:
+          type: array
+          items:
+            $ref: '#/components/schemas/SelectedOption'
+        league:
+          type: integer
+          writeOnly: true
+        profile:
+          type: integer
+          writeOnly: true
+        manage_only:
+          type: boolean
+          writeOnly: true
+      required:
+      - game
+      - game_name
+      - id
+      - selected_options
+    SelectedOption:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        game_option:
+          allOf:
+          - $ref: '#/components/schemas/GameOption'
+          readOnly: true
+        choice:
+          allOf:
+          - $ref: '#/components/schemas/GameOptionChoice'
+          readOnly: true
+        value:
+          type: boolean
+          nullable: true
+        game_option_id:
+          type: integer
+          writeOnly: true
+        choice_id:
+          type: integer
+          writeOnly: true
+          nullable: true
+      required:
+      - choice
+      - game_option
+      - game_option_id
+      - id
+    StartingPointSystem:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        code:
+          type: string
+          maxLength: 10
+        description:
+          type: string
+          maxLength: 255
+      required:
+      - code
+      - description
+      - id
+    StatusFc6Enum:
+      enum:
+      - PICKING
+      - BANNING
+      - REPICKING
+      - PLAYING
+      - DONE
+      type: string
+      description: |-
+        * `PICKING` - Picking
+        * `BANNING` - Banning
+        * `REPICKING` - Repicking
+        * `PLAYING` - Playing
+        * `DONE` - Done
+    TieBreaker:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 255
+        order:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+          description: Higher order is more important.
+        higher_wins:
+          type: boolean
+          description: If True, higher values win. If False, lower values win.
+        result_config:
+          type: integer
+      required:
+      - id
+      - name
+      - order
+      - result_config
+    TypeEnum:
+      enum:
+      - INFO
+      - WINNER
+      - REGISTER
+      - WARNING
+      - NEUTRAL
+      type: string
+      description: |-
+        * `INFO` - Info
+        * `WINNER` - Winner
+        * `REGISTER` - Register
+        * `WARNING` - Warning
+        * `NEUTRAL` - Neutral
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        username:
+          type: string
+          description: Username is used to login
+          pattern: ^[\w.@+-]+$
+          maxLength: 44
+      required:
+      - id
+      - username
+    UserInviteLink:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        key:
+          type: string
+          readOnly: true
+        label:
+          type: string
+          description: Admin note to remember who this invite is for.
+          maxLength: 300
+        player_profile:
+          type: integer
+          nullable: true
+          description: 'Optional: Link this invite to an existing PlayerProfile'
+        player_profile_details:
+          allOf:
+          - $ref: '#/components/schemas/PlayerProfile'
+          readOnly: true
+        created_by:
+          type: integer
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        expires_at:
+          type: string
+          format: date-time
+          nullable: true
+        invite_url:
+          type: string
+          readOnly: true
+      required:
+      - created_at
+      - created_by
+      - id
+      - invite_url
+      - key
+      - player_profile_details
+  securitySchemes:
+    tokenAuth:
+      type: apiKey
+      in: header
+      name: Authorization
+      description: Token-based authentication with required prefix "Token"

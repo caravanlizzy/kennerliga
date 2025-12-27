@@ -54,7 +54,7 @@
         </q-card-section>
       </q-card>
 
-      <!-- New TAnnouncement Form -->
+      <!-- New TAnnouncementDto Form -->
       <q-card flat bordered>
         <q-card-section>
           <div class="text-h6 q-mb-md">Add New Announcement</div>

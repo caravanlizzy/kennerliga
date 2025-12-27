@@ -248,12 +248,12 @@
 import KennerButton from 'components/base/KennerButton.vue';
 import GameSettingsDisplay from 'components/game/selectedGame/GameSettingsDisplay.vue';
 import MatchResult from 'components/league/MatchResult.vue';
-import type { TSeason } from 'src/types';
+import type { TSeasonDto } from 'src/types';
 
 const props = defineProps<{
   member: any;
   league: any;
-  season: TSeason | null;
+  season: TSeasonDto | null;
   matchResultsBySelectedGameId: Record<number, any[]>;
 }>();
 

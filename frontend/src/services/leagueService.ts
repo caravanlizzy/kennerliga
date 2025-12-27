@@ -1,9 +1,9 @@
 import { api } from 'boot/axios';
-import { TLeague } from 'src/types';
+import { TLeagueDto } from 'src/types';
 
 export async function fetchLeagueDetails(
   leagueId: number
-): Promise<TLeague> {
+): Promise<TLeagueDto> {
   try {
     const { data } = await api.get(`league/league-details/${leagueId}`);
     return data;

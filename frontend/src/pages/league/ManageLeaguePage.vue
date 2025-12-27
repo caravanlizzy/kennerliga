@@ -74,22 +74,22 @@ import EmptyMembersState from 'components/league/manager/EmptyMembersState.vue';
 import MemberGameCard from 'components/league/manager/MemberGameCard.vue';
 import ManagerFormsDialog from 'components/league/manager/ManagerFormsDialog.vue';
 import { useDialog } from 'src/composables/dialog';
-import type { TSeason, TLeague, TLeagueMember, TSelectedGameDto, TMatchResult } from 'src/types';
+import type { TSeasonDto, TLeagueDto, TLeagueMemberDto, TSelectedGameDto, TMatchResult } from 'src/types';
 
 const route = useRoute();
 const $q = useQuasar();
 const { setDialog } = useDialog();
 
-const league = ref<TLeague | null>(null);
-const season = ref<TSeason | null>(null);
+const league = ref<TLeagueDto | null>(null);
+const season = ref<TSeasonDto | null>(null);
 const matchResultsBySelectedGameId = ref<Record<number, TMatchResult[]>>({});
 
 const loading = ref(false);
 const error = ref<string | null>(null);
 
-const editingGame = ref<{ member: TLeagueMember; selGame: TSelectedGameDto } | null>(null);
-const selectingGameMember = ref<TLeagueMember | null>(null);
-const banningGameMember = ref<TLeagueMember | null>(null);
+const editingGame = ref<{ member: TLeagueMemberDto; selGame: TSelectedGameDto } | null>(null);
+const selectingGameMember = ref<TLeagueMemberDto | null>(null);
+const banningGameMember = ref<TLeagueMemberDto | null>(null);
 const postResultForSelGame = ref<TSelectedGameDto | null>(null);
 const editResultForSelGameId = ref<number | null>(null);
 
