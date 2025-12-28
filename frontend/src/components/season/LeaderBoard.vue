@@ -14,7 +14,7 @@
         <div class="text-h6 text-weight-bold">Leaderboard</div>
         <div class="text-caption text-grey-7">Season Performance Summary</div>
       </div>
-      <q-chip outline color="primary" icon="event" label="Year {{ standings.year }}" />
+      <q-chip outline color="primary" icon="event" :label="'Year ' + standings.year" />
     </div>
 
     <!-- Table -->
