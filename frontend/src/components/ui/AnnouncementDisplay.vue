@@ -1,11 +1,11 @@
 <template>
-  <div v-if="visibleAnnouncements.length" :class="isMobile ? 'q-mb-sm' : 'q-mb-lg'">
+  <div v-if="visibleAnnouncements.length" :class="isMobile ? 'q-mb-sm' : 'q-mb-md'">
     <transition-group
       appear
       enter-active-class="animated fadeIn"
       leave-active-class="animated fadeOut"
     >
-      <div v-for="a in visibleAnnouncements" :key="a.id" :class="isMobile ? 'q-mb-sm' : 'q-mb-md'">
+      <div v-for="a in visibleAnnouncements" :key="a.id" class="q-mb-sm">
         <!-- TAnnouncementDto Card -->
         <q-card
           flat

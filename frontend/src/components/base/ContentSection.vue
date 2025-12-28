@@ -2,7 +2,7 @@
   <div
     v-if="!isMinimized"
     :class="bordered ? `border-2 rounded-borders border-${color}` : ''"
-    class="q-mt-xs content-section-container"
+    class="q-mt-md content-section-container"
   >
     <template v-if="expandable">
       <q-expansion-item

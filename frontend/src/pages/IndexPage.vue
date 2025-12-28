@@ -34,7 +34,7 @@
               icon="sensors"
               color="accent"
               :bordered="false"
-              class="q-mx-md q-mt-md"
+              class="q-mx-md q-my-md"
             >
               <LiveActionFeed />
             </ContentSection>
@@ -91,7 +91,7 @@
               color="accent"
               minimizable
               :bordered="false"
-              class="col-12 q-mb-md"
+              class="col-12"
             >
               <LiveActionFeed />
             </ContentSection>
