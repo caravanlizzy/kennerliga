@@ -9,7 +9,6 @@
         <!-- TAnnouncementDto Card -->
         <q-card
           flat
-          bordered
           class="announcement-card overflow-hidden"
           :class="[
             cardThemes[a.type],
@@ -279,7 +278,6 @@ const typeColors = {
 <style scoped>
 .announcement-card {
   border-radius: 12px;
-  border: 1px solid rgba(0, 0, 0, 0.08);
   transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
   border-left-width: 6px !important;
 }
