@@ -83,6 +83,17 @@ export async function fetchLeaguesBySeason(seasonId: number): Promise<TLeagueDto
   }
 }
 
+export async function fetchAvailableYears(): Promise<number[]> {
+  try {
+    const { data } = await api.get<TSeasonDto[]>('/season/seasons/');
+    const years = data.map(s => s.year);
+    return Array.from(new Set(years)).sort((a, b) => b - a);
+  } catch (error) {
+    console.error('Error fetching available years:', error);
+    return [new Date().getFullYear()];
+  }
+}
+
 type ProfileLike = { id: number } | number;
 
 export async function ensureParticipants(

@@ -16,7 +16,10 @@
       >
         <template #header>
           <div class="full-width row justify-center items-center">
-            {{ title }}
+            <slot name="title">
+              {{ title }}
+            </slot>
+            <slot name="header-extra" />
           </div>
         </template>
         <q-separator inset :color="color" />
@@ -30,7 +33,10 @@
         class="full-width row q-pr-lg items-center text-h5 q-py-xs"
         :class="[`text-${color}`, titleEnd ? 'justify-end' : 'justify-center']"
       >
-        {{ title }}
+        <slot name="title">
+          {{ title }}
+        </slot>
+        <slot name="header-extra" />
       </div>
       <q-separator inset :color="color" />
       <slot />

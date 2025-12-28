@@ -6,13 +6,27 @@
   <!-- Content -->
   <div
     v-else-if="standings"
-    class="leaderboard-container bg-white rounded-borders shadow-2"
+    class="leaderboard-container rounded-borders shadow-2"
+    :class="$q.dark.isActive ? 'bg-dark' : 'bg-white'"
   >
     <!-- Header -->
-    <div class="row items-center justify-between q-pa-md bg-grey-1">
+    <div
+      class="row items-center justify-between q-pa-md"
+      :class="$q.dark.isActive ? 'bg-grey-9' : 'bg-grey-1'"
+    >
       <div class="column">
-        <div class="text-h6 text-weight-bold text-grey-9">Leaderboard</div>
-        <div class="text-caption text-grey-7">Year Performance</div>
+        <div
+          class="text-h6 text-weight-bold"
+          :class="$q.dark.isActive ? 'text-grey-2' : 'text-grey-9'"
+        >
+          Leaderboard
+        </div>
+        <div
+          class="text-caption"
+          :class="$q.dark.isActive ? 'text-grey-5' : 'text-grey-7'"
+        >
+          Year Performance
+        </div>
       </div>
       <q-chip
         outline
@@ -22,6 +36,7 @@
         icon="event"
         :label="'Year ' + standings.year"
         class="text-weight-bold"
+        :dark="$q.dark.isActive"
       />
     </div>
 

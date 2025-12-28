@@ -27,7 +27,18 @@
             <SeasonStandings />
           </ScrollContainer>
           <ScrollContainer v-else-if="mobileContent === 'leaderboard'">
-            <LeaderBoard :year="2025" />
+            <div class="q-pa-md row items-center justify-between no-wrap">
+              <div class="text-h5 text-weight-bold text-dark">Leaderboard</div>
+              <div style="min-width: 120px">
+                <KennerSelect
+                  v-model="selectedYear"
+                  :options="availableYears"
+                  dense
+                  class="full-width"
+                />
+              </div>
+            </div>
+            <LeaderBoard :year="selectedYear" />
           </ScrollContainer>
         </div>
         <q-toolbar class="col-auto bg-grey-4 text-primary flex-center">
@@ -62,11 +73,28 @@
             <ContentSection
               :bordered="false"
               titleEnd
-              title="Leaderboard"
+              title=""
               class="col-12"
               color="dark"
             >
-              <LeaderBoard :year="2025" />
+              <template #title>
+                <div style="min-width: 120px">
+                  <KennerSelect
+                    v-model="selectedYear"
+                    :options="availableYears"
+                    dense
+                    filled
+                    square
+                    size="sm"
+                    class="q-ml-md"
+                    :dark="$q.dark.isActive"
+                  />
+                </div>
+              </template>
+              <template #header-extra>
+                <div class="q-ml-md">Leaderboard</div>
+              </template>
+              <LeaderBoard :year="selectedYear" />
             </ContentSection>
           </div>
           <ContentSection
@@ -92,11 +120,13 @@ import AnnouncementDisplay from 'components/ui/AnnouncementDisplay.vue';
 import { useResponsive } from 'src/composables/responsive';
 import LeaderBoard from 'components/season/LeaderBoard.vue';
 import ContentSection from 'components/base/ContentSection.vue';
+import KennerSelect from 'components/base/KennerSelect.vue';
 import { useQuasar } from 'quasar';
-import { ref } from 'vue';
+import { onMounted, ref } from 'vue';
 import ScrollContainer from 'components/base/ScrollContainer.vue';
 import SeasonWinners from 'components/season/SeasonWinners.vue';
 import { useUserStore } from 'stores/userStore';
+import { fetchAvailableYears } from 'src/services/seasonService';
 
 const { isMobile } = useResponsive();
 const { isAuthenticated } = useUserStore();
@@ -104,4 +134,15 @@ const $q = useQuasar();
 const isMdUp = $q.screen.gt.sm;
 
 const mobileContent = ref('seasons');
+const selectedYear = ref(new Date().getFullYear());
+const availableYears = ref<number[]>([]);
+
+onMounted(async () => {
+  if (isAuthenticated) {
+    availableYears.value = await fetchAvailableYears();
+    if (availableYears.value.length > 0) {
+      selectedYear.value = availableYears.value[0];
+    }
+  }
+});
 </script>
