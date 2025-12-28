@@ -7,18 +7,12 @@
     <!-- Status Header Row -->
     <div class="status-header q-pa-sm">
       <div class="row items-center no-wrap">
-        <!-- Left spacer -->
-        <div class="col"></div>
-
         <!-- Center: Status chip -->
-        <div class="col-auto flex flex-center">
-          <q-chip
-            color="dark"
+        <div class="col flex items-center">
+          <q-badge
+            color="grey-2"
             text-color="dark"
-            square
-            outline
-            dense
-            class="bg-white text-uppercase text-bold"
+            class="text-uppercase text-bold q-px-sm q-py-xs"
           >
             <template v-if="loading">
               Loading
@@ -26,11 +20,11 @@
             <template v-else>
               {{ statusNoun }}
             </template>
-          </q-chip>
+          </q-badge>
         </div>
 
         <!-- Right: Active player chip -->
-        <div class="col flex justify-end">
+        <div class="col-auto flex justify-end">
           <q-chip
             v-if="activePlayer"
             color="positive"
@@ -52,7 +46,7 @@
 
     <!-- Action Content (only when it's your turn) -->
     <div
-      v-if="isMeActivePlayer"
+      v-if="isMeActivePlayer || hint"
       class="action-content q-pa-md"
     >
       <div
@@ -62,18 +56,24 @@
       >
         <!-- Text Content -->
         <div
-          v-if="leadText || subject"
+          v-if="leadText || subject || hint"
           class="text-section"
-          :class="{ 'q-mb-sm': isMobile && !leadText }"
         >
-          <div v-if="leadText" class="text-body2 text-grey-7 q-mb-xs">
+          <div v-if="leadText" class="text-caption text-grey-6 text-uppercase letter-spacing-1 q-mb-xs">
             <component :is="leadText" />
           </div>
           <div
             v-if="subject"
             class="text-h6 text-dark text-weight-bold"
+            style="line-height: 1.2"
           >
             <component :is="subject" />
+          </div>
+          <div
+            v-if="hint"
+            class="text-caption text-grey-7 q-mt-xs"
+          >
+            <component :is="hint" />
           </div>
         </div>
 
@@ -106,7 +106,7 @@ import { storeToRefs } from 'pinia';
 import { useResponsive } from 'src/composables/responsive';
 import { useUserStore } from 'stores/userStore';
 
-const { actions, leadText, subject, reset } = useActionBar();
+const { actions, leadText, subject, hint, reset } = useActionBar();
 const { user } = storeToRefs(useUserStore());
 const myLeagueStore = useLeagueStore(user.value!.myCurrentLeagueId)();
 const { activePlayer, isMeActivePlayer, statusNoun, loading } =
@@ -131,11 +131,8 @@ async function handleAction(action: any) {
 }
 
 .status-header {
-  background: linear-gradient(
-      135deg,
-      rgba(var(--q-dark-rgb), 0.06) 0%,
-      rgba(var(--q-secondary-rgb), 0.08) 100%
-  );
+  background: #f8f9fa;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
 }
 
 .action-content {
@@ -145,6 +142,10 @@ async function handleAction(action: any) {
 .text-section {
   flex: 1;
   min-width: 0;
+}
+
+.letter-spacing-1 {
+  letter-spacing: 0.5px;
 }
 
 @media (max-width: 599px) {

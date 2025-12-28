@@ -50,6 +50,8 @@ const leadText = shallowRef<RenderFn | null>(null);
 
 const subject = shallowRef<RenderFn | null>(null);
 
+const hint = shallowRef<RenderFn | null>(null);
+
 /**
  * Provides functionalities to manage an action bar including actions and descriptions.
  *
@@ -80,10 +82,16 @@ export function useActionBar() {
       typeof render === 'string' ? () => h('div', render) : render;
   }
 
+  function setHint(render: RenderFn | string | null): void {
+    hint.value =
+      typeof render === 'string' ? () => h('div', render) : render;
+  }
+
   function reset(): void {
     actions.value = [];
     leadText.value = null;
     subject.value = null;
+    hint.value = null;
   }
 
   const hasContent = computed(
@@ -94,7 +102,9 @@ export function useActionBar() {
     actions,
     leadText,
     subject,
+    hint,
     setSubject,
+    setHint,
     hasContent,
     setActions,
     setLeadText,

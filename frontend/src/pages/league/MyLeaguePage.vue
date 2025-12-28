@@ -72,7 +72,10 @@
               </div>
             </div>
             <div v-else class="text-center q-pa-md text-grey">
-              No results recorded yet
+              <div class="text-subtitle1">No results recorded yet</div>
+              <div v-if="leagueStatus === 'PLAYING'" class="text-caption">
+                Games that are finished can be uploaded below.
+              </div>
             </div>
           </ContentSection>
         </template>
@@ -157,7 +160,7 @@ const {
 } = storeToRefs(myLeagueStore);
 const { updateLeagueData, hasSelectedGameResult } = myLeagueStore;
 
-const { setActions, setLeadText, setSubject, reset } = useActionBar();
+const { setActions, setLeadText, setSubject, setHint, reset } = useActionBar();
 
 const gameSelection = ref<TGameSelection | null>(null);
 const selectionValid = ref(false);
@@ -263,8 +266,11 @@ function manageActionBar() {
           buttonVariant: 'accent',
         },
       ]);
-      setLeadText(() => h('div', 'Confirm your game selection'));
+      setLeadText('Confirm your game selection');
       setSubject(gameSelection.value?.game?.name);
+      break;
+    case 'PLAYING':
+      setHint('Games that are finished can be uploaded below.');
       break;
   }
 }
