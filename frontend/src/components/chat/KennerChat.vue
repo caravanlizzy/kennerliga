@@ -27,6 +27,9 @@
               :text="[m.text]"
               :name="m.sender"
               :stamp="timeAgo(m.datetime)"
+              :bg-color="isMine(m) ? 'primary' : 'secondary'"
+              :text-color="isMine(m) ? 'white' : 'white'"
+              class="chat-message"
             />
           </template>
         </q-scroll-area>
@@ -51,14 +54,13 @@
     </q-card-section>
 
     <!-- Composer -->
-    <q-card-section class="col-auto" v-if="isAuthenticated">
+    <q-card-section class="col-auto q-pa-sm bg-grey-1 border-top-subtle" v-if="isAuthenticated">
       <KennerInput
         ref="inputRef"
         v-model="newMessage"
-        class="col-auto"
+        class="col-auto composer-input"
         type="text"
-        filled
-        placeholder="Type a message"
+        placeholder="Type a message..."
         :disable="sending"
         @keydown.enter.prevent="send"
       >
@@ -68,6 +70,7 @@
             round
             dense
             icon="send"
+            color="primary"
             :loading="sending"
             @click="send"
           />
