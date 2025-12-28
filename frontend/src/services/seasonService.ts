@@ -1,6 +1,6 @@
 import { AxiosResponse } from 'axios';
 import { api } from 'boot/axios';
-import { TSeasonDto, TSeasonParticipantDto, TLeagueDto } from 'src/types';
+import { TSeasonDto, TSeasonParticipantDto, TLeagueDto, TLiveEvent } from 'src/types';
 
 export async function registerForSeason(): Promise<AxiosResponse | undefined> {
   try {
@@ -131,6 +131,17 @@ export async function ensureParticipants(
 
   // Return the updated list
   return await fetchSeasonParticipants(seasonId);
+}
+
+export async function fetchLiveActionEvents(seasonId?: number): Promise<TLiveEvent[]> {
+  try {
+    const params = seasonId ? { season_id: seasonId } : {};
+    const { data } = await api.get<TLiveEvent[]>('/season/live-events/', { params });
+    return data;
+  } catch (error) {
+    console.error('Error fetching live action events:', error);
+    return [];
+  }
 }
 
 export async function createLeagueForSeason(

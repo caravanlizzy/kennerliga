@@ -48,7 +48,7 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from 'vue';
 import { TLiveEvent, TLiveEventType } from 'src/types';
-import { api } from 'boot/axios';
+import { fetchLiveActionEvents } from 'src/services/seasonService';
 
 const events = ref<TLiveEvent[]>([]);
 const loading = ref(true);
@@ -56,8 +56,7 @@ let pollInterval: any = null;
 
 async function fetchEvents() {
   try {
-    const { data } = await api.get<TLiveEvent[]>('/season/live-events/');
-    events.value = data;
+    events.value = await fetchLiveActionEvents();
   } catch (error) {
     console.error('Error fetching live events:', error);
   } finally {
