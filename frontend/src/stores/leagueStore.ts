@@ -193,9 +193,16 @@ export const useLeagueStore = (id: number) => {
     const isMePickingGame = computed(
       () => (leagueStatus.value === 'PICKING' || leagueStatus.value === 'REPICKING') && isMeActivePlayer.value
     );
-    const isMeBanningGame = computed(
-      () => leagueStatus.value === 'BANNING' && isMeActivePlayer.value
-    );
+    const isMeBanningGame = computed(() => {
+      const me = members.value.find((m) => isMe(m.username));
+      return (
+        leagueStatus.value === 'BANNING' &&
+        isMeActivePlayer.value &&
+        me &&
+        !me.has_banned &&
+        !me.banned_selected_game
+      );
+    });
 
     void init();
 

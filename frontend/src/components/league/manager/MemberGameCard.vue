@@ -83,7 +83,7 @@
         @click="$emit('add-game', member)"
       />
       <q-btn
-        v-if="!member.my_banned_game"
+        v-if="!member.my_banned_game && !member.has_banned"
         unelevated
         rounded
         color="red-7"
