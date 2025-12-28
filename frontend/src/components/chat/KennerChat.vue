@@ -19,7 +19,7 @@
             <q-spinner-dots color="primary" size="2em" />
           </div>
 
-          <template v-for="m in messages" :key="m.datetime">
+          <template v-for="m in messages" :key="m.id">
             <q-chat-message
               v-if="m.label"
               :label="m.label"
@@ -204,7 +204,14 @@ async function loadMessages() {
   if (!data || data.length === 0) return;
 
   const newMessages = data.reverse();
-  messages.value = [...messages.value, ...newMessages];
+
+  // De-duplicate: only add messages that aren't already in the list
+  const existingIds = new Set(messages.value.map(m => m.id));
+  const uniqueNewMessages = newMessages.filter(m => !existingIds.has(m.id));
+
+  if (uniqueNewMessages.length === 0) return;
+
+  messages.value = [...messages.value, ...uniqueNewMessages];
   lastDateTime = messages.value[messages.value.length - 1].datetime;
 }
 
@@ -235,7 +242,18 @@ async function loadOlderMessages() {
     const oldScrollHeight = scrollTarget?.scrollHeight || 0;
 
     const olderMessages = data.reverse();
-    messages.value = [...olderMessages, ...messages.value];
+
+    // De-duplicate: only add messages that aren't already in the list
+    const existingIds = new Set(messages.value.map(m => m.id));
+    const uniqueOlderMessages = olderMessages.filter(m => !existingIds.has(m.id));
+
+    if (uniqueOlderMessages.length > 0) {
+      messages.value = [...uniqueOlderMessages, ...messages.value];
+    } else {
+      // If we got data but none were unique, it means we reached the end or something is wrong
+      hasMoreOlder.value = false;
+      return;
+    }
 
     await nextTick();
 
