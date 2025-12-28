@@ -9,7 +9,7 @@
     >
       <template #body-cell-invite_url="props">
         <q-td :props="props">
-          <q-btn
+          <KennerButton
             flat
             round
             dense
@@ -23,6 +23,7 @@
 
 <script setup lang="ts">
 import KennerTable from 'components/tables/KennerTable.vue';
+import KennerButton from 'components/base/KennerButton.vue';
 import { api } from 'boot/axios';
 import type { TKennerButton } from 'src/types';
 import { copyToClipboard, useQuasar } from 'quasar';

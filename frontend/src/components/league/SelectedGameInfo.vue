@@ -10,9 +10,9 @@
 
             <div class="text-subtitle1 text-weight-medium ellipsis" >
               {{ truncateString(member.selected_game.game_name) }}
-              <q-tooltip v-if="(member.selected_game.game_name || '').length > 28">
+              <KennerTooltip v-if="(member.selected_game.game_name || '').length > 28">
                 {{ member.selected_game.game_name }}
-              </q-tooltip>
+              </KennerTooltip>
             </div>
           </div>
 
@@ -37,7 +37,7 @@
               >
                 <!-- You can keep line-through, or just dim it; here we just dim -->
                 <span class="text-grey-7">{{ bannedGameName }}</span>
-                <q-tooltip>Not active anymore (banned by others)</q-tooltip>
+                <KennerTooltip>Not active anymore (banned by others)</KennerTooltip>
               </q-chip>
 
               <div v-else-if="banners.length" class="row items-center q-gutter-xs">
@@ -56,7 +56,7 @@
 
         </div>
 
-        <q-btn
+        <KennerButton
           flat
           round
           size="sm"
@@ -80,6 +80,8 @@ import { ref, computed } from 'vue';
 import UserAvatar from 'components/ui/UserAvatar.vue';
 import { truncateString } from 'src/helpers';
 import GameSettingsDisplay from 'components/game/selectedGame/GameSettingsDisplay.vue';
+import KennerButton from 'components/base/KennerButton.vue';
+import KennerTooltip from 'components/base/KennerTooltip.vue';
 
 // --- types trimmed to what we actually render ---
 type Choice = { id: number; name: string; option: number };

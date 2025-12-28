@@ -7,7 +7,7 @@
         <q-icon name="person" class="q-mr-sm" color="primary" />
         {{ user?.username || route.params.username }}
       </div>
-      <q-btn
+      <KennerButton
         dense
         flat
         round
@@ -16,8 +16,8 @@
         :loading="loading"
         :disable="loading"
       >
-        <q-tooltip>Refresh data</q-tooltip>
-      </q-btn>
+        <KennerTooltip>Refresh data</KennerTooltip>
+      </KennerButton>
     </div>
 
     <!-- Stats Overview -->
@@ -167,6 +167,8 @@ import { api } from 'boot/axios';
 import { useRoute } from 'vue-router';
 import { onMounted, ref, computed } from 'vue';
 import LoadingSpinner from 'components/base/LoadingSpinner.vue';
+import KennerButton from 'components/base/KennerButton.vue';
+import KennerTooltip from 'components/base/KennerTooltip.vue';
 import { TSeasonDto, TSeasonParticipantDto, TUserDto, TMatchResultDto, TLeagueDto, TSelectedGameDto } from 'src/types';
 
 defineEmits<{ (e: 'open:season', seasonId: number | string): void }>();

@@ -10,7 +10,7 @@
             account to access the seasons, chat, and leaderboards.
           </div>
           <div class="row q-gutter-md justify-center">
-            <q-btn color="primary" label="Login" icon="login" to="/login" />
+            <KennerButton color="primary" label="Login" icon="login" to="/login" />
           </div>
         </div>
       </div>

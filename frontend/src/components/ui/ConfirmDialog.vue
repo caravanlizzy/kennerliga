@@ -16,13 +16,13 @@
 
       <!-- Actions -->
       <q-card-actions align="right">
-        <q-btn
+        <KennerButton
           flat
           label="Cancel"
           color="secondary"
           @click="handleCancel"
         />
-        <q-btn
+        <KennerButton
           flat
           :label="confirmLabel"
           :color="dialogType"
@@ -35,6 +35,7 @@
 
 <script setup lang="ts">
 import { useDialog } from 'src/composables/dialog'
+import KennerButton from 'components/base/KennerButton.vue'
 
 const {
   showDialog,

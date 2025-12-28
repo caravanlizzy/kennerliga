@@ -80,8 +80,8 @@
           <div class="text-subtitle1 q-mb-sm">Delete option?</div>
           <div class="text-caption text-grey-7 q-mb-md">This cannot be undone.</div>
           <div class="row justify-end q-gutter-sm">
-            <q-btn flat label="Cancel" v-close-popup />
-            <q-btn color="negative" label="Delete" @click="onConfirmDelete" />
+            <KennerButton flat label="Cancel" v-close-popup />
+            <KennerButton color="negative" label="Delete" @click="onConfirmDelete" />
           </div>
         </q-card>
       </q-dialog>

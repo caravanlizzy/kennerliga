@@ -18,7 +18,7 @@
 
     <!-- Small screens: Drawer + full-height slim rail when closed -->
     <template v-else>
-      <q-btn
+      <KennerButton
         v-if="!sideOpen"
         dense
         flat
@@ -45,7 +45,7 @@
         @click="toggleSide"
       >
         {{ props.sideTitle }}
-      </q-btn>
+      </KennerButton>
 
       <q-drawer
         v-model="sideOpen"
@@ -59,7 +59,7 @@
           <q-toolbar-title class="ellipsis">{{
             props.sideTitle
           }}</q-toolbar-title>
-          <q-btn
+          <KennerButton
             flat
             round
             dense
@@ -79,6 +79,7 @@
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue';
 import { useResponsive } from 'src/composables/responsive';
+import KennerButton from 'components/base/KennerButton.vue';
 
 type Break = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
 

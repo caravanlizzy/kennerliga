@@ -1,6 +1,6 @@
 <template>
   <div class="col-12 col-md-6">
-    <q-input
+    <KennerInput
       v-model="filter"
       label="Game"
       outlined
@@ -11,11 +11,12 @@
       <template #append>
         <q-icon name="search" />
       </template>
-    </q-input>
+    </KennerInput>
   </div>
 </template>
 
 <script setup lang="ts">
+import KennerInput from 'components/base/KennerInput.vue';
 const filter = defineModel<string>();
 </script>
 

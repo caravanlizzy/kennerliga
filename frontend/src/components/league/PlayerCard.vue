@@ -21,13 +21,13 @@
                 <div class="game-title">
                   <span class="game-name-text">
                     {{ game.game_name }}
-                    <q-tooltip v-if="(game.game_name || '').length > 28">
+                    <KennerTooltip v-if="(game.game_name || '').length > 28">
                       {{ game.game_name }}
-                    </q-tooltip>
+                    </KennerTooltip>
                   </span>
                 </div>
               </div>
-              <q-btn
+              <KennerButton
                 flat
                 round
                 size="sm"
@@ -97,6 +97,8 @@
 import { computed, ref } from 'vue';
 import UserAvatar from 'components/ui/UserAvatar.vue';
 import GameSettingsDisplay from 'components/game/selectedGame/GameSettingsDisplay.vue';
+import KennerButton from 'components/base/KennerButton.vue';
+import KennerTooltip from 'components/base/KennerTooltip.vue';
 
 import { TLeagueMemberDto, TSelectedGameOptionDto } from 'src/types';
 

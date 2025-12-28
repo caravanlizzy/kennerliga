@@ -46,7 +46,7 @@
             class="row items-center q-gutter-sm"
             :class="isMobile ? 'q-mt-md q-ml-none' : 'q-ml-sm'"
           >
-            <q-btn
+            <KennerButton
               flat
               dense
               no-caps
@@ -56,7 +56,7 @@
             >
               <q-icon :name="showParticipants ? 'expand_less' : 'people'" size="16px" class="q-mr-xs" />
               {{ showParticipants ? 'Hide' : 'View' }} participants
-            </q-btn>
+            </KennerButton>
 
             <KennerButton
               v-if="!isRegisteredForOpenSeason"
@@ -68,9 +68,9 @@
               @click="register"
             >
               Register
-              <q-tooltip v-if="!isAuthenticated" class="bg-grey-9">
+              <KennerTooltip v-if="!isAuthenticated" class="bg-grey-9">
                 Login to register for upcoming season
-              </q-tooltip>
+              </KennerTooltip>
             </KennerButton>
 
             <div v-else class="row items-center q-gutter-x-xs text-positive text-weight-bold text-caption q-px-sm">
@@ -123,6 +123,7 @@ import { useAnnouncementStore } from 'stores/announcementStore';
 import { useUserStore } from 'stores/userStore';
 import { useResponsive } from 'src/composables/responsive';
 import KennerButton from 'components/base/KennerButton.vue';
+import KennerTooltip from 'components/base/KennerTooltip.vue';
 import { useQuasar } from 'quasar';
 import {
   fetchIsRegisteredForSeason,

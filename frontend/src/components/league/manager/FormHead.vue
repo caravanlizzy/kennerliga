@@ -5,7 +5,7 @@
     <div>
       <slot />
     </div>
-    <q-btn
+    <KennerButton
       dense
       flat
       round
@@ -17,5 +17,6 @@
   </div>
 </template>
 <script setup lang="ts">
+import KennerButton from 'components/base/KennerButton.vue';
 const emit = defineEmits(['onClose']);
 </script>

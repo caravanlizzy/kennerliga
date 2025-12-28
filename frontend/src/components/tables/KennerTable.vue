@@ -16,7 +16,7 @@
 
     <template v-slot:top-right>
       <div class="row q-gutter-sm no-wrap">
-        <q-input
+        <KennerInput
           v-model="filter"
           placeholder="Search..."
           debounce="300"
@@ -28,7 +28,7 @@
           <template v-slot:append>
             <q-icon name="search" />
           </template>
-        </q-input>
+        </KennerInput>
 
         <KennerButton
           v-if="createButton"
@@ -46,6 +46,7 @@
 import { ref } from 'vue';
 import { TKennerButton } from 'src/types';
 import KennerButton from 'components/base/KennerButton.vue';
+import KennerInput from 'components/base/KennerInput.vue';
 
 defineProps<{
   title?: string;

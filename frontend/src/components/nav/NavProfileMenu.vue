@@ -10,7 +10,7 @@
       shape="circle"
     />
 
-    <q-btn
+    <KennerButton
       v-if="isAuthenticated"
       flat
       dense
@@ -20,7 +20,7 @@
       @click="onToggle"
     />
 
-    <q-btn
+    <KennerButton
       v-else
       flat
       dense
@@ -35,6 +35,7 @@
 import UserAvatar from 'components/ui/UserAvatar.vue';
 import { useUserStore } from 'stores/userStore';
 import { storeToRefs } from 'pinia';
+import KennerButton from 'components/base/KennerButton.vue';
 
 defineProps<{ onToggle: () => void }>();
 const { user, isAuthenticated } = storeToRefs(useUserStore());

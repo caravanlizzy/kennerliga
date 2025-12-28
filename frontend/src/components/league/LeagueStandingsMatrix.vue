@@ -49,9 +49,9 @@
                     size="28px"
                     shape="squircle"
                   >
-                    <q-tooltip v-if="isMobile && props.row.username">
+                    <KennerTooltip v-if="isMobile && props.row.username">
                       {{ props.row.username }}
-                    </q-tooltip>
+                    </KennerTooltip>
                   </UserAvatar>
                   <div v-if="!isMobile" class="column">
                     <span class="text-subtitle2 text-weight-bold text-dark line-height-1">
@@ -92,7 +92,7 @@
                   color="amber-8"
                   size="18px"
                 />
-                <q-tooltip>League Leader</q-tooltip>
+                <KennerTooltip>League Leader</KennerTooltip>
               </div>
             </div>
           </q-td>
@@ -176,7 +176,7 @@
         <span class="q-mt-xs text-negative text-caption">
           Error loading standings
         </span>
-        <q-btn
+        <KennerButton
           outline
           color="dark"
           label="Retry"
@@ -196,6 +196,8 @@ import LoadingSpinner from 'components/base/LoadingSpinner.vue';
 import type { QTableColumn } from 'quasar';
 import { useResponsive } from 'src/composables/responsive';
 import UserAvatar from 'components/ui/UserAvatar.vue';
+import KennerTooltip from 'components/base/KennerTooltip.vue';
+import KennerButton from 'components/base/KennerButton.vue';
 
 const props = defineProps<{
   leagueId: number;

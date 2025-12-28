@@ -117,7 +117,7 @@
           <div v-if="hasTieBreaker" class="q-pl-sm q-pr-sm q-mt-sm">
             <div class="row items-center justify-between q-mb-xs">
               <div class="text-subtitle2">Tie-breakers</div>
-              <q-btn
+              <KennerButton
                 flat
                 dense
                 icon="add"
@@ -158,7 +158,7 @@
                   </div>
 
                   <div class="col-auto">
-                    <q-btn
+                    <KennerButton
                       flat
                       dense
                       icon="delete"
@@ -186,6 +186,7 @@
 import { ref, watch, computed } from 'vue';
 import KennerSelect from 'components/base/KennerSelect.vue';
 import KennerInput from 'components/base/KennerInput.vue';
+import KennerButton from 'components/base/KennerButton.vue';
 import ListCreator from 'components/lists/ListCreator.vue';
 import { api } from 'boot/axios';
 import { TFaction, TResultConfig, TTieBreaker } from 'src/types';

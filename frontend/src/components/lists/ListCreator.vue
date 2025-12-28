@@ -1,14 +1,14 @@
 <template>
   <div class="q-pb-sm">
-    <q-input filled square bottom-slots hide-bottom-space :label="buttonLabel" v-model="inputItem.name"
+    <KennerInput filled square bottom-slots hide-bottom-space :label="buttonLabel" v-model="inputItem.name"
              @keyup.enter="addItem">
       <template v-slot:append>
         <KennerButton round dense flat icon="add" @click="addItem"/>
       </template>
-    </q-input>
+    </KennerInput>
     <div v-for="(item, index) of listItems" :key="item.id">
       <div v-if="item.isEditable">
-        <q-input square bottom-slots hide-bottom-space label="editieren" color="primary" class="text-white"
+        <KennerInput square bottom-slots hide-bottom-space label="editieren" color="primary" class="text-white"
                  v-model="item.name">
           <template v-slot:prepend>
             <kenner-counter v-if="ranked" :content="index"/>
@@ -17,20 +17,20 @@
             <KennerButton color="primary" dense flat icon="check" @click="item.isEditable=false"
                            @blur="item.isEditable=false"/>
           </template>
-        </q-input>
+        </KennerInput>
       </div>
       <div v-else @click="() => item.isEditable = true" class="flex justify-between q-pa-sm rounded item-border"
            :class="{'border-bottom': index === listItems.length - 1}">
         <div v-if="ranked" class="row">
           <div class="column">
-            <q-btn
+            <KennerButton
               flat
               v-if="index > 0"
               icon="arrow_drop_up"
               size="sm"
               @click.stop="moveItemUp(index)"
             />
-            <q-btn
+            <KennerButton
               flat
               v-if="index<listItems.length -1"
               icon="arrow_drop_down"
@@ -49,6 +49,7 @@
 <script setup lang="ts">
 
 import KennerButton from 'components/base/KennerButton.vue';
+import KennerInput from 'components/base/KennerInput.vue';
 import { Ref, ref } from 'vue';
 import { TItem } from 'src/types';
 import KennerCounter from 'components/base/KennerCounter.vue';

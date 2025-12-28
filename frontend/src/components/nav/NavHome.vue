@@ -1,6 +1,6 @@
 <template>
   <div class="row items-center no-wrap">
-    <q-btn
+    <KennerButton
       :to="{ name: 'home' }"
       unelevated
       flat
@@ -8,12 +8,13 @@
       class="nav-item-radius text-weight-bold"
     >
       <q-icon size="sm" name="img:icons/favicon.svg" />
-    </q-btn>
+    </KennerButton>
 
   </div>
 </template>
 <script setup lang="ts">
 import { useResponsive } from 'src/composables/responsive';
+import KennerButton from 'components/base/KennerButton.vue';
 
 const { isMobile } = useResponsive();
 

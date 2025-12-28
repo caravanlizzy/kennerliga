@@ -32,7 +32,7 @@
     <div class="feedback-form">
       <div class="text-h6 q-mb-md">Submit Feedback</div>
       <q-form @submit="onSubmit" class="q-gutter-md">
-        <q-input
+        <KennerInput
           v-model="feedback"
           label="Your Feedback"
           type="textarea"

@@ -3,7 +3,7 @@
     <!-- Header -->
     <div class="row items-center justify-between q-mb-xs">
       <div class="text-subtitle2 text-weight-medium">Condition</div>
-      <q-btn
+      <KennerButton
         flat dense size="sm" icon="restart_alt" label="Clear"
         :disable="!restrictToOption"
         @click="clearRestriction"
@@ -75,6 +75,7 @@
 
 <script setup lang="ts">
 import KennerSelect from 'components/base/KennerSelect.vue';
+import KennerButton from 'components/base/KennerButton.vue';
 import { computed, inject, ref, Ref } from 'vue';
 import { TGameOption } from 'src/types';
 

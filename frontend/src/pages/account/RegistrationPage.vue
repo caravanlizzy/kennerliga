@@ -31,7 +31,6 @@
         <q-card-section>
           <KennerButton
             type="submit"
-            size="lg"
             class="full-width q-mt-md"
             :label="isSubmitting ? 'Creating Account…' : 'Register'"
             icon="person_add"
@@ -40,7 +39,7 @@
             :disable="isSubmitting"
           />
           <div class="q-mt-md text-center">
-            <q-btn
+            <KennerButton
               flat
               color="dark"
               icon="login"

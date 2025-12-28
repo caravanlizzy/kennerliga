@@ -36,14 +36,14 @@
     </div>
 
     <div class="row justify-end q-mt-xl q-gutter-sm">
-      <q-btn
+      <KennerButton
         flat
         label="Skip Ban"
         color="grey-7"
         :loading="submitting"
         @click="submit(true)"
       />
-      <q-btn
+      <KennerButton
         label="Confirm Ban"
         color="red-7"
         :disable="!selectedGameId"
@@ -60,6 +60,7 @@ import { banGame } from 'src/services/gameService'; // Adjust path if necessary
 import { useQuasar } from 'quasar';
 import { TLeagueDto, TLeagueMemberDto } from 'src/types';
 import { TSelectedGameDto } from 'src/types/game';
+import KennerButton from 'components/base/KennerButton.vue';
 
 const props = defineProps<{
   league: TLeagueDto;

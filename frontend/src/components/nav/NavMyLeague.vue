@@ -1,6 +1,6 @@
 <template>
   <div class="row items-center no-wrap absolute-center">
-    <q-btn
+    <KennerButton
       v-if="isAuthenticated"
       :to="{ name: 'my-league' }"
       unelevated
@@ -12,7 +12,7 @@
       <q-icon color="amber-6" name="emoji_events" />
       <span v-show="!isMobile" class="q-ml-xs text-dark">My League</span>
       <q-badge v-if="isMeActivePlayer" floating rounded color="positive" />
-    </q-btn>
+    </KennerButton>
   </div>
 </template>
 <script setup lang="ts">
@@ -20,6 +20,7 @@ import { useResponsive } from 'src/composables/responsive';
 import { storeToRefs } from 'pinia';
 import { useLeagueStore } from 'stores/leagueStore';
 import { useUserStore } from 'stores/userStore';
+import KennerButton from 'components/base/KennerButton.vue';
 
 const { isMobile } = useResponsive();
 const { isAuthenticated, user } = storeToRefs(useUserStore());

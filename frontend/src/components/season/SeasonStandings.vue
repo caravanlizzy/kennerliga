@@ -66,9 +66,9 @@
             <div class="text-caption text-grey-6 uppercase letter-spacing-1">Division Standings</div>
           </div>
           <q-space />
-          <q-btn flat round icon="info" color="grey-4" size="sm">
-            <q-tooltip>Current standings for League {{ league.level }}</q-tooltip>
-          </q-btn>
+          <KennerButton flat round icon="info" color="grey-4" size="sm">
+            <KennerTooltip>Current standings for League {{ league.level }}</KennerTooltip>
+          </KennerButton>
         </div>
         <div class="matrix-container rounded-borders overflow-hidden">
           <LeagueStandingsMatrix :leagueId="league.id" />
@@ -84,6 +84,8 @@ import LeagueStandingsMatrix from 'components/league/LeagueStandingsMatrix.vue';
 import LoadingSpinner from 'components/base/LoadingSpinner.vue';
 import { api } from 'boot/axios';
 import KennerSelect from 'components/base/KennerSelect.vue';
+import KennerButton from 'components/base/KennerButton.vue';
+import KennerTooltip from 'components/base/KennerTooltip.vue';
 import { useResponsive } from 'src/composables/responsive';
 
 const { isMobile } = useResponsive();
@@ -143,7 +145,7 @@ const monthOptions = computed(() => {
   const uniqueMonths = Array.from(new Set(monthsForYear)).sort((a, b) => a - b);
 
   return uniqueMonths.map((m) => ({
-    label: monthNames[m - 1],
+    label: String(m),
     value: m,
   }));
 });

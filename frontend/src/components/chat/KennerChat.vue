@@ -36,7 +36,7 @@
           class="absolute-bottom full-width flex flex-center q-pb-sm"
           style="pointer-events: none; z-index: 1"
         >
-          <q-btn
+          <KennerButton
             flat
             round
             dense
@@ -52,7 +52,7 @@
 
     <!-- Composer -->
     <q-card-section class="col-auto" v-if="isAuthenticated">
-      <q-input
+      <KennerInput
         ref="inputRef"
         v-model="newMessage"
         class="col-auto"
@@ -63,7 +63,7 @@
         @keydown.enter.prevent="send"
       >
         <template #append>
-          <q-btn
+          <KennerButton
             flat
             round
             dense
@@ -72,19 +72,21 @@
             @click="send"
           />
         </template>
-      </q-input>
+      </KennerInput>
     </q-card-section>
   </q-card>
 </template>
 
 <script setup lang="ts">
 import { ref, type Ref, nextTick, onMounted, onUnmounted } from 'vue';
-import { QInput, QScrollArea } from 'quasar';
+import { QScrollArea } from 'quasar';
 import { postMessage, fetchMessages } from 'src/services/chatService';
 import type { TMessageDto } from 'src/types';
 import { useUserStore } from 'stores/userStore';
 import { storeToRefs } from 'pinia';
 import LoadingSpinner from 'components/base/LoadingSpinner.vue';
+import KennerButton from 'components/base/KennerButton.vue';
+import KennerInput from 'components/base/KennerInput.vue';
 
 const { user, isAuthenticated } = storeToRefs(useUserStore());
 
@@ -97,7 +99,7 @@ const newMessage = ref('');
 const sending = ref(false);
 const showScrollDown = ref(false);
 
-const inputRef = ref<QInput | null>(null);
+const inputRef = ref<any>(null);
 const scrollAreaRef = ref<QScrollArea | null>(null);
 
 let pollTimer: number | undefined;
