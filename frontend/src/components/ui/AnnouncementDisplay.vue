@@ -90,19 +90,15 @@
               </div>
 
               <template v-else-if="participantsLoaded">
-                <div v-if="participants.length" class="row q-col-gutter-sm">
+                <div v-if="participants.length" class="row q-gutter-xs">
                   <div
                     v-for="p in participants"
                     :key="p.id"
                     class="col-auto"
                   >
-                    <UserAvatar
-                      :display-username="p.profile_name || 'Anonymous'"
-                      size="28px"
-                      border
-                    >
-                      <q-tooltip>{{ p.profile_name || 'Anonymous' }}</q-tooltip>
-                    </UserAvatar>
+                    <div class="text-caption bg-white q-px-sm q-py-xs rounded-borders border-all">
+                      {{ p.profile_name || 'Anonymous' }}
+                    </div>
                   </div>
                 </div>
                 <div
@@ -127,7 +123,6 @@ import { useAnnouncementStore } from 'stores/announcementStore';
 import { useUserStore } from 'stores/userStore';
 import { useResponsive } from 'src/composables/responsive';
 import KennerButton from 'components/base/KennerButton.vue';
-import UserAvatar from 'components/ui/UserAvatar.vue';
 import { useQuasar } from 'quasar';
 import {
   fetchIsRegisteredForSeason,
@@ -262,6 +257,10 @@ const typeColors = {
 
 .lh-tight {
   line-height: 1.2;
+}
+
+.border-all {
+  border: 1px solid rgba(0, 0, 0, 0.08);
 }
 
 .min-height-0 {
