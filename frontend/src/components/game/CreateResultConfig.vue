@@ -42,7 +42,6 @@
               class="full-width q-mt-sm"
               v-model="startingPointSystem"
               :options="startingPointSystemOptions"
-              option-value="code"
               option-label="code"
               label="Starting point system"
               :disable="!hasPoints"
@@ -70,6 +69,7 @@
             <div class="text-subtitle2 q-mb-xs">Primary Factions (Level 0)</div>
             <ListCreator
               button-label="Add level 0 faction"
+              :initial-list="factionsLevel0"
               @update-list="(updatedList: string[]) => (factionsLevel0 = updatedList)"
             />
 
@@ -87,6 +87,7 @@
               <div v-if="hasSecondLevel">
                 <ListCreator
                   button-label="Add level 1 faction"
+                  :initial-list="factionsLevel1"
                   @update-list="(updatedList: string[]) => (factionsLevel1 = updatedList)"
                 />
               </div>
@@ -189,6 +190,10 @@ import ListCreator from 'components/lists/ListCreator.vue';
 import { api } from 'boot/axios';
 import { TFaction, TResultConfig, TTieBreaker } from 'src/types';
 
+const props = defineProps<{
+  initialConfig?: TResultConfig;
+}>();
+
 const emit = defineEmits<{
   (event: 'updateResultConfig', resultConfig: TResultConfig): void;
 }>();
@@ -207,15 +212,33 @@ function newRef(): string {
   return `${Date.now()}-${Math.random().toString(16).slice(2)}`;
 }
 
-const isAsymmetric = ref(false);
-const hasStartingPlayerOrder = ref(true);
-const hasPoints = ref(true);
-const hasTieBreaker = ref(false);
-const hasSecondLevel = ref(false);
+const isAsymmetric = ref(props.initialConfig?.isAsymmetric ?? false);
+const hasStartingPlayerOrder = ref(
+  props.initialConfig?.hasStartingPlayerOrder ?? true
+);
+const hasPoints = ref(props.initialConfig?.hasPoints ?? true);
+const hasTieBreaker = ref(props.initialConfig?.hasTieBreaker ?? false);
+const hasSecondLevel = ref(
+  props.initialConfig?.factions?.some((f) => f.level === 1) ?? false
+);
 
-const factionsLevel0 = ref<string[]>([]);
-const factionsLevel1 = ref<string[]>([]);
-const tieBreakersUi = ref<UiTieBreaker[]>([]);
+const factionsLevel0 = ref<string[]>(
+  props.initialConfig?.factions
+    ?.filter((f) => f.level === 0)
+    .map((f) => f.name) ?? []
+);
+const factionsLevel1 = ref<string[]>(
+  props.initialConfig?.factions
+    ?.filter((f) => f.level === 1)
+    .map((f) => f.name) ?? []
+);
+const tieBreakersUi = ref<UiTieBreaker[]>(
+  props.initialConfig?.tieBreakers?.map((tb) => ({
+    id: newRef(),
+    name: tb.name,
+    lowerWins: !tb.higher_wins,
+  })) ?? []
+);
 
 const loadingSystems = ref(true);
 const startingPointSystemOptions = ref<any[]>([]);
@@ -224,7 +247,17 @@ const startingPointSystem = ref<any | null>(null);
 try {
   const { data } = await api('game/starting-point-systems');
   startingPointSystemOptions.value = data || [];
-  startingPointSystem.value = startingPointSystemOptions.value[0] || null;
+
+  if (props.initialConfig?.startingPointSystem) {
+    startingPointSystem.value =
+      startingPointSystemOptions.value.find(
+        (s) => s.id === props.initialConfig?.startingPointSystem
+      ) ||
+      startingPointSystemOptions.value[0] ||
+      null;
+  } else {
+    startingPointSystem.value = startingPointSystemOptions.value[0] || null;
+  }
 } finally {
   loadingSystems.value = false;
 }

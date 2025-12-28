@@ -1,12 +1,13 @@
 <template>
   <q-select
     v-model="modelValue"
+    v-bind="$attrs"
     :options="options"
     :label="label"
     square
     filled
-    color="secondary"
-    class="rounded-borders "
+    color="primary"
+    class="rounded-borders"
   >
   </q-select>
 </template>

@@ -43,12 +43,13 @@ export async function banGame(banDecision: TBanDecisionDtoPayload) {
 
 export async function createGame(
   name: string,
-  platform: TPlatform
+  platform: TPlatform,
+  short_name?: string
 ): Promise<number> {
   try {
     const { data } = await api('game/games/', {
       method: 'POST',
-      data: { name: name, platform: platform.id },
+      data: { name: name, platform: platform.id, short_name: short_name || name },
     });
     return data.id;
   } catch (e) {
@@ -180,10 +181,10 @@ export async function createResultConfigData(
       method: 'POST',
       data: {
         game: gameId,
-        is_asymmetric: resultConfig?.is_asymmetric,
-        has_starting_player_order: resultConfig?.has_starting_player_order,
-        has_points: resultConfig?.has_points,
-        starting_points_system: resultConfig?.starting_points_system,
+        is_asymmetric: resultConfig?.isAsymmetric,
+        has_starting_player_order: resultConfig?.hasStartingPlayerOrder,
+        has_points: resultConfig?.hasPoints,
+        starting_points_system: resultConfig?.startingPointSystem,
       },
     });
     await createFactions(gameId, resultConfig);
@@ -220,10 +221,10 @@ export async function createFactions(
 export async function createTieBreakers(resultConfigId: number, resultConfig: TResultConfig): Promise<void> {
   console.log(resultConfigId, resultConfig);
   if (resultConfig === undefined) return;
-  if (resultConfig.tie_breakers === undefined) return;
-  if (!resultConfig.has_tie_breaker) return;
+  if (resultConfig.tieBreakers === undefined) return;
+  if (!resultConfig.hasTieBreaker) return;
 
-  for (const [index, tieBreaker] of resultConfig.tie_breakers.entries()) {
+  for (const [index, tieBreaker] of resultConfig.tieBreakers.entries()) {
     console.log(index, tieBreaker);
     try {
       await api('game/tie-breakers/', {
@@ -310,5 +311,68 @@ export async function fetchFullGame(gameId: number): Promise<TFullGameDto> {
     return data;
   } catch (error) {
     throw new Error(`Error fetching full game with id ${gameId}: ${error}`);
+  }
+}
+
+export async function updateResultConfigData(
+  gameId: number,
+  resultConfig: TResultConfig
+): Promise<void> {
+  try {
+    // 1. Fetch existing result config to get its ID
+    const { data: existingConfigs } = await api.get<TResultConfig[]>(
+      `game/result-configs/?game=${gameId}`
+    );
+
+    let configId: number;
+
+    if (existingConfigs.length > 0) {
+      configId = existingConfigs[0].id;
+      // 2. Update existing result config
+      await api(`game/result-configs/${configId}/`, {
+        method: 'PATCH',
+        data: {
+          is_asymmetric: resultConfig?.isAsymmetric,
+          has_starting_player_order: resultConfig?.hasStartingPlayerOrder,
+          has_points: resultConfig?.hasPoints,
+          starting_points_system: resultConfig?.startingPointSystem,
+        },
+      });
+
+      // 3. Delete existing factions and tie-breakers (simpler than selective update)
+      const { data: existingFactions } = await api.get<any[]>(
+        `game/factions/?game=${gameId}`
+      );
+      for (const f of existingFactions) {
+        await api.delete(`game/factions/${f.id}/`);
+      }
+
+      const { data: existingTieBreakers } = await api.get<any[]>(
+        `game/tie-breakers/?result_config=${configId}`
+      );
+      for (const tb of existingTieBreakers) {
+        await api.delete(`game/tie-breakers/${tb.id}/`);
+      }
+    } else {
+      // Create new if somehow missing
+      const { data: newConfig } = await api('game/result-configs/', {
+        method: 'POST',
+        data: {
+          game: gameId,
+          is_asymmetric: resultConfig?.isAsymmetric,
+          has_starting_player_order: resultConfig?.hasStartingPlayerOrder,
+          has_points: resultConfig?.hasPoints,
+          starting_points_system: resultConfig?.startingPointSystem,
+        },
+      });
+      configId = newConfig.id;
+    }
+
+    // 4. Create new factions and tie-breakers
+    await createFactions(gameId, resultConfig);
+    await createTieBreakers(configId, resultConfig);
+  } catch (e) {
+    console.log('Error updating the result configuration', e);
+    throw new Error('Error updating the result configuration: \n' + e);
   }
 }

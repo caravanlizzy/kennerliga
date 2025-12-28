@@ -6,6 +6,7 @@ export type TPlatform = {
 export type TGameDto = {
   id: number;
   name: string;
+  short_name: string;
   platform: number;
 };
 
@@ -43,6 +44,7 @@ export type TFullGameOptionDto = {
 export type TFullGameDto = {
   id: number;
   name: string;
+  short_name: string;
   platform: number;
   options: TFullGameOptionDto[];
 };
@@ -134,15 +136,15 @@ export type TTieBreaker = {
 };
 
 export type TResultConfig = {
-  id: number;
-  game: number;
-  has_points: boolean;
-  is_asymmetric: boolean;
-  starting_points_system: 'NONE' | 'STATIC' | 'DYNAMIC';
-  has_starting_player_order: boolean;
+  id?: number;
+  game?: number;
+  hasPoints: boolean;
+  isAsymmetric: boolean;
+  startingPointSystem: number | null;
+  hasStartingPlayerOrder: boolean;
   factions?: TFaction[];
-  tie_breakers?: TTieBreaker[];
-  has_tie_breaker?: boolean;
+  tieBreakers?: TTieBreaker[];
+  hasTieBreaker?: boolean;
 };
 
 export type TTieBreakerDto = {

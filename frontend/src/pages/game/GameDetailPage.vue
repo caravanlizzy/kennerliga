@@ -1,399 +1,174 @@
 <template>
-  <div class="q-pa-md">
-    <!-- Loading State -->
+  <q-page padding>
     <div v-if="isLoading" class="flex flex-center q-pa-xl">
       <q-spinner-puff color="primary" size="3em" />
     </div>
 
     <div v-else class="row justify-center">
-      <div class="col-12">
+      <div class="col-12 col-md-10 col-lg-8">
         <!-- Header -->
-        <q-card flat bordered class="q-mb-lg">
-          <q-card-section class="q-pb-sm">
-            <div class="row items-start justify-between q-col-gutter-md">
-              <div class="col">
-                <div class="text-h5 text-weight-medium ellipsis">
-                  {{ game.name }}
-                </div>
-                <div class="text-caption text-grey-7 q-mt-xs">
-                  Game overview
-                </div>
+        <q-card flat bordered class="q-mb-lg shadow-2 overflow-hidden">
+          <q-card-section class="bg-primary text-white q-pa-lg">
+            <div class="row items-center justify-between">
+              <div>
+                <div class="text-h3 text-weight-bold">{{ game.name }}</div>
+                <div class="text-subtitle1 opacity-80">{{ platform.name }}</div>
               </div>
-              <div class="col-auto">
-                <q-chip
-                  outline
-                  color="primary"
+              <div class="row q-gutter-sm">
+                <KennerButton
+                  unelevated
+                  color="white"
                   text-color="primary"
-                  icon="sports_esports"
-                  class="q-px-md"
-                >
-                  {{ platform.name }}
-                </q-chip>
+                  icon="edit"
+                  label="Edit Game"
+                  @click="router.push({ name: 'game-edit', params: { id: game.id } })"
+                />
               </div>
             </div>
           </q-card-section>
 
-          <q-separator />
-
-          <q-card-section class="q-pt-sm">
-            <div class="row items-center q-gutter-sm">
-              <q-chip
-                dense
-                square
-                color="primary"
-                text-color="white"
-                icon="tune"
-              >
-                Options: {{ game.options?.length ?? 0 }}
-              </q-chip>
-              <q-chip
-                v-if="yesNoOptions.length"
-                dense
-                square
-                outline
-                color="secondary"
-                text-color="secondary"
-                icon="toggle_on"
-              >
-                Yes/No: {{ yesNoOptions.length }}
-              </q-chip>
-              <q-chip
-                v-if="choiceOptions.length"
-                dense
-                square
-                outline
-                color="secondary"
-                text-color="secondary"
-                icon="list"
-              >
-                Choice: {{ choiceOptions.length }}
-              </q-chip>
-            </div>
+          <q-card-section class="q-pa-md bg-grey-1 row items-center q-gutter-sm">
+            <q-chip dense square color="white" text-color="grey-8" class="shadow-1">
+              <q-icon name="tune" color="primary" class="q-mr-xs" />
+              Options: {{ game.options?.length ?? 0 }}
+            </q-chip>
+            <q-chip v-if="yesNoOptions.length" dense square color="white" text-color="grey-8" class="shadow-1">
+              <q-icon name="toggle_on" color="secondary" class="q-mr-xs" />
+              Toggles: {{ yesNoOptions.length }}
+            </q-chip>
+            <q-chip v-if="choiceOptions.length" dense square color="white" text-color="grey-8" class="shadow-1">
+              <q-icon name="list" color="secondary" class="q-mr-xs" />
+              Lists: {{ choiceOptions.length }}
+            </q-chip>
           </q-card-section>
         </q-card>
 
-        <!-- Options -->
-        <q-card flat bordered class="q-mb-lg">
-          <q-card-section class="row items-center justify-between q-pb-sm">
-            <div class="row items-center q-gutter-sm">
-              <q-icon name="tune" class="text-primary" />
-              <div class="text-h6">Game Options</div>
-            </div>
-            <q-chip
-              dense
-              outline
-              color="primary"
-              text-color="primary"
-              icon="rule"
-            >
-              Settings
-            </q-chip>
-          </q-card-section>
+        <!-- Options Section -->
+        <div class="q-mb-xl">
+          <div class="row items-center q-mb-md q-gutter-x-sm">
+            <q-icon name="tune" size="md" color="grey-8" />
+            <h2 class="text-h4 q-my-none text-weight-medium">Game Options</h2>
+          </div>
 
-          <q-separator />
+          <q-banner v-if="!hasOptions" rounded class="bg-blue-1 text-primary q-mb-lg shadow-1">
+            <template #avatar>
+              <q-icon name="info" />
+            </template>
+            No custom options configured for this game.
+          </q-banner>
 
-          <q-card-section>
-            <q-banner v-if="!hasOptions" rounded class="bg-blue-1 text-primary">
-              <template #avatar>
-                <q-icon name="info" class="text-primary" />
-              </template>
-              No options configured for this game.
-            </q-banner>
-
-            <div v-else class="row q-col-gutter-md">
-              <!-- Enabled/Disabled Options Card -->
-              <div v-if="yesNoOptions.length" class="col-12 col-sm-6 col-md-4">
-                <q-card flat bordered class="full-height">
-                  <q-card-section class="q-pb-sm">
-                    <div class="row items-center justify-between">
-                      <div class="row items-center q-gutter-sm">
-                        <q-icon name="toggle_on" class="text-secondary" />
-                        <div class="text-subtitle1 text-weight-medium">
-                          Enabled / Disabled
-                        </div>
-                      </div>
-                      <q-chip
-                        dense
-                        color="secondary"
-                        text-color="white"
-                        icon="done_all"
-                      >
-                        {{ yesNoOptions.length }}
-                      </q-chip>
-                    </div>
-                    <div class="text-caption text-grey-7 q-mt-xs">
-                      Boolean toggles
-                    </div>
-                  </q-card-section>
-
-                  <q-separator />
-
-                  <q-card-section class="q-pt-sm">
-                    <q-list dense padding>
-                      <q-item
-                        v-for="option in yesNoOptions"
-                        :key="option.id"
-                        class="q-px-sm rounded-borders q-mb-xs"
-                      >
-                        <q-item-section
-                          avatar
-                          class="items-center"
-                          style="min-width: 28px"
-                        >
-                          <q-icon
-                            name="check_circle"
-                            color="positive"
-                            size="sm"
-                          />
-                        </q-item-section>
-
-                        <q-item-section>
-                          <q-item-label class="row items-center no-wrap">
-                            <span class="ellipsis">{{ option.name }}</span>
-                            <q-space />
-                            <q-chip
-                              v-if="hasAvailability(option)"
-                              dense
-                              outline
-                              color="warning"
-                              text-color="warning"
-                              icon="rule"
-                            >
-                              Conditional
-                            </q-chip>
-                          </q-item-label>
-
-                          <!-- Conditions -->
-                          <div v-if="hasAvailability(option)" class="q-mt-xs">
-                            <q-expansion-item
-                              dense
-                              switch-toggle-side
-                              icon="rule"
-                              label="Availability rules"
-                              header-class="text-grey-8"
-                              expand-separator
-                            >
-                              <div class="q-pl-md q-pr-sm q-pb-sm">
-                                <div
-                                  v-for="grp in option.availability_groups"
-                                  :key="grp.id"
-                                  class="q-mt-sm"
-                                >
-                                  <q-list
-                                    dense
-                                    class="rounded-borders bg-white"
-                                  >
-                                    <q-item
-                                      v-for="cond in grp.conditions"
-                                      :key="cond.id"
-                                      class="q-px-sm"
-                                    >
-                                      <q-item-section
-                                        avatar
-                                        class="items-center"
-                                        style="min-width: 28px"
-                                      >
-                                        <q-icon
-                                          name="subdirectory_arrow_right"
-                                          color="primary"
-                                          size="xs"
-                                        />
-                                      </q-item-section>
-                                      <q-item-section>
-                                        <q-item-label>{{
-                                          formatCondition(cond)
-                                        }}</q-item-label>
-                                      </q-item-section>
-                                    </q-item>
-                                  </q-list>
-                                </div>
-                              </div>
-                            </q-expansion-item>
+          <div v-else class="row q-col-gutter-lg">
+            <!-- Yes/No Options -->
+            <div v-if="yesNoOptions.length" class="col-12">
+              <q-card flat bordered class="shadow-1">
+                <q-card-section class="bg-grey-2 q-py-sm">
+                  <div class="text-subtitle1 text-weight-bold text-grey-8">Binary Toggles</div>
+                </q-card-section>
+                <q-card-section class="q-pa-none">
+                  <q-list separator>
+                    <q-item v-for="option in yesNoOptions" :key="option.id" class="q-py-md">
+                      <q-item-section avatar>
+                        <q-icon name="check_circle" color="positive" size="sm" />
+                      </q-item-section>
+                      <q-item-section>
+                        <q-item-label class="text-weight-medium text-body1">{{ option.name }}</q-item-label>
+                        <q-item-label v-if="hasAvailability(option)" caption>
+                          <div class="row items-center q-gutter-x-xs text-warning">
+                            <q-icon name="rule" />
+                            <span>Has availability rules</span>
                           </div>
-                        </q-item-section>
-                      </q-item>
-                    </q-list>
-                  </q-card-section>
-                </q-card>
-              </div>
-
-              <!-- Choice Options Cards -->
-              <div
-                v-for="option in choiceOptions"
-                :key="option.id"
-                class="col-12 col-sm-6 col-md-4"
-              >
-                <q-card flat bordered class="full-height">
-                  <q-card-section class="q-pb-sm">
-                    <div
-                      class="row items-center justify-between q-col-gutter-sm"
-                    >
-                      <div
-                        class="col text-subtitle1 text-weight-medium ellipsis"
-                      >
-                        {{ option.name }}
-                      </div>
-                      <div class="col-auto">
-                        <q-chip
+                        </q-item-label>
+                      </q-item-section>
+                      <q-item-section side v-if="hasAvailability(option)">
+                        <q-expansion-item
                           dense
-                          color="primary"
-                          text-color="white"
-                          icon="list"
+                          flat
+                          label="View rules"
+                          header-class="text-caption text-grey-7"
                         >
-                          {{ option.choices?.length ?? 0 }}
-                        </q-chip>
+                          <div class="q-pa-sm bg-grey-1 rounded-borders q-mt-xs">
+                            <div v-for="(grp, idx) in option.availability_groups" :key="grp.id" class="q-mb-xs">
+                              <div class="text-grey-6 text-caption text-uppercase">Group #{{ idx+1 }}</div>
+                              <div v-for="cond in grp.conditions" :key="cond.id" class="text-caption">
+                                • {{ formatCondition(cond) }}
+                              </div>
+                            </div>
+                          </div>
+                        </q-expansion-item>
+                      </q-item-section>
+                    </q-item>
+                  </q-list>
+                </q-card-section>
+              </q-card>
+            </div>
+
+            <!-- Choice Options -->
+            <div v-for="option in choiceOptions" :key="option.id" class="col-12 col-md-6">
+              <q-card flat bordered class="full-height shadow-1">
+                <q-card-section class="bg-grey-2 q-py-sm row items-center justify-between">
+                  <div class="text-subtitle1 text-weight-bold text-grey-8">{{ option.name }}</div>
+                  <q-chip dense color="primary" text-color="white">{{ option.choices?.length ?? 0 }} items</q-chip>
+                </q-card-section>
+                <q-card-section>
+                  <div class="row q-col-gutter-sm">
+                    <div v-for="choice in option.choices" :key="choice.id" class="col-auto">
+                      <q-chip outline color="secondary" icon="radio_button_checked" size="sm">{{ choice.name }}</q-chip>
+                    </div>
+                  </div>
+
+                  <div v-if="hasAvailability(option)" class="q-mt-lg">
+                    <q-separator class="q-mb-sm" />
+                    <div class="text-caption text-weight-bold text-warning row items-center q-gutter-x-xs q-mb-xs">
+                      <q-icon name="rule" />
+                      <span>AVAILABILITY RULES</span>
+                    </div>
+                    <div v-for="grp in option.availability_groups" :key="grp.id" class="bg-orange-1 q-pa-sm rounded-borders q-mb-xs">
+                       <div v-for="cond in grp.conditions" :key="cond.id" class="text-caption text-grey-9">
+                        {{ formatCondition(cond) }}
                       </div>
                     </div>
-
-                    <div class="row items-center q-gutter-xs q-mt-xs">
-                      <q-chip
-                        v-if="hasAvailability(option)"
-                        dense
-                        outline
-                        color="warning"
-                        text-color="warning"
-                        icon="rule"
-                      >
-                        Conditional
-                      </q-chip>
-                    </div>
-                  </q-card-section>
-
-                  <q-separator />
-
-                  <q-card-section class="q-pt-sm">
-                    <q-list dense padding>
-                      <q-item
-                        v-for="choice in option.choices"
-                        :key="choice.id ?? choice.name"
-                        class="q-px-sm rounded-borders q-mb-xs"
-                      >
-                        <q-item-section
-                          avatar
-                          class="items-center"
-                          style="min-width: 28px"
-                        >
-                          <q-icon name="circle" color="secondary" size="6px" />
-                        </q-item-section>
-                        <q-item-section>
-                          <q-item-label class="ellipsis">{{
-                            choice.name
-                          }}</q-item-label>
-                        </q-item-section>
-                      </q-item>
-                    </q-list>
-
-                    <!-- Conditions -->
-                    <div v-if="hasAvailability(option)" class="q-mt-sm">
-                      <q-expansion-item
-                        dense
-                        switch-toggle-side
-                        icon="rule"
-                        label="Availability rules"
-                        header-class="text-grey-8"
-                        expand-separator
-                      >
-                        <div class="q-pb-sm">
-                          <div
-                            v-for="(
-                              grp, grpIndex
-                            ) in option.availability_groups"
-                            :key="grp.id"
-                            class="q-mt-sm"
-                          >
-                            <q-chip
-                              dense
-                              outline
-                              color="primary"
-                              text-color="primary"
-                              icon="call_split"
-                              class="q-mb-xs"
-                            >
-                              OR group #{{ grpIndex + 1 }}
-                            </q-chip>
-
-                            <q-list
-                              dense
-                              bordered
-                              class="rounded-borders bg-white"
-                            >
-                              <q-item
-                                v-for="cond in grp.conditions"
-                                :key="cond.id"
-                                class="q-px-sm"
-                              >
-                                <q-item-section
-                                  avatar
-                                  class="items-center"
-                                  style="min-width: 28px"
-                                >
-                                  <q-icon
-                                    name="subdirectory_arrow_right"
-                                    color="primary"
-                                    size="xs"
-                                  />
-                                </q-item-section>
-                                <q-item-section>
-                                  <q-item-label>{{
-                                    formatCondition(cond)
-                                  }}</q-item-label>
-                                </q-item-section>
-                              </q-item>
-                            </q-list>
-                          </div>
-                        </div>
-                      </q-expansion-item>
-                    </div>
-                  </q-card-section>
-                </q-card>
-              </div>
+                  </div>
+                </q-card-section>
+              </q-card>
             </div>
-          </q-card-section>
-        </q-card>
+          </div>
+        </div>
 
-        <!-- Result Configuration -->
-        <q-card flat bordered>
-          <q-card-section class="row items-center justify-between q-pb-sm">
-            <div class="row items-center q-gutter-sm">
-              <q-icon name="emoji_events" class="text-primary" />
-              <div class="text-h6">Result Configuration</div>
-            </div>
-            <q-chip
-              dense
-              color="secondary"
-              text-color="white"
-              icon="emoji_events"
-            >
-              Scoring
-            </q-chip>
-          </q-card-section>
+        <!-- Result Configuration Section -->
+        <div class="q-mb-xl">
+          <div class="row items-center q-mb-md q-gutter-x-sm">
+            <q-icon name="emoji_events" size="md" color="grey-8" />
+            <h2 class="text-h4 q-my-none text-weight-medium">Result & Scoring</h2>
+          </div>
 
-          <q-separator />
-
-          <q-card-section>
-            <ResultConfiguration
-              :isHighlighed="true"
-              :hasPoints="resultConfig.has_points"
-              :startingPointSystem="resultConfig.starting_points_system"
-              :hasStartingPlayerOrder="resultConfig.has_starting_player_order"
-              :isAsymmetric="resultConfig.is_asymmetric"
-              :factions="factions"
-              :tieBreakers="tieBreakers"
-            />
-          </q-card-section>
-        </q-card>
+          <q-card flat bordered class="shadow-2 overflow-hidden">
+            <q-card-section class="q-pa-none">
+              <ResultConfiguration
+                :hasPoints="resultConfig.has_points"
+                :startingPointSystemCode="resultConfig.starting_points_system_code"
+                :startingPointSystemDescription="resultConfig.starting_points_system_description"
+                :hasStartingPlayerOrder="resultConfig.has_starting_player_order"
+                :isAsymmetric="resultConfig.is_asymmetric"
+                :factions="factions"
+                :tieBreakers="tieBreakers"
+              />
+            </q-card-section>
+          </q-card>
+        </div>
       </div>
     </div>
-  </div>
+  </q-page>
 </template>
 
 <script setup lang="ts">
 import { api } from 'boot/axios';
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import ResultConfiguration from 'components/game/ResultConfiguration.vue';
+import KennerButton from 'components/base/KennerButton.vue';
 import { computed, ref } from 'vue';
 
 const route = useRoute();
+const router = useRouter();
 const isLoading = ref(true);
 
 const { data: game } = await api(`game/games-full/${route.params.id}`);

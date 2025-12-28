@@ -54,13 +54,21 @@ import { TItem } from 'src/types';
 import KennerCounter from 'components/base/KennerCounter.vue';
 import { createRandomId } from 'src/helpers';
 
-defineProps<{ buttonLabel: string, ranked?: boolean }>();
+const props = defineProps<{ buttonLabel: string, ranked?: boolean, initialList?: string[] }>();
 const emit = defineEmits<{
-  (event: 'updateList', list: Omit<TItem, 'isEditable'>[]): void;
+  (event: 'updateList', list: string[]): void;
 }>();
 
 const listItems: Ref<TItem[]> = ref([]);
 const inputItem: Ref<TItem> = ref({ itemId: -1, name: '', isEditable: false });
+
+if (props.initialList) {
+  listItems.value = props.initialList.map(name => ({
+    itemId: createRandomId(),
+    name,
+    isEditable: false
+  }));
+}
 
 
 function addItem() {

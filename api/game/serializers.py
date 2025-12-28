@@ -40,14 +40,23 @@ class TieBreakerSerializer(ModelSerializer):
 
 
 class ResultConfigSerializer(ModelSerializer):
-    starting_points_system = serializers.SerializerMethodField()
+    starting_points_system_code = serializers.SerializerMethodField(read_only=True)
+    starting_points_system_description = serializers.SerializerMethodField(read_only=True)
+    starting_points_system = serializers.PrimaryKeyRelatedField(
+        queryset=StartingPointSystem.objects.all(),
+        required=False,
+        allow_null=True
+    )
 
     class Meta:
         model = ResultConfig
         fields = '__all__'
 
-    def get_starting_points_system(self, obj):
+    def get_starting_points_system_code(self, obj):
         return obj.starting_points_system.code if obj.starting_points_system else None
+
+    def get_starting_points_system_description(self, obj):
+        return obj.starting_points_system.description if obj.starting_points_system else None
 
 
 class StartingPointSystemSerializer(ModelSerializer):
@@ -168,11 +177,13 @@ class SelectedGameSerializer(serializers.ModelSerializer):
 
 
 class FullGameOptionChoiceSerializer(serializers.ModelSerializer):
+    id = serializers.IntegerField(required=False)
+    ref = serializers.CharField(write_only=True, required=False)
     order = serializers.IntegerField(required=False, default=0)
 
     class Meta:
         model = GameOptionChoice
-        fields = ['id', 'name', 'order']
+        fields = ['id', 'ref', 'name', 'order']
 
 
 class FullGameOptionAvailabilityConditionWriteSerializer(serializers.Serializer):
@@ -247,6 +258,7 @@ class AvailabilityGroupsField(serializers.Field):
 
 
 class FullGameOptionSerializer(serializers.ModelSerializer):
+    id = serializers.IntegerField(required=False)
     # Client-only reference used for linking conditions during create/update
     ref = serializers.CharField(write_only=True, required=False)
 
@@ -274,7 +286,7 @@ class FullGameSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Game
-        fields = ['id', 'name', 'platform', 'options']
+        fields = ['id', 'name', 'short_name', 'platform', 'options']
 
     @transaction.atomic
     def create(self, validated_data):
@@ -321,6 +333,7 @@ class FullGameSerializer(serializers.ModelSerializer):
         options_data = validated_data.pop('options', [])
 
         instance.name = validated_data.get('name', instance.name)
+        instance.short_name = validated_data.get('short_name', instance.short_name)
         instance.platform = validated_data.get('platform', instance.platform)
         instance.save()
 
@@ -337,7 +350,7 @@ class FullGameSerializer(serializers.ModelSerializer):
             choices_data = option_payload.pop('choices', [])
             availability_groups_data = option_payload.pop('availability_groups', [])
             option_ref = option_payload.pop('ref', None)
-            option_id = option_payload.get('id')
+            option_id = option_payload.pop('id', None)
             order = option_payload.pop('order', 0)
 
             if option_id:
@@ -353,6 +366,8 @@ class FullGameSerializer(serializers.ModelSerializer):
 
             seen_option_ids.add(option.id)
             if option_ref:
+                if option_ref in option_by_ref:
+                    raise serializers.ValidationError({"options": f"Duplicate option ref: {option_ref}"})
                 option_by_ref[option_ref] = option
 
             existing_choices_by_id = {c.id: c for c in option.choices.all()}
@@ -360,21 +375,25 @@ class FullGameSerializer(serializers.ModelSerializer):
 
             for choice_payload in choices_data:
                 choice_ref = choice_payload.pop('ref', None)
-                choice_id = choice_payload.get('id')
+                choice_id = choice_payload.pop('id', None)
                 ch_order = choice_payload.pop('order', 0)
 
+                choice = None
                 if choice_id:
                     choice = existing_choices_by_id.get(choice_id)
-                    if choice:
-                        choice.name = choice_payload.get('name', choice.name)
-                        choice.order = ch_order
-                        choice.save()
+                    if choice is None:
+                        raise serializers.ValidationError({"options": f"Choice id={choice_id} unknown."})
+                    choice.name = choice_payload.get('name', choice.name)
+                    choice.order = ch_order
+                    choice.save()
                 else:
                     choice = GameOptionChoice.objects.create(option=option, order=ch_order, **choice_payload)
 
                 if choice:
                     seen_choice_ids.add(choice.id)
                     if choice_ref:
+                        if choice_ref in choice_by_ref:
+                            raise serializers.ValidationError({"options": f"Duplicate choice ref: {choice_ref}"})
                         choice_by_ref[choice_ref] = choice
 
             seen_choice_ids_by_option_id[option.id] = seen_choice_ids

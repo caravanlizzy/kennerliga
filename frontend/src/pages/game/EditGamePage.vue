@@ -3,12 +3,20 @@
     <div class="row justify-center">
       <div class="col-12 col-md-10 col-lg-8">
         <q-card flat bordered class="q-pa-lg shadow-2">
-          <div class="row items-center q-mb-lg">
-            <q-icon name="add_circle" size="md" color="primary" class="q-mr-sm" />
-            <h1 class="text-h4 q-my-none text-weight-bold">New Game</h1>
+          <div class="row items-center justify-between q-mb-lg">
+            <div class="row items-center">
+              <q-icon name="edit" size="md" color="primary" class="q-mr-sm" />
+              <h1 class="text-h4 q-my-none text-weight-bold">Edit Game</h1>
+            </div>
+            <q-btn flat round icon="close" @click="router.back()" />
+          </div>
+
+          <div v-if="loading" class="row justify-center q-pa-xl">
+            <q-spinner color="primary" size="3em" />
           </div>
 
           <q-form
+            v-else
             @submit.prevent="onSubmit"
             @keydown.enter.stop.prevent
             class="q-gutter-y-lg"
@@ -36,9 +44,11 @@
                     label="Platform"
                     :options="platforms"
                     v-model="platform"
-                    option-value="name"
+                    option-value="id"
                     option-label="name"
-                    :rules="[(val: string) => !!val || 'Please select a platform']"
+                    emit-value
+                    map-options
+                    :rules="[(val: number) => !!val || 'Please select a platform']"
                   />
                 </div>
               </div>
@@ -321,7 +331,9 @@
             <section>
               <div class="text-h6 q-mb-md text-grey-8">Scoring Configuration</div>
               <CreateResultConfig
+                v-if="initialResultConfig"
                 class="bg-grey-1 rounded-borders q-pa-sm"
+                :initial-config="initialResultConfig"
                 @update-result-config="updateResultConfig"
               />
             </section>
@@ -331,7 +343,7 @@
                 size="lg"
                 type="submit"
                 color="positive"
-                label="Create Game"
+                label="Save Changes"
                 icon="save"
                 unelevated
                 class="q-px-xl"
@@ -345,29 +357,29 @@
 </template>
 
 <script setup lang="ts">
-import { Ref, ref } from 'vue';
+import { onMounted, ref } from 'vue';
 import { useQuasar } from 'quasar';
 import { api } from 'boot/axios';
 import KennerInput from 'components/base/KennerInput.vue';
 import KennerSelect from 'components/base/KennerSelect.vue';
 import KennerButton from 'components/base/KennerButton.vue';
-import { useRouter } from 'vue-router';
-import CreateResultConfig from 'components/game/CreateResultConfig.vue';
-import { TPlatform } from 'src/types';
-import { TResultConfig } from 'src/types';
-import { createResultConfigData } from 'src/services/gameService';
+import { useRoute, useRouter } from 'vue-router';
+import { TPlatform, TFullGameDto, TResultConfig } from 'src/types';
 import { useResponsive } from 'src/composables/responsive';
+import { fetchFullGame, updateResultConfigData } from 'src/services/gameService';
+import CreateResultConfig from 'components/game/CreateResultConfig.vue';
 
 type ConditionKind = 'value' | 'choice';
 
 type UiChoice = {
-  ref: string; // client-only ref (string!)
+  id?: number;
+  ref: string;
   name: string;
   order: number;
 };
 
 type UiCondition = {
-  id: string;
+  id: string; // client-side ID for list rendering
   depends_on_option_ref: string | null;
   kind: ConditionKind;
   expected_value: boolean | null;
@@ -376,12 +388,13 @@ type UiCondition = {
 };
 
 type UiGroup = {
-  id: string;
+  id: string; // client-side ID for list rendering
   conditions: UiCondition[];
 };
 
 type UiOption = {
-  ref: string; // client-only ref (string!)
+  id?: number;
+  ref: string;
   name: string;
   order: number;
   has_choices: boolean;
@@ -389,34 +402,138 @@ type UiOption = {
   availability_groups: UiGroup[];
 };
 
+const route = useRoute();
 const router = useRouter();
 const $q = useQuasar();
 const { isMobile } = useResponsive();
 
-const { data: platforms } = await api('game/platforms/');
+const gameId = parseInt(route.params.id as string);
+const loading = ref(true);
 
+const platforms = ref<TPlatform[]>([]);
 const name = ref('');
 const shortName = ref('');
-const platform: Ref<TPlatform | undefined> = ref(undefined);
+const platform = ref<number | null>(null);
+const gameOptions = ref<UiOption[]>([]);
 
+const initialResultConfig = ref<TResultConfig | null>(null);
 let resultConfig: TResultConfig | undefined = undefined;
 function updateResultConfig(newResultConfig: TResultConfig) {
   resultConfig = newResultConfig;
 }
 
-/**
- * IMPORTANT: this MUST generate a unique string every time.
- * Using crypto.randomUUID() avoids the "duplicate key" issue when adding quickly.
- */
 function newRef(): string {
   if (typeof crypto !== 'undefined' && 'randomUUID' in crypto) {
-    // @ts-expect-error TS lib may not include randomUUID depending on config
+    // @ts-expect-error TS lib may not include randomUUID
     return crypto.randomUUID();
   }
   return `${Date.now()}-${Math.random().toString(16).slice(2)}`;
 }
 
-const gameOptions = ref<UiOption[]>([]);
+onMounted(async () => {
+  try {
+    const [platformsRes, gameData, resultConfigsRes] = await Promise.all([
+      api.get<TPlatform[]>('game/platforms/'),
+      fetchFullGame(gameId),
+      api.get<any[]>(`game/result-configs/?game=${gameId}`)
+    ]);
+
+    platforms.value = platformsRes.data;
+
+    // Fill form
+    name.value = gameData.name;
+    // Note: serializer in issue description doesn't show short_name in fields,
+    // but GameCreatePage uses it. We'll use what's available.
+    // Based on GameCreatePage: short_name might be there.
+    shortName.value = (gameData as any).short_name || '';
+    platform.value = gameData.platform;
+
+    // Load Result Config
+    if (resultConfigsRes.data && resultConfigsRes.data.length > 0) {
+      const rc = resultConfigsRes.data[0];
+      const [tieBreakersRes, factionsRes] = await Promise.all([
+        api.get<any[]>(`game/tie-breakers/?result_config=${rc.id}`),
+        api.get<any[]>(`game/factions/?game=${gameId}`)
+      ]);
+
+      initialResultConfig.value = {
+        isAsymmetric: rc.is_asymmetric,
+        hasPoints: rc.has_points,
+        startingPointSystem: rc.starting_points_system_id || rc.starting_points_system,
+        hasStartingPlayerOrder: rc.has_starting_player_order,
+        factions: factionsRes.data.map(f => ({ name: f.name, level: f.level })),
+        hasTieBreaker: tieBreakersRes.data.length > 0,
+        tieBreakers: tieBreakersRes.data.map(tb => ({ name: tb.name, higher_wins: tb.higher_wins }))
+      };
+    } else {
+      // Fallback default
+      initialResultConfig.value = {
+        isAsymmetric: false,
+        hasPoints: true,
+        startingPointSystem: null,
+        hasStartingPlayerOrder: true,
+        factions: [],
+        hasTieBreaker: false,
+        tieBreakers: []
+      };
+    }
+
+    // Map backend structure to UI structure
+    // We need to establish refs for existing options and choices
+    // so that conditions can reference them.
+    const optionMap = new Map<number, string>();
+    const choiceMap = new Map<number, string>();
+
+    gameOptions.value = gameData.options.map(opt => {
+      const optRef = newRef();
+      optionMap.set(opt.id, optRef);
+
+      return {
+        id: opt.id,
+        ref: optRef,
+        name: opt.name,
+        order: (opt as any).order || 0,
+        has_choices: opt.has_choices,
+        choices: (opt.choices || []).map(ch => {
+          const chRef = newRef();
+          choiceMap.set(ch.id, chRef);
+          return {
+            id: ch.id,
+            ref: chRef,
+            name: ch.name,
+            order: (ch as any).order || 0
+          };
+        }),
+        // Availability groups are replaced on update in the serializer,
+        // but we should still load them for editing.
+        availability_groups: (opt.availability_groups || []).map(grp => ({
+          id: newRef(),
+          conditions: (grp.conditions || []).map(cond => {
+            const dependsOnId = typeof cond.depends_on_option === 'object' ? cond.depends_on_option.id : cond.depends_on_option;
+            const expectedChoiceId = typeof cond.expected_choice === 'object' ? cond.expected_choice?.id : cond.expected_choice;
+
+            return {
+              id: newRef(),
+              depends_on_option_ref: dependsOnId ? (optionMap.get(dependsOnId) || null) : null,
+              kind: expectedChoiceId ? 'choice' : 'value' as ConditionKind,
+              expected_value: cond.expected_value as boolean | null,
+              expected_choice_ref: expectedChoiceId ? (choiceMap.get(expectedChoiceId) || null) : null,
+              negate: !!cond.negate
+            };
+          })
+        }))
+      };
+    });
+
+    loading.value = false;
+  } catch (e) {
+    $q.notify({
+      color: 'negative',
+      message: 'Error loading game data'
+    });
+    console.error(e);
+  }
+});
 
 function addEmptyOption(): void {
   const nextOrder = (gameOptions.value.length + 1) * 10;
@@ -545,7 +662,6 @@ function onConditionKindChanged(cond: UiCondition) {
 }
 
 function optionRefOptions(currentOptionRef: string) {
-  // Exclude current option to avoid self-dependency
   return gameOptions.value
     .filter((o) => o.ref !== currentOptionRef)
     .map((o) => ({
@@ -570,8 +686,6 @@ function choiceRefOptions(dependsOnOptionRef: string | null) {
 
 function validateAvailabilityClientSide(): string[] {
   const errors: string[] = [];
-
-  // Ensure unique option refs + choice refs
   const optionRefs = new Set<string>();
   for (const opt of gameOptions.value) {
     if (optionRefs.has(opt.ref))
@@ -586,15 +700,12 @@ function validateAvailabilityClientSide(): string[] {
     }
   }
 
-  // Validate conditions
   for (const opt of gameOptions.value) {
     for (const grp of opt.availability_groups) {
       for (const cond of grp.conditions) {
         if (!cond.depends_on_option_ref) {
           errors.push(
-            `Option "${
-              opt.name || '(unnamed)'
-            }" has a condition missing "Depends on option".`
+            `Option "${opt.name || '(unnamed)'}" has a condition missing "Depends on option".`
           );
           continue;
         }
@@ -623,30 +734,27 @@ const onSubmit = async () => {
   try {
     if (!platform.value) return;
 
-    const effectiveShortName =
-      shortName.value.trim() !== '' ? shortName.value.trim() : name.value;
-
     const clientErrors = validateAvailabilityClientSide();
     if (clientErrors.length) {
       $q.notify({
         color: 'negative',
-        textColor: 'white',
-        icon: 'warning',
         message: clientErrors[0],
       });
       return;
     }
 
-    const payload = {
+    const payload: any = {
       name: name.value,
-      short_name: effectiveShortName,
-      platform: platform.value.id,
+      short_name: shortName.value.trim() !== '' ? shortName.value.trim() : name.value,
+      platform: platform.value,
       options: gameOptions.value.map((opt) => ({
+        id: opt.id,
         ref: opt.ref,
         name: opt.name,
         order: opt.order,
         has_choices: opt.has_choices,
         choices: opt.choices.map((ch) => ({
+          id: ch.id,
           ref: ch.ref,
           name: ch.name,
           order: ch.order,
@@ -663,30 +771,23 @@ const onSubmit = async () => {
       })),
     };
 
-    const { data: game } = await api.post('/game/games-full/', payload);
+    await api.put(`/game/games-full/${gameId}/`, payload);
 
     if (resultConfig !== undefined) {
-      await createResultConfigData(game.id, resultConfig);
-    } else {
-      console.warn('Missing result config');
-      return;
+      await updateResultConfigData(gameId, resultConfig);
     }
 
     $q.notify({
       color: 'positive',
-      textColor: 'white',
-      icon: 'save',
-      message: 'Saved',
+      message: 'Game updated successfully',
     });
 
     await router.push({ name: 'games' });
   } catch (e) {
-    console.error('Could not create game because', e);
+    console.error('Could not update game because', e);
     $q.notify({
       color: 'negative',
-      textColor: 'white',
-      icon: 'warning',
-      message: 'Error creating game',
+      message: 'Error updating game',
     });
   }
 };

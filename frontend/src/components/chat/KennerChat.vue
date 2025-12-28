@@ -27,8 +27,6 @@
               :text="[m.text]"
               :name="m.sender"
               :stamp="timeAgo(m.datetime)"
-              :bg-color="isMine(m) ? 'secondary' : 'accent'"
-              :text-color="isMine(m) ? 'white' : 'white'"
             />
           </template>
         </q-scroll-area>

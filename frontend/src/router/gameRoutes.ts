@@ -17,5 +17,10 @@ export default {
       name: 'game-create',
       component: () => import('pages/game/GameCreatePage.vue')
     },
+    {
+      path: ':id/edit',
+      name: 'game-edit',
+      component: () => import('pages/game/EditGamePage.vue')
+    },
   ]
 };
