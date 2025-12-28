@@ -53,12 +53,12 @@
                       {{ props.row.username }}
                     </q-tooltip>
                   </UserAvatar>
-                  <div class="column">
+                  <div v-if="!isMobile" class="column">
                     <span class="text-subtitle2 text-weight-bold text-dark line-height-1">
                       {{ props.row.username }}
                     </span>
                     <span
-                      v-if="!isMobile && props.row.profile_name"
+                      v-if="!isMobile && props.row.profile_name && !props.row.username"
                       class="text-caption text-grey-6"
                       style="font-size: 0.7rem; line-height: 1"
                     >
