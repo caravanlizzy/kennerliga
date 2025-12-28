@@ -26,8 +26,6 @@
         <div class="col column">
           <KennerChat v-if="mobileContent === 'chat'" class="column" />
 
-          <!--          <SeasonWinners v-else-if="mobileContent === 'pokal'" class="q-pa-md" />-->
-
           <ScrollContainer v-else-if="mobileContent === 'live'">
             <ContentSection
               v-if="isAuthenticated"
@@ -144,7 +142,7 @@
             style="
               max-height: calc(100vh - 200px);
               position: sticky;
-              top: 100px;
+              top: 80px;
             "
           >
             <KennerChat class="col" />
