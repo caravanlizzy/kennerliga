@@ -9,6 +9,23 @@
 
     <!-- Right: Controls -->
     <div class="row no-wrap items-center q-gutter-x-md">
+      <!-- Minimized Items -->
+      <div v-if="minimizedItems.length" class="row no-wrap items-center q-gutter-x-sm">
+        <q-btn
+          v-for="item in minimizedItems"
+          :key="item.id"
+          flat
+          round
+          dense
+          :icon="item.icon"
+          :color="item.color"
+          @click="restore(item.id)"
+        >
+          <q-tooltip>Restore {{ item.title }}</q-tooltip>
+        </q-btn>
+        <q-separator vertical inset class="q-mx-sm" />
+      </div>
+
       <!-- Main CTA -->
       <NavMyLeague v-if="user && user.myCurrentLeagueId" />
 
@@ -23,11 +40,14 @@ import NavMyLeague from 'components/nav/NavMyLeague.vue';
 import NavProfileMenu from 'components/nav/NavProfileMenu.vue';
 import KennerButton from 'components/base/KennerButton.vue';
 import { useUserStore } from 'stores/userStore';
+import { useUiStore } from 'src/stores/uiStore';
 import { storeToRefs } from 'pinia';
 import { useResponsive } from 'src/composables/responsive';
 
 defineProps<{ onToggle: () => void }>();
 const { user } = storeToRefs(useUserStore());
+const { minimizedItems } = storeToRefs(useUiStore());
+const { restore } = useUiStore();
 const { isMobile } = useResponsive();
 
 </script>

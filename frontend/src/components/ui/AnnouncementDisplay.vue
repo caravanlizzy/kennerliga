@@ -33,7 +33,7 @@
               </div>
 
               <!-- Content -->
-              <div class="col">
+              <div class="col" :class="!isMobile ? 'q-pr-xl' : 'q-pr-md'">
                 <div
                   class="text-subtitle2 text-weight-bold lh-tight"
                   :class="textColors[a.type]"
@@ -86,7 +86,7 @@
 
             <!-- Actions (Desktop all, Mobile only Close) -->
             <div
-              class="row items-center q-gutter-sm"
+              class="row items-center q-gutter-sm absolute-right q-pa-sm"
               :class="isMobile ? 'q-ml-xs' : 'q-ml-sm'"
             >
               <template v-if="!isMobile && a.type === 'REGISTER'">
@@ -123,7 +123,7 @@
                 </div>
               </template>
 
-              <!-- Hide/Dismiss Button -->
+              <!-- Hide/Minimize Button -->
               <KennerButton
                 flat
                 round
@@ -131,9 +131,9 @@
                 icon="close"
                 size="sm"
                 color="grey-6"
-                @click="dismissAnnouncement(a.id)"
+                @click="minimizeAnnouncement(a)"
               >
-                <KennerTooltip>Hide announcement</KennerTooltip>
+                <KennerTooltip>Minimize announcement</KennerTooltip>
               </KennerButton>
             </div>
           </q-card-section>
@@ -180,6 +180,7 @@ import { storeToRefs } from 'pinia';
 import { ref, computed } from 'vue';
 import { useAnnouncementStore } from 'stores/announcementStore';
 import { useUserStore } from 'stores/userStore';
+import { useUiStore } from 'src/stores/uiStore';
 import { useResponsive } from 'src/composables/responsive';
 import KennerButton from 'components/base/KennerButton.vue';
 import KennerTooltip from 'components/base/KennerTooltip.vue';
@@ -198,6 +199,7 @@ const shouldRemoveBorders = computed(() => {
 });
 
 const store = useAnnouncementStore();
+const uiStore = useUiStore();
 const { announcements } = storeToRefs(store);
 const { announcementIcons } = store;
 
@@ -213,8 +215,18 @@ const showParticipants = ref(false);
 const hiddenAnnouncements = ref<Record<number, boolean>>({});
 
 const visibleAnnouncements = computed(() => {
-  return announcements.value.filter(a => !hiddenAnnouncements.value[a.id]);
+  return announcements.value.filter(a => !hiddenAnnouncements.value[a.id] && !uiStore.isMinimized(`announcement-${a.id}`));
 });
+
+function minimizeAnnouncement(a: any) {
+  uiStore.minimize({
+    id: `announcement-${a.id}`,
+    title: a.title,
+    icon: announcementIcons[a.type as keyof typeof announcementIcons] || 'announcement',
+    color: 'primary',
+    type: 'announcement'
+  });
+}
 
 function dismissAnnouncement(id: number) {
   hiddenAnnouncements.value[id] = true;

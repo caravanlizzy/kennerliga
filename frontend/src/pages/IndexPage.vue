@@ -31,22 +31,13 @@
           <ScrollContainer v-else-if="mobileContent === 'live'">
             <ContentSection
               v-if="isAuthenticated"
+              id="live-action-mobile"
               title="Live Action"
+              icon="sensors"
               color="accent"
               :bordered="false"
               class="q-mx-md q-mt-md"
             >
-              <template #header-extra>
-                <q-btn
-                  flat
-                  round
-                  dense
-                  icon="close"
-                  size="sm"
-                  class="q-ml-sm"
-                  @click="mobileContent = 'seasons'"
-                />
-              </template>
               <LiveActionFeed />
             </ContentSection>
           </ScrollContainer>
@@ -71,7 +62,7 @@
         </div>
         <q-toolbar class="col-auto bg-grey-4 text-primary flex-center">
           <q-tabs switch-indicator v-model="mobileContent" class="full-width">
-            <q-tab icon="bolt" name="live" label="Live" />
+            <q-tab icon="sensors" name="live" label="Live" />
             <q-tab icon="history" name="seasons" label="Season" />
             <q-tab icon="chat" name="chat" label="Chat" />
             <!--            <q-tab icon="emoji_events" name="pokal" label="Winners" />-->
@@ -88,7 +79,7 @@
                 dense
                 round
                 color="accent"
-                icon="bolt"
+                icon="sensors"
                 @click="isLiveActionVisible = true"
               >
                 <q-tooltip>Show Live Action</q-tooltip>
@@ -96,26 +87,20 @@
             </div>
             <ContentSection
               v-if="isAuthenticated && isLiveActionVisible"
+              id="live-action"
               title="Live Action"
+              icon="sensors"
               color="accent"
+              minimizable
               :bordered="false"
               class="col-12 q-mb-md"
             >
-              <template #header-extra>
-                <q-btn
-                  flat
-                  round
-                  dense
-                  icon="close"
-                  size="sm"
-                  class="q-ml-sm"
-                  @click="isLiveActionVisible = false"
-                />
-              </template>
               <LiveActionFeed />
             </ContentSection>
             <ContentSection
-              titleEnd
+              id="seasons"
+              icon="history"
+              minimizable
               :bordered="false"
               title="Seasons"
               class="col-12"
@@ -125,13 +110,15 @@
             </ContentSection>
             <ContentSection
               :bordered="false"
-              titleEnd
-              title=""
+              id="leaderboard"
+              icon="leaderboard"
+              minimizable
+              title="Leaderboard"
               class="col-12"
               color="dark"
             >
-              <template #title>
-                <div style="min-width: 120px">
+              <template #header-extra>
+                <div style="min-width: 120px" class="q-ml-md">
                   <KennerSelect
                     v-model="selectedYear"
                     :options="availableYears"
@@ -139,19 +126,18 @@
                     filled
                     square
                     size="sm"
-                    class="q-ml-md"
                     :dark="$q.dark.isActive"
                   />
                 </div>
-              </template>
-              <template #header-extra>
-                <div class="q-ml-md">Leaderboard</div>
               </template>
               <LeaderBoard :year="selectedYear" />
             </ContentSection>
           </div>
           <ContentSection
             class="col-12 col-md-auto column bg-grey-2"
+            id="kennerchat"
+            icon="chat"
+            minimizable
             bordered
             title="Kennerchat"
             color="dark"

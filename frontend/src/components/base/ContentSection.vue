@@ -1,5 +1,6 @@
 <template>
   <div
+    v-if="!isMinimized"
     :class="bordered ? `border-2 rounded-borders border-${color}` : ''"
     class="q-mt-xs content-section-container"
   >
@@ -12,7 +13,7 @@
         expanded-icon="expand_less"
         :expand-icon-class="`text-${color}`"
         :expanded-icon-class="`text-${color}`"
-        :header-class="`text-${color} text-h5 q-py-xs justify-center with-opacity`"
+        :header-class="`text-${color} text-h5 q-py-xs justify-center with-opacity relative-position`"
       >
         <template #header>
           <div class="full-width row justify-center items-center">
@@ -20,6 +21,18 @@
               {{ title }}
             </slot>
             <slot name="header-extra" />
+            <q-btn
+              v-if="minimizable"
+              flat
+              round
+              dense
+              icon="close"
+              size="sm"
+              class="minimize-btn absolute-right q-ma-xs"
+              @click.stop="minimize"
+            >
+              <q-tooltip>Minimize</q-tooltip>
+            </q-btn>
           </div>
         </template>
         <q-separator inset :color="color" />
@@ -30,13 +43,25 @@
     </template>
     <template v-else>
       <div
-        class="full-width row q-pr-lg items-center text-h5 q-py-xs"
+        class="full-width row q-pr-lg items-center text-h5 q-py-xs relative-position"
         :class="[`text-${color}`, titleEnd ? 'justify-end' : 'justify-center']"
       >
         <slot name="title">
           {{ title }}
         </slot>
         <slot name="header-extra" />
+        <q-btn
+          v-if="minimizable"
+          flat
+          round
+          dense
+          icon="close"
+          size="sm"
+          class="minimize-btn absolute-right q-ma-xs"
+          @click="minimize"
+        >
+          <q-tooltip>Minimize</q-tooltip>
+        </q-btn>
       </div>
       <q-separator inset :color="color" />
       <slot />
@@ -45,23 +70,45 @@
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue';
+import { useUiStore } from 'src/stores/uiStore';
+
+const uiStore = useUiStore();
 
 const isOpened = defineModel<boolean>('isOpened', { default: true });
 
-withDefaults(
+const props = withDefaults(
   defineProps<{
+    id?: string;
     title: string;
     color: string;
+    icon?: string;
     bordered?: boolean;
     titleEnd?: boolean;
     expandable?: boolean;
+    minimizable?: boolean;
   }>(),
   {
     titleEnd: false,
     expandable: false,
     bordered: true,
+    minimizable: false,
+    icon: 'article'
   }
 );
+
+const sectionId = computed(() => props.id || props.title || 'default-section');
+const isMinimized = computed(() => uiStore.isMinimized(sectionId.value));
+
+function minimize() {
+  uiStore.minimize({
+    id: sectionId.value,
+    title: props.title,
+    icon: props.icon,
+    color: props.color,
+    type: 'section'
+  });
+}
 </script>
 
 <style scoped>
