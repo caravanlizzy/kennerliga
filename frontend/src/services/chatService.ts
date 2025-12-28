@@ -3,11 +3,13 @@ import { AxiosResponse } from 'axios';
 import { TMessageDto } from 'src/types';
 
 export async function fetchMessages(
-  lastDateTime: string | undefined
+  params?: {
+    last_datetime?: string;
+    before_datetime?: string;
+    limit?: number;
+  }
 ): Promise<AxiosResponse<TMessageDto[]>> {
-  let url = 'chat/messages/';
-  if (lastDateTime) url += `?last_datetime=${lastDateTime}`;
-  return await api.get<TMessageDto[]>(url);
+  return await api.get<TMessageDto[]>('chat/messages/', { params });
 }
 
 export async function postMessage(messageText: string): Promise<void> {

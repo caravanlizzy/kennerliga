@@ -15,6 +15,10 @@
           ref="scrollAreaRef"
           @scroll="onScroll"
         >
+          <div v-if="loadingOlder" class="flex flex-center q-mb-md">
+            <q-spinner-dots color="primary" size="2em" />
+          </div>
+
           <template v-for="m in messages" :key="m.datetime">
             <q-chat-message
               v-if="m.label"
@@ -97,6 +101,8 @@ const { user, isAuthenticated } = storeToRefs(useUserStore());
 let lastDateTime: string | undefined;
 
 const loading = ref(false);
+const loadingOlder = ref(false);
+const hasMoreOlder = ref(true);
 const messages: Ref<TMessageDto[]> = ref([]);
 const newMessage = ref('');
 const sending = ref(false);
@@ -108,7 +114,7 @@ const scrollAreaRef = ref<QScrollArea | null>(null);
 let pollTimer: number | undefined;
 
 // ---------- Helpers ----------
-function onScroll(info: {
+async function onScroll(info: {
   verticalPosition: number;
   verticalSize: number;
   verticalContainerSize: number;
@@ -116,6 +122,11 @@ function onScroll(info: {
   const diff =
     info.verticalSize - info.verticalPosition - info.verticalContainerSize;
   showScrollDown.value = diff > 200;
+
+  // Detect top and load older messages
+  if (info.verticalPosition < 50 && !loadingOlder.value && hasMoreOlder.value && messages.value.length > 0) {
+    await loadOlderMessages();
+  }
 }
 
 function isMine(m: TMessageDto) {
@@ -189,12 +200,57 @@ async function send() {
 }
 
 async function loadMessages() {
-  const { data } = await fetchMessages(lastDateTime);
+  const { data } = await fetchMessages({ last_datetime: lastDateTime });
   if (!data || data.length === 0) return;
 
   const newMessages = data.reverse();
   messages.value = [...messages.value, ...newMessages];
   lastDateTime = messages.value[messages.value.length - 1].datetime;
+}
+
+async function loadOlderMessages() {
+  if (loadingOlder.value || !hasMoreOlder.value) return;
+
+  const firstMsg = messages.value[0];
+  if (!firstMsg) return;
+
+  loadingOlder.value = true;
+  try {
+    const { data } = await fetchMessages({
+      before_datetime: firstMsg.datetime,
+      limit: 20
+    });
+
+    if (!data || data.length === 0) {
+      hasMoreOlder.value = false;
+      return;
+    }
+
+    if (data.length < 20) {
+      hasMoreOlder.value = false;
+    }
+
+    // Keep track of previous scroll height to maintain position
+    const scrollTarget = scrollAreaRef.value?.getScrollTarget();
+    const oldScrollHeight = scrollTarget?.scrollHeight || 0;
+
+    const olderMessages = data.reverse();
+    messages.value = [...olderMessages, ...messages.value];
+
+    await nextTick();
+
+    // Adjust scroll position after messages are added to avoid jump
+    if (scrollAreaRef.value && scrollTarget) {
+      const newScrollHeight = scrollTarget.scrollHeight;
+      const heightDiff = newScrollHeight - oldScrollHeight;
+      const currentPos = scrollAreaRef.value.getScroll().verticalPosition;
+      scrollAreaRef.value.setScrollPosition('vertical', currentPos + heightDiff, 0);
+    }
+  } catch (err) {
+    console.error('Failed to load older messages', err);
+  } finally {
+    loadingOlder.value = false;
+  }
 }
 
 // ---------- Lifecycle ----------
