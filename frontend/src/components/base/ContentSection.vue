@@ -1,7 +1,7 @@
 <template>
   <div
     :class="bordered ? `border-2 rounded-borders border-${color}` : ''"
-    class="q-mt-xs"
+    class="q-mt-xs content-section-container"
   >
     <template v-if="expandable">
       <q-expansion-item
@@ -57,3 +57,14 @@ withDefaults(
   }
 );
 </script>
+
+<style scoped>
+.content-section-container {
+  background: white;
+  overflow: hidden;
+}
+
+.with-opacity {
+  background: rgba(0, 0, 0, 0.01);
+}
+</style>

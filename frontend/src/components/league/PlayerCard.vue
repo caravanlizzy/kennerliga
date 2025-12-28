@@ -173,7 +173,6 @@ const hasSelectedOrBanInfo = computed(
 
 <style scoped lang="scss">
 .player-card {
-  border-radius: 14px;
   padding: 16px;
 }
 

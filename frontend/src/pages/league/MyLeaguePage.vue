@@ -22,10 +22,9 @@
         </LoadingSpinner>
       </template>
 
-      <!-- ==================== NORMAL CONTENT ==================== -->
       <div v-else class="q-pa-md relative-position league-page">
         <ActionBar class="q-mb-md" />
-        {{ league }}
+
         <template v-if="isMePickingGame">
           <ContentSection
             title="Game Selection"
@@ -40,7 +39,7 @@
               :profileId="user.profile.id"
               @selection-updated="(updated:TGameSelection) => updateGameSelection(updated)"
               @selectionValid="(valid: boolean ) => selectionValid = valid"
-              @set-submitter="(s: () => {}) => submitter = s"
+              @set-submitter="(s: TSubmitter) => submitter = s"
               @onSuccess="updateLeagueData"
             />
           </ContentSection>
@@ -55,28 +54,25 @@
             bordered
             class="league-section"
           >
-            <div class="row q-col-gutter-md">
-              <template v-for="member of members" :key="member.profile">
-                <template
-                  v-for="game of member.selected_games ?? []"
-                  :key="game.id"
-                >
-                  <div
-                    v-if="hasSelectedGameResult(game.id)"
-                    class="col-12"
-                    :class="{ 'col-md-6': selectedGamesWithResults.length > 1 }"
-                  >
-                    <q-card class="result-card" flat>
-                      <q-card-section class="q-pa-sm">
-                        <MatchResult
-                          :selectedGame="game"
-                          :displayGameName="true"
-                        />
-                      </q-card-section>
-                    </q-card>
-                  </div>
-                </template>
-              </template>
+            <div
+              v-if="selectedGamesWithResults.length > 0"
+              class="row q-col-gutter-md"
+            >
+              <div
+                v-for="game in selectedGamesWithResults"
+                :key="game.id"
+                class="col-12"
+                :class="{ 'col-md-6': selectedGamesWithResults.length > 1 }"
+              >
+                <q-card class="result-card" flat>
+                  <q-card-section class="q-pa-sm">
+                    <MatchResult :selectedGame="game" display-game-name />
+                  </q-card-section>
+                </q-card>
+              </div>
+            </div>
+            <div v-else class="text-center q-pa-md text-grey">
+              No results recorded yet
             </div>
           </ContentSection>
         </template>
@@ -143,7 +139,10 @@ import { TGameSelection } from 'src/types';
 import MatchResult from 'components/league/MatchResult.vue';
 
 const { user } = storeToRefs(useUserStore());
-const myLeagueStore = useLeagueStore(user.value.myCurrentLeagueId)();
+const myLeagueStore = useLeagueStore(user.value?.myCurrentLeagueId ?? 0)();
+
+type TSubmitter = () => Promise<void>;
+let submitter: TSubmitter;
 
 const {
   isMePickingGame,
@@ -166,74 +165,13 @@ function updateGameSelection(newSelection: TGameSelection) {
   gameSelection.value = newSelection;
 }
 
-function manageActionBar() {
-  switch (leagueStatus.value) {
-    case 'BANNING':
-      if (isMeBanningGame.value && leagueId.value && user.value?.username) {
-        setLeadText('Select a game to ban');
-        setActions([
-          {
-            name: 'No ban',
-            callback: () => handleSkipBan(),
-            buttonVariant: 'dark',
-            autoReset: false,
-          },
-          ...Object.values(selectedGamesById.value)
-            .filter((game) => game.selected_by !== user.value?.username)
-            .map((game) => ({
-              name: `${game.game_name}`,
-              callback: () => handleBanGame(game.id, game.game_name),
-              buttonVariant: 'secondary',
-              autoReset: false,
-            })),
-        ]);
-      }
-      break;
-    case 'PICKING':
-      setActions([
-        {
-          name: 'Save',
-          callback: submitGameSelection,
-          disabled: !selectionValid.value,
-          buttonVariant: 'accent',
-        },
-      ]);
-      setLeadText(() => h('div', 'Confirm your game selection'));
-      setSubject(gameSelection.value?.game?.name);
-      break;
-    default:
-      console.log('No case matched');
-  }
-}
-
-watch(
-  [isMeBanningGame, leagueStatus, gameSelection, selectionValid],
-  manageActionBar,
-  {
-    immediate: true,
-    deep: true,
-  }
-);
-
-type TSubmitter = () => Promise<void>;
-let submitter: TSubmitter;
-
-async function submitGameSelection() {
-  try {
-    await submitter();
-    await updateLeagueData();
-  } catch (error) {
-    console.error('Error submitting game:', error);
-  }
-}
-
 const { setDialog } = useDialog();
 const $q = useQuasar();
 
 function handleSkipBan() {
   setDialog(
     'Confirm Ban',
-    `Are you sure you want to skip banning?`,
+    'Are you sure you want to skip banning?',
     'dark',
     async () => {
       try {
@@ -248,13 +186,13 @@ function handleSkipBan() {
           message: 'Skipped Ban!',
         });
       } catch (e) {
-        console.log('Could not ban game', e);
+        console.error('Could not ban game', e);
       } finally {
         reset();
       }
     },
     () => {
-      console.log('Ban cancelled');
+      /* Ban cancelled */
     },
     'Skip Ban'
   );
@@ -278,26 +216,79 @@ function handleBanGame(selectedGameId: number, gameName: string) {
           message: 'Banned!',
         });
       } catch (e) {
-        console.log('Could not ban game', e);
+        console.error('Could not ban game', e);
       } finally {
         reset();
       }
     },
     () => {
-      console.log('Ban cancelled');
+      /* Ban cancelled */
     },
     'Ban'
   );
 }
 
-interface SectionVisibilityStates {
-  selection: boolean;
-  upload: boolean;
-  results: boolean;
-  players: boolean;
+function manageActionBar() {
+  reset();
+
+  switch (leagueStatus.value) {
+    case 'BANNING':
+      if (isMeBanningGame.value && leagueId.value && user.value?.username) {
+        setLeadText('Select a game to ban');
+        setActions([
+          {
+            name: 'No ban',
+            callback: handleSkipBan,
+            buttonVariant: 'dark',
+            autoReset: false,
+          },
+          ...Object.values(selectedGamesById.value)
+            .filter((game) => game.selected_by !== user.value?.username)
+            .map((game) => ({
+              name: `${game.game_name}`,
+              callback: () => handleBanGame(game.id, game.game_name),
+              buttonVariant: 'secondary',
+              autoReset: false,
+            })),
+        ]);
+      }
+      break;
+    case 'PICKING':
+    case 'REPICKING':
+      setActions([
+        {
+          name: 'Save',
+          callback: submitGameSelection,
+          disabled: !selectionValid.value,
+          buttonVariant: 'accent',
+        },
+      ]);
+      setLeadText(() => h('div', 'Confirm your game selection'));
+      setSubject(gameSelection.value?.game?.name);
+      break;
+  }
 }
 
-const sectionVisibilityStates = ref<SectionVisibilityStates>({
+watch(
+  [isMeBanningGame, leagueStatus, gameSelection, selectionValid],
+  manageActionBar,
+  {
+    immediate: true,
+    deep: true,
+  }
+);
+
+async function submitGameSelection() {
+  if (!submitter) return;
+  try {
+    await submitter();
+    await updateLeagueData();
+  } catch (error) {
+    console.error('Error submitting game:', error);
+  }
+}
+
+const sectionVisibilityStates = ref({
   selection: true,
   upload: false,
   results: false,
@@ -305,23 +296,13 @@ const sectionVisibilityStates = ref<SectionVisibilityStates>({
 });
 
 watchEffect(() => {
-  switch (leagueStatus.value) {
-    case 'PLAYING':
-      sectionVisibilityStates.value['upload'] = true;
-      sectionVisibilityStates.value['results'] = true;
-      break;
-    case 'DONE':
-      sectionVisibilityStates.value['results'] = true;
-      break;
-    case 'BANNING':
-      sectionVisibilityStates.value['selection'] = false;
-      sectionVisibilityStates.value['players'] = true;
-      break;
-    case 'PICKING':
-    case 'REPICKING':
-      sectionVisibilityStates.value['selection'] = true;
-      break;
-  }
+  const status = leagueStatus.value;
+  sectionVisibilityStates.value = {
+    selection: ['PICKING', 'REPICKING'].includes(status),
+    upload: status === 'PLAYING',
+    results: ['PLAYING', 'DONE'].includes(status),
+    players: true, // Always show players/picks/bans?
+  };
 });
 </script>
 
