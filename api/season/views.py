@@ -14,10 +14,12 @@ from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet, ViewSet
 
 from chat.service import create_chat_announcement
-from league.models import League, LeagueStanding, GameStanding
+from game.models import SelectedGame, BanDecision
+from league.models import League, LeagueStanding, GameStanding, LeagueStatus
+from result.models import Result
 from season.queries import register, is_profile_registered, get_open_season
 from season.models import Season, SeasonParticipant
-from season.serializer import SeasonSerializer, SeasonParticipantSerializer
+from season.serializer import SeasonSerializer, SeasonParticipantSerializer, TLiveEventSerializer
 from user.models import PlayerProfile
 
 
@@ -370,4 +372,136 @@ class SeasonParticipantViewSet(ModelViewSet):
 
         qs = self.get_queryset().filter(season=season)
         serializer = self.get_serializer(qs, many=True)
+        return Response(serializer.data)
+
+
+class LiveEventViewSet(ViewSet):
+    permission_classes = [IsAuthenticated]
+
+    def list(self, request):
+        season_id = request.query_params.get('season_id')
+        if not season_id:
+            season = get_open_season()
+            if not season:
+                # Fallback to most recent season
+                season = Season.objects.order_by('-year', '-month').first()
+            if not season:
+                return Response([])
+            season_id = season.id
+
+        leagues = League.objects.filter(season_id=season_id)
+        events = []
+
+        # 1. PICK events
+        picks = SelectedGame.objects.filter(league__in=leagues).select_related('profile', 'game', 'league')
+        for pick in picks:
+            events.append({
+                'id': f'pick-{pick.id}',
+                'type': 'PICK',
+                'timestamp': pick.created_at,
+                'leagueLevel': pick.league.level,
+                'leagueId': pick.league.id,
+                'data': {
+                    'playerName': pick.profile.profile_name,
+                    'gameName': pick.game.name
+                }
+            })
+
+        # 2. BAN events
+        bans = BanDecision.objects.filter(league__in=leagues, skipped_ban=False).select_related('player_banning', 'selected_game__game', 'league')
+        for ban in bans:
+            events.append({
+                'id': f'ban-{ban.id}',
+                'type': 'BAN',
+                'timestamp': ban.created_at,
+                'leagueLevel': ban.league.level,
+                'leagueId': ban.league.id,
+                'data': {
+                    'playerName': ban.player_banning.profile_name,
+                    'gameName': ban.selected_game.game.name if ban.selected_game else "Unknown"
+                }
+            })
+
+        # 3. GAME_FINISHED events
+        # Get all results for these leagues
+        results = Result.objects.filter(league__in=leagues).select_related('player_profile', 'selected_game__game', 'league')
+        # Group results by selected_game
+        results_by_game = defaultdict(list)
+        for r in results:
+            results_by_game[r.selected_game_id].append(r)
+
+        # We need member counts for each league to determine if a game is finished.
+        # Let's count members per league.
+        league_member_counts = {l.id: l.members.count() for l in leagues}
+
+        for sg_id, res_list in results_by_game.items():
+            league_id = res_list[0].league_id
+            member_count = league_member_counts.get(league_id, 0)
+            if len(res_list) == member_count and member_count > 0:
+                # Game is finished. Sort results to find winner.
+                sorted_res = sorted(res_list, key=lambda x: x.points or 0, reverse=True)
+                winner = sorted_res[0]
+                # The timestamp should be the time of the LAST result.
+                last_result_time = max(r.created_at for r in res_list)
+
+                events.append({
+                    'id': f'finish-{sg_id}',
+                    'type': 'GAME_FINISHED',
+                    'timestamp': last_result_time,
+                    'leagueLevel': res_list[0].league.level,
+                    'leagueId': league_id,
+                    'data': {
+                        'gameName': res_list[0].selected_game.game.name,
+                        'summary': f'Winner: {winner.player_profile.profile_name} ({winner.points} pts)'
+                    }
+                })
+
+        # 4. LEAGUE_FINISHED events
+        done_leagues = leagues.filter(status=LeagueStatus.DONE)
+        for league in done_leagues:
+            standings = LeagueStanding.objects.filter(league=league).order_by('-league_points', '-wins', '-points')[:3]
+            winners = [s.player_profile.profile_name for s in standings]
+
+            events.append({
+                'id': f'league-done-{league.id}',
+                'type': 'LEAGUE_FINISHED',
+                'timestamp': league.updated_at,
+                'leagueLevel': league.level,
+                'leagueId': league.id,
+                'data': {
+                    'winners': winners
+                }
+            })
+
+        # 5. SEASON_FINISHED events
+        season = Season.objects.filter(id=season_id).first()
+        if season and season.status == Season.SeasonStatus.DONE:
+            # Find winner of Level 1 league
+            l1 = leagues.filter(level=1).first()
+            winner_name = "Unknown"
+            if l1:
+                top_standing = LeagueStanding.objects.filter(league=l1).order_by('-league_points', '-wins', '-points').first()
+                if top_standing:
+                    winner_name = top_standing.player_profile.profile_name
+
+            events.append({
+                'id': f'season-done-{season.id}',
+                'type': 'SEASON_FINISHED',
+                'timestamp': season.updated_at,
+                'leagueId': None,
+                'data': {
+                    'seasonWinner': winner_name
+                }
+            })
+
+        # Sort and limit
+        events.sort(key=lambda x: x['timestamp'], reverse=True)
+        limit = request.query_params.get('limit', 20)
+        try:
+            limit = int(limit)
+        except ValueError:
+            limit = 20
+        events = events[:limit]
+
+        serializer = TLiveEventSerializer(events, many=True)
         return Response(serializer.data)

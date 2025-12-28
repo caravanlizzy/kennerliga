@@ -32,6 +32,7 @@ class League(models.Model):
         choices=LeagueStatus.choices,
         default=LeagueStatus.PICKING
     )
+    updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return f'{self.season}L{self.level}'

@@ -26,6 +26,7 @@ class Season(models.Model):
         choices=SeasonStatus.choices,
         default=SeasonStatus.NEXT
     )
+    updated_at = models.DateTimeField(auto_now=True)
 
     @property
     def name(self) -> str:

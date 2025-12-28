@@ -5,8 +5,18 @@ from rest_framework.serializers import ModelSerializer
 
 from game.models import SelectedGame, BanDecision
 from game.serializers import SelectedGameSerializer
+from league.models import League
 from season.models import Season, SeasonParticipant
 from user.models import PlayerProfile
+
+
+class TLiveEventSerializer(serializers.Serializer):
+    id = serializers.CharField()
+    type = serializers.CharField()
+    timestamp = serializers.DateTimeField()
+    leagueLevel = serializers.IntegerField(required=False, allow_null=True)
+    leagueId = serializers.IntegerField(required=False, allow_null=True)
+    data = serializers.DictField()
 
 
 class SeasonSerializer(ModelSerializer):

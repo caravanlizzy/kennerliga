@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils import timezone
 from rest_framework.exceptions import ValidationError
 
 from user.models import PlayerProfile, Platform
@@ -155,6 +156,7 @@ class SelectedGame(models.Model):
     profile = models.ForeignKey(PlayerProfile, on_delete=models.CASCADE, related_name='selected_games')
     game = models.ForeignKey(Game, on_delete=models.CASCADE, related_name='game_selections')
     league = models.ForeignKey("league.League", on_delete=models.CASCADE, related_name='game_selections')
+    created_at = models.DateTimeField(default=timezone.now)
 
     class Meta:
         constraints = [

@@ -7,7 +7,7 @@
       No live actions yet.
     </div>
     <div v-else class="events-list q-pa-sm">
-      <div v-for="event in sortedEvents" :key="event.id" class="event-item q-mb-sm">
+      <div v-for="event in events" :key="event.id" class="event-item q-mb-sm">
         <q-card flat bordered class="event-card" :style="{ borderLeftColor: getColorHex(event.type) }">
           <q-card-section class="q-pa-sm">
             <div class="row items-center no-wrap">
@@ -46,135 +46,18 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed, onUnmounted } from 'vue';
+import { ref, onMounted, onUnmounted } from 'vue';
 import { TLiveEvent, TLiveEventType } from 'src/types';
-import { fetchCurrentSeasonId, fetchLeaguesBySeason } from 'src/services/seasonService';
-import { fetchLeagueDetails } from 'src/services/leagueService';
 import { api } from 'boot/axios';
 
 const events = ref<TLiveEvent[]>([]);
 const loading = ref(true);
 let pollInterval: any = null;
 
-const sortedEvents = computed(() => {
-  return [...events.value].sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
-});
-
 async function fetchEvents() {
   try {
-    const seasonId = await fetchCurrentSeasonId();
-    if (!seasonId) return;
-
-    const leagues = await fetchLeaguesBySeason(seasonId);
-    const newEvents: TLiveEvent[] = [];
-
-    for (const leagueSummary of leagues) {
-      const league = await fetchLeagueDetails(leagueSummary.id);
-
-      // Game Picks & Bans
-      for (const member of league.members) {
-        if (member.selected_games) {
-          for (const game of member.selected_games) {
-            newEvents.push({
-              id: `pick-${game.id}`,
-              type: 'PICK',
-              timestamp: game.created_at || new Date().toISOString(), // Assuming created_at exists, fallback to now
-              leagueLevel: league.level,
-              leagueId: league.id,
-              data: {
-                playerName: member.username || member.profile_name,
-                gameName: game.game_name
-              }
-            });
-          }
-        }
-
-        if (member.banned_selected_game) {
-          newEvents.push({
-            id: `ban-${member.id}`,
-            type: 'BAN',
-            timestamp: new Date().toISOString(), // We might not have ban timestamp easily
-            leagueLevel: league.level,
-            leagueId: league.id,
-            data: {
-              playerName: member.username || member.profile_name,
-              gameName: member.banned_selected_game.game_name
-            }
-          });
-        }
-      }
-
-      // Game Finished (check results)
-      for (const member of league.members) {
-        if (member.selected_games) {
-          for (const game of member.selected_games) {
-            try {
-              const { data: results } = await api.get<any[]>(`/result/results/?selected_game=${game.id}`);
-              // Check if game is finished: results length equals league members length
-              if (results.length > 0 && results.length === league.members.length) {
-                // Sort results to find winner
-                const sortedResults = [...results].sort((a, b) => (b.points || 0) - (a.points || 0));
-                const winner = sortedResults[0];
-                newEvents.push({
-                  id: `finish-${game.id}`,
-                  type: 'GAME_FINISHED',
-                  timestamp: sortedResults[0].created_at || new Date().toISOString(),
-                  leagueLevel: league.level,
-                  leagueId: league.id,
-                  data: {
-                    gameName: game.game_name,
-                    summary: `Winner: ${winner.player_profile_name} (${winner.points} pts)`
-                  }
-                });
-              }
-            } catch (e) {
-              console.error(`Error fetching results for game ${game.id}`, e);
-            }
-          }
-        }
-      }
-
-      if (league.status === 'DONE') {
-        newEvents.push({
-          id: `league-done-${league.id}`,
-          type: 'LEAGUE_FINISHED',
-          timestamp: new Date().toISOString(),
-          leagueLevel: league.level,
-          leagueId: league.id,
-          data: {
-            winners: league.members.slice(0, 3).map(m => m.username || m.profile_name) // Mock winners
-          }
-        });
-      }
-    }
-
-    // Check for Season Finished
-    if (leagues.length > 0 && leagues.every(l => l.status === 'DONE')) {
-      const l1 = leagues.find(l => l.level === 1 || l.level === '1');
-      if (l1) {
-        const l1Details = await fetchLeagueDetails(l1.id);
-        const winner = l1Details.members.sort((a, b) => (b.position || 0) - (a.position || 0))[0]; // This logic might need refinement based on how season winners are calculated
-        if (winner) {
-          newEvents.push({
-            id: `season-done-${seasonId}`,
-            type: 'SEASON_FINISHED',
-            timestamp: new Date().toISOString(),
-            leagueId: l1.id,
-            data: {
-              seasonWinner: winner.username || winner.profile_name
-            }
-          });
-        }
-      }
-    }
-
-    // Deduplicate and update
-    const existingIds = new Set(events.value.map(e => e.id));
-    const filteredNew = newEvents.filter(e => !existingIds.has(e.id));
-    if (filteredNew.length > 0) {
-      events.value = [...events.value, ...filteredNew];
-    }
-
+    const { data } = await api.get<TLiveEvent[]>('/season/live-events/');
+    events.value = data;
   } catch (error) {
     console.error('Error fetching live events:', error);
   } finally {
