@@ -1,9 +1,11 @@
 <template>
   <div :class="isMobile ? 'q-pa-sm' : 'q-pa-md'" class="column season-standings">
     <!-- Filters -->
-    <div class="row q-pa-sm q-gutter-md items-center justify-end filters-container bg-grey-1 rounded-borders q-mb-lg">
-      <div class="row items-center q-gutter-sm">
-        <q-icon name="event" color="grey-7" size="sm" />
+    <div
+      class="row q-pa-sm q-gutter-x-sm items-center justify-between filters-container bg-grey-1 rounded-borders q-mb-lg no-wrap"
+    >
+      <div class="row items-center no-wrap col">
+        <q-icon name="event" color="grey-7" size="xs" class="q-mr-xs" />
         <KennerSelect
           v-model="selectedYear"
           :options="yearOptions"
@@ -13,13 +15,14 @@
           emit-value
           map-options
           :disable="loadingSeasons"
-          style="width: 120px"
+          class="col"
+          style="min-width: 80px"
           hide-bottom-space
         />
       </div>
 
-      <div class="row items-center q-gutter-sm">
-        <q-icon name="calendar_month" color="grey-7" size="sm" />
+      <div class="row items-center no-wrap col">
+        <q-icon name="calendar_month" color="grey-7" size="xs" class="q-mr-xs" />
         <KennerSelect
           v-model="selectedMonth"
           :options="monthOptions"
@@ -29,7 +32,8 @@
           emit-value
           map-options
           :disable="loadingSeasons || !selectedYear || monthOptions.length === 0"
-          style="width: 160px"
+          class="col"
+          style="min-width: 80px"
           hide-bottom-space
         />
       </div>
