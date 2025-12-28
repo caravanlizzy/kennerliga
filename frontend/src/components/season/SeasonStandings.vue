@@ -1,58 +1,82 @@
 <template>
-  <div :class="isMobile ? 'q-pa-sm' : 'q-pa-md'" class="column">
+  <div :class="isMobile ? 'q-pa-sm' : 'q-pa-md'" class="column season-standings">
     <!-- Filters -->
-    <div class="row q-pa-sm q-gutter-sm items-center justify-end">
-      <KennerSelect
-        v-model="selectedYear"
-        :options="yearOptions"
-        label="Year"
-        dense
-        outlined
-        emit-value
-        map-options
-        :disable="loadingSeasons"
-        style="max-width: 140px"
-      />
+    <div class="row q-pa-sm q-gutter-md items-center justify-end filters-container bg-grey-1 rounded-borders q-mb-lg">
+      <div class="row items-center q-gutter-sm">
+        <q-icon name="event" color="grey-7" size="sm" />
+        <KennerSelect
+          v-model="selectedYear"
+          :options="yearOptions"
+          label="Year"
+          dense
+          filled
+          emit-value
+          map-options
+          :disable="loadingSeasons"
+          style="width: 120px"
+          hide-bottom-space
+        />
+      </div>
 
-      <KennerSelect
-        v-model="selectedMonth"
-        :options="monthOptions"
-        label="Month"
-        dense
-        outlined
-        emit-value
-        map-options
-        :disable="loadingSeasons || !selectedYear || monthOptions.length === 0"
-        style="max-width: 180px"
-      />
+      <div class="row items-center q-gutter-sm">
+        <q-icon name="calendar_month" color="grey-7" size="sm" />
+        <KennerSelect
+          v-model="selectedMonth"
+          :options="monthOptions"
+          label="Month"
+          dense
+          filled
+          emit-value
+          map-options
+          :disable="loadingSeasons || !selectedYear || monthOptions.length === 0"
+          style="width: 160px"
+          hide-bottom-space
+        />
+      </div>
     </div>
 
     <!-- State primary -->
-    <div v-if="loadingSeasons" class="text-grey-7">Loading seasons…</div>
+    <div v-if="loadingSeasons" class="row justify-center q-pa-xl">
+      <q-spinner-grid color="primary" size="4em" />
+    </div>
 
     <!-- Leagues + matrices -->
-    <div v-if="!selectedSeasonId" class="text-grey-7 q-mt-md">
-      Please select year and month that contain a league.
+    <div v-if="!selectedSeasonId && !loadingSeasons" class="column items-center q-pa-xl text-grey-6">
+      <q-icon name="info_outline" size="48px" class="q-mb-md" />
+      <div class="text-h6">No season selected</div>
+      <div>Please select year and month that contain a league.</div>
     </div>
 
-    <div v-else-if="loadingLeagues" class="text-grey-7 q-mt-md">Loading leagues…</div>
-
-    <div v-else-if="leagues.length === 0" class="text-grey-7 q-mt-md">
-      No leagues for this season. (Should not happen if filters are correct.)
+    <div v-else-if="loadingLeagues" class="row justify-center q-pa-xl">
+       <q-spinner-dots color="primary" size="3em" />
     </div>
 
-    <div v-else class="column q-gutter-y-md">
-      <div v-for="league in leagues" :key="league.id" class="league-container">
-        <div class="row items-center q-mb-sm q-pl-md">
-          <div class="league-level-indicator q-mr-sm">
-            L{{ league.level }}
+    <div v-else-if="leagues.length === 0 && selectedSeasonId" class="column items-center q-pa-xl text-grey-6">
+       <q-icon name="warning_amber" size="48px" class="q-mb-md" />
+       <div class="text-h6">No leagues found</div>
+       <div>No leagues for this season.</div>
+    </div>
+
+    <div v-else class="column q-gutter-y-xl">
+      <div v-for="league in leagues" :key="league.id" class="league-wrapper">
+        <div class="row items-center q-mb-md q-px-sm">
+          <div class="league-badge q-mr-md">
+            {{ league.level }}
           </div>
-          <div class="text-subtitle1 text-weight-bold text-grey-9">
-            League {{ league.level }}
+          <div class="column">
+            <div class="text-h6 text-weight-bold text-grey-9 line-height-1">
+              League {{ league.level }}
+            </div>
+            <div class="text-caption text-grey-6 uppercase letter-spacing-1">Division Standings</div>
           </div>
-          <q-separator class="col q-ml-md" />
+          <q-space />
+          <q-btn flat round icon="info" color="grey-4" size="sm">
+            <q-tooltip>Current standings for League {{ league.level }}</q-tooltip>
+          </q-btn>
         </div>
-        <LeagueStandingsMatrix :leagueId="league.id" />
+        <div class="matrix-container rounded-borders overflow-hidden">
+          <LeagueStandingsMatrix :leagueId="league.id" />
+        </div>
       </div>
     </div>
   </div>
@@ -200,20 +224,43 @@ onMounted(() => {
 </script>
 
 <style scoped lang="scss">
-.league-container {
-  background: white;
+.season-standings {
+  max-width: 1200px;
+  margin: 0 auto;
 }
 
-.league-level-indicator {
+.filters-container {
+  border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.league-badge {
   background: var(--q-primary);
   color: white;
-  width: 32px;
-  height: 32px;
-  border-radius: 4px;
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
   font-weight: 800;
-  font-size: 0.9rem;
+  font-size: 1.2rem;
+  box-shadow: 0 2px 4px rgba(var(--q-primary), 0.3);
+}
+
+.line-height-1 {
+  line-height: 1;
+}
+
+.letter-spacing-1 {
+  letter-spacing: 1px;
+}
+
+.uppercase {
+  text-transform: uppercase;
+}
+
+.matrix-container {
+  background: white;
+  border: 1px solid rgba(0, 0, 0, 0.05);
 }
 </style>

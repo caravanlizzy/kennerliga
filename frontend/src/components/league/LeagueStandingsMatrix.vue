@@ -14,45 +14,52 @@
         :row-class="rowClass"
         class="bg-white rounded-borders text-caption"
       >
-        <!-- Header cells (very minimal styling) -->
         <template #header="props">
-          <q-tr :props="props">
+          <q-tr :props="props" class="header-row">
             <q-th
               v-for="col in props.cols"
               :key="col.name"
               :props="props"
               :class="[
-                'text-uppercase text-weight-medium',
+                'text-uppercase text-weight-bold text-grey-8',
                 col.name === 'profile_name' ? 'text-left' : 'text-center',
               ]"
               :style="
                 col.name.startsWith('game_')
-                  ? 'max-width: 80px; white-space: normal; line-height: 1.1; padding: 4px 8px;'
-                  : 'padding: 4px 8px;'
+                  ? 'max-width: 90px; white-space: normal; line-height: 1.2; padding: 12px 8px;'
+                  : 'padding: 12px 8px;'
               "
             >
-              {{ col.label }}
+              <div v-if="col.name === 'total'" class="row items-center justify-end q-gutter-x-xs">
+                 <q-icon name="stars" color="primary" size="14px" />
+                 <span>{{ col.label }}</span>
+              </div>
+              <span v-else>{{ col.label }}</span>
             </q-th>
           </q-tr>
         </template>
 
         <template #body-cell-profile_name="props">
-          <q-td :props="props" class="text-left" style="padding: 4px 8px">
+          <q-td :props="props" class="text-left profile-cell">
             <div class="row items-center no-wrap">
               <template v-if="props.row.username">
                 <div class="row items-center no-wrap q-gutter-x-sm">
                   <UserAvatar
                     :display-username="props.row.username"
-                    size="24px"
+                    size="28px"
+                    shape="squircle"
                   >
                     <q-tooltip v-if="isMobile && props.row.username">
                       {{ props.row.username }}
                     </q-tooltip>
                   </UserAvatar>
                   <div class="column">
+                    <span class="text-subtitle2 text-weight-bold text-dark line-height-1">
+                      {{ props.row.username }}
+                    </span>
                     <span
                       v-if="!isMobile && props.row.profile_name"
-                      class="text-caption text-grey-7"
+                      class="text-caption text-grey-6"
                       style="font-size: 0.7rem; line-height: 1"
                     >
                       {{ props.row.profile_name }}
@@ -63,7 +70,7 @@
               <template v-else>
                 <template v-if="isMobile">
                   <q-badge
-                    color="grey-3"
+                    color="grey-2"
                     text-color="grey-9"
                     class="text-weight-bold"
                   >
@@ -74,20 +81,19 @@
                   </q-badge>
                 </template>
                 <template v-else>
-                  <span class="text-weight-bold">{{ props.value }}</span>
+                  <span class="text-weight-bold text-dark">{{ props.value }}</span>
                 </template>
               </template>
 
               <!-- League Leader Celebration (First Row) -->
-              <q-icon
-                v-if="!isMobile && props.rowIndex === 0"
-                name="emoji_events"
-                color="amber-8"
-                size="xs"
-                class="q-ml-xs"
-              >
+              <div v-if="!isMobile && props.rowIndex === 0" class="leader-crown q-ml-sm">
+                <q-icon
+                  name="emoji_events"
+                  color="amber-8"
+                  size="18px"
+                />
                 <q-tooltip>League Leader</q-tooltip>
-              </q-icon>
+              </div>
             </div>
           </q-td>
         </template>
@@ -310,7 +316,7 @@ const tableRows = computed(() => {
 
 // highlight winner row (first row) gently
 const rowClass = (_row: unknown, index: number) =>
-  index === 0 ? 'bg-orange-1 league-leader-row' : '';
+  index === 0 ? 'league-leader-row' : '';
 
 const formatNumber = (value: string | number): string => {
   const num = typeof value === 'string' ? parseFloat(value) : value;
@@ -375,10 +381,35 @@ function getRankIndicatorClass(rank: number) {
   left: 0;
   bottom: 0;
   width: 3px;
+  opacity: 0.8;
+}
+
+.header-row {
+  background-color: #f8f9fa;
+  border-bottom: 2px solid rgba(0, 0, 0, 0.05);
+}
+
+.profile-cell {
+  padding: 8px 12px;
+}
+
+.leader-crown {
+  animation: float 2s ease-in-out infinite;
+}
+
+@keyframes float {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-2px); }
+  100% { transform: translateY(0px); }
 }
 
 .league-leader-row {
-  border-left: 3px solid var(--q-amber-7) !important;
+  background-color: #fffaf0 !important; /* very light orange */
+  border-left: 4px solid var(--q-amber-6) !important;
+}
+
+.line-height-1 {
+  line-height: 1.1;
 }
 
 /* Ensure the background doesn't override the hover effect of q-table if any */
@@ -386,6 +417,11 @@ function getRankIndicatorClass(rank: number) {
 :deep(.q-table tbody tr:hover) td.bg-blue-grey-1,
 :deep(.q-table tbody tr:hover) td.bg-brown-1,
 :deep(.q-table tbody tr.bg-orange-1:hover) {
-  filter: brightness(0.95);
+  filter: brightness(0.97);
+}
+
+.overflow-auto {
+  scrollbar-width: thin;
+  scrollbar-color: #e0e0e0 transparent;
 }
 </style>
