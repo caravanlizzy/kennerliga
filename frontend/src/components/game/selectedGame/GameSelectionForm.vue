@@ -138,7 +138,7 @@ const visibleOptionsSafe = computed(() => props.visibleOptions ?? []);
 function findSelectedOption(optionId: number) {
   // find selected option by game option id
   const found = props.gameSelection.selectedOptions.find(
-    (o) => o.id === optionId
+    (o) => o.game_option === optionId
   );
   if (!found) {
     throw new Error(`Selected option not found for optionId: ${optionId}`);
