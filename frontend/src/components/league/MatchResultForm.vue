@@ -1,9 +1,12 @@
 <template>
-  <q-card class="q-pa-md" flat bordered rounded>
-    <div class="row items-center q-mb-md">
+  <q-card class="q-pa-lg" flat bordered rounded>
+    <div class="row items-center q-mb-lg">
       <div class="col">
-        <div class="text-h6 text-dark">Match Result</div>
-        <div class="text-caption text-grey-7">{{ members.length }} players</div>
+        <div class="text-h5 text-weight-bold text-dark">
+          <q-icon name="emoji_events" color="primary" class="q-mr-sm" />
+          Match Result
+        </div>
+        <div class="text-subtitle2 text-grey-6">{{ members.length }} Players Participating</div>
       </div>
     </div>
 
@@ -38,12 +41,15 @@
           <div
             v-for="member in members"
             :key="member.id"
-            class="col-12 col-sm-6 col-lg-3"
+            class="col-12 col-sm-6"
           >
-            <q-card flat bordered class="member-card">
-              <q-card-section class="q-pa-sm">
-                <div class="row items-center justify-between q-mb-sm">
-                  <div class="text-subtitle2 text-weight-medium ellipsis">
+            <q-card flat bordered class="member-card shadow-1">
+              <q-card-section class="q-pa-md">
+                <div class="row items-center q-mb-md">
+                  <q-avatar size="sm" color="primary" text-color="white" class="q-mr-sm">
+                    {{ member.profile_name.charAt(0).toUpperCase() }}
+                  </q-avatar>
+                  <div class="text-subtitle1 text-weight-bold ellipsis">
                     {{ member.profile_name }}
                   </div>
                 </div>
@@ -69,29 +75,20 @@
                     <div class="text-caption text-grey-7 q-mb-xs">
                       Final Position
                     </div>
-                    <div class="row q-gutter-sm justify-center">
-                      <q-btn
-                        v-for="pos in members.length"
-                        :key="pos"
-                        size="md"
-                        round
-                        :outline="getEntry(member.profile).position !== pos"
-                        :unelevated="getEntry(member.profile).position === pos"
-                        :color="
-                          getEntry(member.profile).position === pos
-                            ? 'dark'
-                            : 'grey-4'
-                        "
-                        :text-color="
-                          getEntry(member.profile).position === pos
-                            ? 'white'
-                            : 'grey-8'
-                        "
-                        :label="String(pos)"
-                        class="position-btn"
-                        @click="setPosition(member.id, pos)"
-                      />
-                    </div>
+                      <div class="row q-gutter-xs justify-center">
+                        <q-btn
+                          v-for="pos in members.length"
+                          :key="pos"
+                          size="sm"
+                          round
+                          unelevated
+                          :color="getEntry(member.profile).position === pos ? 'primary' : 'grey-2'"
+                          :text-color="getEntry(member.profile).position === pos ? 'white' : 'grey-9'"
+                          :label="String(pos)"
+                          class="position-btn shadow-1"
+                          @click="setPosition(member.id, pos)"
+                        />
+                      </div>
                     <!-- Notes for position -->
                     <q-input
                       v-model="getEntry(member.profile).notes"
@@ -217,19 +214,23 @@
           </div>
         </div>
 
-        <div class="row justify-end q-gutter-sm">
+        <div class="row justify-end q-gutter-md q-mt-lg">
           <q-btn
             rounded
-            flat
-            color="secondary"
-            label="Reset"
+            unelevated
+            color="grey-4"
+            text-color="grey-9"
+            label="Reset Form"
+            class="q-px-md"
             @click="initFormData"
           />
-          <KennerButton
+          <q-btn
             type="submit"
             :label="submitLabel"
-            color="dark"
+            color="primary"
             unelevated
+            rounded
+            class="q-px-xl text-weight-bold"
           />
         </div>
       </q-form>

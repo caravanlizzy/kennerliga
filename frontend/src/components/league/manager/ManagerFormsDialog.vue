@@ -1,72 +1,64 @@
 <template>
   <q-dialog
-    :model-value="
-      !!(
-        editingGame ||
-        selectingGameMember ||
-        banningGameMember ||
-        postResultForSelGame ||
-        editResultForSelGameId
-      )
-    "
+    :model-value="!!activeForm"
     @update:model-value="$emit('close')"
     persistent
   >
-    <div style="min-width: 320px; max-width: 90vw">
-      <FormLayout v-if="editingGame" @onClose="$emit('close')">
+    <div v-if="activeForm" style="min-width: 320px; max-width: 90vw">
+      <!-- Edit Game -->
+      <FormLayout v-if="activeForm.type === 'edit'" @onClose="$emit('close')">
         <template #head>
           Edit Game
-          <span class="text-primary">{{ editingGame.selGame?.game_name }}</span>
+          <span class="text-primary">{{ activeForm.selGame.game_name }}</span>
           for
-          <span class="text-primary">{{
-            editingGame.member?.profile_name
-          }}</span>
+          <span class="text-primary">{{ activeForm.member.profile_name }}</span>
         </template>
         <GameSettingsEditor
           :leagueId="league.id"
-          :profileId="editingGame.member.profile"
-          :gameId="editingGame.selGame.game"
-          :selectedGameId="editingGame.selGame.id"
-          @onSuccess="$emit('success-edit')"
+          :profileId="activeForm.member.profile"
+          :gameId="activeForm.selGame.game"
+          :selectedGameId="activeForm.selGame.id"
+          @onSuccess="$emit('success')"
         />
       </FormLayout>
 
-      <FormLayout v-if="selectingGameMember" @onClose="$emit('close')">
+      <!-- Select Game -->
+      <FormLayout v-if="activeForm.type === 'add'" @onClose="$emit('close')">
         <template #head>
           Select Game for
-          <span class="text-primary">{{
-            selectingGameMember.profile_name
-          }}</span>
+          <span class="text-primary">{{ activeForm.member.profile_name }}</span>
         </template>
         <GameSelectionView
           manageOnly
           :leagueId="league.id"
-          :profileId="selectingGameMember.profile"
-          @onSuccess="$emit('success-submit')"
+          :profileId="activeForm.member.profile"
+          @onSuccess="$emit('success')"
         />
       </FormLayout>
 
-      <FormLayout v-if="banningGameMember" @onClose="$emit('close')">
+      <!-- Ban Game -->
+      <FormLayout v-if="activeForm.type === 'ban'" @onClose="$emit('close')">
         <template #head>
           Ban Game for
-          <span class="text-primary">{{ banningGameMember.profile_name }}</span>
+          <span class="text-primary">{{ activeForm.member.profile_name }}</span>
         </template>
         <BanGameForm
           :league="league"
-          :member="banningGameMember"
-          @onSuccess="$emit('success-submit')"
+          :member="activeForm.member"
+          @onSuccess="$emit('success')"
         />
       </FormLayout>
 
-      <FormLayout v-if="postResultForSelGame" @onClose="$emit('close')">
+      <!-- Post Result -->
+      <FormLayout v-if="activeForm.type === 'post-result'" @onClose="$emit('close')">
         <template #head>
           Post Result for
-          <span class="text-primary">{{ postResultForSelGame.game_name }}</span>
+          <span class="text-primary">{{ activeForm.selGame.game_name }}</span>
         </template>
         <MatchResultForm
-          :selectedGameId="postResultForSelGame.id"
+          :selectedGameId="activeForm.selGame.id"
           :leagueId="league.id"
-          @submitted="$emit('success-result')"
+          @submitted="$emit('success')"
         />
       </FormLayout>
     </div>
@@ -79,15 +71,18 @@ import GameSelectionView from 'components/game/selectedGame/GameSelectionView.vu
 import GameSettingsEditor from 'components/game/selectedGame/GameSettingsEditor.vue';
 import MatchResultForm from 'components/league/MatchResultForm.vue';
 import BanGameForm from 'components/game/selectedGame/BanGameForm.vue';
+import type { TLeagueDto, TLeagueMemberDto, TSelectedGameDto } from 'src/types';
+
+export type TActiveForm =
+  | { type: 'edit'; member: TLeagueMemberDto; selGame: TSelectedGameDto }
+  | { type: 'add'; member: TLeagueMemberDto }
+  | { type: 'ban'; member: TLeagueMemberDto }
+  | { type: 'post-result'; selGame: TSelectedGameDto };
 
 defineProps<{
-  league: any;
-  editingGame: any | null;
-  selectingGameMember: any | null;
-  banningGameMember: any | null;
-  postResultForSelGame: any | null;
-  editResultForSelGameId: number | null;
+  league: TLeagueDto;
+  activeForm: TActiveForm | null;
 }>();
 
-defineEmits(['close', 'success-submit', 'success-edit', 'success-result']);
+defineEmits(['close', 'success']);
 </script>

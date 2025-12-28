@@ -104,7 +104,7 @@
                     color="amber-9"
                     size="18px"
                   >
-                    <q-tooltip>Season Leader</q-tooltip>
+                    <q-tooltip>Leader</q-tooltip>
                   </q-icon>
                 </div>
                 <span class="text-caption text-grey-6">

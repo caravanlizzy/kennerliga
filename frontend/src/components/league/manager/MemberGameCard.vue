@@ -5,18 +5,18 @@
       <q-avatar color="primary" text-color="white" size="md">
         {{ member.profile_name.charAt(0).toUpperCase() }}
       </q-avatar>
-      <div class="text-h5 text-weight-bold text-grey-9">
+      <div class="text-h5 text-weight-bolder text-grey-9">
         {{ member.profile_name }}
       </div>
       <!-- Banned Game Display -->
       <q-chip
         v-if="member.my_banned_game"
-        outline
+        unelevated
         square
-        color="red-7"
+        color="red-1"
         text-color="red-7"
         icon="block"
-        class="q-ml-sm"
+        class="q-ml-sm text-weight-bold"
       >
         Banned: {{ member.my_banned_game.game_name }}
         <q-btn
@@ -32,12 +32,12 @@
       </q-chip>
       <q-chip
         v-else-if="member.has_banned"
-        outline
+        unelevated
         square
-        color="grey-7"
+        color="grey-2"
         text-color="grey-7"
         icon="skip_next"
-        class="q-ml-sm"
+        class="q-ml-sm text-weight-bold"
       >
         Ban Skipped
         <q-btn
@@ -72,38 +72,38 @@
 
     <!-- Quick Actions Bar -->
     <div class="row q-gutter-sm q-mb-md">
-      <KennerButton
+      <q-btn
         v-if="(member.selected_games?.length || 0) < 2"
-        outline
-        dense
+        unelevated
+        rounded
         color="primary"
         icon="add_circle"
         label="Add Game"
-        class="q-px-sm"
+        class="q-px-md text-weight-bold"
         @click="$emit('add-game', member)"
       />
-      <KennerButton
+      <q-btn
         v-if="!member.my_banned_game"
-        outline
-        dense
+        unelevated
+        rounded
         color="red-7"
         icon="block"
         label="Ban Game"
-        class="q-px-sm"
+        class="q-px-md text-weight-bold"
         @click="$emit('ban-game', member)"
       />
-      <KennerButton
+      <q-btn
         v-if="
           member.id !== league.active_player &&
           ['PICKING', 'REPICKING', 'BANNING'].includes(league.status) &&
           season?.status === 'RUNNING'
         "
-        outline
-        dense
+        unelevated
+        rounded
         color="secondary"
         icon="person_outline"
         label="Set Active"
-        class="q-px-sm"
+        class="q-px-md text-weight-bold"
         @click="$emit('set-active', member.profile)"
       />
     </div>
@@ -115,16 +115,17 @@
         :key="`${member.id}-${selGame.id}`"
         class="col-12 col-md-4"
       >
-        <q-card flat bordered class="fit rounded-borders overflow-hidden">
+        <q-card flat bordered class="fit rounded-borders overflow-hidden shadow-1 hover-shadow">
           <!-- Header Section -->
-          <q-card-section class="q-pa-md bg-grey-2">
-            <div class="row items-center justify-between">
+          <q-card-section class="q-pa-md bg-grey-1 text-grey-9">
+            <div class="row items-center justify-between no-wrap">
               <div class="col">
-                <div class="text-subtitle1 text-weight-bold text-grey-9">
+                <div class="text-subtitle1 text-weight-bolder ellipsis">
                   <q-icon
                     name="sports_esports"
-                    size="xs"
-                    class="q-mr-xs"
+                    size="sm"
+                    color="primary"
+                    class="q-mr-sm"
                   />
                   {{ selGame?.game_name || 'No Game Selected' }}
                 </div>
@@ -135,8 +136,8 @@
                     flat
                     dense
                     round
-                    color="secondary"
-                    icon="edit"
+                    color="grey-7"
+                    icon="settings"
                     size="sm"
                     @click="$emit('edit-game', { member, selGame })"
                   >
@@ -146,33 +147,18 @@
                     flat
                     dense
                     round
-                    :color="
-                      hasResult(selGame) ? 'secondary' : 'primary'
-                    "
-                    :icon="
-                      hasResult(selGame)
-                        ? 'edit_note'
-                        : 'post_add'
-                    "
+                    :color="hasResult(selGame) ? 'secondary' : 'primary'"
+                    :icon="hasResult(selGame) ? 'edit_note' : 'post_add'"
                     size="sm"
-                    @click="
-                      () =>
-                        hasResult(selGame)
-                          ? $emit('edit-result', selGame.id)
-                          : $emit('post-result', selGame)
-                    "
+                    @click="() => hasResult(selGame) ? $emit('edit-result', selGame.id) : $emit('post-result', selGame)"
                   >
-                    <q-tooltip>{{
-                      hasResult(selGame)
-                        ? 'Edit Result'
-                        : 'Post Result'
-                    }}</q-tooltip>
+                    <q-tooltip>{{ hasResult(selGame) ? 'Edit Result' : 'Post Result' }}</q-tooltip>
                   </q-btn>
                   <q-btn
                     flat
                     dense
                     round
-                    color="red-6"
+                    color="red-5"
                     icon="delete_outline"
                     size="sm"
                     @click="$emit('delete-game', { member, selGame })"
@@ -196,10 +182,11 @@
                   <q-icon
                     name="tune"
                     :color="selGame.selected_options?.length > 0 ? 'primary' : 'grey-7'"
+                    size="xs"
                   />
                 </q-item-section>
                 <q-item-section>
-                  <div class="text-weight-bold text-grey-7">Settings</div>
+                  <div class="text-weight-bold text-grey-7 text-uppercase" style="font-size: 0.75rem; letter-spacing: 0.05em;">Settings</div>
                 </q-item-section>
               </template>
               <q-card-section class="bg-white q-pa-md">
@@ -219,10 +206,11 @@
                   <q-icon
                     name="emoji_events"
                     :color="hasResult(selGame) ? 'secondary' : 'grey-7'"
+                    size="xs"
                   />
                 </q-item-section>
                 <q-item-section>
-                  <div class="text-weight-bold text-grey-7">Match Result</div>
+                  <div class="text-weight-bold text-grey-7 text-uppercase" style="font-size: 0.75rem; letter-spacing: 0.05em;">Match Result</div>
                 </q-item-section>
               </template>
               <q-card-section class="bg-white q-pa-md">
@@ -245,7 +233,6 @@
 </template>
 
 <script setup lang="ts">
-import KennerButton from 'components/base/KennerButton.vue';
 import GameSettingsDisplay from 'components/game/selectedGame/GameSettingsDisplay.vue';
 import MatchResult from 'components/league/MatchResult.vue';
 import type { TSeasonDto } from 'src/types';
@@ -272,3 +259,11 @@ function hasResult(selGame: any) {
   return Array.isArray(results) && results.length > 0;
 }
 </script>
+
+<style scoped>
+.ellipsis {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+</style>

@@ -1,26 +1,41 @@
 <template>
   <div
-    class="row items-center q-mb-lg q-pa-md bg-grey-1 rounded-borders"
+    class="row items-center q-mb-lg q-pa-lg bg-white rounded-borders"
   >
     <div class="col-grow">
-      <q-chip
-        dense
-        square
-        color="grey-8"
-        text-color="white"
-        class="q-ml-xs text-weight-medium"
-      >
-        {{ season?.name }} · {{ season?.status }}
-      </q-chip>
-      <q-chip
-        dense
-        square
-        color="primary"
-        text-color="white"
-        class="q-ml-xs text-weight-medium"
-      >
-        L {{ league?.level }}
-      </q-chip>
+      <div class="row items-center q-gutter-md">
+        <div class="text-h4 text-weight-bolder text-primary">
+          League Manager
+        </div>
+        <div class="row q-gutter-sm">
+          <q-chip
+            square
+            color="grey-2"
+            text-color="grey-9"
+            class="text-weight-bold"
+            icon="event"
+          >
+            {{ season?.name }}
+          </q-chip>
+          <q-chip
+            square
+            :color="season?.status === 'RUNNING' ? 'positive' : 'grey-7'"
+            text-color="white"
+            class="text-weight-bold"
+          >
+            {{ season?.status }}
+          </q-chip>
+          <q-chip
+            square
+            color="secondary"
+            text-color="white"
+            class="text-weight-bold"
+            icon="military_tech"
+          >
+            Level {{ league?.level }}
+          </q-chip>
+        </div>
+      </div>
     </div>
     <div class="col-auto">
       <q-btn
