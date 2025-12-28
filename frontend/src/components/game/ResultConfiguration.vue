@@ -43,13 +43,10 @@
       </div>
 
       <div v-if="isAsymmetric" class="q-pa-md bg-white border-light rounded-borders">
-        <div class="text-subtitle2 text-grey-8 q-mb-md border-bottom q-pb-xs">Factions</div>
-        <div v-for="(factionsAtLevel, level) in groupedFactions" :key="level" class="q-mb-md last-child-mb-none">
-          <div class="text-overline text-primary">Level {{ level }}</div>
-          <div class="row q-col-gutter-sm">
-            <div v-for="faction in factionsAtLevel" :key="faction.id" class="col-auto">
-              <q-chip dense outline color="primary" icon="groups">{{ faction.name }}</q-chip>
-            </div>
+        <div class="text-subtitle2 text-grey-8 q-mb-sm border-bottom q-pb-xs">Factions</div>
+        <div class="row q-col-gutter-sm">
+          <div v-for="faction in sortedFactions" :key="faction.id" class="col-auto">
+            <q-chip dense outline color="primary" icon="groups">{{ faction.name }}</q-chip>
           </div>
         </div>
       </div>
@@ -89,13 +86,7 @@ const props = defineProps<{
   tieBreakers: { id: number; name: string }[];
 }>();
 
-const groupedFactions = computed(() => {
-  const groups: Record<number, typeof props.factions> = {};
-  props.factions.forEach((f) => {
-    const level = f.level ?? 0;
-    if (!groups[level]) groups[level] = [];
-    groups[level].push(f);
-  });
-  return groups;
+const sortedFactions = computed(() => {
+  return [...props.factions].sort((a, b) => (a.level ?? 0) - (b.level ?? 0));
 });
 </script>
