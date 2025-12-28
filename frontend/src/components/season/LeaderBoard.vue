@@ -12,7 +12,7 @@
     <div class="row items-center justify-between q-pa-md bg-grey-1">
       <div class="column">
         <div class="text-h6 text-weight-bold text-grey-9">Leaderboard</div>
-        <div class="text-caption text-grey-7">Season Performance Summary</div>
+        <div class="text-caption text-grey-7">Year Performance</div>
       </div>
       <q-chip
         outline

@@ -86,7 +86,7 @@
             <q-separator />
             <div class="bg-grey-1 q-pa-md">
               <div v-if="participantsLoading" class="flex flex-center q-py-sm">
-                <q-spinner size="20px" color="primary" />
+                <q-spinner-grid size="20px" color="primary" />
               </div>
 
               <template v-else-if="participantsLoaded">

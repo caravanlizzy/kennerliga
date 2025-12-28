@@ -11,9 +11,7 @@
             <q-btn flat round icon="close" @click="router.back()" />
           </div>
 
-          <div v-if="loading" class="row justify-center q-pa-xl">
-            <q-spinner color="primary" size="3em" />
-          </div>
+          <LoadingSpinner v-if="loading" />
 
           <q-form
             v-else
@@ -363,6 +361,7 @@ import { api } from 'boot/axios';
 import KennerInput from 'components/base/KennerInput.vue';
 import KennerSelect from 'components/base/KennerSelect.vue';
 import KennerButton from 'components/base/KennerButton.vue';
+import LoadingSpinner from 'components/base/LoadingSpinner.vue';
 import { useRoute, useRouter } from 'vue-router';
 import { TPlatform, TFullGameDto, TResultConfig } from 'src/types';
 import { useResponsive } from 'src/composables/responsive';

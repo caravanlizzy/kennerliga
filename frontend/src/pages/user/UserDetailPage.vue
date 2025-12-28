@@ -104,10 +104,7 @@
 
       <q-card-section>
         <!-- Loading -->
-        <div v-if="loading" class="row items-center q-gutter-sm">
-          <q-spinner size="20px" />
-          <span class="text-grey-7">Loading…</span>
-        </div>
+        <LoadingSpinner v-if="loading" text="Loading…" />
 
         <!-- Empty -->
         <q-banner
@@ -169,6 +166,7 @@
 import { api } from 'boot/axios';
 import { useRoute } from 'vue-router';
 import { onMounted, ref, computed } from 'vue';
+import LoadingSpinner from 'components/base/LoadingSpinner.vue';
 import { TSeasonDto, TSeasonParticipantDto, TUserDto, TMatchResultDto, TLeagueDto, TSelectedGameDto } from 'src/types';
 
 defineEmits<{ (e: 'open:season', seasonId: number | string): void }>();

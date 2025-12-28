@@ -3,11 +3,7 @@
     <!-- Feedback Display for Admins -->
     <div v-if="isAdmin" class="feedback-list">
       <div class="text-h6 q-mb-md">User Feedback</div>
-      <q-card flat bordered v-if="loadingFeedback">
-        <q-card-section class="flex flex-center">
-          <q-spinner color="primary" size="3em" />
-        </q-card-section>
-      </q-card>
+      <LoadingSpinner v-if="loadingFeedback" />
       <div v-else-if="feedbacks.length === 0" class="text-grey-7 text-center q-pa-lg">
         No feedback yet.
       </div>
@@ -62,6 +58,7 @@ import { useRouter } from 'vue-router';
 import { storeToRefs } from 'pinia';
 import { useUserStore } from 'stores/userStore';
 import KennerButton from 'components/base/KennerButton.vue';
+import LoadingSpinner from 'components/base/LoadingSpinner.vue';
 import { postFeedback, fetchFeedback } from 'src/services/feedbackService';
 import type { TFeedbackDto } from 'src/types';
 

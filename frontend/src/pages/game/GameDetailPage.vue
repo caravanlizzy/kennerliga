@@ -1,8 +1,6 @@
 <template>
   <q-page padding>
-    <div v-if="isLoading" class="flex flex-center q-pa-xl">
-      <q-spinner-puff color="primary" size="3em" />
-    </div>
+    <LoadingSpinner v-if="isLoading" />
 
     <div v-else class="row justify-center">
       <div class="col-12 col-md-10 col-lg-8">
@@ -165,6 +163,7 @@ import { api } from 'boot/axios';
 import { useRoute, useRouter } from 'vue-router';
 import ResultConfiguration from 'components/game/ResultConfiguration.vue';
 import KennerButton from 'components/base/KennerButton.vue';
+import LoadingSpinner from 'components/base/LoadingSpinner.vue';
 import { computed, ref } from 'vue';
 
 const route = useRoute();

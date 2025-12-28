@@ -1,7 +1,7 @@
 <template>
   <q-card flat class="q-pa-md q-my-md rounded-borders details-card">
     <q-inner-loading v-if="isLoading" :showing="isLoading">
-      <q-spinner-orbit size="96px" color="secondary" />
+      <q-spinner-grid size="4em" color="primary" />
     </q-inner-loading>
 
     <template v-else>

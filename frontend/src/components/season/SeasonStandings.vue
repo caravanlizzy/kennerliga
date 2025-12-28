@@ -36,9 +36,7 @@
     </div>
 
     <!-- State primary -->
-    <div v-if="loadingSeasons" class="row justify-center q-pa-xl">
-      <q-spinner-grid color="primary" size="4em" />
-    </div>
+    <LoadingSpinner v-if="loadingSeasons" />
 
     <!-- Leagues + matrices -->
     <div v-if="!selectedSeasonId && !loadingSeasons" class="column items-center q-pa-xl text-grey-6">
@@ -47,9 +45,7 @@
       <div>Please select year and month that contain a league.</div>
     </div>
 
-    <div v-else-if="loadingLeagues" class="row justify-center q-pa-xl">
-       <q-spinner-dots color="primary" size="3em" />
-    </div>
+    <LoadingSpinner v-else-if="loadingLeagues" />
 
     <div v-else-if="leagues.length === 0 && selectedSeasonId" class="column items-center q-pa-xl text-grey-6">
        <q-icon name="warning_amber" size="48px" class="q-mb-md" />
@@ -85,6 +81,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, watch } from 'vue';
 import LeagueStandingsMatrix from 'components/league/LeagueStandingsMatrix.vue';
+import LoadingSpinner from 'components/base/LoadingSpinner.vue';
 import { api } from 'boot/axios';
 import KennerSelect from 'components/base/KennerSelect.vue';
 import { useResponsive } from 'src/composables/responsive';

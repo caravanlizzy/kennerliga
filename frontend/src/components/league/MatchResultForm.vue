@@ -235,7 +235,7 @@
         </div>
       </q-form>
 
-      <q-spinner v-else color="dark" size="md" class="q-my-xl" />
+      <LoadingSpinner v-else />
     </div>
   </q-card>
 </template>
@@ -247,6 +247,7 @@ import { useQuasar } from 'quasar';
 import { storeToRefs } from 'pinia';
 import { useLeagueStore } from 'stores/leagueStore';
 import KennerSelect from 'components/base/KennerSelect.vue';
+import LoadingSpinner from 'components/base/LoadingSpinner.vue';
 import {
   TResultConfig,
   TTieBreakerDto,

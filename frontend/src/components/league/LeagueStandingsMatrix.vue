@@ -165,13 +165,7 @@
       </q-table>
 
       <!-- Loading state -->
-      <div
-        v-else-if="loading"
-        class="column items-center q-pa-md bg-white rounded-borders"
-      >
-        <q-spinner-dots size="24px" />
-        <span class="q-mt-xs text-caption"> Loading standings... </span>
-      </div>
+      <LoadingSpinner v-else-if="loading" text="Loading standings..." />
 
       <!-- Error state -->
       <div
@@ -198,6 +192,7 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue';
 import { api } from 'boot/axios';
+import LoadingSpinner from 'components/base/LoadingSpinner.vue';
 import type { QTableColumn } from 'quasar';
 import { useResponsive } from 'src/composables/responsive';
 import UserAvatar from 'components/ui/UserAvatar.vue';
