@@ -1,6 +1,6 @@
 <template>
   <div
-    class="row items-center q-pa-xs no-wrap q-gutter-x-sm bg-grey-2 nav-item-radius"
+    class="row items-center q-pa-xs no-wrap q-gutter-x-xs bg-grey-1 nav-item-radius border-subtle"
     style="z-index: 1"
   >
     <UserAvatar

@@ -3,9 +3,9 @@
     <q-btn
       :to="{ name: 'home' }"
       unelevated
-      bordered
-      color="white"
-      class="primary-border nav-item-radius text-weight-medium"
+      flat
+      color="primary"
+      class="nav-item-radius text-weight-bold"
     >
       <q-icon size="sm" name="img:icons/favicon.svg" />
     </q-btn>

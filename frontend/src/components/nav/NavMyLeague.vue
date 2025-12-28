@@ -4,8 +4,9 @@
       v-if="isAuthenticated"
       :to="{ name: 'my-league' }"
       unelevated
-      color="white"
-      class="nav-item-radius text-weight-medium"
+      color="grey-2"
+      text-color="dark"
+      class="nav-item-radius text-weight-bold"
       no-caps
     >
       <q-icon color="amber-6" name="emoji_events" />

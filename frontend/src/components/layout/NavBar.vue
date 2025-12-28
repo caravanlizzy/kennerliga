@@ -1,6 +1,6 @@
 <template>
   <q-toolbar
-    class="navbar bg-grey-4 text-dark q-px-md q-py-none shadow-1 relative-position"
+    class="navbar bg-white text-dark q-px-md q-py-sm relative-position"
   >
     <!-- Left: Brand -->
     <NavHome />
@@ -32,23 +32,17 @@ const { user } = storeToRefs(useUserStore());
 <style lang="scss">
 .navbar {
   position: relative;
-  overflow: hidden;
-}
-
-.navbar::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: url("data:image/svg+xml,%3Csvg viewBox='0 0 1200 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0,50 C100,90 200,10 300,70 C400,130 500,0 600,50 C700,100 800,20 900,60 C1000,100 1100,30 1200,50' stroke='%23e53935' stroke-width='3' fill='none'/%3E%3C/svg%3E")
-    center / cover no-repeat;
-  opacity: 0.7;
-  z-index: 0;
+  min-height: 64px;
 }
 
 /* Compact version for mobile */
 .nav-item-radius {
-  padding: 2px 7px;
-  border-radius: 13px;
+  padding: 4px 12px;
+  border-radius: 12px;
+}
+
+.border-subtle {
+  border: 1px solid rgba(0, 0, 0, 0.05);
 }
 
 .right-controls--mobile .q-btn {

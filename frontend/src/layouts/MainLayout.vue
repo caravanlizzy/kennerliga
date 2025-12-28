@@ -1,6 +1,6 @@
 <template>
   <q-layout class="column" view="hHh Lpr lFf">
-    <q-header bordered class="text-dark bg-white col-auto">
+    <q-header class="text-dark bg-white col-auto border-bottom">
       <NavBar :onToggle="toggleDrawer" />
     </q-header>
 
@@ -30,3 +30,9 @@ function toggleDrawer(): void {
   drawerState.value = !drawerState.value;
 }
 </script>
+
+<style lang="scss">
+.border-bottom {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+}
+</style>
