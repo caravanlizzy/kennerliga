@@ -260,7 +260,7 @@ const tableColumns = computed<QTableColumn[]>(() => {
       label: '',
       field: 'profile_name',
       align: 'left',
-      sortable: true,
+      sortable: false,
     },
   ];
 
@@ -282,7 +282,7 @@ const tableColumns = computed<QTableColumn[]>(() => {
     label: 'LP',
     field: 'total',
     align: 'right',
-    sortable: true,
+    sortable: false,
   });
 
   return cols;
