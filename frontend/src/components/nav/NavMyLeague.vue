@@ -1,17 +1,16 @@
 <template>
-  <div class="row items-center no-wrap absolute-center">
+  <div class="row items-center no-wrap">
     <KennerButton
       v-if="isAuthenticated"
       :to="{ name: 'my-league' }"
       unelevated
-      color="grey-2"
-      text-color="dark"
-      class="nav-item-radius text-weight-bold"
+      color="primary"
+      class="nav-item-radius text-weight-bold shadow-1"
       no-caps
     >
-      <q-icon color="amber-6" name="emoji_events" />
-      <span v-show="!isMobile" class="q-ml-xs text-dark">My League</span>
-      <q-badge v-if="isMeActivePlayer" floating rounded color="positive" />
+      <q-icon name="emoji_events" color="white" />
+      <span v-show="!isMobile" class="q-ml-xs text-white">My League</span>
+      <q-badge v-if="isMeActivePlayer" floating rounded color="positive" style="top: -4px; right: -4px; border: 2px solid white" />
     </KennerButton>
   </div>
 </template>

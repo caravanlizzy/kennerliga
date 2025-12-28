@@ -1,6 +1,6 @@
 <template>
   <q-layout class="column" view="hHh Lpr lFf">
-    <q-header class="text-dark bg-white col-auto border-bottom">
+    <q-header class="col-auto no-shadow bg-transparent">
       <NavBar :onToggle="toggleDrawer" />
     </q-header>
 
