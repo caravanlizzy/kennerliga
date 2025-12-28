@@ -10,7 +10,12 @@
             account to access the seasons, chat, and leaderboards.
           </div>
           <div class="row q-gutter-md justify-center">
-            <KennerButton color="primary" label="Login" icon="login" to="/login" />
+            <KennerButton
+              color="primary"
+              label="Login"
+              icon="login"
+              to="/login"
+            />
           </div>
         </div>
       </div>
@@ -21,7 +26,7 @@
         <div class="col column">
           <KennerChat v-if="mobileContent === 'chat'" class="column" />
 
-<!--          <SeasonWinners v-else-if="mobileContent === 'pokal'" class="q-pa-md" />-->
+          <!--          <SeasonWinners v-else-if="mobileContent === 'pokal'" class="q-pa-md" />-->
 
           <ScrollContainer v-else-if="mobileContent === 'live'">
             <ContentSection
@@ -69,7 +74,7 @@
             <q-tab icon="bolt" name="live" label="Live" />
             <q-tab icon="history" name="seasons" label="Season" />
             <q-tab icon="chat" name="chat" label="Chat" />
-<!--            <q-tab icon="emoji_events" name="pokal" label="Winners" />-->
+            <!--            <q-tab icon="emoji_events" name="pokal" label="Winners" />-->
             <q-tab icon="leaderboard" name="leaderboard" label="Rank" />
           </q-tabs>
         </q-toolbar>
@@ -150,14 +155,17 @@
             bordered
             title="Kennerchat"
             color="dark"
-            style="max-height: calc(100vh - 200px); position: sticky; top: 100px"
+            style="
+              max-height: calc(100vh - 200px);
+              position: sticky;
+              top: 100px;
+            "
           >
             <KennerChat class="col" />
           </ContentSection>
         </div>
       </div>
     </template>
-
   </q-page>
 </template>
 
@@ -174,7 +182,11 @@ import { useQuasar } from 'quasar';
 import { onMounted, ref, watch } from 'vue';
 import ScrollContainer from 'components/base/ScrollContainer.vue';
 import { useUserStore } from 'stores/userStore';
-import { fetchAvailableYears } from 'src/services/seasonService';
+import {
+  fetchAvailableYears,
+  fetchCurrentSeasonId,
+  fetchSeason,
+} from 'src/services/seasonService';
 import KennerButton from 'components/base/KennerButton.vue';
 
 const { isMobile } = useResponsive();
@@ -183,7 +195,9 @@ const $q = useQuasar();
 const isMdUp = $q.screen.gt.sm;
 
 const mobileContent = ref('seasons');
-const isLiveActionVisible = ref($q.localStorage.getItem('isLiveActionVisible') !== false);
+const isLiveActionVisible = ref(
+  $q.localStorage.getItem('isLiveActionVisible') !== false
+);
 
 watch(isLiveActionVisible, (val) => {
   $q.localStorage.set('isLiveActionVisible', val);
@@ -195,7 +209,13 @@ const availableYears = ref<number[]>([]);
 onMounted(async () => {
   if (isAuthenticated) {
     availableYears.value = await fetchAvailableYears();
-    if (availableYears.value.length > 0) {
+    const currentSeasonId = await fetchCurrentSeasonId();
+    if (currentSeasonId) {
+      const season = await fetchSeason(currentSeasonId);
+      if (season) {
+        selectedYear.value = season.year;
+      }
+    } else if (availableYears.value.length > 0) {
       selectedYear.value = availableYears.value[0];
     }
   }
