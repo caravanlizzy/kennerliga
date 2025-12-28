@@ -23,7 +23,7 @@
 
 <!--          <SeasonWinners v-else-if="mobileContent === 'pokal'" class="q-pa-md" />-->
 
-          <ScrollContainer v-else-if="mobileContent === 'seasons'">
+          <ScrollContainer v-else-if="mobileContent === 'live'">
             <ContentSection
               v-if="isAuthenticated"
               title="Live Action"
@@ -33,6 +33,9 @@
             >
               <LiveActionFeed />
             </ContentSection>
+          </ScrollContainer>
+
+          <ScrollContainer v-else-if="mobileContent === 'seasons'">
             <SeasonStandings />
           </ScrollContainer>
           <ScrollContainer v-else-if="mobileContent === 'leaderboard'">
@@ -52,6 +55,7 @@
         </div>
         <q-toolbar class="col-auto bg-grey-4 text-primary flex-center">
           <q-tabs switch-indicator v-model="mobileContent" class="full-width">
+            <q-tab icon="bolt" name="live" label="Live" />
             <q-tab icon="history" name="seasons" label="Season" />
             <q-tab icon="chat" name="chat" label="Chat" />
 <!--            <q-tab icon="emoji_events" name="pokal" label="Winners" />-->
