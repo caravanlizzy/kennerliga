@@ -97,6 +97,7 @@ export type TSelectedGameDto = {
   game_name?: string;
   league: number;
   selected_options: TSelectedGameOptionDto[];
+  created_at?: string;
 };
 
 export type TSelectedGameDtoPayload = {

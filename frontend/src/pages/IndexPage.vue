@@ -24,6 +24,15 @@
 <!--          <SeasonWinners v-else-if="mobileContent === 'pokal'" class="q-pa-md" />-->
 
           <ScrollContainer v-else-if="mobileContent === 'seasons'">
+            <ContentSection
+              v-if="isAuthenticated"
+              title="Live Action"
+              color="accent"
+              :bordered="false"
+              class="q-mx-md q-mt-md"
+            >
+              <LiveActionFeed />
+            </ContentSection>
             <SeasonStandings />
           </ScrollContainer>
           <ScrollContainer v-else-if="mobileContent === 'leaderboard'">
@@ -53,14 +62,15 @@
       <div v-else class="column col q-pa-md">
         <div class="row col">
           <div class="col-12 col-md" :class="{ 'q-pr-lg': isMdUp }">
-<!--            <ContentSection-->
-<!--              title="Winners"-->
-<!--              color="dark"-->
-<!--              titleEnd-->
-<!--              :bordered="false"-->
-<!--            >-->
-<!--              <SeasonWinners class="q-pa-md" />-->
-<!--            </ContentSection>-->
+            <ContentSection
+              v-if="isAuthenticated"
+              title="Live Action"
+              color="accent"
+              :bordered="false"
+              class="col-12 q-mb-md"
+            >
+              <LiveActionFeed />
+            </ContentSection>
             <ContentSection
               titleEnd
               :bordered="false"
@@ -115,6 +125,7 @@
 
 <script setup lang="ts">
 import KennerChat from 'components/chat/KennerChat.vue';
+import LiveActionFeed from 'components/ui/LiveActionFeed.vue';
 import SeasonStandings from 'components/season/SeasonStandings.vue';
 import AnnouncementDisplay from 'components/ui/AnnouncementDisplay.vue';
 import { useResponsive } from 'src/composables/responsive';
@@ -124,9 +135,9 @@ import KennerSelect from 'components/base/KennerSelect.vue';
 import { useQuasar } from 'quasar';
 import { onMounted, ref } from 'vue';
 import ScrollContainer from 'components/base/ScrollContainer.vue';
-import SeasonWinners from 'components/season/SeasonWinners.vue';
 import { useUserStore } from 'stores/userStore';
 import { fetchAvailableYears } from 'src/services/seasonService';
+import KennerButton from 'components/base/KennerButton.vue';
 
 const { isMobile } = useResponsive();
 const { isAuthenticated } = useUserStore();
