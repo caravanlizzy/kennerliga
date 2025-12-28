@@ -1,5 +1,5 @@
 <template>
-  <div class="q-pa-md bg-white">
+  <div class="q-pa-md">
     <!-- Header -->
     <div class="row items-center q-mb-md">
       <q-btn
@@ -11,34 +11,27 @@
         @click="router.back()"
         class="q-mr-sm"
       />
-      <div class="text-subtitle1 text-weight-medium text-grey-8">
-        Manage Season {{ season?.name || '...' }}
+      <div class="text-h5 text-weight-bold">
+        Manage Season {{ season?.name || '…' }}
       </div>
       <q-space />
-      <q-badge
-        v-if="season?.status"
-        outline
-        color="teal-6"
-        :label="season.status"
-        class="q-mr-xs text-caption"
-      />
-      <q-badge
-        v-if="leagues?.length"
-        outline
-        color="grey-6"
-        :label="`${leagues.length} ${leagues.length === 1 ? 'league' : 'leagues'}`"
-        class="text-caption"
-      />
+      <div v-if="leagues?.length" class="row items-center q-gutter-x-sm">
+        <q-badge align="middle">{{ leagues.length }} leagues</q-badge>
+        <q-badge
+          v-if="season?.status"
+          outline
+          :color="statusColor"
+          :label="season.status"
+        />
+      </div>
     </div>
-
-    <q-separator class="q-mb-md" />
 
     <!-- Error State -->
     <q-banner
       v-if="error && !loading"
       dense
       rounded
-      class="bg-red-1 text-red-8 q-mb-sm"
+      class="bg-red-1 text-red-8 q-mb-md"
     >
       <template v-slot:avatar>
         <q-icon name="error_outline" color="red-5" size="xs" />
@@ -47,31 +40,36 @@
     </q-banner>
 
     <!-- Loading State -->
-    <div v-if="loading" class="row q-col-gutter-sm">
-      <div
-        v-for="i in 3"
-        :key="i"
-        class="col-12 col-sm-6 col-md-4"
-      >
-        <q-skeleton type="rect" height="180px" class="rounded-borders" />
-      </div>
+    <div v-if="loading">
+      <q-skeleton type="rect" class="q-mb-md" height="56px" />
+      <q-skeleton type="rect" class="q-mb-md" height="160px" />
     </div>
 
     <!-- Content -->
     <div v-else-if="!error">
-      <!-- Empty State -->
-      <div v-if="leagues.length === 0" class="text-center q-py-xl">
-        <q-icon name="sports" size="48px" color="grey-4" class="q-mb-sm" />
-        <div class="text-body2 text-grey-6 q-mb-xs">
-          No leagues found for this season
-        </div>
-        <div class="text-caption text-grey-5">
-          Create a league to get started
+      <!-- Registered Members Section -->
+      <div v-if="participants.length > 0" class="q-mb-lg">
+        <div class="text-caption text-grey-7 q-mb-xs uppercase text-weight-bold">Registered Members ({{ participants.length }})</div>
+        <div class="row q-col-gutter-xs">
+          <q-chip
+            v-for="p in participants"
+            :key="p.id"
+            dense
+            icon="person"
+            class="q-mr-xs q-mb-xs"
+          >
+            {{ p.profile_name }}
+          </q-chip>
         </div>
       </div>
 
+      <q-separator v-if="participants.length > 0" class="q-mb-lg" />
+
       <!-- Leagues Grid -->
-      <div v-else class="row q-col-gutter-sm">
+      <div v-if="leagues.length === 0" class="text-grey-7 q-mt-lg">
+        No leagues found for this season.
+      </div>
+      <div v-else class="row q-col-gutter-md">
         <div
           v-for="league in leagues"
           :key="league.id"
@@ -85,31 +83,44 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import { fetchLeaguesBySeason, fetchSeason } from 'src/services/seasonService';
+import { fetchLeaguesBySeason, fetchSeason, fetchSeasonParticipants } from 'src/services/seasonService';
 import LeagueList from 'components/season/LeagueList.vue';
-
-interface Member { id: number|string; username?: string; name?: string }
-interface League { id: number|string; level: number|string; members?: Member[] }
-interface Season { id?: number|string; name?: string; status?: string }
+import { TSeasonDto, TLeagueDto, TSeasonParticipantDto } from 'src/types';
 
 const route = useRoute();
 const router = useRouter();
 const seasonId = Number(route.params.id);
 
-const leagues = ref<League[]>([]);
-const season = ref<Season>({});
+const leagues = ref<TLeagueDto[]>([]);
+const season = ref<TSeasonDto | null>(null);
+const participants = ref<TSeasonParticipantDto[]>([]);
 const loading = ref(true);
 const error = ref<string | null>(null);
+
+const statusColor = computed(() => {
+  switch (season.value?.status) {
+    case 'OPEN': return 'teal-6';
+    case 'RUNNING': return 'primary';
+    case 'DONE': return 'grey-7';
+    default: return 'grey-6';
+  }
+});
 
 onMounted(async () => {
   try {
     loading.value = true;
-    season.value = await fetchSeason(seasonId);
-    leagues.value = await fetchLeaguesBySeason(seasonId);
+    const [seasonData, leagueData, participantData] = await Promise.all([
+      fetchSeason(seasonId),
+      fetchLeaguesBySeason(seasonId),
+      fetchSeasonParticipants(seasonId)
+    ]);
+    season.value = seasonData || null;
+    leagues.value = leagueData;
+    participants.value = participantData;
   } catch (e: any) {
-    error.value = e?.message || 'Failed to load season or leagues.';
+    error.value = e?.message || 'Failed to load season details.';
   } finally {
     loading.value = false;
   }

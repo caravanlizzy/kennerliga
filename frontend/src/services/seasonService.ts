@@ -67,11 +67,9 @@ export async function createSeason(targetYear: number, targetMonth: number): Pro
   return season as TSeasonDto; // { id, year, month, ... }
 }
 
-async function fetchSeasonParticipants(seasonId: number): Promise<TSeasonParticipantDto[]> {
+export async function fetchSeasonParticipants(seasonId: number): Promise<TSeasonParticipantDto[]> {
   // Season detail should include participants array
-  console.log({ seasonId });
   const { data } = await api.get<TSeasonParticipantDto[]>(`/season/season-participants/?season=${seasonId}`);
-  console.log('data in fetchSeasonParticipants: ', data);
   return data ? data : [];
 }
 
