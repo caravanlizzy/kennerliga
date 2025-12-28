@@ -17,7 +17,7 @@ from chat.service import create_chat_announcement
 from game.models import SelectedGame, BanDecision
 from league.models import League, LeagueStanding, GameStanding, LeagueStatus
 from result.models import Result
-from season.queries import register, is_profile_registered, get_open_season
+from season.queries import register, is_profile_registered, get_open_season, get_running_season
 from season.models import Season, SeasonParticipant
 from season.serializer import SeasonSerializer, SeasonParticipantSerializer, TLiveEventSerializer
 from user.models import PlayerProfile
@@ -332,14 +332,18 @@ class CurrentSeasonView(APIView):
     """
 
     def get(self, request):
-        today = timezone.localdate()
-        year, month = today.year, today.month
+        season = get_running_season()
+        if not season:
+            season = get_open_season()
 
-        season = Season.objects.filter(year=year, month=month).first()
+        if not season:
+            today = timezone.localdate()
+            year, month = today.year, today.month
+            season = Season.objects.filter(year=year, month=month).first()
 
         if not season:
             return Response(
-                {"detail": f"No season found for {year}-{month}."},
+                {"detail": "No active or current month season found."},
                 status=status.HTTP_404_NOT_FOUND,
             )
 
@@ -362,10 +366,13 @@ class SeasonParticipantViewSet(ModelViewSet):
         """
         GET /season-participants/current/
 
-        Returns all participants of the *current open season*.
-        If no open season exists, returns an empty list.
+        Returns all participants of the current running or open season.
+        If no such season exists, returns an empty list.
         """
-        season = get_open_season()
+        season = get_running_season()
+        if not season:
+            season = get_open_season()
+
         if not season:
             # frontend can just treat this as "no participants / no open season"
             return Response([], status=200)
@@ -381,7 +388,9 @@ class LiveEventViewSet(ViewSet):
     def list(self, request):
         season_id = request.query_params.get('season_id')
         if not season_id:
-            season = get_open_season()
+            season = get_running_season()
+            if not season:
+                season = get_open_season()
             if not season:
                 # Fallback to most recent season
                 season = Season.objects.order_by('-year', '-month').first()
