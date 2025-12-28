@@ -12,7 +12,7 @@
     <div class="row items-center justify-between q-pa-md border-bottom">
       <div class="column">
         <div class="text-h6 text-weight-bold">Leaderboard</div>
-        <div class="text-caption text-grey-7">Season Performance Summary</div>
+        <div class="text-caption text-grey-7">Year Performance Summary</div>
       </div>
       <q-chip outline color="primary" icon="event" :label="'Year ' + standings.year" />
     </div>
@@ -88,7 +88,7 @@
               />
               <div class="column">
                 <span class="text-subtitle2 text-weight-bold">{{ row.profile_name }}</span>
-                <span v-if="index === 0" class="text-caption text-amber-9 text-weight-medium">Season Leader</span>
+                <span v-if="index === 0" class="text-caption text-amber-9 text-weight-medium">Leader</span>
               </div>
             </div>
           </td>
