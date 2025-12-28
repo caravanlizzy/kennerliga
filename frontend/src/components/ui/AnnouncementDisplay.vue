@@ -23,7 +23,7 @@
               class="icon-wrapper flex flex-center q-mr-md"
               :class="typeColors[a.type]"
             >
-              <q-icon :name="announcementIcons[a.type]" size="18px" />
+              <q-icon :name="announcementIcons[a.type]" size="20px" />
             </div>
 
             <!-- Content -->
@@ -51,9 +51,10 @@
               dense
               no-caps
               color="primary"
-              class="text-caption rounded-borders q-px-sm"
+              class="text-caption rounded-borders q-px-md"
               @click="toggleParticipants"
             >
+              <q-icon :name="showParticipants ? 'expand_less' : 'people'" size="16px" class="q-mr-xs" />
               {{ showParticipants ? 'Hide' : 'View' }} participants
             </q-btn>
 
@@ -72,17 +73,10 @@
               </q-tooltip>
             </KennerButton>
 
-            <q-chip
-              v-else
-              icon="check_circle"
-              color="positive"
-              text-color="white"
-              dense
-              outline
-              size="sm"
-            >
-              Registered
-            </q-chip>
+            <div v-else class="row items-center q-gutter-x-xs text-positive text-weight-bold text-caption q-px-sm">
+              <q-icon name="check_circle" size="16px" />
+              <span>Registered</span>
+            </div>
           </div>
         </q-card-section>
 
@@ -96,20 +90,19 @@
               </div>
 
               <template v-else-if="participantsLoaded">
-                <div v-if="participants.length" class="row q-col-gutter-xs">
+                <div v-if="participants.length" class="row q-col-gutter-sm">
                   <div
                     v-for="p in participants"
                     :key="p.id"
-                    class="col-6 col-sm-4 text-caption text-grey-9"
+                    class="col-auto"
                   >
-                    <q-item dense class="q-pa-none min-height-0">
-                      <q-item-section side class="q-pr-xs">
-                        <q-icon name="person" size="12px" color="grey-5" />
-                      </q-item-section>
-                      <q-item-section>{{
-                          p.profile_name || 'Anonymous'
-                        }}</q-item-section>
-                    </q-item>
+                    <UserAvatar
+                      :display-username="p.profile_name || 'Anonymous'"
+                      size="28px"
+                      border
+                    >
+                      <q-tooltip>{{ p.profile_name || 'Anonymous' }}</q-tooltip>
+                    </UserAvatar>
                   </div>
                 </div>
                 <div
@@ -134,6 +127,7 @@ import { useAnnouncementStore } from 'stores/announcementStore';
 import { useUserStore } from 'stores/userStore';
 import { useResponsive } from 'src/composables/responsive';
 import KennerButton from 'components/base/KennerButton.vue';
+import UserAvatar from 'components/ui/UserAvatar.vue';
 import { useQuasar } from 'quasar';
 import {
   fetchIsRegisteredForSeason,
@@ -145,7 +139,7 @@ const $q = useQuasar();
 const { isMobile } = useResponsive();
 
 const shouldRemoveBorders = computed(() => {
-  return isMobile || $q.screen.width < 1300;
+  return $q.screen.lt.sm;
 });
 
 const store = useAnnouncementStore();
@@ -209,18 +203,18 @@ const textColors = {
 };
 
 const typeColors = {
-  INFO: 'bg-blue-2 text-blue-9',
-  WINNER: 'bg-amber-2 text-amber-9',
-  REGISTER: 'bg-deep-purple-2 text-deep-purple-9',
-  WARNING: 'bg-red-2 text-red-9',
-  NEUTRAL: 'bg-grey-3 text-grey-8',
+  INFO: 'bg-blue-1 text-blue-9',
+  WINNER: 'bg-amber-1 text-amber-9',
+  REGISTER: 'bg-deep-purple-1 text-deep-purple-9',
+  WARNING: 'bg-red-1 text-red-9',
+  NEUTRAL: 'bg-grey-2 text-grey-8',
 };
 </script>
 
 <style scoped>
 .announcement-card {
   border-radius: 12px;
-  border: 1px solid #e0e0e0;
+  border: 1px solid rgba(0, 0, 0, 0.08);
   transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
   border-left-width: 6px !important;
 }
@@ -233,35 +227,35 @@ const typeColors = {
 }
 
 .announcement-card:hover:not(.no-border-radius) {
-  border-color: #bdbdbd;
+  border-color: rgba(0, 0, 0, 0.12);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 }
 
 /* Theme Accents */
 .theme-info {
   border-left-color: var(--q-primary) !important;
-  background-color: #f0f7ff;
+  background-color: #f8fbff;
 }
 .theme-winner {
   border-left-color: var(--q-warning) !important;
-  background-color: #fffbef;
+  background-color: #fffdf5;
 }
 .theme-register {
   border-left-color: var(--q-secondary) !important;
-  background-color: #f7f2ff;
+  background-color: #faf8ff;
 }
 .theme-warning {
   border-left-color: var(--q-negative) !important;
-  background-color: #fff5f5;
+  background-color: #fffafa;
 }
 .theme-neutral {
-  border-left-color: var(--q-grey-6) !important;
+  border-left-color: #9e9e9e !important;
   background-color: #fafafa;
 }
 
 .icon-wrapper {
-  width: 40px;
-  height: 40px;
+  width: 38px;
+  height: 38px;
   border-radius: 10px;
   flex-shrink: 0;
 }
