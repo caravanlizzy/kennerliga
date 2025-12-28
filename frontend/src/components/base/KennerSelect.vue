@@ -9,6 +9,9 @@
     color="primary"
     class="rounded-borders"
   >
+    <template v-for="(_, slot) in $slots" #[slot]="scope">
+      <slot :name="slot" v-bind="scope || {}" />
+    </template>
   </q-select>
 </template>
 
@@ -16,7 +19,7 @@
 const modelValue = defineModel()
 
 defineProps<{
-  options: string[]
-  label: string
+  options: any[]
+  label?: string
 }>()
 </script>

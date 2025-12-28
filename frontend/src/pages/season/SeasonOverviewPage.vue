@@ -2,7 +2,7 @@
   <div class="q-pa-md">
     <!-- Header -->
     <div class="row items-center q-mb-md">
-      <q-btn
+      <KennerButton
         flat
         dense
         round
@@ -87,6 +87,7 @@ import { computed, onMounted, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { fetchLeaguesBySeason, fetchSeason, fetchSeasonParticipants } from 'src/services/seasonService';
 import LeagueList from 'components/season/LeagueList.vue';
+import KennerButton from 'components/base/KennerButton.vue';
 import { TSeasonDto, TLeagueDto, TSeasonParticipantDto } from 'src/types';
 
 const route = useRoute();

@@ -29,7 +29,7 @@
               </template>
 
               <template #action>
-                <q-btn
+                <KennerButton
                   flat
                   round
                   dense
@@ -60,7 +60,7 @@
           <div class="text-h6 q-mb-md">Add New Announcement</div>
 
           <q-form @submit.prevent="submitAnnouncement" class="q-gutter-md">
-            <q-select
+            <KennerSelect
               v-model="newAnnouncement.type"
               :options="announcementTypes"
               label="Type"
@@ -69,14 +69,14 @@
               map-options
             />
 
-            <q-input
+            <KennerInput
               v-model="newAnnouncement.title"
               label="Title"
               outlined
               :rules="[(val) => !!val || 'Title is required']"
             />
 
-            <q-input
+            <KennerInput
               v-model="newAnnouncement.content"
               label="Content (optional)"
               outlined
@@ -85,7 +85,7 @@
             />
 
             <div class="row q-gutter-md">
-              <q-input
+              <KennerInput
                 v-model="newAnnouncement.visible_from"
                 label="Visible From"
                 outlined
@@ -94,7 +94,7 @@
                 :rules="[(val) => !!val || 'Start date is required']"
               />
 
-              <q-input
+              <KennerInput
                 v-model="newAnnouncement.visible_until"
                 label="Visible Until"
                 outlined
@@ -127,8 +127,8 @@
         </q-card-section>
 
         <q-card-actions align="right">
-          <q-btn flat label="Cancel" color="dark" v-close-popup />
-          <q-btn
+          <KennerButton flat label="Cancel" color="dark" v-close-popup />
+          <KennerButton
             flat
             label="Delete"
             color="negative"
@@ -146,6 +146,8 @@ import { storeToRefs } from 'pinia';
 import { useAnnouncementStore } from 'stores/announcementStore';
 import LoadingSpinner from 'components/base/LoadingSpinner.vue';
 import KennerButton from 'components/base/KennerButton.vue';
+import KennerSelect from 'components/base/KennerSelect.vue';
+import KennerInput from 'components/base/KennerInput.vue';
 import { AnnouncementType, type AnnouncementCreate } from 'src/types';
 
 const announcementStore = useAnnouncementStore();

@@ -19,7 +19,7 @@
         class="q-ml-sm text-weight-bold"
       >
         Banned: {{ member.my_banned_game.game_name }}
-        <q-btn
+        <KennerButton
           flat
           round
           dense
@@ -27,8 +27,8 @@
           icon="close"
           class="q-ml-xs"
         >
-          <q-tooltip>Remove Ban</q-tooltip>
-        </q-btn>
+          <KennerTooltip>Remove Ban</KennerTooltip>
+        </KennerButton>
       </q-chip>
       <q-chip
         v-else-if="member.has_banned"
@@ -40,7 +40,7 @@
         class="q-ml-sm text-weight-bold"
       >
         Ban Skipped
-        <q-btn
+        <KennerButton
           flat
           round
           dense
@@ -48,8 +48,8 @@
           icon="close"
           class="q-ml-xs"
         >
-          <q-tooltip>Remove Skip</q-tooltip>
-        </q-btn>
+          <KennerTooltip>Remove Skip</KennerTooltip>
+        </KennerButton>
       </q-chip>
       <q-space />
       <div
@@ -72,7 +72,7 @@
 
     <!-- Quick Actions Bar -->
     <div class="row q-gutter-sm q-mb-md">
-      <q-btn
+      <KennerButton
         v-if="(member.selected_games?.length || 0) < 2"
         unelevated
         rounded
@@ -82,7 +82,7 @@
         class="q-px-md text-weight-bold"
         @click="$emit('add-game', member)"
       />
-      <q-btn
+      <KennerButton
         v-if="!member.my_banned_game && !member.has_banned"
         unelevated
         rounded
@@ -92,7 +92,7 @@
         class="q-px-md text-weight-bold"
         @click="$emit('ban-game', member)"
       />
-      <q-btn
+      <KennerButton
         v-if="
           member.id !== league.active_player &&
           ['PICKING', 'REPICKING', 'BANNING'].includes(league.status) &&
@@ -132,7 +132,7 @@
               </div>
               <div class="col-auto">
                 <div class="row items-center q-gutter-xs">
-                  <q-btn
+                  <KennerButton
                     flat
                     dense
                     round
@@ -141,9 +141,9 @@
                     size="sm"
                     @click="$emit('edit-game', { member, selGame })"
                   >
-                    <q-tooltip>Edit Settings</q-tooltip>
-                  </q-btn>
-                  <q-btn
+                    <KennerTooltip>Edit Settings</KennerTooltip>
+                  </KennerButton>
+                  <KennerButton
                     flat
                     dense
                     round
@@ -152,9 +152,9 @@
                     size="sm"
                     @click="() => hasResult(selGame) ? $emit('edit-result', selGame.id) : $emit('post-result', selGame)"
                   >
-                    <q-tooltip>{{ hasResult(selGame) ? 'Edit Result' : 'Post Result' }}</q-tooltip>
-                  </q-btn>
-                  <q-btn
+                    <KennerTooltip>{{ hasResult(selGame) ? 'Edit Result' : 'Post Result' }}</KennerTooltip>
+                  </KennerButton>
+                  <KennerButton
                     flat
                     dense
                     round
@@ -163,8 +163,8 @@
                     size="sm"
                     @click="$emit('delete-game', { member, selGame })"
                   >
-                    <q-tooltip>Delete Game</q-tooltip>
-                  </q-btn>
+                    <KennerTooltip>Delete Game</KennerTooltip>
+                  </KennerButton>
                 </div>
               </div>
             </div>
@@ -235,6 +235,8 @@
 <script setup lang="ts">
 import GameSettingsDisplay from 'components/game/selectedGame/GameSettingsDisplay.vue';
 import MatchResult from 'components/league/MatchResult.vue';
+import KennerButton from 'components/base/KennerButton.vue';
+import KennerTooltip from 'components/base/KennerTooltip.vue';
 import type { TSeasonDto } from 'src/types';
 
 const props = defineProps<{

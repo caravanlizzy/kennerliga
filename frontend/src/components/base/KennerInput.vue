@@ -11,20 +11,17 @@
     square
     v-bind="$attrs"
   >
-    <template #prepend><slot name="prepend" /></template>
-    <template #append><slot name="append" /></template>
-    <template #before><slot name="before" /></template>
-    <template #after><slot name="after" /></template>
-    <template #hint><slot name="hint" /></template>
-    <template #counter><slot name="counter" /></template>
+    <template v-for="(_, slot) in $slots" #[slot]="scope">
+      <slot :name="slot" v-bind="scope || {}" />
+    </template>
   </q-input>
 </template>
 
 <script setup lang="ts">
 type Rule = () => string
 withDefaults(defineProps<{
-  rules?: Rule[],
-  label: string,
+  rules?: any[],
+  label?: string,
   dark?: boolean,
 }>(), { dark: false });
 

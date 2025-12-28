@@ -56,7 +56,7 @@
 
                 <div class="column q-gutter-sm">
                   <!-- Points (for points-based games) -->
-                  <q-input
+                  <KennerInput
                     v-if="resultConfig?.has_points"
                     v-model.number="getEntry(member.profile).points"
                     type="number"
@@ -76,7 +76,7 @@
                       Final Position
                     </div>
                       <div class="row q-gutter-xs justify-center">
-                        <q-btn
+                        <KennerButton
                           v-for="pos in members.length"
                           :key="pos"
                           size="sm"
@@ -90,7 +90,7 @@
                         />
                       </div>
                     <!-- Notes for position -->
-                    <q-input
+                    <KennerInput
                       v-model="getEntry(member.profile).notes"
                       label="Position Note"
                       placeholder="Explain position reason..."
@@ -136,7 +136,7 @@
                       Starting Position
                     </div>
                     <div class="row q-gutter-xs justify-center">
-                      <q-btn
+                      <KennerButton
                         v-for="pos in members.length"
                         :key="pos"
                         size="sm"
@@ -165,7 +165,7 @@
                   </div>
 
                   <!-- Starting Points -->
-                  <q-input
+                  <KennerInput
                     v-if="
                       resultConfig?.starting_points_system &&
                       resultConfig.starting_points_system === 'DYNAMIC'
@@ -189,7 +189,7 @@
                     v-if="tieBreakerRequired && needsTieBreaker(member.profile)"
                     class="q-mt-sm"
                   >
-                    <q-input
+                    <KennerInput
                       v-model.number="
                         getEntry(member.profile).tie_breaker_value
                       "
@@ -206,7 +206,7 @@
                       <template #prepend>
                         <q-icon name="balance" size="xs" color="orange-9" />
                       </template>
-                    </q-input>
+                    </KennerInput>
                   </div>
                 </div>
               </q-card-section>
@@ -215,7 +215,7 @@
         </div>
 
         <div class="row justify-end q-gutter-md q-mt-lg">
-          <q-btn
+          <KennerButton
             rounded
             unelevated
             color="grey-4"
@@ -224,7 +224,7 @@
             class="q-px-md"
             @click="initFormData"
           />
-          <q-btn
+          <KennerButton
             type="submit"
             :label="submitLabel"
             color="primary"
@@ -247,6 +247,8 @@ import { useQuasar } from 'quasar';
 import { storeToRefs } from 'pinia';
 import { useLeagueStore } from 'stores/leagueStore';
 import KennerSelect from 'components/base/KennerSelect.vue';
+import KennerInput from 'components/base/KennerInput.vue';
+import KennerButton from 'components/base/KennerButton.vue';
 import LoadingSpinner from 'components/base/LoadingSpinner.vue';
 import {
   TResultConfig,
@@ -254,7 +256,6 @@ import {
   TMatchResultPayload,
   TMatchResultSubmitPayload,
 } from 'src/types';
-import KennerButton from 'components/base/KennerButton.vue';
 
 type Faction = { id: number; name: string; level: number };
 

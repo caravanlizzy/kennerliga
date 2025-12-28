@@ -8,7 +8,7 @@
               <q-icon name="edit" size="md" color="primary" class="q-mr-sm" />
               <h1 class="text-h4 q-my-none text-weight-bold">Edit Game</h1>
             </div>
-            <q-btn flat round icon="close" @click="router.back()" />
+            <KennerButton flat round icon="close" @click="router.back()" />
           </div>
 
           <LoadingSpinner v-if="loading" />
@@ -81,7 +81,7 @@
                     <q-card-section class="bg-grey-1 row items-center justify-between q-py-sm">
                       <div class="row items-center q-gutter-x-sm">
                         <div class="text-subtitle1 text-weight-bold">#{{ optIdx + 1 }}</div>
-                        <q-input
+                        <KennerInput
                           dense
                           borderless
                           v-model="opt.name"
@@ -91,7 +91,7 @@
                         />
                       </div>
                       <div class="row items-center q-gutter-x-xs">
-                        <q-btn
+                        <KennerButton
                           flat
                           round
                           dense
@@ -100,7 +100,7 @@
                           :disable="optIdx === 0"
                           @click="moveOption(optIdx, 'up')"
                         />
-                        <q-btn
+                        <KennerButton
                           flat
                           round
                           dense
@@ -109,8 +109,7 @@
                           :disable="optIdx === gameOptions.length - 1"
                           @click="moveOption(optIdx, 'down')"
                         />
-                        <q-separator vertical class="q-mx-xs" />
-                        <q-btn flat round dense icon="delete" color="negative" @click="removeOption(opt.ref)" />
+                        <KennerButton flat round dense icon="delete" color="negative" @click="removeOption(opt.ref)" />
                       </div>
                     </q-card-section>
 
@@ -118,7 +117,7 @@
                       <div class="row items-center q-mb-md">
                         <q-toggle v-model="opt.has_choices" label="Has choices" color="primary" />
                         <q-icon name="help_outline" size="xs" color="grey-5" class="q-ml-xs">
-                          <q-tooltip>If enabled, players can choose from a list. If disabled, it's a simple toggle.</q-tooltip>
+                          <KennerTooltip>If enabled, players can choose from a list. If disabled, it's a simple toggle.</KennerTooltip>
                         </q-icon>
                       </div>
 
@@ -126,7 +125,7 @@
                       <div v-if="opt.has_choices" class="q-pl-md q-border-l">
                         <div class="row items-center justify-between q-mb-sm">
                           <div class="text-subtitle2 text-grey-7">Choices</div>
-                          <q-btn
+                          <KennerButton
                             flat
                             dense
                             size="sm"
@@ -143,7 +142,7 @@
                         <div v-for="(ch, chIdx) in opt.choices" :key="ch.ref" class="row items-center q-col-gutter-x-sm q-mb-xs">
                           <div class="col-auto">
                             <div class="column">
-                              <q-btn
+                              <KennerButton
                                 flat
                                 round
                                 dense
@@ -152,7 +151,7 @@
                                 :disable="chIdx === 0"
                                 @click="moveChoice(opt.ref, chIdx, 'up')"
                               />
-                              <q-btn
+                              <KennerButton
                                 flat
                                 round
                                 dense
@@ -164,10 +163,10 @@
                             </div>
                           </div>
                           <div class="col">
-                            <q-input dense filled square v-model="ch.name" placeholder="Choice name" />
+                            <KennerInput dense filled square v-model="ch.name" placeholder="Choice name" />
                           </div>
                           <div class="col-auto">
-                            <q-btn flat round dense icon="close" size="sm" color="negative" @click="removeChoice(opt.ref, ch.ref)" />
+                            <KennerButton flat round dense icon="close" size="sm" color="negative" @click="removeChoice(opt.ref, ch.ref)" />
                           </div>
                         </div>
                       </div>
@@ -178,7 +177,7 @@
                       <div>
                         <div class="row items-center justify-between q-mb-sm">
                           <div class="text-subtitle2 text-grey-7">Availability Rules</div>
-                          <q-btn
+                          <KennerButton
                             flat
                             dense
                             size="sm"
@@ -205,7 +204,7 @@
                             <div class="row items-center justify-between q-mb-sm">
                               <div class="text-overline text-grey-7">Group #{{ grpIndex + 1 }} (OR)</div>
                               <div class="row items-center q-gutter-x-sm">
-                                <q-btn
+                                <KennerButton
                                   flat
                                   dense
                                   size="sm"
@@ -214,7 +213,7 @@
                                   color="primary"
                                   @click="addCondition(opt.ref, grp.id)"
                                 />
-                                <q-btn
+                                <KennerButton
                                   flat
                                   round
                                   dense
@@ -299,7 +298,7 @@
                                   </div>
                                 </div>
                                 <div class="col-auto">
-                                  <q-btn
+                                  <KennerButton
                                     flat
                                     round
                                     dense
@@ -361,6 +360,7 @@ import { api } from 'boot/axios';
 import KennerInput from 'components/base/KennerInput.vue';
 import KennerSelect from 'components/base/KennerSelect.vue';
 import KennerButton from 'components/base/KennerButton.vue';
+import KennerTooltip from 'components/base/KennerTooltip.vue';
 import LoadingSpinner from 'components/base/LoadingSpinner.vue';
 import { useRoute, useRouter } from 'vue-router';
 import { TPlatform, TFullGameDto, TResultConfig } from 'src/types';

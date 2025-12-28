@@ -38,7 +38,7 @@
       </div>
     </div>
     <div class="col-auto">
-      <q-btn
+      <KennerButton
         flat
         icon="refresh"
         round
@@ -46,14 +46,16 @@
         size="md"
         @click="$emit('refresh')"
       >
-        <q-tooltip>Refresh</q-tooltip>
-      </q-btn>
+        <KennerTooltip>Refresh</KennerTooltip>
+      </KennerButton>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import type { TSeasonDto } from 'src/types';
+import KennerButton from 'src/components/base/KennerButton.vue';
+import KennerTooltip from 'src/components/base/KennerTooltip.vue';
 
 defineProps<{
   league: any;

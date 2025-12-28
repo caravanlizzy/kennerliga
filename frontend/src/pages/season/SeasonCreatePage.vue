@@ -9,7 +9,7 @@
     <div>Select which members to include from all Player Profiles</div>
     <div class="row q-col-gutter-sm items-end">
       <div class="col">
-        <q-select
+        <KennerSelect
           v-model="memberList"
           :options="profileOptions"
           option-label="label"
@@ -25,7 +25,7 @@
         />
       </div>
       <div class="col-auto">
-        <q-btn color="secondary" label="Reload Profiles" @click="loadMembers" />
+        <KennerButton color="secondary" label="Reload Profiles" @click="loadMembers" />
       </div>
     </div>
 
@@ -60,16 +60,16 @@
         </div>
 
         <div class="col-auto">
-          <q-btn flat color="negative" label="Remove" @click="removeLeague(idx)" />
+          <KennerButton flat color="negative" label="Remove" @click="removeLeague(idx)" />
         </div>
       </div>
     </div>
 
-    <q-btn flat color="dark" label="+ Add League" @click="addLeague" />
+    <KennerButton flat color="dark" label="+ Add League" @click="addLeague" />
 
     <div class="row q-col-gutter-sm q-mt-md">
       <div class="col-auto">
-        <q-btn
+        <KennerButton
           color="dark"
           label="Create Season & Leagues"
           :disable="!canSubmit"
@@ -77,7 +77,7 @@
         />
       </div>
       <div class="col-auto">
-        <q-btn flat label="Clear" @click="resetForm" />
+        <KennerButton flat label="Clear" @click="resetForm" />
       </div>
     </div>
   </div>
@@ -87,6 +87,8 @@
 import { computed, onMounted, ref } from 'vue';
 import { api } from 'boot/axios';
 import KennerInput from 'components/base/KennerInput.vue';
+import KennerButton from 'components/base/KennerButton.vue';
+import KennerSelect from 'components/base/KennerSelect.vue';
 import {
   createLeagueForSeason,
   createSeason,

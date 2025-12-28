@@ -9,6 +9,7 @@
     :icon="icon"
     size="md"
     :label="label"
+    v-bind="$attrs"
   >
     <slot></slot>
   </q-btn>
