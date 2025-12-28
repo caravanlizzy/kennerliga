@@ -31,6 +31,17 @@
               :bordered="false"
               class="q-mx-md q-mt-md"
             >
+              <template #header-extra>
+                <q-btn
+                  flat
+                  round
+                  dense
+                  icon="close"
+                  size="sm"
+                  class="q-ml-sm"
+                  @click="mobileContent = 'seasons'"
+                />
+              </template>
               <LiveActionFeed />
             </ContentSection>
           </ScrollContainer>
@@ -66,13 +77,36 @@
       <div v-else class="column col q-pa-md">
         <div class="row col">
           <div class="col-12 col-md" :class="{ 'q-pr-lg': isMdUp }">
+            <div v-if="!isLiveActionVisible" class="row justify-end q-mb-sm">
+              <q-btn
+                flat
+                dense
+                round
+                color="accent"
+                icon="bolt"
+                @click="isLiveActionVisible = true"
+              >
+                <q-tooltip>Show Live Action</q-tooltip>
+              </q-btn>
+            </div>
             <ContentSection
-              v-if="isAuthenticated"
+              v-if="isAuthenticated && isLiveActionVisible"
               title="Live Action"
               color="accent"
               :bordered="false"
               class="col-12 q-mb-md"
             >
+              <template #header-extra>
+                <q-btn
+                  flat
+                  round
+                  dense
+                  icon="close"
+                  size="sm"
+                  class="q-ml-sm"
+                  @click="isLiveActionVisible = false"
+                />
+              </template>
               <LiveActionFeed />
             </ContentSection>
             <ContentSection
@@ -137,7 +171,7 @@ import LeaderBoard from 'components/season/LeaderBoard.vue';
 import ContentSection from 'components/base/ContentSection.vue';
 import KennerSelect from 'components/base/KennerSelect.vue';
 import { useQuasar } from 'quasar';
-import { onMounted, ref } from 'vue';
+import { onMounted, ref, watch } from 'vue';
 import ScrollContainer from 'components/base/ScrollContainer.vue';
 import { useUserStore } from 'stores/userStore';
 import { fetchAvailableYears } from 'src/services/seasonService';
@@ -149,6 +183,12 @@ const $q = useQuasar();
 const isMdUp = $q.screen.gt.sm;
 
 const mobileContent = ref('seasons');
+const isLiveActionVisible = ref($q.localStorage.getItem('isLiveActionVisible') !== false);
+
+watch(isLiveActionVisible, (val) => {
+  $q.localStorage.set('isLiveActionVisible', val);
+});
+
 const selectedYear = ref(new Date().getFullYear());
 const availableYears = ref<number[]>([]);
 
