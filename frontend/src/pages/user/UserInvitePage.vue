@@ -2,7 +2,7 @@
   <div class="q-pa-md">
     <div class="row q-col-gutter-md">
       <div class="col-12 col-sm-6">
-        <q-input
+        <KennerInput
           v-model="note"
           label="Internal note (remember who you invited)"
           outlined
@@ -27,13 +27,13 @@
         />
       </div>
       <div class="col-12">
-        <kenner-button
+        <KennerButton
           color="positive"
           :loading="loading"
           @click="handleInvite"
         >
           Invite User
-        </kenner-button>
+        </KennerButton>
       </div>
     </div>
   </div>
@@ -46,6 +46,7 @@ import { useQuasar } from 'quasar';
 import KennerButton from 'components/base/KennerButton.vue';
 import { useRouter } from 'vue-router';
 import KennerSelect from 'components/base/KennerSelect.vue';
+import KennerInput from 'components/base/KennerInput.vue';
 
 interface PlayerProfile {
   id: number;

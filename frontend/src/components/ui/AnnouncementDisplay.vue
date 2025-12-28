@@ -1,118 +1,138 @@
 <template>
-  <div v-if="announcements.length" :class="isMobile ? 'q-mb-md' : 'q-mb-lg'">
-    <div v-for="a in announcements" :key="a.id" class="q-mb-md">
-      <!-- TAnnouncementDto Card -->
-      <q-card
-        flat
-        bordered
-        class="announcement-card overflow-hidden"
-        :class="[
-          cardThemes[a.type],
-          { 'no-border-radius': shouldRemoveBorders },
-        ]"
-      >
-        <q-card-section
-          class="q-py-md"
-          :class="isMobile ? 'column' : 'row items-center no-wrap'"
+  <div v-if="visibleAnnouncements.length" :class="isMobile ? 'q-mb-md' : 'q-mb-lg'">
+    <transition-group
+      appear
+      enter-active-class="animated fadeIn"
+      leave-active-class="animated fadeOut"
+    >
+      <div v-for="a in visibleAnnouncements" :key="a.id" class="q-mb-md">
+        <!-- TAnnouncementDto Card -->
+        <q-card
+          flat
+          bordered
+          class="announcement-card overflow-hidden"
+          :class="[
+            cardThemes[a.type],
+            { 'no-border-radius': shouldRemoveBorders },
+          ]"
         >
-          <!-- Content Header (Icon + Text) -->
-          <div class="row items-center no-wrap col">
-            <!-- Icon Circle -->
-            <div
-              v-if="announcementIcons[a.type]"
-              class="icon-wrapper flex flex-center q-mr-md"
-              :class="typeColors[a.type]"
-            >
-              <q-icon :name="announcementIcons[a.type]" size="20px" />
-            </div>
-
-            <!-- Content -->
-            <div class="col">
-              <div
-                class="text-subtitle2 text-weight-bold lh-tight"
-                :class="textColors[a.type]"
-              >
-                {{ a.title }}
-              </div>
-              <div v-if="a.content" class="text-caption text-grey-8 q-mt-xs">
-                {{ a.content }}
-              </div>
-            </div>
-          </div>
-
-          <!-- Actions -->
-          <div
-            v-if="a.type === 'REGISTER'"
-            class="row items-center q-gutter-sm"
-            :class="isMobile ? 'q-mt-md q-ml-none' : 'q-ml-sm'"
+          <q-card-section
+            class="q-py-md relative-position"
+            :class="isMobile ? 'column' : 'row items-center no-wrap'"
           >
-            <KennerButton
-              flat
-              dense
-              no-caps
-              color="primary"
-              class="text-caption rounded-borders q-px-md"
-              @click="toggleParticipants"
-            >
-              <q-icon :name="showParticipants ? 'expand_less' : 'people'" size="16px" class="q-mr-xs" />
-              {{ showParticipants ? 'Hide' : 'View' }} participants
-            </KennerButton>
-
-            <KennerButton
-              v-if="!isRegisteredForOpenSeason"
-              unelevated
-              dense
-              color="primary"
-              :disable="!isAuthenticated"
-              class="q-px-md"
-              @click="register"
-            >
-              Register
-              <KennerTooltip v-if="!isAuthenticated" class="bg-grey-9">
-                Login to register for upcoming season
-              </KennerTooltip>
-            </KennerButton>
-
-            <div v-else class="row items-center q-gutter-x-xs text-positive text-weight-bold text-caption q-px-sm">
-              <q-icon name="check_circle" size="16px" />
-              <span>Registered</span>
-            </div>
-          </div>
-        </q-card-section>
-
-        <!-- Expanded Participants Panel -->
-        <q-slide-transition>
-          <div v-if="a.type === 'REGISTER' && showParticipants">
-            <q-separator />
-            <div class="bg-grey-1 q-pa-md">
-              <div v-if="participantsLoading" class="flex flex-center q-py-sm">
-                <q-spinner-grid size="20px" color="primary" />
+            <!-- Content Header (Icon + Text) -->
+            <div class="row items-center no-wrap col">
+              <!-- Icon Circle -->
+              <div
+                v-if="announcementIcons[a.type]"
+                class="icon-wrapper flex flex-center q-mr-md"
+                :class="typeColors[a.type]"
+              >
+                <q-icon :name="announcementIcons[a.type]" size="20px" />
               </div>
 
-              <template v-else-if="participantsLoaded">
-                <div v-if="participants.length" class="row q-gutter-xs">
-                  <div
-                    v-for="p in participants"
-                    :key="p.id"
-                    class="col-auto"
-                  >
-                    <div class="text-caption bg-white q-px-sm q-py-xs rounded-borders border-all">
-                      {{ p.profile_name || 'Anonymous' }}
-                    </div>
-                  </div>
-                </div>
+              <!-- Content -->
+              <div class="col">
                 <div
-                  v-else
-                  class="text-caption text-grey-6 text-center q-py-sm italic"
+                  class="text-subtitle2 text-weight-bold lh-tight"
+                  :class="textColors[a.type]"
                 >
-                  No participants registered yet. Be the first!
+                  {{ a.title }}
+                </div>
+                <div v-if="a.content" class="text-caption text-grey-8 q-mt-xs">
+                  {{ a.content }}
+                </div>
+              </div>
+            </div>
+
+            <!-- Actions -->
+            <div
+              class="row items-center q-gutter-sm"
+              :class="isMobile ? 'q-mt-md q-ml-none' : 'q-ml-sm'"
+            >
+              <template v-if="a.type === 'REGISTER'">
+                <KennerButton
+                  flat
+                  dense
+                  no-caps
+                  color="primary"
+                  class="text-caption rounded-borders q-px-md"
+                  @click="toggleParticipants"
+                >
+                  <q-icon :name="showParticipants ? 'expand_less' : 'people'" size="16px" class="q-mr-xs" />
+                  {{ showParticipants ? 'Hide' : 'View' }} participants
+                </KennerButton>
+
+                <KennerButton
+                  v-if="!isRegisteredForOpenSeason"
+                  unelevated
+                  dense
+                  color="primary"
+                  :disable="!isAuthenticated"
+                  class="q-px-md"
+                  @click="register"
+                >
+                  Register
+                  <KennerTooltip v-if="!isAuthenticated" class="bg-grey-9">
+                    Login to register for upcoming season
+                  </KennerTooltip>
+                </KennerButton>
+
+                <div v-else class="row items-center q-gutter-x-xs text-positive text-weight-bold text-caption q-px-sm">
+                  <q-icon name="check_circle" size="16px" />
+                  <span>Registered</span>
                 </div>
               </template>
+
+              <!-- Hide/Dismiss Button -->
+              <KennerButton
+                flat
+                round
+                dense
+                icon="close"
+                size="sm"
+                color="grey-6"
+                @click="dismissAnnouncement(a.id)"
+              >
+                <KennerTooltip>Hide announcement</KennerTooltip>
+              </KennerButton>
             </div>
-          </div>
-        </q-slide-transition>
-      </q-card>
-    </div>
+          </q-card-section>
+
+          <!-- Expanded Participants Panel -->
+          <q-slide-transition>
+            <div v-if="a.type === 'REGISTER' && showParticipants">
+              <q-separator />
+              <div class="bg-grey-1 q-pa-md">
+                <div v-if="participantsLoading" class="flex flex-center q-py-sm">
+                  <q-spinner-grid size="20px" color="primary" />
+                </div>
+
+                <template v-else-if="participantsLoaded">
+                  <div v-if="participants.length" class="row q-gutter-xs">
+                    <div
+                      v-for="p in participants"
+                      :key="p.id"
+                      class="col-auto"
+                    >
+                      <div class="text-caption bg-white q-px-sm q-py-xs rounded-borders border-all">
+                        {{ p.profile_name || 'Anonymous' }}
+                      </div>
+                    </div>
+                  </div>
+                  <div
+                    v-else
+                    class="text-caption text-grey-6 text-center q-py-sm italic"
+                  >
+                    No participants registered yet. Be the first!
+                  </div>
+                </template>
+              </div>
+            </div>
+          </q-slide-transition>
+        </q-card>
+      </div>
+    </transition-group>
   </div>
 </template>
 
@@ -151,6 +171,15 @@ const participants = ref<any[] | null>(null);
 const participantsLoading = ref(false);
 const participantsLoaded = ref(false);
 const showParticipants = ref(false);
+const hiddenAnnouncements = ref<Record<number, boolean>>({});
+
+const visibleAnnouncements = computed(() => {
+  return announcements.value.filter(a => !hiddenAnnouncements.value[a.id]);
+});
+
+function dismissAnnouncement(id: number) {
+  hiddenAnnouncements.value[id] = true;
+}
 
 async function loadParticipants() {
   if (participantsLoaded.value || participantsLoading.value) return;
