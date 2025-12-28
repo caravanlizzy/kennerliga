@@ -6,48 +6,58 @@
   <!-- Content -->
   <div
     v-else-if="standings"
-    class="leaderboard-container bg-white rounded-borders shadow-1"
+    class="leaderboard-container bg-white rounded-borders shadow-2"
   >
     <!-- Header -->
-    <div class="row items-center justify-between q-pa-md border-bottom">
+    <div class="row items-center justify-between q-pa-md bg-grey-1">
       <div class="column">
-        <div class="text-h6 text-weight-bold">Leaderboard</div>
-        <div class="text-caption text-grey-7">Year Performance Summary</div>
+        <div class="text-h6 text-weight-bold text-grey-9">Leaderboard</div>
+        <div class="text-caption text-grey-7">Season Performance Summary</div>
       </div>
-      <q-chip outline color="primary" icon="event" :label="'Year ' + standings.year" />
+      <q-chip
+        outline
+        square
+        color="primary"
+        text-color="primary"
+        icon="event"
+        :label="'Year ' + standings.year"
+        class="text-weight-bold"
+      />
     </div>
+
+    <q-separator />
 
     <!-- Table -->
     <q-markup-table flat dense separator="none" class="leaderboard-table">
       <thead>
-      <tr class="text-uppercase text-grey-7 text-caption">
-        <th class="text-left q-pl-lg">Player</th>
+      <tr class="text-uppercase text-grey-6 text-caption text-weight-bold">
+        <th class="text-left q-pl-lg" style="width: 40%">Player</th>
 
         <th class="text-center">
             <div class="column items-center">
-              <q-icon name="emoji_events" class="text-amber-8" size="20px" />
-              <span class="text-weight-bold">1st</span>
+              <q-icon name="emoji_events" class="text-amber-8" size="22px" />
+              <span class="q-mt-xs">1st</span>
             </div>
         </th>
 
         <th class="text-center">
             <div class="column items-center">
-              <q-icon name="military_tech" class="text-blue-grey-4" size="20px" />
-              <span class="text-weight-bold">2nd</span>
+              <q-icon name="military_tech" class="text-blue-grey-4" size="22px" />
+              <span class="q-mt-xs">2nd</span>
             </div>
         </th>
 
         <th class="text-center">
             <div class="column items-center">
-              <q-icon name="military_tech" class="text-brown-5" size="20px" />
-              <span class="text-weight-bold">3rd</span>
+              <q-icon name="military_tech" class="text-brown-5" size="22px" />
+              <span class="q-mt-xs">3rd</span>
             </div>
         </th>
 
         <th class="text-center">
             <div class="column items-center">
-              <q-icon name="flag" class="text-red-5" size="20px" />
-              <span class="text-weight-bold">4th</span>
+              <q-icon name="flag" class="text-red-5" size="22px" />
+              <span class="q-mt-xs">4th</span>
             </div>
         </th>
       </tr>
@@ -65,30 +75,41 @@
           }"
         >
           <!-- Player -->
-          <td class="text-left relative-position q-py-sm">
+          <td class="text-left relative-position q-py-md">
             <div
               v-if="bestLeague(row) !== null"
-              class="row-group-line"
+              class="row-group-line shadow-1"
               :class="'bg-' + leagueBadgeColor(bestLeague(row)!)"
             ></div>
             <div
               v-if="shouldShowGroupHeader(index) && bestLeague(row) !== null"
-              class="group-label-container"
+              class="group-label-container shadow-1"
             >
                <span class="group-label-text" :class="'text-' + leagueBadgeColor(bestLeague(row)!)">
                  League {{ bestLeague(row) }}
                </span>
             </div>
 
-            <div class="row items-center q-gutter-x-md q-pl-md">
+            <div class="row items-center q-gutter-x-md q-pl-lg">
               <UserAvatar
                 :display-username="row.profile_name"
-                size="36px"
-                shape="squircle"
+                size="40px"
               />
               <div class="column">
-                <span class="text-subtitle2 text-weight-bold">{{ row.profile_name }}</span>
-                <span v-if="index === 0" class="text-caption text-amber-9 text-weight-medium">Leader</span>
+                <div class="row items-center q-gutter-x-xs">
+                  <span class="text-subtitle1 text-weight-bold text-grey-9">{{ row.profile_name }}</span>
+                  <q-icon
+                    v-if="index === 0"
+                    name="stars"
+                    color="amber-9"
+                    size="18px"
+                  >
+                    <q-tooltip>Season Leader</q-tooltip>
+                  </q-icon>
+                </div>
+                <span class="text-caption text-grey-6">
+                  {{ totalPoints(row) }} Points
+                </span>
               </div>
             </div>
           </td>
@@ -212,6 +233,10 @@ function bestLeague(row: PlayerYearStanding): number | null {
   return Math.min(...levels);
 }
 
+function totalPoints(row: PlayerYearStanding): number {
+  return (row.totals.first * 4) + (row.totals.second * 3) + (row.totals.third * 2) + (row.totals.fourth * 1);
+}
+
 function shouldShowGroupHeader(index: number): boolean {
   if (!standings.value || !standings.value.standings[index]) return false;
   if (index === 0) return true;
@@ -260,11 +285,11 @@ watch(
 }
 
 .top-rank-bg {
-  background-color: #fffbeb; /* amber-50 */
+  background-color: #fff9e6; /* subtle amber tint */
 }
 
 .top-rank-bg:hover {
-  background-color: #fef3c7; /* amber-100 */
+  background-color: #fff3cd;
 }
 
 .row-group-line {
@@ -272,26 +297,27 @@ watch(
   left: 0;
   top: 0;
   bottom: 0;
-  width: 4px;
-  opacity: 0.8;
+  width: 6px;
+  opacity: 0.9;
+  border-radius: 0 4px 4px 0;
 }
 
 .group-label-container {
   position: absolute;
   left: 12px;
-  top: -10px;
+  top: -8px;
   z-index: 10;
   background: white;
-  padding: 0 4px;
-  border-radius: 4px;
-  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+  padding: 2px 8px;
+  border-radius: 12px;
+  border: 1px solid rgba(0,0,0,0.05);
 }
 
 .group-label-text {
-  font-size: 9px;
+  font-size: 10px;
   font-weight: 800;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.8px;
 }
 
 .border-bottom {
