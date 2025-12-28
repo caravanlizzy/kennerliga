@@ -1,11 +1,11 @@
 <template>
-  <div v-if="visibleAnnouncements.length" :class="isMobile ? 'q-mb-md' : 'q-mb-lg'">
+  <div v-if="visibleAnnouncements.length" :class="isMobile ? 'q-mb-sm' : 'q-mb-lg'">
     <transition-group
       appear
       enter-active-class="animated fadeIn"
       leave-active-class="animated fadeOut"
     >
-      <div v-for="a in visibleAnnouncements" :key="a.id" class="q-mb-md">
+      <div v-for="a in visibleAnnouncements" :key="a.id" :class="isMobile ? 'q-mb-sm' : 'q-mb-md'">
         <!-- TAnnouncementDto Card -->
         <q-card
           flat
@@ -17,18 +17,20 @@
           ]"
         >
           <q-card-section
-            class="q-py-md relative-position"
-            :class="isMobile ? 'column' : 'row items-center no-wrap'"
+            :class="[
+              isMobile ? 'q-py-sm' : 'q-py-md',
+              'relative-position row items-start no-wrap'
+            ]"
           >
             <!-- Content Header (Icon + Text) -->
-            <div class="row items-center no-wrap col">
+            <div class="row items-start no-wrap col">
               <!-- Icon Circle -->
               <div
                 v-if="announcementIcons[a.type]"
                 class="icon-wrapper flex flex-center q-mr-md"
-                :class="typeColors[a.type]"
+                :class="[typeColors[a.type], isMobile ? 'icon-wrapper--mobile q-mt-xs' : '']"
               >
-                <q-icon :name="announcementIcons[a.type]" size="20px" />
+                <q-icon :name="announcementIcons[a.type]" :size="isMobile ? '16px' : '20px'" />
               </div>
 
               <!-- Content -->
@@ -42,15 +44,53 @@
                 <div v-if="a.content" class="text-caption text-grey-8 q-mt-xs">
                   {{ a.content }}
                 </div>
+
+                <!-- Action Buttons (Mobile: below content, Desktop: right side) -->
+                <div
+                  v-if="isMobile && a.type === 'REGISTER'"
+                  class="row items-center q-gutter-sm q-mt-sm"
+                >
+                  <KennerButton
+                    flat
+                    dense
+                    no-caps
+                    color="primary"
+                    class="text-caption rounded-borders q-px-md"
+                    @click="toggleParticipants"
+                  >
+                    <q-icon :name="showParticipants ? 'expand_less' : 'people'" size="16px" class="q-mr-xs" />
+                    {{ showParticipants ? 'Hide' : 'View' }} participants
+                  </KennerButton>
+
+                  <KennerButton
+                    v-if="!isRegisteredForOpenSeason"
+                    unelevated
+                    dense
+                    color="primary"
+                    :disable="!isAuthenticated"
+                    class="q-px-md"
+                    @click="register"
+                  >
+                    Register
+                    <KennerTooltip v-if="!isAuthenticated" class="bg-grey-9">
+                      Login to register for upcoming season
+                    </KennerTooltip>
+                  </KennerButton>
+
+                  <div v-else class="row items-center q-gutter-x-xs text-positive text-weight-bold text-caption q-px-sm">
+                    <q-icon name="check_circle" size="16px" />
+                    <span>Registered</span>
+                  </div>
+                </div>
               </div>
             </div>
 
-            <!-- Actions -->
+            <!-- Actions (Desktop all, Mobile only Close) -->
             <div
               class="row items-center q-gutter-sm"
-              :class="isMobile ? 'q-mt-md q-ml-none' : 'q-ml-sm'"
+              :class="isMobile ? 'q-ml-xs' : 'q-ml-sm'"
             >
-              <template v-if="a.type === 'REGISTER'">
+              <template v-if="!isMobile && a.type === 'REGISTER'">
                 <KennerButton
                   flat
                   dense
@@ -283,6 +323,13 @@ const typeColors = {
   height: 38px;
   border-radius: 10px;
   flex-shrink: 0;
+}
+
+.icon-wrapper--mobile {
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  margin-right: 8px !important;
 }
 
 .lh-tight {
