@@ -63,7 +63,7 @@
                     @click="toggleParticipants"
                   >
                     <q-icon :name="showParticipants ? 'expand_less' : 'people'" size="16px" class="q-mr-xs" />
-                    {{ showParticipants ? 'Hide' : 'View' }} participants
+                    {{ showParticipants ? 'Hide' : 'View' }} participants {{ participants.length}}
                   </KennerButton>
 
                   <KennerButton
@@ -233,10 +233,6 @@ function minimizeAnnouncement(a: any) {
     color: 'primary',
     type: 'announcement'
   });
-}
-
-function dismissAnnouncement(id: number) {
-  hiddenAnnouncements.value[id] = true;
 }
 
 async function loadParticipants() {

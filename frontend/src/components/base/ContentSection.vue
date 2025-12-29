@@ -3,7 +3,7 @@
     v-if="!isMinimized"
     :class="[
       bordered ? `border-2 rounded-borders border-${color}` : '',
-      { 'bg-grey-1': !bordered, 'bg-white': bordered }
+      { 'bg-grey-2': !bordered, 'bg-white': bordered }
     ]"
     class="q-mt-md content-section-container"
   >
