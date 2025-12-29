@@ -110,7 +110,7 @@ class LeaderboardViewSet(APIView):
             .order_by(
                 "league__level",  # level first (1 = best)
                 "league_id",  # then league within that level
-                "-league_points", "-wins", "-points"  # then positions within the league
+                "-league_points", "-wins" # then positions within the league
             )
         )
 
