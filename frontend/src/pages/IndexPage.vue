@@ -42,10 +42,10 @@
             backdrop-filter: blur(4px);
           "
         >
-          <q-tab icon="sensors" name="live" label="Live" />
-          <q-tab icon="history" name="seasons" label="Seasons" />
-          <q-tab icon="chat" name="chat" label="Chat" />
-          <q-tab icon="leaderboard" name="leaderboard" label="Rank" />
+          <q-tab icon="sensors" name="live" />
+          <q-tab icon="history" name="seasons" />
+          <q-tab icon="chat" name="chat" />
+          <q-tab icon="leaderboard" name="leaderboard"/>
         </q-tabs>
         <div class="col column">
           <KennerChat v-if="mobileContent === 'chat'" class="column" />
