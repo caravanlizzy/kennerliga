@@ -483,40 +483,51 @@ onMounted(async () => {
     const optionMap = new Map<number, string>();
     const choiceMap = new Map<number, string>();
 
+    // Pass 1: Build maps
+    gameData.options.forEach(opt => {
+      const oId = Number(opt.id);
+      optionMap.set(oId, newRef());
+      (opt.choices || []).forEach(ch => {
+        const cId = Number(ch.id);
+        choiceMap.set(cId, newRef());
+      });
+    });
+
+    // Pass 2: Build UI structure
     gameOptions.value = gameData.options.map(opt => {
-      const optRef = newRef();
-      optionMap.set(opt.id, optRef);
+      const oId = Number(opt.id);
+      const optRef = optionMap.get(oId)!;
 
       return {
-        id: opt.id,
+        id: oId,
         ref: optRef,
         name: opt.name,
         order: (opt as any).order || 0,
         has_choices: opt.has_choices,
         choices: (opt.choices || []).map(ch => {
-          const chRef = newRef();
-          choiceMap.set(ch.id, chRef);
+          const cId = Number(ch.id);
           return {
-            id: ch.id,
-            ref: chRef,
+            id: cId,
+            ref: choiceMap.get(cId)!,
             name: ch.name,
             order: (ch as any).order || 0
           };
         }),
-        // Availability groups are replaced on update in the serializer,
-        // but we should still load them for editing.
         availability_groups: (opt.availability_groups || []).map(grp => ({
           id: newRef(),
           conditions: (grp.conditions || []).map(cond => {
-            const dependsOnId = typeof cond.depends_on_option === 'object' ? cond.depends_on_option.id : cond.depends_on_option;
-            const expectedChoiceId = typeof cond.expected_choice === 'object' ? cond.expected_choice?.id : cond.expected_choice;
+            const dependsOnId = cond.depends_on_option_id || (typeof cond.depends_on_option === 'object' ? cond.depends_on_option?.id : cond.depends_on_option);
+            const expectedChoiceId = cond.expected_choice_id || (typeof cond.expected_choice === 'object' ? cond.expected_choice?.id : cond.expected_choice);
+
+            const dependsOnRef = dependsOnId ? optionMap.get(Number(dependsOnId)) : null;
+            const expectedChoiceRef = expectedChoiceId ? choiceMap.get(Number(expectedChoiceId)) : null;
 
             return {
               id: newRef(),
-              depends_on_option_ref: dependsOnId ? (optionMap.get(dependsOnId) || null) : null,
+              depends_on_option_ref: dependsOnRef || null,
               kind: expectedChoiceId ? 'choice' : 'value' as ConditionKind,
               expected_value: cond.expected_value as boolean | null,
-              expected_choice_ref: expectedChoiceId ? (choiceMap.get(expectedChoiceId) || null) : null,
+              expected_choice_ref: expectedChoiceRef || null,
               negate: !!cond.negate
             };
           })
