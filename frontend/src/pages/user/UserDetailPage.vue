@@ -23,46 +23,95 @@
     <!-- Stats Overview -->
     <div v-if="!loading && user" class="q-mb-lg">
       <div class="row q-col-gutter-sm">
-        <div class="col-6 col-sm-3">
+        <div class="col-12 col-sm-4">
           <q-card flat bordered class="text-center q-pa-sm bg-blue-1 text-blue-9">
             <div class="text-caption text-weight-medium">Seasons</div>
             <div class="text-h6 text-weight-bold">{{ stats.totalSeasons }}</div>
           </q-card>
         </div>
-        <div class="col-6 col-sm-3">
+        <div class="col-12 col-sm-4">
           <q-card flat bordered class="text-center q-pa-sm bg-green-1 text-green-9">
             <div class="text-caption text-weight-medium">Avg Rank</div>
-            <div class="text-h6 text-weight-bold">{{ stats.avgSeasonRank.toFixed(1) }}</div>
+            <div class="text-h6 text-weight-bold">
+              {{ stats.avgSeasonRank ? stats.avgSeasonRank.toFixed(1) : '-' }}
+            </div>
           </q-card>
         </div>
-        <div class="col-6 col-sm-3">
+        <div class="col-12 col-sm-4">
           <q-card flat bordered class="text-center q-pa-sm bg-orange-1 text-orange-9">
-            <div class="text-caption text-weight-medium">Avg Pos</div>
-            <div class="text-h6 text-weight-bold">{{ stats.avgGamePosition.toFixed(1) }}</div>
-          </q-card>
-        </div>
-        <div class="col-6 col-sm-3">
-          <q-card flat bordered class="text-center q-pa-sm bg-purple-1 text-purple-9">
-            <div class="text-caption text-weight-medium">Avg League</div>
-            <div class="text-h6 text-weight-bold">{{ stats.avgLeagueLevel.toFixed(1) }}</div>
+            <div class="text-caption text-weight-medium">Win Rate</div>
+            <div class="text-h6 text-weight-bold">{{ stats.winRate.toFixed(0) }}%</div>
           </q-card>
         </div>
       </div>
 
       <div class="row q-col-gutter-sm q-mt-sm">
-        <div class="col-12 col-md-6">
+        <!-- Position Distribution -->
+        <div class="col-12">
           <q-card flat bordered>
+            <q-card-section class="q-py-xs bg-grey-1">
+              <div class="text-subtitle2">Game Positions</div>
+            </q-card-section>
+            <q-separator />
+            <q-card-section class="q-py-md">
+              <div class="row q-col-gutter-md items-center">
+                <div class="col-12 col-sm-4 text-center">
+                  <div class="text-h3 text-weight-bolder text-primary">
+                    {{ stats.avgGamePosition ? stats.avgGamePosition.toFixed(1) : '-' }}
+                  </div>
+                  <div class="text-caption text-grey-7">Average Position</div>
+                </div>
+                <div class="col-12 col-sm-8">
+                  <div class="row items-center q-gutter-x-sm no-wrap q-mb-xs">
+                    <div style="width: 30px" class="text-weight-bold text-caption">1st</div>
+                    <div class="col">
+                      <q-linear-progress :value="stats.positionDistribution[1] / (stats.totalGames || 1)" color="positive" size="12px" rounded />
+                    </div>
+                    <div style="width: 25px" class="text-right text-caption">{{ stats.positionDistribution[1] }}</div>
+                  </div>
+                  <div class="row items-center q-gutter-x-sm no-wrap q-mb-xs">
+                    <div style="width: 30px" class="text-weight-bold text-caption">2nd</div>
+                    <div class="col">
+                      <q-linear-progress :value="stats.positionDistribution[2] / (stats.totalGames || 1)" color="green-4" size="12px" rounded />
+                    </div>
+                    <div style="width: 25px" class="text-right text-caption">{{ stats.positionDistribution[2] }}</div>
+                  </div>
+                  <div class="row items-center q-gutter-x-sm no-wrap q-mb-xs">
+                    <div style="width: 30px" class="text-weight-bold text-caption">3rd</div>
+                    <div class="col">
+                      <q-linear-progress :value="stats.positionDistribution[3] / (stats.totalGames || 1)" color="orange-4" size="12px" rounded />
+                    </div>
+                    <div style="width: 25px" class="text-right text-caption">{{ stats.positionDistribution[3] }}</div>
+                  </div>
+                  <div class="row items-center q-gutter-x-sm no-wrap q-mb-xs">
+                    <div style="width: 30px" class="text-weight-bold text-caption">4th</div>
+                    <div class="col">
+                      <q-linear-progress :value="stats.positionDistribution[4] / (stats.totalGames || 1)" color="deep-orange-4" size="12px" rounded />
+                    </div>
+                    <div style="width: 25px" class="text-right text-caption">{{ stats.positionDistribution[4] }}</div>
+                  </div>
+                </div>
+              </div>
+            </q-card-section>
+          </q-card>
+        </div>
+
+        <div class="col-12 col-md-6">
+          <q-card flat bordered class="full-height">
             <q-card-section class="q-py-xs bg-grey-1">
               <div class="text-subtitle2">Most Played Games</div>
             </q-card-section>
             <q-separator />
             <q-list dense>
               <q-item v-for="game in stats.mostPlayedGames" :key="game.name">
+                <q-item-section avatar>
+                  <q-icon name="videogame_asset" color="grey-6" size="xs" />
+                </q-item-section>
                 <q-item-section>
                   <q-item-label>{{ game.name }}</q-item-label>
                 </q-item-section>
                 <q-item-section side>
-                  <q-badge color="primary">{{ game.count }}</q-badge>
+                  <q-badge color="primary" rounded>{{ game.count }}</q-badge>
                 </q-item-section>
               </q-item>
               <q-item v-if="!stats.mostPlayedGames.length">
@@ -71,20 +120,60 @@
             </q-list>
           </q-card>
         </div>
+
         <div class="col-12 col-md-6">
-           <q-card flat bordered class="full-height">
+          <q-card flat bordered class="full-height">
             <q-card-section class="q-py-xs bg-grey-1">
-              <div class="text-subtitle2">Lifetime Stats</div>
+              <div class="text-subtitle2">Best Games (Avg. Pos)</div>
             </q-card-section>
             <q-separator />
-            <q-card-section>
-              <div class="row justify-between q-mb-xs">
-                <span>Total Games Played:</span>
-                <span class="text-weight-bold">{{ stats.totalGames }}</span>
-              </div>
-               <div class="row justify-between">
-                <span>League Participations:</span>
-                <span class="text-weight-bold">{{ leagueMemberships.length }}</span>
+            <q-list dense>
+              <q-item v-for="game in stats.bestGames" :key="game.name">
+                <q-item-section avatar>
+                  <q-icon name="star" color="orange" size="xs" />
+                </q-item-section>
+                <q-item-section>
+                  <q-item-label>{{ game.name }}</q-item-label>
+                </q-item-section>
+                <q-item-section side>
+                  <q-badge color="secondary" rounded>#{{ game.avgPos.toFixed(1) }}</q-badge>
+                </q-item-section>
+              </q-item>
+              <q-item v-if="!stats.bestGames.length">
+                <q-item-section class="text-grey-6 italic">Play more games to see your best!</q-item-section>
+              </q-item>
+            </q-list>
+          </q-card>
+        </div>
+
+        <div class="col-12">
+           <q-card flat bordered>
+            <q-card-section class="q-py-xs bg-grey-1">
+              <div class="text-subtitle2">Lifetime Achievements</div>
+            </q-card-section>
+            <q-separator />
+            <q-card-section class="q-py-sm">
+              <div class="row q-col-gutter-md">
+                <div class="col-6 col-sm-3 text-center">
+                  <div class="text-h6 text-weight-bold">{{ stats.totalGames }}</div>
+                  <div class="text-caption text-grey-7">Total Games</div>
+                </div>
+                <div class="col-6 col-sm-3 text-center">
+                  <div class="text-h6 text-weight-bold">{{ leagueMemberships.length }}</div>
+                  <div class="text-caption text-grey-7">Leagues Joined</div>
+                </div>
+                <div class="col-6 col-sm-3 text-center">
+                  <div class="text-h6 text-weight-bold text-secondary">
+                    {{ stats.highestRank ? `#${stats.highestRank}` : '-' }}
+                  </div>
+                  <div class="text-caption text-grey-7">Highest Season Rank</div>
+                </div>
+                <div class="col-6 col-sm-3 text-center">
+                   <div class="text-h6 text-weight-bold text-accent">
+                    {{ stats.avgLeagueLevel ? stats.avgLeagueLevel.toFixed(1) : '-' }}
+                  </div>
+                  <div class="text-caption text-grey-7">Avg League Level</div>
+                </div>
               </div>
             </q-card-section>
           </q-card>
@@ -268,21 +357,47 @@ const stats = computed(() => {
     : 0;
 
   // Most played games
-  const gameCounts: Record<string, { count: number; name: string }> = {};
+  const gameCounts: Record<string, { count: number; name: string; positions: number[] }> = {};
   matchResults.value.forEach((r) => {
     const gameName = r.game_name || `Game ${r.selected_game}`;
     if (!gameCounts[gameName]) {
       gameCounts[gameName] = {
         count: 0,
         name: gameName,
+        positions: [],
       };
     }
     gameCounts[gameName].count++;
+    if (r.position !== null) {
+      gameCounts[gameName].positions.push(r.position);
+    }
   });
 
   const mostPlayedGames = Object.values(gameCounts)
     .sort((a, b) => b.count - a.count)
     .slice(0, 5);
+
+  const bestGames = Object.values(gameCounts)
+    .filter((g) => g.positions.length >= 2) // Need at least 2 games to be "best" consistently
+    .map((g) => ({
+      ...g,
+      avgPos: g.positions.reduce((a, b) => a + b, 0) / g.positions.length,
+    }))
+    .sort((a, b) => a.avgPos - b.avgPos || b.count - a.count)
+    .slice(0, 5);
+
+  const positionDistribution = {
+    1: gamePositions.filter((p) => p === 1).length,
+    2: gamePositions.filter((p) => p === 2).length,
+    3: gamePositions.filter((p) => p === 3).length,
+    4: gamePositions.filter((p) => p === 4).length,
+  };
+
+  const winRate = gamePositions.length
+    ? (positionDistribution[1] / gamePositions.length) * 100
+    : 0;
+
+  const highestRank = ranks.length ? Math.min(...ranks) : null;
 
   return {
     totalSeasons,
@@ -290,6 +405,10 @@ const stats = computed(() => {
     avgGamePosition,
     avgLeagueLevel,
     mostPlayedGames,
+    bestGames,
+    positionDistribution,
+    winRate,
+    highestRank,
     totalGames: matchResults.value.length,
   };
 });
