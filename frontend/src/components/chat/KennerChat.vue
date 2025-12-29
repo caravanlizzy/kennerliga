@@ -210,13 +210,23 @@ async function send() {
 
   sending.value = true;
   try {
-    await postMessage(text);
-    await loadMessages();
-    // Filter out the optimistic message after successful send and load
-    messages.value = messages.value.filter(m => m.id !== tempId);
+    const { data: sentMsg } = await postMessage(text);
+    // Replace the optimistic message with the real one from the server
+    const index = messages.value.findIndex(m => m.id === tempId);
+    if (index !== -1) {
+      messages.value[index] = sentMsg;
+    } else {
+      messages.value.push(sentMsg);
+    }
+
+    // Update lastDateTime so the next poll doesn't fetch this message again
+    if (!lastDateTime || sentMsg.datetime > lastDateTime) {
+      lastDateTime = sentMsg.datetime;
+    }
+
     scrollToBottom();
   } catch (e) {
-    // If it fails, we might want to remove the optimistic message or show error
+    // If it fails, remove the optimistic message
     messages.value = messages.value.filter(m => m.id !== tempId);
     console.error('Failed to send message', e);
   } finally {

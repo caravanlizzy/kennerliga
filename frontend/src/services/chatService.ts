@@ -12,9 +12,6 @@ export async function fetchMessages(
   return await api.get<TMessageDto[]>('chat/messages/', { params });
 }
 
-export async function postMessage(messageText: string): Promise<void> {
-  await api('chat/messages/', {
-    method: 'POST',
-    data: { text: messageText }
-  });
+export async function postMessage(messageText: string): Promise<AxiosResponse<TMessageDto>> {
+  return await api.post<TMessageDto>('chat/messages/', { text: messageText });
 }
