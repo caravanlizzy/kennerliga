@@ -44,6 +44,7 @@ def rebuild_game_snapshot(selected_game, win_mode: str = "count_top_block") -> N
             {
                 "profile": r.player_profile,
                 "position": int(pos),
+                "points": Decimal(str(r.points)) if r.points is not None else Decimal("0"),
             }
         )
 
@@ -133,6 +134,7 @@ def rebuild_game_snapshot(selected_game, win_mode: str = "count_top_block") -> N
                     league=league,
                     selected_game=selected_game,
                     player_profile=row["profile"],
+                    points=row["points"],
                     rank=row["rank"],
                     league_points=row["league_points"],
                     win_share=row["win_share"],
