@@ -14,7 +14,6 @@ class Row:
     selected_game_id: int
     player_id: int
     player_name: str
-    points: Decimal | int | float  # raw match points
     position: int | None = None    # rank/position from the game
 
 
@@ -38,8 +37,8 @@ def compute_league_table(
           - "fractional": top block shares 1.0 wins evenly.
           - "single": exactly one win (first within the top block in sorted order).
 
-    Returns a list of dicts sorted by (-league_points, -wins, -points, player).
-      Dict keys: player, player_id, points, wins, league_points
+    Returns a list of dicts sorted by (-league_points, -wins, player).
+      Dict keys: player, player_id, wins, league_points
     """
     by_game: Dict[int, List[Row]] = defaultdict(list)
     for r in rows:
@@ -52,7 +51,6 @@ def compute_league_table(
             totals[pid] = {
                 "player": name,
                 "player_id": pid,
-                "points": Decimal("0"),
                 "wins": Decimal("0"),
                 "league_points": Decimal("0"),
             }
@@ -66,16 +64,14 @@ def compute_league_table(
         per_game = _dense_rank_and_share(lst, current_place_points, win_mode)
         for entry in per_game:
             ensure(entry["player_id"], entry["player"])
-            totals[entry["player_id"]]["points"] += entry["points"]
             totals[entry["player_id"]]["league_points"] += entry["league_points"]
             totals[entry["player_id"]]["wins"] += entry["wins"]
 
     out = list(totals.values())
-    out.sort(key=lambda r: (-r["league_points"], -r["wins"], -r["points"], r["player"]))
+    out.sort(key=lambda r: (-r["league_points"], -r["wins"], r["player"]))
 
     if not return_decimals:
         for r in out:
-            r["points"] = float(r["points"])
             r["league_points"] = float(r["league_points"])
             r["wins"] = float(r["wins"])
     return out
@@ -92,8 +88,8 @@ def compute_game_breakdown(
     Useful right after creating results for a single match.
 
     Returns a list of dicts for that game with:
-      player, player_id, points, rank, league_points, wins
-    Sorted by (-league_points, -points, player)
+      player, player_id, rank, league_points, wins
+    Sorted by (-league_points, player)
     """
     lst = list(rows)
 
@@ -104,10 +100,9 @@ def compute_game_breakdown(
 
     table = _dense_rank_and_share(lst, current_place_points, win_mode)
 
-    table.sort(key=lambda r: (-r["league_points"], -r["points"], r["player"]))
+    table.sort(key=lambda r: (-r["league_points"], r["player"]))
     if not return_decimals:
         for r in table:
-            r["points"] = float(r["points"])
             r["league_points"] = float(r["league_points"])
             r["wins"] = float(r["wins"])
     return table
@@ -122,7 +117,7 @@ def _dense_rank_and_share(
 ) -> List[Dict]:
     """
     Given rows for a single selected_game, return per-player dicts:
-      player, player_id, points (Decimal), rank (int), league_points (Decimal), wins (Decimal)
+      player, player_id, rank (int), league_points (Decimal), wins (Decimal)
     """
     # Sort by position asc (1st place first)
     lst = sorted(lst, key=lambda x: x.position if x.position is not None else 999)
@@ -166,7 +161,6 @@ def _dense_rank_and_share(
             out.append({
                 "player": r.player_name,
                 "player_id": r.player_id,
-                "points": Decimal(r.points) if r.points is not None else Decimal("0"),
                 "position": r.position,
                 "rank": place,                # dense rank
                 "league_points": share,       # shared by the block

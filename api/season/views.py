@@ -463,21 +463,21 @@ class LiveEventViewSet(ViewSet):
                     'leagueId': league_id,
                     'data': {
                         'gameName': res_list[0].selected_game.game.name,
-                        'summary': f'Winner: {winner.player_profile.profile_name} ({winner.points} pts)'
+                        'summary': f'Winner: {winner.player_profile.profile_name}'
                     }
                 })
 
         # 4. LEAGUE_FINISHED events
         done_leagues = leagues.filter(status=LeagueStatus.DONE)
         for league in done_leagues:
-            standings = LeagueStanding.objects.filter(league=league).order_by('-league_points', '-wins', '-points')
+            standings = LeagueStanding.objects.filter(league=league).select_related('player_profile').order_by('-league_points', '-wins')
             if standings.exists():
-                top_standing = standings.first()
+                top_standing = standings[0]
                 # Get all players tied for first place
                 winners = [
                     s.player_profile.profile_name 
                     for s in standings 
-                    if s.league_points == top_standing.league_points and s.wins == top_standing.wins and s.points == top_standing.points
+                    if s.league_points == top_standing.league_points and s.wins == top_standing.wins
                 ]
             else:
                 winners = []
@@ -500,7 +500,7 @@ class LiveEventViewSet(ViewSet):
             l1 = leagues.filter(level=1).first()
             winner_name = "Unknown"
             if l1:
-                top_standing = LeagueStanding.objects.filter(league=l1).order_by('-league_points', '-wins', '-points').first()
+                top_standing = LeagueStanding.objects.filter(league=l1).order_by('-league_points', '-wins').first()
                 if top_standing:
                     winner_name = top_standing.player_profile.profile_name
 

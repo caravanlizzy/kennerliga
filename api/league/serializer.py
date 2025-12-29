@@ -59,7 +59,7 @@ class GameStandingSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = GameStanding
-        fields = ("player_profile", "profile_name", "user_id", "username", "selected_game", "points", "rank", "league_points", "win_share")
+        fields = ("player_profile", "profile_name", "user_id", "username", "selected_game", "rank", "league_points", "win_share")
 
 
 class LeagueDetailSerializer(serializers.ModelSerializer):

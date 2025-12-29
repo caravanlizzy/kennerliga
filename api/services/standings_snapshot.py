@@ -5,9 +5,9 @@ from decimal import Decimal, InvalidOperation
 from django.db import transaction
 from result.models import Result
 from api.constants import get_league_points
-from services.scoring import Row, compute_game_breakdown, compute_league_table
+from services.scoring import Row, compute_league_table
 from league.models import LeagueStanding, GameStanding, League
-from game.models import SelectedGame, ResultConfig
+from game.models import SelectedGame
 
 
 @transaction.atomic
@@ -15,10 +15,6 @@ def rebuild_game_snapshot(selected_game, win_mode: str = "count_top_block") -> N
     """
     Rebuild per-game standings for a single SelectedGame.
     - Uses Result.position for sorting and ranking (pre-calculated with tie-breakers).
-    - If ResultConfig.has_points is True:
-        * Stores Result.points in GameStanding.points.
-    - If has_points is False:
-        * Stores -position in GameStanding.points.
     - Computes dense ranks based on position.
     - For win_mode == "count_top_block":
         * Rank 1 players share win_share = 1 / number_of_first_place_players.
@@ -37,31 +33,16 @@ def rebuild_game_snapshot(selected_game, win_mode: str = "count_top_block") -> N
 
     league = selected_game.league
 
-    try:
-        result_config = ResultConfig.objects.get(game=selected_game.game)
-    except ResultConfig.DoesNotExist:
-        # No config → clear standings and bail
-        GameStanding.objects.filter(selected_game=selected_game).delete()
-        return
-
-    use_points = result_config.has_points
-
     # ------------------------------------------------------------------
     # Build rows based on pre-calculated position
     # ------------------------------------------------------------------
     rows: list[dict] = []
     for r in results:
         pos = r.position if r.position is not None else 999
-        if use_points:
-            score = Decimal(r.points if r.points is not None else 0)
-        else:
-            # Store negative position so sorting/points remain consistent with "score"
-            score = Decimal(-int(pos))
 
         rows.append(
             {
                 "profile": r.player_profile,
-                "score": score,
                 "position": int(pos),
             }
         )
@@ -152,7 +133,6 @@ def rebuild_game_snapshot(selected_game, win_mode: str = "count_top_block") -> N
                     league=league,
                     selected_game=selected_game,
                     player_profile=row["profile"],
-                    points=row["score"].quantize(Decimal("0.01")),
                     rank=row["rank"],
                     league_points=row["league_points"],
                     win_share=row["win_share"],
@@ -164,51 +144,58 @@ def rebuild_game_snapshot(selected_game, win_mode: str = "count_top_block") -> N
 
 @transaction.atomic
 def rebuild_league_snapshot(league: League, *, win_mode: str = "count_top_block"):
-    # compute over all results in league
+    # 1. Get all current league members
+    member_profiles = [sp.profile for sp in league.members.all().select_related('profile')]
+    member_pids = {p.id for p in member_profiles}
+
+    # 2. Compute over all results in league
     qs = (
         Result.objects
         .filter(league=league)
         .select_related("selected_game", "player_profile")
-        .only("selected_game_id", "player_profile", "player_profile__profile_name", "points")
+        .only("selected_game_id", "player_profile", "player_profile__profile_name", "position")
     )
-
-    def dec_or_zero(value):
-        try:
-            # handle None, '', etc.
-            return Decimal(value if value is not None else 0)
-        except (InvalidOperation, TypeError, ValueError):
-            return Decimal(0)
 
     rows = [
         Row(
             selected_game_id=r.selected_game_id,
             player_id=r.player_profile.id,
             player_name=r.player_profile.profile_name,
-            points=dec_or_zero(r.points),
-            position=r.position,  # Add this line
+            position=r.position,
         )
         for r in qs
     ]
 
     table = compute_league_table(rows, win_mode=win_mode, return_decimals=True)
+    results_map = {r["player_id"]: r for r in table}
 
-    # upsert LeagueStanding (NO raw points)
+    # 3. Upsert LeagueStanding (ensures all members have a record, even with 0 points)
     existing = {ls.player_profile_id: ls for ls in LeagueStanding.objects.filter(league=league)}
     to_create, to_update = [], []
 
-    for r in table:
-        obj = existing.get(r["player_id"])
+    for profile in member_profiles:
+        pid = profile.id
+        r = results_map.get(pid)
+        wins = r["wins"] if r else Decimal("0.00")
+        lp = r["league_points"] if r else Decimal("0.00")
+
+        obj = existing.get(pid)
         if obj is None:
             to_create.append(LeagueStanding(
                 league=league,
-                player_profile_id=r["player_id"],
-                wins=r["wins"],
-                league_points=r["league_points"],
+                player_profile=profile,
+                wins=wins,
+                league_points=lp,
             ))
         else:
-            obj.wins = r["wins"]
-            obj.league_points = r["league_points"]
+            obj.wins = wins
+            obj.league_points = lp
             to_update.append(obj)
+
+    # 4. Remove standings for profiles no longer in the league
+    pids_to_remove = set(existing.keys()) - member_pids
+    if pids_to_remove:
+        LeagueStanding.objects.filter(league=league, player_profile_id__in=pids_to_remove).delete()
 
     if to_create:
         LeagueStanding.objects.bulk_create(to_create)
