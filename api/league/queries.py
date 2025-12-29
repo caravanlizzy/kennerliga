@@ -83,3 +83,49 @@ def is_two_player_league(league: League) -> bool:
 
 def both_players_exactly_one_pick(league: League) -> bool:
     return SelectedGame.objects.filter(league=league).count() == 2
+
+def is_league_finished(league: League) -> bool:
+    """Check if all expected games in the league have been played and have results."""
+    member_count = league.members.count()
+    if member_count == 0:
+        return False
+
+    # Expected games count
+    picks_per_player = get_game_picks_per_player(member_count)
+    expected_games_count = member_count * picks_per_player
+    
+    # Games that are not banned
+    # Assuming there's no easy way to check if a game is NOT banned without checking BanDecision
+    # Actually, a better way is to see if we have enough SelectedGames that have results.
+    
+    # Get all SelectedGames for this league
+    selected_games = SelectedGame.objects.filter(league=league)
+    
+    # We need to filter out banned games. 
+    # A game is banned if there is a BanDecision pointing to it.
+    # Actually, it depends on min_bans.
+    min_bans = 2 if member_count > 2 else 1
+    
+    from django.db.models import Count
+    banned_game_ids = (
+        BanDecision.objects.filter(league=league, selected_game__isnull=False)
+        .values("selected_game_id")
+        .annotate(c=Count("id"))
+        .filter(c__gte=min_bans)
+        .values_list("selected_game_id", flat=True)
+    )
+    
+    active_games = selected_games.exclude(id__in=banned_game_ids)
+    
+    if active_games.count() < expected_games_count:
+        # Not all games have been picked/repicked yet
+        return False
+        
+    # Check if all active games have results
+    from result.models import Result
+    for game in active_games:
+        result_count = Result.objects.filter(selected_game=game).count()
+        if result_count < member_count:
+            return False
+            
+    return True

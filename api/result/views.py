@@ -14,6 +14,8 @@ from season.serializer import SeasonSerializer
 from services.standings_snapshot import rebuild_game_snapshot, rebuild_league_snapshot
 from .models import Result
 from .serializers import ResultSerializer
+from league.models import LeagueStatus
+from league.queries import is_league_finished
 
 
 class IsAdminOrMemberInCurrentLeague(permissions.BasePermission):
@@ -127,6 +129,10 @@ class MatchResultViewSet(ViewSet):
 
             rebuild_game_snapshot(selected_game, win_mode="count_top_block")
             rebuild_league_snapshot(league, win_mode="count_top_block")
+
+            if is_league_finished(league):
+                league.status = LeagueStatus.DONE
+                league.save(update_fields=["status"])
 
         standings = GameStanding.objects.filter(league=league, selected_game=selected_game.id).select_related(
             "player_profile").order_by("rank", "player_profile__profile_name")

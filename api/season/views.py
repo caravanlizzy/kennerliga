@@ -468,8 +468,17 @@ class LiveEventViewSet(ViewSet):
         # 4. LEAGUE_FINISHED events
         done_leagues = leagues.filter(status=LeagueStatus.DONE)
         for league in done_leagues:
-            standings = LeagueStanding.objects.filter(league=league).order_by('-league_points', '-wins', '-points')[:3]
-            winners = [s.player_profile.profile_name for s in standings]
+            standings = LeagueStanding.objects.filter(league=league).order_by('-league_points', '-wins', '-points')
+            if standings.exists():
+                top_standing = standings.first()
+                # Get all players tied for first place
+                winners = [
+                    s.player_profile.profile_name 
+                    for s in standings 
+                    if s.league_points == top_standing.league_points and s.wins == top_standing.wins and s.points == top_standing.points
+                ]
+            else:
+                winners = []
 
             events.append({
                 'id': f'league-done-{league.id}',

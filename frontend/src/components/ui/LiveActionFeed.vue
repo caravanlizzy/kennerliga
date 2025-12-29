@@ -30,7 +30,7 @@
                     Game <strong>{{ event.data.gameName }}</strong> finished! {{ event.data.summary }}
                   </span>
                   <span v-else-if="event.type === 'LEAGUE_FINISHED'">
-                    League {{ event.leagueLevel }} finished! Winners: {{ event.data.winners?.join(', ') }}
+                    League {{ event.leagueLevel }} finished! Winner: <strong>{{ event.data.winners?.join(', ') }}</strong>
                   </span>
                   <span v-else-if="event.type === 'SEASON_FINISHED'">
                     Season finished! Shout out to <strong>{{ event.data.seasonWinner }}</strong>!
