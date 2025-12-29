@@ -12,6 +12,7 @@ export type TItem = {
 };
 
 export type TMessageDto = {
+  id: number;
   text: string;
   datetime: string;
   user: number;

@@ -15,8 +15,17 @@
           ref="scrollAreaRef"
           @scroll="onScroll"
         >
-          <div v-if="loadingOlder" class="flex flex-center q-mb-md">
-            <q-spinner-dots color="primary" size="2em" />
+          <div v-if="hasMoreOlder" class="flex flex-center q-mb-md">
+            <KennerButton
+              flat
+              dense
+              label="Load older messages"
+              :loading="loadingOlder"
+              @click="loadOlderMessages"
+            />
+          </div>
+          <div v-else-if="messages.length > 0" class="text-center text-caption text-grey q-mb-md">
+            No more messages
           </div>
 
           <template v-for="m in messages" :key="m.id">
@@ -123,8 +132,8 @@ async function onScroll(info: {
     info.verticalSize - info.verticalPosition - info.verticalContainerSize;
   showScrollDown.value = diff > 200;
 
-  // Detect top and load older messages
-  if (info.verticalPosition < 50 && !loadingOlder.value && hasMoreOlder.value && messages.value.length > 0) {
+  // Auto-load older messages when near top
+  if (info.verticalPosition < 100 && !loadingOlder.value && hasMoreOlder.value && messages.value.length > 0) {
     await loadOlderMessages();
   }
 }
@@ -186,13 +195,30 @@ async function send() {
   const text = newMessage.value.trim();
   if (!text || sending.value) return;
 
+  const tempId = Date.now();
+  const optimisticMsg: TMessageDto = {
+    id: tempId,
+    text,
+    datetime: new Date().toISOString(),
+    sender: user.value?.username || 'Me',
+    user: user.value?.id || 0,
+  };
+
+  messages.value.push(optimisticMsg);
+  newMessage.value = '';
+  scrollToBottom();
+
   sending.value = true;
   try {
     await postMessage(text);
-    newMessage.value = '';
-
     await loadMessages();
+    // Filter out the optimistic message after successful send and load
+    messages.value = messages.value.filter(m => m.id !== tempId);
     scrollToBottom();
+  } catch (e) {
+    // If it fails, we might want to remove the optimistic message or show error
+    messages.value = messages.value.filter(m => m.id !== tempId);
+    console.error('Failed to send message', e);
   } finally {
     sending.value = false;
     nextTick(() => inputRef.value?.focus());
@@ -212,7 +238,14 @@ async function loadMessages() {
   if (uniqueNewMessages.length === 0) return;
 
   messages.value = [...messages.value, ...uniqueNewMessages];
-  lastDateTime = messages.value[messages.value.length - 1].datetime;
+  const lastRealMessage = [...messages.value].reverse().find(m => {
+    // Optimistic messages have a Date.now() id, which is > 10^12.
+    // Database IDs are usually smaller.
+    return m.id < 1000000000000;
+  });
+  if (lastRealMessage) {
+    lastDateTime = lastRealMessage.datetime;
+  }
 }
 
 async function loadOlderMessages() {
