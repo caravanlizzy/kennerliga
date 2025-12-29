@@ -4,12 +4,12 @@
       :to="{ name: 'home' }"
       unelevated
       flat
-      color="primary"
+      color="dark"
       class="nav-item-radius text-weight-bold"
     >
       <div class="row items-center no-wrap">
         <q-icon size="md" name="img:icons/favicon.svg" class="q-mr-sm" />
-        <span v-if="!isMobile" class="text-h5 text-primary text-weight-bold tracking-tight" style="letter-spacing: -0.5px;">KennerLiga</span>
+        <span v-if="!isMobile" class="text-h5 text-dark text-weight-bold tracking-tight" style="letter-spacing: -0.5px;">KennerLiga</span>
       </div>
     </KennerButton>
 

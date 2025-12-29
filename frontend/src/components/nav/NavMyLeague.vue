@@ -4,7 +4,7 @@
       v-if="isAuthenticated"
       :to="{ name: 'my-league' }"
       unelevated
-      color="primary"
+      color="secondary"
       class="nav-item-radius text-weight-bold shadow-1"
       no-caps
     >

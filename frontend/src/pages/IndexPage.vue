@@ -23,6 +23,30 @@
     <template v-else>
       <AnnouncementDisplay class="col-auto" />
       <div v-if="isMobile" class="column col">
+        <q-tabs
+          v-model="mobileContent"
+          class="text-dark q-py-xs"
+          active-color="dark"
+          indicator-color="dark"
+          align="center"
+          narrow-indicator
+          dense
+          no-caps
+          inline-label
+          style="
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(4px);
+          "
+        >
+          <q-tab icon="sensors" name="live" label="Live" />
+          <q-tab icon="history" name="seasons" label="Seasons" />
+          <q-tab icon="chat" name="chat" label="Chat" />
+          <q-tab icon="leaderboard" name="leaderboard" label="Rank" />
+        </q-tabs>
         <div class="col column">
           <KennerChat v-if="mobileContent === 'chat'" class="column" />
 
@@ -58,15 +82,6 @@
             <LeaderBoard :year="selectedYear" />
           </ScrollContainer>
         </div>
-        <q-toolbar class="col-auto bg-grey-4 text-primary flex-center">
-          <q-tabs switch-indicator v-model="mobileContent" class="full-width">
-            <q-tab icon="sensors" name="live" label="Live" />
-            <q-tab icon="history" name="seasons" label="Season" />
-            <q-tab icon="chat" name="chat" label="Chat" />
-            <!--            <q-tab icon="emoji_events" name="pokal" label="Winners" />-->
-            <q-tab icon="leaderboard" name="leaderboard" label="Rank" />
-          </q-tabs>
-        </q-toolbar>
       </div>
       <div v-else class="column col q-pa-md">
         <div class="row col">
@@ -113,7 +128,7 @@
               minimizable
               title="Leaderboard"
               class="col-12"
-              color="dark"
+              color="secondary"
             >
               <template #header-extra>
                 <div style="min-width: 120px" class="q-ml-md">
@@ -139,11 +154,7 @@
             bordered
             title="Kennerchat"
             color="dark"
-            style="
-              max-height: calc(100vh - 200px);
-              position: sticky;
-              top: 80px;
-            "
+            style="max-height: calc(100vh - 200px); position: sticky; top: 80px"
           >
             <KennerChat class="col" />
           </ContentSection>

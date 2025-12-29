@@ -10,7 +10,10 @@
     <!-- Right: Controls -->
     <div class="row no-wrap items-center q-gutter-x-md">
       <!-- Minimized Items -->
-      <div v-if="minimizedItems.length" class="row no-wrap items-center q-gutter-x-sm">
+      <div
+        v-if="minimizedItems.length && isIndexPage"
+        class="row no-wrap items-center q-gutter-x-sm"
+      >
         <q-btn
           v-for="item in minimizedItems"
           :key="item.id"
@@ -43,12 +46,17 @@ import { useUserStore } from 'stores/userStore';
 import { useUiStore } from 'src/stores/uiStore';
 import { storeToRefs } from 'pinia';
 import { useResponsive } from 'src/composables/responsive';
+import { useRoute } from 'vue-router';
+import { computed } from 'vue';
 
 defineProps<{ onToggle: () => void }>();
 const { user } = storeToRefs(useUserStore());
 const { minimizedItems } = storeToRefs(useUiStore());
 const { restore } = useUiStore();
 const { isMobile } = useResponsive();
+const route = useRoute();
+
+const isIndexPage = computed(() => route.name === 'home');
 
 </script>
 
