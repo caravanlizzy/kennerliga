@@ -96,11 +96,19 @@ def rebuild_game_snapshot(selected_game, win_mode: str = "count_top_block") -> N
     # First: win_share
     if win_mode == "count_top_block":
         first_group = rank_groups.get(1, [])
+        for row in first_group:
+            row["win_share"] = Decimal("1.00")
+    elif win_mode == "fractional":
+        first_group = rank_groups.get(1, [])
         if first_group:
-            share = Decimal("1.00") / Decimal(len(first_group))
-            share = share.quantize(Decimal("0.01"))
+            share = (Decimal("1.00") / Decimal(len(first_group))).quantize(Decimal("0.01"))
             for row in first_group:
                 row["win_share"] = share
+    elif win_mode == "single":
+        first_group = rank_groups.get(1, [])
+        if first_group:
+            # exactly one win
+            first_group[0]["win_share"] = Decimal("1.00")
 
     # Then: league points distribution based on player count, with tie handling
     player_count = (
