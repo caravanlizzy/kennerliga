@@ -4,6 +4,7 @@ from collections import defaultdict
 from decimal import Decimal, InvalidOperation
 from django.db import transaction
 from result.models import Result
+from api.constants import get_league_points
 from services.scoring import Row, compute_game_breakdown, compute_league_table
 from league.models import LeagueStanding, GameStanding, League
 from game.models import SelectedGame, ResultConfig
@@ -101,12 +102,13 @@ def rebuild_game_snapshot(selected_game, win_mode: str = "count_top_block") -> N
             for row in first_group:
                 row["win_share"] = share
 
-    # Then: league points 6 / 3 / 1 / 0 based on "place", with tie handling
-    POINTS_TABLE = {
-        1: Decimal("6"),
-        2: Decimal("3"),
-        3: Decimal("1"),
-    }
+    # Then: league points distribution based on player count, with tie handling
+    player_count = (
+        Result.objects
+        .filter(selected_game=selected_game)
+        .count()
+    )
+    POINTS_TABLE = get_league_points(player_count)
 
     # We walk rank groups in order and assign places 1..N
     current_place = 1

@@ -1,6 +1,7 @@
 from typing import List
 from league.models import League
 from game.models import SelectedGame, BanDecision
+from api.constants import get_game_picks_per_player
 
 
 def get_members_ordered(league: League):
@@ -10,7 +11,7 @@ def get_members_ordered(league: League):
 
 def all_players_have_picked(league: League) -> bool:
     """Check if all league members have selected a game."""
-    expected_count = 2 if is_two_player_league(league) else 1
+    expected_count = get_game_picks_per_player(league.members.count())
     for participant in league.members.all():
         pick_count = SelectedGame.objects.filter(
             league=league,
@@ -63,7 +64,7 @@ def get_players_to_repick(league: League) -> List:
 
 
 def all_repickers_have_repicked(league: League) -> bool:
-    expected_count = 3 if is_two_player_league(league) else 2
+    expected_count = get_game_picks_per_player(league.members.count()) + 1
     """Check if all players who must repick have done so."""
     for player in get_players_to_repick(league):
         # For 2-player leagues, players should have 3 games if they had to repick

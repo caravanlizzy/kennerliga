@@ -6,6 +6,8 @@ from dataclasses import dataclass
 from decimal import Decimal
 from typing import Dict, Iterable, List, Literal
 
+from api.constants import get_league_points
+
 # Public row DTO you pass into the scorer
 @dataclass(frozen=True)
 class Row:
@@ -15,20 +17,13 @@ class Row:
     points: Decimal | int | float  # raw match points
     position: int | None = None    # rank/position from the game
 
-# Default place->league points mapping (edit as needed)
-DEFAULT_PLACE_POINTS: Dict[int, Decimal] = {
-    1: Decimal("6"),
-    2: Decimal("3"),
-    3: Decimal("1"),
-    4: Decimal("0"),
-}
 
 WinMode = Literal["count_top_block", "fractional", "single"]
 
 
 def compute_league_table(
     rows: Iterable[Row],
-    place_points: Dict[int, Decimal] = DEFAULT_PLACE_POINTS,
+    place_points: Dict[int, Decimal] | None = None,
     win_mode: WinMode = "count_top_block",
     return_decimals: bool = False,
 ) -> List[Dict]:
@@ -63,7 +58,12 @@ def compute_league_table(
             }
 
     for game_id, lst in by_game.items():
-        per_game = _dense_rank_and_share(lst, place_points, win_mode)
+        # If place_points is NOT provided, we use the dynamic distribution based on player count
+        current_place_points = place_points
+        if current_place_points is None:
+            current_place_points = get_league_points(len(lst))
+
+        per_game = _dense_rank_and_share(lst, current_place_points, win_mode)
         for entry in per_game:
             ensure(entry["player_id"], entry["player"])
             totals[entry["player_id"]]["points"] += entry["points"]
@@ -83,7 +83,7 @@ def compute_league_table(
 
 def compute_game_breakdown(
     rows: Iterable[Row],
-    place_points: Dict[int, Decimal] = DEFAULT_PLACE_POINTS,
+    place_points: Dict[int, Decimal] | None = None,
     win_mode: WinMode = "count_top_block",
     return_decimals: bool = False,
 ) -> List[Dict]:
@@ -96,7 +96,13 @@ def compute_game_breakdown(
     Sorted by (-league_points, -points, player)
     """
     lst = list(rows)
-    table = _dense_rank_and_share(lst, place_points, win_mode)
+
+    # If place_points is NOT provided, we use the dynamic distribution based on player count
+    current_place_points = place_points
+    if current_place_points is None:
+        current_place_points = get_league_points(len(lst))
+
+    table = _dense_rank_and_share(lst, current_place_points, win_mode)
 
     table.sort(key=lambda r: (-r["league_points"], -r["points"], r["player"]))
     if not return_decimals:
