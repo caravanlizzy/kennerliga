@@ -33,11 +33,15 @@ class ChatViewSet(ModelViewSet):
             parsed_last_datetime = parse_datetime(last_datetime)
             if parsed_last_datetime:
                 chat_queryset = chat_queryset.filter(datetime__gt=parsed_last_datetime)
+            else:
+                raise ValidationError('last_datetime must be a valid ISO 8601 datetime.')
 
         if before_datetime is not None:
             parsed_before_datetime = parse_datetime(before_datetime)
             if parsed_before_datetime:
                 chat_queryset = chat_queryset.filter(datetime__lt=parsed_before_datetime)
+            else:
+                raise ValidationError('before_datetime must be a valid ISO 8601 datetime.')
 
         # Order by the DateTimeField in descending order to get the most recent items first
         return chat_queryset.order_by('-datetime')[:limit]

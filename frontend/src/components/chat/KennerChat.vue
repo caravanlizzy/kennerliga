@@ -237,7 +237,16 @@ async function send() {
 
 async function loadMessages() {
   const { data } = await fetchMessages({ last_datetime: lastDateTime });
-  if (!data || data.length === 0) return;
+  if (!data) return;
+
+  if (!lastDateTime) {
+    // Initial load
+    if (data.length < 20) {
+      hasMoreOlder.value = false;
+    }
+  }
+
+  if (data.length === 0) return;
 
   const newMessages = data.reverse();
 

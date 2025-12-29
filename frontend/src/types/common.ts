@@ -17,6 +17,7 @@ export type TMessageDto = {
   datetime: string;
   user: number;
   sender: string;
+  label?: string;
 };
 
 export type TFeedbackDto = {

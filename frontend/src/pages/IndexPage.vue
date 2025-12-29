@@ -151,7 +151,7 @@
             id="kennerchat"
             icon="chat"
             minimizable
-            bordered
+            :bordered="false"
             title="Kennerchat"
             color="dark"
             style="max-height: calc(100vh - 200px); position: sticky; top: 80px"
