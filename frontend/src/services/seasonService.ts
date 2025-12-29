@@ -22,8 +22,18 @@ export async function fetchIsRegisteredForSeason(): Promise<boolean> {
 
 export async function fetchOpenSeasonParticipants(): Promise<TSeasonParticipantDto[]> {
   try {
-    const { data } = await api.get('/season/season-participants/current/');
-    return data;
+    // 1. Find the season that is currently 'OPEN' (registration phase)
+    const { data: seasons } = await api.get<TSeasonDto[]>('/season/seasons/?status=OPEN');
+    const openSeason = seasons.length > 0 ? seasons[0] : null;
+
+    if (!openSeason) {
+      // Fallback: If no OPEN season, maybe try 'current' as before or return empty
+      const { data } = await api.get('/season/season-participants/current/');
+      return data;
+    }
+
+    // 2. Fetch participants for that specific season
+    return await fetchSeasonParticipants(openSeason.id);
   } catch (error) {
     console.error('Failed to fetch open season participants:', error);
     return []; // safe fallback

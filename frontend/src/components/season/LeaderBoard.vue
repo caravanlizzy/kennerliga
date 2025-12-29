@@ -6,7 +6,7 @@
   <!-- Content -->
   <div
     v-else-if="standings"
-    class="leaderboard-container rounded-borders shadow-2"
+    class="leaderboard-container rounded-borders"
     :class="$q.dark.isActive ? 'bg-dark' : 'bg-white'"
   >
     <!-- Table -->
@@ -60,12 +60,12 @@
           <td class="text-left relative-position q-py-md">
             <div
               v-if="bestLeague(row) !== null"
-              class="row-group-line shadow-1"
+              class="row-group-line"
               :class="'bg-' + leagueBadgeColor(bestLeague(row)!)"
             ></div>
             <div
               v-if="shouldShowGroupHeader(index) && bestLeague(row) !== null"
-              class="group-label-container shadow-1"
+              class="group-label-container"
             >
                <span class="group-label-text" :class="'text-' + leagueBadgeColor(bestLeague(row)!)">
                  League {{ bestLeague(row) }}
