@@ -477,7 +477,7 @@ class LiveEventViewSet(ViewSet):
                 winners = [
                     s.player_profile.profile_name 
                     for s in standings 
-                    if s.league_points == top_standing.league_points and s.wins == top_standing.wins and s.points == top_standing.points
+                    if s.league_points == top_standing.league_points and s.wins == top_standing.wins
                 ]
             else:
                 winners = []
