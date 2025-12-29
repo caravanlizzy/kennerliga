@@ -1,7 +1,10 @@
 <template>
   <div
     v-if="!isMinimized"
-    :class="bordered ? `border-2 rounded-borders border-${color}` : ''"
+    :class="[
+      bordered ? `border-2 rounded-borders border-${color}` : '',
+      { 'bg-grey-1': !bordered, 'bg-white': bordered }
+    ]"
     class="q-mt-md content-section-container"
   >
     <template v-if="expandable">
@@ -113,7 +116,6 @@ function minimize() {
 
 <style scoped>
 .content-section-container {
-  background: white;
   overflow: hidden;
 }
 

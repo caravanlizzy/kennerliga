@@ -9,9 +9,8 @@
         <!-- TAnnouncementDto Card -->
         <q-card
           flat
-          class="announcement-card overflow-hidden"
+          class="announcement-card overflow-hidden border-all"
           :class="[
-            cardThemes[a.type],
             { 'no-border-radius': shouldRemoveBorders },
           ]"
         >
@@ -21,8 +20,14 @@
               'relative-position row items-start no-wrap'
             ]"
           >
+            <!-- Colored accent bar -->
+            <div
+              class="absolute-left full-height accent-bar"
+              :class="typeColors[a.type].split(' ')[0]"
+            ></div>
+
             <!-- Content Header (Icon + Text) -->
-            <div class="row items-start no-wrap col">
+            <div class="row items-start no-wrap col q-pl-sm">
               <!-- Icon Circle -->
               <div
                 v-if="announcementIcons[a.type]"
@@ -35,12 +40,12 @@
               <!-- Content -->
               <div class="col" :class="!isMobile ? 'q-pr-xl' : 'q-pr-md'">
                 <div
-                  class="text-subtitle2 text-weight-bold lh-tight"
+                  class="text-subtitle1 text-weight-bold lh-tight"
                   :class="textColors[a.type]"
                 >
                   {{ a.title }}
                 </div>
-                <div v-if="a.content" class="text-caption text-grey-8 q-mt-xs">
+                <div v-if="a.content" class="text-body2 text-grey-8 q-mt-xs">
                   {{ a.content }}
                 </div>
 
@@ -54,7 +59,7 @@
                     dense
                     no-caps
                     color="primary"
-                    class="text-caption rounded-borders q-px-md"
+                    class="text-caption rounded-borders q-px-md border-all"
                     @click="toggleParticipants"
                   >
                     <q-icon :name="showParticipants ? 'expand_less' : 'people'" size="16px" class="q-mr-xs" />
@@ -65,9 +70,10 @@
                     v-if="!isRegisteredForOpenSeason"
                     unelevated
                     dense
+                    no-caps
                     color="primary"
                     :disable="!isAuthenticated"
-                    class="q-px-md"
+                    class="q-px-md rounded-borders"
                     @click="register"
                   >
                     Register
@@ -95,7 +101,7 @@
                   dense
                   no-caps
                   color="primary"
-                  class="text-caption rounded-borders q-px-md"
+                  class="text-caption rounded-borders q-px-md border-all"
                   @click="toggleParticipants"
                 >
                   <q-icon :name="showParticipants ? 'expand_less' : 'people'" size="16px" class="q-mr-xs" />
@@ -106,9 +112,10 @@
                   v-if="!isRegisteredForOpenSeason"
                   unelevated
                   dense
+                  no-caps
                   color="primary"
                   :disable="!isAuthenticated"
-                  class="q-px-md"
+                  class="q-px-md rounded-borders"
                   @click="register"
                 >
                   Register
@@ -262,83 +269,58 @@ async function register() {
   }
 }
 
-const cardThemes = {
-  INFO: 'theme-info',
-  WINNER: 'theme-winner',
-  REGISTER: 'theme-register',
-  WARNING: 'theme-warning',
-  NEUTRAL: 'theme-neutral',
-};
 
 const textColors = {
-  INFO: 'text-blue-10',
-  WINNER: 'text-amber-10',
-  REGISTER: 'text-deep-purple-10',
-  WARNING: 'text-red-10',
+  INFO: 'text-primary',
+  WINNER: 'text-warning',
+  REGISTER: 'text-secondary',
+  WARNING: 'text-negative',
   NEUTRAL: 'text-grey-9',
 };
 
 const typeColors = {
-  INFO: 'bg-blue-1 text-blue-9',
-  WINNER: 'bg-amber-1 text-amber-9',
-  REGISTER: 'bg-deep-purple-1 text-deep-purple-9',
-  WARNING: 'bg-red-1 text-red-9',
-  NEUTRAL: 'bg-grey-2 text-grey-8',
+  INFO: 'bg-primary text-white',
+  WINNER: 'bg-warning text-white',
+  REGISTER: 'bg-secondary text-white',
+  WARNING: 'bg-negative text-white',
+  NEUTRAL: 'bg-grey-4 text-grey-9',
 };
 </script>
 
 <style scoped>
 .announcement-card {
-  border-radius: 12px;
-  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-  border-left-width: 6px !important;
+  border-radius: 8px;
+  transition: all 0.2s ease-in-out;
+  background-color: white;
+}
+
+.accent-bar {
+  width: 6px;
+  border-radius: 4px 0 0 4px;
 }
 
 .no-border-radius {
   border-radius: 0 !important;
-  border-left-width: 0 !important;
-  border-right-width: 0 !important;
-  border-top-width: 0 !important;
+}
+
+.no-border-radius .accent-bar {
+  border-radius: 0 !important;
 }
 
 .announcement-card:hover:not(.no-border-radius) {
-  border-color: rgba(0, 0, 0, 0.12);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-}
-
-/* Theme Accents */
-.theme-info {
-  border-left-color: var(--q-primary) !important;
-  background-color: #f8fbff;
-}
-.theme-winner {
-  border-left-color: var(--q-warning) !important;
-  background-color: #fffdf5;
-}
-.theme-register {
-  border-left-color: var(--q-secondary) !important;
-  background-color: #faf8ff;
-}
-.theme-warning {
-  border-left-color: var(--q-negative) !important;
-  background-color: #fffafa;
-}
-.theme-neutral {
-  border-left-color: #9e9e9e !important;
-  background-color: #fafafa;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
 
 .icon-wrapper {
-  width: 38px;
-  height: 38px;
-  border-radius: 10px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
   flex-shrink: 0;
 }
 
 .icon-wrapper--mobile {
-  width: 30px;
-  height: 30px;
-  border-radius: 8px;
+  width: 28px;
+  height: 28px;
   margin-right: 8px !important;
 }
 

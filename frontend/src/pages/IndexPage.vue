@@ -48,7 +48,7 @@
           <q-tab icon="leaderboard" name="leaderboard"/>
         </q-tabs>
         <div class="col column">
-          <KennerChat v-if="mobileContent === 'chat'" class="column" />
+          <KennerChat v-if="mobileContent === 'chat'" class="column bg-grey-1" />
 
           <ScrollContainer v-else-if="mobileContent === 'live'">
             <ContentSection
@@ -65,21 +65,25 @@
           </ScrollContainer>
 
           <ScrollContainer v-else-if="mobileContent === 'seasons'">
-            <SeasonStandings />
+            <div class="bg-grey-1 full-height">
+              <SeasonStandings />
+            </div>
           </ScrollContainer>
           <ScrollContainer v-else-if="mobileContent === 'leaderboard'">
-            <div class="q-pa-md row items-center justify-between no-wrap">
-              <div class="text-h5 text-weight-bold text-dark">Leaderboard</div>
-              <div style="min-width: 120px">
-                <KennerSelect
-                  v-model="selectedYear"
-                  :options="availableYears"
-                  dense
-                  class="full-width"
-                />
+            <div class="bg-grey-1 full-height">
+              <div class="q-pa-md row items-center justify-between no-wrap">
+                <div class="text-h5 text-weight-bold text-dark">Leaderboard</div>
+                <div style="min-width: 120px">
+                  <KennerSelect
+                    v-model="selectedYear"
+                    :options="availableYears"
+                    dense
+                    class="full-width"
+                  />
+                </div>
               </div>
+              <LeaderBoard :year="selectedYear" />
             </div>
-            <LeaderBoard :year="selectedYear" />
           </ScrollContainer>
         </div>
       </div>
@@ -117,7 +121,7 @@
               :bordered="false"
               title="Seasons"
               class="col-12"
-              color="dark"
+              color="primary"
             >
               <SeasonStandings class="col-12" />
             </ContentSection>
@@ -128,7 +132,7 @@
               minimizable
               title="Leaderboard"
               class="col-12"
-              color="secondary"
+              color="primary"
             >
               <template #header-extra>
                 <div style="min-width: 120px" class="q-ml-md">
@@ -147,13 +151,13 @@
             </ContentSection>
           </div>
           <ContentSection
-            class="col-12 col-md-auto column bg-grey-2"
+            class="col-12 col-md-auto column"
             id="kennerchat"
             icon="chat"
             minimizable
             :bordered="false"
             title="Kennerchat"
-            color="dark"
+            color="primary"
             style="max-height: calc(100vh - 200px); position: sticky; top: 80px"
           >
             <KennerChat class="col" />

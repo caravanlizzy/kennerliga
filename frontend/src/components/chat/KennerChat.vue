@@ -3,7 +3,7 @@
   <q-card
     v-else
     flat
-    class="column col"
+    class="column col bg-transparent"
     style="min-width: 350px; min-height: 400px"
   >
     <!-- Messages -->
@@ -67,7 +67,7 @@
     </q-card-section>
 
     <!-- Composer -->
-    <q-card-section class="col-auto q-pa-sm bg-grey-1 border-top-subtle" v-if="isAuthenticated">
+    <q-card-section class="col-auto q-pa-sm border-top-subtle" v-if="isAuthenticated">
       <KennerInput
         ref="inputRef"
         v-model="newMessage"
