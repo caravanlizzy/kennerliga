@@ -76,6 +76,7 @@ class GameStanding(models.Model):
     player_profile = models.ForeignKey(PlayerProfile, on_delete=models.CASCADE)
 
     # Per-game snapshot
+    points = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     rank = models.PositiveIntegerField()  # dense rank within the game
     league_points = models.DecimalField(max_digits=10, decimal_places=2, default=0)  # tie-shared per rules
     win_share = models.DecimalField(max_digits=10, decimal_places=2, default=0)  # 1, fractional, or 0
@@ -85,7 +86,7 @@ class GameStanding(models.Model):
         unique_together = ("selected_game", "player_profile")
         indexes = [
             models.Index(fields=["league", "selected_game"]),
-            models.Index(fields=["league", "-league_points"]),
+            models.Index(fields=["league", "-league_points", "-points"], name="league_game_league__9b635e_idx"),
         ]
 
     def __str__(self):

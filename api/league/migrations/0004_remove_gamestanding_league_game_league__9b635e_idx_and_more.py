@@ -11,24 +11,12 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.RemoveIndex(
-            model_name='gamestanding',
-            name='league_game_league__9b635e_idx',
-        ),
-        migrations.RemoveIndex(
             model_name='leaguestanding',
             name='league_leag_league__cc32b5_idx',
         ),
         migrations.RemoveField(
-            model_name='gamestanding',
-            name='points',
-        ),
-        migrations.RemoveField(
             model_name='leaguestanding',
             name='points',
-        ),
-        migrations.AddIndex(
-            model_name='gamestanding',
-            index=models.Index(fields=['league', '-league_points'], name='league_game_league__63c48e_idx'),
         ),
         migrations.AddIndex(
             model_name='leaguestanding',
