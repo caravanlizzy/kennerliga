@@ -444,6 +444,8 @@ class LiveEventViewSet(ViewSet):
         league_member_counts = {l.id: l.members.count() for l in leagues}
 
         for sg_id, res_list in results_by_game.items():
+            if not res_list:
+                continue
             league_id = res_list[0].league_id
             member_count = league_member_counts.get(league_id, 0)
             if len(res_list) == member_count and member_count > 0:
