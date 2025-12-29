@@ -54,7 +54,7 @@ class LeagueViewSet(ModelViewSet):
         """
         Returns a matrix suitable for a standings table:
         - Rows: players ordered by total league_points (desc)
-        - Columns: per-game data (league_points for each selected_game)
+        - Columns: per-game data (points & league_points for each selected_game)
 
         Response shape:
         {
@@ -70,8 +70,8 @@ class LeagueViewSet(ModelViewSet):
               "total_league_points": "18.00",
               "total_wins": "3.00",
               "games": {
-                "1": {"league_points": "6.00", "rank": 1},
-                "2": {"league_points": "3.00", "rank": 2},
+                "1": {"points": "120.00", "league_points": "6.00", "rank": 1},
+                "2": {"points": "85.50", "league_points": "3.00", "rank": 2},
                 ...
               }
             },
@@ -116,6 +116,7 @@ class LeagueViewSet(ModelViewSet):
             if pid not in game_data_by_player:
                 game_data_by_player[pid] = {}
             game_data_by_player[pid][gs.selected_game_id] = {
+                "points": str(gs.points),
                 "league_points": str(gs.league_points),
                 "rank": gs.rank,
             }
@@ -132,7 +133,7 @@ class LeagueViewSet(ModelViewSet):
                 if sg_id in player_games:
                     games_dict[str(sg_id)] = player_games[sg_id]
                 else:
-                    games_dict[str(sg_id)] = {"league_points": None, "rank": None}
+                    games_dict[str(sg_id)] = {"points": None, "league_points": None, "rank": None}
 
             standings_list.append({
                 "player_profile_id": pid,

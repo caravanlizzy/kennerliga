@@ -21,17 +21,17 @@ class LeagueResultAdmin(admin.ModelAdmin):
 
 @admin.register(LeagueStanding)
 class LeagueStandingAdmin(admin.ModelAdmin):
-    list_display = ('league', 'player_profile', 'wins', 'league_points', 'updated_at')
+    list_display = ('league', 'player_profile', 'points', 'wins', 'league_points', 'updated_at')
     list_filter = ('league', 'updated_at')
     search_fields = ('league__season__year', 'player_profile__profile_name')
     raw_id_fields = ('league', 'player_profile')
-    ordering = ('-league_points', '-wins')
+    ordering = ('-league_points', '-wins', '-points')
 
 
 @admin.register(GameStanding)
 class GameStandingAdmin(admin.ModelAdmin):
-    list_display = ('league', 'selected_game', 'player_profile', 'rank', 'league_points', 'updated_at')
+    list_display = ('league', 'selected_game', 'player_profile', 'points', 'rank', 'league_points', 'updated_at')
     list_filter = ('league', 'updated_at')
     search_fields = ('league__season__year', 'player_profile__profile_name')
     raw_id_fields = ('league', 'selected_game', 'player_profile')
-    ordering = ('-league_points',)
+    ordering = ('-league_points', '-points')
