@@ -1,5 +1,5 @@
 <template>
-  <div v-if="visibleAnnouncements.length" :class="isMobile ? 'q-mb-sm' : 'q-mb-md'">
+  <div v-if="isVisible" :class="isMobile ? 'q-mb-sm' : 'q-mb-md'">
     <transition-group
       appear
       enter-active-class="animated fadeIn"
@@ -55,18 +55,6 @@
                   class="row items-center q-gutter-sm q-mt-sm"
                 >
                   <KennerButton
-                    flat
-                    dense
-                    no-caps
-                    color="primary"
-                    class="text-caption rounded-borders q-px-md border-all"
-                    @click="toggleParticipants"
-                  >
-                    <q-icon :name="showParticipants ? 'expand_less' : 'people'" size="16px" class="q-mr-xs" />
-                    {{ showParticipants ? 'Hide' : 'View' }} participants {{ participants.length}}
-                  </KennerButton>
-
-                  <KennerButton
                     v-if="!isRegisteredForOpenSeason"
                     unelevated
                     dense
@@ -87,6 +75,39 @@
                     <span>Registered</span>
                   </div>
                 </div>
+
+                <!-- Integrated Participants List -->
+                <div v-if="a.type === 'REGISTER'" class="q-mt-md">
+                  <div class="row items-center q-gutter-x-sm q-mb-xs">
+                    <div class="text-caption text-weight-bold text-grey-7 uppercase tracking-wider">
+                      Participants
+                    </div>
+                    <q-badge color="secondary" :label="participants?.length ?? 0" rounded class="text-weight-bold" style="font-size: 10px; padding: 2px 6px;" />
+                  </div>
+
+                  <div v-if="participantsLoading" class="row q-gutter-xs">
+                    <q-skeleton v-for="i in 5" :key="i" type="rect" width="60px" height="22px" class="rounded-borders" />
+                  </div>
+                  <template v-else-if="participantsLoaded">
+                    <div v-if="participants?.length" class="row q-gutter-xs">
+                      <div
+                        v-for="p in participants"
+                        :key="p.id"
+                        class="col-auto"
+                      >
+                        <div class="participant-chip border-all">
+                          {{ p.profile_name || 'Anonymous' }}
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      v-else
+                      class="text-caption text-grey-6 italic"
+                    >
+                      No participants yet.
+                    </div>
+                  </template>
+                </div>
               </div>
             </div>
 
@@ -96,18 +117,6 @@
               :class="isMobile ? 'q-ml-xs' : 'q-ml-sm'"
             >
               <template v-if="!isMobile && a.type === 'REGISTER'">
-                <KennerButton
-                  flat
-                  dense
-                  no-caps
-                  color="primary"
-                  class="text-caption rounded-borders q-px-md border-all"
-                  @click="toggleParticipants"
-                >
-                  <q-icon :name="showParticipants ? 'expand_less' : 'people'" size="16px" class="q-mr-xs" />
-                  {{ showParticipants ? 'Hide' : 'View' }} participants
-                </KennerButton>
-
                 <KennerButton
                   v-if="!isRegisteredForOpenSeason"
                   unelevated
@@ -144,38 +153,6 @@
               </KennerButton>
             </div>
           </q-card-section>
-
-          <!-- Expanded Participants Panel -->
-          <q-slide-transition>
-            <div v-if="a.type === 'REGISTER' && showParticipants">
-              <q-separator />
-              <div class="bg-grey-1 q-pa-md">
-                <div v-if="participantsLoading" class="flex flex-center q-py-sm">
-                  <q-spinner-grid size="20px" color="primary" />
-                </div>
-
-                <template v-else-if="participantsLoaded">
-                  <div v-if="participants.length" class="row q-gutter-xs">
-                    <div
-                      v-for="p in participants"
-                      :key="p.id"
-                      class="col-auto"
-                    >
-                      <div class="text-caption bg-white q-px-sm q-py-xs rounded-borders border-all">
-                        {{ p.profile_name || 'Anonymous' }}
-                      </div>
-                    </div>
-                  </div>
-                  <div
-                    v-else
-                    class="text-caption text-grey-6 text-center q-py-sm italic"
-                  >
-                    No participants registered yet. Be the first!
-                  </div>
-                </template>
-              </div>
-            </div>
-          </q-slide-transition>
         </q-card>
       </div>
     </transition-group>
@@ -218,12 +195,26 @@ isRegisteredForOpenSeason.value = await fetchIsRegisteredForSeason();
 const participants = ref<any[] | null>(null);
 const participantsLoading = ref(false);
 const participantsLoaded = ref(false);
-const showParticipants = ref(false);
 const hiddenAnnouncements = ref<Record<number, boolean>>({});
+
+const hasRegisterAnnouncement = computed(() => {
+  return announcements.value.some(a => a.type === 'REGISTER');
+});
 
 const visibleAnnouncements = computed(() => {
   return announcements.value.filter(a => !hiddenAnnouncements.value[a.id] && !uiStore.isMinimized(`announcement-${a.id}`));
 });
+
+const isVisible = computed(() => {
+  return visibleAnnouncements.value.length > 0;
+});
+
+import { watch } from 'vue';
+watch(hasRegisterAnnouncement, (hasReg) => {
+  if (hasReg) {
+    loadParticipants();
+  }
+}, { immediate: true });
 
 function minimizeAnnouncement(a: any) {
   uiStore.minimize({
@@ -236,7 +227,7 @@ function minimizeAnnouncement(a: any) {
 }
 
 async function loadParticipants() {
-  if (participantsLoaded.value || participantsLoading.value) return;
+  if (participantsLoading.value) return;
 
   participantsLoading.value = true;
   try {
@@ -249,18 +240,10 @@ async function loadParticipants() {
   }
 }
 
-async function toggleParticipants() {
-  if (!showParticipants.value) {
-    await loadParticipants();
-  }
-  showParticipants.value = !showParticipants.value;
-}
-
 async function register() {
   const { status } = await registerForSeason();
   if (status === 200) {
     isRegisteredForOpenSeason.value = true;
-    participantsLoaded.value = false;
     await loadParticipants();
   }
 }
@@ -326,6 +309,20 @@ const typeColors = {
 
 .border-all {
   border: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.participant-chip {
+  font-size: 11px;
+  background: #f8f9fa;
+  padding: 3px 8px;
+  border-radius: 4px;
+  color: #2c3e50;
+  font-weight: 500;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.tracking-wider {
+  letter-spacing: 0.05em;
 }
 
 .min-height-0 {
