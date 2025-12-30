@@ -5,7 +5,7 @@
       bordered ? `border-2 rounded-borders border-${color}` : '',
       { 'bg-grey-2': !bordered, 'bg-white': bordered }
     ]"
-    class="q-mt-md content-section-container"
+    class="q-mt-md content-section-container rounded-borders"
   >
     <template v-if="expandable">
       <q-expansion-item
