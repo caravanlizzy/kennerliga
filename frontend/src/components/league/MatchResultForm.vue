@@ -128,7 +128,7 @@
                   </div>
 
                   <!-- Starting position -->
-                  <div>
+                  <div v-if="resultConfig?.has_starting_player_order">
                     <div
                       class="text-caption text-grey-7 q-mb-xs"
                       style="font-size: 11px"
@@ -397,7 +397,9 @@ function initFormData() {
     faction_ids: {} as Record<number, number | null>,
     tie_breaker_value: null as number | null,
   }));
-  preselectStartingPositions();
+  if (resultConfig.value?.has_starting_player_order) {
+    preselectStartingPositions();
+  }
 
   tieBreakerRequired.value = false;
   requiredTieBreaker.value = null;
@@ -521,7 +523,9 @@ async function submitResults() {
       points: resultConfig.value?.has_points ? entry.points : null,
       position: !resultConfig.value?.has_points ? entry.position : null,
       notes: entry.notes || null,
-      starting_position: entry.starting_position,
+      starting_position: resultConfig.value?.has_starting_player_order
+        ? entry.starting_position
+        : null,
       starting_points: entry.starting_points,
       faction_ids: selectedFactionIds,
       tie_breaker_value: entry.tie_breaker_value ?? null,
