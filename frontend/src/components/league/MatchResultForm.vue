@@ -167,8 +167,8 @@
                   <!-- Starting Points -->
                   <KennerInput
                     v-if="
-                      resultConfig?.starting_points_system &&
-                      resultConfig.starting_points_system === 'DYNAMIC'
+                      resultConfig?.starting_points_system_code &&
+                      resultConfig.starting_points_system_code === 'DYNAMIC'
                     "
                     v-model.number="getEntry(member.profile).starting_points"
                     type="number"
