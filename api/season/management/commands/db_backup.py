@@ -31,6 +31,7 @@ class Command(BaseCommand):
 
         cmd = [
             "mysqldump",
+            "--no-tablespaces",
             f"-h{db['HOST']}",
             f"-u{db['USER']}",
             f"-p{db['PASSWORD']}",
