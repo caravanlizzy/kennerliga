@@ -141,7 +141,7 @@ class RankingService:
         Returns:
             List containing only participants who were part of the previous season.
         """
-        prev_season = get_previous_season()
+        prev_season = get_running_season()
         if not prev_season:
             return []
         prev_participants = set(prev_season.participants.all())
