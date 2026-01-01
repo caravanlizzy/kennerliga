@@ -89,9 +89,6 @@
                     <q-tooltip>Leader</q-tooltip>
                   </q-icon>
                 </div>
-                <span class="text-caption text-grey-6">
-                  {{ totalPoints(row) }} Points
-                </span>
               </div>
             </div>
           </td>
