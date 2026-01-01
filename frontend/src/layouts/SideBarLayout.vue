@@ -24,6 +24,7 @@
         flat
         no-caps
         ripple
+        color="white"
         :style="{
           position: 'fixed',
           top: '50%',
@@ -38,7 +39,6 @@
           alignItems: 'center',
           justifyContent: 'center',
           backgroundColor: 'var(--q-dark)', // or use a class
-          color: 'white',
           fontWeight: '600',
           writingMode: 'vertical-rl',
         }"
@@ -55,7 +55,7 @@
         :width="sideWidth"
         :elevated="true"
       >
-        <q-toolbar class="q-px-md">
+        <q-toolbar class="q-px-md bg-dark text-white">
           <q-toolbar-title class="ellipsis">{{
             props.sideTitle
           }}</q-toolbar-title>
@@ -63,6 +63,7 @@
             flat
             round
             dense
+            color="white"
             icon="close"
             @click="toggleSide"
           />
