@@ -61,6 +61,7 @@ import KennerButton from 'components/base/KennerButton.vue';
 import LoadingSpinner from 'components/base/LoadingSpinner.vue';
 import { postFeedback, fetchFeedback } from 'src/services/feedbackService';
 import type { TFeedbackDto } from 'src/types';
+import KennerInput from 'components/base/KennerInput.vue';
 
 const $q = useQuasar();
 const router = useRouter();
