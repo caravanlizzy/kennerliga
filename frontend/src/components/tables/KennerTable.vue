@@ -14,6 +14,10 @@
       <slot :name="slotName" v-bind="slotProps" />
     </template>
 
+    <template v-slot:no-data>
+      <!-- hide default "No data available" -->
+    </template>
+
     <template v-slot:top-right>
       <div class="row q-gutter-sm no-wrap">
         <KennerInput
