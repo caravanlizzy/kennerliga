@@ -14,8 +14,8 @@
               <UserAvatar
                 class="player-avatar-inline"
                 :display-username="member.username"
-                size="32px"
-                shape="circle"
+                size="48px"
+                shape="squircle"
               />
               <div class="game-title-highlight">
                 <div class="game-title">

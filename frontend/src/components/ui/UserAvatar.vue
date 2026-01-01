@@ -83,7 +83,7 @@ const shapeClass = computed(() => {
 }
 
 .avatar-text {
-  font-size: 0.78rem;
+  font-size: 0.9rem;
   font-weight: 600;
   line-height: 1;
   letter-spacing: 0.2px;

@@ -122,7 +122,7 @@
 </template>
 
 <script setup lang="ts">
-import { h, ref, watch, watchEffect } from 'vue';
+import { ref, watch, watchEffect } from 'vue';
 import GameSelectionView from 'components/game/selectedGame/GameSelectionView.vue';
 import { useLeagueStore } from 'stores/leagueStore';
 import { storeToRefs } from 'pinia';

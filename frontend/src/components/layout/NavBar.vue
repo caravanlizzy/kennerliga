@@ -41,11 +41,9 @@
 import NavHome from 'components/nav/NavHome.vue';
 import NavMyLeague from 'components/nav/NavMyLeague.vue';
 import NavProfileMenu from 'components/nav/NavProfileMenu.vue';
-import KennerButton from 'components/base/KennerButton.vue';
 import { useUserStore } from 'stores/userStore';
 import { useUiStore } from 'src/stores/uiStore';
 import { storeToRefs } from 'pinia';
-import { useResponsive } from 'src/composables/responsive';
 import { useRoute } from 'vue-router';
 import { computed } from 'vue';
 
@@ -53,7 +51,6 @@ defineProps<{ onToggle: () => void }>();
 const { user } = storeToRefs(useUserStore());
 const { minimizedItems } = storeToRefs(useUiStore());
 const { restore } = useUiStore();
-const { isMobile } = useResponsive();
 const route = useRoute();
 
 const isIndexPage = computed(() => route.name === 'home');
