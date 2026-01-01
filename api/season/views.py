@@ -46,10 +46,22 @@ class SeasonViewSet(ModelViewSet):
     serializer_class = SeasonSerializer
     filterset_fields = ['year', 'month', 'status']
 
+    def get_queryset(self):
+        qs = super().get_queryset()
+        if self.request.query_params.get('with_leagues') == '1':
+            return qs.filter(leagues__isnull=False).distinct()
+        return qs
+
     def get_permissions(self):
-        if self.action in ['list', 'retrieve', 'registration_status', 'league_winners']:
+        if self.action in ['list', 'retrieve', 'registration_status', 'league_winners', 'seasons_with_leagues']:
             return [IsAuthenticated()]
         return [IsAdminUser()]
+
+    @action(detail=False, methods=['get'], url_path='seasons-with-leagues')
+    def seasons_with_leagues(self, request):
+        queryset = self.get_queryset().filter(leagues__isnull=False).distinct()
+        serializer = SeasonSerializer(queryset, many=True)
+        return Response(serializer.data)
 
     @action(detail=False, methods=['get'], url_path='registration-status')
     def registration_status(self, request):

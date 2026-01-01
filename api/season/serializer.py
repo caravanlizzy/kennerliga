@@ -5,7 +5,6 @@ from rest_framework.serializers import ModelSerializer
 
 from game.models import SelectedGame, BanDecision
 from game.serializers import SelectedGameSerializer
-from league.models import League
 from season.models import Season, SeasonParticipant
 from user.models import PlayerProfile
 

@@ -118,20 +118,6 @@ const selectedSeasonId = ref<number | null>(null);
 const leagues = ref<League[]>([]);
 const loadingLeagues = ref(false);
 
-const monthNames = [
-  'January',
-  'February',
-  'March',
-  'April',
-  'May',
-  'June',
-  'July',
-  'August',
-  'September',
-  'October',
-  'November',
-  'December',
-];
 
 const yearOptions = computed(() =>
   Array.from(new Set(seasonsWithLeagues.value.map((s) => s.year)))
@@ -159,7 +145,7 @@ async function loadSeasonsWithLeagues() {
   loadingSeasons.value = true;
   try {
     const { data } = await api.get(
-      'result/match-results/seasons-with-results/'
+      'season/seasons/seasons-with-leagues/'
     );
     seasonsWithLeagues.value = data;
     // Preselect the latest (year, month) that actually has leagues
