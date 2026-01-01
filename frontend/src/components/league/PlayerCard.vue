@@ -204,7 +204,7 @@ const hasSelectedOrBanInfo = computed(
   right: 0;
   bottom: 0;
   height: 3px;
-  background: #3dadea; /* primary color */
+  background: var(--q-info); /* info color */
   border-radius: 3px;
 }
 
