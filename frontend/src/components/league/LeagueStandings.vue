@@ -1,6 +1,6 @@
 <template>
   <q-table
-    title="League Standings"
+    :title="isMobile ? '' : 'League Standings'"
     flat
     :rows="rows"
     :columns="columns"
@@ -19,10 +19,12 @@ import { useLeagueStore } from 'stores/leagueStore';
 import { useUserStore } from 'stores/userStore';
 import { api } from 'boot/axios';
 import { formatNumbers } from 'src/helpers';
+import { useResponsive } from 'src/composables/responsive';
 
 const { user } = storeToRefs(useUserStore());
 const myLeagueStore = useLeagueStore(user.value.myCurrentLeagueId)();
 const { leagueId } = storeToRefs(myLeagueStore);
+const { isMobile } = useResponsive();
 
 interface LeagueStanding {
   player_profile: number;
