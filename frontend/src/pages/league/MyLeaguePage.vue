@@ -158,7 +158,7 @@ const {
   loading,
   selectedGamesWithResults,
 } = storeToRefs(myLeagueStore);
-const { updateLeagueData, hasSelectedGameResult } = myLeagueStore;
+const { updateLeagueData } = myLeagueStore;
 
 const { setActions, setLeadText, setSubject, setHint, reset } = useActionBar();
 

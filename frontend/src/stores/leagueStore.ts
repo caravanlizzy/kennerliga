@@ -1,10 +1,15 @@
 // stores/leagueStore.ts
 import { defineStore } from 'pinia';
-import { computed, ref, shallowRef } from 'vue';
+import { computed, ref, shallowRef, onUnmounted } from 'vue';
 import { fetchLeagueDetails } from 'src/services/leagueService';
 import { useUserStore } from 'stores/userStore';
 import { api } from 'boot/axios';
-import { TMatchResult, TLeagueMemberDto, TLeagueDto, TLeagueStatus } from 'src/types';
+import {
+  TLeagueMemberDto,
+  TLeagueDto,
+  TLeagueStatus,
+  TSelectedGameDto,
+} from 'src/types';
 
 
 /**
@@ -102,10 +107,11 @@ export const useLeagueStore = (id: number) => {
 
     const initialized = ref(false);
     let initPromise: Promise<void> | null = null;
+    let pollingInterval: ReturnType<typeof setInterval> | null = null;
 
     async function updateLeagueData() {
       if (leagueId.value == null) return;
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      // await new Promise(resolve => setTimeout(resolve, 1000));
       loading.value = true;
       try {
         const data = await fetchLeagueDetails(leagueId.value);
@@ -114,6 +120,23 @@ export const useLeagueStore = (id: number) => {
         leagueStatus.value = data.status;
       } finally {
         loading.value = false;
+      }
+    }
+
+    async function refresh() {
+      await updateLeagueData();
+      await getMatchResults();
+    }
+
+    function startPolling() {
+      if (pollingInterval) return;
+      pollingInterval = setInterval(refresh, 5 * 60 * 1000); // 5 minutes
+    }
+
+    function stopPolling() {
+      if (pollingInterval) {
+        clearInterval(pollingInterval);
+        pollingInterval = null;
       }
     }
 
@@ -168,6 +191,7 @@ export const useLeagueStore = (id: number) => {
           await updateLeagueData();
           await getMatchResults();
           initialized.value = true;
+          startPolling();
         } finally {
           loading.value = false;
           initPromise = null;
@@ -206,6 +230,10 @@ export const useLeagueStore = (id: number) => {
 
     void init();
 
+    onUnmounted(() => {
+      stopPolling();
+    });
+
     return {
       // state
       loading,
@@ -236,6 +264,9 @@ export const useLeagueStore = (id: number) => {
       updateLeagueData,
       refreshResultsForGame,
       hasSelectedGameResult,
+      startPolling,
+      stopPolling,
+      refresh,
     };
   });
 }
