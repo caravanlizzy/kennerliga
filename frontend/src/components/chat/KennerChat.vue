@@ -32,7 +32,7 @@
             <q-chat-message
               v-if="m.label"
               :label="m.label"
-              class="text-accent text-weight-bold"
+              class="text-secondary text-weight-bold"
             />
             <q-chat-message
               v-else
@@ -40,7 +40,7 @@
               :text="[m.text]"
               :name="m.sender"
               :stamp="timeAgo(m.datetime)"
-              :bg-color="isMine(m) ? 'primary' : 'secondary'"
+              :bg-color="isMine(m) ? 'primary' : 'accent'"
               :text-color="isMine(m) ? 'white' : 'white'"
               class="chat-message"
             />
