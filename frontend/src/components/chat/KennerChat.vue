@@ -40,9 +40,8 @@
               :text="[m.text]"
               :name="m.sender"
               :stamp="timeAgo(m.datetime)"
-              :bg-color="isMine(m) ? 'primary' : 'accent'"
-              :text-color="isMine(m) ? 'white' : 'white'"
               class="chat-message"
+              :class="isMine(m) ? 'chat-message-sent' : 'chat-message-received'"
             />
           </template>
         </q-scroll-area>
@@ -346,3 +345,34 @@ onUnmounted(() => {
   }
 });
 </script>
+
+<style lang="scss" scoped>
+.chat-message {
+  :deep(.q-message-text) {
+    border: 1px solid;
+    min-height: unset;
+
+    &:before {
+      border: inherit;
+      border-bottom: 0;
+      border-right: 0;
+    }
+  }
+
+  &.chat-message-sent {
+    :deep(.q-message-text) {
+      border-color: rgba($primary, 0.3);
+      background: rgba($primary, 0.1) !important;
+      color: $primary !important;
+    }
+  }
+
+  &.chat-message-received {
+    :deep(.q-message-text) {
+      border-color: rgba($secondary, 0.3);
+      background: rgba($secondary, 0.1) !important;
+      color: $accent !important;
+    }
+  }
+}
+</style>
