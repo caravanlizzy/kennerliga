@@ -27,3 +27,10 @@ def get_game_picks_per_player(player_count: int) -> int:
     if player_count == 2:
         return 2
     return 1
+
+
+# Amount of BanDecisions required for a successful ban
+def get_ban_amount_for_success(player_count: int) -> int:
+    if player_count == 2:
+        return 1
+    return 2

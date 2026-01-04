@@ -2,6 +2,7 @@ from django.db import transaction
 from rest_framework import serializers
 from rest_framework.serializers import ModelSerializer
 
+from api.constants import get_ban_amount_for_success
 from game.models import Game, GameOption, GameOptionChoice, Faction, TieBreaker, ResultConfig, StartingPointSystem, \
     Platform, SelectedGame, SelectedOption, BanDecision, GameOptionAvailabilityGroup, GameOptionAvailabilityCondition
 from league.models import League
@@ -99,6 +100,7 @@ class SelectedGameSerializer(serializers.ModelSerializer):
     # game_name is read only
     game_name = serializers.SerializerMethodField()
     selected_options = SelectedOptionSerializer(many=True)
+    successfully_banned = serializers.SerializerMethodField()
 
     profile = serializers.PrimaryKeyRelatedField(
         queryset=PlayerProfile.objects.all(),
@@ -115,7 +117,7 @@ class SelectedGameSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = SelectedGame
-        fields = ['id', 'game', 'game_name', 'selected_options', 'league', 'profile', 'manage_only']
+        fields = ['id', 'game', 'game_name', 'selected_options', 'league', 'profile', 'manage_only', 'successfully_banned']
 
     def get_game_name(self, obj):
         return obj.game.name if obj.game else None
@@ -128,6 +130,18 @@ class SelectedGameSerializer(serializers.ModelSerializer):
         league = validated_data.pop('league', None)
         validated_data['league'] = League.objects.get(id=league)
         return validated_data
+
+    def get_successfully_banned(self, obj):
+        league = obj.league
+        if not league:
+            return False
+
+        required_bans = get_ban_amount_for_success(league.members.count())
+        ban_count = BanDecision.objects.filter(selected_game=obj).count()
+
+        return ban_count >= required_bans
+
+
 
     def create(self, validated_data):
         # Remove write-only fields that shouldn't go to the model
