@@ -34,6 +34,12 @@
                  <q-icon name="stars" color="primary" size="14px" />
                  <span>{{ col.label }}</span>
               </div>
+              <div v-else-if="col.name.startsWith('game_')" class="column items-center">
+                <span>{{ col.label }}</span>
+                <div v-if="(col as any).selectedByName" class="text-grey-6" style="font-size: 0.6rem; font-weight: normal; margin-top: 2px;">
+                  <span class="text-grey-5">by </span>{{ (col as any).selectedByName }}
+                </div>
+              </div>
               <span v-else>{{ col.label }}</span>
             </q-th>
           </q-tr>
@@ -224,6 +230,7 @@ interface SelectedGame {
   id: number;
   game_name: string;
   game_short_name: string; // 🔹 now available
+  selected_by_name?: string;
 }
 
 interface StandingsData {
@@ -277,6 +284,8 @@ const tableColumns = computed<QTableColumn[]>(() => {
           : game.game_name,
       field: `game_${game.id}`,
       align: 'center',
+      // @ts-expect-error - custom property for header
+      selectedByName: game.selected_by_name,
     });
   });
 
