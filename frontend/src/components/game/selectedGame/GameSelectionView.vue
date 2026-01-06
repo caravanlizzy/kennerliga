@@ -99,7 +99,7 @@ const {
   isPlatformSelected,
   loadPlatformsAndGames,
   submitGame,
-} = useGameSelection(props.leagueId, props.profileId);
+} = useGameSelection(props.leagueId, props.profileId, props.manageOnly);
 
 provide('platforms', platforms);
 

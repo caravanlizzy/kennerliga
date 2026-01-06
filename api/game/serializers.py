@@ -123,8 +123,9 @@ class SelectedGameSerializer(serializers.ModelSerializer):
         game = attrs.get('game', None)
         league = attrs.get('league', None)
         profile = attrs.get('profile', None)
+        manage_only = attrs.get('manage_only', False)
 
-        if game and league and profile:
+        if not manage_only and game and league and profile:
             # A profile can select the same game at most twice per season year
             season_year = league.season.year
 

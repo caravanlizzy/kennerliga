@@ -32,7 +32,7 @@ type OptionWithAvailability = TGameOptionDto & {
   ref?: string;
 };
 
-const EMPTY_GAME: TGameDto = { id: -1, name: '', platform: -1 };
+const EMPTY_GAME: TGameDto = { id: -1, name: '', short_name: '', platform: -1 };
 
 function asId(v: unknown): number | undefined {
   if (typeof v === 'number') return v;
@@ -43,7 +43,7 @@ function asId(v: unknown): number | undefined {
   return undefined;
 }
 
-export function useGameSelection(leagueId: number, profileId: number) {
+export function useGameSelection(leagueId: number, profileId: number, manage_only = false) {
   // --- state ---
   const gameInformation = reactive<{
     game: TGameDto | undefined;
@@ -240,7 +240,7 @@ export function useGameSelection(leagueId: number, profileId: number) {
   }
 
   async function fetchGames() {
-    const { data } = await api(`game/games/?league=${leagueId}`);
+    const { data } = await api(`game/games/?league=${leagueId}&manage_only=${manage_only}`);
     gameData.value = data;
   }
 
@@ -259,7 +259,7 @@ export function useGameSelection(leagueId: number, profileId: number) {
     try {
       const full: TFullGameDto = await fetchFullGame(game.id);
 
-      gameInformation.game = { id: full.id, name: full.name, platform: full.platform };
+      gameInformation.game = { id: full.id, name: full.name, short_name: full.short_name, platform: full.platform };
       // ensure arrays exist
       gameInformation.options = (full.options ?? []).map((o) => ({
         ...o,
