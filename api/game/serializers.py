@@ -119,6 +119,33 @@ class SelectedGameSerializer(serializers.ModelSerializer):
         model = SelectedGame
         fields = ['id', 'game', 'game_name', 'selected_options', 'league', 'profile', 'manage_only', 'successfully_banned']
 
+    def validate(self, attrs):
+        game = attrs.get('game', None)
+        league = attrs.get('league', None)
+        profile = attrs.get('profile', None)
+
+        if game and league and profile:
+            # A profile can select the same game at most twice per season year
+            season_year = league.season.year
+
+            # Count how many times this profile has selected this game in this season year
+            selections_count = SelectedGame.objects.filter(
+                profile=profile,
+                game=game,
+                league__season__year=season_year
+            )
+
+            # If updating, exclude the current instance
+            if self.instance:
+                selections_count = selections_count.exclude(id=self.instance.id)
+
+            if selections_count.count() >= 2:
+                raise serializers.ValidationError(
+                    f"You cannot select '{game.name}' more than twice a year. This year is {season_year}."
+                )
+
+        return attrs
+
     def get_game_name(self, obj):
         return obj.game.name if obj.game else None
 

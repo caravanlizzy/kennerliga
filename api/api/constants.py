@@ -10,6 +10,9 @@ LEAGUE_POINTS_DISTRIBUTION = {
     2: {1: Decimal("6"), 2: Decimal("0")},
 }
 
+# the number the same game can be picked within a year
+MAX_SAME_GAME_PER_YEAR = 2
+
 DEFAULT_LEAGUE_POINTS = {
     1: Decimal("6"),
     2: Decimal("3"),
