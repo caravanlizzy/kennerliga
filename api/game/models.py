@@ -6,8 +6,8 @@ from user.models import PlayerProfile, Platform
 
 
 class Game(models.Model):
-    name = models.CharField(max_length=88)
-    short_name = models.CharField(max_length=33, blank=True, default='')
+    name = models.CharField(max_length=120)
+    short_name = models.CharField(max_length=120, blank=True, default='')
     platform = models.ForeignKey(Platform, on_delete=models.CASCADE)
 
     class Meta:
