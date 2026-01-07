@@ -9,6 +9,7 @@ from game.serializers import GameSerializer, GameOptionSerializer, GameOptionCho
     SelectedGameSerializer, SelectedOptionSerializer, FullGameSerializer, BanDecisionSerializer
 
 from league.services import LeagueService
+from league.models import League
 
 
 class GameViewSet(ModelViewSet):
@@ -18,15 +19,29 @@ class GameViewSet(ModelViewSet):
 
     def get_queryset(self):
         queryset = Game.objects.all()
-        league = self.request.query_params.get("league")  # Query param to specify the league
+        league_id = self.request.query_params.get("league")  # Query param to specify the league
+        manage_only = self.request.query_params.get("manage_only", "false").lower() == "true"
+        is_admin = self.request.user and self.request.user.is_staff
 
         # Ensure league is provided to apply filtering
-        if league:
-            # Exclude games selected by any player in the league
-            selected_games = SelectedGame.objects.filter(
-                league=league
-            ).values_list("game_id", flat=True)
-            queryset = queryset.exclude(id__in=selected_games)
+        if league_id:
+            try:
+                league = League.objects.get(id=league_id)
+                member_count = league.members.count()
+
+                if not (manage_only and is_admin):
+                    queryset = queryset.filter(
+                        min_players__lte=member_count,
+                        max_players__gte=member_count
+                    )
+
+                # Exclude games selected by any player in the league
+                selected_games = SelectedGame.objects.filter(
+                    league=league
+                ).values_list("game_id", flat=True)
+                queryset = queryset.exclude(id__in=selected_games)
+            except League.DoesNotExist:
+                pass
 
         return queryset.order_by(Lower('name'))
 

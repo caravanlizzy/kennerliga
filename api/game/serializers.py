@@ -125,25 +125,38 @@ class SelectedGameSerializer(serializers.ModelSerializer):
         profile = attrs.get('profile', None)
         manage_only = attrs.get('manage_only', False)
 
-        if not manage_only and game and league and profile:
-            # A profile can select the same game at most twice per season year
-            season_year = league.season.year
+        request = self.context.get('request')
+        is_admin = request and request.user and request.user.is_staff
 
-            # Count how many times this profile has selected this game in this season year
-            selections_count = SelectedGame.objects.filter(
-                profile=profile,
-                game=game,
-                league__season__year=season_year
-            )
+        if manage_only and not is_admin:
+            manage_only = False
 
-            # If updating, exclude the current instance
-            if self.instance:
-                selections_count = selections_count.exclude(id=self.instance.id)
-
-            if selections_count.count() >= 2:
+        if not manage_only and game and league:
+            member_count = league.members.count()
+            if member_count < game.min_players or member_count > game.max_players:
                 raise serializers.ValidationError(
-                    f"You cannot select '{game.name}' more than twice a year. This year is {season_year}."
+                    f"Game '{game.name}' requires {game.min_players}-{game.max_players} players, but this league has {member_count} members."
                 )
+
+            if profile:
+                # A profile can select the same game at most twice per season year
+                season_year = league.season.year
+
+                # Count how many times this profile has selected this game in this season year
+                selections_count = SelectedGame.objects.filter(
+                    profile=profile,
+                    game=game,
+                    league__season__year=season_year
+                )
+
+                # If updating, exclude the current instance
+                if self.instance:
+                    selections_count = selections_count.exclude(id=self.instance.id)
+
+                if selections_count.count() >= 2:
+                    raise serializers.ValidationError(
+                        f"You cannot select '{game.name}' more than twice a year. This year is {season_year}."
+                    )
 
         return attrs
 

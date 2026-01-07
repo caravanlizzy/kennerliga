@@ -9,6 +9,8 @@ class Game(models.Model):
     name = models.CharField(max_length=120)
     short_name = models.CharField(max_length=120, blank=True, default='')
     platform = models.ForeignKey(Platform, on_delete=models.CASCADE)
+    min_players = models.PositiveIntegerField(default=2)
+    max_players = models.PositiveIntegerField(default=4)
 
     class Meta:
         constraints = [
