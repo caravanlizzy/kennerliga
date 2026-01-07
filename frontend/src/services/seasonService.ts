@@ -162,7 +162,7 @@ export async function createLeagueForSeason(
 ): Promise<TLeagueDto> {
   // map chosen PlayerProfile IDs -> SeasonParticipant IDs
   const spIds = seasonParticipants
-    .filter((sp: TSeasonParticipantDto) => memberProfileIds.includes(sp.profile_id))
+    .filter((sp: TSeasonParticipantDto) => memberProfileIds.includes(sp.profile))
     .map((sp: TSeasonParticipantDto) => sp.id);
 
   const { data } = await api('/league/leagues/', {
