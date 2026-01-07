@@ -12,7 +12,6 @@ from season.serializer import SeasonParticipantSerializer, SeasonParticipantMini
 class LeagueSerializer(serializers.ModelSerializer):
     # write: accept SP ids
     member_ids = serializers.PrimaryKeyRelatedField(
-        source="members",
         queryset=SeasonParticipant.objects.all(),
         many=True,
         write_only=True,
@@ -27,19 +26,27 @@ class LeagueSerializer(serializers.ModelSerializer):
 
     def validate(self, attrs):
         season = attrs.get("season") or getattr(self.instance, "season", None)
-        members = attrs.get("members", [])
-        # Ensure all members are from the same season
-        invalid = [sp.id for sp in members if sp.season_id != season.id]
-        if invalid:
-            raise serializers.ValidationError(
-                {"members": f"All members must belong to season {season.id}. Offenders: {invalid}"}
-            )
+        members = attrs.get("member_ids", [])
+        if season and members:
+            # Ensure all members are from the same season
+            invalid = [sp.id for sp in members if sp.season_id != season.id]
+            if invalid:
+                raise serializers.ValidationError(
+                    {"member_ids": f"All members must belong to season {season.id}. Offenders: {invalid}"}
+                )
         return attrs
 
     def create(self, validated_data):
-        members = validated_data.pop("members", [])
+        members = validated_data.pop("member_ids", [])
         league = League.objects.create(**validated_data)
         league.members.set(members)
+        return league
+
+    def update(self, instance, validated_data):
+        members = validated_data.pop("member_ids", None)
+        league = super().update(instance, validated_data)
+        if members is not None:
+            league.members.set(members)
         return league
 
 class LeagueStandingSerializer(serializers.ModelSerializer):
