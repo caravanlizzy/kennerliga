@@ -19,6 +19,12 @@
         class="q-ml-sm text-weight-bold"
       >
         Banned: {{ member.my_banned_game.game_name }}
+        <span
+          v-if="getOwnerName(member.my_banned_game.profile)"
+          class="text-weight-light q-ml-xs"
+        >
+          (by {{ getOwnerName(member.my_banned_game.profile) }})
+        </span>
         <KennerButton
           flat
           round
@@ -30,27 +36,44 @@
           <KennerTooltip>Remove Ban</KennerTooltip>
         </KennerButton>
       </q-chip>
+
       <q-chip
-        v-else-if="member.has_banned"
+        v-for="banner in getBannersInfo(member)"
+        :key="banner.id"
         unelevated
         square
-        color="grey-2"
-        text-color="grey-7"
-        icon="skip_next"
+        color="orange-1"
+        text-color="orange-9"
+        icon="group"
         class="q-ml-sm text-weight-bold"
       >
-        Ban Skipped
-        <KennerButton
-          flat
-          round
-          dense
-          size="xs"
-          icon="close"
-          class="q-ml-xs"
-        >
-          <KennerTooltip>Remove Skip</KennerTooltip>
-        </KennerButton>
+        Banned Pick: {{ banner.game_name }} (by
+        {{ formatBannerNames(banner.banner_names) }})
       </q-chip>
+
+      <template v-if="!member.my_banned_game">
+        <q-chip
+          v-if="member.has_banned"
+          unelevated
+          square
+          color="grey-2"
+          text-color="grey-7"
+          icon="skip_next"
+          class="q-ml-sm text-weight-bold"
+        >
+          Ban Skipped
+          <KennerButton
+            flat
+            round
+            dense
+            size="xs"
+            icon="close"
+            class="q-ml-xs"
+          >
+            <KennerTooltip>Remove Skip</KennerTooltip>
+          </KennerButton>
+        </q-chip>
+      </template>
       <q-space />
       <div
         v-if="
@@ -111,23 +134,40 @@
     <div class="row q-col-gutter-lg">
       <!-- Card per selected game -->
       <div
-        v-for="selGame in member.selected_games || []"
+        v-for="selGame in (member.selected_games || [])"
         :key="`${member.id}-${selGame.id}`"
         class="col-12 col-md-4"
       >
-        <q-card flat bordered class="fit rounded-borders overflow-hidden shadow-1 hover-shadow">
+        <q-card
+          flat
+          bordered
+          class="fit rounded-borders overflow-hidden shadow-1 hover-shadow"
+          :class="{ 'opacity-60 grayscale': selGame.successfully_banned }"
+        >
           <!-- Header Section -->
-          <q-card-section class="q-pa-md bg-grey-1 text-grey-9">
+          <q-card-section
+            class="q-pa-md text-grey-9"
+            :class="selGame.successfully_banned ? 'bg-red-50' : 'bg-grey-1'"
+          >
             <div class="row items-center justify-between no-wrap">
               <div class="col">
-                <div class="text-subtitle1 text-weight-bolder ellipsis">
+                <div
+                  class="text-subtitle1 text-weight-bolder ellipsis"
+                  :class="{ 'text-strike': selGame.successfully_banned }"
+                >
                   <q-icon
-                    name="sports_esports"
+                    :name="selGame.successfully_banned ? 'block' : 'sports_esports'"
                     size="sm"
-                    color="primary"
+                    :color="selGame.successfully_banned ? 'negative' : 'primary'"
                     class="q-mr-sm"
                   />
                   {{ selGame?.game_name || 'No Game Selected' }}
+                </div>
+                <div
+                  v-if="selGame.successfully_banned"
+                  class="text-caption text-negative text-weight-bold"
+                >
+                  BANNED
                 </div>
               </div>
               <div class="col-auto">
@@ -260,6 +300,36 @@ function hasResult(selGame: any) {
   const results = props.matchResultsBySelectedGameId[selGame.id];
   return Array.isArray(results) && results.length > 0;
 }
+
+function getOwnerName(profileId: number) {
+  const owner = props.league?.members?.find((m: any) => m.profile === profileId);
+  return owner?.profile_name || null;
+}
+
+function getBannersInfo(member: any) {
+  const info: { id: number; game_name: string; banner_names: string[] }[] = [];
+  (member.selected_games || []).forEach((sg: any) => {
+    const bannerNames = (props.league?.members || [])
+      .filter((m: any) => m.my_banned_game?.game && m.my_banned_game.id === sg.id)
+      .map((m: any) => m.profile_name);
+
+    if (bannerNames.length > 0) {
+      info.push({
+        id: sg.id,
+        game_name: sg.game_name,
+        banner_names: bannerNames,
+      });
+    }
+  });
+  return info;
+}
+
+function formatBannerNames(names: string[]) {
+  if (names.length === 0) return '';
+  if (names.length === 1) return names[0];
+  if (names.length === 2) return `${names[0]} and ${names[1]}`;
+  return `${names.slice(0, -1).join(', ')} and ${names[names.length - 1]}`;
+}
 </script>
 
 <style scoped>
@@ -267,5 +337,14 @@ function hasResult(selGame: any) {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+.opacity-60 {
+  opacity: 0.6;
+}
+.grayscale {
+  filter: grayscale(0.5);
+}
+.bg-red-50 {
+  background-color: #fef2f2;
 }
 </style>

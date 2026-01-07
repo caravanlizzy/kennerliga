@@ -58,13 +58,13 @@
 import { ref, computed } from 'vue';
 import { banGame } from 'src/services/gameService'; // Adjust path if necessary
 import { useQuasar } from 'quasar';
-import { TLeagueDto, TLeagueMemberDto } from 'src/types';
+import { TLeagueDto, TSeasonParticipantDto } from 'src/types';
 import { TSelectedGameDto } from 'src/types/game';
 import KennerButton from 'components/base/KennerButton.vue';
 
 const props = defineProps<{
   league: TLeagueDto;
-  member: TLeagueMemberDto;
+  member: TSeasonParticipantDto;
 }>();
 
 const emit = defineEmits(['onSuccess']);
@@ -79,7 +79,7 @@ interface AvailableGame extends TSelectedGameDto {
 
 const availableToBan = computed(() => {
   const games: AvailableGame[] = [];
-  props.league.members.forEach((m: TLeagueMemberDto) => {
+  props.league.members.forEach((m: TSeasonParticipantDto) => {
     // Players usually can't ban their own picks
     if (m.id === props.member.id) return;
 

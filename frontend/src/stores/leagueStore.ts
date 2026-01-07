@@ -5,7 +5,7 @@ import { fetchLeagueDetails } from 'src/services/leagueService';
 import { useUserStore } from 'stores/userStore';
 import { api } from 'boot/axios';
 import {
-  TLeagueMemberDto,
+  TSeasonParticipantDto,
   TLeagueDto,
   TLeagueStatus,
   TSelectedGameDto,
@@ -38,7 +38,7 @@ export const useLeagueStore = (id: number) => {
     // leagueData
     const leagueId = ref(id);
     const leagueData = shallowRef<TLeagueDto|null>(null);
-    const members = ref<TLeagueMemberDto[]>([]);
+    const members = ref<TSeasonParticipantDto[]>([]);
     const leagueStatus = ref<TLeagueStatus>('PICKING'); // states: PICKING, BANNING, REPICKING, PLAYING, DONE
 
     const statusMap: Record<TLeagueStatus, { noun?: string; verb?: string }> = {
@@ -55,8 +55,8 @@ export const useLeagueStore = (id: number) => {
     const statusVerb = computed(() => statusMap[leagueStatus.value]?.verb ?? '');
 
     // --- Derived maps for O(1) lookups ---
-    const membersById = computed<{ [key: number]: TLeagueMemberDto }>(() =>
-      members.value.reduce((acc: { [key: number]: TLeagueMemberDto }, m) => {
+    const membersById = computed<{ [key: number]: TSeasonParticipantDto }>(() =>
+      members.value.reduce((acc: { [key: number]: TSeasonParticipantDto }, m) => {
         acc[m.id] = m;
         return acc;
       }, {})

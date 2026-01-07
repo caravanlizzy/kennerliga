@@ -101,15 +101,7 @@
           bordered
           class="league-section"
         >
-          <div class="row q-col-gutter-md">
-            <div
-              v-for="member in members"
-              :key="member.id"
-              class="col-12 col-md-6"
-            >
-              <PlayerCard :member="member" />
-            </div>
-          </div>
+          <PlayerCard :all-members="members" />
         </ContentSection>
       </div>
 

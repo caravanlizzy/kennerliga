@@ -63,7 +63,7 @@ import EmptyMembersState from 'components/league/manager/EmptyMembersState.vue';
 import MemberGameCard from 'components/league/manager/MemberGameCard.vue';
 import ManagerFormsDialog, { type TActiveForm } from 'components/league/manager/ManagerFormsDialog.vue';
 import { useDialog } from 'src/composables/dialog';
-import type { TSeasonDto, TLeagueDto, TLeagueMemberDto, TSelectedGameDto, TMatchResult } from 'src/types';
+import type { TSeasonDto, TLeagueDto, TSeasonParticipantDto, TSelectedGameDto, TMatchResult } from 'src/types';
 
 const route = useRoute();
 const $q = useQuasar();

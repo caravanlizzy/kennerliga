@@ -95,21 +95,4 @@ class LeagueDetailSerializer(serializers.ModelSerializer):
         for i, member in enumerate(data, 1):
             member['position'] = i
 
-            # If you don't want to send heavy banned_game details anymore:
-            if 'banned_game' in member:
-                member.pop('banned_game', None)
-
-            # Ensure we don't expose these fields if they were previously added
-            member.pop('selected_game_id', None)
-            member.pop('banned_by', None)
-
-            # In case you previously injected banned_by into nested objects
-            for sg in (member.get("selected_games") or []):
-                if isinstance(sg, dict):
-                    sg.pop("banned_by", None)
-
-            banned_sg = member.get("first_game_selection_banned_by_others")
-            if isinstance(banned_sg, dict):
-                banned_sg.pop("banned_by", None)
-
         return data

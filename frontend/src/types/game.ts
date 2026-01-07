@@ -98,6 +98,7 @@ export type TSelectedGameDto = {
   league: number;
   selected_options: TSelectedGameOptionDto[];
   created_at?: string;
+  successfully_banned?: boolean;
 };
 
 export type TSelectedGameDtoPayload = {

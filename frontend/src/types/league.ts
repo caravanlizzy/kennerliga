@@ -8,19 +8,6 @@ export type TSeasonDto = {
   status?: string;
 };
 
-export type TSeasonParticipantDto = {
-  id: number;
-  season: number;
-  profile_id: number;
-  rank: number | null;
-  username: string;
-  profile_name: string;
-  selected_game: TSelectedGameDto | null;
-  banned_selected_game: TSelectedGameDto | null;
-  has_banned: boolean;
-  is_active_player: boolean;
-};
-
 export type TLeagueStatus =
   | 'PICKING'
   | 'REPICKING'
@@ -28,22 +15,18 @@ export type TLeagueStatus =
   | 'PLAYING'
   | 'DONE';
 
-export type TLeagueMemberDto = {
+export type TSeasonParticipantDto = {
   id: number;
   season: number;
-  profile_id: number;
   rank: number;
   username: string;
   profile_name: string;
   profile: number; // player_profile id
-  selected_game: TSelectedGameDto | null;
   selected_games: TSelectedGameDto[] | null;
-  banned_selected_game: TSelectedGameDto | null;
-  banned_game: TBannedGame;
+  my_banned_game: TBannedGame;
   has_banned: boolean;
   is_active_player: boolean;
   position: number;
-  selected_game_id: number | null;
   banned_by: string[];
 };
 
@@ -51,7 +34,7 @@ export type TLeagueDto = {
   id: number;
   level: number | string;
   season: number;
-  members: TLeagueMemberDto[];
+  members: TSeasonParticipantDto[];
   status?: TLeagueStatus;
 };
 
@@ -59,6 +42,7 @@ export type TBannedGameFull = {
   id: number;
   game: number;
   game_name: string;
+  profile: number;
   selected_options: TSelectedGameOptionDto[];
 };
 

@@ -71,12 +71,12 @@ import GameSelectionView from 'components/game/selectedGame/GameSelectionView.vu
 import GameSettingsEditor from 'components/game/selectedGame/GameSettingsEditor.vue';
 import MatchResultForm from 'components/league/MatchResultForm.vue';
 import BanGameForm from 'components/game/selectedGame/BanGameForm.vue';
-import type { TLeagueDto, TLeagueMemberDto, TSelectedGameDto } from 'src/types';
+import type { TLeagueDto, TSeasonParticipantDto, TSelectedGameDto } from 'src/types';
 
 export type TActiveForm =
-  | { type: 'edit'; member: TLeagueMemberDto; selGame: TSelectedGameDto }
-  | { type: 'add'; member: TLeagueMemberDto }
-  | { type: 'ban'; member: TLeagueMemberDto }
+  | { type: 'edit'; member: TSeasonParticipantDto; selGame: TSelectedGameDto }
+  | { type: 'add'; member: TSeasonParticipantDto }
+  | { type: 'ban'; member: TSeasonParticipantDto }
   | { type: 'post-result'; selGame: TSelectedGameDto };
 
 defineProps<{

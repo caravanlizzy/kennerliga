@@ -2,21 +2,26 @@
   <q-card flat unelevated class="player-card">
     <q-card-section class="card-body">
       <div class="game-primary-section">
-        <template v-if="hasSelectedOrBanInfo">
-          <!-- Games list (per game) -->
+        <div v-for="m in allMembers" :key="m.id" class="member-group q-mb-xl">
+          <!-- Member Header -->
+          <div class="member-header q-mb-md">
+            <UserAvatar
+              :display-username="m.username"
+              size="48px"
+              shape="squircle"
+            />
+            <div class="member-info q-ml-md">
+              <div class="text-h6 text-weight-bold">{{ m.profile_name }}</div>
+            </div>
+          </div>
+
+          <!-- 1. Active Pick(s) -->
           <div
-            v-for="(game, idx) in displayedSelectedGames"
-            :key="gameKey(game, idx)"
+            v-for="game in getActivePicks(m)"
+            :key="game.id"
             class="selected-game-card q-mb-md"
           >
-            <!-- Game Header -->
             <div class="game-title-row">
-              <UserAvatar
-                class="player-avatar-inline"
-                :display-username="member.username"
-                size="48px"
-                shape="squircle"
-              />
               <div class="game-title-highlight">
                 <div class="game-title">
                   <span class="game-name-text">
@@ -33,59 +38,100 @@
                 size="sm"
                 icon="expand_more"
                 class="expand-btn"
-                :class="{ expanded: isExpanded(idx) }"
-                @click="toggleExpanded(idx)"
+                :class="{ expanded: isExpanded(game.id) }"
+                @click="toggleExpanded(game.id)"
               />
             </div>
 
-            <!-- Expandable Settings (per game) -->
             <transition name="expand">
-              <div v-if="isExpanded(idx)" class="game-settings-wrapper">
+              <div v-if="isExpanded(game.id)" class="game-settings-wrapper">
                 <div class="settings-divider"></div>
                 <GameSettingsDisplay :selectedOptions="game.selected_options" />
               </div>
             </transition>
           </div>
 
-          <!-- Bans Section (ONCE per player) -->
-          <div class="bans-section">
-            <div class="ban-row">
-              <div class="bans-label">
-                <q-icon name="gavel" size="16px" />
-                <span>Ban</span>
-              </div>
-              <div class="bans-content">
-                <q-chip v-if="myBannedGameName" dense class="my-ban-chip">
-                  {{ myBannedGameName }}
-                </q-chip>
-                <span v-else-if="member.has_banned" class="no-bans">
-                  Ban skipped
-                </span>
-              </div>
+          <!-- 2. The Game they Banned (my_banned_game) -->
+          <div v-if="m.my_banned_game?.game" class="ban-row q-mb-md">
+            <div class="bans-label">
+              <q-icon name="gavel" size="16px" color="red-5" />
+              <span>Banned</span>
             </div>
-
-            <div v-if="firstGameSelectionBannedByOthers" class="ban-row">
-              <div class="bans-label">
-                <q-icon name="group" size="16px" />
-                <span>Banned Pick</span>
-              </div>
-              <div class="bans-content">
-                <template v-if="firstGameSelectionBannedByOthers">
-                  <q-chip dense class="first-selection-chip" icon="looks_one">
-                    {{ firstGameSelectionBannedByOthers }}
-                  </q-chip>
-                </template>
-              </div>
+            <div class="bans-content">
+              <q-chip dense class="my-ban-chip">
+                {{ m.my_banned_game.game_name }}
+                <KennerTooltip v-if="getOwnerName(m.my_banned_game.profile)">
+                  Picked by {{ getOwnerName(m.my_banned_game.profile) }}
+                </KennerTooltip>
+              </q-chip>
             </div>
           </div>
-        </template>
+          <div v-else-if="m.has_banned" class="ban-row q-mb-md">
+            <div class="bans-label">
+              <q-icon name="gavel" size="16px" />
+              <span>Ban</span>
+            </div>
+            <div class="bans-content">
+              <span class="no-bans">Ban skipped</span>
+            </div>
+          </div>
 
-        <!-- Empty State (only when no selected games AND no ban info) -->
-        <div v-else class="no-game-selected row items-center">
+          <!-- 3. Their own game that has been successfully banned -->
+          <div
+            v-for="game in getSuccessfullyBannedPicks(m)"
+            :key="'banned-' + game.id"
+            class="selected-game-card q-mb-md banned-pick-row"
+          >
+            <div class="game-title-row">
+              <div class="game-title-highlight banned">
+                <div class="game-title">
+                  <span class="game-name-text text-grey-6">
+                    <q-icon
+                      name="block"
+                      color="red-5"
+                      size="xs"
+                      class="q-mr-xs"
+                    />
+                    <del>{{ game.game_name }}</del>
+                  </span>
+                </div>
+                <div class="text-caption text-grey-6">
+                  Successfully Banned
+                  <span v-if="getBannerNames(game.id).length > 0">
+                    by
+                    <strong>{{
+                      formatBannerNames(getBannerNames(game.id))
+                    }}</strong>
+                  </span>
+                </div>
+              </div>
+              <KennerButton
+                flat
+                round
+                size="sm"
+                icon="expand_more"
+                class="expand-btn"
+                :class="{ expanded: isExpanded(game.id) }"
+                @click="toggleExpanded(game.id)"
+              />
+            </div>
+
+            <transition name="expand">
+              <div v-if="isExpanded(game.id)" class="game-settings-wrapper">
+                <div class="settings-divider"></div>
+                <div class="opacity-50">
+                  <GameSettingsDisplay :selectedOptions="game.selected_options" />
+                </div>
+              </div>
+            </transition>
+          </div>
+        </div>
+
+        <!-- Empty State -->
+        <div v-if="allMembers.length === 0" class="no-game-selected row items-center">
           <q-icon name="videogame_asset_off" size="32px" />
           <div class="q-ml-sm">
-            <div class="text-grey-8">{{ member.profile_name }}</div>
-            No game selected
+            No players in league
           </div>
         </div>
       </div>
@@ -94,88 +140,70 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { ref } from 'vue';
 import UserAvatar from 'components/ui/UserAvatar.vue';
 import GameSettingsDisplay from 'components/game/selectedGame/GameSettingsDisplay.vue';
 import KennerButton from 'components/base/KennerButton.vue';
 import KennerTooltip from 'components/base/KennerTooltip.vue';
 
-import { TLeagueMemberDto, TSelectedGameOptionDto } from 'src/types';
-
-type SelectedGame = {
-  id?: number | string;
-  game_name?: string;
-  selected_options?: TSelectedGameOptionDto[];
-};
+import { TSeasonParticipantDto } from 'src/types';
 
 const props = withDefaults(
-  defineProps<{ member: TLeagueMemberDto; color?: string }>(),
+  defineProps<{
+    allMembers?: TSeasonParticipantDto[];
+    color?: string;
+  }>(),
   {
+    allMembers: () => [],
     color: 'var(--q-dark)',
   }
 );
 
-const expandedByIndex = ref<Record<number, boolean>>({});
+const expandedById = ref<Record<number, boolean>>({});
 
-function toggleExpanded(idx: number) {
-  expandedByIndex.value[idx] = !expandedByIndex.value[idx];
+function toggleExpanded(id: number) {
+  expandedById.value[id] = !expandedById.value[id];
 }
-function isExpanded(idx: number) {
-  return !!expandedByIndex.value[idx];
-}
-function gameKey(game: SelectedGame, idx: number) {
-  return game?.id ?? idx;
+function isExpanded(id: number) {
+  return !!expandedById.value[id];
 }
 
-const banners = computed(() => props.member.banned_by ?? []);
+function getActivePicks(m: TSeasonParticipantDto) {
+  return (m.selected_games ?? []).filter((g) => !g.successfully_banned);
+}
 
-const myBannedGameName = computed(() => {
-  const mbg = props.member?.my_banned_game;
-  return mbg?.game_name ?? null;
-});
+function getSuccessfullyBannedPicks(m: TSeasonParticipantDto) {
+  return (m.selected_games ?? []).filter((g) => g.successfully_banned);
+}
 
-const firstGameSelectionBannedByOthers = computed(() => {
-  const fgs = props.member?.first_game_selection_banned_by_others;
-  return fgs?.game_name ?? fgs?.game?.game_name ?? null;
-});
+function getOwnerName(profileId: number) {
+  const owner = props.allMembers?.find((m) => m.profile === profileId);
+  return owner?.profile_name ?? null;
+}
 
-const hasSelectedGames = computed(
-  () => (props.member?.selected_games?.length ?? 0) > 0
-);
+function getBannerNames(gameId: number) {
+  return (props.allMembers ?? [])
+    .filter((m) => m.my_banned_game?.game && m.my_banned_game.id === gameId)
+    .map((m) => m.profile_name);
+}
 
-const displayedSelectedGames = computed<SelectedGame[]>(() => {
-  const selected = (props.member?.selected_games ?? []) as SelectedGame[];
-  if (selected.length > 0) return selected;
-
-  if (firstGameSelectionBannedByOthers.value) {
-    return [
-      {
-        id: 'banned-pick-placeholder',
-        game_name: firstGameSelectionBannedByOthers.value,
-        selected_options: [],
-      },
-    ];
-  }
-
-  return [];
-});
-
-const hasBanInfo = computed(() => {
-  return (
-    Boolean(myBannedGameName.value) ||
-    Boolean(firstGameSelectionBannedByOthers.value) ||
-    (banners.value?.length ?? 0) > 0
-  );
-});
-
-const hasSelectedOrBanInfo = computed(
-  () => hasSelectedGames.value || hasBanInfo.value
-);
+function formatBannerNames(names: string[]) {
+  if (names.length === 0) return '';
+  if (names.length === 1) return names[0];
+  if (names.length === 2) return `${names[0]} and ${names[1]}`;
+  return `${names.slice(0, -1).join(', ')} and ${names[names.length - 1]}`;
+}
 </script>
 
 <style scoped lang="scss">
 .player-card {
   padding: 16px;
+}
+
+/* MEMBER HEADER */
+.member-header {
+  display: flex;
+  align-items: center;
 }
 
 /* GAME TITLE ROW */
@@ -190,11 +218,19 @@ const hasSelectedOrBanInfo = computed(
   flex-shrink: 0;
 }
 
+.opacity-50 {
+  opacity: 0.5;
+}
+
 .game-title-highlight {
   flex: 1;
   padding: 6px 0;
   position: relative;
   /* No border, no background = clean */
+}
+
+.game-title-highlight.banned::after {
+  background: var(--q-negative);
 }
 
 .game-title-highlight::after {
