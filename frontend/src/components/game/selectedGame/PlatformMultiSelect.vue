@@ -1,11 +1,11 @@
 <template>
-  <div class="col-12 col-md-6">
-    <div class="text-caption text-grey-7 q-mb-xs">Platform</div>
+  <div class="col-12">
     <div class="row items-center q-gutter-xs">
       <q-chip
         v-for="p in platforms || []"
         :key="p.id"
         clickable
+        dense
         :outline="!isPlatformSelected(p.id)"
         :color="getPlatformColor(p.name).color"
         :text-color="
@@ -13,8 +13,9 @@
         "
         :style="!isPlatformSelected(p.id) ? 'background-color: white' : ''"
         @click="togglePlatform(p.id)"
+        class="platform-chip"
       >
-        <q-icon name="sports_esports" size="16px" class="q-mr-xs" />
+        <q-icon name="sports_esports" size="14px" class="q-mr-xs" />
         {{ shortPlatformLabel(p.name) }}
       </q-chip>
     </div>
@@ -35,6 +36,15 @@ defineProps<{
 }>();
 
 function shortPlatformLabel(name: string): string {
-  return name.length > 14 ? name.slice(0, 13) + '…' : name;
+  const short = name.split('.')[0];
+  return short.length > 14 ? short.slice(0, 13) + '…' : short;
 }
 </script>
+
+<style scoped lang="scss">
+.platform-chip {
+  font-size: 11px;
+  height: 24px;
+  margin: 2px;
+}
+</style>
