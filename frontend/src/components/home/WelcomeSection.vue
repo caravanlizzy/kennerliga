@@ -1,5 +1,5 @@
 <template>
-  <div v-if="!isMinimized">
+  <div :id="id">
     <template v-if="!isAuthenticated">
       <div
         class="column items-center justify-center relative-position q-mb-xl"
@@ -13,20 +13,6 @@
           <q-icon name="img:icons/favicon.svg" :size="isMobile ? '120px' : '200px'" />
         </div>
 
-        <q-btn
-          v-if="!isMobile"
-          flat
-          round
-          dense
-          icon="close"
-          size="sm"
-          class="absolute-top-right q-ma-xs fancy-close-btn"
-          color="grey-7"
-          @click="minimize"
-          style="z-index: 2"
-        >
-          <q-tooltip>Close Welcome</q-tooltip>
-        </q-btn>
         <div class="full-width relative-position" style="z-index: 1">
           <!-- Hero Section -->
           <div class="column items-center text-center" :class="isMobile ? 'q-mb-lg' : 'q-mb-xl'">
@@ -46,37 +32,6 @@
                 to="/login"
                 :size="isMobile ? 'md' : 'lg'"
               />
-            </div>
-          </div>
-
-          <!-- Features Section -->
-          <div class="row q-col-gutter-xl" :class="isMobile ? 'q-pt-lg' : 'q-pt-xl'">
-            <div class="col-12 col-md-4">
-              <div class="column items-center text-center">
-                <q-avatar :size="isMobile ? '50px' : '70px'" :font-size="isMobile ? '24px' : '36px'" color="primary-1" text-color="primary" icon="history" />
-                <h3 :class="[isMobile ? 'text-h6' : 'text-h5', 'text-weight-bold q-my-md']">Seasonal Play</h3>
-                <p class="text-body1 text-grey-7">
-                  Organize your gaming year into competitive seasons with custom scoring and rankings.
-                </p>
-              </div>
-            </div>
-            <div class="col-12 col-md-4">
-              <div class="column items-center text-center">
-                <q-avatar :size="isMobile ? '50px' : '70px'" :font-size="isMobile ? '24px' : '36px'" color="accent-1" text-color="accent" icon="leaderboard" />
-                <h3 :class="[isMobile ? 'text-h6' : 'text-h5', 'text-weight-bold q-my-md']">Live Standings</h3>
-                <p class="text-body1 text-grey-7">
-                  Stay updated with real-time leaderboards and detailed performance statistics for every player.
-                </p>
-              </div>
-            </div>
-            <div class="col-12 col-md-4">
-              <div class="column items-center text-center">
-                <q-avatar :size="isMobile ? '50px' : '70px'" :font-size="isMobile ? '24px' : '36px'" color="secondary-1" text-color="secondary" icon="chat" />
-                <h3 :class="[isMobile ? 'text-h6' : 'text-h5', 'text-weight-bold q-my-md']">Community Chat</h3>
-                <p class="text-body1 text-grey-7">
-                  Discuss strategies, schedule game nights, and share your victories with fellow Kenner.
-                </p>
-              </div>
             </div>
           </div>
 
@@ -103,20 +58,6 @@
           <q-icon name="img:icons/favicon.svg" :size="isMobile ? '100px' : '140px'" />
         </div>
 
-        <q-btn
-          v-if="!isMobile"
-          flat
-          round
-          dense
-          icon="close"
-          size="sm"
-          class="absolute-top-right q-ma-xs fancy-close-btn"
-          color="grey-7"
-          @click="minimize"
-          style="z-index: 2"
-        >
-          <q-tooltip>Close Welcome</q-tooltip>
-        </q-btn>
         <div class="relative-position" style="z-index: 1">
           <div :class="[isMobile ? 'text-h5' : 'text-h4', 'text-weight-bold text-dark tracking-tight']" style="letter-spacing: -0.5px; text-shadow: 0 1px 2px rgba(0,0,0,0.05)">Welcome back!</div>
           <div :class="[isMobile ? 'text-body1' : 'text-subtitle1', 'text-grey-8 q-mt-sm']" style="opacity: 0.9">
@@ -124,11 +65,11 @@
             <div class="row q-col-gutter-md q-mt-xs text-body1">
               <div class="col-12 col-sm-6">
                 <div class="row no-wrap items-center">
-                  <q-icon name="sensors" color="accent" size="xs" class="q-mr-xs" />
+                  <q-icon name="bolt" color="accent" size="xs" class="q-mr-xs" />
                   <span class="text-weight-bold q-mr-xs">Live Action:</span> See what's happening right now across the leagues.
                 </div>
                 <div class="row no-wrap items-center q-mt-xs">
-                  <q-icon name="history" color="primary" size="xs" class="q-mr-xs" />
+                  <q-icon name="military_tech" color="primary" size="xs" class="q-mr-xs" />
                   <span class="text-weight-bold q-mr-xs">Seasons:</span> Check current standings and dive into past season data.
                 </div>
               </div>
@@ -146,7 +87,6 @@
             <div class="q-mt-md text-body2 text-grey-7">
               <q-icon name="info" size="xs" class="q-mr-xs" />
               Everything is tracked, so you can check out the stats and see how you're doing later on.
-              <span v-if="!isMobile">Feel free to close any windows you don't need – they'll stay tucked away in the navbar icons if you want them back.</span>
             </div>
           </div>
         </div>
@@ -159,7 +99,7 @@
 import KennerButton from 'components/base/KennerButton.vue';
 import { useUiStore } from 'src/stores/uiStore';
 import { useResponsive } from 'src/composables/responsive';
-import { computed } from 'vue';
+import { onMounted, onUnmounted } from 'vue';
 
 const props = withDefaults(
   defineProps<{
@@ -173,17 +113,14 @@ const props = withDefaults(
 
 const uiStore = useUiStore();
 const { isMobile } = useResponsive();
-const isMinimized = computed(() => !isMobile && uiStore.isMinimized(props.id));
 
-function minimize() {
-  uiStore.minimize({
-    id: props.id,
-    title: 'Welcome',
-    icon: 'auto_awesome',
-    color: 'primary',
-    type: 'section'
-  });
-}
+onMounted(() => {
+  // Navigation registration removed
+});
+
+onUnmounted(() => {
+  // Navigation registration removed
+});
 </script>
 
 <style scoped lang="scss">

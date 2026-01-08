@@ -112,6 +112,11 @@ function toggleLeagueFilter(lvl: number | string) {
   } else {
     selectedLeagues.value.add(lvl);
   }
+
+  // If all individual leagues are selected, automatically switch to "All" (empty set)
+  if (selectedLeagues.value.size === availableLeagues.value.length) {
+    selectedLeagues.value.clear();
+  }
 }
 
 function toggleAllLeagues() {
