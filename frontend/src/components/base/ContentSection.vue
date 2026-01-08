@@ -32,6 +32,7 @@
               <span class="text-h5 text-weight-bold tracking-tight" :class="`text-${color}`">{{ title }}</span>
             </slot>
             <slot name="header-extra" />
+            <q-space />
           </div>
         </template>
         <div class="section-content relative-position q-pt-md">
@@ -48,121 +49,105 @@
           <span class="text-h5 text-weight-bold tracking-tight" :class="`text-${color}`">{{ title }}</span>
         </slot>
         <slot name="header-extra" />
+        <q-space />
       </div>
       <div class="section-content relative-position q-pt-md">
         <slot />
       </div>
     </template>
   </div>
-</template>
+  </template>
 
-<script setup lang="ts">
-import { computed, onMounted, onUnmounted } from 'vue';
-import { useUiStore } from 'src/stores/uiStore';
-import { useResponsive } from 'src/composables/responsive';
+  <script setup lang="ts">
+  import { computed, onMounted, onUnmounted } from 'vue';
+  import { useUiStore } from 'src/stores/uiStore';
+  import { useResponsive } from 'src/composables/responsive';
 
-const uiStore = useUiStore();
-const { isMobile } = useResponsive();
+  const uiStore = useUiStore();
+  const { isMobile } = useResponsive();
 
-const isOpened = defineModel<boolean>('isOpened', { default: true });
+  const isOpened = defineModel<boolean>('isOpened', { default: true });
 
-const props = withDefaults(
-  defineProps<{
-    id?: string;
-    title: string;
-    color: string;
-    icon?: string;
-    bordered?: boolean;
-    titleEnd?: boolean;
-    expandable?: boolean;
-    minimizable?: boolean;
-  }>(),
-  {
-    titleEnd: false,
-    expandable: false,
-    bordered: true,
-    minimizable: false,
-    icon: 'article'
-  }
-);
+  const props = withDefaults(
+    defineProps<{
+      id?: string;
+      title: string;
+      color: string;
+      icon?: string;
+      bordered?: boolean;
+      titleEnd?: boolean;
+      expandable?: boolean;
+    }>(),
+    {
+      titleEnd: false,
+      expandable: false,
+      bordered: true,
+      icon: 'article'
+    }
+  );
 
-const sectionId = computed(() => props.id || props.title.toLowerCase().replace(/\s+/g, '-'));
+  const sectionId = computed(() => props.id || props.title.toLowerCase().replace(/\s+/g, '-'));
 
-onMounted(() => {
-  uiStore.registerSection({
-    id: sectionId.value,
-    title: props.title,
-    icon: props.icon || 'article',
-    color: props.color
+  onMounted(() => {
+    uiStore.registerSection({
+      id: sectionId.value,
+      title: props.title,
+      icon: props.icon || 'article',
+      color: props.color
+    });
   });
-});
 
-onUnmounted(() => {
-  uiStore.unregisterSection(sectionId.value);
-});
-</script>
+  onUnmounted(() => {
+    uiStore.unregisterSection(sectionId.value);
+  });
+  </script>
 
-<style scoped lang="scss">
-.content-section-container {
-  transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
-  padding-left: 16px;
-  position: relative;
+  <style scoped lang="scss">
+  .content-section-container {
+    transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+    padding-left: 16px;
+    position: relative;
 
-  &::before {
-    content: '';
-    position: absolute;
-    left: 0;
-    top: 8px;
-    bottom: 0;
-    width: 3px;
-    border-radius: 4px;
-    background: currentColor;
-    opacity: 0.3;
+    &::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 8px;
+      bottom: 0;
+      width: 3px;
+      border-radius: 4px;
+      background: currentColor;
+      opacity: 0.3;
+      z-index: 1;
+    }
+
+    &.indicator-primary::before { background: var(--q-primary); opacity: 0.6; }
+    &.indicator-secondary::before { background: var(--q-secondary); opacity: 0.6; }
+    &.indicator-accent::before { background: var(--q-accent); opacity: 0.6; }
+    &.indicator-dark::before { background: var(--q-dark); opacity: 0.6; }
+    &.indicator-info::before { background: var(--q-info); opacity: 0.6; }
+    &.indicator-warning::before { background: var(--q-warning); opacity: 0.6; }
+    &.indicator-negative::before { background: var(--q-negative); opacity: 0.6; }
+    &.indicator-positive::before { background: var(--q-positive); opacity: 0.6; }
+  }
+
+  .section-header {
+    padding: 8px 0;
+    border-bottom: 1px solid rgba(54, 64, 88, 0.08);
+  }
+
+  .section-content {
     z-index: 1;
   }
 
-  &.indicator-primary::before { background: var(--q-primary); opacity: 0.6; }
-  &.indicator-secondary::before { background: var(--q-secondary); opacity: 0.6; }
-  &.indicator-accent::before { background: var(--q-accent); opacity: 0.6; }
-  &.indicator-dark::before { background: var(--q-dark); opacity: 0.6; }
-  &.indicator-info::before { background: var(--q-info); opacity: 0.6; }
-  &.indicator-warning::before { background: var(--q-warning); opacity: 0.6; }
-  &.indicator-negative::before { background: var(--q-negative); opacity: 0.6; }
-  &.indicator-positive::before { background: var(--q-positive); opacity: 0.6; }
-}
-
-.section-header {
-  padding: 8px 0;
-  border-bottom: 1px solid rgba(54, 64, 88, 0.08);
-}
-
-.section-content {
-  z-index: 1;
-}
-
-.section-watermark {
-  z-index: 0;
-  transition: all 0.3s ease;
-  pointer-events: none;
-}
-
-.content-section-container:hover .section-watermark {
-  opacity: 0.08 !important;
-  transform: rotate(-10deg) scale(1.1) !important;
-}
-
-.fancy-close-btn {
-  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-  opacity: 0.8;
-  background: rgba(0, 0, 0, 0.05);
-  color: var(--q-primary);
-  font-weight: bold;
-
-  &:hover {
-    opacity: 1;
-    background: rgba(0, 0, 0, 0.12);
-    transform: rotate(90deg) scale(1.15);
-    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.12);
+  .section-watermark {
+    z-index: 0;
+    transition: all 0.3s ease;
+    pointer-events: none;
   }
-}
-</style>
+
+  .content-section-container:hover .section-watermark {
+    opacity: 0.08 !important;
+    transform: rotate(-10deg) scale(1.1) !important;
+  }
+  </style>

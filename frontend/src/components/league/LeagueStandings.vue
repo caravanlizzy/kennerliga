@@ -5,7 +5,6 @@
     :columns="columns"
     row-key="player_profile"
     hide-bottom
-    hide-header
     class="bg-transparent"
     :loading="loading"
   />
