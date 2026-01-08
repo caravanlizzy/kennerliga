@@ -10,8 +10,6 @@
           v-model="selectedYear"
           :options="yearOptions"
           label="Year"
-          dense
-          filled
           emit-value
           map-options
           :disable="loadingSeasons"
@@ -27,8 +25,6 @@
           v-model="selectedMonth"
           :options="monthOptions"
           label="Month"
-          dense
-          filled
           emit-value
           map-options
           :disable="loadingSeasons || !selectedYear || monthOptions.length === 0"

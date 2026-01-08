@@ -143,7 +143,6 @@
                 <div class="row items-center q-col-gutter-sm">
                   <div class="col">
                     <KennerInput
-                      dense
                       v-model="tb.name"
                       label="Tie-breaker name"
                     />

@@ -3,10 +3,7 @@
     <KennerInput
       v-model="filter"
       label="Game"
-      outlined
-      dense
       clearable
-      class="rounded-borders"
     >
       <template #append>
         <q-icon name="search" />

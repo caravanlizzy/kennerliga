@@ -62,11 +62,7 @@
                     type="number"
                     inputmode="numeric"
                     label="Points"
-                    dense
-                    outlined
-                    hide-bottom-space
                     class="points-input"
-                    bg-color="grey-2"
                     :rules="[(v: number | null) => v !== null && v !== '' || 'Required']"
                   />
 
@@ -94,9 +90,6 @@
                       v-model="getEntry(member.profile).notes"
                       label="Position Note"
                       placeholder="Explain position reason..."
-                      dense
-                      outlined
-                      hide-bottom-space
                       class="q-mt-sm"
                       type="textarea"
                       autogrow
@@ -118,9 +111,6 @@
                       :label="
                         level === 0 ? 'Faction' : `Level ${level} Faction`
                       "
-                      dense
-                      outlined
-                      hide-bottom-space
                       clearable
                       options-dense
                       class="q-mb-xs"
@@ -174,11 +164,7 @@
                     type="number"
                     inputmode="numeric"
                     label="Starting Points"
-                    dense
-                    outlined
-                    hide-bottom-space
                     class="q-mt-xs"
-                    bg-color="blue-1"
                     :rules="[
                       (v: number | null) => (v !== null && v !== '') || 'Required'
                     ]"
@@ -196,11 +182,7 @@
                       :label="requiredTieBreaker?.name || 'Tie-breaker Value'"
                       type="number"
                       inputmode="decimal"
-                      dense
-                      outlined
                       color="orange-8"
-                      bg-color="orange-1"
-                      hide-bottom-space
                       :rules="[(v: number | null) => v !== null && v !== '' || 'Tie-breaker value required']"
                     >
                       <template #prepend>

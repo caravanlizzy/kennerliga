@@ -1,6 +1,6 @@
 <template>
   <div class="q-pb-sm">
-    <KennerInput filled square bottom-slots hide-bottom-space :label="buttonLabel" v-model="inputItem.name"
+    <KennerInput bottom-slots hide-bottom-space :label="buttonLabel" v-model="inputItem.name"
              @keyup.enter="addItem">
       <template v-slot:append>
         <KennerButton round dense flat icon="add" @click="addItem"/>
@@ -8,7 +8,7 @@
     </KennerInput>
     <div v-for="(item, index) of listItems" :key="item.id">
       <div v-if="item.isEditable">
-        <KennerInput square bottom-slots hide-bottom-space label="editieren" color="primary" class="text-white"
+        <KennerInput bottom-slots hide-bottom-space label="editieren" color="primary" class="text-white"
                  v-model="item.name">
           <template v-slot:prepend>
             <kenner-counter v-if="ranked" :content="index"/>
