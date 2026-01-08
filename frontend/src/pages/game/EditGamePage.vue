@@ -463,7 +463,9 @@ onMounted(async () => {
         hasStartingPlayerOrder: rc.has_starting_player_order,
         factions: factionsRes.data.map(f => ({ name: f.name, level: f.level })),
         hasTieBreaker: tieBreakersRes.data.length > 0,
-        tieBreakers: tieBreakersRes.data.map(tb => ({ name: tb.name, higher_wins: tb.higher_wins }))
+        tieBreakers: tieBreakersRes.data
+          .sort((a, b) => b.order - a.order)
+          .map(tb => ({ name: tb.name, higher_wins: tb.higher_wins }))
       };
     } else {
       // Fallback default

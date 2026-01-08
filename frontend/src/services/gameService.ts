@@ -71,7 +71,7 @@ export async function addRestrictions(option: TGameOption): Promise<void> {
 
   if (optionId === undefined) {
     console.error(
-      `Invalid option: ${onlyIfOption}. It does not exist in optionIDStorage.`
+      `Invalid option: ${only_if_option}. It does not exist in optionIDStorage.`
     );
     return;
   }
@@ -224,6 +224,7 @@ export async function createTieBreakers(resultConfigId: number, resultConfig: TR
   if (resultConfig.tieBreakers === undefined) return;
   if (!resultConfig.hasTieBreaker) return;
 
+  const len = resultConfig.tieBreakers.length;
   for (const [index, tieBreaker] of resultConfig.tieBreakers.entries()) {
     console.log(index, tieBreaker);
     try {
@@ -232,7 +233,7 @@ export async function createTieBreakers(resultConfigId: number, resultConfig: TR
         data: {
           result_config: resultConfigId,
           name: tieBreaker.name,
-          order: index * 10,
+          order: (len - index) * 10,
           higher_wins: tieBreaker.higher_wins,
         },
       });

@@ -102,7 +102,11 @@ export const useLeagueStore = (id: number) => {
     );
 
     const selectedGamesFetchedEmpty = computed(() =>
-      selectedGames.value.filter(g => (matchResultsBySelectedGame.value[g.id]?.length ?? 0) === 0)
+      selectedGames.value.filter(
+        (g) =>
+          (matchResultsBySelectedGame.value[g.id]?.length ?? 0) === 0 &&
+          !g.successfully_banned
+      )
     );
 
 
@@ -224,8 +228,7 @@ export const useLeagueStore = (id: number) => {
         leagueStatus.value === 'BANNING' &&
         isMeActivePlayer.value &&
         me &&
-        !me.has_banned &&
-        !me.banned_selected_game
+        !me.has_banned
       );
     });
 

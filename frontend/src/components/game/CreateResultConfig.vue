@@ -145,15 +145,38 @@
 
             <div v-else class="q-mt-sm">
               <div
-                v-for="tb in tieBreakersUi"
+                v-for="(tb, tbIdx) in tieBreakersUi"
                 :key="tb.id"
-                class="q-mb-sm q-pa-sm bg-white rounded-borders"
+                class="q-mb-sm q-pa-sm bg-white rounded-borders shadow-1 border-light"
               >
                 <div class="row items-center q-col-gutter-sm">
+                  <div class="col-auto">
+                    <div class="column">
+                      <KennerButton
+                        flat
+                        round
+                        dense
+                        size="xs"
+                        icon="keyboard_arrow_up"
+                        :disable="tbIdx === 0"
+                        @click="moveTieBreaker(tbIdx, 'up')"
+                      />
+                      <KennerButton
+                        flat
+                        round
+                        dense
+                        size="xs"
+                        icon="keyboard_arrow_down"
+                        :disable="tbIdx === tieBreakersUi.length - 1"
+                        @click="moveTieBreaker(tbIdx, 'down')"
+                      />
+                    </div>
+                  </div>
                   <div class="col">
                     <KennerInput
                       v-model="tb.name"
                       label="Tie-breaker name"
+                      placeholder="e.g. Most coins, Strength..."
                     />
                   </div>
 
@@ -162,12 +185,14 @@
                       dense
                       v-model="tb.lowerWins"
                       label="Lower wins"
+                      color="primary"
                     />
                   </div>
 
                   <div class="col-auto">
                     <KennerButton
                       flat
+                      round
                       dense
                       icon="delete"
                       color="negative"
@@ -176,7 +201,7 @@
                   </div>
                 </div>
 
-                <div class="text-caption text-grey-7 q-mt-xs">
+                <div class="text-caption text-grey-7 q-mt-xs q-ml-xl">
                   {{
                     tb.lowerWins ? 'Lower numbers win' : 'Higher numbers win'
                   }}
@@ -292,11 +317,19 @@ const pointsDescription = computed(() => {
 });
 
 function addTieBreaker(): void {
-  tieBreakersUi.value.unshift({
+  tieBreakersUi.value.push({
     id: newRef(),
     name: '',
     lowerWins: false, // default: higher wins
   });
+}
+
+function moveTieBreaker(index: number, direction: 'up' | 'down') {
+  const newIndex = direction === 'up' ? index - 1 : index + 1;
+  if (newIndex < 0 || newIndex >= tieBreakersUi.value.length) return;
+  const temp = tieBreakersUi.value[index];
+  tieBreakersUi.value[index] = tieBreakersUi.value[newIndex];
+  tieBreakersUi.value[newIndex] = temp;
 }
 
 function removeTieBreaker(id: string): void {
