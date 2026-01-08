@@ -83,6 +83,12 @@
                   <span class="text-weight-bold q-mr-xs">Kennerchat:</span> Catch up with the community and plan your next session.
                 </div>
               </div>
+              <div class="col-12">
+                <div class="row no-wrap items-center q-mt-xs">
+                  <q-icon name="ads_click" color="primary" size="xs" class="q-mr-xs" />
+                  <span class="text-weight-bold q-mr-xs">My League:</span> Dedicated area to handle your active league's game picking, banning, and results uploading.
+                </div>
+              </div>
             </div>
             <div class="q-mt-md text-body2 text-grey-7">
               <q-icon name="info" size="xs" class="q-mr-xs" />

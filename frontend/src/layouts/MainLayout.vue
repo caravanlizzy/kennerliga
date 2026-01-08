@@ -42,7 +42,6 @@
         class="shadow-10 glass-toggle"
         @click="chatDrawerOpen = true"
       >
-        <q-badge floating color="accent" rounded />
       </q-btn>
     </div>
 
