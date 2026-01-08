@@ -27,7 +27,7 @@
       </div>
     </q-drawer>
 
-    <q-page-container class="col column">
+    <q-page-container class="col column bg-white">
       <div
         class="q-mx-auto"
         style="max-width: 1300px; width: 100%; "

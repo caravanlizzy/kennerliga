@@ -9,7 +9,7 @@
     <q-space />
 
     <!-- Center: Mobile Tabs -->
-    <div v-if="isMobile && isIndexPage" class="row no-wrap items-center bg-grey-2 rounded-borders q-pa-none q-mr-sm" style="height: 40px;">
+    <div v-if="isMobile && isIndexPage" class="row no-wrap items-center bg-blue-grey-1 rounded-borders q-pa-none q-mr-sm" style="height: 40px; border: 1px solid rgba(54, 64, 88, 0.08); box-shadow: inset 0 1px 2px rgba(0,0,0,0.03)">
       <q-tabs
         v-model="activeTab"
         class="text-dark compact-tabs"
@@ -36,7 +36,7 @@
 
       <!-- Minimized Items (Desktop) -->
       <div
-        v-if="!isMobile && minimizedItems.length && isIndexPage"
+        v-if="!isMobile && minimizedItems.length"
         class="row no-wrap items-center q-gutter-x-sm"
       >
         <q-btn
@@ -110,12 +110,12 @@ const isIndexPage = computed(() => route.name === 'home');
 
   .q-tab--active {
     background: white !important;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08) !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08) !important;
 
     &::after {
       content: '';
       position: absolute;
-      bottom: 2px;
+      bottom: 3px;
       left: 50%;
       transform: translateX(-50%);
       width: 4px;
@@ -127,10 +127,10 @@ const isIndexPage = computed(() => route.name === 'home');
 }
 
 .glass-effect {
-  background: rgba(255, 255, 255, 0.8) !important;
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  background: rgba(255, 255, 255, 0.82) !important;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(54, 64, 88, 0.1);
 }
 
 /* Compact version for mobile */
