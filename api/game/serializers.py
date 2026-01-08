@@ -101,6 +101,7 @@ class SelectedGameSerializer(serializers.ModelSerializer):
     game_name = serializers.SerializerMethodField()
     selected_options = SelectedOptionSerializer(many=True)
     successfully_banned = serializers.SerializerMethodField()
+    has_points = serializers.SerializerMethodField()
 
     profile = serializers.PrimaryKeyRelatedField(
         queryset=PlayerProfile.objects.all(),
