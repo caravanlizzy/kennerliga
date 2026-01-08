@@ -32,7 +32,7 @@
             <q-chat-message
               v-if="m.label"
               :label="m.label"
-              class="text-blue-grey-8 text-weight-bold"
+              class="text-secondary text-weight-bold"
             />
             <q-chat-message
               v-else
