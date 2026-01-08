@@ -10,11 +10,21 @@ export interface MinimizedItem {
   type: 'section' | 'announcement';
 }
 
+export interface NavSection {
+  id: string;
+  title: string;
+  icon: string;
+  color: string;
+  isActive?: boolean | import('vue').Ref<boolean>;
+  onClick?: () => void;
+}
+
 const STORAGE_KEY = 'minimized_items';
 
 export const useUiStore = defineStore('ui', () => {
   const isDev = ref(false);
   const minimizedItems = ref<MinimizedItem[]>(LocalStorage.getItem(STORAGE_KEY) || []);
+  const navSections = ref<NavSection[]>([]);
   const activeTab = ref('seasons');
 
   watch(
@@ -49,15 +59,28 @@ export const useUiStore = defineStore('ui', () => {
     return minimizedItems.value.some(i => i.id === id);
   }
 
+  function registerSection(section: NavSection) {
+    if (!navSections.value.find(s => s.id === section.id)) {
+      navSections.value.push(section);
+    }
+  }
+
+  function unregisterSection(id: string) {
+    navSections.value = navSections.value.filter(s => s.id !== id);
+  }
+
   return {
     isDev,
     showDev,
     hideDev,
     toggleDev,
     minimizedItems,
+    navSections,
     activeTab,
     minimize,
     restore,
-    isMinimized
+    isMinimized,
+    registerSection,
+    unregisterSection
   };
 });

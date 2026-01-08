@@ -10,11 +10,10 @@
       side="left"
       v-model="chatDrawerOpen"
       :width="380"
-      bordered
-      class="bg-white chat-drawer"
+      class="chat-drawer glass-drawer"
     >
       <div class="column full-height">
-        <div class="q-pa-md row items-center justify-between border-bottom-subtle">
+        <div class="q-pa-md row items-center justify-between border-bottom-subtle bg-white">
           <div class="row items-center">
             <q-icon name="chat" color="primary" size="sm" class="q-mr-sm" />
             <div class="text-h6 text-weight-bold">Kennerchat</div>
@@ -23,7 +22,7 @@
             <q-tooltip>Minimize Chat</q-tooltip>
           </q-btn>
         </div>
-        <KennerChat class="col" />
+        <KennerChat class="col bg-white" />
       </div>
     </q-drawer>
 
@@ -41,7 +40,7 @@
 
 <script setup lang="ts">
 import NavBar from 'components/layout/NavBar.vue';
-import { ref, Ref, computed } from 'vue';
+import { ref, Ref, onMounted, onUnmounted } from 'vue';
 import KennerDrawer from 'components/layout/KennerDrawer.vue';
 import ConfirmDialog from 'components/ui/ConfirmDialog.vue';
 import KennerChat from 'components/chat/KennerChat.vue';
@@ -55,21 +54,23 @@ const { isAuthenticated } = storeToRefs(useUserStore());
 const { isMobile } = useResponsive();
 const uiStore = useUiStore();
 
-const chatDrawerOpen = computed({
-  get: () => isAuthenticated.value && !isMobile && !uiStore.isMinimized('kennerchat'),
-  set: (val) => {
-    if (!val) {
-      uiStore.minimize({
-        id: 'kennerchat',
-        title: 'Kennerchat',
-        icon: 'chat',
-        color: 'primary',
-        type: 'section'
-      });
-    } else {
-      uiStore.restore('kennerchat');
+const chatDrawerOpen = ref(isAuthenticated.value && !isMobile.value);
+
+onMounted(() => {
+  uiStore.registerSection({
+    id: 'kennerchat',
+    title: 'Kennerchat',
+    icon: 'chat',
+    color: 'primary',
+    isActive: chatDrawerOpen,
+    onClick: () => {
+      chatDrawerOpen.value = !chatDrawerOpen.value;
     }
-  }
+  });
+});
+
+onUnmounted(() => {
+  uiStore.unregisterSection('kennerchat');
 });
 
 function toggleDrawer(): void {
@@ -86,5 +87,10 @@ function toggleDrawer(): void {
 }
 .chat-drawer {
   border-right: 1px solid rgba(0, 0, 0, 0.05) !important;
+}
+.glass-drawer {
+  background: rgba(255, 255, 255, 0.4) !important;
+  backdrop-filter: blur(12px);
+  border-right: 1px solid rgba(54, 64, 88, 0.1) !important;
 }
 </style>
