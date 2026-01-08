@@ -149,7 +149,7 @@ function scrollToSection(id: string) {
   background: rgba(255, 255, 255, 0.82) !important;
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border-bottom: 2px solid #607d8b;
+  border-bottom: 2px solid #cfd8dc;
 }
 
 /* Compact version for mobile */

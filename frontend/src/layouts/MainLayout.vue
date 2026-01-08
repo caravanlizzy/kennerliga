@@ -90,7 +90,7 @@ function toggleDrawer(): void {
   border-bottom: 1px solid rgba(0, 0, 0, 0.05);
 }
 .chat-drawer {
-  border-right: 2px solid #607d8b !important;
+  border-right: 2px solid #cfd8dc !important;
 }
 .glass-drawer {
   background: rgba(255, 255, 255, 0.4) !important;
