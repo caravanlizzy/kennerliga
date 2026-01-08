@@ -1,5 +1,5 @@
 <template>
-  <div class="column full-width glass-effect shadow-1">
+  <div class="column full-width glass-effect">
     <q-toolbar
       class="navbar text-dark q-py-sm relative-position"
       :class="isMobile ? 'q-px-sm' : 'q-px-md'"
@@ -149,7 +149,7 @@ function scrollToSection(id: string) {
   background: rgba(255, 255, 255, 0.82) !important;
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border-bottom: 1px solid rgba(54, 64, 88, 0.1);
+  border-bottom: 2px solid #607d8b;
 }
 
 /* Compact version for mobile */
