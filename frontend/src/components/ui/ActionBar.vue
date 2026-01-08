@@ -10,9 +10,10 @@
         <!-- Center: Status chip -->
         <div class="col flex items-center">
           <q-badge
-            color="grey-2"
-            text-color="dark"
-            class="text-uppercase text-bold q-px-sm q-py-xs"
+            color="white"
+            text-color="primary"
+            class="text-uppercase text-bold q-px-sm q-py-xs shadow-1"
+            style="border-radius: 4px; border: 1px solid rgba(0,0,0,0.05)"
           >
             <template v-if="loading">
               Loading
@@ -27,13 +28,12 @@
         <div class="col-auto flex justify-end">
           <q-chip
             v-if="activePlayer"
-            color="positive"
-            text-color="white"
-            square
-            dense
+            :color="isMeActivePlayer ? 'positive' : 'grey-4'"
+            :text-color="isMeActivePlayer ? 'white' : 'dark'"
             class="text-weight-bold"
+            style="border-radius: 8px"
           >
-            <q-icon name="schedule" size="14px" class="q-mr-xs" />
+            <q-icon :name="isMeActivePlayer ? 'bolt' : 'schedule'" size="16px" class="q-mr-xs" />
             <span v-if="isMeActivePlayer">Your turn</span>
             <span v-else>{{ activePlayer?.username }}'s turn</span>
           </q-chip>
@@ -125,18 +125,27 @@ async function handleAction(action: any) {
 
 <style scoped lang="scss">
 .action-bar-card {
-  border-radius: 8px;
+  border-radius: 12px;
   overflow: hidden;
-  background: white;
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(54, 64, 88, 0.1);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+  transition: all 0.3s ease;
+
+  &:hover {
+    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.06);
+    background: rgba(255, 255, 255, 0.8);
+  }
 }
 
 .status-header {
-  background: #f8f9fa;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  background: rgba(248, 249, 250, 0.5);
+  border-bottom: 1px solid rgba(54, 64, 88, 0.05);
 }
 
 .action-content {
-  background: white;
+  background: transparent;
 }
 
 .text-section {
@@ -145,7 +154,8 @@ async function handleAction(action: any) {
 }
 
 .letter-spacing-1 {
-  letter-spacing: 0.5px;
+  letter-spacing: 0.05em;
+  font-weight: 700;
 }
 
 @media (max-width: 599px) {

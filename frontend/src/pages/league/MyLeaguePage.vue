@@ -29,6 +29,7 @@
           <ContentSection
             title="Game Selection"
             color="accent"
+            icon="ads_click"
             :is-opened="sectionVisibilityStates['selection']"
             expandable
             bordered
@@ -49,6 +50,7 @@
           <ContentSection
             title="Results"
             color="primary"
+            icon="emoji_events"
             :is-opened="sectionVisibilityStates['results']"
             expandable
             bordered
@@ -84,6 +86,7 @@
           <ContentSection
             title="Upload Results"
             color="secondary"
+            icon="publish"
             :is-opened="sectionVisibilityStates['upload']"
             expandable
             bordered
@@ -96,6 +99,7 @@
         <ContentSection
           title="Games - Picks and Bans"
           color="dark"
+          icon="groups"
           :is-opened="sectionVisibilityStates['players']"
           expandable
           bordered
