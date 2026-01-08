@@ -68,11 +68,11 @@
           </div>
           <div v-else-if="m.has_banned" class="ban-row q-mb-md">
             <div class="bans-label">
-              <q-icon name="gavel" size="16px" />
+              <q-icon name="gavel" size="16px" color="grey-6" />
               <span>Ban</span>
             </div>
             <div class="bans-content">
-              <span class="no-bans">Ban skipped</span>
+              <span class="no-bans italic text-grey-6">Player skipped ban</span>
             </div>
           </div>
 

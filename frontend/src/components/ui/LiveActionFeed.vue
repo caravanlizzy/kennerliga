@@ -1,5 +1,5 @@
 <template>
-  <div class="live-action-feed">
+  <div class="live-action-feed custom-scrollbar">
     <div v-if="loading" class="flex flex-center q-pa-md">
       <q-spinner color="primary" size="2em" />
     </div>
@@ -7,24 +7,61 @@
       No live actions yet.
     </div>
     <div v-else class="events-list q-pa-sm">
-      <div v-for="event in events" :key="event.id" class="event-item q-mb-sm">
-        <q-card flat bordered class="event-card" :style="{ borderLeftColor: getColorHex(event.type) }">
+      <!-- League Filters -->
+      <div v-if="availableLeagues.length > 1" class="row q-gutter-xs q-mb-md q-px-xs">
+        <q-chip
+          clickable
+          :outline="!isAllSelected"
+          :color="isAllSelected ? 'primary' : 'grey-7'"
+          text-color="white"
+          size="sm"
+          class="text-weight-bold"
+          @click="toggleAllLeagues"
+        >
+          All
+        </q-chip>
+        <q-chip
+          v-for="lvl in availableLeagues"
+          :key="lvl"
+          clickable
+          :outline="!selectedLeagues.has(lvl)"
+          :color="selectedLeagues.has(lvl) ? 'primary' : 'grey-7'"
+          text-color="white"
+          size="sm"
+          class="text-weight-bold"
+          @click="toggleLeagueFilter(lvl)"
+        >
+          L{{ lvl }}
+        </q-chip>
+      </div>
+
+      <div v-for="event in filteredEvents" :key="event.id" class="event-item q-mb-sm">
+        <q-card flat class="event-card" :style="{ borderLeftColor: getColorHex(event.type) }">
           <q-card-section class="q-pa-sm">
             <div class="row items-center no-wrap">
               <div class="col-auto q-mr-sm">
                 <q-icon :name="getIcon(event.type)" :color="getColor(event.type)" size="sm" />
               </div>
               <div class="col">
-                <div class="text-caption text-grey-7 flex justify-between">
-                  <span>League {{ event.leagueLevel }}</span>
-                  <span>{{ formatTime(event.timestamp) }}</span>
+                <div class="text-caption text-grey-7 flex justify-between items-center">
+                  <span class="row items-center">
+                    <q-badge color="grey-3" text-color="grey-9" class="q-mr-xs text-weight-bold" style="font-size: 0.65rem">
+                      L{{ event.leagueLevel }}
+                    </q-badge>
+                  </span>
+                  <span style="font-size: 0.7rem; opacity: 0.8">{{ formatTime(event.timestamp) }}</span>
                 </div>
-                <div class="event-content">
+                <div class="event-content q-mt-xs">
                   <span v-if="event.type === 'PICK'">
                     <strong>{{ event.data.playerName }}</strong> picked <strong>{{ event.data.gameName }}</strong>
                   </span>
                   <span v-else-if="event.type === 'BAN'">
-                    <strong>{{ event.data.playerName }}</strong> banned <strong>{{ event.data.gameName }}</strong>
+                    <template v-if="event.data.gameName">
+                      <strong>{{ event.data.playerName }}</strong> banned <strong>{{ event.data.gameName }}</strong>
+                    </template>
+                    <template v-else>
+                      <strong>{{ event.data.playerName }}</strong> skipped their ban
+                    </template>
                   </span>
                   <span v-else-if="event.type === 'GAME_FINISHED'">
                     Game <strong>{{ event.data.gameName }}</strong> finished! {{ event.data.summary }}
@@ -46,13 +83,40 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from 'vue';
+import { ref, computed, onMounted, onUnmounted } from 'vue';
 import { TLiveEvent, TLiveEventType } from 'src/types';
 import { fetchLiveActionEvents } from 'src/services/seasonService';
 
 const events = ref<TLiveEvent[]>([]);
 const loading = ref(true);
+const selectedLeagues = ref<Set<number | string>>(new Set());
 let pollInterval: any = null;
+
+const availableLeagues = computed(() => {
+  const lvls = events.value
+    .map((e) => e.leagueLevel)
+    .filter((lvl): lvl is number | string => lvl !== undefined);
+  return Array.from(new Set(lvls)).sort((a, b) => Number(a) - Number(b));
+});
+
+const isAllSelected = computed(() => selectedLeagues.value.size === 0);
+
+const filteredEvents = computed(() => {
+  if (isAllSelected.value) return events.value;
+  return events.value.filter((e) => e.leagueLevel !== undefined && selectedLeagues.value.has(e.leagueLevel));
+});
+
+function toggleLeagueFilter(lvl: number | string) {
+  if (selectedLeagues.value.has(lvl)) {
+    selectedLeagues.value.delete(lvl);
+  } else {
+    selectedLeagues.value.add(lvl);
+  }
+}
+
+function toggleAllLeagues() {
+  selectedLeagues.value.clear();
+}
 
 async function fetchEvents() {
   try {
@@ -124,16 +188,40 @@ function getColorHex(type: TLiveEventType) {
   max-height: 500px;
   overflow-y: auto;
 }
+
+.custom-scrollbar {
+  &::-webkit-scrollbar {
+    width: 4px;
+  }
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+  }
+}
+
 .event-card {
-  transition: transform 0.2s;
-  border-left: 4px solid currentColor;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  border-left: 3px solid currentColor;
+  background: rgba(255, 255, 255, 0.5);
+  backdrop-filter: blur(4px);
+  border-radius: 8px;
+  margin-left: 1px;
 }
 .event-card:hover {
   transform: translateX(4px);
+  background: rgba(255, 255, 255, 0.8);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 }
 .event-content {
   font-size: 0.9rem;
   line-height: 1.4;
+  color: #2c3e50;
+}
+strong {
+  color: var(--q-primary);
 }
 
 </style>
