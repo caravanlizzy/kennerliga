@@ -1,25 +1,25 @@
 <template>
-  <q-card flat class="q-pa-md q-my-md modern-details-card">
+  <q-card flat class="q-pa-sm q-my-md modern-details-card">
     <q-inner-loading v-if="isLoading" :showing="isLoading" class="rounded-borders">
       <q-spinner-grid size="4em" color="primary" />
     </q-inner-loading>
 
     <template v-else>
       <!-- Header -->
-      <div class="row items-center justify-between q-mb-md">
+      <div class="row items-center justify-between q-mb-sm q-pa-sm">
         <div class="column">
-          <div class="text-h6 text-weight-bold text-dark line-height-1 q-mb-xs">
-            {{ gameInformation.game.name }}
-          </div>
-          <div class="row items-center q-gutter-x-sm">
+          <div class="row items-center q-gutter-x-sm q-mb-xs">
             <q-badge
               rounded
               :color="getPlatformColor(getPlatformName(platforms, gameInformation.game.platform)).color"
-              style="width: 8px; height: 8px; padding: 0"
+              style="width: 10px; height: 10px; padding: 0"
             />
-            <span class="text-caption text-grey-7 font-weight-600">
+            <span class="text-overline text-grey-7 font-weight-700 letter-spacing-1">
               {{ getPlatformName(platforms, gameInformation.game.platform).split('.')[0] }}
             </span>
+          </div>
+          <div class="text-h6 text-weight-bolder text-dark line-height-1">
+            {{ gameInformation.game.name }}
           </div>
         </div>
 
@@ -29,18 +29,18 @@
           icon="save"
           :disable="!isValid"
           @click="onSubmit"
-          class="shadow-2"
+          class="shadow-4 save-btn"
         >
-          Save Selection
+          Confirm Selection
         </KennerButton>
       </div>
 
-      <q-separator class="q-mb-lg opacity-10" />
+      <q-separator class="q-mb-md opacity-10" />
 
       <!-- No settings (use conditional visibility) -->
-      <div v-if="!visibleOptionsSafe.length" class="text-center q-pa-lg bg-grey-1 rounded-borders border-subtle">
-        <q-icon name="info" size="sm" color="grey-5" class="q-mb-sm" />
-        <div class="text-subtitle2 text-grey-7 font-weight-500">
+      <div v-if="!visibleOptionsSafe.length" class="text-center q-pa-md bg-grey-1 rounded-borders border-subtle">
+        <q-icon name="info" size="xs" color="grey-5" class="q-mb-xs" />
+        <div class="text-caption text-grey-7 font-weight-500">
           No additional settings for this game.
         </div>
       </div>
@@ -55,7 +55,7 @@
         <!-- Choices -->
         <div
           v-if="visibleOptionsSafe.some((o) => o.has_choices)"
-          class="q-mb-lg"
+          class="q-mb-md"
         >
           <div class="row q-col-gutter-md">
             <div
@@ -126,6 +126,19 @@
 
 .letter-spacing-1 {
   letter-spacing: 0.05em;
+}
+
+.save-btn {
+  transition: all 0.3s ease;
+  &:not(.q-btn--disabled) {
+    animation: pulse-btn 2s infinite;
+  }
+}
+
+@keyframes pulse-btn {
+  0% { box-shadow: 0 0 0 0 rgba(54, 64, 88, 0.4); }
+  70% { box-shadow: 0 0 0 10px rgba(54, 64, 88, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(54, 64, 88, 0); }
 }
 
 .font-weight-500 {

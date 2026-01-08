@@ -1,15 +1,14 @@
 <template>
-  <div class="col-12 col-md-6">
-    <KennerInput
-      v-model="filter"
-      label="Game"
-      clearable
-    >
-      <template #append>
-        <q-icon name="search" />
-      </template>
-    </KennerInput>
-  </div>
+  <KennerInput
+    v-model="filter"
+    label="Game"
+    clearable
+    class="full-width"
+  >
+    <template #append>
+      <q-icon name="search" color="primary" />
+    </template>
+  </KennerInput>
 </template>
 
 <script setup lang="ts">

@@ -157,6 +157,18 @@ async function onSubmit() {
   border: 1px solid rgba(54, 64, 88, 0.08);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
   overflow: hidden;
+  position: relative;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: var(--q-primary);
+    opacity: 0.15;
+  }
 }
 
 .letter-spacing-1 {
