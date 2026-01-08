@@ -2,6 +2,7 @@
   <div
     v-if="!isMinimized"
     class="q-mt-xl content-section-container relative-position"
+    :class="`indicator-${color}`"
   >
     <!-- Background Watermark -->
     <div
@@ -26,7 +27,6 @@
       >
         <template #header>
           <div class="full-width row items-center no-wrap">
-            <div :class="`bg-${color}`" class="header-indicator q-mr-md" />
             <q-icon :name="icon" class="q-mr-sm" size="sm" style="opacity: 0.7" />
             <slot name="title">
               <span class="text-h5 text-weight-bold tracking-tight" :class="`text-${color}`">{{ title }}</span>
@@ -56,7 +56,6 @@
       <div
         class="section-header full-width row items-center no-wrap relative-position"
       >
-        <div :class="`bg-${color}`" class="header-indicator q-mr-md" />
         <q-icon :name="icon" class="q-mr-sm" size="sm" style="opacity: 0.7; color: var(--q-primary)" :class="`text-${color}`" />
         <slot name="title">
           <span class="text-h5 text-weight-bold tracking-tight" :class="`text-${color}`">{{ title }}</span>
@@ -130,17 +129,35 @@ function minimize() {
 <style scoped lang="scss">
 .content-section-container {
   transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+  padding-left: 16px;
+  position: relative;
+
+  &::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 8px;
+    bottom: 0;
+    width: 3px;
+    border-radius: 4px;
+    background: currentColor;
+    opacity: 0.3;
+    z-index: 1;
+  }
+
+  &.indicator-primary::before { background: var(--q-primary); opacity: 0.6; }
+  &.indicator-secondary::before { background: var(--q-secondary); opacity: 0.6; }
+  &.indicator-accent::before { background: var(--q-accent); opacity: 0.6; }
+  &.indicator-dark::before { background: var(--q-dark); opacity: 0.6; }
+  &.indicator-info::before { background: var(--q-info); opacity: 0.6; }
+  &.indicator-warning::before { background: var(--q-warning); opacity: 0.6; }
+  &.indicator-negative::before { background: var(--q-negative); opacity: 0.6; }
+  &.indicator-positive::before { background: var(--q-positive); opacity: 0.6; }
 }
 
 .section-header {
   padding: 8px 0;
   border-bottom: 1px solid rgba(54, 64, 88, 0.08);
-}
-
-.header-indicator {
-  width: 4px;
-  height: 24px;
-  border-radius: 4px;
 }
 
 .section-content {
