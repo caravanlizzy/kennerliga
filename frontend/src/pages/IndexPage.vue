@@ -9,9 +9,10 @@
           <WelcomeSection
             v-if="mobileContent === 'welcome'"
             :is-authenticated="isAuthenticated"
+            key="welcome"
           />
 
-          <ScrollContainer v-else-if="mobileContent === 'seasons'">
+          <ScrollContainer v-else-if="mobileContent === 'seasons'" key="seasons">
             <div class="full-height">
               <div
                 class="q-pa-md row items-center justify-between no-wrap border-bottom-subtle"
@@ -44,7 +45,7 @@
             </div>
           </ScrollContainer>
 
-          <ScrollContainer v-else-if="mobileContent === 'live'">
+          <ScrollContainer v-else-if="mobileContent === 'live'" key="live">
             <div class="q-px-md">
               <ContentSection
                 v-if="isAuthenticated"
@@ -58,7 +59,7 @@
               </ContentSection>
             </div>
           </ScrollContainer>
-          <ScrollContainer v-else-if="mobileContent === 'leaderboard'">
+          <ScrollContainer v-else-if="mobileContent === 'leaderboard'" key="leaderboard">
             <div class="full-height">
               <div
                 class="q-pa-md row items-center justify-between no-wrap border-bottom-subtle"
@@ -79,6 +80,14 @@
               <LeaderBoard :year="selectedYear" />
             </div>
           </ScrollContainer>
+
+          <div v-else-if="mobileContent === 'chat'" class="col column" key="chat">
+            <div class="q-pa-md row items-center border-bottom-subtle bg-white">
+              <q-icon name="chat" color="primary" size="sm" class="q-mr-sm" />
+              <div class="text-h5 text-weight-bold">Kennerchat</div>
+            </div>
+            <KennerChat class="col bg-white" />
+          </div>
         </div>
       </div>
       <div v-else class="column col q-pt-none">
@@ -91,6 +100,7 @@
               title="Seasons"
               class="col-12"
               color="primary"
+              expandable
             >
               <template #header-extra>
                 <div class="row no-wrap q-gutter-x-sm q-ml-md">
@@ -124,16 +134,18 @@
               color="accent"
               :bordered="false"
               class="col-12"
+              expandable
             >
               <LiveActionFeed />
             </ContentSection>
             <ContentSection
               :bordered="false"
               id="leaderboard"
-              icon="leaderboard"
+              icon="stars"
               title="Leaderboard"
               class="col-12"
               color="primary"
+              expandable
             >
               <template #header-extra>
                 <div style="min-width: 120px" class="q-ml-md">

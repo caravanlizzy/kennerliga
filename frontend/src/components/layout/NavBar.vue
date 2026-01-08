@@ -15,7 +15,7 @@
 
         <!-- Section Navigation Icons -->
         <div
-          v-if="!isMobile && (navSections.length || minimizedItems.length)"
+          v-if="!isMobile && navSections.length"
           class="row no-wrap items-center q-gutter-x-xs"
         >
           <q-btn
@@ -34,23 +34,6 @@
             <q-tooltip>Scroll to {{ section.title }}</q-tooltip>
           </q-btn>
 
-          <q-separator v-if="navSections.length && minimizedItems.length" vertical inset class="q-mx-xs opacity-10" />
-
-          <q-btn
-            v-for="item in minimizedItems"
-            :key="item.id"
-            flat
-            round
-            dense
-            :icon="item.icon"
-            :color="item.color"
-            size="sm"
-            @click="restore(item.id)"
-            class="nav-section-btn minimized-btn"
-          >
-            <q-tooltip>Restore {{ item.title }}</q-tooltip>
-          </q-btn>
-
           <q-separator vertical inset class="q-mx-sm opacity-10" />
         </div>
 
@@ -62,7 +45,7 @@
     </q-toolbar>
 
     <!-- Center: Mobile Tabs (Second Row) -->
-    <div v-if="isMobile && isIndexPage" class="row justify-center q-pb-sm q-px-sm">
+    <div v-if="isMobile" class="row justify-center q-pb-sm q-px-sm">
       <div class="row no-wrap items-center bg-blue-grey-1 rounded-borders q-pa-none full-width justify-center" style="height: 40px; border: 1px solid rgba(54, 64, 88, 0.08); box-shadow: inset 0 1px 2px rgba(0,0,0,0.03)">
         <q-tabs
           v-model="activeTab"
@@ -72,10 +55,12 @@
           align="justify"
           dense
           no-caps
+          @update:model-value="handleTabChange"
         >
           <q-tab icon="military_tech" name="seasons" class="tab-seasons" />
           <q-tab icon="bolt" name="live" class="tab-live" />
-          <q-tab icon="leaderboard" name="leaderboard" class="tab-leaderboard" />
+          <q-tab icon="chat" name="chat" class="tab-chat" />
+          <q-tab icon="stars" name="leaderboard" class="tab-leaderboard" />
         </q-tabs>
       </div>
     </div>
@@ -93,17 +78,24 @@ import { useRoute } from 'vue-router';
 import { ref, computed, onMounted, onUnmounted, watch, unref } from 'vue';
 import { useResponsive } from 'src/composables/responsive';
 import { scroll } from 'quasar';
+import { useRouter } from 'vue-router';
 
 const { getScrollTarget, setVerticalScrollPosition } = scroll;
 
 defineProps<{ onToggle: () => void }>();
 const { user } = storeToRefs(useUserStore());
-const { navSections, minimizedItems, activeTab } = storeToRefs(useUiStore());
-const { restore } = useUiStore();
+const { navSections, activeTab } = storeToRefs(useUiStore());
 const route = useRoute();
+const router = useRouter();
 const { isMobile } = useResponsive();
 
 const isIndexPage = computed(() => route.name === 'home');
+
+function handleTabChange(value: string) {
+  if (!isIndexPage.value) {
+    router.push({ name: 'home' });
+  }
+}
 
 function handleSectionClick(section: NavSection) {
   if (section.onClick) {
