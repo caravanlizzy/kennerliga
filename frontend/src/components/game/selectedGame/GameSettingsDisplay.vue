@@ -89,7 +89,7 @@ const getChoiceLabel = (selected: SelectedOption): string => {
 .game-settings-options {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 0.25rem;
 }
 
 /* Eine Reihe mit Name links, Wert rechts */
@@ -97,16 +97,16 @@ const getChoiceLabel = (selected: SelectedOption): string => {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0.4rem 0.6rem;
-  border-radius: 0.4rem;
-  background: #f6f6f8;
-  flex-wrap: wrap;
+  padding: 0.2rem 0;
+  flex-wrap: nowrap;
   gap: 0.5rem;
 }
 
 .option-name {
   font-weight: 500;
-  flex: 1 1 auto;
+  font-size: 0.9rem;
+  color: var(--q-primary);
+  flex: 1;
   min-width: 0;
 }
 
@@ -115,50 +115,45 @@ const getChoiceLabel = (selected: SelectedOption): string => {
   display: flex;
   align-items: center;
   flex-shrink: 0;
-}
-
-/* On small screens, force wrap to 2 rows */
-@media (max-width: 600px) {
-  .option-row {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  .option-value {
-    width: 100%;
-    justify-content: flex-start;
-  }
+  font-weight: 600;
 }
 
 /* Badge für Boolean-Wert */
 .boolean-pill {
   padding: 0.1rem 0.6rem;
-  border-radius: 999px;
-  font-size: 0.85rem;
+  border-radius: 6px;
+  font-size: 0.75rem;
   border: 1px solid transparent;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
 }
 
 .boolean-true {
-  background: #e1f8e6;
-  border-color: #7ac28a;
+  background: rgba(var(--q-primary), 0.1);
+  color: var(--q-primary);
+  border-color: rgba(var(--q-primary), 0.2);
 }
 
 .boolean-false {
-  background: #fde3e3;
-  border-color: #e58a8a;
+  background: #f1f3f5;
+  color: #6c757d;
+  border-color: #dee2e6;
 }
 
 .boolean-null {
-  background: #eeeeee;
-  border-color: #cccccc;
+  background: #f1f3f5;
+  color: #adb5bd;
+  border-color: #dee2e6;
 }
 
 /* Badge für Choice-Wert */
 .choice-pill {
   padding: 0.1rem 0.6rem;
-  border-radius: 999px;
-  font-size: 0.85rem;
-  background: #e4ecff;
-  border: 1px solid #9db4ff;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  background: white;
+  color: var(--q-dark);
+  border: 1px solid var(--q-primary);
+  box-shadow: 0 1px 2px rgba(var(--q-primary), 0.05);
 }
 </style>
