@@ -6,12 +6,38 @@
       <AnnouncementDisplay class="col-auto" />
       <div v-if="isMobile" class="column col">
         <div class="col column">
-          <WelcomeSection v-if="mobileContent === 'welcome'" :is-authenticated="isAuthenticated" />
+          <WelcomeSection
+            v-if="mobileContent === 'welcome'"
+            :is-authenticated="isAuthenticated"
+          />
           <KennerChat v-else-if="mobileContent === 'chat'" class="column" />
 
           <ScrollContainer v-else-if="mobileContent === 'seasons'">
             <div class="full-height">
-              <SeasonStandings />
+              <div
+                class="q-pa-md row items-center justify-between no-wrap border-bottom-subtle"
+              >
+                <div class="text-h5 text-weight-bold text-dark">Seasons</div>
+                <div class="row no-wrap q-gutter-x-xs">
+                  <div style="width: 110px">
+                    <KennerSelect
+                      v-model="selectedSeasonYear"
+                      :options="seasonYearOptions"
+                      dense
+                      label="Year"
+                    />
+                  </div>
+                  <div style="width: 110px">
+                    <KennerSelect
+                      v-model="selectedSeasonMonth"
+                      :options="seasonMonthOptions"
+                      dense
+                      label="Month"
+                    />
+                  </div>
+                </div>
+              </div>
+              <SeasonStandings :seasonId="selectedSeasonId" />
             </div>
           </ScrollContainer>
 
@@ -31,8 +57,12 @@
           </ScrollContainer>
           <ScrollContainer v-else-if="mobileContent === 'leaderboard'">
             <div class="full-height">
-              <div class="q-pa-md row items-center justify-between no-wrap border-bottom-subtle">
-                <div class="text-h5 text-weight-bold text-dark">Leaderboard</div>
+              <div
+                class="q-pa-md row items-center justify-between no-wrap border-bottom-subtle"
+              >
+                <div class="text-h5 text-weight-bold text-dark">
+                  Leaderboard
+                </div>
                 <div style="min-width: 100px">
                   <KennerSelect
                     v-model="selectedYear"
@@ -58,7 +88,25 @@
               class="col-12"
               color="primary"
             >
-              <SeasonStandings class="col-12" />
+              <template #header-extra>
+                <div class="row no-wrap q-gutter-x-sm q-ml-md">
+                  <div style="width: 110px">
+                    <KennerSelect
+                      v-model="selectedSeasonYear"
+                      :options="seasonYearOptions"
+                      label="Year"
+                    />
+                  </div>
+                  <div style="width: 110px">
+                    <KennerSelect
+                      v-model="selectedSeasonMonth"
+                      :options="seasonMonthOptions"
+                      label="Month"
+                    />
+                  </div>
+                </div>
+              </template>
+              <SeasonStandings :seasonId="selectedSeasonId" class="col-12" />
             </ContentSection>
             <div v-if="!isLiveActionVisible" class="row justify-end q-mb-sm">
               <q-btn
@@ -125,7 +173,7 @@ import LeaderBoard from 'components/season/LeaderBoard.vue';
 import ContentSection from 'components/base/ContentSection.vue';
 import KennerSelect from 'components/base/KennerSelect.vue';
 import { useQuasar } from 'quasar';
-import { onMounted, ref, watch } from 'vue';
+import { computed, onMounted, ref, watch } from 'vue';
 import WelcomeSection from 'components/home/WelcomeSection.vue';
 import ScrollContainer from 'components/base/ScrollContainer.vue';
 import { useUserStore } from 'stores/userStore';
@@ -135,7 +183,9 @@ import {
   fetchAvailableYears,
   fetchCurrentSeasonId,
   fetchSeason,
+  fetchSeasonsWithLeagues,
 } from 'src/services/seasonService';
+import type { TSeasonDto } from 'src/types';
 
 const { isMobile } = useResponsive();
 const { isAuthenticated } = storeToRefs(useUserStore());
@@ -154,6 +204,47 @@ watch(isLiveActionVisible, (val) => {
 const selectedYear = ref(new Date().getFullYear());
 const availableYears = ref<number[]>([]);
 
+// Seasons logic
+const seasonsWithLeagues = ref<TSeasonDto[]>([]);
+const selectedSeasonYear = ref<number | null>(null);
+const selectedSeasonMonth = ref<number | null>(null);
+
+const seasonYearOptions = computed(() =>
+  Array.from(new Set(seasonsWithLeagues.value.map((s) => s.year)))
+    .sort((a, b) => b - a)
+    .map((y) => ({ label: String(y), value: y }))
+);
+
+const seasonMonthOptions = computed(() => {
+  if (!selectedSeasonYear.value) return [];
+  const months = seasonsWithLeagues.value
+    .filter((s) => s.year === selectedSeasonYear.value)
+    .map((s) => s.month);
+  return Array.from(new Set(months))
+    .sort((a, b) => a - b)
+    .map((m) => ({ label: String(m), value: m }));
+});
+
+const selectedSeasonId = computed(() => {
+  const found = seasonsWithLeagues.value.find(
+    (s) =>
+      s.year === selectedSeasonYear.value &&
+      s.month === selectedSeasonMonth.value
+  );
+  return found ? found.id : null;
+});
+
+watch(selectedSeasonYear, (newYear, oldYear) => {
+  if (oldYear !== null && newYear !== oldYear) {
+    selectedSeasonMonth.value = null;
+    // Auto-select first available month for this year if any
+    const months = seasonsWithLeagues.value.filter((s) => s.year === newYear);
+    if (months.length > 0) {
+      selectedSeasonMonth.value = months[0].month;
+    }
+  }
+});
+
 onMounted(async () => {
   if (isAuthenticated) {
     availableYears.value = await fetchAvailableYears();
@@ -165,6 +256,17 @@ onMounted(async () => {
       }
     } else if (availableYears.value.length > 0) {
       selectedYear.value = availableYears.value[0];
+    }
+
+    // Load seasons with leagues
+    seasonsWithLeagues.value = await fetchSeasonsWithLeagues();
+    if (seasonsWithLeagues.value.length > 0) {
+      const latest = [...seasonsWithLeagues.value].sort((a, b) => {
+        if (a.year !== b.year) return b.year - a.year;
+        return b.month - a.month;
+      })[0];
+      selectedSeasonYear.value = latest.year;
+      selectedSeasonMonth.value = latest.month;
     }
   }
 });

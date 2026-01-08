@@ -154,6 +154,16 @@ export async function fetchLiveActionEvents(seasonId?: number): Promise<TLiveEve
   }
 }
 
+export async function fetchSeasonsWithLeagues(): Promise<TSeasonDto[]> {
+  try {
+    const { data } = await api.get<TSeasonDto[]>('season/seasons/seasons-with-leagues/');
+    return data;
+  } catch (error) {
+    console.error('Error fetching seasons with leagues:', error);
+    return [];
+  }
+}
+
 export async function createLeagueForSeason(
   seasonId: number,
   level: number,
