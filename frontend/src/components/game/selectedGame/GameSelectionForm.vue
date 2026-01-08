@@ -1,44 +1,49 @@
 <template>
-  <q-card flat class="q-pa-sm q-my-md modern-details-card">
+  <q-card flat class="q-pa-sm modern-details-card">
     <q-inner-loading v-if="isLoading" :showing="isLoading" class="rounded-borders">
       <q-spinner-grid size="4em" color="primary" />
     </q-inner-loading>
 
     <template v-else>
       <!-- Header -->
-      <div class="row items-center justify-between q-mb-sm q-pa-sm">
-        <div class="column">
-          <div class="row items-center q-gutter-x-sm q-mb-xs">
-            <q-badge
-              rounded
-              :color="getPlatformColor(getPlatformName(platforms, gameInformation.game.platform)).color"
-              style="width: 10px; height: 10px; padding: 0"
-            />
-            <span class="text-overline text-grey-7 font-weight-700 letter-spacing-1">
-              {{ getPlatformName(platforms, gameInformation.game.platform).split('.')[0] }}
-            </span>
-          </div>
+      <div class="column q-mb-md q-pa-md">
+        <!-- Platform info -->
+        <div class="row items-center q-gutter-x-sm q-mb-xs">
+          <q-badge
+            rounded
+            :color="getPlatformColor(getPlatformName(platforms, gameInformation.game.platform)).color"
+            style="width: 10px; height: 10px; padding: 0"
+          />
+          <span class="text-overline text-grey-7 font-weight-700 letter-spacing-1">
+            {{ getPlatformName(platforms, gameInformation.game.platform).split('.')[0] }}
+          </span>
+        </div>
+
+        <!-- Title and Button Row -->
+        <div class="row items-center justify-between no-wrap q-gutter-x-lg">
           <div class="text-h6 text-weight-bolder text-dark line-height-1">
             {{ gameInformation.game.name }}
           </div>
-        </div>
 
-        <KennerButton
-          size="md"
-          color="primary"
-          icon="save"
-          :disable="!isValid"
-          @click="onSubmit"
-          class="shadow-4 save-btn"
-        >
-          Confirm Selection
-        </KennerButton>
+          <div class="flex-shrink-0">
+            <KennerButton
+              size="md"
+              color="primary"
+              icon="save"
+              :disable="!isValid"
+              @click="onSubmit"
+              class="shadow-4 save-btn"
+            >
+              Confirm Selection
+            </KennerButton>
+          </div>
+        </div>
       </div>
 
       <q-separator class="q-mb-md opacity-10" />
 
       <!-- No settings (use conditional visibility) -->
-      <div v-if="!visibleOptionsSafe.length" class="text-center q-pa-md bg-grey-1 rounded-borders border-subtle">
+      <div v-if="!visibleOptionsSafe.length" class="text-center q-pa-md bg-blue-grey-1 rounded-borders border-subtle">
         <q-icon name="info" size="xs" color="grey-5" class="q-mb-xs" />
         <div class="text-caption text-grey-7 font-weight-500">
           No additional settings for this game.
@@ -102,22 +107,11 @@
 <style lang="scss" scoped>
 .modern-details-card {
   border-radius: 16px;
-  background: rgba(255, 255, 255, 0.7);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(54, 64, 88, 0.1);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.05);
+  background: white;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
   position: relative;
   overflow: hidden;
-
-  &::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 4px;
-    height: 100%;
-    background: var(--q-primary);
-  }
 }
 
 .line-height-1 {
@@ -147,6 +141,10 @@
 
 .font-weight-600 {
   font-weight: 600;
+}
+
+.flex-shrink-0 {
+  flex-shrink: 0;
 }
 
 .opacity-10 {
