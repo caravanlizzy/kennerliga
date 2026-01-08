@@ -100,7 +100,6 @@
               title="Seasons"
               class="col-12"
               color="primary"
-              expandable
             >
               <template #header-extra>
                 <div class="row no-wrap q-gutter-x-sm q-ml-md">
@@ -134,7 +133,6 @@
               color="accent"
               :bordered="false"
               class="col-12"
-              expandable
             >
               <LiveActionFeed />
             </ContentSection>
@@ -145,7 +143,6 @@
               title="Leaderboard"
               class="col-12"
               color="primary"
-              expandable
             >
               <template #header-extra>
                 <div style="min-width: 120px" class="q-ml-md">
