@@ -117,7 +117,7 @@ class SelectedGameSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = SelectedGame
-        fields = ['id', 'game', 'game_name', 'selected_options', 'league', 'profile', 'manage_only', 'successfully_banned']
+        fields = ['id', 'game', 'game_name', 'selected_options', 'league', 'profile', 'manage_only', 'successfully_banned', 'has_points']
 
     def validate(self, attrs):
         game = attrs.get('game', None)
@@ -162,6 +162,9 @@ class SelectedGameSerializer(serializers.ModelSerializer):
 
     def get_game_name(self, obj):
         return obj.game.name if obj.game else None
+
+    def get_has_points(self, obj):
+        return obj.game.resultconfig_set.first().has_points if obj.game.resultconfig_set.exists() else True
 
     def set_player_and_league(self, validated_data):
         # Set player

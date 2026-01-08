@@ -97,6 +97,7 @@ class LeagueViewSet(ModelViewSet):
                 "id": sg.id,
                 "game_name": sg.game.name,
                 "game_short_name": sg.game.short_name,
+                "has_points": sg.game.resultconfig_set.first().has_points if sg.game.resultconfig_set.exists() else True,
                 "selected_by_id": sg.profile.id if sg.profile else None,
                 "selected_by_name": sg.profile.profile_name if sg.profile else None,
             }
