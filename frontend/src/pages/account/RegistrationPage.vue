@@ -1,17 +1,26 @@
 <template>
   <div
-    class="column"
+    class="column items-center justify-center full-height"
     :style="[
-      isMobile ? 'min-width: 280px; max-width: 500px' : 'min-width: 450px',
+      isMobile ? 'min-width: 280px; max-width: 500px; width: 100%' : 'min-width: 450px',
     ]"
   >
-    <q-card :bordered="!isMobile" flat :class="{ 'q-pa-xl': !isMobile }">
-      <q-form ref="formRef" @submit="doRegister" @keyup.enter="doRegister">
-        <q-card-section class="q-mb-md">
-          <span class="text-h4 text-accent"> Register </span>
-        </q-card-section>
+    <q-card
+      flat
+      class="registration-card shadow-2xl"
+      :class="[isMobile ? 'q-pa-lg' : 'q-pa-xl']"
+      style="border-radius: 20px; border: 1px solid rgba(54, 64, 88, 0.08)"
+    >
+      <q-form ref="formRef" @submit="doRegister" @keyup.enter="doRegister" class="q-gutter-y-lg">
+        <div class="column items-center q-mb-lg">
+          <q-icon name="img:icons/favicon.svg" size="64px" class="q-mb-md" />
+          <div class="text-h4 text-weight-bolder text-dark tracking-tighter">Register</div>
+          <div class="text-subtitle2 text-grey-6 q-mt-xs text-center">
+            Join the KennerLiga community
+          </div>
+        </div>
 
-        <q-card-section>
+        <div class="column q-gutter-y-md">
           <KennerInput
             v-model="username"
             :rules="[rules.required, rules.usernameLen]"
@@ -23,31 +32,31 @@
             :rules="[rules.required, rules.passwordLen]"
             label="Password"
             type="password"
-            class="q-pt-md"
             autocomplete="new-password"
           />
-        </q-card-section>
+        </div>
 
-        <q-card-section>
+        <div class="column q-gutter-y-sm">
           <KennerButton
             type="submit"
-            class="full-width q-mt-md"
+            size="lg"
+            class="full-width shadow-4"
             :label="isSubmitting ? 'Creating Account…' : 'Register'"
             icon="person_add"
-            color="positive"
+            color="primary"
             :loading="isSubmitting"
             :disable="isSubmitting"
           />
-          <div class="q-mt-md text-center">
-            <KennerButton
-              flat
-              color="dark"
-              icon="login"
-              label="Already have an account? Login"
-              @click="goToLogin"
-            />
-          </div>
-        </q-card-section>
+          <KennerButton
+            flat
+            color="grey-7"
+            icon="login"
+            label="Already have an account? Login"
+            @click="goToLogin"
+            class="full-width"
+            no-caps
+          />
+        </div>
       </q-form>
     </q-card>
   </div>
@@ -148,3 +157,16 @@ function goToLogin(): void {
   router.push({ name: 'login' }); // adjust route if different
 }
 </script>
+
+<style scoped lang="scss">
+.registration-card {
+  background: rgba(255, 255, 255, 0.8) !important;
+  backdrop-filter: blur(12px);
+  max-width: 500px;
+  width: 100%;
+}
+
+.tracking-tighter {
+  letter-spacing: -1.5px;
+}
+</style>
