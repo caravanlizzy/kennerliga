@@ -1,66 +1,61 @@
 <template>
-  <q-card flat class="q-pa-md q-my-md rounded-borders details-card">
-    <q-inner-loading v-if="isLoading" :showing="isLoading">
+  <q-card flat class="q-pa-md q-my-md modern-details-card">
+    <q-inner-loading v-if="isLoading" :showing="isLoading" class="rounded-borders">
       <q-spinner-grid size="4em" color="primary" />
     </q-inner-loading>
 
     <template v-else>
       <!-- Header -->
-      <div class="row items-center justify-between q-mb-sm">
-        <div class="text-h6 text-weight-bold text-dark">
-          {{ gameInformation.game.name }}
+      <div class="row items-center justify-between q-mb-md">
+        <div class="column">
+          <div class="text-h6 text-weight-bold text-dark line-height-1 q-mb-xs">
+            {{ gameInformation.game.name }}
+          </div>
+          <div class="row items-center q-gutter-x-sm">
+            <q-badge
+              rounded
+              :color="getPlatformColor(getPlatformName(platforms, gameInformation.game.platform)).color"
+              style="width: 8px; height: 8px; padding: 0"
+            />
+            <span class="text-caption text-grey-7 font-weight-600">
+              {{ getPlatformName(platforms, gameInformation.game.platform).split('.')[0] }}
+            </span>
+          </div>
         </div>
 
-        <!-- Right side: platform + save -->
-        <div class="row items-center q-gutter-x-md">
-          <q-chip
-            square
-            outline
-            class="q-px-sm bg-white"
-            :color="
-              getPlatformColor(
-                getPlatformName(platforms, gameInformation.game.platform)
-              ).color
-            "
-            :text-color="
-              getPlatformColor(
-                getPlatformName(platforms, gameInformation.game.platform)
-              ).text
-            "
-          >
-            {{
-              getPlatformName(platforms, gameInformation.game.platform).split(
-                '.'
-              )[0]
-            }}
-          </q-chip>
-
-          <KennerButton
-            size="md"
-            color="accent"
-            :disable="!isValid"
-            @click="onSubmit"
-          >
-            Save
-          </KennerButton>
-        </div>
+        <KennerButton
+          size="md"
+          color="primary"
+          icon="save"
+          :disable="!isValid"
+          @click="onSubmit"
+          class="shadow-2"
+        >
+          Save Selection
+        </KennerButton>
       </div>
 
-      <q-separator spaced />
+      <q-separator class="q-mb-lg opacity-10" />
 
       <!-- No settings (use conditional visibility) -->
-      <div v-if="!visibleOptionsSafe.length" class="text-italic text-grey">
-        This game has no additional settings.
+      <div v-if="!visibleOptionsSafe.length" class="text-center q-pa-lg bg-grey-1 rounded-borders border-subtle">
+        <q-icon name="info" size="sm" color="grey-5" class="q-mb-sm" />
+        <div class="text-subtitle2 text-grey-7 font-weight-500">
+          No additional settings for this game.
+        </div>
       </div>
 
       <!-- Settings -->
       <template v-else>
-        <div class="section-title text-grey-7 q-mb-sm">Settings</div>
+        <div class="row items-center q-gutter-x-sm q-mb-md">
+          <q-icon name="settings" size="18px" color="primary" />
+          <div class="text-subtitle2 text-weight-bold text-uppercase letter-spacing-1 text-primary">Game Settings</div>
+        </div>
 
         <!-- Choices -->
         <div
           v-if="visibleOptionsSafe.some((o) => o.has_choices)"
-          class="q-mb-md"
+          class="q-mb-lg"
         >
           <div class="row q-col-gutter-md">
             <div
@@ -72,7 +67,6 @@
                 :options="option.choices || null"
                 :label="option.name"
                 option-label="name"
-                color="accent"
                 v-model="findSelectedOption(option.id).choice"
                 :rules="[(val) => !!val || `${option.name} is required`]"
                 class="full-width"
@@ -82,24 +76,74 @@
         </div>
 
         <!-- Toggles -->
-        <div v-if="visibleOptionsSafe.some((o) => !o.has_choices)">
-          <div class="section-subtitle q-mb-xs">Toggles</div>
+        <div v-if="visibleOptionsSafe.some((o) => !o.has_choices)" class="bg-blue-grey-1 q-pa-md rounded-borders border-subtle">
+          <div class="text-caption text-weight-bold text-grey-7 text-uppercase q-mb-sm letter-spacing-1">Toggles</div>
           <div class="row q-col-gutter-sm">
-            <q-toggle
+            <div
               v-for="option in visibleOptionsSafe.filter((o) => !o.has_choices)"
               :key="option.id"
-              v-model="findSelectedOption(option.id).value"
-              :label="option.name"
-              dense
-              color="accent"
               class="col-auto"
-            />
+            >
+              <q-toggle
+                v-model="findSelectedOption(option.id).value"
+                :label="option.name"
+                dense
+                color="primary"
+                class="font-weight-600"
+              />
+            </div>
           </div>
         </div>
       </template>
     </template>
   </q-card>
 </template>
+
+<style lang="scss" scoped>
+.modern-details-card {
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(54, 64, 88, 0.1);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.05);
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+    background: var(--q-primary);
+  }
+}
+
+.line-height-1 {
+  line-height: 1.1;
+}
+
+.letter-spacing-1 {
+  letter-spacing: 0.05em;
+}
+
+.font-weight-500 {
+  font-weight: 500;
+}
+
+.font-weight-600 {
+  font-weight: 600;
+}
+
+.opacity-10 {
+  opacity: 0.1;
+}
+
+.border-subtle {
+  border: 1px solid rgba(0, 0, 0, 0.05);
+}
+</style>
 
 <script setup lang="ts">
 import KennerSelect from 'components/base/KennerSelect.vue';

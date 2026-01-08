@@ -1,7 +1,7 @@
 <template>
   <div class="row q-col-gutter-lg">
     <!-- LEFT: SELECTED GAME DETAILS -->
-    <div v-if="gameSelection.game.id > 0" class="col-12 col-md-6">
+    <div v-if="gameSelection.game.id > 0" class="col-12 col-md-6 order-md-last">
       <GameSelectionForm
         :game-information="gameInformation"
         :game-selection="gameSelection"
@@ -14,34 +14,40 @@
 
     <div class="selector col-12" :class="{ 'col-md-6': gameSelection.game.id > 0 }">
       <!-- FILTER CARD -->
-      <q-card flat class="q-pa-md rounded-borders">
-        <div class="row items-center q-gutter-sm q-mb-sm">
-          <q-icon name="tune" size="18px" class="text-grey-7" />
-          <div class="text-caption text-uppercase text-grey-7">Filters</div>
+      <q-card flat class="q-pa-md modern-filter-card q-mb-md">
+        <div class="row items-center q-gutter-x-sm q-mb-md">
+          <q-icon name="tune" size="20px" color="primary" />
+          <div class="text-subtitle2 text-weight-bold text-uppercase letter-spacing-1 text-grey-8">Find Your Game</div>
         </div>
 
-        <div class="row q-col-gutter-md items-start">
+        <div class="row q-col-gutter-sm items-center">
           <!-- Search -->
-          <GameFilter v-model="filter" />
+          <div class="col-12 col-sm-6">
+            <GameFilter v-model="filter" />
+          </div>
 
           <!-- Platform multi-select chips -->
-          <PlatformMultiSelect
-            :isPlatformSelected="isPlatformSelected"
-            :togglePlatform="togglePlatform"
-          />
+          <div class="col-12 col-sm-6">
+            <PlatformMultiSelect
+              :isPlatformSelected="isPlatformSelected"
+              :togglePlatform="togglePlatform"
+            />
+          </div>
         </div>
       </q-card>
 
       <!-- GAME GRID CARD -->
-      <q-card flat class="q-pa-sm q-mt-md rounded-borders">
-        <div class="row items-center q-gutter-sm q-px-sm q-pt-sm q-pb-xs">
-          <q-icon name="grid_view" size="16px" class="text-grey-7" />
-          <div class="text-caption text-uppercase text-grey-7">
-            Games ({{ availableGames.length }})
+      <q-card flat class="q-pa-none modern-grid-card">
+        <div class="row items-center justify-between q-px-md q-pt-md q-pb-sm">
+          <div class="row items-center q-gutter-x-sm">
+            <q-icon name="grid_view" size="18px" color="primary" />
+            <div class="text-caption text-weight-bold text-uppercase letter-spacing-1 text-grey-7">
+              Available Games ({{ availableGames.length }})
+            </div>
           </div>
         </div>
 
-        <div class="game-grid">
+        <div class="game-grid custom-scrollbar">
           <!-- Empty state -->
           <NoGamesFound v-if="availableGames.length === 0" />
 
@@ -79,7 +85,7 @@ const props = defineProps<{
 
 // ---- actions / header wiring ----
 const emit = defineEmits<{
-  (e: 'selection-updated', value: typeof gameSelection): void;
+  (e: 'selection-updated', value: any): void;
   (e: 'selection-valid', value: boolean): void;
   (e: 'set-submitter', submitter: () => Promise<void>): void;
   (e: 'on-success'): void;
@@ -118,7 +124,6 @@ async function onSubmit() {
   try {
     await submitGame(props.manageOnly);
     emit('on-success');
-    console.log('here');
     await props.onSuccess?.();
   } catch (e) {
     console.error(e);
@@ -128,64 +133,51 @@ async function onSubmit() {
 </script>
 
 <style scoped lang="scss">
-/* CSS kept only where Quasar utilities aren't expressive enough */
-
 /* CSS Grid for responsive, evenly-spaced game cards */
 .game-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
   gap: 12px;
-  max-height: 260px;
+  max-height: 380px;
   overflow-y: auto;
-  padding: 8px 12px 12px;
+  padding: 8px 16px 16px;
 }
 
-/* Card look & feel for games (hover + selected) */
-.game-card {
-  background: #f7f7f9;
-  transition: box-shadow 0.12s ease, transform 0.12s ease,
-    border-color 0.12s ease;
+.modern-filter-card {
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(54, 64, 88, 0.08);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
 }
 
-.game-card:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
-}
-
-.game-card.selected {
-  border: 2px solid var(--q-color-secondary);
-  background: #fff;
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
-}
-
-.game-name {
-  font-weight: 600;
-}
-
-/* Details card: subtle accent divider */
-.details-card {
-  position: relative;
+.modern-grid-card {
+  border-radius: 16px;
   background: white;
-  border-left: 4px solid var(--q-color-secondary);
+  border: 1px solid rgba(54, 64, 88, 0.08);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+  overflow: hidden;
 }
 
-/* Section headings */
-.section-title {
-  font-size: 0.9rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  color: var(--q-dark);
-  opacity: 0.85;
-}
-
-.section-subtitle {
-  font-size: 0.8rem;
-  font-weight: 600;
-  text-transform: uppercase;
+.letter-spacing-1 {
   letter-spacing: 0.05em;
-  color: var(--q-dark);
-  opacity: 0.65;
 }
 
+.custom-scrollbar {
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+  }
+  &::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 0, 0, 0.2);
+  }
+}
+
+/* Details card: subtle accent divider handled in GameSelectionForm */
 </style>
