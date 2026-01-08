@@ -364,7 +364,7 @@ import KennerButton from 'components/base/KennerButton.vue';
 import KennerTooltip from 'components/base/KennerTooltip.vue';
 import LoadingSpinner from 'components/base/LoadingSpinner.vue';
 import { useRoute, useRouter } from 'vue-router';
-import { TPlatform, TFullGameDto, TResultConfig } from 'src/types';
+import { TPlatform, TResultConfig } from 'src/types';
 import { useResponsive } from 'src/composables/responsive';
 import { fetchFullGame, updateResultConfigData } from 'src/services/gameService';
 import CreateResultConfig from 'components/game/CreateResultConfig.vue';
@@ -405,7 +405,6 @@ type UiOption = {
 const route = useRoute();
 const router = useRouter();
 const $q = useQuasar();
-const { isMobile } = useResponsive();
 
 const gameId = parseInt(route.params.id as string);
 const loading = ref(true);
@@ -731,10 +730,10 @@ function validateAvailabilityClientSide(): string[] {
 
         if (cond.kind === 'value') {
           if (cond.expected_value === null)
-            errors.push(`A boolean condition is missing expected_value.`);
+            errors.push('A boolean condition is missing expected_value.');
         } else {
           if (!cond.expected_choice_ref)
-            errors.push(`A choice condition is missing expected_choice_ref.`);
+            errors.push('A choice condition is missing expected_choice_ref.');
         }
       }
     }

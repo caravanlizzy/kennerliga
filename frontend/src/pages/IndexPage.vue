@@ -197,7 +197,6 @@ const { isMobile } = useResponsive();
 const { isAuthenticated } = storeToRefs(useUserStore());
 const uiStore = useUiStore();
 const { activeTab: mobileContent } = storeToRefs(uiStore);
-const $q = useQuasar();
 
 const selectedYear = ref(new Date().getFullYear());
 const availableYears = ref<number[]>([]);

@@ -65,7 +65,6 @@ import ConfirmDialog from 'components/ui/ConfirmDialog.vue';
 import KennerChat from 'components/chat/KennerChat.vue';
 import { useUserStore } from 'stores/userStore';
 import { useResponsive } from 'src/composables/responsive';
-import { useUiStore } from 'src/stores/uiStore';
 import { storeToRefs } from 'pinia';
 
 const drawerState: Ref<boolean> = ref(false);

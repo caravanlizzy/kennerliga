@@ -75,7 +75,7 @@ import { useUserStore } from 'stores/userStore';
 import { useUiStore, type NavSection } from 'src/stores/uiStore';
 import { storeToRefs } from 'pinia';
 import { useRoute } from 'vue-router';
-import { ref, computed, onMounted, onUnmounted, watch, unref } from 'vue';
+import { computed, unref } from 'vue';
 import { useResponsive } from 'src/composables/responsive';
 import { scroll } from 'quasar';
 import { useRouter } from 'vue-router';
@@ -91,7 +91,7 @@ const { isMobile } = useResponsive();
 
 const isIndexPage = computed(() => route.name === 'home');
 
-function handleTabChange(value: string) {
+function handleTabChange() {
   if (!isIndexPage.value) {
     router.push({ name: 'home' });
   }

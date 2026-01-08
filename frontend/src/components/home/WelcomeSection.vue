@@ -107,7 +107,7 @@ import { useUiStore } from 'src/stores/uiStore';
 import { useResponsive } from 'src/composables/responsive';
 import { onMounted, onUnmounted } from 'vue';
 
-const props = withDefaults(
+withDefaults(
   defineProps<{
     isAuthenticated: boolean;
     id?: string;
@@ -117,7 +117,6 @@ const props = withDefaults(
   }
 );
 
-const uiStore = useUiStore();
 const { isMobile } = useResponsive();
 
 onMounted(() => {

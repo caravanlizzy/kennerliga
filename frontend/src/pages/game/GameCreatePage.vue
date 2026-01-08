@@ -4,7 +4,12 @@
       <div class="col-12 col-md-10 col-lg-8">
         <q-card flat bordered class="q-pa-lg shadow-2">
           <div class="row items-center q-mb-lg">
-            <q-icon name="add_circle" size="md" color="primary" class="q-mr-sm" />
+            <q-icon
+              name="add_circle"
+              size="md"
+              color="primary"
+              class="q-mr-sm"
+            />
             <h1 class="text-h4 q-my-none text-weight-bold">New Game</h1>
           </div>
 
@@ -70,9 +75,13 @@
               <div v-else class="column q-gutter-y-md">
                 <div v-for="(opt, optIdx) in gameOptions" :key="opt.ref">
                   <q-card flat bordered class="option-card overflow-hidden">
-                    <q-card-section class="bg-grey-1 row items-center justify-between q-py-sm">
+                    <q-card-section
+                      class="bg-grey-1 row items-center justify-between q-py-sm"
+                    >
                       <div class="row items-center q-gutter-x-sm">
-                        <div class="text-subtitle1 text-weight-bold">#{{ optIdx + 1 }}</div>
+                        <div class="text-subtitle1 text-weight-bold">
+                          #{{ optIdx + 1 }}
+                        </div>
                         <KennerInput
                           v-model="opt.name"
                           placeholder="Option Name"
@@ -100,15 +109,34 @@
                           @click="moveOption(optIdx, 'down')"
                         />
                         <q-separator vertical class="q-mx-xs" />
-                        <KennerButton flat round dense icon="delete" color="negative" @click="removeOption(opt.ref)" />
+                        <KennerButton
+                          flat
+                          round
+                          dense
+                          icon="delete"
+                          color="negative"
+                          @click="removeOption(opt.ref)"
+                        />
                       </div>
                     </q-card-section>
 
                     <q-card-section class="q-pa-md">
                       <div class="row items-center q-mb-md">
-                        <q-toggle v-model="opt.has_choices" label="Has choices" color="primary" />
-                        <q-icon name="help_outline" size="xs" color="grey-5" class="q-ml-xs">
-                          <KennerTooltip>If enabled, players can choose from a list. If disabled, it's a simple toggle.</KennerTooltip>
+                        <q-toggle
+                          v-model="opt.has_choices"
+                          label="Has choices"
+                          color="primary"
+                        />
+                        <q-icon
+                          name="help_outline"
+                          size="xs"
+                          color="grey-5"
+                          class="q-ml-xs"
+                        >
+                          <KennerTooltip
+                            >If enabled, players can choose from a list. If
+                            disabled, it's a simple toggle.</KennerTooltip
+                          >
                         </q-icon>
                       </div>
 
@@ -127,10 +155,17 @@
                           />
                         </div>
 
-                        <div v-if="!opt.choices.length" class="text-caption text-grey-5 q-mb-md">
+                        <div
+                          v-if="!opt.choices.length"
+                          class="text-caption text-grey-5 q-mb-md"
+                        >
                           No choices defined.
                         </div>
-                        <div v-for="(ch, chIdx) in opt.choices" :key="ch.ref" class="row items-center q-col-gutter-x-sm q-mb-xs">
+                        <div
+                          v-for="(ch, chIdx) in opt.choices"
+                          :key="ch.ref"
+                          class="row items-center q-col-gutter-x-sm q-mb-xs"
+                        >
                           <div class="col-auto">
                             <div class="column">
                               <KennerButton
@@ -160,7 +195,15 @@
                             />
                           </div>
                           <div class="col-auto">
-                            <KennerButton flat round dense icon="close" size="sm" color="negative" @click="removeChoice(opt.ref, ch.ref)" />
+                            <KennerButton
+                              flat
+                              round
+                              dense
+                              icon="close"
+                              size="sm"
+                              color="negative"
+                              @click="removeChoice(opt.ref, ch.ref)"
+                            />
                           </div>
                         </div>
                       </div>
@@ -170,7 +213,9 @@
                       <!-- Availability rules -->
                       <div>
                         <div class="row items-center justify-between q-mb-sm">
-                          <div class="text-subtitle2 text-grey-7">Availability Rules</div>
+                          <div class="text-subtitle2 text-grey-7">
+                            Availability Rules
+                          </div>
                           <KennerButton
                             flat
                             dense
@@ -195,8 +240,12 @@
                             :key="grp.id"
                             class="q-pa-md bg-grey-1 rounded-borders border-light relative-position"
                           >
-                            <div class="row items-center justify-between q-mb-sm">
-                              <div class="text-overline text-grey-7">Group #{{ grpIndex + 1 }} (OR)</div>
+                            <div
+                              class="row items-center justify-between q-mb-sm"
+                            >
+                              <div class="text-overline text-grey-7">
+                                Group #{{ grpIndex + 1 }} (OR)
+                              </div>
                               <div class="row items-center q-gutter-x-sm">
                                 <KennerButton
                                   flat
@@ -214,12 +263,17 @@
                                   size="xs"
                                   icon="delete"
                                   color="negative"
-                                  @click="removeAvailabilityGroup(opt.ref, grp.id)"
+                                  @click="
+                                    removeAvailabilityGroup(opt.ref, grp.id)
+                                  "
                                 />
                               </div>
                             </div>
 
-                            <div v-if="!grp.conditions.length" class="text-caption text-grey-5">
+                            <div
+                              v-if="!grp.conditions.length"
+                              class="text-caption text-grey-5"
+                            >
                               No conditions in this group.
                             </div>
 
@@ -256,7 +310,9 @@
                                     emit-value
                                     map-options
                                     label="Type"
-                                    @update:model-value="onConditionKindChanged(cond)"
+                                    @update:model-value="
+                                      onConditionKindChanged(cond)
+                                    "
                                   />
                                 </div>
                                 <div class="col-6 col-md-4">
@@ -281,7 +337,11 @@
                                       dense
                                       outlined
                                       v-model="cond.expected_choice_ref"
-                                      :options="choiceRefOptions(cond.depends_on_option_ref)"
+                                      :options="
+                                        choiceRefOptions(
+                                          cond.depends_on_option_ref
+                                        )
+                                      "
                                       option-value="value"
                                       option-label="label"
                                       emit-value
@@ -299,11 +359,19 @@
                                     size="sm"
                                     icon="close"
                                     color="grey-7"
-                                    @click="removeCondition(opt.ref, grp.id, cond.id)"
+                                    @click="
+                                      removeCondition(opt.ref, grp.id, cond.id)
+                                    "
                                   />
                                 </div>
                                 <div class="col-12 row items-center no-wrap">
-                                  <q-toggle v-model="cond.negate" label="Negate (NOT)" dense color="red" class="text-caption" />
+                                  <q-toggle
+                                    v-model="cond.negate"
+                                    label="Negate (NOT)"
+                                    dense
+                                    color="red"
+                                    class="text-caption"
+                                  />
                                 </div>
                               </div>
                             </div>
@@ -320,7 +388,9 @@
 
             <!-- Scoring Configuration -->
             <section>
-              <div class="text-h6 q-mb-md text-grey-8">Scoring Configuration</div>
+              <div class="text-h6 q-mb-md text-grey-8">
+                Scoring Configuration
+              </div>
               <CreateResultConfig
                 class="bg-grey-1 rounded-borders q-pa-sm"
                 @update-result-config="updateResultConfig"
@@ -358,7 +428,6 @@ import CreateResultConfig from 'components/game/CreateResultConfig.vue';
 import { TPlatform } from 'src/types';
 import { TResultConfig } from 'src/types';
 import { createResultConfigData } from 'src/services/gameService';
-import { useResponsive } from 'src/composables/responsive';
 
 type ConditionKind = 'value' | 'choice';
 
@@ -464,7 +533,11 @@ function addChoice(optionRef: string) {
   });
 }
 
-function moveChoice(optionRef: string, choiceIndex: number, direction: 'up' | 'down') {
+function moveChoice(
+  optionRef: string,
+  choiceIndex: number,
+  direction: 'up' | 'down'
+) {
   const opt = gameOptions.value.find((o) => o.ref === optionRef);
   if (!opt) return;
   const newIndex = direction === 'up' ? choiceIndex - 1 : choiceIndex + 1;
@@ -608,10 +681,10 @@ function validateAvailabilityClientSide(): string[] {
 
         if (cond.kind === 'value') {
           if (cond.expected_value === null)
-            errors.push(`A boolean condition is missing expected_value.`);
+            errors.push('A boolean condition is missing expected_value.');
         } else {
           if (!cond.expected_choice_ref)
-            errors.push(`A choice condition is missing expected_choice_ref.`);
+            errors.push('A choice condition is missing expected_choice_ref.');
         }
       }
     }
