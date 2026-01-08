@@ -26,10 +26,11 @@
       <ContentSection
         v-if="!loading"
         title="League Standings"
-        color="primary"
+        color="info"
         icon="leaderboard"
         bordered
         expandable
+        v-model:is-opened="sectionVisibilityStates['standings']"
         class="league-section"
       >
         <LeagueStandings />
@@ -40,7 +41,7 @@
           title="Game Selection"
           color="primary"
           icon="ads_click"
-          :is-opened="sectionVisibilityStates['selection']"
+          v-model:is-opened="sectionVisibilityStates['selection']"
           expandable
           bordered
           class="league-section"
@@ -59,9 +60,9 @@
       <template v-if="leagueStatus === 'PLAYING' || leagueStatus === 'DONE'">
         <ContentSection
           title="Results"
-          color="primary"
+          color="warning"
           icon="emoji_events"
-          :is-opened="sectionVisibilityStates['results']"
+          v-model:is-opened="sectionVisibilityStates['results']"
           expandable
           bordered
           class="league-section"
@@ -95,9 +96,9 @@
       <template v-if="leagueStatus === 'PLAYING'">
         <ContentSection
           title="Upload Results"
-          color="secondary"
+          color="accent"
           icon="publish"
-          :is-opened="sectionVisibilityStates['upload']"
+          v-model:is-opened="sectionVisibilityStates['upload']"
           expandable
           bordered
           class="league-section"
@@ -108,9 +109,9 @@
 
       <ContentSection
         title="Games - Picks and Bans"
-        color="dark"
+        color="secondary"
         icon="groups"
-        :is-opened="sectionVisibilityStates['players']"
+        v-model:is-opened="sectionVisibilityStates['players']"
         expandable
         bordered
         class="league-section"
@@ -294,6 +295,7 @@ async function submitGameSelection() {
 }
 
 const sectionVisibilityStates = ref({
+  standings: true,
   selection: true,
   upload: false,
   results: false,
@@ -302,10 +304,13 @@ const sectionVisibilityStates = ref({
 
 watchEffect(() => {
   const status = leagueStatus.value;
+  const hasResults = selectedGamesWithResults.value.length > 0;
+
   sectionVisibilityStates.value = {
+    standings: hasResults,
     selection: ['PICKING', 'REPICKING'].includes(status),
     upload: status === 'PLAYING',
-    results: ['PLAYING', 'DONE'].includes(status),
+    results: ['PLAYING', 'DONE'].includes(status) && hasResults,
     players: true, // Always show players/picks/bans?
   };
 });
