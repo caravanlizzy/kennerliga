@@ -29,7 +29,7 @@
             :size="isMobile ? 'sm' : 'md'"
             @click="handleSectionClick(section)"
             class="nav-section-btn"
-            :class="{ 'is-active': activeSectionId === section.id || unref(section.isActive) }"
+            :class="{ 'is-active': unref(section.isActive) }"
           >
             <q-tooltip>Scroll to {{ section.title }}</q-tooltip>
           </q-btn>
@@ -73,10 +73,8 @@
           dense
           no-caps
         >
-          <q-tab icon="auto_awesome" name="welcome" class="tab-welcome" />
-          <q-tab icon="history" name="seasons" class="tab-seasons" />
-          <q-tab icon="sensors" name="live" class="tab-live" />
-          <q-tab icon="chat" name="chat" class="tab-chat" />
+          <q-tab icon="military_tech" name="seasons" class="tab-seasons" />
+          <q-tab icon="bolt" name="live" class="tab-live" />
           <q-tab icon="leaderboard" name="leaderboard" class="tab-leaderboard" />
         </q-tabs>
       </div>
@@ -106,43 +104,6 @@ const route = useRoute();
 const { isMobile } = useResponsive();
 
 const isIndexPage = computed(() => route.name === 'home');
-const activeSectionId = ref<string | null>(null);
-
-let observer: IntersectionObserver | null = null;
-
-onMounted(() => {
-  setupObserver();
-});
-
-onUnmounted(() => {
-  if (observer) observer.disconnect();
-});
-
-function setupObserver() {
-  observer = new IntersectionObserver(
-    (entries) => {
-      // Find the first entry that is intersecting
-      const visible = entries.find(e => e.isIntersecting);
-      if (visible) {
-        activeSectionId.value = visible.target.id;
-      }
-    },
-    {
-      rootMargin: '-100px 0px -70% 0px', // Adjust based on navbar height and preferred trigger point
-      threshold: 0
-    }
-  );
-
-  // Watch navSections and observe elements
-  watch(navSections, (sections) => {
-    if (!observer) return;
-    observer.disconnect();
-    sections.forEach(s => {
-      const el = document.getElementById(s.id);
-      if (el) observer?.observe(el);
-    });
-  }, { immediate: true, deep: true });
-}
 
 function handleSectionClick(section: NavSection) {
   if (section.onClick) {
@@ -189,18 +150,6 @@ function scrollToSection(id: string) {
   .q-tab--active {
     background: white !important;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08) !important;
-
-    &::after {
-      content: '';
-      position: absolute;
-      bottom: 3px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 4px;
-      height: 4px;
-      border-radius: 50%;
-      background: currentColor;
-    }
   }
 }
 
@@ -244,18 +193,6 @@ function scrollToSection(id: string) {
     transform: translateY(-2px);
     background: rgba(0, 0, 0, 0.05);
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-
-    &::after {
-      content: '';
-      position: absolute;
-      bottom: 4px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 4px;
-      height: 4px;
-      border-radius: 50%;
-      background: currentColor;
-    }
   }
 
   &.minimized-btn {

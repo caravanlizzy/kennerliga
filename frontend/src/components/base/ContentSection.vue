@@ -1,6 +1,6 @@
 <template>
   <div
-    v-if="!isMinimized"
+    :id="sectionId"
     class="q-mt-xl content-section-container relative-position"
     :class="`indicator-${color}`"
   >
@@ -32,19 +32,6 @@
               <span class="text-h5 text-weight-bold tracking-tight" :class="`text-${color}`">{{ title }}</span>
             </slot>
             <slot name="header-extra" />
-            <q-btn
-              v-if="minimizable && !isMobile"
-              flat
-              round
-              dense
-              icon="close"
-              size="sm"
-              class="minimize-btn absolute-top-right q-ma-xs fancy-close-btn"
-              @click.stop="minimize"
-              style="z-index: 2"
-            >
-              <q-tooltip>Minimize</q-tooltip>
-            </q-btn>
           </div>
         </template>
         <div class="section-content relative-position q-pt-md">
@@ -61,19 +48,6 @@
           <span class="text-h5 text-weight-bold tracking-tight" :class="`text-${color}`">{{ title }}</span>
         </slot>
         <slot name="header-extra" />
-        <q-btn
-          v-if="minimizable && !isMobile"
-          flat
-          round
-          dense
-          icon="close"
-          size="sm"
-          class="minimize-btn absolute-top-right q-ma-xs fancy-close-btn"
-          @click="minimize"
-          style="z-index: 2"
-        >
-          <q-tooltip>Minimize</q-tooltip>
-        </q-btn>
       </div>
       <div class="section-content relative-position q-pt-md">
         <slot />
@@ -83,7 +57,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, onMounted, onUnmounted } from 'vue';
 import { useUiStore } from 'src/stores/uiStore';
 import { useResponsive } from 'src/composables/responsive';
 
@@ -112,18 +86,20 @@ const props = withDefaults(
   }
 );
 
-const sectionId = computed(() => props.id || props.title || 'default-section');
-const isMinimized = computed(() => uiStore.isMinimized(sectionId.value));
+const sectionId = computed(() => props.id || props.title.toLowerCase().replace(/\s+/g, '-'));
 
-function minimize() {
-  uiStore.minimize({
+onMounted(() => {
+  uiStore.registerSection({
     id: sectionId.value,
     title: props.title,
-    icon: props.icon,
-    color: props.color,
-    type: 'section'
+    icon: props.icon || 'article',
+    color: props.color
   });
-}
+});
+
+onUnmounted(() => {
+  uiStore.unregisterSection(sectionId.value);
+});
 </script>
 
 <style scoped lang="scss">

@@ -10,7 +10,6 @@
             v-if="mobileContent === 'welcome'"
             :is-authenticated="isAuthenticated"
           />
-          <KennerChat v-else-if="mobileContent === 'chat'" class="column" />
 
           <ScrollContainer v-else-if="mobileContent === 'seasons'">
             <div class="full-height">
@@ -25,6 +24,8 @@
                       :options="seasonYearOptions"
                       dense
                       label="Year"
+                      emit-value
+                      map-options
                     />
                   </div>
                   <div style="width: 110px">
@@ -33,6 +34,8 @@
                       :options="seasonMonthOptions"
                       dense
                       label="Month"
+                      emit-value
+                      map-options
                     />
                   </div>
                 </div>
@@ -47,7 +50,7 @@
                 v-if="isAuthenticated"
                 id="live-action-mobile"
                 title="Live Action"
-                icon="sensors"
+                icon="bolt"
                 color="accent"
                 :bordered="false"
               >
@@ -68,6 +71,8 @@
                     v-model="selectedYear"
                     :options="availableYears"
                     class="full-width"
+                    emit-value
+                    map-options
                   />
                 </div>
               </div>
@@ -81,8 +86,7 @@
           <div class="col-12 col-md">
             <ContentSection
               id="seasons"
-              icon="history"
-              minimizable
+              icon="military_tech"
               :bordered="false"
               title="Seasons"
               class="col-12"
@@ -95,6 +99,8 @@
                       v-model="selectedSeasonYear"
                       :options="seasonYearOptions"
                       label="Year"
+                      emit-value
+                      map-options
                     />
                   </div>
                   <div style="width: 110px">
@@ -102,31 +108,20 @@
                       v-model="selectedSeasonMonth"
                       :options="seasonMonthOptions"
                       label="Month"
+                      emit-value
+                      map-options
                     />
                   </div>
                 </div>
               </template>
               <SeasonStandings :seasonId="selectedSeasonId" class="col-12" />
             </ContentSection>
-            <div v-if="!isLiveActionVisible" class="row justify-end q-mb-sm">
-              <q-btn
-                flat
-                dense
-                round
-                color="accent"
-                icon="sensors"
-                @click="isLiveActionVisible = true"
-              >
-                <q-tooltip>Show Live Action</q-tooltip>
-              </q-btn>
-            </div>
             <ContentSection
-              v-if="isAuthenticated && isLiveActionVisible"
+              v-if="isAuthenticated"
               id="live-action"
               title="Live Action"
-              icon="sensors"
+              icon="bolt"
               color="accent"
-              minimizable
               :bordered="false"
               class="col-12"
             >
@@ -136,7 +131,6 @@
               :bordered="false"
               id="leaderboard"
               icon="leaderboard"
-              minimizable
               title="Leaderboard"
               class="col-12"
               color="primary"
@@ -146,6 +140,8 @@
                   <KennerSelect
                     v-model="selectedYear"
                     :options="availableYears"
+                    emit-value
+                    map-options
                   />
                 </div>
               </template>
@@ -154,6 +150,7 @@
           </div>
         </div>
       </div>
+      <div class="q-py-xl"></div>
     </template>
     <template v-else>
       <div v-if="isMobile" class="column col">
@@ -192,14 +189,6 @@ const { isAuthenticated } = storeToRefs(useUserStore());
 const uiStore = useUiStore();
 const { activeTab: mobileContent } = storeToRefs(uiStore);
 const $q = useQuasar();
-const isMdUp = $q.screen.gt.sm;
-const isLiveActionVisible = ref(
-  $q.localStorage.getItem('isLiveActionVisible') !== false
-);
-
-watch(isLiveActionVisible, (val) => {
-  $q.localStorage.set('isLiveActionVisible', val);
-});
 
 const selectedYear = ref(new Date().getFullYear());
 const availableYears = ref<number[]>([]);

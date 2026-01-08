@@ -42,7 +42,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, watch } from 'vue';
+import { ref, watch } from 'vue';
 import LeagueStandingsMatrix from 'components/league/LeagueStandingsMatrix.vue';
 import LoadingSpinner from 'components/base/LoadingSpinner.vue';
 import { api } from 'boot/axios';

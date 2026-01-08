@@ -6,10 +6,12 @@
 
     <KennerDrawer v-model="drawerState" />
     <q-drawer
-      v-if="isAuthenticated && !isMobile"
+      v-if="isAuthenticated"
       side="left"
       v-model="chatDrawerOpen"
       :width="380"
+      :behavior="isMobile ? 'mobile' : 'desktop'"
+      :overlay="isMobile"
       class="chat-drawer glass-drawer"
     >
       <div class="column full-height">
@@ -25,6 +27,24 @@
         <KennerChat class="col bg-white" />
       </div>
     </q-drawer>
+
+    <!-- Chat Toggle Button (Left) -->
+    <div
+      v-if="isAuthenticated && !chatDrawerOpen"
+      class="fixed-bottom-left q-ma-md"
+      style="z-index: 2000"
+    >
+      <q-btn
+        round
+        size="lg"
+        color="primary"
+        icon="chat"
+        class="shadow-10 glass-toggle"
+        @click="chatDrawerOpen = true"
+      >
+        <q-badge floating color="accent" rounded />
+      </q-btn>
+    </div>
 
     <q-page-container class="col column bg-white">
       <div
@@ -56,23 +76,6 @@ const uiStore = useUiStore();
 
 const chatDrawerOpen = ref(isAuthenticated.value && !isMobile.value);
 
-onMounted(() => {
-  uiStore.registerSection({
-    id: 'kennerchat',
-    title: 'Kennerchat',
-    icon: 'chat',
-    color: 'primary',
-    isActive: chatDrawerOpen,
-    onClick: () => {
-      chatDrawerOpen.value = !chatDrawerOpen.value;
-    }
-  });
-});
-
-onUnmounted(() => {
-  uiStore.unregisterSection('kennerchat');
-});
-
 function toggleDrawer(): void {
   drawerState.value = !drawerState.value;
 }
@@ -92,5 +95,11 @@ function toggleDrawer(): void {
   background: rgba(255, 255, 255, 0.4) !important;
   backdrop-filter: blur(12px);
   border-right: 1px solid rgba(54, 64, 88, 0.1) !important;
+}
+.glass-toggle {
+  background: rgba(255, 255, 255, 0.7) !important;
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(54, 64, 88, 0.1);
+  color: var(--q-primary) !important;
 }
 </style>
