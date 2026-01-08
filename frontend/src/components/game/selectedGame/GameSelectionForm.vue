@@ -73,8 +73,6 @@
                 :label="option.name"
                 option-label="name"
                 color="accent"
-                dense
-                outlined
                 v-model="findSelectedOption(option.id).choice"
                 :rules="[(val) => !!val || `${option.name} is required`]"
                 class="full-width"

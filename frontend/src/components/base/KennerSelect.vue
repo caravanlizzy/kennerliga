@@ -58,18 +58,34 @@ defineProps<{
   }
 
   .q-field__label {
-    top: 8px !important;
+    top: 18px !important;
     left: 12px !important;
-    transition: transform 0.3s, color 0.3s;
+    transform: translateY(-50%);
+    transition: transform 0.3s, color 0.3s, font-size 0.3s;
+    pointer-events: none;
   }
 
   &.q-field--float .q-field__label {
-    transform: translateY(-50%) scale(0.75);
+    transform: translateY(-130%) scale(0.75);
     background: white;
     padding: 0 4px;
     left: 8px !important;
-    z-index: 1;
+    z-index: 10;
     border-radius: 4px;
+    font-weight: 700;
+  }
+
+  &.q-field--error {
+    border-color: var(--q-negative) !important;
+    background: rgba(255, 0, 0, 0.03);
+
+    .q-field__label {
+      color: var(--q-negative) !important;
+    }
+  }
+
+  .q-field__bottom {
+    padding: 4px 0 0 !important;
   }
 }
 
