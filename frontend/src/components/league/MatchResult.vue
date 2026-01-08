@@ -76,7 +76,7 @@
         <q-item-section side class="stats-col">
           <div class="row items-center justify-end q-gutter-xs">
             <q-badge
-              v-if="result.points != null"
+              v-if="result.points != null && selectedGame.has_points !== false"
               :color="result.position === 1 ? 'amber-7' : 'grey-6'"
               class="stat-badge"
             >

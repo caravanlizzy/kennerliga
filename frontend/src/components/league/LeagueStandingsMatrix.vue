@@ -143,9 +143,9 @@
                 class="text-weight-bold text-dark row items-baseline"
                 style="font-size: 0.9rem"
               >
-                <span>{{ displayPointsValue(props.value.points) }}</span>
+                <span>{{ displayPointsValue(props.value.points, (props.col as any).hasPoints) }}</span>
                 <span
-                  v-if="!isRank(props.value.points)"
+                  v-if="(props.col as any).hasPoints"
                   class="text-weight-medium q-ml-xs"
                   style="font-size: 0.6rem; opacity: 0.7"
                   >VP</span
@@ -229,7 +229,8 @@ interface Standing {
 interface SelectedGame {
   id: number;
   game_name: string;
-  game_short_name: string; // 🔹 now available
+  game_short_name: string;
+  has_points: boolean; // 🔹 added
   selected_by_name?: string;
 }
 
@@ -286,6 +287,8 @@ const tableColumns = computed<QTableColumn[]>(() => {
       align: 'center',
       // @ts-expect-error - custom property for header
       selectedByName: game.selected_by_name,
+      // @ts-expect-error - custom property for cell
+      hasPoints: game.has_points,
     });
   });
 
@@ -331,23 +334,25 @@ const formatNumber = (value: string | number): string => {
   return (num as number) % 1 === 0 ? (num as number).toFixed(0) : String(num);
 };
 
-function isRank(points: string) {
-  return ['-1.00', '-2.00', '-3.00', '-4.00'].includes(points);
-}
-
-function displayPointsValue(points: string) {
-  switch (points) {
-    case '-1.00':
-      return '1st';
-    case '-2.00':
-      return '2nd';
-    case '-3.00':
-      return '3rd';
-    case '-4.00':
-      return '4th';
-    default:
-      return formatNumber(points);
+function displayPointsValue(points: string, hasPoints: boolean) {
+  if (!hasPoints) {
+    switch (points) {
+      case '-1.00':
+        return '1st';
+      case '-2.00':
+        return '2nd';
+      case '-3.00':
+        return '3rd';
+      case '-4.00':
+        return '4th';
+      default:
+        // Fallback for positions > 4 if they occur
+        if (parseFloat(points) < 0) {
+          return `${Math.abs(Math.round(parseFloat(points)))}th`;
+        }
+    }
   }
+  return formatNumber(points);
 }
 
 function getRankBgClass(rank: number | undefined) {

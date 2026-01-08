@@ -99,6 +99,7 @@ export type TSelectedGameDto = {
   selected_options: TSelectedGameOptionDto[];
   created_at?: string;
   successfully_banned?: boolean;
+  has_points?: boolean;
 };
 
 export type TSelectedGameDtoPayload = {
