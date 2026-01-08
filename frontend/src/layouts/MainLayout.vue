@@ -20,7 +20,7 @@
             <q-icon name="chat" color="blue-grey-6" size="sm" class="q-mr-sm" />
             <div class="text-h6 text-weight-bold text-blue-grey-6">Kennerchat</div>
           </div>
-          <q-btn flat round dense icon="close" size="sm" color="blue-grey-6" @click="chatDrawerOpen = false">
+          <q-btn flat round dense icon="chevron_left" size="sm" color="blue-grey-6" @click="chatDrawerOpen = false">
             <q-tooltip>Minimize Chat</q-tooltip>
           </q-btn>
         </div>
