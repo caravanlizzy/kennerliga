@@ -188,3 +188,5 @@ export type TMatchResultDto = {
   decisive_tie_breaker: { id: number; name: string } | null;
   factions: { id: number; name: string; level: number }[];
 };
+
+export type TMatchResult = TMatchResultDto;

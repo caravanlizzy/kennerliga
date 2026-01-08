@@ -9,6 +9,7 @@ import {
   TLeagueDto,
   TLeagueStatus,
   TSelectedGameDto,
+  TMatchResult,
 } from 'src/types';
 
 
