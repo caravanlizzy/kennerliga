@@ -1,15 +1,11 @@
 <template>
   <div
     v-if="!isMinimized"
-    :class="[
-      bordered ? `border-2 rounded-borders border-${color}` : '',
-      { 'section-gradient': !bordered, 'bg-white': bordered }
-    ]"
-    class="q-mt-md content-section-container rounded-borders shadow-subtle border-subtle relative-position"
+    class="q-mt-xl content-section-container relative-position"
   >
     <!-- Background Watermark -->
     <div
-      class="section-watermark absolute-bottom-right q-ma-md"
+      class="section-watermark absolute-top-right q-ma-md"
       :class="`text-${color}`"
       style="opacity: 0.03; pointer-events: none; transform: rotate(-15deg)"
     >
@@ -26,13 +22,14 @@
         expanded-icon="expand_less"
         :expand-icon-class="`text-${color}`"
         :expanded-icon-class="`text-${color}`"
-        :header-class="`text-${color} text-h5 q-py-sm justify-center header-tint relative-position`"
+        header-class="section-header relative-position"
       >
         <template #header>
-          <div class="full-width row justify-center items-center">
+          <div class="full-width row items-center no-wrap">
+            <div :class="`bg-${color}`" class="header-indicator q-mr-md" />
             <q-icon :name="icon" class="q-mr-sm" size="sm" style="opacity: 0.7" />
             <slot name="title">
-              <span class="text-weight-bold">{{ title }}</span>
+              <span class="text-h5 text-weight-bold tracking-tight" :class="`text-${color}`">{{ title }}</span>
             </slot>
             <slot name="header-extra" />
             <q-btn
@@ -42,7 +39,7 @@
               dense
               icon="close"
               size="sm"
-              class="minimize-btn absolute-top-right q-ma-xs"
+              class="minimize-btn absolute-top-right q-ma-xs fancy-close-btn"
               @click.stop="minimize"
               style="z-index: 2"
             >
@@ -50,20 +47,19 @@
             </q-btn>
           </div>
         </template>
-        <q-separator inset :color="color" style="opacity: 0.3" />
-        <div class="relative-position">
+        <div class="section-content relative-position q-pt-md">
           <slot />
         </div>
       </q-expansion-item>
     </template>
     <template v-else>
       <div
-        class="full-width row q-pr-lg items-center text-h5 q-py-sm relative-position header-tint"
-        :class="[`text-${color}`, titleEnd ? 'justify-end' : 'justify-center']"
+        class="section-header full-width row items-center no-wrap relative-position"
       >
-        <q-icon :name="icon" class="q-mr-sm" size="sm" style="opacity: 0.7" />
+        <div :class="`bg-${color}`" class="header-indicator q-mr-md" />
+        <q-icon :name="icon" class="q-mr-sm" size="sm" style="opacity: 0.7; color: var(--q-primary)" :class="`text-${color}`" />
         <slot name="title">
-          <span class="text-weight-bold">{{ title }}</span>
+          <span class="text-h5 text-weight-bold tracking-tight" :class="`text-${color}`">{{ title }}</span>
         </slot>
         <slot name="header-extra" />
         <q-btn
@@ -73,15 +69,14 @@
           dense
           icon="close"
           size="sm"
-          class="minimize-btn absolute-top-right q-ma-xs"
+          class="minimize-btn absolute-top-right q-ma-xs fancy-close-btn"
           @click="minimize"
           style="z-index: 2"
         >
           <q-tooltip>Minimize</q-tooltip>
         </q-btn>
       </div>
-      <q-separator inset :color="color" style="opacity: 0.3" />
-      <div class="relative-position">
+      <div class="section-content relative-position q-pt-md">
         <slot />
       </div>
     </template>
@@ -134,32 +129,47 @@ function minimize() {
 
 <style scoped lang="scss">
 .content-section-container {
-  overflow: hidden;
-  transition: all 0.3s ease;
+  transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 
-.section-gradient {
-  background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
-  position: relative;
+.section-header {
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(54, 64, 88, 0.08);
 }
 
-.shadow-subtle {
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+.header-indicator {
+  width: 4px;
+  height: 24px;
+  border-radius: 4px;
 }
 
-.border-subtle {
-  border: 1px solid rgba(0, 0, 0, 0.05);
-}
-
-.with-opacity {
-  background: rgba(0, 0, 0, 0.01);
-}
-
-.header-tint {
-  background: rgba(0, 0, 0, 0.015);
+.section-content {
+  z-index: 1;
 }
 
 .section-watermark {
   z-index: 0;
+  transition: all 0.3s ease;
+  pointer-events: none;
+}
+
+.content-section-container:hover .section-watermark {
+  opacity: 0.08 !important;
+  transform: rotate(-10deg) scale(1.1) !important;
+}
+
+.fancy-close-btn {
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  opacity: 0.8;
+  background: rgba(0, 0, 0, 0.05);
+  color: var(--q-primary);
+  font-weight: bold;
+
+  &:hover {
+    opacity: 1;
+    background: rgba(0, 0, 0, 0.12);
+    transform: rotate(90deg) scale(1.15);
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.12);
+  }
 }
 </style>

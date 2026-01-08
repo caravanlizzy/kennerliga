@@ -24,9 +24,6 @@
           v-model="filter"
           placeholder="Search..."
           debounce="300"
-          outlined
-          dense
-          class="bg-white"
           style="min-width: 250px"
         >
           <template v-slot:append>
