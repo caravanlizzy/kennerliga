@@ -10,33 +10,33 @@
           <KennerChat v-else-if="mobileContent === 'chat'" class="column" />
 
           <ScrollContainer v-else-if="mobileContent === 'seasons'">
-            <div class="bg-grey-1 full-height">
+            <div class="full-height">
               <SeasonStandings />
             </div>
           </ScrollContainer>
 
           <ScrollContainer v-else-if="mobileContent === 'live'">
-            <ContentSection
-              v-if="isAuthenticated"
-              id="live-action-mobile"
-              title="Live Action"
-              icon="sensors"
-              color="accent"
-              :bordered="false"
-              class="q-my-md"
-            >
-              <LiveActionFeed />
-            </ContentSection>
+            <div class="q-px-md">
+              <ContentSection
+                v-if="isAuthenticated"
+                id="live-action-mobile"
+                title="Live Action"
+                icon="sensors"
+                color="accent"
+                :bordered="false"
+              >
+                <LiveActionFeed />
+              </ContentSection>
+            </div>
           </ScrollContainer>
           <ScrollContainer v-else-if="mobileContent === 'leaderboard'">
-            <div class="bg-grey-1 full-height">
-              <div class="q-pa-md row items-center justify-between no-wrap">
+            <div class="full-height">
+              <div class="q-pa-md row items-center justify-between no-wrap border-bottom-subtle">
                 <div class="text-h5 text-weight-bold text-dark">Leaderboard</div>
-                <div style="min-width: 120px">
+                <div style="min-width: 100px">
                   <KennerSelect
                     v-model="selectedYear"
                     :options="availableYears"
-                    dense
                     class="full-width"
                   />
                 </div>
@@ -98,11 +98,6 @@
                   <KennerSelect
                     v-model="selectedYear"
                     :options="availableYears"
-                    dense
-                    filled
-                    square
-                    size="sm"
-                    :dark="$q.dark.isActive"
                   />
                 </div>
               </template>

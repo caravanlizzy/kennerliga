@@ -5,7 +5,6 @@
         <KennerInput
           v-model="note"
           label="Internal note (remember who you invited)"
-          outlined
         />
       </div>
       <div class="col-12 col-sm-6">
@@ -14,7 +13,6 @@
           v-model="selectedProfile"
           :options="profileOptions"
           label="Player Profile (optional)"
-          outlined
           clearable
           use-input
           input-debounce="300"

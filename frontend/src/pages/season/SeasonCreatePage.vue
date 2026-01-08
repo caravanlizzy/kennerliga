@@ -18,8 +18,6 @@
           map-options
           multiple
           use-chips
-          filled
-          dense
           label="Pick players…"
           @update:model-value="onMemberListChange"
         />
@@ -52,8 +50,6 @@
             map-options
             multiple
             use-chips
-            filled
-            dense
             placeholder="Assign players to this league…"
             @update:model-value="(val) => onLeaguePickChange(idx, val)"
           />

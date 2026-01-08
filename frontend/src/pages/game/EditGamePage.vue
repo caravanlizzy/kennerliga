@@ -82,8 +82,6 @@
                       <div class="row items-center q-gutter-x-sm">
                         <div class="text-subtitle1 text-weight-bold">#{{ optIdx + 1 }}</div>
                         <KennerInput
-                          dense
-                          borderless
                           v-model="opt.name"
                           placeholder="Option Name"
                           class="text-subtitle1 text-weight-medium"
@@ -163,7 +161,10 @@
                             </div>
                           </div>
                           <div class="col">
-                            <KennerInput dense filled square v-model="ch.name" placeholder="Choice name" />
+                            <KennerInput
+                              v-model="ch.name"
+                              placeholder="Choice name"
+                            />
                           </div>
                           <div class="col-auto">
                             <KennerButton flat round dense icon="close" size="sm" color="negative" @click="removeChoice(opt.ref, ch.ref)" />

@@ -36,7 +36,6 @@
           v-model="feedback"
           label="Your Feedback"
           type="textarea"
-          filled
           :rules="[(val) => !!val || 'Feedback is required']"
         />
 

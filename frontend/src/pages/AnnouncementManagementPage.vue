@@ -64,7 +64,6 @@
               v-model="newAnnouncement.type"
               :options="announcementTypes"
               label="Type"
-              outlined
               emit-value
               map-options
             />
@@ -72,14 +71,12 @@
             <KennerInput
               v-model="newAnnouncement.title"
               label="Title"
-              outlined
               :rules="[(val) => !!val || 'Title is required']"
             />
 
             <KennerInput
               v-model="newAnnouncement.content"
               label="Content (optional)"
-              outlined
               type="textarea"
               autogrow
             />
@@ -88,7 +85,6 @@
               <KennerInput
                 v-model="newAnnouncement.visible_from"
                 label="Visible From"
-                outlined
                 type="date"
                 class="col"
                 :rules="[(val) => !!val || 'Start date is required']"
@@ -97,7 +93,6 @@
               <KennerInput
                 v-model="newAnnouncement.visible_until"
                 label="Visible Until"
-                outlined
                 type="date"
                 class="col"
                 :rules="[(val) => !!val || 'End date is required']"
