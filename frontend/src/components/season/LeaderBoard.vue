@@ -6,13 +6,12 @@
   <!-- Content -->
   <div
     v-else-if="standings"
-    class="leaderboard-container rounded-borders"
-    :class="$q.dark.isActive ? 'bg-dark' : 'bg-white'"
+    class="leaderboard-container"
   >
     <!-- Table -->
-    <q-markup-table flat dense separator="none" class="leaderboard-table">
+    <q-markup-table flat dense separator="none" class="leaderboard-table bg-transparent">
       <thead>
-      <tr class="text-uppercase text-grey-6 text-caption text-weight-bold">
+      <tr class="text-uppercase text-grey-6 text-caption text-weight-bold header-row">
         <th class="text-left q-pl-lg" style="width: 40%">Player</th>
 
         <th class="text-center">
@@ -59,11 +58,6 @@
           <!-- Player -->
           <td class="text-left relative-position q-py-md">
             <div
-              v-if="bestLeague(row) !== null"
-              class="row-group-line"
-              :class="'bg-' + leagueBadgeColor(bestLeague(row)!)"
-            ></div>
-            <div
               v-if="shouldShowGroupHeader(index) && bestLeague(row) !== null"
               class="group-label-container"
             >
@@ -75,11 +69,11 @@
             <div class="row items-center q-gutter-x-md q-pl-lg">
               <UserAvatar
                 :display-username="row.profile_name"
-                size="40px"
+                size="32px"
               />
               <div class="column">
                 <div class="row items-center q-gutter-x-xs">
-                  <span class="text-subtitle1 text-weight-bold text-grey-9">{{ row.profile_name }}</span>
+                  <span class="text-subtitle2 text-weight-bold text-grey-9">{{ row.profile_name }}</span>
                   <q-icon
                     v-if="index === 0"
                     name="stars"
@@ -244,66 +238,58 @@ watch(
 );
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .leaderboard-container {
   overflow: hidden;
-  border: 1px solid rgba(0, 0, 0, 0.05);
+  background: rgba(255, 255, 255, 0.4);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(54, 64, 88, 0.08);
+  border-radius: 12px;
 }
 
-.leaderboard-table :deep(thead tr th) {
+.header-row {
+  background: rgba(248, 249, 250, 0.5);
+  border-bottom: 1px solid rgba(54, 64, 88, 0.05);
   height: 64px;
 }
 
 .leaderboard-row {
   position: relative;
-  transition: background-color 0.2s ease;
-}
+  transition: all 0.2s ease;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.03);
 
-.leaderboard-row:hover {
-  background-color: rgba(0, 0, 0, 0.02);
+  &:hover {
+    background-color: rgba(255, 255, 255, 0.6) !important;
+    transform: scale(1.002);
+    z-index: 1;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+  }
 }
 
 .top-rank-bg {
-  background-color: #fff9e6; /* subtle amber tint */
-}
-
-.top-rank-bg:hover {
-  background-color: #fff3cd;
-}
-
-.row-group-line {
-  position: absolute;
-  left: 0;
-  top: 0;
-  bottom: 0;
-  width: 6px;
-  opacity: 0.9;
-  border-radius: 0 4px 4px 0;
+  background-color: rgba(255, 249, 230, 0.4);
 }
 
 .group-label-container {
   position: absolute;
   left: 12px;
-  top: -8px;
+  top: -10px;
   z-index: 10;
   background: white;
-  padding: 2px 8px;
-  border-radius: 12px;
-  border: 1px solid rgba(0,0,0,0.05);
+  padding: 2px 10px;
+  border-radius: 20px;
+  border: 1px solid rgba(54, 64, 88, 0.1);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
 }
 
 .group-label-text {
   font-size: 10px;
   font-weight: 800;
   text-transform: uppercase;
-  letter-spacing: 0.8px;
+  letter-spacing: 1px;
 }
 
-.border-bottom {
-  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-}
-
-.divide-y tr:not(:last-child) {
-  border-bottom: 1px solid rgba(0, 0, 0, 0.03);
+.divide-y tr:last-child {
+  border-bottom: none;
 }
 </style>
