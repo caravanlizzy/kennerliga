@@ -29,7 +29,7 @@ defineProps<{
 .kenner-select {
   background: rgba(0, 0, 0, 0.03);
   padding: 0 12px;
-  border-radius: 8px;
+  border-radius: 6px;
   transition: all 0.3s ease;
   min-height: 36px;
   display: flex;
@@ -74,7 +74,7 @@ defineProps<{
 }
 
 .kenner-select-popup {
-  border-radius: 8px !important;
+  border-radius: 6px !important;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1) !important;
   border: 1px solid rgba(0, 0, 0, 0.05);
   margin-top: 4px;

@@ -33,7 +33,7 @@ const modelValue = defineModel();
 .kenner-input {
   background: rgba(0, 0, 0, 0.03);
   padding: 0 12px;
-  border-radius: 8px;
+  border-radius: 6px;
   transition: all 0.3s ease;
   min-height: 36px;
   display: flex;

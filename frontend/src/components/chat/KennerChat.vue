@@ -365,7 +365,7 @@ onUnmounted(() => {
   }
 
   :deep(.q-message-text) {
-    border-radius: 16px !important;
+    border-radius: 12px !important;
     padding: 10px 14px;
     line-height: 1.5;
     min-height: unset;
@@ -400,22 +400,34 @@ onUnmounted(() => {
 }
 
 .composer-input {
+  background: rgba(255, 255, 255, 0.8) !important;
+  backdrop-filter: blur(8px);
+  border-radius: 12px !important;
+  padding: 0 4px 0 16px !important;
+  border: 1px solid rgba(0, 0, 0, 0.08) !important;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.03) !important;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.9) !important;
+    border-color: rgba(0, 0, 0, 0.12) !important;
+  }
+
+  &.q-field--focused {
+    background: white !important;
+    border-color: var(--q-primary) !important;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08) !important;
+  }
+
   :deep(.q-field__control) {
-    background: #f8f9fa !important;
-    border-radius: 24px !important;
-    padding: 0 16px !important;
-    transition: all 0.3s ease;
-    border: 1px solid rgba(0, 0, 0, 0.05);
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+  }
 
-    &:hover {
-      background: #f1f3f5 !important;
-    }
-
-    &.q-field--focused {
-      background: white !important;
-      border-color: var(--q-primary);
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-    }
+  :deep(.q-field__native) {
+    font-weight: 500 !important;
+    font-size: 0.95rem;
   }
 }
 </style>
