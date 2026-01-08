@@ -18,9 +18,9 @@
         <div class="q-pa-md row items-center justify-between border-bottom-subtle bg-white">
           <div class="row items-center">
             <q-icon name="chat" color="blue-grey-8" size="sm" class="q-mr-sm" />
-            <div class="text-h6 text-weight-bold">Kennerchat</div>
+            <div class="text-h6 text-weight-bold text-blue-grey-10">Kennerchat</div>
           </div>
-          <q-btn flat round dense icon="close" size="sm" color="grey-7" @click="chatDrawerOpen = false">
+          <q-btn flat round dense icon="close" size="sm" color="blue-grey-7" @click="chatDrawerOpen = false">
             <q-tooltip>Minimize Chat</q-tooltip>
           </q-btn>
         </div>
@@ -90,12 +90,11 @@ function toggleDrawer(): void {
   border-bottom: 1px solid rgba(0, 0, 0, 0.05);
 }
 .chat-drawer {
-  border-right: 1px solid rgba(0, 0, 0, 0.05) !important;
+  border-right: 2px solid #546e7a !important;
 }
 .glass-drawer {
   background: rgba(255, 255, 255, 0.4) !important;
   backdrop-filter: blur(12px);
-  border-right: 1px solid rgba(54, 64, 88, 0.1) !important;
 }
 .glass-toggle {
   background: rgba(255, 255, 255, 0.7) !important;

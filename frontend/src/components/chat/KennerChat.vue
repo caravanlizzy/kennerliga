@@ -7,11 +7,11 @@
     style="min-width: 350px; min-height: 400px"
   >
     <!-- Messages -->
-    <q-card-section class="q-pa-none col column relative-position">
+    <q-card-section class="q-pa-none col column relative-position chat-body">
       <div class="relative-position col">
         <q-scroll-area
           :visible="false"
-          class="absolute-full q-pa-md"
+          class="absolute-full q-pa-md chat-scroll-area"
           ref="scrollAreaRef"
           @scroll="onScroll"
         >
@@ -65,7 +65,7 @@
     </q-card-section>
 
     <!-- Composer -->
-    <q-card-section class="col-auto q-pa-md border-top-subtle" v-if="isAuthenticated">
+    <q-card-section class="col-auto q-pa-md border-top-subtle chat-footer" v-if="isAuthenticated">
       <KennerInput
         ref="inputRef"
         v-model="newMessage"
@@ -346,6 +346,18 @@ onUnmounted(() => {
 </script>
 
 <style lang="scss" scoped>
+.chat-body {
+  background: rgba(241, 243, 245, 0.4);
+}
+
+.chat-footer {
+  background: white;
+}
+
+.chat-scroll-area {
+  background: linear-gradient(to bottom, transparent, rgba(84, 110, 122, 0.02));
+}
+
 .chat-message {
   margin-bottom: 8px;
 
