@@ -1,10 +1,20 @@
 <template>
-  <q-layout class="column" view="hHh Lpr lFf">
+  <q-layout class="column" view="hHh LpR lFf">
     <q-header class="col-auto no-shadow bg-transparent">
       <NavBar :onToggle="toggleDrawer" />
     </q-header>
 
-    <KennerDrawer v-model="drawerState" />
+    <q-drawer
+      side="right"
+      v-model="drawerState"
+      :width="300"
+      :behavior="isMobile ? 'mobile' : 'desktop'"
+      :overlay="isMobile"
+      class="kenner-drawer glass-drawer"
+    >
+      <KennerDrawer v-model="drawerState" />
+    </q-drawer>
+
     <q-drawer
       v-if="isAuthenticated"
       side="left"
@@ -41,6 +51,23 @@
         icon="chat"
         class="glass-toggle"
         @click="chatDrawerOpen = true"
+      >
+      </q-btn>
+    </div>
+
+    <!-- Menu Toggle Button (Right) -->
+    <div
+      v-if="isAuthenticated && !drawerState && !isMobile"
+      class="fixed-bottom-right q-ma-md"
+      style="z-index: 2000"
+    >
+      <q-btn
+        round
+        size="lg"
+        color="blue-grey-8"
+        icon="menu"
+        class="glass-toggle"
+        @click="drawerState = true"
       >
       </q-btn>
     </div>
