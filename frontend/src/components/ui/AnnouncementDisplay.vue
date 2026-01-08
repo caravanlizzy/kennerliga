@@ -202,7 +202,7 @@ const hasRegisterAnnouncement = computed(() => {
 });
 
 const visibleAnnouncements = computed(() => {
-  return announcements.value.filter(a => !hiddenAnnouncements.value[a.id] && !uiStore.isMinimized(`announcement-${a.id}`));
+  return announcements.value.filter(a => !hiddenAnnouncements.value[a.id]);
 });
 
 const isVisible = computed(() => {
@@ -217,13 +217,7 @@ watch(hasRegisterAnnouncement, (hasReg) => {
 }, { immediate: true });
 
 function minimizeAnnouncement(a: any) {
-  uiStore.minimize({
-    id: `announcement-${a.id}`,
-    title: a.title,
-    icon: announcementIcons[a.type as keyof typeof announcementIcons] || 'announcement',
-    color: 'primary',
-    type: 'announcement'
-  });
+  hiddenAnnouncements.value[a.id] = true;
 }
 
 async function loadParticipants() {

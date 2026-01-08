@@ -17,7 +17,7 @@
       <div class="column full-height">
         <div class="q-pa-md row items-center justify-between border-bottom-subtle bg-white">
           <div class="row items-center">
-            <q-icon name="chat" color="primary" size="sm" class="q-mr-sm" />
+            <q-icon name="chat" color="secondary" size="sm" class="q-mr-sm" />
             <div class="text-h6 text-weight-bold">Kennerchat</div>
           </div>
           <q-btn flat round dense icon="close" size="sm" color="grey-7" @click="chatDrawerOpen = false">
@@ -30,7 +30,7 @@
 
     <!-- Chat Toggle Button (Left) -->
     <div
-      v-if="isAuthenticated && !chatDrawerOpen"
+      v-if="isAuthenticated && !chatDrawerOpen && !isMobile"
       class="fixed-bottom-left q-ma-md"
       style="z-index: 2000"
     >
@@ -60,7 +60,7 @@
 
 <script setup lang="ts">
 import NavBar from 'components/layout/NavBar.vue';
-import { ref, Ref, onMounted, onUnmounted } from 'vue';
+import { ref, Ref, onMounted } from 'vue';
 import KennerDrawer from 'components/layout/KennerDrawer.vue';
 import ConfirmDialog from 'components/ui/ConfirmDialog.vue';
 import KennerChat from 'components/chat/KennerChat.vue';
@@ -72,9 +72,12 @@ import { storeToRefs } from 'pinia';
 const drawerState: Ref<boolean> = ref(false);
 const { isAuthenticated } = storeToRefs(useUserStore());
 const { isMobile } = useResponsive();
-const uiStore = useUiStore();
 
-const chatDrawerOpen = ref(isAuthenticated.value && !isMobile.value);
+const chatDrawerOpen = ref(false);
+
+onMounted(() => {
+  chatDrawerOpen.value = isAuthenticated.value && !isMobile;
+});
 
 function toggleDrawer(): void {
   drawerState.value = !drawerState.value;
@@ -100,6 +103,6 @@ function toggleDrawer(): void {
   background: rgba(255, 255, 255, 0.7) !important;
   backdrop-filter: blur(8px);
   border: 1px solid rgba(54, 64, 88, 0.1);
-  color: var(--q-primary) !important;
+  color: var(--q-secondary) !important;
 }
 </style>

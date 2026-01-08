@@ -75,7 +75,7 @@
               </div>
               <div class="col-12 col-sm-6">
                 <div class="row no-wrap items-center">
-                  <q-icon name="leaderboard" color="primary" size="xs" class="q-mr-xs" />
+                  <q-icon name="stars" color="primary" size="xs" class="q-mr-xs" />
                   <span class="text-weight-bold q-mr-xs">Leaderboard:</span> See the overall rankings and who's leading this year.
                 </div>
                 <div class="row no-wrap items-center q-mt-xs">
