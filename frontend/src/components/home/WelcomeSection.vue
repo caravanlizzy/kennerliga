@@ -131,7 +131,7 @@
                   <q-icon name="history" color="primary" size="xs" class="q-mr-xs" />
                   <span class="text-weight-bold q-mr-xs">Seasons:</span> Check current standings and dive into past season data.
                 </div>
-              </div>ir
+              </div>
               <div class="col-12 col-sm-6">
                 <div class="row no-wrap items-center">
                   <q-icon name="leaderboard" color="primary" size="xs" class="q-mr-xs" />
