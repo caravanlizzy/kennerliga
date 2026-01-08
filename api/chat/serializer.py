@@ -9,8 +9,8 @@ class ChatSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Chat
-        fields = ['text', 'user', 'datetime', 'sender', 'label']
-        read_only_fields = ['user', 'datetime', 'sender', 'label']
+        fields = ['id', 'text', 'user', 'datetime', 'sender', 'label']
+        read_only_fields = ['id', 'user', 'datetime', 'sender', 'label']
 
     @staticmethod
     def get_sender(obj):

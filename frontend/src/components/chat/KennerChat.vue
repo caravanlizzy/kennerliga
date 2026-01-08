@@ -235,7 +235,7 @@ async function send() {
 }
 
 async function loadMessages() {
-  const { data } = await fetchMessages({ last_datetime: lastDateTime });
+  const { data } = await fetchMessages({ last_datetime: lastDateTime, limit: 20 });
   if (!data) return;
 
   if (!lastDateTime) {
