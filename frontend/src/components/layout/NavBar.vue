@@ -1,17 +1,42 @@
 <template>
   <q-toolbar
-    class="navbar text-dark q-px-md q-py-sm relative-position glass-effect shadow-1"
+    class="navbar text-dark q-py-sm relative-position glass-effect shadow-1"
+    :class="isMobile ? 'q-px-sm' : 'q-px-md'"
   >
     <!-- Left: Brand -->
     <NavHome />
 
     <q-space />
 
+    <!-- Center: Mobile Tabs -->
+    <div v-if="isMobile && isIndexPage" class="row no-wrap items-center bg-grey-2 rounded-borders q-pa-none q-mr-sm" style="height: 40px;">
+      <q-tabs
+        v-model="activeTab"
+        class="text-dark compact-tabs"
+        active-color="primary"
+        indicator-color="transparent"
+        align="center"
+        dense
+        no-caps
+      >
+        <q-tab icon="auto_awesome" name="welcome" class="tab-welcome" />
+        <q-tab icon="history" name="seasons" class="tab-seasons" />
+        <q-tab icon="sensors" name="live" class="tab-live" />
+        <q-tab icon="chat" name="chat" class="tab-chat" />
+        <q-tab icon="leaderboard" name="leaderboard" class="tab-leaderboard" />
+      </q-tabs>
+    </div>
+
     <!-- Right: Controls -->
-    <div class="row no-wrap items-center q-gutter-x-md">
-      <!-- Minimized Items -->
+    <div class="row no-wrap items-center" :class="isMobile ? 'q-gutter-x-xs' : 'q-gutter-x-sm'">
+
+      <!-- Minimized Items (Mobile - show only those NOT in tabs if any, but usually they are the same) -->
+      <!-- Actually, the request says minimize functionality does not make sense on mobile since it duplicates nav elements -->
+      <!-- So we just don't show minimizedItems on mobile at all in the navbar -->
+
+      <!-- Minimized Items (Desktop) -->
       <div
-        v-if="minimizedItems.length && isIndexPage"
+        v-if="!isMobile && minimizedItems.length && isIndexPage"
         class="row no-wrap items-center q-gutter-x-sm"
       >
         <q-btn
@@ -46,12 +71,14 @@ import { useUiStore } from 'src/stores/uiStore';
 import { storeToRefs } from 'pinia';
 import { useRoute } from 'vue-router';
 import { computed } from 'vue';
+import { useResponsive } from 'src/composables/responsive';
 
 defineProps<{ onToggle: () => void }>();
 const { user } = storeToRefs(useUserStore());
-const { minimizedItems } = storeToRefs(useUiStore());
+const { minimizedItems, activeTab } = storeToRefs(useUiStore());
 const { restore } = useUiStore();
 const route = useRoute();
+const { isMobile } = useResponsive();
 
 const isIndexPage = computed(() => route.name === 'home');
 
@@ -61,6 +88,42 @@ const isIndexPage = computed(() => route.name === 'home');
 .navbar {
   position: relative;
   min-height: 64px;
+}
+
+.compact-tabs {
+  .q-tab {
+    min-height: 40px !important;
+    padding: 0 !important;
+    border-radius: 4px !important;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  }
+  .q-tab__content {
+    padding: 0 !important;
+    min-width: 44px !important;
+    position: relative;
+  }
+  .tab-welcome .q-icon { color: var(--q-primary); }
+  .tab-live .q-icon { color: var(--q-accent); }
+  .tab-seasons .q-icon { color: var(--q-primary); }
+  .tab-chat .q-icon { color: var(--q-primary); }
+  .tab-leaderboard .q-icon { color: var(--q-primary); }
+
+  .q-tab--active {
+    background: white !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08) !important;
+
+    &::after {
+      content: '';
+      position: absolute;
+      bottom: 2px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 4px;
+      height: 4px;
+      border-radius: 50%;
+      background: currentColor;
+    }
+  }
 }
 
 .glass-effect {

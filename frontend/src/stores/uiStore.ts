@@ -15,6 +15,7 @@ const STORAGE_KEY = 'minimized_items';
 export const useUiStore = defineStore('ui', () => {
   const isDev = ref(false);
   const minimizedItems = ref<MinimizedItem[]>(LocalStorage.getItem(STORAGE_KEY) || []);
+  const activeTab = ref('seasons');
 
   watch(
     minimizedItems,
@@ -54,6 +55,7 @@ export const useUiStore = defineStore('ui', () => {
     hideDev,
     toggleDev,
     minimizedItems,
+    activeTab,
     minimize,
     restore,
     isMinimized

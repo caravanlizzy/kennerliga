@@ -5,7 +5,7 @@
       unelevated
       flat
       color="dark"
-      class="nav-item-radius text-weight-bold"
+      :class="[isMobile ? 'q-px-xs' : 'nav-item-radius', 'text-weight-bold']"
     >
       <div class="row items-center no-wrap">
         <q-icon size="md" name="img:icons/favicon.svg" class="q-mr-sm" />
