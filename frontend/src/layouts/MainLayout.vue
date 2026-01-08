@@ -17,10 +17,10 @@
       <div class="column full-height">
         <div class="q-pa-md row items-center justify-between border-bottom-subtle bg-white">
           <div class="row items-center">
-            <q-icon name="chat" color="blue-grey-8" size="sm" class="q-mr-sm" />
-            <div class="text-h6 text-weight-bold text-blue-grey-10">Kennerchat</div>
+            <q-icon name="chat" color="blue-grey-6" size="sm" class="q-mr-sm" />
+            <div class="text-h6 text-weight-bold text-blue-grey-6">Kennerchat</div>
           </div>
-          <q-btn flat round dense icon="close" size="sm" color="blue-grey-7" @click="chatDrawerOpen = false">
+          <q-btn flat round dense icon="close" size="sm" color="blue-grey-6" @click="chatDrawerOpen = false">
             <q-tooltip>Minimize Chat</q-tooltip>
           </q-btn>
         </div>
@@ -90,7 +90,7 @@ function toggleDrawer(): void {
   border-bottom: 1px solid rgba(0, 0, 0, 0.05);
 }
 .chat-drawer {
-  border-right: 2px solid #546e7a !important;
+  border-right: 2px solid #607d8b !important;
 }
 .glass-drawer {
   background: rgba(255, 255, 255, 0.4) !important;
@@ -100,6 +100,6 @@ function toggleDrawer(): void {
   background: rgba(255, 255, 255, 0.7) !important;
   backdrop-filter: blur(8px);
   border: 1px solid rgba(54, 64, 88, 0.1);
-  color: #455a64 !important; // blue-grey-8
+  color: #607d8b !important; // blue-grey-6
 }
 </style>
