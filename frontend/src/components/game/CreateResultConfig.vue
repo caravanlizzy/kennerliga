@@ -66,35 +66,44 @@
           </div>
 
           <div v-if="isAsymmetric" class="q-pl-sm q-pr-sm q-mt-sm">
-            <div class="text-subtitle2 q-mb-xs">Primary Factions (Level 0)</div>
-            <ListCreator
-              button-label="Add level 0 faction"
-              :initial-list="factionsLevel0"
-              @update-list="(updatedList: string[]) => (factionsLevel0 = updatedList)"
-            />
-
-            <div class="q-mt-md">
+            <div v-for="(levelData, index) in factionLevels" :key="levelData.id" class="q-mb-md">
               <div class="row items-center justify-between q-mb-xs">
-                <div class="text-subtitle2">Secondary Factions (Level 1)</div>
-                <q-toggle
-                  v-model="hasSecondLevel"
+                <div class="text-subtitle2">
+                  {{ index === 0 ? 'Primary' : 'Secondary' }} Factions (Level {{ index }})
+                </div>
+                <KennerButton
+                  v-if="index > 0"
+                  flat
                   dense
-                  label="Enable Level 1"
-                  left-label
-                />
+                  round
+                  icon="delete"
+                  color="negative"
+                  size="sm"
+                  @click="removeFactionLevel(index)"
+                >
+                  <q-tooltip>Remove level {{ index }}</q-tooltip>
+                </KennerButton>
               </div>
+              <ListCreator
+                :button-label="`Add level ${index} faction`"
+                :initial-list="levelData.factions"
+                @update-list="(updatedList: string[]) => (levelData.factions = updatedList)"
+              />
+            </div>
 
-              <div v-if="hasSecondLevel">
-                <ListCreator
-                  button-label="Add level 1 faction"
-                  :initial-list="factionsLevel1"
-                  @update-list="(updatedList: string[]) => (factionsLevel1 = updatedList)"
-                />
-              </div>
+            <div class="row justify-center q-mt-sm">
+              <KennerButton
+                flat
+                dense
+                icon="add"
+                label="Add faction level"
+                color="primary"
+                @click="addFactionLevel"
+              />
             </div>
 
             <div
-              v-if="!factionsLevel0.length && !factionsLevel1.length"
+              v-if="!factionLevels.some(l => l.factions.length)"
               class="text-caption text-grey-7 q-mt-xs"
             >
               No factions added yet.
@@ -218,20 +227,32 @@ const hasStartingPlayerOrder = ref(
 );
 const hasPoints = ref(props.initialConfig?.hasPoints ?? true);
 const hasTieBreaker = ref(props.initialConfig?.hasTieBreaker ?? false);
-const hasSecondLevel = ref(
-  props.initialConfig?.factions?.some((f) => f.level === 1) ?? false
-);
 
-const factionsLevel0 = ref<string[]>(
-  props.initialConfig?.factions
-    ?.filter((f) => f.level === 0)
-    .map((f) => f.name) ?? []
-);
-const factionsLevel1 = ref<string[]>(
-  props.initialConfig?.factions
-    ?.filter((f) => f.level === 1)
-    .map((f) => f.name) ?? []
-);
+type UiFactionLevel = {
+  id: string;
+  factions: string[];
+};
+
+const factionLevels = ref<UiFactionLevel[]>([]);
+
+// Initialize from props
+if (props.initialConfig?.factions && props.initialConfig.factions.length > 0) {
+  const maxLevel = Math.max(
+    ...props.initialConfig.factions.map((f) => f.level),
+    0
+  );
+  for (let i = 0; i <= maxLevel; i++) {
+    factionLevels.value.push({
+      id: newRef(),
+      factions: props.initialConfig.factions
+        .filter((f) => f.level === i)
+        .map((f) => f.name),
+    });
+  }
+} else {
+  factionLevels.value = [{ id: newRef(), factions: [] }]; // Start with level 0
+}
+
 const tieBreakersUi = ref<UiTieBreaker[]>(
   props.initialConfig?.tieBreakers?.map((tb) => ({
     id: newRef(),
@@ -282,6 +303,16 @@ function removeTieBreaker(id: string): void {
   tieBreakersUi.value = tieBreakersUi.value.filter((t) => t.id !== id);
 }
 
+function addFactionLevel(): void {
+  factionLevels.value.push({ id: newRef(), factions: [] });
+}
+
+function removeFactionLevel(index: number): void {
+  if (index > 0) {
+    factionLevels.value.splice(index, 1);
+  }
+}
+
 const tieBreakers = computed<TTieBreaker[]>(() => {
   return tieBreakersUi.value.map((tb) => ({
     name: tb.name,
@@ -291,16 +322,15 @@ const tieBreakers = computed<TTieBreaker[]>(() => {
 
 const factions = computed<TFaction[]>(() => {
   if (!isAsymmetric.value) return [];
-  const level0: TFaction[] = factionsLevel0.value.map((name) => ({
-    name,
-    level: 0,
-  }));
+  const allFactions: TFaction[] = [];
 
-  const level1: TFaction[] = hasSecondLevel.value
-    ? factionsLevel1.value.map((name) => ({ name, level: 1 }))
-    : [];
+  factionLevels.value.forEach((levelData, level) => {
+    levelData.factions.forEach((name) => {
+      allFactions.push({ name, level });
+    });
+  });
 
-  return [...level0, ...level1];
+  return allFactions;
 });
 
 const resultConfig = computed<TResultConfig>(() => ({

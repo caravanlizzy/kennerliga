@@ -393,7 +393,6 @@ type UiOption = {
 
 const router = useRouter();
 const $q = useQuasar();
-const { isMobile } = useResponsive();
 
 const { data: platforms } = await api('game/platforms/');
 
