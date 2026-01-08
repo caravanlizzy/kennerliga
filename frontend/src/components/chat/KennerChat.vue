@@ -38,7 +38,7 @@
               v-else
               :sent="isMine(m)"
               :text="[m.text]"
-              :name="m.sender"
+              :name="isMine(m) ? undefined : m.sender"
               :stamp="timeAgo(m.datetime)"
               class="chat-message"
               :class="isMine(m) ? 'chat-message-sent' : 'chat-message-received'"
@@ -66,7 +66,7 @@
     </q-card-section>
 
     <!-- Composer -->
-    <q-card-section class="col-auto q-pa-sm border-top-subtle" v-if="isAuthenticated">
+    <q-card-section class="col-auto q-pa-md border-top-subtle" v-if="isAuthenticated">
       <KennerInput
         ref="inputRef"
         v-model="newMessage"
@@ -348,30 +348,73 @@ onUnmounted(() => {
 
 <style lang="scss" scoped>
 .chat-message {
+  margin-bottom: 8px;
+
+  :deep(.q-message-name) {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--q-primary);
+    margin-bottom: 4px;
+    opacity: 0.9;
+  }
+
+  :deep(.q-message-stamp) {
+    font-size: 0.7rem;
+    opacity: 0.6;
+    margin-top: 4px;
+  }
+
   :deep(.q-message-text) {
-    border: 1px solid;
+    border-radius: 16px !important;
+    padding: 10px 14px;
+    line-height: 1.5;
     min-height: unset;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
 
     &:before {
-      border: inherit;
-      border-bottom: 0;
-      border-right: 0;
+      display: none;
     }
   }
 
   &.chat-message-sent {
     :deep(.q-message-text) {
-      border-color: rgba($primary, 0.3);
-      background: rgba($primary, 0.1) !important;
-      color: $primary !important;
+      background: var(--q-primary) !important;
+      color: white !important;
+      border-bottom-right-radius: 4px !important;
+    }
+    :deep(.q-message-text-content) {
+      color: white !important;
     }
   }
 
   &.chat-message-received {
     :deep(.q-message-text) {
-      border-color: rgba($secondary, 0.3);
-      background: rgba($secondary, 0.1) !important;
-      color: $accent !important;
+      background: #f1f3f5 !important;
+      color: #2c3e50 !important;
+      border-bottom-left-radius: 4px !important;
+    }
+    :deep(.q-message-text-content) {
+      color: #2c3e50 !important;
+    }
+  }
+}
+
+.composer-input {
+  :deep(.q-field__control) {
+    background: #f8f9fa !important;
+    border-radius: 24px !important;
+    padding: 0 16px !important;
+    transition: all 0.3s ease;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+
+    &:hover {
+      background: #f1f3f5 !important;
+    }
+
+    &.q-field--focused {
+      background: white !important;
+      border-color: var(--q-primary);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
     }
   }
 }
