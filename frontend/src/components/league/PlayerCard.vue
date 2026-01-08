@@ -1,142 +1,133 @@
 <template>
-  <q-card flat unelevated class="player-card">
-    <q-card-section class="card-body">
-      <div class="game-primary-section">
-        <div v-for="m in allMembers" :key="m.id" class="member-group q-mb-xl">
-          <!-- Member Header -->
-          <div class="member-header q-mb-md">
-            <UserAvatar
-              :display-username="m.username"
-              size="48px"
-              shape="squircle"
-            />
-            <div class="member-info q-ml-md">
-              <div class="text-h6 text-weight-bold">{{ m.profile_name }}</div>
-            </div>
-          </div>
-
-          <!-- 1. Active Pick(s) -->
-          <div
-            v-for="game in getActivePicks(m)"
-            :key="game.id"
-            class="selected-game-card q-mb-md"
-          >
-            <div class="game-title-row">
-              <div class="game-title-highlight">
-                <div class="game-title">
-                  <span class="game-name-text">
-                    {{ game.game_name }}
-                    <KennerTooltip v-if="(game.game_name || '').length > 28">
-                      {{ game.game_name }}
-                    </KennerTooltip>
-                  </span>
-                </div>
-              </div>
-              <KennerButton
-                flat
-                round
-                size="sm"
-                icon="expand_more"
-                class="expand-btn"
-                :class="{ expanded: isExpanded(game.id) }"
-                @click="toggleExpanded(game.id)"
-              />
-            </div>
-
-            <transition name="expand">
-              <div v-if="isExpanded(game.id)" class="game-settings-wrapper">
-                <div class="settings-divider"></div>
-                <GameSettingsDisplay :selectedOptions="game.selected_options" />
-              </div>
-            </transition>
-          </div>
-
-          <!-- 2. The Game they Banned (my_banned_game) -->
-          <div v-if="m.my_banned_game?.game" class="ban-row q-mb-md">
-            <div class="bans-label">
-              <q-icon name="gavel" size="16px" color="red-5" />
-              <span>Banned</span>
-            </div>
-            <div class="bans-content">
-              <q-chip dense class="my-ban-chip">
-                {{ m.my_banned_game.game_name }}
-                <KennerTooltip v-if="getOwnerName(m.my_banned_game.profile)">
-                  Picked by {{ getOwnerName(m.my_banned_game.profile) }}
-                </KennerTooltip>
-              </q-chip>
-            </div>
-          </div>
-          <div v-else-if="m.has_banned" class="ban-row q-mb-md">
-            <div class="bans-label">
-              <q-icon name="gavel" size="16px" color="grey-6" />
-              <span>Ban</span>
-            </div>
-            <div class="bans-content">
-              <span class="no-bans italic text-grey-6">Player skipped ban</span>
-            </div>
-          </div>
-
-          <!-- 3. Their own game that has been successfully banned -->
-          <div
-            v-for="game in getSuccessfullyBannedPicks(m)"
-            :key="'banned-' + game.id"
-            class="selected-game-card q-mb-md banned-pick-row"
-          >
-            <div class="game-title-row">
-              <div class="game-title-highlight banned">
-                <div class="game-title">
-                  <span class="game-name-text text-grey-6">
-                    <q-icon
-                      name="block"
-                      color="red-5"
-                      size="xs"
-                      class="q-mr-xs"
-                    />
-                    <del>{{ game.game_name }}</del>
-                  </span>
-                </div>
-                <div class="text-caption text-grey-6">
-                  Successfully Banned
-                  <span v-if="getBannerNames(game.id).length > 0">
-                    by
-                    <strong>{{
-                      formatBannerNames(getBannerNames(game.id))
-                    }}</strong>
-                  </span>
-                </div>
-              </div>
-              <KennerButton
-                flat
-                round
-                size="sm"
-                icon="expand_more"
-                class="expand-btn"
-                :class="{ expanded: isExpanded(game.id) }"
-                @click="toggleExpanded(game.id)"
-              />
-            </div>
-
-            <transition name="expand">
-              <div v-if="isExpanded(game.id)" class="game-settings-wrapper">
-                <div class="settings-divider"></div>
-                <div class="opacity-50">
-                  <GameSettingsDisplay :selectedOptions="game.selected_options" />
-                </div>
-              </div>
-            </transition>
-          </div>
-        </div>
-
-        <!-- Empty State -->
-        <div v-if="allMembers.length === 0" class="no-game-selected row items-center">
-          <q-icon name="videogame_asset_off" size="32px" />
-          <div class="q-ml-sm">
-            No players in league
-          </div>
+  <div class="player-card">
+    <div v-for="m in allMembers" :key="m.id" class="member-section">
+      <!-- Member Header -->
+      <div class="member-header q-mb-sm">
+        <UserAvatar
+          :display-username="m.username"
+          size="32px"
+          shape="squircle"
+        />
+        <div class="text-subtitle1 text-weight-bold q-ml-sm text-primary">
+          {{ m.profile_name }}
         </div>
       </div>
-    </q-card-section>
-  </q-card>
+
+      <q-list class="game-list">
+        <!-- 1. Active Pick(s) -->
+        <div
+          v-for="game in getActivePicks(m)"
+          :key="game.id"
+          class="game-item-container"
+        >
+          <q-item class="game-item">
+            <q-item-section avatar>
+              <q-icon name="sports_esports" color="primary" size="24px" />
+            </q-item-section>
+
+            <q-item-section>
+              <q-item-label class="game-name">
+                {{ game.game_name }}
+                <KennerTooltip v-if="(game.game_name || '').length > 28">
+                  {{ game.game_name }}
+                </KennerTooltip>
+              </q-item-label>
+            </q-item-section>
+
+            <q-item-section side>
+              <KennerButton
+                flat
+                round
+                size="sm"
+                :icon="isExpanded(game.id) ? 'expand_less' : 'expand_more'"
+                @click="toggleExpanded(game.id)"
+              />
+            </q-item-section>
+          </q-item>
+
+          <q-slide-transition>
+            <div v-if="isExpanded(game.id)" class="game-details q-px-md q-pb-sm">
+              <GameSettingsDisplay :selectedOptions="game.selected_options" />
+            </div>
+          </q-slide-transition>
+        </div>
+
+        <!-- 2. The Game they Banned -->
+        <q-item v-if="m.my_banned_game?.game" class="ban-item">
+          <q-item-section avatar>
+            <q-icon name="gavel" color="blue-grey-4" size="20px" />
+          </q-item-section>
+          <q-item-section>
+            <q-item-label class="row items-center">
+              <span class="text-blue-grey-7 text-weight-medium q-mr-sm">Banned:</span>
+              <span class="text-weight-medium">{{ m.my_banned_game.game_name }}</span>
+              <KennerTooltip v-if="getOwnerName(m.my_banned_game.profile)">
+                Picked by {{ getOwnerName(m.my_banned_game.profile) }}
+              </KennerTooltip>
+            </q-item-label>
+          </q-item-section>
+        </q-item>
+
+        <q-item v-else-if="m.has_banned" class="ban-item skipped">
+          <q-item-section avatar>
+            <q-icon name="gavel" color="grey-5" size="20px" />
+          </q-item-section>
+          <q-item-section>
+            <q-item-label class="text-grey-6 italic">Player skipped ban</q-item-label>
+          </q-item-section>
+        </q-item>
+
+        <!-- 3. Their own game that has been successfully banned -->
+        <div
+          v-for="game in getSuccessfullyBannedPicks(m)"
+          :key="'banned-' + game.id"
+          class="game-item-container banned"
+        >
+          <q-item class="game-item">
+            <q-item-section avatar>
+              <q-icon name="block" color="negative" size="20px" />
+            </q-item-section>
+
+            <q-item-section>
+              <q-item-label class="game-name text-grey-6 text-strike">
+                {{ game.game_name }}
+              </q-item-label>
+              <q-item-label caption class="text-blue-grey-4">
+                Successfully Banned
+                <span v-if="getBannerNames(game.id).length > 0">
+                  by {{ formatBannerNames(getBannerNames(game.id)) }}
+                </span>
+              </q-item-label>
+            </q-item-section>
+
+            <q-item-section side>
+              <KennerButton
+                flat
+                round
+                size="sm"
+                :icon="isExpanded(game.id) ? 'expand_less' : 'expand_more'"
+                @click="toggleExpanded(game.id)"
+              />
+            </q-item-section>
+          </q-item>
+
+          <q-slide-transition>
+            <div v-if="isExpanded(game.id)" class="game-details q-px-md q-pb-sm opacity-50">
+              <GameSettingsDisplay :selectedOptions="game.selected_options" />
+            </div>
+          </q-slide-transition>
+        </div>
+      </q-list>
+    </div>
+
+    <!-- Empty State -->
+    <div v-if="allMembers.length === 0" class="no-game-selected row items-center justify-center q-pa-xl">
+      <q-icon name="videogame_asset_off" size="48px" color="grey-4" />
+      <div class="text-h6 text-grey-5 q-mt-md full-width text-center">
+        No players in league
+      </div>
+    </div>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -197,142 +188,81 @@ function formatBannerNames(names: string[]) {
 
 <style scoped lang="scss">
 .player-card {
-  background: transparent;
-  padding: 0;
-}
+  padding: 8px 0;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
 
-.member-group {
-  background: rgba(255, 255, 255, 0.4);
-  backdrop-filter: blur(8px);
-  border: 1px solid rgba(54, 64, 88, 0.08);
-  border-radius: 16px;
-  padding: 24px;
-  transition: all 0.3s ease;
-
-  &:hover {
-    background: rgba(255, 255, 255, 0.6);
-    border-color: rgba(54, 64, 88, 0.15);
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+  @media (min-width: 1024px) {
+    grid-template-columns: repeat(2, 1fr);
   }
 }
 
-/* MEMBER HEADER */
+.member-section {
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+
+  &:hover {
+    border-color: var(--q-primary);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  }
+}
+
 .member-header {
   display: flex;
   align-items: center;
+  padding: 12px 16px;
+  background: rgba(var(--q-primary), 0.05);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
 }
 
-/* GAME TITLE ROW */
-.game-title-row {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 8px;
+.game-list {
+  background: transparent;
 }
 
-.player-avatar-inline {
-  flex-shrink: 0;
+.game-item-container {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.03);
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.game-item {
+  padding: 8px 16px;
+  min-height: 48px;
+}
+
+.game-name {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--q-dark);
+}
+
+.ban-item {
+  min-height: 40px;
+  padding: 4px 16px;
+  background: rgba(var(--q-blue-grey), 0.05);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.03);
+
+  &.skipped {
+    background: transparent;
+  }
+}
+
+.game-details {
+  border-top: 1px dashed rgba(0, 0, 0, 0.05);
+  background: rgba(0, 0, 0, 0.01);
 }
 
 .opacity-50 {
   opacity: 0.5;
 }
 
-.game-title-highlight {
-  flex: 1;
-  padding: 6px 0;
-  position: relative;
-  /* No border, no background = clean */
-}
-
-.game-title-highlight.banned::after {
-  background: var(--q-negative);
-}
-
-.game-title-highlight::after {
-  content: '';
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  height: 3px;
-  background: var(--q-info); /* info color */
-  border-radius: 3px;
-}
-
-.game-name-text {
-  font-size: 18px;
-  font-weight: 700;
-  color: var(--q-dark);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-/* CHIPS – clean white with soft gray border */
-.q-chip {
-  background: rgba(255, 255, 255, 0.8) !important;
-  backdrop-filter: blur(4px);
-  border: 1px solid rgba(54, 64, 88, 0.08) !important;
-  font-size: 13px;
-  padding: 4px 10px !important;
-  border-radius: 8px !important;
-  transition: all 0.2s ease;
-
-  &:hover {
-    background: white !important;
-    border-color: rgba(54, 64, 88, 0.2) !important;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
-  }
-}
-
-/* RED CHIP */
-.my-ban-chip {
-  color: #dc2626 !important;
-  border-color: #fecaca !important;
-}
-
-/* BLUE CHIP */
-.first-selection-chip {
-  color: #1e3a8a !important;
-  border-color: #bfdbfe !important;
-}
-
-/* BANS SECTION – no background, no border */
-.bans-section {
-  margin-top: 6px;
-}
-
-.ban-row {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 4px;
-}
-
-.bans-label {
-  width: 110px;
-  font-size: 12px;
-  color: #6b7280;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.no-bans {
-  color: #9ca3af;
-  font-style: italic;
-}
-.selected-game-card {
-  background: rgba(255, 255, 255, 0.5);
-  border-radius: 12px;
-  padding: 12px 16px;
-  border: 1px solid rgba(54, 64, 88, 0.05);
-  transition: all 0.2s ease;
-
-  &:hover {
-    background: rgba(255, 255, 255, 0.8);
-    border-color: rgba(54, 64, 88, 0.1);
-  }
+.text-strike {
+  text-decoration: line-through;
 }
 </style>
