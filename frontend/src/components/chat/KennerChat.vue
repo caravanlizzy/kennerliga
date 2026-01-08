@@ -32,7 +32,7 @@
             <q-chat-message
               v-if="m.label"
               :label="m.label"
-              class="text-secondary text-weight-bold"
+              class="text-blue-grey-8 text-weight-bold"
             />
             <q-chat-message
               v-else
@@ -55,8 +55,7 @@
             flat
             round
             dense
-            color="white"
-            text-color="accent"
+            color="blue-grey-8"
             icon="expand_more"
             style="pointer-events: auto"
             @click="scrollToBottom(true, true)"
@@ -82,7 +81,7 @@
             round
             dense
             icon="send"
-            color="secondary"
+            color="blue-grey-8"
             :loading="sending"
             @click="send"
           />
@@ -353,7 +352,7 @@ onUnmounted(() => {
   :deep(.q-message-name) {
     font-size: 0.75rem;
     font-weight: 700;
-    color: var(--q-accent);
+    color: #546e7a; // blue-grey-7
     margin-bottom: 4px;
     opacity: 0.9;
   }
@@ -378,7 +377,7 @@ onUnmounted(() => {
 
   &.chat-message-sent {
     :deep(.q-message-text) {
-      background: var(--q-secondary) !important;
+      background: #546e7a !important;
       color: white !important;
       border-bottom-right-radius: 4px !important;
     }
@@ -414,7 +413,7 @@ onUnmounted(() => {
 
   &.q-field--focused {
     background: white !important;
-    border-color: var(--q-secondary) !important;
+    border-color: #546e7a !important;
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08) !important;
   }
 

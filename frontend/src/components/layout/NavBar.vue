@@ -136,7 +136,7 @@ function scrollToSection(id: string) {
   .tab-welcome .q-icon { color: var(--q-primary); }
   .tab-live .q-icon { color: var(--q-accent); }
   .tab-seasons .q-icon { color: var(--q-primary); }
-  .tab-chat .q-icon { color: var(--q-primary); }
+  .tab-chat .q-icon { color: #455a64; } // blue-grey-8
   .tab-leaderboard .q-icon { color: var(--q-primary); }
 
   .q-tab--active {

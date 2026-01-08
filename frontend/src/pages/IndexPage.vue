@@ -83,7 +83,7 @@
 
           <div v-else-if="mobileContent === 'chat'" class="col column" key="chat">
             <div class="q-pa-md row items-center border-bottom-subtle bg-white">
-              <q-icon name="chat" color="primary" size="sm" class="q-mr-sm" />
+              <q-icon name="chat" color="blue-grey-8" size="sm" class="q-mr-sm" />
               <div class="text-h5 text-weight-bold">Kennerchat</div>
             </div>
             <KennerChat class="col bg-white" />

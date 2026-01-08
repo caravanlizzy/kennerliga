@@ -79,7 +79,7 @@
                   <span class="text-weight-bold q-mr-xs">Leaderboard:</span> See the overall rankings and who's leading this year.
                 </div>
                 <div class="row no-wrap items-center q-mt-xs">
-                  <q-icon name="chat" color="primary" size="xs" class="q-mr-xs" />
+                  <q-icon name="chat" color="blue-grey-8" size="xs" class="q-mr-xs" />
                   <span class="text-weight-bold q-mr-xs">Kennerchat:</span> Catch up with the community and plan your next session.
                 </div>
               </div>
