@@ -39,7 +39,7 @@
         size="lg"
         color="blue-grey-8"
         icon="chat"
-        class="shadow-10 glass-toggle"
+        class="glass-toggle"
         @click="chatDrawerOpen = true"
       >
       </q-btn>

@@ -5,12 +5,13 @@
       :to="{ name: 'my-league' }"
       unelevated
       color="secondary"
-      class="nav-item-radius text-weight-bold shadow-1"
+      class="nav-item-radius text-weight-bold league-btn"
+      :class="{ 'is-active': isMeActivePlayer }"
       no-caps
     >
-      <q-icon name="emoji_events" color="white" />
+      <q-icon :name="isMeActivePlayer ? 'workspace_premium' : 'emoji_events'" color="white" />
       <span v-show="!isMobile" class="q-ml-xs text-white">My League</span>
-      <q-badge v-if="isMeActivePlayer" floating rounded color="positive" style="top: -4px; right: -4px; border: 2px solid white" />
+      <q-badge v-if="isMeActivePlayer" floating rounded style="top: -4px; right: -4px; border: 2px solid white" color="positive" />
     </KennerButton>
   </div>
 </template>
@@ -28,3 +29,13 @@ const { isMeActivePlayer } = storeToRefs(myLeagueStore);
 
 
 </script>
+
+<style lang="scss" scoped>
+.league-btn {
+  transition: all 0.3s ease;
+
+  &.is-active {
+    border: 2px solid white;
+  }
+}
+</style>

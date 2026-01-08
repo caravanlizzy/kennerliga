@@ -46,7 +46,7 @@
 
     <!-- Center: Mobile Tabs (Second Row) -->
     <div v-if="isMobile" class="row justify-center q-pb-sm q-px-sm">
-      <div class="row no-wrap items-center bg-blue-grey-1 rounded-borders q-pa-none full-width justify-center" style="height: 40px; border: 1px solid rgba(54, 64, 88, 0.08); box-shadow: inset 0 1px 2px rgba(0,0,0,0.03)">
+      <div class="row no-wrap items-center bg-blue-grey-1 rounded-borders q-pa-none full-width justify-center" style="height: 40px; border: 1px solid rgba(54, 64, 88, 0.08);">
         <q-tabs
           v-model="activeTab"
           class="text-dark compact-tabs full-width"
@@ -141,7 +141,6 @@ function scrollToSection(id: string) {
 
   .q-tab--active {
     background: white !important;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08) !important;
   }
 }
 
@@ -184,7 +183,6 @@ function scrollToSection(id: string) {
     opacity: 1;
     transform: translateY(-2px);
     background: rgba(0, 0, 0, 0.05);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
   }
 
   &.minimized-btn {
