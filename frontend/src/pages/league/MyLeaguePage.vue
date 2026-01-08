@@ -259,7 +259,7 @@ function manageActionBar() {
           name: 'Save',
           callback: submitGameSelection,
           disabled: !selectionValid.value,
-          buttonVariant: 'accent',
+          buttonVariant: 'primary',
         },
       ]);
       setLeadText('Confirm your game selection');

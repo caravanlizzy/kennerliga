@@ -1,51 +1,45 @@
 <!-- CollapsibleSidePanel.vue -->
 <template>
-  <div class="row no-wrap items-stretch">
+  <div class="row no-wrap items-stretch full-height relative-position">
     <!-- Main content -->
     <div class="col min-w-0" :class="[{ 'q-pr-md': !isSmall }]">
       <slot />
     </div>
 
-    <!-- Large screens: separator + fixed panel -->
+    <!-- Large screens: panel -->
     <template v-if="!isSmall">
       <div
-        class="col-auto"
+        class="col-auto glass-sidebar"
         :style="{ width: props.sideWidth + 'px', flex: '0 0 auto' }"
       >
-        <slot name="side" />
+        <div class="q-pa-md">
+          <div class="row items-center q-mb-md">
+            <div class="bg-primary header-indicator q-mr-sm" />
+            <div class="text-h6 text-weight-bold text-primary tracking-tight">{{ props.sideTitle }}</div>
+          </div>
+          <slot name="side" />
+        </div>
       </div>
     </template>
 
-    <!-- Small screens: Drawer + full-height slim rail when closed -->
+    <!-- Small screens: Drawer + floating toggle -->
     <template v-else>
-      <KennerButton
+      <div
         v-if="!sideOpen"
-        dense
-        flat
-        no-caps
-        ripple
-        color="white"
-        :style="{
-          position: 'fixed',
-          top: '50%',
-          right: 0,
-          transform: 'translateY(-50%)',
-          width: props.railWidth + 'px',
-          minWidth: props.railWidth + 'px',
-          height: '120px',
-          borderRadius: '8px 0 0 8px',
-          zIndex: 2002,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          backgroundColor: 'var(--q-dark)', // or use a class
-          fontWeight: '600',
-          writingMode: 'vertical-rl',
-        }"
-        @click="toggleSide"
+        class="fixed-bottom-right q-ma-md"
+        style="z-index: 2000"
       >
-        {{ props.sideTitle }}
-      </KennerButton>
+        <q-btn
+          round
+          size="lg"
+          color="primary"
+          icon="leaderboard"
+          class="shadow-10"
+          @click="toggleSide"
+        >
+          <q-badge floating color="accent" rounded />
+        </q-btn>
+      </div>
 
       <q-drawer
         v-model="sideOpen"
@@ -53,24 +47,27 @@
         behavior="mobile"
         overlay
         :width="sideWidth"
-        :elevated="true"
+        class="glass-sidebar-drawer"
       >
-        <q-toolbar class="q-px-md bg-dark text-white">
-          <q-toolbar-title class="ellipsis">{{
-            props.sideTitle
-          }}</q-toolbar-title>
-          <KennerButton
-            flat
-            round
-            dense
-            color="white"
-            icon="close"
-            @click="toggleSide"
-          />
-        </q-toolbar>
-        <q-separator />
-        <div class="q-pa-md">
-          <slot name="side" />
+        <div class="column full-height">
+          <q-toolbar class="q-px-md glass-header text-primary">
+            <div class="bg-primary header-indicator q-mr-sm" />
+            <q-toolbar-title class="text-weight-bold tracking-tight">
+              {{ props.sideTitle }}
+            </q-toolbar-title>
+            <q-btn
+              flat
+              round
+              dense
+              color="primary"
+              icon="close"
+              @click="toggleSide"
+            />
+          </q-toolbar>
+          <q-separator class="opacity-10" />
+          <div class="col scroll q-pa-md">
+            <slot name="side" />
+          </div>
         </div>
       </q-drawer>
     </template>
@@ -80,7 +77,6 @@
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue';
 import { useResponsive } from 'src/composables/responsive';
-import KennerButton from 'components/base/KennerButton.vue';
 
 type Break = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
 
@@ -116,12 +112,16 @@ const isSmall = computed(() => {
   return cur <= cut;
 });
 
-/** Open state: large screens always open; small screens follow default & toggles */
-const sideOpen = ref(true);
+/** Open state: small screens follow default & toggles */
+const sideOpen = ref(false);
 watch(
   isSmall,
   (small) => {
-    sideOpen.value = small ? !props.collapsedSmallByDefault : true;
+    if (!small) {
+      sideOpen.value = false; // reset for mobile when returning to desktop
+    } else {
+      sideOpen.value = !props.collapsedSmallByDefault;
+    }
   },
   { immediate: true }
 );
@@ -131,14 +131,42 @@ function toggleSide() {
 }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .min-w-0 {
   min-width: 0;
 }
-/* ultra-minimal helper for vertical rail text */
-.vertical-label {
-  writing-mode: vertical-rl;
-  text-orientation: mixed;
-  font-weight: 600;
+
+.glass-sidebar {
+  background: rgba(255, 255, 255, 0.4);
+  backdrop-filter: blur(12px);
+  border-left: 1px solid rgba(54, 64, 88, 0.08);
+  height: calc(100vh - 120px); // Adjust based on navbar/footer height if needed
+  position: sticky;
+  top: 80px;
+  overflow-y: auto;
+}
+
+.glass-sidebar-drawer {
+  background: rgba(255, 255, 255, 0.9) !important;
+  backdrop-filter: blur(16px);
+}
+
+.glass-header {
+  background: transparent;
+  min-height: 64px;
+}
+
+.header-indicator {
+  width: 4px;
+  height: 24px;
+  border-radius: 4px;
+}
+
+.tracking-tight {
+  letter-spacing: -0.02em;
+}
+
+.opacity-10 {
+  opacity: 0.1;
 }
 </style>

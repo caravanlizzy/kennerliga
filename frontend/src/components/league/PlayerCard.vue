@@ -197,7 +197,23 @@ function formatBannerNames(names: string[]) {
 
 <style scoped lang="scss">
 .player-card {
-  padding: 16px;
+  background: transparent;
+  padding: 0;
+}
+
+.member-group {
+  background: rgba(255, 255, 255, 0.4);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(54, 64, 88, 0.08);
+  border-radius: 16px;
+  padding: 24px;
+  transition: all 0.3s ease;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.6);
+    border-color: rgba(54, 64, 88, 0.15);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+  }
 }
 
 /* MEMBER HEADER */
@@ -247,7 +263,7 @@ function formatBannerNames(names: string[]) {
 .game-name-text {
   font-size: 18px;
   font-weight: 700;
-  color: #222;
+  color: var(--q-dark);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -255,11 +271,19 @@ function formatBannerNames(names: string[]) {
 
 /* CHIPS – clean white with soft gray border */
 .q-chip {
-  background: #fff !important;
-  border: 1px solid #e5e7eb !important;
+  background: rgba(255, 255, 255, 0.8) !important;
+  backdrop-filter: blur(4px);
+  border: 1px solid rgba(54, 64, 88, 0.08) !important;
   font-size: 13px;
   padding: 4px 10px !important;
   border-radius: 8px !important;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: white !important;
+    border-color: rgba(54, 64, 88, 0.2) !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  }
 }
 
 /* RED CHIP */
@@ -298,5 +322,17 @@ function formatBannerNames(names: string[]) {
 .no-bans {
   color: #9ca3af;
   font-style: italic;
+}
+.selected-game-card {
+  background: rgba(255, 255, 255, 0.5);
+  border-radius: 12px;
+  padding: 12px 16px;
+  border: 1px solid rgba(54, 64, 88, 0.05);
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.8);
+    border-color: rgba(54, 64, 88, 0.1);
+  }
 }
 </style>
