@@ -1,65 +1,66 @@
 <template>
-  <q-toolbar
-    class="navbar text-dark q-py-sm relative-position glass-effect shadow-1"
-    :class="isMobile ? 'q-px-sm' : 'q-px-md'"
-  >
-    <!-- Left: Brand -->
-    <NavHome />
+  <div class="column full-width glass-effect shadow-1">
+    <q-toolbar
+      class="navbar text-dark q-py-sm relative-position"
+      :class="isMobile ? 'q-px-sm' : 'q-px-md'"
+      style="border-bottom: none;"
+    >
+      <!-- Left: Brand -->
+      <NavHome />
 
-    <q-space />
+      <q-space />
 
-    <!-- Center: Mobile Tabs -->
-    <div v-if="isMobile && isIndexPage" class="row no-wrap items-center bg-blue-grey-1 rounded-borders q-pa-none q-mr-sm" style="height: 40px; border: 1px solid rgba(54, 64, 88, 0.08); box-shadow: inset 0 1px 2px rgba(0,0,0,0.03)">
-      <q-tabs
-        v-model="activeTab"
-        class="text-dark compact-tabs"
-        active-color="primary"
-        indicator-color="transparent"
-        align="center"
-        dense
-        no-caps
-      >
-        <q-tab icon="auto_awesome" name="welcome" class="tab-welcome" />
-        <q-tab icon="history" name="seasons" class="tab-seasons" />
-        <q-tab icon="sensors" name="live" class="tab-live" />
-        <q-tab icon="chat" name="chat" class="tab-chat" />
-        <q-tab icon="leaderboard" name="leaderboard" class="tab-leaderboard" />
-      </q-tabs>
-    </div>
+      <!-- Right: Controls -->
+      <div class="row no-wrap items-center" :class="isMobile ? 'q-gutter-x-xs' : 'q-gutter-x-sm'">
 
-    <!-- Right: Controls -->
-    <div class="row no-wrap items-center" :class="isMobile ? 'q-gutter-x-xs' : 'q-gutter-x-sm'">
-
-      <!-- Minimized Items (Mobile - show only those NOT in tabs if any, but usually they are the same) -->
-      <!-- Actually, the request says minimize functionality does not make sense on mobile since it duplicates nav elements -->
-      <!-- So we just don't show minimizedItems on mobile at all in the navbar -->
-
-      <!-- Minimized Items (Desktop) -->
-      <div
-        v-if="!isMobile && minimizedItems.length"
-        class="row no-wrap items-center q-gutter-x-sm"
-      >
-        <q-btn
-          v-for="item in minimizedItems"
-          :key="item.id"
-          flat
-          round
-          dense
-          :icon="item.icon"
-          :color="item.color"
-          @click="restore(item.id)"
+        <!-- Minimized Items (Desktop) -->
+        <div
+          v-if="!isMobile && minimizedItems.length"
+          class="row no-wrap items-center q-gutter-x-sm"
         >
-          <q-tooltip>Restore {{ item.title }}</q-tooltip>
-        </q-btn>
-        <q-separator vertical inset class="q-mx-sm" />
+          <q-btn
+            v-for="item in minimizedItems"
+            :key="item.id"
+            flat
+            round
+            dense
+            :icon="item.icon"
+            :color="item.color"
+            @click="restore(item.id)"
+          >
+            <q-tooltip>Restore {{ item.title }}</q-tooltip>
+          </q-btn>
+          <q-separator vertical inset class="q-mx-sm" />
+        </div>
+
+        <!-- Main CTA -->
+        <NavMyLeague v-if="user && user.myCurrentLeagueId" />
+
+        <NavProfileMenu :onToggle="onToggle" />
       </div>
+    </q-toolbar>
 
-      <!-- Main CTA -->
-      <NavMyLeague v-if="user && user.myCurrentLeagueId" />
-
-      <NavProfileMenu :onToggle="onToggle" />
+    <!-- Center: Mobile Tabs (Second Row) -->
+    <div v-if="isMobile && isIndexPage" class="row justify-center q-pb-sm q-px-sm">
+      <div class="row no-wrap items-center bg-blue-grey-1 rounded-borders q-pa-none full-width justify-center" style="height: 40px; border: 1px solid rgba(54, 64, 88, 0.08); box-shadow: inset 0 1px 2px rgba(0,0,0,0.03)">
+        <q-tabs
+          v-model="activeTab"
+          class="text-dark compact-tabs full-width"
+          active-color="primary"
+          indicator-color="transparent"
+          align="justify"
+          dense
+          no-caps
+        >
+          <q-tab icon="auto_awesome" name="welcome" class="tab-welcome" />
+          <q-tab icon="history" name="seasons" class="tab-seasons" />
+          <q-tab icon="sensors" name="live" class="tab-live" />
+          <q-tab icon="chat" name="chat" class="tab-chat" />
+          <q-tab icon="leaderboard" name="leaderboard" class="tab-leaderboard" />
+        </q-tabs>
+      </div>
     </div>
-  </q-toolbar>
+  </div>
 </template>
 
 <script setup lang="ts">
