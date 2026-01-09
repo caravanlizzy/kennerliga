@@ -242,7 +242,6 @@ export const useLeagueStore = (id: number) => {
       );
     });
 
-    void init();
 
     onUnmounted(() => {
       stopPolling();

@@ -18,14 +18,13 @@
 <script setup lang="ts">
 import { useResponsive } from 'src/composables/responsive';
 import { storeToRefs } from 'pinia';
-import { useLeagueStore } from 'stores/leagueStore';
 import { useUserStore } from 'stores/userStore';
 import KennerButton from 'components/base/KennerButton.vue';
+import { computed } from 'vue';
 
 const { isMobile } = useResponsive();
 const { isAuthenticated, user } = storeToRefs(useUserStore());
-const myLeagueStore = useLeagueStore(user.value?.myCurrentLeagueId)();
-const { isMeActivePlayer } = storeToRefs(myLeagueStore);
+const isMeActivePlayer = computed(() => user.value?.isMyTurn ?? false);
 
 
 </script>
