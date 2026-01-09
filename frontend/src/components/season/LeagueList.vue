@@ -8,7 +8,18 @@
         <div class="text-subtitle1 text-weight-medium">League {{ league.level }}</div>
         <div class="text-caption text-grey-7">ID: {{ league.id }}</div>
       </div>
-      <q-chip square outline icon="group" class="q-ml-auto">{{ league.members?.length || 0 }}</q-chip>
+      <div class="col-auto column items-end q-gutter-y-xs">
+        <q-chip square outline icon="group" class="q-ma-none">{{ league.members?.length || 0 }}</q-chip>
+        <q-badge
+          v-if="league.is_completed"
+          color="positive"
+          text-color="white"
+          class="q-pa-xs"
+        >
+          <q-icon name="check_circle" size="14px" class="q-mr-xs" />
+          <span class="text-weight-bold" style="font-size: 10px">COMPLETE</span>
+        </q-badge>
+      </div>
     </q-card-section>
     <q-separator />
     <q-card-section>

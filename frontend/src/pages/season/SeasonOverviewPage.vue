@@ -1,85 +1,118 @@
 <template>
-  <div class="q-pa-md">
-    <!-- Header -->
-    <div class="row items-center q-mb-md">
-      <KennerButton
-        flat
-        dense
-        round
-        icon="arrow_back"
-        color="grey-7"
-        @click="router.back()"
-        class="q-mr-sm"
-      />
-      <div class="text-h5 text-weight-bold">
-        Manage Season {{ season?.name || '…' }}
+  <q-page class="q-pa-md">
+    <!-- Header Area -->
+    <div class="row items-center justify-between q-mb-md">
+      <div class="row items-center q-gutter-x-sm">
+        <q-icon name="military_tech" size="md" color="primary" />
+        <div class="text-h4 text-weight-bolder text-dark tracking-tighter">
+          Manage Season {{ season?.name || '…' }}
+        </div>
       </div>
-      <q-space />
-      <div v-if="leagues?.length" class="row items-center q-gutter-x-sm">
-        <q-badge align="middle">{{ leagues.length }} leagues</q-badge>
-        <q-badge
-          v-if="season?.status"
-          outline
-          :color="statusColor"
-          :label="season.status"
-        />
+      <div class="row items-center q-gutter-x-sm">
+        <KennerButton
+          v-if="!loading && season"
+          flat
+          icon="refresh"
+          round
+          color="primary"
+          size="md"
+          @click="load"
+        >
+          <KennerTooltip>Refresh</KennerTooltip>
+        </KennerButton>
+        <KennerButton
+          flat
+          icon="close"
+          round
+          color="grey-7"
+          size="md"
+          @click="router.back()"
+        >
+          <KennerTooltip>Back</KennerTooltip>
+        </KennerButton>
       </div>
     </div>
 
     <!-- Error State -->
-    <q-banner
-      v-if="error && !loading"
-      dense
-      rounded
-      class="bg-red-1 text-red-8 q-mb-md"
-    >
-      <template v-slot:avatar>
-        <q-icon name="error_outline" color="red-5" size="xs" />
-      </template>
-      <span class="text-caption">{{ error }}</span>
-    </q-banner>
+    <ErrorDisplay v-if="error && !loading" :error="error" class="q-mb-md" />
 
     <!-- Loading State -->
-    <div v-if="loading">
-      <q-skeleton type="rect" class="q-mb-md" height="56px" />
-      <q-skeleton type="rect" class="q-mb-md" height="160px" />
+    <div v-if="loading" class="flex justify-center q-my-xl">
+      <LoadingSpinner />
     </div>
 
     <!-- Content -->
-    <div v-else-if="!error">
-      <!-- Registered Members Section -->
-      <div v-if="participants.length > 0" class="q-mb-lg">
-        <div class="text-caption text-grey-7 q-mb-xs uppercase text-weight-bold">Registered Members ({{ participants.length }})</div>
-        <div class="row q-col-gutter-xs">
-          <q-chip
-            v-for="p in participants"
-            :key="p.id"
-            dense
-            icon="person"
-            class="q-mr-xs q-mb-xs"
+    <div v-else-if="!error && season">
+      <!-- Season Info Section -->
+      <div class="row q-col-gutter-md q-mb-lg">
+        <div class="col-12 col-md-6">
+          <ContentSection
+            title="Season Info"
+            icon="info"
+            color="primary"
+            style="margin-top: 0"
+            :bordered="false"
           >
-            {{ p.profile_name }}
-          </q-chip>
+            <div class="row q-gutter-sm items-center">
+              <q-badge align="middle" color="grey-2" text-color="grey-9" class="q-pa-sm text-weight-bold">
+                {{ leagues.length }} leagues
+              </q-badge>
+              <q-badge
+                v-if="season?.status"
+                :color="statusColor"
+                class="q-pa-sm text-weight-bold"
+                :label="season.status"
+              />
+            </div>
+          </ContentSection>
+        </div>
+
+        <div class="col-12 col-md-6">
+          <ContentSection
+            title="Registered Members"
+            icon="people"
+            color="secondary"
+            style="margin-top: 0"
+            :bordered="false"
+          >
+            <div v-if="participants.length > 0" class="row q-col-gutter-xs">
+              <q-chip
+                v-for="p in participants"
+                :key="p.id"
+                dense
+                icon="person"
+                class="q-mr-xs q-mb-xs"
+              >
+                {{ p.profile_name }}
+              </q-chip>
+            </div>
+            <div v-else class="text-caption text-grey-6 italic">No registered members for this season.</div>
+          </ContentSection>
         </div>
       </div>
-
-      <q-separator v-if="participants.length > 0" class="q-mb-lg" />
 
       <!-- Leagues Grid -->
-      <div v-if="leagues.length === 0" class="text-grey-7 q-mt-lg">
-        No leagues found for this season.
-      </div>
-      <div v-else class="row q-col-gutter-md">
-        <div
-          v-for="league in leagues"
-          :key="league.id"
-          class="col-12 col-sm-6 col-md-4"
-        >
-          <LeagueList :league="league"/>
+      <ContentSection
+        title="Leagues"
+        icon="groups"
+        color="accent"
+        :bordered="false"
+      >
+        <div v-if="leagues.length === 0" class="text-grey-7 q-pa-md bg-grey-1 rounded-borders text-center">
+          No leagues found for this season.
         </div>
-      </div>
+        <div v-else class="row q-col-gutter-lg">
+          <div
+            v-for="league in leagues"
+            :key="league.id"
+            class="col-12 col-sm-6 col-md-4"
+          >
+            <LeagueList :league="league"/>
+          </div>
+        </div>
+      </ContentSection>
     </div>
-  </div>
+  </q-page>
 </template>
 
 <script setup lang="ts">
@@ -88,6 +121,10 @@ import { useRoute, useRouter } from 'vue-router';
 import { fetchLeaguesBySeason, fetchSeason, fetchSeasonParticipants } from 'src/services/seasonService';
 import LeagueList from 'components/season/LeagueList.vue';
 import KennerButton from 'components/base/KennerButton.vue';
+import KennerTooltip from 'components/base/KennerTooltip.vue';
+import ContentSection from 'components/base/ContentSection.vue';
+import ErrorDisplay from 'components/base/ErrorDisplay.vue';
+import LoadingSpinner from 'components/base/LoadingSpinner.vue';
 import { TSeasonDto, TLeagueDto, TSeasonParticipantDto } from 'src/types';
 
 const route = useRoute();
@@ -109,9 +146,10 @@ const statusColor = computed(() => {
   }
 });
 
-onMounted(async () => {
+async function load() {
   try {
     loading.value = true;
+    error.value = null;
     const [seasonData, leagueData, participantData] = await Promise.all([
       fetchSeason(seasonId),
       fetchLeaguesBySeason(seasonId),
@@ -125,5 +163,7 @@ onMounted(async () => {
   } finally {
     loading.value = false;
   }
-});
+}
+
+onMounted(load);
 </script>

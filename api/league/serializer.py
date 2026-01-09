@@ -19,10 +19,15 @@ class LeagueSerializer(serializers.ModelSerializer):
     )
     # read: return mini objects
     members = SerializerMethodField()
+    is_completed = SerializerMethodField()
 
     class Meta:
         model = League
-        fields = ["id", "season", "level", "status", "active_player", "members", "member_ids"]
+        fields = ["id", "season", "level", "status", "active_player", "members", "member_ids", "is_completed"]
+
+    def get_is_completed(self, obj):
+        from league.queries import is_league_finished
+        return is_league_finished(obj)
 
     def get_members(self, obj):
         # We want to include selected_games for the season list page's icons
