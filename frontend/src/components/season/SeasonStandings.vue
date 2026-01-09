@@ -26,15 +26,20 @@
             <div class="text-h6 text-weight-bold text-grey-9 line-height-1">
               League {{ league.level }}
             </div>
-            <div class="text-caption text-grey-6 uppercase letter-spacing-1">Division Standings</div>
+            <div class="text-caption text-grey-6 uppercase letter-spacing-1">
+              {{ mode === 'results' ? 'Match Results' : 'Division Standings' }}
+            </div>
           </div>
           <q-space />
           <KennerButton flat round icon="info" color="grey-4" size="sm">
-            <KennerTooltip>Current standings for League {{ league.level }}</KennerTooltip>
+            <KennerTooltip>
+              {{ mode === 'results' ? 'Detailed match results' : 'Current standings' }} for League {{ league.level }}
+            </KennerTooltip>
           </KennerButton>
         </div>
-        <div class="matrix-container rounded-borders overflow-hidden">
-          <LeagueStandingsMatrix :leagueId="league.id" />
+        <div class="results-container">
+          <LeagueMatchResults v-if="mode === 'results'" :leagueId="league.id" />
+          <LeagueStandingsMatrix v-else :leagueId="league.id" />
         </div>
       </div>
     </div>
@@ -43,6 +48,7 @@
 
 <script setup lang="ts">
 import { ref, watch } from 'vue';
+import LeagueMatchResults from 'components/league/LeagueMatchResults.vue';
 import LeagueStandingsMatrix from 'components/league/LeagueStandingsMatrix.vue';
 import LoadingSpinner from 'components/base/LoadingSpinner.vue';
 import { api } from 'boot/axios';
@@ -58,9 +64,12 @@ interface League {
   level: number;
 }
 
-const props = defineProps<{
+const props = withDefaults(defineProps<{
   seasonId?: number | null;
-}>();
+  mode?: 'standings' | 'results';
+}>(), {
+  mode: 'standings'
+});
 
 const leagues = ref<League[]>([]);
 const loadingLeagues = ref(false);
@@ -127,8 +136,7 @@ watch(() => props.seasonId, (id) => {
   text-transform: uppercase;
 }
 
-.matrix-container {
-  background: white;
-  border: 1px solid rgba(0, 0, 0, 0.05);
+.results-container {
+  /* removed white background and border to let cards breathe */
 }
 </style>
