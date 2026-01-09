@@ -96,7 +96,7 @@
     <!-- Quick Actions Bar -->
     <div class="row q-gutter-sm q-mb-md">
       <KennerButton
-        v-if="(member.selected_games?.length || 0) < 2"
+        v-if="(member.selected_games?.length || 0) < maxGames"
         unelevated
         rounded
         color="primary"
@@ -273,6 +273,7 @@
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue';
 import GameSettingsDisplay from 'components/game/selectedGame/GameSettingsDisplay.vue';
 import MatchResult from 'components/league/MatchResult.vue';
 import KennerButton from 'components/base/KennerButton.vue';
@@ -285,6 +286,11 @@ const props = defineProps<{
   season: TSeasonDto | null;
   matchResultsBySelectedGameId: Record<number, any[]>;
 }>();
+
+const maxGames = computed(() => {
+  const memberCount = props.league?.members?.length || 0;
+  return memberCount === 2 ? 3 : 2;
+});
 
 defineEmits([
   'add-game',
