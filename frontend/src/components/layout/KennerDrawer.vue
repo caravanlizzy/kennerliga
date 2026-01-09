@@ -1,52 +1,43 @@
 <template>
-  <div class="column full-height">
-    <!-- Drawer Header -->
-    <div class="q-pa-md row items-center justify-between border-bottom-subtle bg-white">
-      <div class="row items-center">
-        <q-icon name="menu" color="grey-7" size="sm" class="q-mr-sm" />
-        <div class="text-h6 text-weight-bold text-grey-8">Menu</div>
-      </div>
-      <q-btn flat round dense icon="chevron_right" size="sm" color="grey-7" @click="drawerState = false">
-        <q-tooltip>Minimize Menu</q-tooltip>
-      </q-btn>
-    </div>
-
+  <div class="column full-height kenner-drawer-container">
     <!-- Drawer Content -->
-    <div class="col scroll bg-white">
-      <q-list class="q-py-md">
+    <div class="col scroll">
+      <q-list class="q-py-sm">
         <DrawerSubGroup> General </DrawerSubGroup>
-        <DrawerItem icon="feedback" label="Feedback" forward-name="feedback" />
+        <DrawerItem icon="feedback" icon-color="orange-8" label="Feedback" forward-name="feedback" />
 
-        <q-separator class="q-my-md border-subtle" inset />
+        <q-separator class="q-my-sm drawer-separator" inset />
 
         <template v-if="isAdmin">
-          <DrawerSubGroup>Admin</DrawerSubGroup>
-          <DrawerItem icon="casino" label="Games" forward-name="games" />
-          <DrawerItem icon="group" label="Members" forward-name="users" />
+          <DrawerSubGroup>Management</DrawerSubGroup>
+          <DrawerItem icon="casino" icon-color="indigo-7" label="Games" forward-name="games" />
+          <DrawerItem icon="group" icon-color="teal-7" label="Members" forward-name="users" />
           <DrawerItem
             icon="forward_to_inbox"
+            icon-color="deep-purple-7"
             label="Invitations"
             forward-name="invitations"
           />
           <DrawerItem
             icon="calendar_month"
+            icon-color="blue-8"
             label="Seasons"
             forward-name="seasons"
           />
-          <q-separator class="q-my-md border-subtle" inset />
+          <q-separator class="q-my-sm drawer-separator" inset />
         </template>
 
         <template v-if="isAdmin">
-          <DrawerSubGroup>Dev</DrawerSubGroup>
-          <DrawerItem icon="build" label="Hijack" forward-name="dev" />
-          <q-separator class="q-my-md border-subtle" inset />
+          <DrawerSubGroup>Development</DrawerSubGroup>
+          <DrawerItem icon="terminal" icon-color="grey-9" label="Hijack (Dev)" forward-name="dev" />
+          <q-separator class="q-my-sm drawer-separator" inset />
         </template>
       </q-list>
     </div>
 
-    <q-list class="q-pb-lg bg-white">
-      <DrawerItem icon="logout" label="Logout" @click="doLogout" />
-    </q-list>
+    <div class="q-pb-lg">
+      <DrawerItem icon="logout" icon-color="red-7" label="Logout" @click="doLogout" />
+    </div>
   </div>
 </template>
 
@@ -78,11 +69,16 @@ async function doLogout(): Promise<void> {
 </script>
 
 <style lang="scss">
-.kenner-drawer {
-  border-left: 2px solid #cfd8dc !important;
+.kenner-drawer-container {
+  background-color: #fbfbfb;
 }
 
-.border-subtle {
-  border-color: rgba(0, 0, 0, 0.05);
+.drawer-separator {
+  opacity: 0.5;
+}
+
+.kenner-drawer {
+  border-left: 2px solid #cfd8dc !important;
+  box-shadow: -2px 0 10px rgba(0, 0, 0, 0.02);
 }
 </style>

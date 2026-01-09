@@ -7,7 +7,11 @@
     active-class="drawer-item--active"
   >
     <q-item-section avatar class="drawer-item__icon-section">
-      <q-icon :name="icon" size="22px" :class="active ? 'text-primary' : 'text-grey-7'" />
+      <q-icon
+        :name="icon"
+        size="22px"
+        :color="active ? (iconColor || 'primary') : (iconColor || 'grey-7')"
+      />
     </q-item-section>
     <q-item-section class="drawer-item__text-section">
       <q-item-label class="text-subtitle2 text-weight-medium">
@@ -54,8 +58,9 @@ function handleClick() {
   }
 
   &--active {
-    background: rgba(var(--q-primary), 0.1);
+    background: rgba(var(--q-primary), 0.08);
     color: var(--q-primary);
+    font-weight: 600;
   }
 }
 

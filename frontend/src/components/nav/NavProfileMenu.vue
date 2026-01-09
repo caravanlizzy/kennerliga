@@ -25,7 +25,7 @@
       flat
       dense
       round
-      color="positive"
+      color="primary"
       icon="login"
       :to="{ name: 'login' }"
     />
