@@ -23,13 +23,14 @@ export async function fetchIsRegisteredForSeason(): Promise<boolean> {
 export async function fetchOpenSeasonParticipants(): Promise<TSeasonParticipantDto[]> {
   try {
     // 1. Find the season that is currently 'OPEN' (registration phase)
-    const { data: seasons } = await api.get<TSeasonDto[]>('/season/seasons/?status=OPEN');
+    const { data } = await api.get('/season/seasons/?status=OPEN');
+    const seasons = Array.isArray(data) ? data : data.results || [];
     const openSeason = seasons.length > 0 ? seasons[0] : null;
 
     if (!openSeason) {
       // Fallback: If no OPEN season, maybe try 'current' as before or return empty
       const { data } = await api.get('/season/season-participants/current/');
-      return data;
+      return Array.isArray(data) ? data : data.results || [];
     }
 
     // 2. Fetch participants for that specific season
@@ -79,14 +80,15 @@ export async function createSeason(targetYear: number, targetMonth: number): Pro
 
 export async function fetchSeasonParticipants(seasonId: number): Promise<TSeasonParticipantDto[]> {
   // Season detail should include participants array
-  const { data } = await api.get<TSeasonParticipantDto[]>(`/season/season-participants/?season=${seasonId}`);
-  return data ? data : [];
+  const { data } = await api.get(`/season/season-participants/?season=${seasonId}`);
+  const arr = Array.isArray(data) ? data : data?.results || [];
+  return arr;
 }
 
 export async function fetchLeaguesBySeason(seasonId: number): Promise<TLeagueDto[]> {
   try {
     const { data } = await api(`/league/leagues/?season=${seasonId}`);
-    return data;
+    return Array.isArray(data) ? data : data?.results || [];
   } catch (error) {
     console.error('Error fetching leagues by season:', error);
     throw error; // Re-throw the error to let the caller handle it
@@ -95,9 +97,10 @@ export async function fetchLeaguesBySeason(seasonId: number): Promise<TLeagueDto
 
 export async function fetchAvailableYears(): Promise<number[]> {
   try {
-    const { data } = await api.get<TSeasonDto[]>('/season/seasons/');
-    const years = data.map(s => s.year);
-    return Array.from(new Set(years)).sort((a, b) => b - a);
+    const { data } = await api.get('/season/seasons/');
+    const seasons = Array.isArray(data) ? data : data?.results || [];
+    const years = seasons.map((s: any) => s.year);
+    return Array.from(new Set(years)).sort((a, b) => (b as number) - (a as number));
   } catch (error) {
     console.error('Error fetching available years:', error);
     return [new Date().getFullYear()];
@@ -146,8 +149,8 @@ export async function ensureParticipants(
 export async function fetchLiveActionEvents(seasonId?: number): Promise<TLiveEvent[]> {
   try {
     const params = seasonId ? { season_id: seasonId } : {};
-    const { data } = await api.get<TLiveEvent[]>('/season/live-events/', { params });
-    return data;
+    const { data } = await api.get('/season/live-events/', { params });
+    return Array.isArray(data) ? data : data?.results || [];
   } catch (error) {
     console.error('Error fetching live action events:', error);
     return [];
@@ -156,8 +159,8 @@ export async function fetchLiveActionEvents(seasonId?: number): Promise<TLiveEve
 
 export async function fetchSeasonsWithLeagues(): Promise<TSeasonDto[]> {
   try {
-    const { data } = await api.get<TSeasonDto[]>('season/seasons/seasons-with-leagues/');
-    return data;
+    const { data } = await api.get('season/seasons/seasons-with-leagues/');
+    return Array.isArray(data) ? data : data?.results || [];
   } catch (error) {
     console.error('Error fetching seasons with leagues:', error);
     return [];

@@ -243,9 +243,16 @@ watch(selectedSeasonYear, (newYear, oldYear) => {
 });
 
 onMounted(async () => {
-  if (isAuthenticated) {
-    availableYears.value = await fetchAvailableYears();
-    const currentSeasonId = await fetchCurrentSeasonId();
+  if (isAuthenticated.value) {
+    const [years, currentSeasonId, seasons] = await Promise.all([
+      fetchAvailableYears(),
+      fetchCurrentSeasonId(),
+      fetchSeasonsWithLeagues(),
+    ]);
+
+    availableYears.value = years;
+    seasonsWithLeagues.value = seasons;
+
     if (currentSeasonId) {
       const season = await fetchSeason(currentSeasonId);
       if (season) {
@@ -256,7 +263,6 @@ onMounted(async () => {
     }
 
     // Load seasons with leagues
-    seasonsWithLeagues.value = await fetchSeasonsWithLeagues();
     if (seasonsWithLeagues.value.length > 0) {
       const latest = [...seasonsWithLeagues.value].sort((a, b) => {
         if (a.year !== b.year) return b.year - a.year;
