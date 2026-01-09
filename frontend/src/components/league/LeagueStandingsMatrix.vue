@@ -68,7 +68,7 @@
                       {{ props.row.username }}
                     </span>
                     <span
-                      v-if="!isMobile && props.row.profile_name && !props.row.username"
+                      v-if="!isMobile && props.row.profile_name && props.row.profile_name !== props.row.username"
                       class="text-caption text-grey-6"
                       style="font-size: 0.7rem; line-height: 1"
                     >
@@ -189,6 +189,18 @@
         <div class="text-caption">The standings will appear here once the season starts.</div>
       </div>
 
+      <!-- Footer Actions -->
+      <div v-if="standings && standings.season_id" class="row justify-end q-mt-md">
+        <KennerButton
+          flat
+          color="primary"
+          icon="visibility"
+          label="View Season Overview"
+          size="sm"
+          :to="{ name: 'season-overview', params: { id: standings.season_id } }"
+        />
+      </div>
+
       <!-- Error state -->
       <div
         v-else-if="error"
@@ -255,6 +267,7 @@ interface SelectedGame {
 interface StandingsData {
   selected_games: SelectedGame[];
   standings: Standing[];
+  season_id?: number;
 }
 
 const standings = ref<StandingsData | null>(null);

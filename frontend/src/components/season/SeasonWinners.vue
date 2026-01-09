@@ -24,6 +24,9 @@
           aria-label="Second place"
         >
           <div class="podium__name text-weight-bold text-capitalize">
+            {{ top3[1].username }}
+          </div>
+          <div v-if="top3[1].profile_name && top3[1].profile_name !== top3[1].username" class="text-caption text-grey-6" style="font-size: 0.7rem">
             {{ top3[1].profile_name }}
           </div>
           <div class="podium__base q-pa-sm text-weight-bold">L2</div>
@@ -35,6 +38,9 @@
           aria-label="First place"
         >
           <div class="podium__name text-weight-bold text-capitalize">
+            {{ top3[0].username }}
+          </div>
+          <div v-if="top3[0].profile_name && top3[0].profile_name !== top3[0].username" class="text-caption text-grey-6" style="font-size: 0.7rem">
             {{ top3[0].profile_name }}
           </div>
           <div class="podium__base q-pa-sm text-weight-bold">L1</div>
@@ -46,6 +52,9 @@
           aria-label="Third place"
         >
           <div class="podium__name text-weight-bold text-capitalize">
+            {{ top3[2].username }}
+          </div>
+          <div v-if="top3[2].profile_name && top3[2].profile_name !== top3[2].username" class="text-caption text-grey-6" style="font-size: 0.7rem">
             {{ top3[2].profile_name }}
           </div>
           <div class="podium__base q-pa-sm text-weight-bold">L3</div>
@@ -56,8 +65,8 @@
       <div v-if="rest.length" class="next q-mt-sm">
         <ol class="next__list q-pa-none q-ma-none q-mt-xs">
           <li
-            v-for="(name, idx) in rest"
-            :key="`${name}-${idx}`"
+            v-for="(item, idx) in rest"
+            :key="`${item.username}-${idx}`"
             class="next__item q-pa-sm q-gutter-sm"
             :class="{
               'next__item--pos4': idx === 0,
@@ -67,7 +76,12 @@
             <span class="next__badge bg-grey-3 text-weight-bolder">
               {{ levelLabel(idx + 4) }}
             </span>
-            <span class="next__name text-capitalize">{{ name }}</span>
+            <div class="column">
+              <span class="next__name text-capitalize text-weight-bold">{{ item.username }}</span>
+              <span v-if="item.profile_name && item.profile_name !== item.username" class="text-caption text-grey-6" style="font-size: 0.7rem">
+                {{ item.profile_name }}
+              </span>
+            </div>
           </li>
         </ol>
       </div>
@@ -84,6 +98,8 @@ type LeagueWinnerApiResponse = {
   winners: Array<{
     league: { id: number; level: number };
     winner: string | null;
+    username: string | null;
+    profile_name: string | null;
     league_points: number | null;
   }>;
 };
@@ -93,7 +109,7 @@ const props = defineProps<{
 }>();
 
 const season = ref<string>('');
-const winners = ref<string[]>([]);
+const winners = ref<Array<{ username: string; profile_name: string }>>([]);
 
 onMounted(async () => {
   if (!props.seasonId) return;
@@ -107,8 +123,11 @@ onMounted(async () => {
   winners.value = (data.winners ?? [])
     .slice()
     .sort((a, b) => a.league.level - b.league.level)
-    .map((x) => x.winner)
-    .filter((x): x is string => Boolean(x));
+    .map((x) => ({
+      username: x.username || x.winner || '',
+      profile_name: x.profile_name || x.winner || ''
+    }))
+    .filter((x) => x.username !== '');
 });
 
 const top3 = computed(() => winners.value.slice(0, 3));
