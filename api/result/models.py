@@ -48,6 +48,12 @@ class Result(models.Model):
     tie_breaker_resolved = models.BooleanField(default=False)
     created_at = models.DateTimeField(default=timezone.now)
 
+    class Meta:
+        indexes = [
+            models.Index(fields=['selected_game', 'player_profile']),
+            models.Index(fields=['league', 'season']),
+        ]
+
     def __str__(self):
         return (
             f"{self.player_profile.profile_name} - "

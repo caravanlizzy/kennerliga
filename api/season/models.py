@@ -66,6 +66,10 @@ class SeasonParticipant(models.Model):
     class Meta:
         unique_together = ('season', 'profile')
         ordering = ['rank']
+        indexes = [
+            models.Index(fields=['season', 'profile']),
+            models.Index(fields=['season', 'rank']),
+        ]
 
     def __str__(self):
         return f"{self.profile.profile_name} - {self.season} (Rank: {self.rank})"
