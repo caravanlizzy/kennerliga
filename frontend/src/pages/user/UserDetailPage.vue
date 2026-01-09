@@ -290,6 +290,10 @@ onMounted(load);
 }
 .hover-shadow {
   transition: all 0.3s ease;
+  &:hover {
+    background-color: #f8f9fa !important;
+    border-color: var(--q-primary) !important;
+  }
 }
 .border-subtle {
   border: 1px solid rgba(0,0,0,0.05);
