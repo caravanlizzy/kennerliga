@@ -38,6 +38,20 @@
         </div>
 
         <!-- Main CTA -->
+        <div v-if="isAuthenticated && !isMobile" class="row no-wrap items-center q-mr-xs">
+          <q-btn
+            flat
+            round
+            dense
+            :icon="chatDrawerOpen ? 'speaker_notes_off' : 'chat'"
+            :color="chatDrawerOpen ? 'blue-grey-4' : 'blue-grey-6'"
+            @click="toggleChat"
+            class="nav-section-btn"
+          >
+            <q-tooltip>{{ chatDrawerOpen ? 'Hide Chat' : 'Show Chat' }}</q-tooltip>
+          </q-btn>
+        </div>
+
         <NavMyLeague v-if="user && user.myCurrentLeagueId" />
 
         <NavProfileMenu :onToggle="onToggle" />
@@ -84,8 +98,10 @@ import { useRouter } from 'vue-router';
 const { getScrollTarget, setVerticalScrollPosition } = scroll;
 
 defineProps<{ onToggle: () => void }>();
-const { user } = storeToRefs(useUserStore());
-const { navSections } = storeToRefs(useUiStore());
+const { user, isAuthenticated } = storeToRefs(useUserStore());
+const uiStore = useUiStore();
+const { navSections, chatDrawerOpen } = storeToRefs(uiStore);
+const { toggleChat } = uiStore;
 const route = useRoute();
 const router = useRouter();
 const { isMobile } = useResponsive();

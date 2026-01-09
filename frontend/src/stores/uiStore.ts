@@ -14,6 +14,7 @@ export interface NavSection {
 export const useUiStore = defineStore('ui', () => {
   const isDev = ref(false);
   const navSections = ref<NavSection[]>([]);
+  const chatDrawerOpen = ref(false);
 
   function showDev() {
     isDev.value = true;
@@ -23,6 +24,10 @@ export const useUiStore = defineStore('ui', () => {
   }
   function toggleDev() {
     isDev.value = !isDev.value;
+  }
+
+  function toggleChat() {
+    chatDrawerOpen.value = !chatDrawerOpen.value;
   }
 
   function registerSection(section: NavSection) {
@@ -42,6 +47,8 @@ export const useUiStore = defineStore('ui', () => {
     toggleDev,
     navSections,
     registerSection,
-    unregisterSection
+    unregisterSection,
+    chatDrawerOpen,
+    toggleChat
   };
 });

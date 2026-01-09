@@ -30,31 +30,13 @@
             <q-icon name="chat" color="blue-grey-6" size="sm" class="q-mr-sm" />
             <div class="text-h6 text-weight-bold text-blue-grey-6">KennerChat</div>
           </div>
-          <q-btn flat round dense icon="chevron_left" size="sm" color="blue-grey-6" @click="chatDrawerOpen = false">
+          <q-btn flat round dense icon="chevron_left" size="sm" color="blue-grey-6" @click="toggleChat">
             <q-tooltip>Minimize Chat</q-tooltip>
           </q-btn>
         </div>
         <KennerChat class="col bg-white" />
       </div>
     </q-drawer>
-
-    <!-- Chat Toggle Button (Left) -->
-    <div
-      v-if="isAuthenticated && !chatDrawerOpen && !isMobile"
-      class="fixed-bottom-left q-ma-md"
-      style="z-index: 2000"
-    >
-      <q-btn
-        round
-        size="lg"
-        color="blue-grey-8"
-        icon="chat"
-        class="glass-toggle"
-        @click="chatDrawerOpen = true"
-      >
-      </q-btn>
-    </div>
-
 
     <q-page-container class="col column bg-white">
       <div
@@ -75,17 +57,19 @@ import KennerDrawer from 'components/layout/KennerDrawer.vue';
 import ConfirmDialog from 'components/ui/ConfirmDialog.vue';
 import KennerChat from 'components/chat/KennerChat.vue';
 import { useUserStore } from 'stores/userStore';
+import { useUiStore } from 'stores/uiStore';
 import { useResponsive } from 'src/composables/responsive';
 import { storeToRefs } from 'pinia';
 
 const drawerState: Ref<boolean> = ref(false);
 const { isAuthenticated } = storeToRefs(useUserStore());
+const uiStore = useUiStore();
 const { isMobile } = useResponsive();
-
-const chatDrawerOpen = ref(false);
+const { chatDrawerOpen } = storeToRefs(uiStore);
+const { toggleChat } = uiStore;
 
 onMounted(() => {
-  chatDrawerOpen.value = isAuthenticated.value && !isMobile;
+  chatDrawerOpen.value = isAuthenticated.value && !isMobile.value;
 });
 
 function toggleDrawer(): void {
