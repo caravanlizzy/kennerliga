@@ -15,7 +15,10 @@
     </template>
 
     <template v-slot:no-data>
-      <!-- hide default "No data available" -->
+      <div class="full-width row flex-center q-pa-xl text-grey-5 italic">
+        <q-icon name="sentiment_dissatisfied" size="32px" class="q-mr-sm" />
+        No entries found.
+      </div>
     </template>
 
     <template v-slot:top-right>

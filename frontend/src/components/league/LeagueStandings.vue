@@ -1,5 +1,6 @@
 <template>
   <q-table
+    v-if="rows.length > 0"
     flat
     :rows="rows"
     :columns="columns"
@@ -8,6 +9,12 @@
     class="bg-transparent"
     :loading="loading"
   />
+  <div v-else-if="!loading" class="q-pa-md text-center text-grey-6 italic">
+    No standings available.
+  </div>
+  <div v-else-if="loading" class="q-pa-md flex flex-center">
+    <q-spinner-dots color="primary" size="40px" />
+  </div>
 </template>
 
 <script setup lang="ts">

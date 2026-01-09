@@ -1,11 +1,11 @@
 <template>
   <!-- Loading -->
   <LoadingSpinner v-if="loading" />
-  <ErrorDisplay v-if="error" error="error" />
+  <ErrorDisplay v-if="error" :error="error ? 'Failed to load leaderboard' : ''" />
 
   <!-- Content -->
   <div
-    v-else-if="standings"
+    v-else-if="standings && standings.standings.length > 0"
     class="leaderboard-container"
   >
     <!-- Table -->
@@ -162,7 +162,11 @@
   </div>
 
   <!-- No data -->
-  <div v-else class="text-caption text-grey-7">No Leaderboard available.</div>
+  <div v-else class="column items-center q-pa-xl text-grey-6 leaderboard-empty">
+    <q-icon name="stars" size="48px" class="q-mb-sm opacity-20" />
+    <div class="text-subtitle1 text-weight-bold">No Leaderboard Data</div>
+    <div class="text-caption">Leaderboard statistics will appear here after the seasons conclude.</div>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -256,7 +260,7 @@ watch(
 </script>
 
 <style scoped lang="scss">
-.leaderboard-container {
+.leaderboard-container, .leaderboard-empty {
   overflow: hidden;
   background: rgba(255, 255, 255, 0.4);
   backdrop-filter: blur(8px);

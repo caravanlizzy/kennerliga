@@ -88,13 +88,17 @@ type LeagueWinnerApiResponse = {
   }>;
 };
 
+const props = defineProps<{
+  seasonId: number;
+}>();
+
 const season = ref<string>('');
 const winners = ref<string[]>([]);
 
 onMounted(async () => {
-  const seasonId = 1; // change if you get it from route/props
+  if (!props.seasonId) return;
   const { data } = await api.get<LeagueWinnerApiResponse>(
-    `season/seasons/${seasonId}/league-winners/`
+    `season/seasons/${props.seasonId}/league-winners/`
   );
 
   season.value = data.season?.name ?? '';

@@ -10,10 +10,10 @@
       <div>Please select year and month that contain a league.</div>
     </div>
 
-    <div v-else-if="leagues.length === 0 && seasonId" class="column items-center q-pa-xl text-grey-6">
-       <q-icon name="warning_amber" size="48px" class="q-mb-md" />
-       <div class="text-h6">No leagues found</div>
-       <div>No leagues for this season.</div>
+    <div v-else-if="leagues.length === 0 && seasonId" class="column items-center q-pa-xl text-grey-6 bg-white rounded-borders border-subtle">
+       <q-icon name="upcoming" size="48px" class="q-mb-md opacity-20" />
+       <div class="text-h6 text-weight-bold">No leagues found</div>
+       <div class="text-caption">This season hasn't been set up with any leagues yet.</div>
     </div>
 
     <div v-else class="column q-gutter-y-xl">
@@ -88,6 +88,14 @@ watch(() => props.seasonId, (id) => {
 </script>
 
 <style scoped lang="scss">
+.border-subtle {
+  border: 1px solid rgba(54, 64, 88, 0.08);
+}
+
+.opacity-20 {
+  opacity: 0.2;
+}
+
 .season-standings {
   max-width: 1200px;
   margin: 0 auto;
