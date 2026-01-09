@@ -95,12 +95,44 @@ class ResultConfigAdmin(admin.ModelAdmin):
     list_filter = ('game',)
 
 
+from django.urls import path
+from django.shortcuts import redirect
+from django.utils.html import format_html
+
 @admin.register(SelectedGame)
 class SelectedGameAdmin(admin.ModelAdmin):
     list_display = ('profile', 'game', 'league')
     list_filter = ('league', 'game', 'profile')
     search_fields = ('profile__profile_name', 'game__name')
     actions = ['rebuild_selected_game_standings']
+    readonly_fields = ('recalculate_button',)
+
+    def recalculate_button(self, obj):
+        if not obj.id:
+            return "-"
+        return format_html(
+            '<a class="button" href="{}">Rebuild Standings</a>',
+            f"/admin/game/selectedgame/{obj.id}/rebuild/"
+        )
+    recalculate_button.short_description = "Recalculate"
+
+    def get_urls(self):
+        urls = super().get_urls()
+        custom_urls = [
+            path(
+                '<int:sg_id>/rebuild/',
+                self.admin_site.admin_view(self.rebuild_view),
+                name='selectedgame-rebuild',
+            ),
+        ]
+        return custom_urls + urls
+
+    def rebuild_view(self, request, sg_id):
+        sg = SelectedGame.objects.get(id=sg_id)
+        rebuild_game_snapshot(sg)
+        rebuild_league_snapshot(sg.league)
+        self.message_user(request, "Standings rebuilt successfully.", messages.SUCCESS)
+        return redirect(f"/admin/game/selectedgame/{sg_id}/change/")
 
     @admin.action(description="Rebuild standings for selected games")
     def rebuild_selected_game_standings(self, request, queryset):
