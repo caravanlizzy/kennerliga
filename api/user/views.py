@@ -81,6 +81,61 @@ class UserViewSet(ModelViewSet):
         serializer = ResultSerializer(results, many=True)
         return Response(serializer.data)
 
+    @action(detail=True, methods=['get'], url_path='statistics')
+    def user_statistics(self, request, pk=None):
+        """
+        GET /user/users/{id|username}/statistics/
+        Returns aggregated league and game statistics for the user.
+        """
+        user = self.get_object()
+        profile = user.profile
+
+        # 1. League Statistics
+        participants = SeasonParticipant.objects.filter(profile=profile).select_related('season')
+        total_leagues = participants.count()
+        distribution = {}
+        for pos in [1, 2, 3, 4]:
+            count = participants.filter(position=pos).count()
+            distribution[pos] = {
+                "count": count,
+                "percentage": (count / total_leagues * 100) if total_leagues > 0 else 0
+            }
+
+        # 2. Game Statistics
+        results = Result.objects.filter(player_profile=profile).select_related('selected_game__game')
+        stats_map = {}
+        for r in results:
+            game_name = r.selected_game.game.name if r.selected_game and r.selected_game.game else f"Game {r.selected_game_id}"
+            if game_name not in stats_map:
+                stats_map[game_name] = {"name": game_name, "positions": [], "wins": 0}
+            
+            if r.position is not None:
+                stats_map[game_name]["positions"].append(r.position)
+                if r.position == 1:
+                    stats_map[game_name]["wins"] += 1
+
+        game_stats = []
+        for g in stats_map.values():
+            count = len(g["positions"])
+            game_stats.append({
+                "name": g["name"],
+                "winRate": (g["wins"] / count * 100) if count > 0 else 0,
+                "avgPos": (sum(g["positions"]) / count) if count > 0 else 0,
+                "count": count,
+                "positions": g["positions"]
+            })
+        
+        # Sort by count descending
+        game_stats.sort(key=lambda x: x["count"], reverse=True)
+
+        return Response({
+            "league_stats": {
+                "totalLeagues": total_leagues,
+                "distribution": distribution
+            },
+            "game_stats": game_stats
+        })
+
 
 class MeViewSet(ViewSet):
     permission_classes = [IsAuthenticated]

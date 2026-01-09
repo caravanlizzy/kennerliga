@@ -179,14 +179,18 @@ const router = useRouter();
 const loading = ref(true);
 const user = ref<TUserDto | null>(null);
 const userSeasonList = ref<(TSeasonParticipantDto & { season_details?: TSeasonDto })[]>([]);
-const matchResults = ref<TMatchResultDto[]>([]);
 const gameSearch = ref('');
+
+const leagueStats = ref({
+  totalLeagues: 0,
+  distribution: {} as Record<number, { count: number; percentage: number }>
+});
+const gameStats = ref<any[]>([]);
 
 async function load() {
   loading.value = true;
   user.value = null;
   userSeasonList.value = [];
-  matchResults.value = [];
   const username = String(route.params.username || '');
   try {
     // 1. Fetch the User object by username
@@ -202,17 +206,20 @@ async function load() {
       user.value = foundUser;
 
       // 2. Extract profile ID from user object
-      // Priority to foundUser.profile.id as it's the PlayerProfile ID
-      // foundUser.profile_id might contain the SeasonParticipant ID in some contexts
       const profileId = foundUser.profile?.id || foundUser.profile_id;
 
       if (profileId) {
-        const [seasonsRes, resultsRes] = await Promise.all([
+        // Fetch seasons and statistics in parallel
+        const [seasonsRes, statsRes] = await Promise.all([
           api.get('season/season-participants/', { params: { profile: profileId } }),
-          api.get('result/results/', { params: { player_profile: profileId } })
+          api.get(`user/users/${foundUser.id}/statistics/`)
         ]);
+
         const participants: TSeasonParticipantDto[] = Array.isArray(seasonsRes.data) ? seasonsRes.data : seasonsRes.data.results || [];
-        matchResults.value = Array.isArray(resultsRes.data) ? resultsRes.data : resultsRes.data.results || [];
+
+        // Map backend statistics
+        leagueStats.value = statsRes.data.league_stats;
+        gameStats.value = statsRes.data.game_stats;
 
         // 3. Fetch season details for each participant entry to get the season name
         const seasonIds = [...new Set(participants.map(p => p.season))];
@@ -238,46 +245,6 @@ async function load() {
 function reload() {
   load();
 }
-
-const leagueStats = computed(() => {
-  const totalLeagues = userSeasonList.value.length;
-  const distribution: Record<number, { count: number; percentage: number }> = {};
-
-  [1, 2, 3, 4].forEach(pos => {
-    const count = userSeasonList.value.filter(sp => sp.position === pos).length;
-    distribution[pos] = {
-      count,
-      percentage: totalLeagues ? (count / totalLeagues) * 100 : 0
-    };
-  });
-
-  return {
-    totalLeagues,
-    distribution
-  };
-});
-
-const gameStats = computed(() => {
-  const statsMap: Record<string, { name: string; positions: number[]; wins: number }> = {};
-
-  matchResults.value.forEach(r => {
-    const gameName = r.game_name || `Game ${r.selected_game}`;
-    if (!statsMap[gameName]) {
-      statsMap[gameName] = { name: gameName, positions: [], wins: 0 };
-    }
-    if (r.position !== null) {
-      statsMap[gameName].positions.push(r.position);
-      if (r.position === 1) statsMap[gameName].wins++;
-    }
-  });
-
-  return Object.values(statsMap).map(g => ({
-    ...g,
-    winRate: g.positions.length ? (g.wins / g.positions.length) * 100 : 0,
-    avgPos: g.positions.length ? g.positions.reduce((a, b) => a + b, 0) / g.positions.length : 0,
-    count: g.positions.length
-  })).sort((a, b) => b.count - a.count);
-});
 
 const filteredGameStats = computed(() => {
   if (!gameSearch.value) return gameStats.value;

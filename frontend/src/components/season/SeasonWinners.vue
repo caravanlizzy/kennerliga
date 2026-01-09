@@ -16,65 +16,50 @@
     </div>
 
     <template v-else>
+      <!-- Season Winner (Level 1 Winner) -->
+      <div v-if="seasonWinner" class="season-winner-crown text-center q-mb-lg">
+        <div class="relative-position display-inline-block">
+          <q-icon name="workspace_premium" color="amber-8" size="64px" class="crown-icon" />
+          <q-badge color="amber-1" text-color="amber-9" floating class="text-weight-bold" style="top: 10px; right: -5px">
+            Winner
+          </q-badge>
+        </div>
+        <div class="text-h4 text-weight-bolder text-dark q-mt-sm">{{ seasonWinner.username }}</div>
+        <div class="text-subtitle1 text-grey-7 text-uppercase letter-spacing-1">Season Winner</div>
+      </div>
+
+      <q-separator class="q-my-md" />
+      <div class="text-overline text-grey-6 text-center">League Winners</div>
+
       <!-- Podium (top 3) -->
       <div class="podium q-gutter-sm" aria-label="Podium">
         <div
-          v-if="top3[1]"
-          class="podium__spot podium__spot--second"
-          aria-label="Second place"
+          v-for="spot in podiumSpots"
+          :key="spot.level"
+          class="podium__spot"
+          :class="`podium__spot--${spot.class}`"
+          :aria-label="`${spot.label} place`"
         >
           <div class="podium__name text-weight-bold text-capitalize">
-            {{ top3[1].username }}
+            {{ spot.winner?.username || '-' }}
           </div>
-          <div v-if="top3[1].profile_name && top3[1].profile_name !== top3[1].username" class="text-caption text-grey-6" style="font-size: 0.7rem">
-            {{ top3[1].profile_name }}
+          <div v-if="spot.winner?.profile_name && spot.winner.profile_name !== spot.winner.username" class="text-caption text-grey-6" style="font-size: 0.7rem">
+            {{ spot.winner.profile_name }}
           </div>
-          <div class="podium__base q-pa-sm text-weight-bold">L2</div>
-        </div>
-
-        <div
-          v-if="top3[0]"
-          class="podium__spot podium__spot--first"
-          aria-label="First place"
-        >
-          <div class="podium__name text-weight-bold text-capitalize">
-            {{ top3[0].username }}
-          </div>
-          <div v-if="top3[0].profile_name && top3[0].profile_name !== top3[0].username" class="text-caption text-grey-6" style="font-size: 0.7rem">
-            {{ top3[0].profile_name }}
-          </div>
-          <div class="podium__base q-pa-sm text-weight-bold">L1</div>
-        </div>
-
-        <div
-          v-if="top3[2]"
-          class="podium__spot podium__spot--third"
-          aria-label="Third place"
-        >
-          <div class="podium__name text-weight-bold text-capitalize">
-            {{ top3[2].username }}
-          </div>
-          <div v-if="top3[2].profile_name && top3[2].profile_name !== top3[2].username" class="text-caption text-grey-6" style="font-size: 0.7rem">
-            {{ top3[2].profile_name }}
-          </div>
-          <div class="podium__base q-pa-sm text-weight-bold">L3</div>
+          <div class="podium__base q-pa-sm text-weight-bold">L{{ spot.level }}</div>
         </div>
       </div>
 
       <!-- Next in line -->
-      <div v-if="rest.length" class="next q-mt-sm">
+      <div v-if="restOfLeagues.length" class="next q-mt-sm">
         <ol class="next__list q-pa-none q-ma-none q-mt-xs">
           <li
-            v-for="(item, idx) in rest"
-            :key="`${item.username}-${idx}`"
+            v-for="item in restOfLeagues"
+            :key="`${item.username}-${item.level}`"
             class="next__item q-pa-sm q-gutter-sm"
-            :class="{
-              'next__item--pos4': idx === 0,
-              'next__item--pos5': idx === 1,
-            }"
           >
             <span class="next__badge bg-grey-3 text-weight-bolder">
-              {{ levelLabel(idx + 4) }}
+              L{{ item.level }}
             </span>
             <div class="column">
               <span class="next__name text-capitalize text-weight-bold">{{ item.username }}</span>
@@ -109,7 +94,7 @@ const props = defineProps<{
 }>();
 
 const season = ref<string>('');
-const winners = ref<Array<{ username: string; profile_name: string }>>([]);
+const winners = ref<Array<{ username: string; profile_name: string; level: number }>>([]);
 
 onMounted(async () => {
   if (!props.seasonId) return;
@@ -124,18 +109,68 @@ onMounted(async () => {
     .slice()
     .sort((a, b) => a.league.level - b.league.level)
     .map((x) => ({
-      username: x.username || x.winner || '',
-      profile_name: x.profile_name || x.winner || ''
+      username: x.winner?.username || x.username || '',
+      profile_name: x.winner?.profile_name || x.profile_name || '',
+      level: x.league.level
     }))
     .filter((x) => x.username !== '');
 });
 
-const top3 = computed(() => winners.value.slice(0, 3));
-const rest = computed(() => winners.value.slice(3));
+const seasonWinner = computed(() => winners.value.find(w => w.level === 1));
+
+const podiumSpots = computed(() => {
+  const levels = [2, 1, 3];
+  const classes = ['second', 'first', 'third'];
+  const labels = ['Second', 'First', 'Third'];
+
+  return levels.map((lvl, idx) => ({
+    level: lvl,
+    class: classes[idx],
+    label: labels[idx],
+    winner: winners.value.find(w => w.level === lvl)
+  }));
+});
+
+const restOfLeagues = computed(() => {
+  return winners.value.filter(w => ![1, 2, 3].includes(w.level));
+});
 const levelLabel = (pos: number) => `L${pos}`;
 </script>
 
 <style scoped>
+.season-winner-crown {
+  animation: fadeInDown 0.8s ease-out;
+}
+
+.crown-icon {
+  animation: float 3s ease-in-out infinite;
+}
+
+.display-inline-block {
+  display: inline-block;
+}
+
+.letter-spacing-1 {
+  letter-spacing: 1px;
+}
+
+@keyframes float {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+  100% { transform: translateY(0px); }
+}
+
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translate3d(0, -20px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
 .season-winners {
   display: grid;
   gap: 16px;
