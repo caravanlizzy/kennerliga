@@ -1,51 +1,46 @@
 <template>
-  <div v-if="isVisible" :class="isMobile ? 'q-mb-sm' : 'q-mb-md'">
+  <div v-if="isVisible" :class="isMobile ? 'q-mb-sm' : 'q-mb-lg'">
     <transition-group
       appear
-      enter-active-class="animated fadeIn"
-      leave-active-class="animated fadeOut"
+      enter-active-class="animated fadeInDown"
+      leave-active-class="animated fadeOutUp"
     >
-      <div v-for="a in visibleAnnouncements" :key="a.id" class="q-mb-sm">
+      <div v-for="a in visibleAnnouncements" :key="a.id" class="q-mb-md">
         <!-- TAnnouncementDto Card -->
         <q-card
           flat
-          class="announcement-card overflow-hidden border-all"
+          class="announcement-card overflow-hidden"
           :class="[
             { 'no-border-radius': shouldRemoveBorders },
+            `announcement-card--${a.type.toLowerCase()}`
           ]"
         >
           <q-card-section
             :class="[
-              isMobile ? 'q-py-sm' : 'q-py-md',
-              'relative-position row items-start no-wrap'
+              isMobile ? 'q-py-md' : 'q-py-lg',
+              'relative-position row items-center no-wrap'
             ]"
           >
-            <!-- Colored accent bar -->
-            <div
-              class="absolute-left full-height accent-bar"
-              :class="typeColors[a.type].split(' ')[0]"
-            ></div>
-
             <!-- Content Header (Icon + Text) -->
-            <div class="row items-start no-wrap col q-pl-sm">
+            <div class="row items-center no-wrap col q-px-md">
               <!-- Icon Circle -->
               <div
                 v-if="announcementIcons[a.type]"
-                class="icon-wrapper flex flex-center q-mr-md"
-                :class="[typeColors[a.type], isMobile ? 'icon-wrapper--mobile q-mt-xs' : '']"
+                class="icon-wrapper flex flex-center q-mr-lg"
+                :class="[typeColors[a.type], isMobile ? 'icon-wrapper--mobile' : '']"
               >
-                <q-icon :name="announcementIcons[a.type]" :size="isMobile ? '16px' : '20px'" />
+                <q-icon :name="announcementIcons[a.type]" :size="isMobile ? '20px' : '24px'" />
               </div>
 
               <!-- Content -->
-              <div class="col" :class="!isMobile ? 'q-pr-xl' : 'q-pr-md'">
+              <div class="col">
                 <div
-                  class="text-subtitle1 text-weight-bold lh-tight"
+                  class="text-h6 text-weight-bolder lh-tight"
                   :class="textColors[a.type]"
                 >
                   {{ a.title }}
                 </div>
-                <div v-if="a.content" class="text-body2 text-grey-8 q-mt-xs">
+                <div v-if="a.content" class="text-subtitle2 text-grey-8 q-mt-xs">
                   {{ a.content }}
                 </div>
 
@@ -77,25 +72,25 @@
                 </div>
 
                 <!-- Integrated Participants List -->
-                <div v-if="a.type === 'REGISTER'" class="q-mt-md">
-                  <div class="row items-center q-gutter-x-sm q-mb-xs">
-                    <div class="text-caption text-weight-bold text-grey-7 uppercase tracking-wider">
-                      Participants
+                <div v-if="a.type === 'REGISTER'" class="q-mt-lg">
+                  <div class="row items-center q-gutter-x-sm q-mb-sm">
+                    <div class="text-caption text-weight-bolder text-grey-8 uppercase tracking-widest" style="font-size: 0.65rem">
+                      Registered Players
                     </div>
                     <q-badge color="secondary" :label="participants?.length ?? 0" rounded class="text-weight-bold" style="font-size: 10px; padding: 2px 6px;" />
                   </div>
 
                   <div v-if="participantsLoading" class="row q-gutter-xs">
-                    <q-skeleton v-for="i in 5" :key="i" type="rect" width="60px" height="22px" class="rounded-borders" />
+                    <q-skeleton v-for="i in 5" :key="i" type="rect" width="60px" height="28px" class="rounded-borders" />
                   </div>
                   <template v-else-if="participantsLoaded">
-                    <div v-if="participants?.length" class="row q-gutter-xs">
+                    <div v-if="participants?.length" class="row q-gutter-sm">
                       <div
                         v-for="p in participants"
                         :key="p.id"
                         class="col-auto"
                       >
-                        <div class="participant-chip border-all">
+                        <div class="participant-chip">
                           {{ p.profile_name || 'Anonymous' }}
                         </div>
                       </div>
@@ -104,7 +99,7 @@
                       v-else
                       class="text-caption text-grey-6 italic"
                     >
-                      No participants yet.
+                      No participants yet. Be the first to join!
                     </div>
                   </template>
                 </div>
@@ -113,8 +108,7 @@
 
             <!-- Actions (Desktop all, Mobile only Close) -->
             <div
-              class="row items-center q-gutter-sm absolute-right q-pa-sm"
-              :class="isMobile ? 'q-ml-xs' : 'q-ml-sm'"
+              class="row items-center q-gutter-sm absolute-top-right q-pa-md"
             >
               <template v-if="!isMobile && a.type === 'REGISTER'">
                 <KennerButton
@@ -262,39 +256,39 @@ const typeColors = {
 
 <style scoped>
 .announcement-card {
-  border-radius: 8px;
-  transition: all 0.2s ease-in-out;
+  border-radius: 16px;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
   background-color: white;
+  border: 1px solid rgba(0, 0, 0, 0.05);
 }
 
-.accent-bar {
-  width: 6px;
-  border-radius: 4px 0 0 4px;
-}
+.announcement-card--info { background: #e3f2fd; border-color: #bbdefb; }
+.announcement-card--winner { background: #fff8e1; border-color: #ffecb3; }
+.announcement-card--register { background: #e0f2f1; border-color: #b2dfdb; }
+.announcement-card--warning { background: #ffebee; border-color: #ffcdd2; }
+.announcement-card--neutral { background: #f5f5f5; border-color: #e0e0e0; }
 
 .no-border-radius {
   border-radius: 0 !important;
 }
 
-.no-border-radius .accent-bar {
-  border-radius: 0 !important;
-}
-
 .announcement-card:hover:not(.no-border-radius) {
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
 }
 
 .icon-wrapper {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
   flex-shrink: 0;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
 
 .icon-wrapper--mobile {
-  width: 28px;
-  height: 28px;
-  margin-right: 8px !important;
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  margin-right: 12px !important;
 }
 
 .lh-tight {
@@ -306,17 +300,18 @@ const typeColors = {
 }
 
 .participant-chip {
-  font-size: 11px;
-  background: #f8f9fa;
-  padding: 3px 8px;
-  border-radius: 4px;
+  font-size: 12px;
+  background: white;
+  padding: 4px 12px;
+  border-radius: 8px;
   color: #2c3e50;
-  font-weight: 500;
-  border: 1px solid rgba(0, 0, 0, 0.05);
+  font-weight: 600;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
 }
 
-.tracking-wider {
-  letter-spacing: 0.05em;
+.tracking-widest {
+  letter-spacing: 0.1em;
 }
 
 .min-height-0 {

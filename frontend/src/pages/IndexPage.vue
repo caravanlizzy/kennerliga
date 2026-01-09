@@ -3,7 +3,9 @@
     <WelcomeSection v-if="!isMobile" :is-authenticated="isAuthenticated" />
 
     <template v-if="isAuthenticated">
-      <AnnouncementDisplay class="col-auto" />
+      <div class="row justify-center">
+        <AnnouncementDisplay class="col-12" style="max-width: 800px" />
+      </div>
       <div v-if="isMobile" class="column col">
         <div class="col column">
           <WelcomeSection
