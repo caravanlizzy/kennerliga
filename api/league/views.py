@@ -136,6 +136,8 @@ class LeagueViewSet(ModelViewSet):
                 "points": str(gs.points),
                 "league_points": str(gs.league_points),
                 "rank": gs.rank,
+                "decisive_tie_breaker_name": gs.decisive_tie_breaker.name if gs.decisive_tie_breaker else None,
+                "tie_breaker_value": gs.tie_breaker_value,
             }
 
         # 4. Build the response rows

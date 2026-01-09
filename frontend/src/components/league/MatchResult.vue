@@ -52,7 +52,7 @@
           <q-item-label
             v-if="result.notes || result.decisive_tie_breaker"
             caption
-            class="text-grey-7 ellipsis"
+            class="text-grey-7"
           >
             <template v-if="result.notes">
               <q-icon name="notes" size="14px" class="q-mr-xs" />
@@ -64,8 +64,8 @@
               >•</span
             >
             <template v-if="result.decisive_tie_breaker">
-              <q-icon name="Equalizer" size="14px" class="q-mr-xs" />
-              TB: {{ result.decisive_tie_breaker }} ({{
+              <q-icon name="equalizer" size="14px" class="q-mr-xs" />
+              <span class="text-weight-bold">TB:</span> {{ result.decisive_tie_breaker }} ({{
                 result.tie_breaker_value
               }})
             </template>

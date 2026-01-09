@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from game.models import ResultConfig, Faction
+from game.models import ResultConfig, Faction, TieBreaker
 from .models import Result
 
 
@@ -11,7 +11,11 @@ class ResultSerializer(serializers.ModelSerializer):
     )
     factions = serializers.SerializerMethodField(read_only=True)
     player_profile_name = serializers.SerializerMethodField(read_only=True)
-    decisive_tie_breaker = serializers.SerializerMethodField(required=False, read_only=True)
+    decisive_tie_breaker = serializers.PrimaryKeyRelatedField(
+        queryset=TieBreaker.objects.all(),
+        required=False,
+        allow_null=True
+    )
     game_name = serializers.CharField(source='selected_game.game.name', read_only=True)
 
     class Meta:
@@ -45,17 +49,14 @@ class ResultSerializer(serializers.ModelSerializer):
     def get_player_profile_name(self, obj):
         return obj.player_profile.profile_name
 
-    def get_decisive_tie_breaker(self, obj):
-        if isinstance(obj, dict):
-            # This is a dict, skip processing (likely in dry_run)
-            return obj.get("decisive_tie_breaker")
-
-        if hasattr(obj, 'decisive_tie_breaker') and obj.decisive_tie_breaker:
-            return {
-                "id": obj.decisive_tie_breaker.id,
-                "name": obj.decisive_tie_breaker.name
+    def to_representation(self, instance):
+        ret = super().to_representation(instance)
+        if instance.decisive_tie_breaker:
+            ret['decisive_tie_breaker'] = {
+                "id": instance.decisive_tie_breaker.id,
+                "name": instance.decisive_tie_breaker.name
             }
-        return None
+        return ret
 
     def validate(self, data):
         selected_game = data.get('selected_game')

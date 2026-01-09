@@ -63,6 +63,8 @@ def rebuild_game_snapshot(selected_game, win_mode: str = "count_top_block") -> N
                 "profile": r.player_profile,
                 "score": score,
                 "position": int(pos),
+                "decisive_tie_breaker": r.decisive_tie_breaker,
+                "tie_breaker_value": r.tie_breaker_value,
             }
         )
 
@@ -156,6 +158,8 @@ def rebuild_game_snapshot(selected_game, win_mode: str = "count_top_block") -> N
                     rank=row["rank"],
                     league_points=row["league_points"],
                     win_share=row["win_share"],
+                    decisive_tie_breaker=row.get("decisive_tie_breaker"),
+                    tie_breaker_value=row.get("tie_breaker_value"),
                 )
             )
 

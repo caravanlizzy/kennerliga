@@ -85,6 +85,8 @@ class GameStanding(models.Model):
     rank = models.PositiveIntegerField()  # dense rank within the game
     league_points = models.DecimalField(max_digits=10, decimal_places=2, default=0)  # tie-shared per rules
     win_share = models.DecimalField(max_digits=10, decimal_places=2, default=0)  # 1, fractional, or 0
+    decisive_tie_breaker = models.ForeignKey('game.TieBreaker', on_delete=models.SET_NULL, null=True, blank=True)
+    tie_breaker_value = models.CharField(max_length=255, null=True, blank=True)
     updated_at = models.DateTimeField(default=timezone.now)
 
     class Meta:

@@ -128,6 +128,11 @@
             style="padding: 4px 6px"
             :class="getRankBgClass(props.value?.rank)"
           >
+            <!-- Tie Breaker Info Tooltip -->
+            <KennerTooltip v-if="props.value?.decisive_tie_breaker_name">
+              Resolved by {{ props.value.decisive_tie_breaker_name }}: {{ props.value.tie_breaker_value }}
+            </KennerTooltip>
+
             <!-- Rank Indicator Bar -->
             <div
               v-if="props.value?.rank && props.value.rank <= 4"
@@ -226,6 +231,8 @@ interface GameStats {
   points: string;
   league_points: string;
   rank: number;
+  decisive_tie_breaker_name?: string;
+  tie_breaker_value?: string;
 }
 
 interface Standing {
