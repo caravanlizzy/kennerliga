@@ -130,7 +130,7 @@ class MatchResultViewSet(ViewSet):
             rebuild_game_snapshot(selected_game, win_mode="count_top_block")
             rebuild_league_snapshot(league, win_mode="count_top_block")
 
-            if is_league_finished(league):
+            if league.is_finished:
                 league.status = LeagueStatus.DONE
                 league.save(update_fields=["status"])
 

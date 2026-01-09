@@ -485,8 +485,10 @@ class LiveEventViewSet(ViewSet):
                 })
 
         # 4. LEAGUE_FINISHED events
-        done_leagues = leagues.filter(status=LeagueStatus.DONE)
-        for league in done_leagues:
+        for league in leagues:
+            if not league.is_finished:
+                continue
+
             standings = LeagueStanding.objects.filter(league=league).order_by('-league_points', '-wins')
             if standings.exists():
                 top_standing = standings.first()

@@ -47,6 +47,13 @@ class Season(models.Model):
         # Both operands are now aware -> safe subtraction
         return self.season_start_time - timezone.now()
 
+    @property
+    def is_completed(self) -> bool:
+        leagues = self.leagues.all()
+        if not leagues.exists():
+            return False
+        return all(league.is_finished for league in leagues)
+
     def __str__(self):
         return self.name
 

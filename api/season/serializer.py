@@ -47,29 +47,7 @@ class SeasonSerializer(ModelSerializer):
         return not obj.participants.exists()
 
     def get_is_completed(self, obj):
-        # Optimized version
-        leagues = obj.leagues.all()
-        if not leagues.exists():
-            return False
-            
-        participants = obj.participants.all()
-        if not participants.exists():
-            return False
-
-        # If there are participants not assigned to any league, it's not completed?
-        # Actually, in this app, participants are assigned to leagues.
-        # Let's check if all participants belong to a league in this season.
-        # But for status "is_completed", we care about the games in the leagues.
-
-        # A season is completed if:
-        # 1. All leagues in the season are status DONE.
-        if leagues.filter(~Q(status='DONE')).exists():
-            return False
-            
-        # 2. At least one league exists and has members.
-        # (Already checked above)
-        
-        return True
+        return obj.is_completed
 
     def get_is_incomplete(self, obj):
         is_empty = self.get_is_empty(obj)

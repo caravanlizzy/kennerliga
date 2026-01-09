@@ -34,6 +34,11 @@ class League(models.Model):
     )
     updated_at = models.DateTimeField(auto_now=True)
 
+    @property
+    def is_finished(self) -> bool:
+        from league.queries import is_league_finished
+        return is_league_finished(self)
+
     def __str__(self):
         return f'{self.season}L{self.level}'
 
