@@ -1,12 +1,12 @@
 from collections import defaultdict
 
 from django.db.models import Count, Exists, OuterRef
+from rest_framework.fields import SerializerMethodField
 from rest_framework import serializers
 
 from game.models import BanDecision
 from league.models import League, GameStanding, LeagueStanding
 from season.models import SeasonParticipant
-from season.serializer import SeasonParticipantSerializer, SeasonParticipantMiniSerializer
 
 
 class LeagueSerializer(serializers.ModelSerializer):
@@ -18,11 +18,17 @@ class LeagueSerializer(serializers.ModelSerializer):
         required=False,
     )
     # read: return mini objects
-    members = SeasonParticipantMiniSerializer(many=True, read_only=True)
+    members = SerializerMethodField()
 
     class Meta:
         model = League
         fields = ["id", "season", "level", "status", "active_player", "members", "member_ids"]
+
+    def get_members(self, obj):
+        # We want to include selected_games for the season list page's icons
+        # Use SeasonParticipantSerializer and pass the league in context
+        from season.serializer import SeasonParticipantSerializer
+        return SeasonParticipantSerializer(obj.members.all(), many=True, context={'league': obj}).data
 
     def validate(self, attrs):
         season = attrs.get("season") or getattr(self.instance, "season", None)
@@ -78,6 +84,7 @@ class LeagueDetailSerializer(serializers.ModelSerializer):
 
     def get_members(self, league):
         # Render members with your existing participant serializer
+        from season.serializer import SeasonParticipantSerializer
         members_qs = (
             league.members
             .select_related('profile__user')

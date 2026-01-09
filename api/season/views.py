@@ -19,7 +19,7 @@ from league.models import League, LeagueStanding, GameStanding, LeagueStatus
 from result.models import Result
 from season.queries import register, is_profile_registered, get_open_season, get_running_season
 from season.models import Season, SeasonParticipant
-from season.serializer import SeasonSerializer, SeasonParticipantSerializer, TLiveEventSerializer
+from season.serializer import SeasonSerializer, SeasonParticipantSerializer, TLiveEventSerializer, SeasonWithLeaguesSerializer
 from user.models import PlayerProfile
 
 
@@ -60,7 +60,7 @@ class SeasonViewSet(ModelViewSet):
     @action(detail=False, methods=['get'], url_path='seasons-with-leagues')
     def seasons_with_leagues(self, request):
         queryset = self.get_queryset().filter(leagues__isnull=False).distinct()
-        serializer = SeasonSerializer(queryset, many=True)
+        serializer = SeasonWithLeaguesSerializer(queryset, many=True)
         return Response(serializer.data)
 
     @action(detail=False, methods=['get'], url_path='registration-status')

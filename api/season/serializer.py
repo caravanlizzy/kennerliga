@@ -40,6 +40,14 @@ class SeasonSerializer(ModelSerializer):
         fields = '__all__'
 
 
+class SeasonWithLeaguesSerializer(SeasonSerializer):
+    leagues = SerializerMethodField()
+
+    def get_leagues(self, obj):
+        from league.serializer import LeagueSerializer
+        return LeagueSerializer(obj.leagues.all(), many=True).data
+
+
 class SeasonParticipantMiniSerializer(ModelSerializer):
     profile_name = CharField(source="profile.profile_name", read_only=True)
     username = SerializerMethodField()

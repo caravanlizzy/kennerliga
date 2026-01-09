@@ -102,6 +102,7 @@ class SelectedGameSerializer(serializers.ModelSerializer):
     selected_options = SelectedOptionSerializer(many=True)
     successfully_banned = serializers.SerializerMethodField()
     has_points = serializers.SerializerMethodField()
+    results_uploaded = serializers.SerializerMethodField()
 
     profile = serializers.PrimaryKeyRelatedField(
         queryset=PlayerProfile.objects.all(),
@@ -118,7 +119,7 @@ class SelectedGameSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = SelectedGame
-        fields = ['id', 'game', 'game_name', 'selected_options', 'league', 'profile', 'manage_only', 'successfully_banned', 'has_points']
+        fields = ['id', 'game', 'game_name', 'selected_options', 'league', 'profile', 'manage_only', 'successfully_banned', 'has_points', 'results_uploaded']
 
     def validate(self, attrs):
         game = attrs.get('game', None)
@@ -166,6 +167,21 @@ class SelectedGameSerializer(serializers.ModelSerializer):
 
     def get_has_points(self, obj):
         return obj.game.resultconfig_set.first().has_points if obj.game.resultconfig_set.exists() else True
+
+    def get_results_uploaded(self, obj):
+        from result.models import Result
+        # A game is considered to have results uploaded if there are results for it in its league
+        # Usually, a game is finished when all members of the league have a result for it.
+        # However, for the purpose of "is it complete", we check if results exist at all,
+        # or better, if the number of results matches the number of league members.
+        league = obj.league
+        if not league:
+            return False
+        
+        member_count = league.members.count()
+        result_count = Result.objects.filter(selected_game=obj).count()
+        
+        return result_count >= member_count and member_count > 0
 
     def set_player_and_league(self, validated_data):
         # Set player
