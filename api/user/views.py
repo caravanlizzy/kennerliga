@@ -161,6 +161,7 @@ class MeViewSet(ViewSet):
 
     @action(detail=False, methods=['get'], url_path='current-league')
     def current_league(self, request):
+        from league.serializer import LeagueMinimalSerializer
         profile = request.user.profile
 
         participant = (
@@ -181,7 +182,9 @@ class MeViewSet(ViewSet):
         if not league:
             return Response({'detail': 'No league found for current season.'}, status=404)
 
-        return Response(LeagueSerializer(league).data)
+        data = LeagueMinimalSerializer(league).data
+        data['is_my_turn'] = league.active_player == participant
+        return Response(data)
 
     @action(detail=False, methods=['get'], url_path='results')
     def results(self, request):

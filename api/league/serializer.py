@@ -97,6 +97,11 @@ class GameStandingSerializer(serializers.ModelSerializer):
         fields = ("player_profile", "profile_name", "user_id", "username", "selected_game", "points", "rank", "league_points", "win_share", "decisive_tie_breaker", "decisive_tie_breaker_name", "tie_breaker_value")
 
 
+class LeagueMinimalSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = League
+        fields = ["id", "season", "level", "status", "active_player"]
+
 class LeagueDetailSerializer(serializers.ModelSerializer):
     members = serializers.SerializerMethodField()
 
