@@ -2,6 +2,7 @@ from urllib.parse import urlencode
 
 from django.conf import settings
 from django.db import transaction
+from django.db.models import Q
 from django.db.models.functions import Lower
 from rest_framework import status
 from rest_framework.decorators import action
@@ -10,7 +11,7 @@ from rest_framework.permissions import IsAuthenticated, IsAdminUser, AllowAny
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet, ViewSet
 
-from league.models import League
+from league.models import League, LeagueStanding
 from league.serializer import LeagueSerializer
 from result.models import Result
 from result.serializers import ResultSerializer
@@ -91,15 +92,33 @@ class UserViewSet(ModelViewSet):
         profile = user.profile
 
         # 1. League Statistics
-        participants = SeasonParticipant.objects.filter(profile=profile).select_related('season')
-        total_leagues = participants.count()
+        standings = LeagueStanding.objects.filter(player_profile=profile).select_related('league')
+        total_leagues = standings.count()
         distribution = {}
+        
+        # Initialize distribution
         for pos in [1, 2, 3, 4]:
-            count = participants.filter(position=pos).count()
-            distribution[pos] = {
-                "count": count,
-                "percentage": (count / total_leagues * 100) if total_leagues > 0 else 0
-            }
+            distribution[pos] = {"count": 0, "percentage": 0}
+
+        for s in standings:
+            # Calculate rank in this specific league using the same logic as in season services/views
+            # Higher league_points, then higher wins, then lower id (as tie-breaker)
+            better_count = LeagueStanding.objects.filter(
+                league=s.league
+            ).filter(
+                Q(league_points__gt=s.league_points) | 
+                Q(league_points=s.league_points, wins__gt=s.wins) |
+                Q(league_points=s.league_points, wins=s.wins, id__lt=s.id)
+            ).count()
+            rank = better_count + 1
+            
+            if rank in distribution:
+                distribution[rank]["count"] += 1
+        
+        # Calculate percentages
+        for pos in [1, 2, 3, 4]:
+            count = distribution[pos]["count"]
+            distribution[pos]["percentage"] = (count / total_leagues * 100) if total_leagues > 0 else 0
 
         # 2. Game Statistics
         results = Result.objects.filter(player_profile=profile).select_related('selected_game__game')
