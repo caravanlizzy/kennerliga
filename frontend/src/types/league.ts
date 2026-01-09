@@ -6,6 +6,7 @@ export type TSeasonDto = {
   month: number;
   name?: string;
   status?: string;
+  is_completed?: boolean;
 };
 
 export type TLeagueStatus =

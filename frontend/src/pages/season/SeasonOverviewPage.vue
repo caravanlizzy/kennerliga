@@ -147,10 +147,7 @@ const statusColor = computed(() => {
   }
 });
 
-const isSeasonCompleted = computed(() => {
-  if (!leagues.value.length) return false;
-  return leagues.value.every(l => l.is_completed);
-});
+const isSeasonCompleted = computed(() => season.value?.is_completed ?? false);
 
 const seasonStatusLabel = computed(() => {
   if (isSeasonCompleted.value) return 'COMPLETE';

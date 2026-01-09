@@ -46,15 +46,9 @@ import { api } from 'boot/axios';
 import { useRouter } from 'vue-router';
 import { computed } from 'vue';
 import type { QTableProps } from 'quasar';
-import type { TKennerButton, TLeagueDto } from 'src/types';
+import type { TKennerButton, TLeagueDto, TSeasonDto } from 'src/types';
 
-type Season = {
-  id: number;
-  year: number;
-  month: number;
-  name?: string;  // backend-provided if available
-  status?: 'NEXT' | 'OPEN' | 'RUNNING' | 'DONE' | string;
-  is_completed?: boolean;
+type SeasonExtra = TSeasonDto & {
   is_empty?: boolean;
   is_incomplete?: boolean;
 };
@@ -64,13 +58,13 @@ const {
   data: seasons,
   isFinished,
   error: fetchError,
-} = useAxios<Season[]>('/season/seasons/', api);
+} = useAxios<SeasonExtra[]>('/season/seasons/', api);
 
 const loading = computed(() => !isFinished.value);
 const error = computed(() => fetchError.value?.message || null);
 
 // status determination
-const getSeasonStats = (s: Season) => {
+const getSeasonStats = (s: SeasonExtra) => {
   return {
     isEmpty: s.is_empty,
     isCompleted: s.is_completed,
@@ -80,15 +74,15 @@ const getSeasonStats = (s: Season) => {
 
 // navigation
 const router = useRouter();
-function onRowClick(_evt: unknown, row: Season) {
+function onRowClick(_evt: unknown, row: SeasonExtra) {
   router.push({ name: 'season-detail', params: { id: row.id } });
 }
 
 // display helpers
 const monthNames = ['', 'January','February','March','April','May','June','July','August','September','October','November','December'];
 const monthLabel = (m?: number) => (m ? (monthNames[m] || `M${m}`) : 'Unknown');
-const fallbackName = (s: Season) => `${s.year} · S${s.month} (${monthLabel(s.month)})`;
-const displayName  = (s: Season) => s.name || fallbackName(s);
+const fallbackName = (s: SeasonExtra) => `${s.year} · S${s.month} (${monthLabel(s.month)})`;
+const displayName  = (s: SeasonExtra) => s.name || fallbackName(s);
 
 // columns for KennerTable
 const columns = computed<QTableProps['columns']>(() => ([
@@ -96,7 +90,7 @@ const columns = computed<QTableProps['columns']>(() => ([
     name: 'details',
     label: '',
     align: 'center',
-    field: (s: Season) => getSeasonStats(s),
+    field: (s: SeasonExtra) => getSeasonStats(s),
     style: 'width: 50px',
   },
   {
@@ -104,9 +98,9 @@ const columns = computed<QTableProps['columns']>(() => ([
     label: 'Season',
     align: 'left',
     sortable: true,
-    field: (s: Season) => displayName(s),
+    field: (s: SeasonExtra) => displayName(s),
     // render icon + name
-    format: (val: string, row: Season) => val, // keep value for filtering/sorting if KennerTable uses it
+    format: (val: string, row: SeasonExtra) => val, // keep value for filtering/sorting if KennerTable uses it
     headerStyle: 'white-space: nowrap',
     style: 'white-space: nowrap; max-width: 0',
   },
