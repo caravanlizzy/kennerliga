@@ -14,6 +14,7 @@ from season.serializer import SeasonSerializer
 from services.standings_snapshot import rebuild_game_snapshot, rebuild_league_snapshot
 from .models import Result
 from .serializers import ResultSerializer
+from .services import finalize_results, get_game_standings_data, get_tie_groups
 from league.models import LeagueStatus
 from league.queries import is_league_finished
 
@@ -77,68 +78,16 @@ class MatchResultViewSet(ViewSet):
             return default
 
     def _get_tie_groups(self, rows, base_field, use_points, tbs, level):
-        def key_up_to(row, lvl):
-            base_val = self._fnum(row.get(base_field), 0)
-            key = [-base_val] if use_points else [base_val]
-            for i in range(lvl + 1):
-                if i < 0: continue
-                tb = tbs[i]
-                val = self._fnum(row.get("tie_breaker_value"))
-                if val is None:
-                    key.append(float("inf"))
-                else:
-                    key.append(-val if tb.higher_wins else val)
-            return tuple(key)
-
-        groups = defaultdict(list)
-        for r in rows:
-            groups[key_up_to(r, level)].append(r)
-        return [g for g in groups.values() if len(g) > 1]
+        return get_tie_groups(rows, base_field, use_points, tbs, level)
 
     def _finalize_results(self, serializers, rows, base_field, use_points, tbs, selected_game, league, decisive_tb=None,
                           needing_pids=None):
-        if needing_pids is None:
-            needing_pids = set()
-
-        def get_full_sort_key(row):
-            base_val = self._fnum(row.get(base_field), 0)
-            key = [-base_val] if use_points else [base_val]
-            for tb in tbs:
-                val = self._fnum(row.get("tie_breaker_value"))
-                key.append(float("inf") if val is None else (-val if tb.higher_wins else val))
-            return tuple(key)
-
-        sorted_rows = sorted(rows, key=get_full_sort_key)
-        pid_to_rank = {}
-        current_rank = 1
-        for i, row in enumerate(sorted_rows):
-            if i > 0 and get_full_sort_key(row) != get_full_sort_key(sorted_rows[i - 1]):
-                current_rank = i + 1
-            pid_to_rank[row["player_profile"].id] = current_rank
-
-        with transaction.atomic():
-            saved = []
-            for s in serializers:
-                row_data = s.validated_data
-                pid = row_data["player_profile"].id
-                row_data["position"] = pid_to_rank[pid]
-                row_data["tie_breaker_resolved"] = True
-                if decisive_tb and pid in needing_pids:
-                    row_data["decisive_tie_breaker"] = decisive_tb
-                saved.append(s.save())
-
-            rebuild_game_snapshot(selected_game, win_mode="count_top_block")
-            rebuild_league_snapshot(league, win_mode="count_top_block")
-
-            if league.is_finished:
-                league.status = LeagueStatus.DONE
-                league.save(update_fields=["status"])
-
-        standings = GameStanding.objects.filter(league=league, selected_game=selected_game.id).select_related(
-            "player_profile").order_by("rank", "player_profile__profile_name")
+        saved = finalize_results(serializers, rows, base_field, use_points, tbs, selected_game, league, decisive_tb,
+                                  needing_pids)
+        game_standings = get_game_standings_data(league, selected_game.id)
         return Response({
             "results": ResultSerializer(saved, many=True).data,
-            "game_standings": GameStandingSerializer(standings, many=True).data,
+            "game_standings": game_standings,
         }, status=status.HTTP_201_CREATED)
 
     def create(self, request, *args, **kwargs):

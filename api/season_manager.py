@@ -1,20 +1,17 @@
-from season.queries import get_registered_participants, get_open_season
-from season.services import SeasonService
-from season.services import RankingService
+from season.queries import get_registered_participants, get_open_season, get_running_season
+from season.services import close_running, rank_participants, create_leagues, open_new, create_next
 
 
 class SeasonManager:
     def start_new_season(self):
-        running_season = SeasonService()
-        running_season.close_running()
+        running_season = get_running_season()
+        close_running(running_season)
 
         open_season = get_open_season()
-        season_service = SeasonService(open_season)
         participants = get_registered_participants()
-        ranking = RankingService(open_season)
-        ranked = ranking.rank_participants(participants)
+        ranked = rank_participants(open_season, participants)
 
         # create leagues before closing season
-        season_service.create_leagues(ranked)
-        season_service.open_new()
-        season_service.create_next()
+        create_leagues(open_season, ranked)
+        open_new()
+        create_next(open_season)

@@ -11,6 +11,7 @@ from game.models import SelectedGame, BanDecision
 from league.models import League, LeagueStanding, GameStanding
 from league.serializer import LeagueDetailSerializer, LeagueStandingSerializer, GameStandingSerializer, LeagueSerializer, LeagueListSerializer
 from services.standings_snapshot import rebuild_league_snapshot, rebuild_game_snapshot
+from league.services import advance_turn, get_full_standings_data
 
 
 class LeagueViewSet(ModelViewSet):
@@ -57,117 +58,9 @@ class LeagueViewSet(ModelViewSet):
 
     @action(detail=True, methods=['get'], url_path='full-standings')
     def full_standings(self, request, pk=None):
-        """
-        Returns a matrix suitable for a standings table:
-        - Rows: players ordered by total league_points (desc)
-        - Columns: per-game data (points & league_points for each selected_game)
-
-        Response shape:
-        {
-          "selected_games": [
-            {"id": 1, "game_name": "Catan"},
-            {"id": 2, "game_name": "Azul"},
-            ...
-          ],
-          "standings": [
-            {
-              "player_profile_id": 5,
-              "profile_name": "Alice",
-              "total_league_points": "18.00",
-              "total_wins": "3.00",
-              "games": {
-                "1": {"points": "120.00", "league_points": "6.00", "rank": 1},
-                "2": {"points": "85.50", "league_points": "3.00", "rank": 2},
-                ...
-              }
-            },
-            ...
-          ]
-        }
-        """
         league = self.get_object()
-        required_bans = get_ban_amount_for_success(league.members.count())
-
-        # 1. Get all selected games for this league (column headers)
-        selected_games = (
-            SelectedGame.objects
-            .filter(league=league)
-            .annotate(ban_count=Count('bandecision'))
-            .filter(ban_count__lt=required_bans)
-            .select_related('game')
-            .prefetch_related('game__resultconfig_set')
-            .order_by('id')
-        )
-        selected_game_list = []
-        for sg in selected_games:
-            # Avoid N+1 by using the prefetched resultconfig_set
-            configs = list(sg.game.resultconfig_set.all())
-            selected_game_list.append({
-                "id": sg.id,
-                "game_name": sg.game.name,
-                "game_short_name": sg.game.short_name,
-                "has_points": configs[0].has_points if configs else True,
-                "selected_by_id": sg.profile.id if sg.profile else None,
-                "selected_by_name": sg.profile.profile_name if sg.profile else None,
-            })
-        selected_game_ids = [sg.id for sg in selected_games]
-
-        # 2. Get league standings (for row ordering & totals)
-        league_standings = (
-            LeagueStanding.objects
-            .filter(league=league)
-            .select_related('player_profile__user')
-            .order_by('-league_points', '-wins', 'player_profile__profile_name')
-        )
-
-        # 3. Get all game standings for this league
-        game_standings = (
-            GameStanding.objects
-            .filter(league=league)
-        )
-
-        # Build a lookup: {player_profile_id: {selected_game_id: {...}}}
-        game_data_by_player = {}
-        for gs in game_standings:
-            pid = gs.player_profile_id
-            if pid not in game_data_by_player:
-                game_data_by_player[pid] = {}
-            game_data_by_player[pid][gs.selected_game_id] = {
-                "points": str(gs.points),
-                "league_points": str(gs.league_points),
-                "rank": gs.rank,
-                "decisive_tie_breaker_name": gs.decisive_tie_breaker.name if gs.decisive_tie_breaker else None,
-                "tie_breaker_value": gs.tie_breaker_value,
-            }
-
-        # 4. Build the response rows
-        standings_list = []
-        for ls in league_standings:
-            pid = ls.player_profile_id
-            player_games = game_data_by_player.get(pid, {})
-
-            # Build games dict keyed by selected_game_id (as string for JSON)
-            games_dict = {}
-            for sg_id in selected_game_ids:
-                if sg_id in player_games:
-                    games_dict[str(sg_id)] = player_games[sg_id]
-                else:
-                    games_dict[str(sg_id)] = {"points": None, "league_points": None, "rank": None}
-
-            standings_list.append({
-                "player_profile_id": pid,
-                "profile_name": ls.player_profile.profile_name,
-                "user_id": ls.player_profile.user.id if ls.player_profile.user else None,
-                "username": ls.player_profile.user.username if ls.player_profile.user else None,
-                "total_league_points": str(ls.league_points),
-                "total_wins": str(ls.wins),
-                "games": games_dict,
-            })
-
-        return Response({
-            "selected_games": selected_game_list,
-            "standings": standings_list,
-        }, status=status.HTTP_200_OK)
+        data = get_full_standings_data(league)
+        return Response(data, status=status.HTTP_200_OK)
 
     @action(detail=True, methods=['post'], url_path='rebuild-standings')
     def rebuild_standings(self, request, pk=None):

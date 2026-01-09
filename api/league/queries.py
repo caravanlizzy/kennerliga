@@ -1,3 +1,4 @@
+from django.db.models import Count
 from typing import List
 from league.models import League
 from game.models import SelectedGame, BanDecision
@@ -11,54 +12,68 @@ def get_members_ordered(league: League):
 
 def all_players_have_picked(league: League) -> bool:
     """Check if all league members have selected a game."""
-    expected_count = get_game_picks_per_player(league.members.count())
-    for participant in league.members.all():
-        pick_count = SelectedGame.objects.filter(
-            league=league,
-            profile=participant.profile
-        ).count()
-        if pick_count < expected_count:
+    members = league.members.all()
+    member_count = members.count()
+    expected_count = get_game_picks_per_player(member_count)
+    
+    pick_counts = SelectedGame.objects.filter(
+        league=league
+    ).values("profile").annotate(count=Count("id"))
+    
+    pick_counts_map = {item["profile"]: item["count"] for item in pick_counts}
+    
+    for participant in members:
+        if pick_counts_map.get(participant.profile_id, 0) < expected_count:
             return False
     return True
 
-
 def all_players_have_banned(league: League) -> bool:
     """Check if all league members have submitted at least one ban."""
+    members = league.members.all()
     expected_ban_count = 1
 
-    for participant in league.members.all():
-        ban_count = BanDecision.objects.filter(
-            league=league,
-            player_banning=participant.profile
-        ).count()
-        if ban_count < expected_ban_count:
+    ban_counts = BanDecision.objects.filter(
+        league=league
+    ).values("player_banning").annotate(count=Count("id"))
+    
+    ban_counts_map = {item["player_banning"]: item["count"] for item in ban_counts}
+
+    for participant in members:
+        if ban_counts_map.get(participant.profile_id, 0) < expected_ban_count:
             return False
     return True
 
 
 def get_players_to_repick(league: League) -> List:
     """Return members who must repick because at least one of their games was banned."""
-    from django.db.models import Count  # local import to keep file-level imports minimal
+    member_count = league.members.count()
+    min_bans = 2 if member_count > 2 else 1
 
+    # Get all banned game IDs for this league
+    banned_game_ids = (
+        BanDecision.objects.filter(league=league, selected_game__isnull=False)
+        .values("selected_game_id")
+        .annotate(c=Count("id"))
+        .filter(c__gte=min_bans)
+        .values_list("selected_game_id", flat=True)
+    )
+
+    # Find members who have at least one of these games as their pick
     repick_players = []
-    min_bans = 2 if league.members.count() > 2 else 1
-
-    for member in league.members.all():
-        qs = SelectedGame.objects.filter(profile=member.profile, league=league)
-        sgs = list(qs.only("id")[:2])  # in 2-player leagues, a player can have 2 picks
-
-        if not sgs:
-            continue
-
-        # Count bans per selected game for this member (in this league)
-        banned_counts = (
-            BanDecision.objects.filter(league=league, selected_game__in=sgs)
-            .values("selected_game_id")
-            .annotate(c=Count("id"))
-        )
-
-        if any(row["c"] >= min_bans for row in banned_counts):
-            repick_players.append(member)
+    for member in league.members.all().select_related("profile"):
+        # We only care about the first 2 picks (per the original logic)
+        has_banned_pick = SelectedGame.objects.filter(
+            profile=member.profile, 
+            league=league, 
+            id__in=banned_game_ids
+        ).exists()
+        
+        # Original logic had some slicing: sgs = list(qs.only("id")[:2])
+        # If we want to be exact:
+        if has_banned_pick:
+            sgs_ids = list(SelectedGame.objects.filter(profile=member.profile, league=league).values_list("id", flat=True)[:2])
+            if any(sg_id in banned_game_ids for sg_id in sgs_ids):
+                repick_players.append(member)
 
     return repick_players
 

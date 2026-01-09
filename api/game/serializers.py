@@ -2,7 +2,8 @@ from django.db import transaction
 from rest_framework import serializers
 from rest_framework.serializers import ModelSerializer
 
-from api.constants import get_ban_amount_for_success
+from .services import create_selected_game, create_ban_decision
+from . import queries as game_q
 from game.models import Game, GameOption, GameOptionChoice, Faction, TieBreaker, ResultConfig, StartingPointSystem, \
     Platform, SelectedGame, SelectedOption, BanDecision, GameOptionAvailabilityGroup, GameOptionAvailabilityCondition
 from league.models import League
@@ -200,31 +201,21 @@ class SelectedGameSerializer(serializers.ModelSerializer):
         return validated_data
 
     def get_successfully_banned(self, obj):
-        league = obj.league
-        if not league:
-            return False
-
-        required_bans = get_ban_amount_for_success(league.members.count())
-        ban_count = BanDecision.objects.filter(selected_game=obj).count()
-
-        return ban_count >= required_bans
+        return game_q.is_game_successfully_banned(obj)
 
 
 
     def create(self, validated_data):
-        # Remove write-only fields that shouldn't go to the model
-        validated_data.pop('manage_only', None)
-        # Create SelectedGame and SelectedOption instances
-        selected_options_data = validated_data.pop('selected_options')
-
-        # Create SelectedGame instance
-        selected_game = SelectedGame.objects.create(**validated_data)
-
-        # Create SelectedOption instances
-        for option_data in selected_options_data:
-            SelectedOption.objects.create(selected_game=selected_game, **option_data)
-
-        return selected_game
+        manage_only = validated_data.pop('manage_only', False)
+        selected_options_data = validated_data.pop('selected_options', [])
+        
+        return create_selected_game(
+            game=validated_data['game'],
+            league=validated_data.get('league'),
+            profile=validated_data['profile'],
+            selected_options_data=selected_options_data,
+            manage_only=manage_only
+        )
 
     def update(self, instance, validated_data):
         # Remove write-only field
@@ -576,9 +567,10 @@ class BanDecisionSerializer(serializers.ModelSerializer):
         return attrs
 
     def create(self, validated_data):
-        obj, _ = BanDecision.objects.update_or_create(
+        manage_only = self.context.get('request').data.get('manage_only', False) if self.context.get('request') else False
+        return create_ban_decision(
             league=validated_data['league'],
-            player_banning=validated_data['player_banning'],
-            defaults={'selected_game': validated_data.get('selected_game')}
+            profile=validated_data['player_banning'],
+            selected_game=validated_data.get('selected_game'),
+            manage_only=manage_only
         )
-        return obj

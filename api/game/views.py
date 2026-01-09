@@ -8,8 +8,9 @@ from game.serializers import GameSerializer, GameOptionSerializer, GameOptionCho
     TieBreakerSerializer, ResultConfigSerializer, StartingPointSystemSerializer, PlatformSerializer, \
     SelectedGameSerializer, SelectedOptionSerializer, FullGameSerializer, BanDecisionSerializer
 
-from league.services import LeagueService
+from league.services import advance_turn
 from league.models import League
+from .queries import get_all_games, get_selected_games_for_league
 
 
 class GameViewSet(ModelViewSet):
@@ -18,12 +19,11 @@ class GameViewSet(ModelViewSet):
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        queryset = Game.objects.all()
-        league_id = self.request.query_params.get("league")  # Query param to specify the league
+        queryset = get_all_games()
+        league_id = self.request.query_params.get("league")
         manage_only = self.request.query_params.get("manage_only", "false").lower() == "true"
         is_admin = self.request.user and self.request.user.is_staff
 
-        # Ensure league is provided to apply filtering
         if league_id:
             try:
                 league = League.objects.get(id=league_id)
@@ -35,10 +35,7 @@ class GameViewSet(ModelViewSet):
                         max_players__gte=member_count
                     )
 
-                # Exclude games selected by any player in the league
-                selected_games = SelectedGame.objects.filter(
-                    league=league
-                ).values_list("game_id", flat=True)
+                selected_games = get_selected_games_for_league(league).values_list("game_id", flat=True)
                 queryset = queryset.exclude(id__in=selected_games)
             except League.DoesNotExist:
                 pass
@@ -107,7 +104,7 @@ class SelectedGameViewSet(ModelViewSet):
             # Trigger league logic when request from inside a league
             league = selected_game.league
             if league:
-                LeagueService(league).advance_turn()
+                advance_turn(league)
 
 
 class BanDecisionViewSet(ModelViewSet):
@@ -126,7 +123,7 @@ class BanDecisionViewSet(ModelViewSet):
             # Trigger league logic when request from inside a league
             league = ban_decision.league
             if league:
-                LeagueService(league).advance_turn()
+                advance_turn(league)
 
 
 class SelectedOptionViewSet(ModelViewSet):
