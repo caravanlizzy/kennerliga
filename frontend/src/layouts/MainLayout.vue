@@ -55,22 +55,6 @@
       </q-btn>
     </div>
 
-    <!-- Menu Toggle Button (Right) -->
-    <div
-      v-if="isAuthenticated && !drawerState && !isMobile"
-      class="fixed-bottom-right q-ma-md"
-      style="z-index: 2000"
-    >
-      <q-btn
-        round
-        size="lg"
-        color="blue-grey-8"
-        icon="menu"
-        class="glass-toggle"
-        @click="drawerState = true"
-      >
-      </q-btn>
-    </div>
 
     <q-page-container class="col column bg-white">
       <div
