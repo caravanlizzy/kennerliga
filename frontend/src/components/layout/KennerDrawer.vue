@@ -2,13 +2,18 @@
   <div class="column full-height kenner-drawer-container">
     <!-- Drawer Content -->
     <div class="col scroll">
-      <q-list class="q-py-sm">
-        <DrawerSubGroup> General </DrawerSubGroup>
+      <q-list class="q-py-md">
+        <DrawerSubGroup>General</DrawerSubGroup>
         <DrawerItem icon="feedback" icon-color="orange-8" label="Feedback" forward-name="feedback" />
-
-        <q-separator class="q-my-sm drawer-separator" inset />
+        <DrawerItem
+          icon="calendar_month"
+          icon-color="blue-8"
+          label="Seasons"
+          forward-name="seasons"
+        />
 
         <template v-if="isAdmin">
+          <q-separator class="q-my-sm drawer-separator" />
           <DrawerSubGroup>Management</DrawerSubGroup>
           <DrawerItem icon="casino" icon-color="indigo-7" label="Games" forward-name="games" />
           <DrawerItem icon="group" icon-color="teal-7" label="Members" forward-name="users" />
@@ -18,19 +23,12 @@
             label="Invitations"
             forward-name="invitations"
           />
-          <DrawerItem
-            icon="calendar_month"
-            icon-color="blue-8"
-            label="Seasons"
-            forward-name="seasons"
-          />
-          <q-separator class="q-my-sm drawer-separator" inset />
         </template>
 
         <template v-if="isAdmin">
+          <q-separator class="q-my-sm drawer-separator" />
           <DrawerSubGroup>Development</DrawerSubGroup>
           <DrawerItem icon="terminal" icon-color="grey-9" label="Hijack (Dev)" forward-name="dev" />
-          <q-separator class="q-my-sm drawer-separator" inset />
         </template>
       </q-list>
     </div>
@@ -43,9 +41,9 @@
 
 <script setup lang="ts">
 import DrawerItem from 'components/base/DrawerItem.vue';
+import DrawerSubGroup from 'components/base/DrawerSubGroup.vue';
 import { useUserStore } from 'stores/userStore';
 import { useResponsive } from 'src/composables/responsive';
-import DrawerSubGroup from 'components/base/DrawerSubGroup.vue';
 import { storeToRefs } from 'pinia';
 import { useRouter } from 'vue-router';
 import { provide } from 'vue';

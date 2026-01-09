@@ -1,5 +1,11 @@
 <template>
-  <q-card bordered flat class="league-card cursor-pointer" @click="goToLeague(league)">
+  <q-card
+    bordered
+    flat
+    class="league-card"
+    :class="{ 'cursor-pointer': isAdmin }"
+    @click="isAdmin ? goToLeague(league) : undefined"
+  >
     <q-card-section class="row items-center q-gutter-sm">
       <q-avatar color="primary" text-color="white" size="40px">
         L{{ league.level }}
@@ -19,6 +25,16 @@
           <q-icon name="check_circle" size="14px" class="q-mr-xs" />
           <span class="text-weight-bold" style="font-size: 10px">COMPLETE</span>
         </q-badge>
+        <KennerButton
+          v-if="isAdmin"
+          flat
+          dense
+          color="primary"
+          icon="settings"
+          size="sm"
+          label="Manage"
+          @click.stop="goToLeague(league)"
+        />
       </div>
     </q-card-section>
     <q-separator />
@@ -45,22 +61,22 @@
 <script setup lang="ts">
 import { TLeagueDto } from 'src/types';
 import { useRouter } from 'vue-router';
+import { useUserStore } from 'stores/userStore';
+import { storeToRefs } from 'pinia';
+import KennerButton from 'components/base/KennerButton.vue';
 
 defineProps<{ league: TLeagueDto }>();
 
 const router = useRouter();
+const { isAdmin } = storeToRefs(useUserStore());
 
 function goToLeague(league: TLeagueDto) {
-  try {
-    router.push({ name: 'ManageLeague', params: { id: league.id } });
-  } catch (e) {
-    router.push(`/leagues/${league.id}`);
-  }
+  router.push({ name: 'league-manager', params: { id: league.id } });
 }
 </script>
 
 <style scoped>
-.league-card:hover {
+.league-card:hover.cursor-pointer {
   background: #fafafa;
 }
 </style>

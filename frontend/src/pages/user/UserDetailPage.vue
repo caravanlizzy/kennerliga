@@ -129,7 +129,7 @@
             >
               <q-card-section class="row items-center no-wrap">
                 <div class="column col">
-                  <div class="text-subtitle1 text-weight-bold">{{ sp.season_details?.name }}</div>
+                  <div class="text-subtitle1 text-weight-bold">{{ sp.season_details?.name || `Season ${sp.season}` }}</div>
                   <div class="row items-center q-gutter-x-sm">
                     <q-badge color="grey-2" text-color="grey-9" class="text-weight-bold">
                       Pos: {{ sp.position || '-' }}
@@ -145,6 +145,21 @@
           </div>
         </div>
       </ContentSection>
+    </div>
+
+    <div v-else class="flex flex-center q-my-xl text-grey-6">
+      <div class="column items-center">
+        <q-icon name="person_off" size="64px" class="q-mb-md opacity-20" />
+        <div class="text-h6">User not found</div>
+        <KennerButton
+          flat
+          color="primary"
+          label="Go back"
+          icon="arrow_back"
+          class="q-mt-md"
+          @click="router.back()"
+        />
+      </div>
     </div>
   </q-page>
 </template>
@@ -169,7 +184,10 @@ const gameSearch = ref('');
 
 async function load() {
   loading.value = true;
-  const username = route.params.username;
+  user.value = null;
+  userSeasonList.value = [];
+  matchResults.value = [];
+  const username = String(route.params.username || '');
   try {
     // 1. Fetch the User object by username
     const { data: usersResponse } = await api.get('user/users/', {
@@ -177,25 +195,37 @@ async function load() {
     });
 
     let foundUser: TUserDto | null = null;
-    if (Array.isArray(usersResponse) && usersResponse.length > 0) {
-      foundUser = usersResponse[0];
-    } else if (usersResponse.results && usersResponse.results.length > 0) {
-      foundUser = usersResponse.results[0];
-    }
+    const users = Array.isArray(usersResponse) ? usersResponse : usersResponse.results || [];
+    foundUser = users.find((u: TUserDto) => u.username.toLowerCase() === username.toLowerCase()) || null;
 
     if (foundUser) {
       user.value = foundUser;
 
       // 2. Extract profile ID from user object
-      const profileId = foundUser.profile_id || foundUser.profile?.id;
+      // Priority to foundUser.profile.id as it's the PlayerProfile ID
+      // foundUser.profile_id might contain the SeasonParticipant ID in some contexts
+      const profileId = foundUser.profile?.id || foundUser.profile_id;
 
       if (profileId) {
         const [seasonsRes, resultsRes] = await Promise.all([
           api.get('season/season-participants/', { params: { profile: profileId } }),
           api.get('result/results/', { params: { player_profile: profileId } })
         ]);
-        userSeasonList.value = Array.isArray(seasonsRes.data) ? seasonsRes.data : seasonsRes.data.results || [];
+        const participants: TSeasonParticipantDto[] = Array.isArray(seasonsRes.data) ? seasonsRes.data : seasonsRes.data.results || [];
         matchResults.value = Array.isArray(resultsRes.data) ? resultsRes.data : resultsRes.data.results || [];
+
+        // 3. Fetch season details for each participant entry to get the season name
+        const seasonIds = [...new Set(participants.map(p => p.season))];
+        const seasonsData = await Promise.all(seasonIds.map(id => api.get(`season/seasons/${id}/`)));
+        const seasonsMap: Record<number, TSeasonDto> = {};
+        seasonsData.forEach(res => {
+          if (res.data) seasonsMap[res.data.id] = res.data;
+        });
+
+        userSeasonList.value = participants.map(p => ({
+          ...p,
+          season_details: seasonsMap[p.season]
+        }));
       }
     }
   } catch (err) {

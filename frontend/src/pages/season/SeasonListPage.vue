@@ -1,7 +1,7 @@
 <template>
   <KennerTable
     v-if="!loading && !error && seasons && Array.isArray(seasons)"
-    :create-button="createBtn"
+    :create-button="isAdmin ? createBtn : undefined"
     flat
     title="Seasons"
     row-key="id"
@@ -28,6 +28,30 @@
         </div>
       </q-td>
     </template>
+
+    <template v-slot:body-cell-actions="props">
+      <q-td :props="props" class="q-gutter-x-sm">
+        <KennerButton
+          flat
+          dense
+          color="secondary"
+          icon="visibility"
+          label="View"
+          :to="{ name: 'season-detail', params: { id: props.row.id } }"
+          @click.stop
+        />
+        <KennerButton
+          v-if="isAdmin"
+          flat
+          dense
+          color="primary"
+          icon="settings"
+          label="Manage"
+          :to="{ name: 'season-detail', params: { id: props.row.id } }"
+          @click.stop
+        />
+      </q-td>
+    </template>
   </KennerTable>
 
   <div v-else class="q-pa-md">
@@ -45,13 +69,19 @@ import { useAxios } from '@vueuse/integrations/useAxios';
 import { api } from 'boot/axios';
 import { useRouter } from 'vue-router';
 import { computed } from 'vue';
+import { storeToRefs } from 'pinia';
+import { useUserStore } from 'stores/userStore';
 import type { QTableProps } from 'quasar';
 import type { TKennerButton, TLeagueDto, TSeasonDto } from 'src/types';
+import KennerButton from 'src/components/base/KennerButton.vue';
 
 type SeasonExtra = TSeasonDto & {
   is_empty?: boolean;
   is_incomplete?: boolean;
 };
+
+const userStore = useUserStore();
+const { isAdmin } = storeToRefs(userStore);
 
 // fetch seasons
 const {
@@ -127,6 +157,12 @@ const columns = computed<QTableProps['columns']>(() => ([
     field: 'status',
     align: 'left',
     sortable: true,
+    headerStyle: 'white-space: nowrap',
+  },
+  {
+    name: 'actions',
+    label: 'Actions',
+    align: 'right',
     headerStyle: 'white-space: nowrap',
   },
 ]));

@@ -1,18 +1,19 @@
 export default {
-  path: 'seasons/', meta: { requiresAuth: true, requiresAdmin: true }, children: [
+  path: 'seasons/', meta: { requiresAuth: true }, children: [
     {
       path: '',
       name: 'seasons',
       component: () => import('pages/season/SeasonListPage.vue'),
-      meta: { icon: 'build', label: 'Manage Seasons' },
+      meta: { icon: 'military_tech', label: 'Seasons' },
     },
     {
       path: 'create',
       name: 'season-create',
       component: () => import('pages/season/SeasonCreatePage.vue'),
+      meta: { requiresAdmin: true }
     },
     {
-      path: ':id',
+      path: ':id/manage',
       name: 'season-detail',
       component: () => import('pages/season/SeasonManagePage.vue'),
     },

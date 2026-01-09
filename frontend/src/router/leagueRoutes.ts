@@ -6,9 +6,10 @@ export default {
       component: () => import('pages/league/MyLeaguePage.vue'),
     },
     {
-      path: ':id',
+      path: ':id/manage',
       name: 'league-manager',
       component: () => import('pages/league/ManageLeaguePage.vue'),
+      meta: { requiresAdmin: true }
     }
   ]
 };
