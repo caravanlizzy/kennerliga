@@ -2,8 +2,8 @@
   "name": "kennerliga",
   "version": "0.0.1",
   "description": "Board Game League ",
-  "productName": "KennerLiga",
-  "author": "Marc Kittner <m.kittner@kunbus.com>",
+  "productName": "Kennerliga",
+  "author": "Marc Kittner <marc.kittner@posteo.de>",
   "private": true,
   "scripts": {
     "lint": "eslint --ext .js,.ts,.vue ./",

@@ -39,7 +39,7 @@
         </div>
         <div class="results-container">
           <LeagueMatchResults v-if="mode === 'results'" :leagueId="league.id" />
-          <LeagueStandingsMatrix v-else :leagueId="league.id" />
+          <LeagueStandingsMatrix v-else :leagueId="league.id" :prefetchedData="allStandingsData[league.id]" />
         </div>
       </div>
     </div>
@@ -55,6 +55,8 @@ import { api } from 'boot/axios';
 import KennerButton from 'components/base/KennerButton.vue';
 import KennerTooltip from 'components/base/KennerTooltip.vue';
 import { useResponsive } from 'src/composables/responsive';
+
+import { useLeagueStore } from 'stores/leagueStore';
 
 const { isMobile } = useResponsive();
 
@@ -72,15 +74,40 @@ const props = withDefaults(defineProps<{
 });
 
 const leagues = ref<League[]>([]);
+const allStandingsData = ref<Record<number, any>>({});
 const loadingLeagues = ref(false);
 
 async function loadLeaguesForSeason(seasonId: number) {
   loadingLeagues.value = true;
   try {
-    const { data } = await api.get<League[]>('league/leagues', {
+    const { data: leaguesData } = await api.get<League[]>('league/leagues', {
       params: { season: seasonId },
     });
-    leagues.value = data;
+    leagues.value = leaguesData;
+
+    if (leaguesData.length > 0) {
+      if (props.mode === 'standings') {
+        // Fetch all full-standings in parallel
+        const standingsPromises = leaguesData.map(l =>
+          api.get(`league/leagues/${l.id}/full-standings/`).then(res => ({ id: l.id, data: res.data }))
+        );
+        const results = await Promise.all(standingsPromises);
+        const standingsMap: Record<number, any> = {};
+        results.forEach(r => {
+          standingsMap[r.id] = r.data;
+        });
+        allStandingsData.value = standingsMap;
+      } else {
+        // In results mode, initialize all league stores in parallel
+        const storePromises = leaguesData.map(l => {
+          const store = useLeagueStore(l.id)();
+          return store.init();
+        });
+        await Promise.all(storePromises);
+      }
+    }
+  } catch (e) {
+    console.error('Error loading season standings:', e);
   } finally {
     loadingLeagues.value = false;
   }

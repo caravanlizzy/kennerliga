@@ -58,40 +58,69 @@
         </div>
 
         <div class="relative-position" style="z-index: 1">
-          <div :class="[isMobile ? 'text-h5' : 'text-h4', 'text-weight-bold text-dark tracking-tight']" style="letter-spacing: -0.5px; text-shadow: 0 1px 2px rgba(0,0,0,0.05)">Welcome back!</div>
-          <div :class="[isMobile ? 'text-body1' : 'text-subtitle1', 'text-grey-8 q-mt-sm']" style="opacity: 0.9">
-            Glad to have you here! This is your central hub for everything KennerLiga. Here's a quick rundown of what you'll find:
-            <div class="row q-col-gutter-md q-mt-xs text-body1">
-              <div class="col-12 col-sm-6">
-                <div class="row no-wrap items-center">
-                  <q-icon name="bolt" color="accent" size="xs" class="q-mr-xs" />
-                  <span class="text-weight-bold q-mr-xs">Live Action:</span> See what's happening right now across the leagues.
-                </div>
-                <div class="row no-wrap items-center q-mt-xs">
-                  <q-icon name="military_tech" color="primary" size="xs" class="q-mr-xs" />
-                  <span class="text-weight-bold q-mr-xs">Seasons:</span> Check current standings and dive into past season data.
+          <div
+            :class="[isMobile ? 'text-h5' : 'text-h4', 'text-weight-bold text-dark tracking-tighter']"
+            style="letter-spacing: -1px;"
+          >
+            Welcome back!
+          </div>
+          <p
+            :class="[isMobile ? 'text-body1' : 'text-subtitle1', 'text-grey-7 q-mt-sm q-mb-lg']"
+            style="max-width: 800px; line-height: 1.4"
+          >
+            Glad to have you here! This is your central hub for everything KennerLiga.
+            Check out what's happening right now or dive into the stats.
+          </p>
+
+          <div class="row q-col-gutter-lg">
+            <!-- Left Column -->
+            <div class="col-12 col-md-6 column q-gutter-y-md">
+              <div class="row no-wrap items-start">
+                <q-icon name="bolt" color="accent" size="24px" class="q-mr-md q-mt-xs" />
+                <div class="column">
+                  <span class="text-subtitle2 text-weight-bold text-dark">Live Action</span>
+                  <span class="text-body2 text-grey-7">See what's happening right now across the leagues.</span>
                 </div>
               </div>
-              <div class="col-12 col-sm-6">
-                <div class="row no-wrap items-center">
-                  <q-icon name="stars" color="primary" size="xs" class="q-mr-xs" />
-                  <span class="text-weight-bold q-mr-xs">Leaderboard:</span> See the overall rankings and who's leading this year.
-                </div>
-                <div class="row no-wrap items-center q-mt-xs">
-                  <q-icon name="chat" color="blue-grey-8" size="xs" class="q-mr-xs" />
-                  <span class="text-weight-bold q-mr-xs">KennerChat:</span> Catch up with the community and plan your next session.
+              <div class="row no-wrap items-start">
+                <q-icon name="military_tech" color="primary" size="24px" class="q-mr-md q-mt-xs" />
+                <div class="column">
+                  <span class="text-subtitle2 text-weight-bold text-dark">Seasons</span>
+                  <span class="text-body2 text-grey-7">Check current standings and dive into past season data.</span>
                 </div>
               </div>
-              <div class="col-12">
-                <div class="row no-wrap items-center q-mt-xs">
-                  <q-icon name="ads_click" color="primary" size="xs" class="q-mr-xs" />
-                  <span class="text-weight-bold q-mr-xs">My League:</span> Dedicated area to handle your active league's game picking, banning, and results uploading.
+              <div class="row no-wrap items-start">
+                <q-icon name="ads_click" color="secondary" size="24px" class="q-mr-md q-mt-xs" />
+                <div class="column">
+                  <span class="text-subtitle2 text-weight-bold text-dark">My League</span>
+                  <span class="text-body2 text-grey-7">Handle game picking, banning, and results uploading.</span>
                 </div>
               </div>
             </div>
-            <div class="q-mt-md text-body2 text-grey-7">
-              <q-icon name="info" size="xs" class="q-mr-xs" />
-              Everything is tracked, so you can check out the stats and see how you're doing later on.
+
+            <!-- Right Column -->
+            <div class="col-12 col-md-6 column q-gutter-y-md">
+              <div class="row no-wrap items-start">
+                <q-icon name="stars" color="warning" size="24px" class="q-mr-md q-mt-xs" />
+                <div class="column">
+                  <span class="text-subtitle2 text-weight-bold text-dark">Leaderboard</span>
+                  <span class="text-body2 text-grey-7">See the overall rankings and who's leading this year.</span>
+                </div>
+              </div>
+              <div class="row no-wrap items-start">
+                <q-icon name="chat" color="blue-grey-6" size="24px" class="q-mr-md q-mt-xs" />
+                <div class="column">
+                  <span class="text-subtitle2 text-weight-bold text-dark">KennerChat</span>
+                  <span class="text-body2 text-grey-7">Catch up with the community and plan your next session.</span>
+                </div>
+              </div>
+              <div class="row no-wrap items-start">
+                <q-icon name="analytics" color="info" size="24px" class="q-mr-md q-mt-xs" />
+                <div class="column">
+                  <span class="text-subtitle2 text-weight-bold text-dark">Statistics</span>
+                  <span class="text-body2 text-grey-7">Everything is tracked so you can check your performance.</span>
+                </div>
+              </div>
             </div>
           </div>
         </div>

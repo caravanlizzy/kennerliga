@@ -67,7 +67,7 @@ const {
 
 onMounted(async () => {
   if (!initialized.value) {
-    await leagueStore.updateLeagueData();
+    await leagueStore.init();
   }
 });
 </script>

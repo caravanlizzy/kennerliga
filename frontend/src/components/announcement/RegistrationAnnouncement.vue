@@ -22,49 +22,53 @@
 
         <!-- Content -->
         <div class="col">
-          <div class="text-h6 text-weight-bolder lh-tight text-secondary">
-            {{ announcement.title }}
+          <!-- Header & Actions -->
+          <div class="row items-center justify-between no-wrap q-mb-xs">
+            <div class="text-h6 text-weight-bolder lh-tight text-secondary col">
+              {{ announcement.title }}
+            </div>
+
+            <!-- Mobile Action Button -->
+            <div v-if="isMobile" class="col-auto">
+              <KennerButton
+                v-if="!isRegisteredForOpenSeason"
+                unelevated
+                dense
+                no-caps
+                color="primary"
+                :disable="!isAuthenticated"
+                class="q-px-md rounded-borders"
+                @click="register"
+              >
+                Register
+                <KennerTooltip v-if="!isAuthenticated" class="bg-grey-9">
+                  Login to register for upcoming season
+                </KennerTooltip>
+              </KennerButton>
+
+              <div
+                v-else
+                class="row items-center q-gutter-x-xs text-positive text-weight-bold text-caption"
+              >
+                <q-icon name="check_circle" size="16px" />
+                <span>Registered</span>
+              </div>
+            </div>
           </div>
+
           <div
             v-if="announcement.content"
-            class="text-subtitle2 text-grey-8 q-mt-xs"
+            class="text-subtitle2 text-grey-8 q-mb-sm"
           >
             {{ announcement.content }}
           </div>
 
-          <!-- Action Buttons (Mobile: below content, Desktop: right side) -->
-          <div v-if="isMobile" class="row items-center q-gutter-sm q-mt-sm">
-            <KennerButton
-              v-if="!isRegisteredForOpenSeason"
-              unelevated
-              dense
-              no-caps
-              color="primary"
-              :disable="!isAuthenticated"
-              class="q-px-md rounded-borders"
-              @click="register"
-            >
-              Register
-              <KennerTooltip v-if="!isAuthenticated" class="bg-grey-9">
-                Login to register for upcoming season
-              </KennerTooltip>
-            </KennerButton>
-
-            <div
-              v-else
-              class="row items-center q-gutter-x-xs text-positive text-weight-bold text-caption q-px-sm"
-            >
-              <q-icon name="check_circle" size="16px" />
-              <span>Registered</span>
-            </div>
-          </div>
-
           <!-- Integrated Participants List -->
-          <div class="q-mt-lg">
-            <div class="row items-center q-gutter-x-sm q-mb-sm">
+          <div :class="isMobile ? 'q-mt-sm' : 'q-mt-lg'">
+            <div class="row items-center q-gutter-x-sm" :class="isMobile ? 'q-mb-xs' : 'q-mb-sm'">
               <div
                 class="text-caption text-weight-bolder text-grey-8 uppercase tracking-widest"
-                style="font-size: 0.65rem"
+                :style="isMobile ? 'font-size: 0.6rem' : 'font-size: 0.65rem'"
               >
                 Registered Players
               </div>
@@ -73,7 +77,7 @@
                 :label="participants?.length ?? 0"
                 rounded
                 class="text-weight-bold"
-                style="font-size: 10px; padding: 2px 6px"
+                :style="isMobile ? 'font-size: 9px; padding: 1px 4px' : 'font-size: 10px; padding: 2px 6px'"
               />
             </div>
 
@@ -82,15 +86,15 @@
                 v-for="i in 5"
                 :key="i"
                 type="rect"
-                width="60px"
-                height="28px"
+                :width="isMobile ? '40px' : '60px'"
+                :height="isMobile ? '20px' : '28px'"
                 class="rounded-borders"
               />
             </div>
             <template v-else-if="participantsLoaded">
-              <div v-if="participants?.length" class="row q-gutter-sm">
+              <div v-if="participants?.length" class="row q-gutter-xs">
                 <div v-for="p in participants" :key="p.id" class="col-auto">
-                  <div class="participant-chip">
+                  <div class="participant-chip" :class="{ 'participant-chip--mobile': isMobile }">
                     {{ p.profile_name || 'Anonymous' }}
                   </div>
                 </div>
@@ -260,6 +264,12 @@ onMounted(async () => {
   font-weight: 600;
   border: 1px solid rgba(0, 0, 0, 0.08);
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+}
+
+.participant-chip--mobile {
+  font-size: 10px;
+  padding: 2px 8px;
+  border-radius: 6px;
 }
 
 .tracking-widest {

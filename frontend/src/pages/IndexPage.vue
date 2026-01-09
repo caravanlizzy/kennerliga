@@ -1,5 +1,9 @@
 <template>
   <q-page class="column col q-pa-md">
+    <div class="row justify-center">
+      <AnnouncementDisplay class="col-12" style="max-width: 800px" />
+    </div>
+
     <WelcomeSection v-if="!isMobile || mobileContent === 'welcome'" :is-authenticated="isAuthenticated" />
 
     <template v-if="isAuthenticated">
@@ -7,9 +11,6 @@
         <NavMyLeague />
       </div>
 
-      <div class="row justify-center">
-        <AnnouncementDisplay class="col-12" style="max-width: 800px" />
-      </div>
       <div v-if="!isMobile" class="column col q-pt-none">
         <div class="row col">
           <div class="col-12 col-md">
@@ -43,7 +44,10 @@
                   </div>
                 </div>
               </template>
-              <SeasonStandings :seasonId="selectedSeasonId" class="col-12" />
+              <SeasonStandings v-if="!loadingSeasonInit" :seasonId="selectedSeasonId" class="col-12" />
+              <div v-else class="flex flex-center q-pa-xl">
+                <LoadingSpinner text="Initializing seasons..." />
+              </div>
             </ContentSection>
             <ContentSection
               v-if="isAuthenticated"
@@ -85,7 +89,6 @@
 
 <script setup lang="ts">
 import NavMyLeague from 'src/components/nav/NavMyLeague.vue';
-import KennerChat from 'components/chat/KennerChat.vue';
 import LiveActionFeed from 'components/ui/LiveActionFeed.vue';
 import SeasonStandings from 'components/season/SeasonStandings.vue';
 import AnnouncementDisplay from 'components/ui/AnnouncementDisplay.vue';
@@ -93,13 +96,10 @@ import { useResponsive } from 'src/composables/responsive';
 import LeaderBoard from 'components/season/LeaderBoard.vue';
 import ContentSection from 'components/base/ContentSection.vue';
 import KennerSelect from 'components/base/KennerSelect.vue';
-import { useQuasar } from 'quasar';
 import { useRoute } from 'vue-router';
-import { computed, onMounted, ref, watch, unref } from 'vue';
+import { computed, onMounted, ref, watch } from 'vue';
 import WelcomeSection from 'components/home/WelcomeSection.vue';
-import ScrollContainer from 'components/base/ScrollContainer.vue';
 import { useUserStore } from 'stores/userStore';
-import { useUiStore } from 'src/stores/uiStore';
 import { storeToRefs } from 'pinia';
 import {
   fetchAvailableYears,
@@ -112,7 +112,6 @@ import type { TSeasonDto } from 'src/types';
 const { isMobile } = useResponsive();
 const { isAuthenticated } = storeToRefs(useUserStore());
 const { user } = storeToRefs(useUserStore());
-const uiStore = useUiStore();
 const route = useRoute();
 
 const mobileContent = computed(() => {
@@ -122,6 +121,7 @@ const mobileContent = computed(() => {
 
 const selectedYear = ref(new Date().getFullYear());
 const availableYears = ref<number[]>([]);
+const loadingSeasonInit = ref(false);
 
 // Seasons logic
 const seasonsForYear = ref<TSeasonDto[]>([]);
@@ -176,28 +176,41 @@ watch(selectedSeasonYear, async (newYear) => {
 
 onMounted(async () => {
   if (isAuthenticated.value) {
-    const [years, currentSeasonId] = await Promise.all([
-      fetchAvailableYears(),
-      fetchCurrentSeasonId(),
-    ]);
+    loadingSeasonInit.value = true;
+    try {
+      const [years, currentSeasonId] = await Promise.all([
+        fetchAvailableYears(),
+        fetchCurrentSeasonId(),
+      ]);
 
-    availableYears.value = years;
+      availableYears.value = years;
 
-    if (currentSeasonId) {
-      const season = await fetchSeason(currentSeasonId);
-      if (season) {
-        selectedYear.value = season.year;
-        // Setting this will trigger the watcher which fetches seasons and sets month
-        selectedSeasonYear.value = season.year;
-        // Explicitly set month after a short delay or by waiting for the fetch
-        // But actually, we already have the season object, so we can just set it
-        // The watcher might overwrite it, so we should be careful.
-        // Let's just set it and ensure the watcher doesn't overwrite it if it's already set to a valid value.
-        selectedSeasonMonth.value = season.month;
+      if (currentSeasonId) {
+        const season = await fetchSeason(currentSeasonId);
+        if (season) {
+          selectedYear.value = season.year;
+          // IMPORTANT: We need seasons for this year to be loaded before we set the month
+          // To avoid the watcher's async nature from causing issues, we can fetch them here.
+          const seasons = await fetchSeasons({ year: season.year });
+          seasonsForYear.value = seasons;
+
+          selectedSeasonYear.value = season.year;
+          selectedSeasonMonth.value = season.month;
+        }
+      } else if (availableYears.value.length > 0) {
+        const year = availableYears.value[0];
+        selectedYear.value = year;
+
+        const seasons = await fetchSeasons({ year });
+        seasonsForYear.value = seasons;
+
+        selectedSeasonYear.value = year;
+        if (seasons.length > 0) {
+          selectedSeasonMonth.value = Math.max(...seasons.map(s => s.month));
+        }
       }
-    } else if (availableYears.value.length > 0) {
-      selectedYear.value = availableYears.value[0];
-      selectedSeasonYear.value = availableYears.value[0];
+    } finally {
+      loadingSeasonInit.value = false;
     }
   }
 });

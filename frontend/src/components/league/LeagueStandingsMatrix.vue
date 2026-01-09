@@ -224,7 +224,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue';
+import { ref, computed, watch } from 'vue';
 import { api } from 'boot/axios';
 import LoadingSpinner from 'components/base/LoadingSpinner.vue';
 import type { QTableColumn } from 'quasar';
@@ -235,6 +235,7 @@ import KennerButton from 'components/base/KennerButton.vue';
 
 const props = defineProps<{
   leagueId: number;
+  prefetchedData?: StandingsData | null;
 }>();
 
 const { isMobile } = useResponsive();
@@ -270,11 +271,12 @@ interface StandingsData {
   season_id?: number;
 }
 
-const standings = ref<StandingsData | null>(null);
-const loading = ref(true);
+const standings = ref<StandingsData | null>(props.prefetchedData || null);
+const loading = ref(!props.prefetchedData);
 const error = ref(false);
 
 const fetchStandings = async () => {
+  if (props.prefetchedData) return;
   loading.value = true;
   error.value = false;
   try {
@@ -290,8 +292,17 @@ const fetchStandings = async () => {
   }
 };
 
+watch(() => props.prefetchedData, (newVal) => {
+  if (newVal) {
+    standings.value = newVal;
+    loading.value = false;
+  }
+}, { immediate: true });
+
 // initial load
-fetchStandings();
+if (!props.prefetchedData) {
+  fetchStandings();
+}
 
 const tableColumns = computed<QTableColumn[]>(() => {
   if (!standings.value) return [];
@@ -316,9 +327,7 @@ const tableColumns = computed<QTableColumn[]>(() => {
           : game.game_name,
       field: `game_${game.id}`,
       align: 'center',
-      // @ts-expect-error - custom property for header
       selectedByName: game.selected_by_name,
-      // @ts-expect-error - custom property for cell
       hasPoints: game.has_points,
     });
   });

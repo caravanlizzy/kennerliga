@@ -323,10 +323,6 @@ onMounted(load);
 }
 .hover-shadow {
   transition: all 0.3s ease;
-  &:hover {
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1) !important;
-    transform: translateY(-2px);
-  }
 }
 .border-subtle {
   border: 1px solid rgba(0,0,0,0.05);

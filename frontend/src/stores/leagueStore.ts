@@ -275,6 +275,7 @@ export const useLeagueStore = (id: number) => {
 
 
       // actions
+      init,
       updateLeagueData,
       refreshResultsForGame,
       hasSelectedGameResult,

@@ -25,7 +25,10 @@
         </div>
       </div>
     </div>
-    <SeasonStandings :seasonId="selectedSeasonId" />
+    <SeasonStandings v-if="!loadingSeasonInit" :seasonId="selectedSeasonId" />
+    <div v-else class="flex flex-center q-pa-xl">
+      <LoadingSpinner text="Initializing seasons..." />
+    </div>
   </q-page>
 </template>
 
@@ -47,6 +50,7 @@ const availableYears = ref<number[]>([]);
 const seasonsForYear = ref<TSeasonDto[]>([]);
 const selectedSeasonYear = ref<number | null>(null);
 const selectedSeasonMonth = ref<number | null>(null);
+const loadingSeasonInit = ref(false);
 
 const seasonYearOptions = computed(() =>
   [...availableYears.value]
@@ -94,21 +98,36 @@ watch(selectedSeasonYear, async (newYear) => {
 });
 
 onMounted(async () => {
-  const [years, currentSeasonId] = await Promise.all([
-    fetchAvailableYears(),
-    fetchCurrentSeasonId(),
-  ]);
+  loadingSeasonInit.value = true;
+  try {
+    const [years, currentSeasonId] = await Promise.all([
+      fetchAvailableYears(),
+      fetchCurrentSeasonId(),
+    ]);
 
-  availableYears.value = years;
+    availableYears.value = years;
 
-  if (currentSeasonId) {
-    const season = await fetchSeason(currentSeasonId);
-    if (season) {
-      selectedSeasonYear.value = season.year;
-      selectedSeasonMonth.value = season.month;
+    if (currentSeasonId) {
+      const season = await fetchSeason(currentSeasonId);
+      if (season) {
+        const seasons = await fetchSeasons({ year: season.year });
+        seasonsForYear.value = seasons;
+
+        selectedSeasonYear.value = season.year;
+        selectedSeasonMonth.value = season.month;
+      }
+    } else if (availableYears.value.length > 0) {
+      const year = availableYears.value[0];
+      const seasons = await fetchSeasons({ year });
+      seasonsForYear.value = seasons;
+
+      selectedSeasonYear.value = year;
+      if (seasons.length > 0) {
+        selectedSeasonMonth.value = Math.max(...seasons.map(s => s.month));
+      }
     }
-  } else if (availableYears.value.length > 0) {
-    selectedSeasonYear.value = availableYears.value[0];
+  } finally {
+    loadingSeasonInit.value = false;
   }
 });
 </script>

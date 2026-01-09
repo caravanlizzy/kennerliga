@@ -2,7 +2,7 @@
   <KennerTable
     :create-button="createButton"
     flat
-    title="KennerLiga Members"
+    title=" KennerLiga Members"
     @row-click="onRowClick"
     :rows="users"
     :columns="columns"
