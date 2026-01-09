@@ -3,7 +3,7 @@
     <!-- Table / states -->
     <div class="overflow-auto">
       <q-table
-        v-if="standings && standings.standings.length > 0"
+        v-if="standings && (standings.standings.length > 0 || standings.selected_games.length > 0)"
         :rows="tableRows"
         :columns="tableColumns"
         row-key="player_profile_id"
@@ -16,10 +16,7 @@
       >
         <template #no-data>
           <!-- This slot will not be used because of v-if above, but good practice -->
-          <div class="full-width row flex-center q-pa-lg text-grey-6">
-             <q-icon name="sentiment_dissatisfied" size="24px" class="q-mr-sm" />
-             <span>No standings data available yet.</span>
-          </div>
+          <div class="hidden"></div>
         </template>
         <template #header="props">
           <q-tr :props="props" class="header-row">
@@ -181,7 +178,7 @@
       <LoadingSpinner v-else-if="loading" text="Loading standings..." />
 
       <!-- Empty state -->
-      <div v-else-if="standings && standings.standings.length === 0" class="column items-center q-pa-xl text-grey-6 bg-white rounded-borders">
+      <div v-else-if="standings && standings.standings.length === 0 && standings.selected_games.length === 0" class="column items-center q-pa-xl text-grey-6 bg-white rounded-borders">
         <q-icon name="upcoming" size="40px" class="q-mb-sm opacity-50" />
         <div class="text-subtitle2">No participants yet</div>
         <div class="text-caption">The standings will appear here once the season starts.</div>
