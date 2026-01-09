@@ -17,4 +17,5 @@ export type TUserDto = {
   token?: string;
   admin?: boolean;
   myCurrentLeagueId?: number | null;
+  isMyTurn?: boolean;
 };

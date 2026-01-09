@@ -13,10 +13,13 @@ export async function fetchLeagueDetails(
   }
 }
 
-export async function fetchMyCurrentLeagueId(): Promise<number | null> {
+export async function fetchMyCurrentLeagueInfo(): Promise<{ id: number; is_my_turn: boolean } | null> {
   try {
     const response = await api.get('user/me/current-league');
-    return response.data.id;
+    return {
+      id: response.data.id,
+      is_my_turn: response.data.is_my_turn
+    };
   } catch (error: unknown) {
     const err = error as { response?: { status?: number } };
     // Check if the error is a 404 (Not Found) which indicates no active league

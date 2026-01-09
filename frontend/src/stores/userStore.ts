@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia';
 import { ref, Ref } from 'vue';
 import { api } from 'boot/axios';
-import { fetchMyCurrentLeagueId } from 'src/services/leagueService';
+import { fetchMyCurrentLeagueInfo } from 'src/services/leagueService';
 import { TUserDto } from 'src/types';
 
 export const useUserStore = defineStore(
@@ -42,7 +42,14 @@ export const useUserStore = defineStore(
 
     async function setMyCurrentLeagueId() {
       if( !user.value ) return;
-      user.value.myCurrentLeagueId = await fetchMyCurrentLeagueId();
+      const info = await fetchMyCurrentLeagueInfo();
+      if (info) {
+        user.value.myCurrentLeagueId = info.id;
+        user.value.isMyTurn = info.is_my_turn;
+      } else {
+        user.value.myCurrentLeagueId = null;
+        user.value.isMyTurn = false;
+      }
     }
 
     function loadDataFromLocalStorage(): void {
