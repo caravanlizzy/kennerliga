@@ -58,6 +58,7 @@
         <MatchResultForm
           :selectedGameId="activeForm.selGame.id"
           :leagueId="league.id"
+          :league="league"
           @submitted="$emit('success')"
         />
       </FormLayout>

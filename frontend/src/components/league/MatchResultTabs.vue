@@ -22,6 +22,7 @@
     @submitted="handleSubmit"
     :selected-game-id="currentFormSelectedGameId"
     :leagueId="user.myCurrentLeagueId"
+    :league="leagueData"
   />
 </template>
 
@@ -36,7 +37,7 @@ import { useUserStore } from 'stores/userStore';
 
 const { user } = storeToRefs(useUserStore());
 const myLeagueStore = useLeagueStore(user.value.myCurrentLeagueId)();
-const { selectedGamesFetchedEmpty } = storeToRefs(myLeagueStore);
+const { selectedGamesFetchedEmpty, leagueData } = storeToRefs(myLeagueStore);
 const { refreshResultsForGame } = myLeagueStore;
 const { isMobile } = useResponsive();
 

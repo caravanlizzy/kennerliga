@@ -232,12 +232,7 @@ import KennerSelect from 'components/base/KennerSelect.vue';
 import KennerInput from 'components/base/KennerInput.vue';
 import KennerButton from 'components/base/KennerButton.vue';
 import LoadingSpinner from 'components/base/LoadingSpinner.vue';
-import {
-  TResultConfig,
-  TTieBreakerDto,
-  TMatchResultPayload,
-  TMatchResultSubmitPayload,
-} from 'src/types';
+import { TLeagueDto, TResultConfig, TTieBreakerDto, TMatchResultPayload, TMatchResultSubmitPayload, TMatchResult } from 'src/types';
 
 type Faction = { id: number; name: string; level: number };
 
@@ -256,7 +251,11 @@ type FormDataEntry = {
 const emit = defineEmits<{ (e: 'submitted', selectedGameId: number): void }>();
 const $q = useQuasar();
 
-const props = defineProps<{ selectedGameId: number; leagueId: number }>();
+const props = defineProps<{
+  selectedGameId: number;
+  leagueId: number;
+  league?: TLeagueDto;
+}>();
 const leagueStore = useLeagueStore(props.leagueId)();
 const { members } = storeToRefs(leagueStore);
 
@@ -363,9 +362,19 @@ async function fetchFactions() {
 }
 
 async function fetchExistingResults() {
+  if (!leagueStore.leagueData?.season) {
+    // If season is not in leagueData, try the league prop if available
+    const seasonId = props.league?.season || leagueStore.leagueData?.season;
+    if (!seasonId) {
+      console.warn('Cannot fetch existing results: season ID is missing');
+      return false;
+    }
+    // Update local reference if needed or just use it
+  }
+  const seasonId = props.league?.season || leagueStore.leagueData?.season;
   try {
     const { data } = await api.get<TMatchResult[]>(
-      `result/match-results/?season=${leagueStore.league?.season}&league=${props.leagueId}&selected_game=${props.selectedGameId}`
+      `result/match-results/?season=${seasonId}&league=${props.leagueId}&selected_game=${props.selectedGameId}`
     );
     if (data && data.length > 0) {
       // Map existing results to formData

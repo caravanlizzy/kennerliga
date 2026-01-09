@@ -233,6 +233,10 @@ class MatchResultViewSet(ViewSet):
         season_id = request.query_params.get("season")
         league = request.query_params.get("league")
         selected_game_id = request.query_params.get("selected_game")
+
+        if any(v == 'undefined' for v in [season_id, league, selected_game_id]):
+            return Response({"detail": "Invalid parameters."}, status=status.HTTP_400_BAD_REQUEST)
+
         if not all([season_id, league, selected_game_id]):
             return Response({"detail": "Parameters required."}, status=status.HTTP_400_BAD_REQUEST)
         qs = Result.objects.filter(season_id=season_id, league=league, selected_game_id=selected_game_id)
