@@ -1,8 +1,8 @@
 <template>
-  <KennerligaTable
+  <KennerTable
     :create-button="createButton"
     flat
-    title="Kennerliga Members"
+    title="KennerLiga Members"
     @row-click="onRowClick"
     :rows="users"
     :columns="columns"
@@ -10,7 +10,7 @@
 </template>
 
 <script setup lang="ts">
-import KennerligaTable from 'components/tables/KennerTable.vue';
+import KennerTable from 'components/tables/KennerTable.vue';
 import { useRouter } from 'vue-router';
 import { TKennerButton, TUserDto } from 'src/types';
 import { onMounted, ref } from 'vue';

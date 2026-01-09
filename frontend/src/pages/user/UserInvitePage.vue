@@ -111,7 +111,7 @@ const handleInvite = async () => {
     await router.push({ name: 'invitations' });
     $q.notify({
       type: 'positive',
-      message: `User can now register. Internal note: ${note.value}`,
+      message: `User can now sign up. Internal note: ${note.value}`,
     });
   } catch (error) {
     $q.notify({

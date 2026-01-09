@@ -1,6 +1,6 @@
-# Kennerliga (kennerliga)
+# KennerLiga (kennerliga)
 
-Board Game League 
+Board Game League
 
 ## Install the dependencies
 ```bash

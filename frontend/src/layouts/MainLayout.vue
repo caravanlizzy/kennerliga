@@ -28,7 +28,7 @@
         <div class="q-pa-md row items-center justify-between border-bottom-subtle bg-white">
           <div class="row items-center">
             <q-icon name="chat" color="blue-grey-6" size="sm" class="q-mr-sm" />
-            <div class="text-h6 text-weight-bold text-blue-grey-6">Kennerchat</div>
+            <div class="text-h6 text-weight-bold text-blue-grey-6">KennerChat</div>
           </div>
           <q-btn flat round dense icon="chevron_left" size="sm" color="blue-grey-6" @click="chatDrawerOpen = false">
             <q-tooltip>Minimize Chat</q-tooltip>

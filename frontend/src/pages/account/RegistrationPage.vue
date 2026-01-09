@@ -14,9 +14,9 @@
       <q-form ref="formRef" @submit="doRegister" @keyup.enter="doRegister" class="q-gutter-y-lg">
         <div class="column items-center q-mb-lg">
           <q-icon name="img:icons/favicon.svg" size="64px" class="q-mb-md" />
-          <div class="text-h4 text-weight-bolder text-dark tracking-tighter">Register</div>
+          <div class="text-h4 text-weight-bolder text-dark tracking-tighter">Sign Up</div>
           <div class="text-subtitle2 text-grey-6 q-mt-xs text-center">
-            Join the KennerLiga community
+            Join the Kenner<span class="text-primary">Liga</span> community
           </div>
         </div>
 
@@ -41,7 +41,7 @@
             type="submit"
             size="lg"
             class="full-width shadow-4"
-            :label="isSubmitting ? 'Creating Account…' : 'Register'"
+            :label="isSubmitting ? 'Signing Up…' : 'Sign Up'"
             icon="person_add"
             color="primary"
             :loading="isSubmitting"
@@ -128,7 +128,7 @@ async function doRegister(): Promise<void> {
     const data = res.data;
 
     if (res.status >= 400) {
-      throw new Error(data?.detail || 'Registration failed.');
+      throw new Error(data?.detail || 'Sign up failed.');
     }
 
     $q.notify({
@@ -146,7 +146,7 @@ async function doRegister(): Promise<void> {
   } catch (err: any) {
     $q.notify({
       type: 'negative',
-      message: err?.message || 'Unknown error during registration.',
+      message: err?.message || 'Unknown error during sign up.',
     });
   } finally {
     isSubmitting.value = false;

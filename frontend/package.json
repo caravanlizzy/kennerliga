@@ -2,7 +2,7 @@
   "name": "kennerliga",
   "version": "0.0.1",
   "description": "Board Game League ",
-  "productName": "Kennerliga",
+  "productName": "KennerLiga",
   "author": "Marc Kittner <m.kittner@kunbus.com>",
   "private": true,
   "scripts": {

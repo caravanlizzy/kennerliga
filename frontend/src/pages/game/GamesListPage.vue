@@ -1,5 +1,5 @@
 <template>
-  <KennerligaTable
+  <KennerTable
     v-if="!loading && !error && data && Array.isArray(data)"
     :create-button="button"
     flat
@@ -20,7 +20,7 @@
 </template>
 
 <script setup lang="ts">
-import KennerligaTable from 'components/tables/KennerTable.vue';
+import KennerTable from 'components/tables/KennerTable.vue';
 import { useAxios } from '@vueuse/integrations/useAxios';
 import { api } from 'boot/axios';
 import { useRouter } from 'vue-router';

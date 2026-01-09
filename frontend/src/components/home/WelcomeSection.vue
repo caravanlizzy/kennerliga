@@ -21,13 +21,12 @@
               Kenner<span class="text-primary">Liga</span>
             </h1>
             <p :class="[isMobile ? 'text-subtitle1' : 'text-h5', 'text-grey-8 q-mt-md q-mb-xl']">
-              Welcome to KennerLiga! This is your go-to spot for following the league, signing up, picking your games, and logging your wins. Once the dust settles, we've got all the stats and data ready for you to dive into.
+              A private space for our boardgame league. We manage everything from season registration and auto league assignment to game picking, banning, and result uploads. Stay connected via community chat and keep an eye on past season stats and overviews.
             </p>
             <div class="row q-gutter-md justify-center">
               <KennerButton
-                outline
-                color="dark"
-                label="Sign In"
+                color="primary"
+                label="Login"
                 icon="login"
                 to="/login"
                 :size="isMobile ? 'md' : 'lg'"
@@ -39,7 +38,7 @@
           <div :class="[isMobile ? 'q-mt-lg q-pa-md' : 'q-mt-xl q-pa-lg', 'text-center border-top-subtle']">
             <q-icon name="lock" size="xs" color="grey-6" class="q-mr-sm" />
             <span class="text-body2 text-grey-6">
-              KennerLiga is a private platform. Registration is required to view full league details and participate.
+              An account is required to view league details and participate.
             </span>
           </div>
         </div>
@@ -80,7 +79,7 @@
                 </div>
                 <div class="row no-wrap items-center q-mt-xs">
                   <q-icon name="chat" color="blue-grey-8" size="xs" class="q-mr-xs" />
-                  <span class="text-weight-bold q-mr-xs">Kennerchat:</span> Catch up with the community and plan your next session.
+                  <span class="text-weight-bold q-mr-xs">KennerChat:</span> Catch up with the community and plan your next session.
                 </div>
               </div>
               <div class="col-12">
