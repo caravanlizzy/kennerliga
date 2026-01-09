@@ -160,7 +160,7 @@ class SeasonViewSet(ModelViewSet):
             LeagueStanding.objects
             .filter(league__in=leagues)
             .select_related("league", "player_profile", "player_profile__user")
-            .order_by("league_id", "-league_points", "-points", "id")
+            .order_by("league_id", "-league_points", "-wins", "id")
         )
 
         winner_by_league_id = {}
