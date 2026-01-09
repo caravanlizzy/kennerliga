@@ -100,6 +100,7 @@ export type TSelectedGameDto = {
   created_at?: string;
   successfully_banned?: boolean;
   has_points?: boolean;
+  results_uploaded?: boolean;
 };
 
 export type TSelectedGameDtoPayload = {

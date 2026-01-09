@@ -1,12 +1,91 @@
 <template>
   <q-page class="q-pa-md">
-    <!-- Header -->
-    <LeagueHeader
-      v-if="!loading && league"
-      :league="league"
-      :season="season"
-      @refresh="load"
-    />
+    <!-- Header Area -->
+    <div class="row items-center justify-between q-mb-md">
+      <div class="row items-center q-gutter-x-sm">
+        <q-icon name="settings" size="md" color="primary" />
+        <div class="text-h4 text-weight-bolder text-dark tracking-tighter">
+          Manage League
+        </div>
+      </div>
+      <div class="row items-center q-gutter-x-sm">
+        <KennerButton
+          v-if="!loading && league"
+          flat
+          icon="refresh"
+          round
+          color="primary"
+          size="md"
+          @click="load"
+        >
+          <KennerTooltip>Refresh</KennerTooltip>
+        </KennerButton>
+        <KennerButton
+          flat
+          icon="close"
+          round
+          color="grey-7"
+          size="md"
+          @click="$router.back()"
+        >
+          <KennerTooltip>Back</KennerTooltip>
+        </KennerButton>
+      </div>
+    </div>
+
+    <!-- Info Section -->
+    <div v-if="!loading && league" class="row q-col-gutter-md q-mb-lg">
+      <div class="col-12 col-md-6">
+        <ContentSection
+          title="League Info"
+          icon="info"
+          color="primary"
+          style="margin-top: 0"
+          :bordered="false"
+        >
+          <div class="row q-gutter-sm items-center">
+            <q-chip
+              square
+              color="grey-2"
+              text-color="grey-9"
+              class="text-weight-bold"
+              icon="event"
+            >
+              {{ season?.name }}
+            </q-chip>
+            <q-chip
+              square
+              :color="season?.status === 'RUNNING' ? 'positive' : 'grey-7'"
+              text-color="white"
+              class="text-weight-bold"
+            >
+              {{ season?.status }}
+            </q-chip>
+            <q-chip
+              square
+              color="secondary"
+              text-color="white"
+              class="text-weight-bold"
+              icon="military_tech"
+            >
+              Level {{ league?.level }}
+            </q-chip>
+          </div>
+        </ContentSection>
+      </div>
+
+      <div class="col-12 col-md-6">
+        <ContentSection
+          title="Standings"
+          icon="leaderboard"
+          color="info"
+          style="margin-top: 0"
+          :bordered="false"
+        >
+          <LeagueStandings :league-id="league.id" />
+        </ContentSection>
+      </div>
+    </div>
 
     <!-- Loading / Error -->
     <div class="flex justify-center q-my-xl" v-if="loading">
@@ -20,32 +99,40 @@
     />
 
     <!-- Members Grid -->
-    <div v-else-if="!loading && league" class="row q-col-gutter-xl">
-      <MemberGameCard
-        v-for="member in league?.members"
-        :key="member.id"
-        :member="member"
-        :league="league"
-        :season="season"
-        :matchResultsBySelectedGameId="matchResultsBySelectedGameId"
-        @add-game="m => (activeForm = { type: 'add', member: m })"
-        @ban-game="m => (activeForm = { type: 'ban', member: m })"
-        @set-active="profileId => setActivePlayer(profileId)"
-        @edit-game="data => (activeForm = { type: 'edit', member: data.member, selGame: data.selGame })"
-        @post-result="selGame => (activeForm = { type: 'post-result', selGame })"
-        @edit-result="selGameId => (activeForm = { type: 'post-result', selGame: findSelGame(selGameId) })"
-        @delete-game="data => onDeleteSelectedGame(data.selGame)"
-      />
+    <ContentSection
+      v-else-if="!loading && league"
+      title="League Members"
+      icon="people"
+      color="secondary"
+      :bordered="false"
+    >
+      <div class="row q-col-gutter-xl">
+        <MemberGameCard
+          v-for="member in league?.members"
+          :key="member.id"
+          :member="member"
+          :league="league"
+          :season="season"
+          :matchResultsBySelectedGameId="matchResultsBySelectedGameId"
+          @add-game="m => (activeForm = { type: 'add', member: m })"
+          @ban-game="m => (activeForm = { type: 'ban', member: m })"
+          @set-active="profileId => setActivePlayer(profileId)"
+          @edit-game="data => (activeForm = { type: 'edit', member: data.member, selGame: data.selGame })"
+          @post-result="selGame => (activeForm = { type: 'post-result', selGame })"
+          @edit-result="selGameId => (activeForm = { type: 'post-result', selGame: findSelGame(selGameId) })"
+          @delete-game="data => onDeleteSelectedGame(data.selGame)"
+        />
+      </div>
+    </ContentSection>
 
-      <!-- Unified Dialog for all Forms -->
-      <ManagerFormsDialog
-        v-if="league"
-        :league="league"
-        :activeForm="activeForm"
-        @close="activeForm = null"
-        @success="onSuccess"
-      />
-    </div>
+    <!-- Unified Dialog for all Forms -->
+    <ManagerFormsDialog
+      v-if="league && activeForm"
+      :league="league"
+      :activeForm="activeForm"
+      @close="activeForm = null"
+      @success="onSuccess"
+    />
   </q-page>
 </template>
 
@@ -56,11 +143,14 @@ import { useQuasar } from 'quasar';
 import { api } from 'boot/axios';
 import { fetchLeagueDetails } from 'src/services/leagueService';
 import { fetchSeason } from 'src/services/seasonService';
+import ContentSection from 'components/base/ContentSection.vue';
+import KennerTooltip from 'components/base/KennerTooltip.vue';
+import KennerButton from 'components/base/KennerButton.vue';
 import ErrorDisplay from 'components/base/ErrorDisplay.vue';
 import LoadingSpinner from 'components/base/LoadingSpinner.vue';
-import LeagueHeader from 'components/league/manager/LeagueHeader.vue';
-import EmptyMembersState from 'components/league/manager/EmptyMembersState.vue';
 import MemberGameCard from 'components/league/manager/MemberGameCard.vue';
+import EmptyMembersState from 'components/league/manager/EmptyMembersState.vue';
+import LeagueStandings from 'components/league/LeagueStandings.vue';
 import ManagerFormsDialog, { type TActiveForm } from 'components/league/manager/ManagerFormsDialog.vue';
 import { useDialog } from 'src/composables/dialog';
 import type { TSeasonDto, TLeagueDto, TSeasonParticipantDto, TSelectedGameDto, TMatchResult } from 'src/types';

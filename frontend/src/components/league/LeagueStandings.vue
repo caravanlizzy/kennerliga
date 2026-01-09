@@ -20,9 +20,13 @@ import { api } from 'boot/axios';
 import { formatNumbers } from 'src/helpers';
 import { useResponsive } from 'src/composables/responsive';
 
+const props = defineProps<{
+  leagueId?: number;
+}>();
+
 const { user } = storeToRefs(useUserStore());
-const myLeagueStore = useLeagueStore(user.value.myCurrentLeagueId)();
-const { leagueId } = storeToRefs(myLeagueStore);
+const myLeagueStore = useLeagueStore(props.leagueId || user.value.myCurrentLeagueId)();
+const { leagueId: storeLeagueId } = storeToRefs(myLeagueStore);
 const { isMobile } = useResponsive();
 
 interface LeagueStanding {
@@ -36,11 +40,12 @@ const standings = ref<LeagueStanding[]>([]);
 const loading = ref(false);
 
 const fetchStandings = async () => {
-  if (!leagueId.value) return;
+  const idToUse = props.leagueId || storeLeagueId.value;
+  if (!idToUse) return;
   loading.value = true;
   try {
     const { data } = await api.get<LeagueStanding[]>(
-      `league/leagues/${leagueId.value}/standings/`
+      `league/leagues/${idToUse}/standings/`
     );
     standings.value = data;
   } catch (e) {

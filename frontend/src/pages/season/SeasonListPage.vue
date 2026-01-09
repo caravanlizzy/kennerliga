@@ -8,7 +8,27 @@
     :rows="seasons"
     :columns="columns"
     @row-click="onRowClick"
-  />
+  >
+    <template v-slot:body-cell-details="props">
+      <q-td :props="props">
+        <div v-if="props.value.isEmpty">
+          <q-icon name="group_off" color="grey-4" size="xs">
+            <q-tooltip>No participants</q-tooltip>
+          </q-icon>
+        </div>
+        <div v-else-if="props.value.isCompleted">
+          <q-icon name="check_circle" color="positive" size="xs">
+            <q-tooltip>Complete (all games selected and results uploaded)</q-tooltip>
+          </q-icon>
+        </div>
+        <div v-else-if="props.value.isIncomplete">
+          <q-icon name="pending" color="warning" size="xs">
+            <q-tooltip>Incomplete (games or results missing)</q-tooltip>
+          </q-icon>
+        </div>
+      </q-td>
+    </template>
+  </KennerTable>
 
   <div v-else class="q-pa-md">
     <q-banner v-if="error" rounded dense class="q-mb-sm">
@@ -26,7 +46,7 @@ import { api } from 'boot/axios';
 import { useRouter } from 'vue-router';
 import { computed } from 'vue';
 import type { QTableProps } from 'quasar';
-import type { TKennerButton } from 'src/types';
+import type { TKennerButton, TLeagueDto } from 'src/types';
 
 type Season = {
   id: number;
@@ -34,6 +54,7 @@ type Season = {
   month: number;
   name?: string;  // backend-provided if available
   status?: 'NEXT' | 'OPEN' | 'RUNNING' | 'DONE' | string;
+  leagues?: TLeagueDto[];
 };
 
 // fetch seasons
@@ -41,10 +62,30 @@ const {
   data: seasons,
   isFinished,
   error: fetchError,
-} = useAxios<Season[]>('/season/seasons/', api);
+} = useAxios<Season[]>('/season/seasons/seasons-with-leagues/', api);
 
 const loading = computed(() => !isFinished.value);
 const error = computed(() => fetchError.value?.message || null);
+
+// status determination
+const getSeasonStats = (s: Season) => {
+  const leagues = s.leagues || [];
+  const participants = leagues.flatMap(l => l.members || []);
+  const isEmpty = participants.length === 0;
+
+  if (isEmpty) return { isEmpty: true, isCompleted: false, isIncomplete: false };
+
+  // Check if completed: all participants have selected games AND all those games have results
+  const allMembersSelected = participants.every(m => (m.selected_games?.length || 0) > 0);
+  const allGamesHaveResults = participants.every(m =>
+    (m.selected_games || []).every(sg => sg.results_uploaded)
+  );
+
+  const isCompleted = allMembersSelected && allGamesHaveResults;
+  const isIncomplete = !isCompleted;
+
+  return { isEmpty, isCompleted, isIncomplete };
+};
 
 // navigation
 const router = useRouter();
@@ -60,6 +101,13 @@ const displayName  = (s: Season) => s.name || fallbackName(s);
 
 // columns for KennerTable
 const columns = computed<QTableProps['columns']>(() => ([
+  {
+    name: 'details',
+    label: '',
+    align: 'center',
+    field: (s: Season) => getSeasonStats(s),
+    style: 'width: 50px',
+  },
   {
     name: 'name',
     label: 'Season',
