@@ -123,7 +123,7 @@ export async function ensureParticipants(
   const existing = await fetchSeasonParticipants(seasonId);
   const byProfile: Record<number, TSeasonParticipantDto> = {};
   for (const sp of existing) {
-    const pid = sp.profile_id;
+    const pid = sp.profile;
     if (pid != null) byProfile[pid] = sp;
   }
 
@@ -177,7 +177,7 @@ export async function createLeagueForSeason(
 
   const { data } = await api('/league/leagues/', {
     method: 'POST',
-    data: { season: seasonId, level, member_ids: spIds, status: 'DONE' },
+    data: { season: seasonId, level, member_ids: spIds, status: 'PLAYING' },
   });
   return data;
 }

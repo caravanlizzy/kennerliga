@@ -1,9 +1,12 @@
+from django.db.models import Count, Q
 from rest_framework import serializers
 from rest_framework.fields import SerializerMethodField, BooleanField, CharField
 from rest_framework.serializers import ModelSerializer
 
 from game.models import SelectedGame, BanDecision
 from game.serializers import SelectedGameSerializer
+from league.models import League
+from result.models import Result
 from season.models import Season, SeasonParticipant
 from user.models import PlayerProfile
 
@@ -22,6 +25,10 @@ class SeasonSerializer(ModelSerializer):
     season_start_time = serializers.SerializerMethodField(read_only=True)
     time_to_start = serializers.SerializerMethodField(read_only=True)
 
+    is_completed = serializers.SerializerMethodField(read_only=True)
+    is_empty = serializers.SerializerMethodField(read_only=True)
+    is_incomplete = serializers.SerializerMethodField(read_only=True)
+
     @staticmethod
     def get_name(obj):
         return obj.name
@@ -34,6 +41,41 @@ class SeasonSerializer(ModelSerializer):
     def get_time_to_start(obj):
         # Returning as a human-readable string or as total seconds
         return str(obj.time_to_start)  # or obj.time_to_start.total_seconds()
+
+    def get_is_empty(self, obj):
+        # A season is empty if it has no participants
+        return not obj.participants.exists()
+
+    def get_is_completed(self, obj):
+        # Optimized version
+        leagues = obj.leagues.all()
+        if not leagues.exists():
+            return False
+            
+        participants = obj.participants.all()
+        if not participants.exists():
+            return False
+
+        # If there are participants not assigned to any league, it's not completed?
+        # Actually, in this app, participants are assigned to leagues.
+        # Let's check if all participants belong to a league in this season.
+        # But for status "is_completed", we care about the games in the leagues.
+
+        # A season is completed if:
+        # 1. All leagues in the season are status DONE.
+        if leagues.filter(~Q(status='DONE')).exists():
+            return False
+            
+        # 2. At least one league exists and has members.
+        # (Already checked above)
+        
+        return True
+
+    def get_is_incomplete(self, obj):
+        is_empty = self.get_is_empty(obj)
+        if is_empty:
+            return False
+        return not self.get_is_completed(obj)
 
     class Meta:
         model = Season

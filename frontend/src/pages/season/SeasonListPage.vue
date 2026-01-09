@@ -54,7 +54,9 @@ type Season = {
   month: number;
   name?: string;  // backend-provided if available
   status?: 'NEXT' | 'OPEN' | 'RUNNING' | 'DONE' | string;
-  leagues?: TLeagueDto[];
+  is_completed?: boolean;
+  is_empty?: boolean;
+  is_incomplete?: boolean;
 };
 
 // fetch seasons
@@ -62,29 +64,18 @@ const {
   data: seasons,
   isFinished,
   error: fetchError,
-} = useAxios<Season[]>('/season/seasons/?include_details=1', api);
+} = useAxios<Season[]>('/season/seasons/', api);
 
 const loading = computed(() => !isFinished.value);
 const error = computed(() => fetchError.value?.message || null);
 
 // status determination
 const getSeasonStats = (s: Season) => {
-  const leagues = s.leagues || [];
-  const participants = leagues.flatMap(l => l.members || []);
-  const isEmpty = participants.length === 0;
-
-  if (isEmpty) return { isEmpty: true, isCompleted: false, isIncomplete: false };
-
-  // Check if completed: all participants have selected games AND all those games have results
-  const allMembersSelected = participants.every(m => (m.selected_games?.length || 0) > 0);
-  const allGamesHaveResults = participants.every(m =>
-    (m.selected_games || []).every(sg => sg.results_uploaded)
-  );
-
-  const isCompleted = allMembersSelected && allGamesHaveResults;
-  const isIncomplete = !isCompleted;
-
-  return { isEmpty, isCompleted, isIncomplete };
+  return {
+    isEmpty: s.is_empty,
+    isCompleted: s.is_completed,
+    isIncomplete: s.is_incomplete
+  };
 };
 
 // navigation
