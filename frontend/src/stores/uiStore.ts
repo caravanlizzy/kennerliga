@@ -14,7 +14,6 @@ export interface NavSection {
 export const useUiStore = defineStore('ui', () => {
   const isDev = ref(false);
   const navSections = ref<NavSection[]>([]);
-  const activeTab = ref('seasons');
 
   function showDev() {
     isDev.value = true;
@@ -42,7 +41,6 @@ export const useUiStore = defineStore('ui', () => {
     hideDev,
     toggleDev,
     navSections,
-    activeTab,
     registerSection,
     unregisterSection
   };

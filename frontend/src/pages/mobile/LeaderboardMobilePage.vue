@@ -30,8 +30,6 @@ const selectedYear = ref(new Date().getFullYear());
 const availableYears = ref<number[]>([]);
 
 onMounted(async () => {
-  uiStore.activeTab = 'leaderboard';
-
   const [years, currentSeasonId] = await Promise.all([
     fetchAvailableYears(),
     fetchCurrentSeasonId(),

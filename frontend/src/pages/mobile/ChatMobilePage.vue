@@ -14,10 +14,6 @@ import { onMounted } from 'vue';
 import { useUiStore } from 'stores/uiStore';
 
 const uiStore = useUiStore();
-
-onMounted(() => {
-  uiStore.activeTab = 'chat';
-});
 </script>
 
 <style scoped>

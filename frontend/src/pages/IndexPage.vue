@@ -1,98 +1,16 @@
 <template>
   <q-page class="column col q-pa-md">
-    <WelcomeSection v-if="!isMobile" :is-authenticated="isAuthenticated" />
+    <WelcomeSection v-if="!isMobile || mobileContent === 'welcome'" :is-authenticated="isAuthenticated" />
 
     <template v-if="isAuthenticated">
+      <div v-if="isMobile && user?.myCurrentLeagueId" class="row justify-center q-pt-sm q-px-md">
+        <NavMyLeague />
+      </div>
+
       <div class="row justify-center">
         <AnnouncementDisplay class="col-12" style="max-width: 800px" />
       </div>
-      <div v-if="isMobile" class="column col">
-        <div class="col column">
-          <WelcomeSection
-            v-if="mobileContent === 'welcome'"
-            :is-authenticated="isAuthenticated"
-            key="welcome"
-          />
-
-          <ScrollContainer v-else-if="mobileContent === 'seasons'" key="seasons">
-            <div class="full-height">
-              <div
-                class="q-pa-md row items-center justify-between no-wrap border-bottom-subtle"
-              >
-                <div class="text-h5 text-weight-bold text-dark">Seasons</div>
-                <div class="row no-wrap q-gutter-x-xs">
-                  <div style="width: 110px">
-                    <KennerSelect
-                      v-model="selectedSeasonYear"
-                      :options="seasonYearOptions"
-                      dense
-                      label="Year"
-                      emit-value
-                      map-options
-                    />
-                  </div>
-                  <div style="width: 110px">
-                    <KennerSelect
-                      v-model="selectedSeasonMonth"
-                      :options="seasonMonthOptions"
-                      dense
-                      label="Month"
-                      emit-value
-                      map-options
-                    />
-                  </div>
-                </div>
-              </div>
-              <SeasonStandings :seasonId="selectedSeasonId" />
-            </div>
-          </ScrollContainer>
-
-          <ScrollContainer v-else-if="mobileContent === 'live'" key="live">
-            <div class="q-px-md">
-              <ContentSection
-                v-if="isAuthenticated"
-                id="live-action-mobile"
-                title="Live Action"
-                icon="bolt"
-                color="accent"
-                :bordered="false"
-              >
-                <LiveActionFeed />
-              </ContentSection>
-            </div>
-          </ScrollContainer>
-          <ScrollContainer v-else-if="mobileContent === 'leaderboard'" key="leaderboard">
-            <div class="full-height">
-              <div
-                class="q-pa-md row items-center justify-between no-wrap border-bottom-subtle"
-              >
-                <div class="text-h5 text-weight-bold text-dark">
-                  Leaderboard
-                </div>
-                <div style="min-width: 100px">
-                  <KennerSelect
-                    v-model="selectedYear"
-                    :options="availableYears"
-                    class="full-width"
-                    emit-value
-                    map-options
-                  />
-                </div>
-              </div>
-              <LeaderBoard :year="selectedYear" />
-            </div>
-          </ScrollContainer>
-
-          <div v-else-if="mobileContent === 'chat'" class="col column" key="chat">
-            <div class="q-pa-md row items-center border-bottom-subtle bg-white">
-              <q-icon name="chat" color="blue-grey-8" size="sm" class="q-mr-sm" />
-              <div class="text-h5 text-weight-bold">KennerChat</div>
-            </div>
-            <KennerChat class="col bg-white" />
-          </div>
-        </div>
-      </div>
-      <div v-else class="column col q-pt-none">
+      <div v-if="!isMobile" class="column col q-pt-none">
         <div class="row col">
           <div class="col-12 col-md">
             <ContentSection
@@ -161,17 +79,12 @@
           </div>
         </div>
       </div>
-      <div class="q-py-xl"></div>
-    </template>
-    <template v-else>
-      <div v-if="isMobile" class="column col">
-        <WelcomeSection :is-authenticated="false" />
-      </div>
     </template>
   </q-page>
 </template>
 
 <script setup lang="ts">
+import NavMyLeague from 'src/components/nav/NavMyLeague.vue';
 import KennerChat from 'components/chat/KennerChat.vue';
 import LiveActionFeed from 'components/ui/LiveActionFeed.vue';
 import SeasonStandings from 'components/season/SeasonStandings.vue';
@@ -181,7 +94,8 @@ import LeaderBoard from 'components/season/LeaderBoard.vue';
 import ContentSection from 'components/base/ContentSection.vue';
 import KennerSelect from 'components/base/KennerSelect.vue';
 import { useQuasar } from 'quasar';
-import { computed, onMounted, ref, watch } from 'vue';
+import { useRoute } from 'vue-router';
+import { computed, onMounted, ref, watch, unref } from 'vue';
 import WelcomeSection from 'components/home/WelcomeSection.vue';
 import ScrollContainer from 'components/base/ScrollContainer.vue';
 import { useUserStore } from 'stores/userStore';
@@ -197,8 +111,14 @@ import type { TSeasonDto } from 'src/types';
 
 const { isMobile } = useResponsive();
 const { isAuthenticated } = storeToRefs(useUserStore());
+const { user } = storeToRefs(useUserStore());
 const uiStore = useUiStore();
-const { activeTab: mobileContent } = storeToRefs(uiStore);
+const route = useRoute();
+
+const mobileContent = computed(() => {
+  if (route.name === 'home') return 'welcome';
+  return null;
+});
 
 const selectedYear = ref(new Date().getFullYear());
 const availableYears = ref<number[]>([]);

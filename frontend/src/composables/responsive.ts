@@ -13,7 +13,7 @@ export function useResponsive(breakpoint?: Ref<'xs' | 'sm' | 'md' | 'lg' | 'xl'>
   const $q = useQuasar()
 
   // Keeps your original platform flag
-  const isMobile: boolean | undefined = $q.platform.is.mobile
+  const isMobile = computed(() => !!$q.platform.is.mobile || $q.screen.lt.sm)
 
   // New: "smallScreen" based on screen breakpoint (separate from platform)
   const smallScreen = computed(() => {
@@ -22,7 +22,7 @@ export function useResponsive(breakpoint?: Ref<'xs' | 'sm' | 'md' | 'lg' | 'xl'>
   })
 
   // Your original helper, but reactive
-  const buttonMargin = computed(() => (isMobile ? '0 4px' : undefined))
+  const buttonMargin = computed(() => (isMobile.value ? '0 4px' : undefined))
 
   // A couple of convenient extras (optional to use)
   const isTouch = computed(() => !!($q.platform.has.touch))

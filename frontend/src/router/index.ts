@@ -33,12 +33,11 @@ export default route(async function(/* { store, ssrContext } */) {
     history: createHistory(process.env.VUE_ROUTER_BASE)
   });
   Router.beforeEach(function(to, from, next) {
-    if(!to.meta.requiresAuth) return next();
-      const userStore = useUserStore();
-      const { user } = userStore;
-      if (user) return next();
-      return next({ name: 'login' });
-    }
-  );
+    if (!to.meta.requiresAuth) return next();
+    const userStore = useUserStore();
+    const { user } = userStore;
+    if (user) return next();
+    return next({ name: 'login' });
+  });
   return Router;
 });

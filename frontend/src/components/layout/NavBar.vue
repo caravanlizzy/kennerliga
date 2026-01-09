@@ -48,7 +48,7 @@
     <div v-if="isMobile" class="row justify-center q-pb-sm q-px-sm">
       <div class="row no-wrap items-center bg-blue-grey-1 rounded-borders q-pa-none full-width justify-center" style="height: 40px; border: 1px solid rgba(54, 64, 88, 0.08);">
         <q-tabs
-          v-model="activeTab"
+          :model-value="activeTab"
           class="text-dark compact-tabs full-width"
           active-color="primary"
           indicator-color="transparent"
@@ -57,6 +57,7 @@
           no-caps
           @update:model-value="handleTabChange"
         >
+          <q-tab icon="home" name="welcome" class="tab-welcome" />
           <q-tab icon="military_tech" name="seasons" class="tab-seasons" />
           <q-tab icon="bolt" name="live" class="tab-live" />
           <q-tab icon="chat" name="chat" class="tab-chat" />
@@ -84,15 +85,43 @@ const { getScrollTarget, setVerticalScrollPosition } = scroll;
 
 defineProps<{ onToggle: () => void }>();
 const { user } = storeToRefs(useUserStore());
-const { navSections, activeTab } = storeToRefs(useUiStore());
+const { navSections } = storeToRefs(useUiStore());
 const route = useRoute();
 const router = useRouter();
 const { isMobile } = useResponsive();
 
 const isIndexPage = computed(() => route.name === 'home');
 
-function handleTabChange() {
-  if (!isIndexPage.value) {
+const activeTab = computed(() => {
+  const name = route.name as string;
+  if (name === 'home') return 'welcome';
+  if (name === 'mobile-seasons') return 'seasons';
+  if (name === 'mobile-live') return 'live';
+  if (name === 'mobile-chat') return 'chat';
+  if (name === 'mobile-leaderboard') return 'leaderboard';
+  return null;
+});
+
+function handleTabChange(value: string) {
+  if (isMobile.value) {
+    switch (value) {
+      case 'seasons':
+        router.push({ name: 'mobile-seasons' });
+        break;
+      case 'live':
+        router.push({ name: 'mobile-live' });
+        break;
+      case 'chat':
+        router.push({ name: 'mobile-chat' });
+        break;
+      case 'leaderboard':
+        router.push({ name: 'mobile-leaderboard' });
+        break;
+      case 'welcome':
+        router.push({ name: 'home' });
+        break;
+    }
+  } else if (!isIndexPage.value) {
     router.push({ name: 'home' });
   }
 }

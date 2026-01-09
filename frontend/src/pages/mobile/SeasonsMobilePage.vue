@@ -1,0 +1,120 @@
+<template>
+  <q-page class="bg-white">
+    <div class="q-pa-md row items-center justify-between no-wrap border-bottom-subtle">
+      <div class="text-h5 text-weight-bold text-dark">Seasons</div>
+      <div class="row no-wrap q-gutter-x-xs">
+        <div style="width: 100px">
+          <KennerSelect
+            v-model="selectedSeasonYear"
+            :options="seasonYearOptions"
+            dense
+            label="Year"
+            emit-value
+            map-options
+          />
+        </div>
+        <div style="width: 80px">
+          <KennerSelect
+            v-model="selectedSeasonMonth"
+            :options="seasonMonthOptions"
+            dense
+            label="Month"
+            emit-value
+            map-options
+          />
+        </div>
+      </div>
+    </div>
+    <SeasonStandings :seasonId="selectedSeasonId" />
+  </q-page>
+</template>
+
+<script setup lang="ts">
+import { ref, computed, onMounted, watch } from 'vue';
+import SeasonStandings from 'components/season/SeasonStandings.vue';
+import KennerSelect from 'components/base/KennerSelect.vue';
+import {
+  fetchAvailableYears,
+  fetchCurrentSeasonId,
+  fetchSeason,
+  fetchSeasons
+} from 'src/services/seasonService';
+import { useUiStore } from 'stores/uiStore';
+import type { TSeasonDto } from 'src/types';
+
+const uiStore = useUiStore();
+const availableYears = ref<number[]>([]);
+const seasonsForYear = ref<TSeasonDto[]>([]);
+const selectedSeasonYear = ref<number | null>(null);
+const selectedSeasonMonth = ref<number | null>(null);
+
+const seasonYearOptions = computed(() =>
+  [...availableYears.value]
+    .sort((a, b) => b - a)
+    .map((y) => ({ label: String(y), value: y }))
+);
+
+const seasonMonthOptions = computed(() => {
+  return seasonsForYear.value
+    .map((s) => s.month)
+    .sort((a, b) => a - b)
+    .map((m) => ({
+      label: m,
+      value: m,
+    }));
+});
+
+const selectedSeasonId = computed(() => {
+  const found = seasonsForYear.value.find(
+    (s) => s.month === selectedSeasonMonth.value
+  );
+  return found ? found.id : null;
+});
+
+watch(selectedSeasonYear, async (newYear) => {
+  if (newYear) {
+    const seasons = await fetchSeasons({ year: newYear });
+    seasonsForYear.value = seasons;
+
+    if (seasons.length > 0) {
+      const months = seasons.map((s) => s.month);
+      if (
+        !selectedSeasonMonth.value ||
+        !months.includes(selectedSeasonMonth.value)
+      ) {
+        selectedSeasonMonth.value = Math.max(...months);
+      }
+    } else {
+      selectedSeasonMonth.value = null;
+    }
+  } else {
+    seasonsForYear.value = [];
+    selectedSeasonMonth.value = null;
+  }
+});
+
+onMounted(async () => {
+  const [years, currentSeasonId] = await Promise.all([
+    fetchAvailableYears(),
+    fetchCurrentSeasonId(),
+  ]);
+
+  availableYears.value = years;
+
+  if (currentSeasonId) {
+    const season = await fetchSeason(currentSeasonId);
+    if (season) {
+      selectedSeasonYear.value = season.year;
+      selectedSeasonMonth.value = season.month;
+    }
+  } else if (availableYears.value.length > 0) {
+    selectedSeasonYear.value = availableYears.value[0];
+  }
+});
+</script>
+
+<style scoped>
+.border-bottom-subtle {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+</style>
