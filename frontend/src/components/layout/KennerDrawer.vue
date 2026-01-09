@@ -11,12 +11,12 @@
           label="Seasons"
           forward-name="seasons"
         />
+        <DrawerItem icon="group" icon-color="teal-7" label="Members" forward-name="users" />
 
         <template v-if="isAdmin">
           <q-separator class="q-my-sm drawer-separator" />
           <DrawerSubGroup>Management</DrawerSubGroup>
           <DrawerItem icon="casino" icon-color="indigo-7" label="Games" forward-name="games" />
-          <DrawerItem icon="group" icon-color="teal-7" label="Members" forward-name="users" />
           <DrawerItem
             icon="forward_to_inbox"
             icon-color="deep-purple-7"
