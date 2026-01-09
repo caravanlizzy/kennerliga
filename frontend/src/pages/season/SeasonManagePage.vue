@@ -5,10 +5,20 @@
       <div class="row items-center q-gutter-x-sm">
         <q-icon name="military_tech" size="md" color="primary" />
         <div class="text-h4 text-weight-bolder text-dark tracking-tighter">
-          Season {{ season?.name || '…' }} Overview
+          Manage Season {{ season?.name || '…' }}
         </div>
       </div>
       <div class="row items-center q-gutter-x-sm">
+        <KennerButton
+          flat
+          icon="visibility"
+          round
+          color="secondary"
+          size="md"
+          :to="{ name: 'season-overview', params: { id: seasonId } }"
+        >
+          <KennerTooltip>View Public Overview</KennerTooltip>
+        </KennerButton>
         <KennerButton
           v-if="!loading && season"
           flat
@@ -69,21 +79,48 @@
 
         <div class="col-12 col-md-6">
           <ContentSection
-            title="Season Winners"
-            icon="emoji_events"
-            color="amber-8"
+            title="Registered Members"
+            icon="people"
+            color="secondary"
             style="margin-top: 0"
             :bordered="false"
           >
-            <SeasonWinners :season-id="seasonId" />
+            <div v-if="participants.length > 0" class="row q-col-gutter-xs">
+              <q-chip
+                v-for="p in participants"
+                :key="p.id"
+                dense
+                icon="person"
+                class="q-mr-xs q-mb-xs"
+              >
+                {{ p.profile_name }}
+              </q-chip>
+            </div>
+            <div v-else class="text-caption text-grey-6 italic">No registered members for this season.</div>
           </ContentSection>
         </div>
       </div>
 
       <!-- Leagues Grid -->
-      <div class="q-mt-xl">
-        <SeasonStandings :season-id="seasonId" mode="results" />
-      </div>
+      <ContentSection
+        title="Leagues"
+        icon="groups"
+        color="accent"
+        :bordered="false"
+      >
+        <div v-if="leagues.length === 0" class="text-grey-7 q-pa-md bg-grey-1 rounded-borders text-center">
+          No leagues found for this season.
+        </div>
+        <div v-else class="row q-col-gutter-lg">
+          <div
+            v-for="league in leagues"
+            :key="league.id"
+            class="col-12 col-sm-6 col-md-4"
+          >
+            <LeagueList :league="league"/>
+          </div>
+        </div>
+      </ContentSection>
     </div>
   </q-page>
 </template>
@@ -92,13 +129,12 @@
 import { computed, onMounted, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { fetchLeaguesBySeason, fetchSeason, fetchSeasonParticipants } from 'src/services/seasonService';
+import LeagueList from 'components/season/LeagueList.vue';
 import KennerButton from 'components/base/KennerButton.vue';
 import KennerTooltip from 'components/base/KennerTooltip.vue';
 import ContentSection from 'components/base/ContentSection.vue';
 import ErrorDisplay from 'components/base/ErrorDisplay.vue';
 import LoadingSpinner from 'components/base/LoadingSpinner.vue';
-import SeasonStandings from 'components/season/SeasonStandings.vue';
-import SeasonWinners from 'components/season/SeasonWinners.vue';
 import { TSeasonDto, TLeagueDto, TSeasonParticipantDto } from 'src/types';
 
 const route = useRoute();
