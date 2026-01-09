@@ -2,7 +2,7 @@
   <q-page class="bg-white">
     <div class="q-pa-md row items-center justify-between no-wrap border-bottom-subtle">
       <div class="text-h5 text-weight-bold text-dark">Seasons</div>
-      <div class="row no-wrap q-gutter-x-xs">
+      <div v-if="!loadingSeasonInit" class="row no-wrap q-gutter-x-xs">
         <div style="width: 100px">
           <KennerSelect
             v-model="selectedSeasonYear"
@@ -100,11 +100,11 @@ watch(selectedSeasonYear, async (newYear) => {
 onMounted(async () => {
   loadingSeasonInit.value = true;
   try {
-    const [years, currentSeasonId] = await Promise.all([
-      fetchAvailableYears(),
-      fetchCurrentSeasonId(),
-    ]);
+    // 1. Fetch current season ID first as requested
+    const currentSeasonId = await fetchCurrentSeasonId();
 
+    // 2. Then fetch years and seasons
+    const years = await fetchAvailableYears();
     availableYears.value = years;
 
     if (currentSeasonId) {

@@ -23,7 +23,7 @@
               color="primary"
             >
               <template #header-extra>
-                <div class="row no-wrap q-gutter-x-sm q-ml-md">
+                <div v-if="!loadingSeasonInit" class="row no-wrap q-gutter-x-sm q-ml-md">
                   <div style="width: 110px">
                     <KennerSelect
                       v-model="selectedSeasonYear"
@@ -178,19 +178,18 @@ onMounted(async () => {
   if (isAuthenticated.value) {
     loadingSeasonInit.value = true;
     try {
-      const [years, currentSeasonId] = await Promise.all([
-        fetchAvailableYears(),
-        fetchCurrentSeasonId(),
-      ]);
+      // 1. Fetch current season ID first as requested
+      const currentSeasonId = await fetchCurrentSeasonId();
 
+      // 2. Then fetch years and seasons
+      const years = await fetchAvailableYears();
       availableYears.value = years;
 
       if (currentSeasonId) {
         const season = await fetchSeason(currentSeasonId);
         if (season) {
           selectedYear.value = season.year;
-          // IMPORTANT: We need seasons for this year to be loaded before we set the month
-          // To avoid the watcher's async nature from causing issues, we can fetch them here.
+
           const seasons = await fetchSeasons({ year: season.year });
           seasonsForYear.value = seasons;
 
