@@ -44,8 +44,8 @@ def finalize_results(serializers, rows, base_field, use_points, tbs, selected_ga
                 row_data["decisive_tie_breaker"] = decisive_tb
             saved.append(s.save())
 
-        rebuild_game_snapshot(selected_game, win_mode="count_top_block")
-        rebuild_league_snapshot(league, win_mode="count_top_block")
+        rebuild_game_snapshot(selected_game, win_mode="fractional")
+        rebuild_league_snapshot(league, win_mode="fractional")
 
         if league.is_finished:
             league.status = LeagueStatus.DONE

@@ -11,7 +11,7 @@ from game.models import SelectedGame, ResultConfig
 
 
 @transaction.atomic
-def rebuild_game_snapshot(selected_game, win_mode: str = "count_top_block") -> None:
+def rebuild_game_snapshot(selected_game, win_mode: str = "fractional") -> None:
     """
     Rebuild per-game standings for a single SelectedGame.
     - Uses Result.position for sorting and ranking (pre-calculated with tie-breakers).
@@ -20,7 +20,7 @@ def rebuild_game_snapshot(selected_game, win_mode: str = "count_top_block") -> N
     - If has_points is False:
         * Stores -position in GameStanding.points.
     - Computes dense ranks based on position.
-    - For win_mode == "count_top_block":
+    - For win_mode == "fractional":
         * Rank 1 players share win_share = 1 / number_of_first_place_players.
     """
     # Load all results for this selected game
@@ -167,7 +167,7 @@ def rebuild_game_snapshot(selected_game, win_mode: str = "count_top_block") -> N
 
 
 @transaction.atomic
-def rebuild_league_snapshot(league: League, *, win_mode: str = "count_top_block"):
+def rebuild_league_snapshot(league: League, *, win_mode: str = "fractional"):
     # compute over all results in league
     qs = (
         Result.objects

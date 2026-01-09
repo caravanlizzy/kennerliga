@@ -73,8 +73,8 @@ class LeagueViewSet(ModelViewSet):
 
 
 
-        # Optional: allow client to specify win_mode, defaulting to "count_top_block"
-        win_mode = request.data.get("win_mode", "count_top_block")
+        # Optional: allow client to specify win_mode, defaulting to "fractional"
+        win_mode = request.data.get("win_mode", "fractional")
 
         # 1) Rebuild per-game snapshots for all SelectedGames in this league
         selected_games = SelectedGame.objects.filter(league=league).select_related("game")

@@ -24,7 +24,7 @@ WinMode = Literal["count_top_block", "fractional", "single"]
 def compute_league_table(
     rows: Iterable[Row],
     place_points: Dict[int, Decimal] | None = None,
-    win_mode: WinMode = "count_top_block",
+    win_mode: WinMode = "fractional",
     return_decimals: bool = False,
 ) -> List[Dict]:
     """
@@ -84,7 +84,7 @@ def compute_league_table(
 def compute_game_breakdown(
     rows: Iterable[Row],
     place_points: Dict[int, Decimal] | None = None,
-    win_mode: WinMode = "count_top_block",
+    win_mode: WinMode = "fractional",
     return_decimals: bool = False,
 ) -> List[Dict]:
     """

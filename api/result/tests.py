@@ -100,3 +100,49 @@ class ResultAPITests(TestCase):
         self.assertEqual(res1.position, 1)
         self.assertEqual(res2.position, 2)
         self.assertEqual(res1.decisive_tie_breaker, tb)
+
+    def test_fractional_wins_on_tie(self):
+        # Create another player
+        user2 = User.objects.create(username='user2')
+        profile2 = PlayerProfile.objects.create(user=user2, profile_name='Profile 2')
+        participant2 = SeasonParticipant.objects.create(season=self.season, profile=profile2, rank=2)
+        self.league.members.add(participant2)
+
+        data = {
+            "selected_game": self.selected_game.id,
+            "results": [
+                {
+                    "player_profile": self.profile.id,
+                    "points": 10,
+                    "starting_position": 1
+                },
+                {
+                    "player_profile": profile2.id,
+                    "points": 10,
+                    "starting_position": 2
+                }
+            ]
+        }
+        # Submission with equal points and NO tie-breakers defined for this game in setUp
+        # Actually, let's make sure no tie-breakers exist so it stays a tie.
+        TieBreaker.objects.filter(result_config=self.config).delete()
+
+        response = self.client.post('/api/result/match-results/', data, format='json')
+        # Since there are no tie-breakers, it should finalize immediately with a tie
+        self.assertEqual(response.status_code, 201)
+
+        from league.models import LeagueStanding, GameStanding
+        # Check GameStanding for win_share
+        gs1 = GameStanding.objects.get(selected_game=self.selected_game, player_profile=self.profile)
+        gs2 = GameStanding.objects.get(selected_game=self.selected_game, player_profile=profile2)
+
+        # Both should have 0.5 wins
+        self.assertEqual(float(gs1.win_share), 0.5)
+        self.assertEqual(float(gs2.win_share), 0.5)
+
+        # Check LeagueStanding for total wins
+        ls1 = LeagueStanding.objects.get(league=self.league, player_profile=self.profile)
+        ls2 = LeagueStanding.objects.get(league=self.league, player_profile=profile2)
+
+        self.assertEqual(float(ls1.wins), 0.5)
+        self.assertEqual(float(ls2.wins), 0.5)
