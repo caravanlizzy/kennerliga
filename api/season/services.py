@@ -1,5 +1,5 @@
 import logging
-from league.models import League, LeagueResult
+from league.models import League, LeagueStanding
 from season.models import Season
 from season.queries import get_running_season, get_open_season
 from random import shuffle
@@ -129,11 +129,23 @@ def get_previous_result(profile: PlayerProfile) -> Optional[dict]:
     except League.DoesNotExist:
         return None
 
-    result = LeagueResult.objects.filter(league=league, profile=profile).first()
+    # Get standings for this league ordered by performance (descending)
+    standings = list(
+        LeagueStanding.objects.filter(league=league)
+        .order_by("-league_points", "-wins", "player_profile__profile_name")
+    )
+    
+    # Find this player's standing and rank
+    player_standing = next((s for s in standings if s.player_profile_id == profile.id), None)
+    if not player_standing:
+        return None
+        
+    rank = standings.index(player_standing) + 1
+    
     return {
         "league": league.level,
-        "position": result.league_points if result else None,
-        "is_last": (result and result.position == league.members.count()),
+        "position": rank,
+        "is_last": (rank == len(standings) and len(standings) > 1),
     }
 
 def order_previous(participants: List[PlayerProfile]) -> List[PlayerProfile]:

@@ -1,5 +1,5 @@
 from django.contrib import admin, messages
-from league.models import League, LeagueResult, LeagueStanding, GameStanding
+from league.models import League, LeagueStanding, GameStanding
 from services.standings_snapshot import rebuild_league_snapshot, rebuild_game_snapshot
 from game.models import SelectedGame
 
@@ -23,12 +23,6 @@ class LeagueAdmin(admin.ModelAdmin):
         self.message_user(request, f"Standings rebuilt for {queryset.count()} leagues.", messages.SUCCESS)
 
 
-@admin.register(LeagueResult)
-class LeagueResultAdmin(admin.ModelAdmin):
-    list_display = ('league', 'profile', 'league_points', 'position', 'last')
-    list_filter = ('league', 'last')
-    search_fields = ('league__season__year', 'profile__profile_name')
-    raw_id_fields = ('league', 'profile')
 
 
 @admin.register(LeagueStanding)

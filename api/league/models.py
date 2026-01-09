@@ -43,19 +43,6 @@ class League(models.Model):
         return f'{self.season}L{self.level}'
 
 
-class LeagueResult(models.Model):
-    league = models.ForeignKey(
-        League,
-        on_delete=models.CASCADE
-    )
-    profile = models.ForeignKey(
-        'user.PlayerProfile',
-        on_delete=models.CASCADE,
-        related_name='league_results'
-    )
-    league_points = models.FloatField()
-    position = models.IntegerField()
-    last = models.BooleanField()
 
 
 class LeagueStanding(models.Model):
