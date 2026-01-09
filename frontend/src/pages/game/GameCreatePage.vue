@@ -3,12 +3,12 @@
     <div class="row justify-center">
       <div class="col-12 col-md-10 col-lg-8">
         <q-card flat bordered class="q-pa-lg shadow-2">
-          <div class="row items-center q-mb-lg">
+          <div class="row items-center q-mb-lg q-gutter-x-sm">
+            <KennerButton flat round icon="arrow_back" @click="$router.back()" />
             <q-icon
               name="add_circle"
               size="md"
               color="primary"
-              class="q-mr-sm"
             />
             <h1 class="text-h4 q-my-none text-weight-bold">New Game</h1>
           </div>
@@ -199,7 +199,7 @@
                               flat
                               round
                               dense
-                              icon="close"
+                              icon="delete"
                               size="sm"
                               color="negative"
                               @click="removeChoice(opt.ref, ch.ref)"
@@ -357,7 +357,7 @@
                                     round
                                     dense
                                     size="sm"
-                                    icon="close"
+                                    icon="delete"
                                     color="grey-7"
                                     @click="
                                       removeCondition(opt.ref, grp.id, cond.id)

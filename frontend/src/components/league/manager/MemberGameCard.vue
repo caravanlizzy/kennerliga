@@ -30,7 +30,7 @@
           round
           dense
           size="xs"
-          icon="close"
+          icon="remove"
           class="q-ml-xs"
         >
           <KennerTooltip>Remove Ban</KennerTooltip>
@@ -67,7 +67,7 @@
             round
             dense
             size="xs"
-            icon="close"
+            icon="remove"
             class="q-ml-xs"
           >
             <KennerTooltip>Remove Skip</KennerTooltip>

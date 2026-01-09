@@ -41,7 +41,7 @@
           <!--          <kenner-counter :content="index" />-->
         </div>
         <div class="column justify-center item-start">{{ item.name }}</div>
-        <KennerButton icon="close" @click="removeItem(item)" color="accent" flat dense/>
+        <KennerButton icon="delete" @click="removeItem(item)" color="accent" flat dense/>
       </div>
     </div>
   </div>

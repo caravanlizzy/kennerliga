@@ -3,6 +3,16 @@
     <!-- Header Area -->
     <div class="row items-center justify-between q-mb-md">
       <div class="row items-center q-gutter-x-sm">
+        <KennerButton
+          flat
+          icon="arrow_back"
+          round
+          color="grey-7"
+          size="md"
+          @click="router.back()"
+        >
+          <KennerTooltip>Back</KennerTooltip>
+        </KennerButton>
         <q-icon name="military_tech" size="md" color="primary" />
         <div class="text-h4 text-weight-bolder text-dark tracking-tighter">
           Season {{ season?.name || '…' }} Overview
@@ -19,16 +29,6 @@
           @click="load"
         >
           <KennerTooltip>Refresh</KennerTooltip>
-        </KennerButton>
-        <KennerButton
-          flat
-          icon="close"
-          round
-          color="grey-7"
-          size="md"
-          @click="router.back()"
-        >
-          <KennerTooltip>Back</KennerTooltip>
         </KennerButton>
       </div>
     </div>

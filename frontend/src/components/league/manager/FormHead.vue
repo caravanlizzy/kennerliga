@@ -9,7 +9,7 @@
       dense
       flat
       round
-      icon="close"
+      icon="cancel"
       color="grey-8"
       size="md"
       @click="emit('onClose')"
