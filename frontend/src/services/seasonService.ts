@@ -157,12 +157,17 @@ export async function fetchLiveActionEvents(seasonId?: number): Promise<TLiveEve
   }
 }
 
-export async function fetchSeasonsWithLeagues(): Promise<TSeasonDto[]> {
+export async function fetchSeasons(params?: {
+  year?: number;
+  status?: string;
+}): Promise<TSeasonDto[]> {
   try {
-    const { data } = await api.get('season/seasons/seasons-with-leagues/');
+    const { data } = await api.get('/season/seasons/', {
+      params: { ...params },
+    });
     return Array.isArray(data) ? data : data?.results || [];
   } catch (error) {
-    console.error('Error fetching seasons with leagues:', error);
+    console.error('Error fetching seasons:', error);
     return [];
   }
 }

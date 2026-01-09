@@ -189,7 +189,7 @@ import {
   fetchAvailableYears,
   fetchCurrentSeasonId,
   fetchSeason,
-  fetchSeasonsWithLeagues,
+  fetchSeasons,
 } from 'src/services/seasonService';
 import type { TSeasonDto } from 'src/types';
 
@@ -202,74 +202,80 @@ const selectedYear = ref(new Date().getFullYear());
 const availableYears = ref<number[]>([]);
 
 // Seasons logic
-const seasonsWithLeagues = ref<TSeasonDto[]>([]);
+const seasonsForYear = ref<TSeasonDto[]>([]);
 const selectedSeasonYear = ref<number | null>(null);
 const selectedSeasonMonth = ref<number | null>(null);
 
 const seasonYearOptions = computed(() =>
-  Array.from(new Set(seasonsWithLeagues.value.map((s) => s.year)))
+  [...availableYears.value]
     .sort((a, b) => b - a)
     .map((y) => ({ label: String(y), value: y }))
 );
 
 const seasonMonthOptions = computed(() => {
-  if (!selectedSeasonYear.value) return [];
-  const months = seasonsWithLeagues.value
-    .filter((s) => s.year === selectedSeasonYear.value)
-    .map((s) => s.month);
-  return Array.from(new Set(months))
+  return seasonsForYear.value
+    .map((s) => s.month)
     .sort((a, b) => a - b)
-    .map((m) => ({ label: String(m), value: m }));
+    .map((m) => ({
+      label: `Month ${m}`,
+      value: m,
+    }));
 });
 
 const selectedSeasonId = computed(() => {
-  const found = seasonsWithLeagues.value.find(
-    (s) =>
-      s.year === selectedSeasonYear.value &&
-      s.month === selectedSeasonMonth.value
+  const found = seasonsForYear.value.find(
+    (s) => s.month === selectedSeasonMonth.value
   );
   return found ? found.id : null;
 });
 
-watch(selectedSeasonYear, (newYear, oldYear) => {
-  if (oldYear !== null && newYear !== oldYear) {
-    selectedSeasonMonth.value = null;
-    // Auto-select first available month for this year if any
-    const months = seasonsWithLeagues.value.filter((s) => s.year === newYear);
-    if (months.length > 0) {
-      selectedSeasonMonth.value = months[0].month;
+watch(selectedSeasonYear, async (newYear) => {
+  if (newYear) {
+    const seasons = await fetchSeasons({ year: newYear });
+    seasonsForYear.value = seasons;
+
+    // If current selected month is not in new seasons, pick the latest month
+    if (seasons.length > 0) {
+      const months = seasons.map((s) => s.month);
+      if (
+        !selectedSeasonMonth.value ||
+        !months.includes(selectedSeasonMonth.value)
+      ) {
+        selectedSeasonMonth.value = Math.max(...months);
+      }
+    } else {
+      selectedSeasonMonth.value = null;
     }
+  } else {
+    seasonsForYear.value = [];
+    selectedSeasonMonth.value = null;
   }
 });
 
 onMounted(async () => {
   if (isAuthenticated.value) {
-    const [years, currentSeasonId, seasons] = await Promise.all([
+    const [years, currentSeasonId] = await Promise.all([
       fetchAvailableYears(),
       fetchCurrentSeasonId(),
-      fetchSeasonsWithLeagues(),
     ]);
 
     availableYears.value = years;
-    seasonsWithLeagues.value = seasons;
 
     if (currentSeasonId) {
       const season = await fetchSeason(currentSeasonId);
       if (season) {
         selectedYear.value = season.year;
+        // Setting this will trigger the watcher which fetches seasons and sets month
+        selectedSeasonYear.value = season.year;
+        // Explicitly set month after a short delay or by waiting for the fetch
+        // But actually, we already have the season object, so we can just set it
+        // The watcher might overwrite it, so we should be careful.
+        // Let's just set it and ensure the watcher doesn't overwrite it if it's already set to a valid value.
+        selectedSeasonMonth.value = season.month;
       }
     } else if (availableYears.value.length > 0) {
       selectedYear.value = availableYears.value[0];
-    }
-
-    // Load seasons with leagues
-    if (seasonsWithLeagues.value.length > 0) {
-      const latest = [...seasonsWithLeagues.value].sort((a, b) => {
-        if (a.year !== b.year) return b.year - a.year;
-        return b.month - a.month;
-      })[0];
-      selectedSeasonYear.value = latest.year;
-      selectedSeasonMonth.value = latest.month;
+      selectedSeasonYear.value = availableYears.value[0];
     }
   }
 });
