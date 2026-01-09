@@ -13,6 +13,7 @@ export type TAnnouncementDto = {
   content: string | null;
   visible_until: string;
   visible_from: string;
+  season_id?: number;
 };
 
 export type AnnouncementCreate = {

@@ -2,17 +2,18 @@ import { AxiosResponse } from 'axios';
 import { api } from 'boot/axios';
 import { TSeasonDto, TSeasonParticipantDto, TLeagueDto, TLiveEvent } from 'src/types';
 
-export async function registerForSeason(): Promise<AxiosResponse | undefined> {
+export async function registerForSeason(seasonId: number): Promise<AxiosResponse | undefined> {
   try {
-    return await api.post('/season/register/');
+    return await api.post('/season/register/', { season_id: seasonId });
   } catch (error) {
     console.error(error);
   }
 }
 
-export async function fetchIsRegisteredForSeason(): Promise<boolean> {
+export async function fetchIsRegisteredForSeason(seasonId?: number): Promise<boolean> {
   try {
-    const { data } = await api.get('/season/seasons/registration-status/');
+    const params = seasonId ? { season: seasonId } : {};
+    const { data } = await api.get('/season/seasons/registration-status/', { params });
     return data.registered;
   } catch (error) {
     console.log(error);

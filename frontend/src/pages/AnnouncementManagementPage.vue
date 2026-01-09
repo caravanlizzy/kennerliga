@@ -33,7 +33,7 @@
                   flat
                   round
                   dense
-                  icon="close"
+                  icon="delete"
                   @click="requestDelete(announcement.id)"
                 />
               </template>
