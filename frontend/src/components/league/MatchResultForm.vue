@@ -223,7 +223,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch, computed } from 'vue';
+import { ref, watch, computed, onMounted } from 'vue';
 import { api } from 'boot/axios';
 import { useQuasar } from 'quasar';
 import { storeToRefs } from 'pinia';
@@ -257,7 +257,13 @@ const props = defineProps<{
   league?: TLeagueDto;
 }>();
 const leagueStore = useLeagueStore(props.leagueId)();
-const { members } = storeToRefs(leagueStore);
+const { members, initialized } = storeToRefs(leagueStore);
+
+onMounted(() => {
+  if (!initialized.value) {
+    leagueStore.init();
+  }
+});
 
 const resultConfig = ref<TResultConfig | null>(null);
 const factions = ref<Faction[]>([]);

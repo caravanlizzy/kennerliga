@@ -123,7 +123,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch, watchEffect } from 'vue';
+import { onMounted, ref, watch, watchEffect } from 'vue';
 import GameSelectionView from 'components/game/selectedGame/GameSelectionView.vue';
 import { useLeagueStore } from 'stores/leagueStore';
 import { storeToRefs } from 'pinia';
@@ -230,6 +230,10 @@ function handleBanGame(selectedGameId: number, gameName: string) {
     'Ban'
   );
 }
+
+onMounted(() => {
+  myLeagueStore.init();
+});
 
 function manageActionBar() {
   reset();
