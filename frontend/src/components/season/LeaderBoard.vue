@@ -49,6 +49,21 @@
         v-for="(row, index) in standings.standings"
         :key="row.player_profile_id"
       >
+        <!-- Group Separator Row -->
+        <tr v-if="shouldShowGroupHeader(index) && bestLeague(row) !== null" class="group-separator-row">
+          <td colspan="5" class="q-pa-none">
+            <div class="group-header-content row items-center q-px-lg q-pt-md q-pb-xs">
+              <div class="group-line col"></div>
+              <div class="group-label-chip q-mx-sm" :class="'bg-' + leagueBadgeColor(bestLeague(row)!) + '-1'">
+                 <span class="group-label-text" :class="'text-' + leagueBadgeColor(bestLeague(row)!)">
+                   League {{ bestLeague(row) }}
+                 </span>
+              </div>
+              <div class="group-line col"></div>
+            </div>
+          </td>
+        </tr>
+
         <tr
           class="leaderboard-row"
           :class="{
@@ -57,15 +72,6 @@
         >
           <!-- Player -->
           <td class="text-left relative-position q-py-md">
-            <div
-              v-if="shouldShowGroupHeader(index) && bestLeague(row) !== null"
-              class="group-label-container"
-            >
-               <span class="group-label-text" :class="'text-' + leagueBadgeColor(bestLeague(row)!)">
-                 League {{ bestLeague(row) }}
-               </span>
-            </div>
-
             <div class="row items-center q-gutter-x-md q-pl-lg">
               <UserAvatar
                 :display-username="row.profile_name"
@@ -142,6 +148,17 @@
       </template>
       </tbody>
     </q-markup-table>
+
+    <!-- Legend -->
+    <div class="q-px-lg q-py-sm text-caption text-grey-7 border-top-subtle">
+      <div class="row items-center q-gutter-x-xs">
+        <q-icon name="info" size="14px" />
+        <span>
+          <strong>Legend:</strong> "League X" indicates the highest league level a player has participated in at least once.
+          Higher league participation results in a higher leaderboard position.
+        </span>
+      </div>
+    </div>
   </div>
 
   <!-- No data -->
@@ -260,7 +277,6 @@ watch(
 
   &:hover {
     background-color: rgba(255, 255, 255, 0.6) !important;
-    transform: scale(1.002);
     z-index: 1;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
   }
@@ -270,16 +286,24 @@ watch(
   background-color: rgba(255, 249, 230, 0.4);
 }
 
-.group-label-container {
-  position: absolute;
-  left: 12px;
-  top: -10px;
-  z-index: 10;
-  background: white;
+.group-separator-row {
+  background: transparent !important;
+}
+
+.group-header-content {
+  opacity: 0.8;
+}
+
+.group-line {
+  height: 1px;
+  background: rgba(54, 64, 88, 0.08);
+}
+
+.group-label-chip {
   padding: 2px 10px;
   border-radius: 20px;
-  border: 1px solid rgba(54, 64, 88, 0.1);
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(54, 64, 88, 0.05);
+  white-space: nowrap;
 }
 
 .group-label-text {
@@ -287,6 +311,10 @@ watch(
   font-weight: 800;
   text-transform: uppercase;
   letter-spacing: 1px;
+}
+
+.border-top-subtle {
+  border-top: 1px solid rgba(54, 64, 88, 0.05);
 }
 
 .divide-y tr:last-child {

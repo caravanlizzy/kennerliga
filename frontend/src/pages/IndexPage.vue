@@ -142,7 +142,7 @@
               icon="stars"
               title="Leaderboard"
               class="col-12"
-              color="primary"
+              color="warning"
             >
               <template #header-extra>
                 <div style="min-width: 120px" class="q-ml-md">

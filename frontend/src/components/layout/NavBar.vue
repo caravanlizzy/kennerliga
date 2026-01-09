@@ -137,10 +137,19 @@ function scrollToSection(id: string) {
   .tab-live .q-icon { color: var(--q-accent); }
   .tab-seasons .q-icon { color: var(--q-primary); }
   .tab-chat .q-icon { color: #455a64; } // blue-grey-8
-  .tab-leaderboard .q-icon { color: var(--q-primary); }
+  .tab-leaderboard .q-icon { color: var(--q-warning); }
 
   .q-tab--active {
     background: white !important;
+    &.tab-leaderboard {
+      color: var(--q-warning) !important;
+    }
+    &.tab-live {
+      color: var(--q-accent) !important;
+    }
+    &.tab-seasons {
+      color: var(--q-primary) !important;
+    }
   }
 }
 
