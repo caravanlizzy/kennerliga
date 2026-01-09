@@ -81,6 +81,26 @@ const routes: RouteRecordRaw[] = [
       seasonRoutes,
       leagueRoutes,
       {
+        path: 'm/seasons',
+        name: 'mobile-seasons',
+        component: () => import('src/pages/mobile/SeasonsMobilePage.vue'),
+      },
+      {
+        path: 'm/live',
+        name: 'mobile-live',
+        component: () => import('src/pages/mobile/LiveActionMobilePage.vue'),
+      },
+      {
+        path: 'm/chat',
+        name: 'mobile-chat',
+        component: () => import('src/pages/mobile/ChatMobilePage.vue'),
+      },
+      {
+        path: 'm/leaderboard',
+        name: 'mobile-leaderboard',
+        component: () => import('src/pages/mobile/LeaderboardMobilePage.vue'),
+      },
+      {
         path: 'dev',
         name: 'dev',
         component: () => import('pages/DevPage.vue'),
