@@ -36,6 +36,7 @@ export type TLeagueDto = {
   season: number;
   members: TSeasonParticipantDto[];
   status?: TLeagueStatus;
+  is_completed?: boolean;
 };
 
 export type TBannedGameFull = {

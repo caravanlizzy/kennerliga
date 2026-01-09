@@ -58,10 +58,10 @@
                 {{ leagues.length }} leagues
               </q-badge>
               <q-badge
-                v-if="season?.status"
+                v-if="seasonStatusLabel"
                 :color="statusColor"
                 class="q-pa-sm text-weight-bold"
-                :label="season.status"
+                :label="seasonStatusLabel"
               />
             </div>
           </ContentSection>
@@ -138,12 +138,23 @@ const loading = ref(true);
 const error = ref<string | null>(null);
 
 const statusColor = computed(() => {
+  if (isSeasonCompleted.value) return 'grey-7';
   switch (season.value?.status) {
     case 'OPEN': return 'teal-6';
     case 'RUNNING': return 'primary';
     case 'DONE': return 'grey-7';
     default: return 'grey-6';
   }
+});
+
+const isSeasonCompleted = computed(() => {
+  if (!leagues.value.length) return false;
+  return leagues.value.every(l => l.is_completed);
+});
+
+const seasonStatusLabel = computed(() => {
+  if (isSeasonCompleted.value) return 'COMPLETE';
+  return season.value?.status || '';
 });
 
 async function load() {
