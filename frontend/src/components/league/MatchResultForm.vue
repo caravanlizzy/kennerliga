@@ -362,6 +362,56 @@ async function fetchFactions() {
   factions.value = (factionRes.data ?? []) as Faction[];
 }
 
+async function fetchExistingResults() {
+  try {
+    const { data } = await api.get<TMatchResult[]>(
+      `result/match-results/?season=${leagueStore.league?.season}&league=${props.leagueId}&selected_game=${props.selectedGameId}`
+    );
+    if (data && data.length > 0) {
+      // Map existing results to formData
+      formData.value = members.value.map((m) => {
+        const existing = data.find((r) => r.player_profile === m.profile);
+        if (existing) {
+          const faction_ids: Record<number, number | null> = {};
+          if (existing.factions) {
+            existing.factions.forEach((f) => {
+              faction_ids[f.level] = f.id;
+            });
+          }
+          return {
+            player_profile: m.profile,
+            selected_game: props.selectedGameId,
+            points: existing.points,
+            position: existing.position,
+            notes: existing.notes || '',
+            starting_position: existing.starting_position,
+            starting_points: existing.starting_points,
+            faction_ids,
+            tie_breaker_value: existing.tie_breaker_value
+              ? Number(existing.tie_breaker_value)
+              : null,
+          };
+        }
+        return {
+          player_profile: m.profile,
+          selected_game: props.selectedGameId,
+          points: null,
+          position: null,
+          notes: '',
+          starting_position: null,
+          starting_points: null,
+          faction_ids: {},
+          tie_breaker_value: null,
+        };
+      });
+      return true;
+    }
+  } catch (e) {
+    console.error('Error fetching existing results:', e);
+  }
+  return false;
+}
+
 function initFormData() {
   if (!members.value || members.value.length === 0) {
     formData.value = [];
@@ -396,7 +446,10 @@ watch(
       isLoading.value = true;
       try {
         await Promise.all([fetchResultConfig(), fetchFactions()]);
-        initFormData();
+        const hasResults = await fetchExistingResults();
+        if (!hasResults) {
+          initFormData();
+        }
       } catch (error) {
         console.error('Error loading form data:', error);
       } finally {
@@ -499,7 +552,7 @@ async function submitResults() {
       (id) => id !== null && id !== undefined
     ) as number[];
 
-    return {
+    const res: TMatchResultPayload = {
       player_profile: entry.player_profile,
       selected_game: entry.selected_game,
       points: resultConfig.value?.has_points ? entry.points : null,
@@ -512,6 +565,7 @@ async function submitResults() {
       faction_ids: selectedFactionIds,
       tie_breaker_value: entry.tie_breaker_value ?? null,
     };
+    return res;
   });
 
   const payload: TMatchResultSubmitPayload = {
@@ -526,7 +580,7 @@ async function submitResults() {
   try {
     const response = await api.post('/result/match-results/', payload);
 
-    if (response.status === 201) {
+    if (response.status === 201 || response.status === 200) {
       $q.notify({ type: 'positive', message: 'Result saved.' });
       emit('submitted', props.selectedGameId);
       tieBreakerRequired.value = false;

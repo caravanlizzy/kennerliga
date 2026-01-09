@@ -165,11 +165,24 @@ class MatchResultViewSet(ViewSet):
         serializers, seen = [], set()
         for entry in data:
             entry.update({"selected_game": selected_game.id, "league": league.id, "season": season.id})
-            if entry.get("player_profile") in seen:
+            player_profile_id = entry.get("player_profile")
+            if player_profile_id in seen:
                 return Response({"detail": "Duplicate player."}, status=status.HTTP_400_BAD_REQUEST)
-            seen.add(entry.get("player_profile"))
-            s = ResultSerializer(data=entry, context={"request": request})
-            if not s.is_valid(): return Response(s.errors, status=status.HTTP_400_BAD_REQUEST)
+            seen.add(player_profile_id)
+
+            # Check for existing result to update
+            existing_result = Result.objects.filter(
+                selected_game=selected_game,
+                player_profile_id=player_profile_id
+            ).first()
+
+            if existing_result:
+                s = ResultSerializer(existing_result, data=entry, context={"request": request})
+            else:
+                s = ResultSerializer(data=entry, context={"request": request})
+
+            if not s.is_valid():
+                return Response(s.errors, status=status.HTTP_400_BAD_REQUEST)
             serializers.append(s)
 
         rows = [s.validated_data for s in serializers]

@@ -104,4 +104,12 @@ class ResultSerializer(serializers.ModelSerializer):
             factions = Faction.objects.filter(id__in=faction_ids)
             instance.factions.set(factions)
 
+    def update(self, instance, validated_data):
+        faction_ids = validated_data.pop('faction_ids', None)
+        instance = super().update(instance, validated_data)
+
+        if faction_ids is not None:
+            factions = Faction.objects.filter(id__in=faction_ids)
+            instance.factions.set(factions)
+
         return instance

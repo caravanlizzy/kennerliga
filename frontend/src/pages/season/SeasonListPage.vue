@@ -62,7 +62,7 @@ const {
   data: seasons,
   isFinished,
   error: fetchError,
-} = useAxios<Season[]>('/season/seasons/seasons-with-leagues/', api);
+} = useAxios<Season[]>('/season/seasons/?include_details=1', api);
 
 const loading = computed(() => !isFinished.value);
 const error = computed(() => fetchError.value?.message || null);

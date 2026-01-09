@@ -4,6 +4,7 @@
     v-else
     :gameInformation="gameInformation"
     :gameSelection="gameSelection"
+    :visibleOptions="visibleOptions"
     :isLoading="isLoading"
     :isValid="isValid"
     :onSubmit="onSubmit"
@@ -32,6 +33,7 @@ const {
   gameSelection,
   platforms,
   isValid,
+  visibleOptions,
   initGameInformation,
   fetchPlatforms,
   toSelectedGamePayload,
@@ -44,10 +46,9 @@ onMounted(async () => {
   const { data: selection } = await api(
     `game/selected-games/${props.selectedGameId}`
   );
-  await initGameInformation(game);
-  gameSelection.game = game;
   gameSelection.leagueId = props.leagueId;
   gameSelection.profileId = props.profileId;
+  await initGameInformation(game);
   gameSelection.selectedOptions = apiToGameSelectionOptions(
     selection.selected_options
   );

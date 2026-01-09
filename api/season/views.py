@@ -46,6 +46,11 @@ class SeasonViewSet(ModelViewSet):
     serializer_class = SeasonSerializer
     filterset_fields = ['year', 'month', 'status']
 
+    def get_serializer_class(self):
+        if self.action == 'list' and self.request.query_params.get('include_details') == '1':
+            return SeasonWithLeaguesSerializer
+        return super().get_serializer_class()
+
     def get_queryset(self):
         qs = super().get_queryset()
         if self.request.query_params.get('with_leagues') == '1':
