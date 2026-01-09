@@ -217,7 +217,7 @@ const seasonMonthOptions = computed(() => {
     .map((s) => s.month)
     .sort((a, b) => a - b)
     .map((m) => ({
-      label: `Month ${m}`,
+      label: m,
       value: m,
     }));
 });
