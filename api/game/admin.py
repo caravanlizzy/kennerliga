@@ -1,10 +1,11 @@
-from django.contrib import admin
+from django.contrib import admin, messages
 from nested_admin.nested import NestedModelAdmin, NestedStackedInline, NestedTabularInline
 
 # Register your models here.
 from game.models import Game, GameOption, GameOptionChoice, StartingPointSystem, Faction, TieBreaker, \
     ResultConfig, SelectedGame, BanDecision, SelectedOption, GameOptionAvailabilityCondition, \
     GameOptionAvailabilityGroup
+from services.standings_snapshot import rebuild_game_snapshot, rebuild_league_snapshot
 
 
 # @admin.register(GameOption)
@@ -99,6 +100,19 @@ class SelectedGameAdmin(admin.ModelAdmin):
     list_display = ('profile', 'game', 'league')
     list_filter = ('league', 'game', 'profile')
     search_fields = ('profile__profile_name', 'game__name')
+    actions = ['rebuild_selected_game_standings']
+
+    @admin.action(description="Rebuild standings for selected games")
+    def rebuild_selected_game_standings(self, request, queryset):
+        leagues = set()
+        for sg in queryset:
+            rebuild_game_snapshot(sg)
+            leagues.add(sg.league)
+        
+        for league in leagues:
+            rebuild_league_snapshot(league)
+            
+        self.message_user(request, f"Standings rebuilt for {queryset.count()} games.", messages.SUCCESS)
 
 
 @admin.register(BanDecision)
