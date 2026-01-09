@@ -60,6 +60,17 @@ class LeagueSerializer(serializers.ModelSerializer):
             league.members.set(members)
         return league
 
+class LeagueListSerializer(serializers.ModelSerializer):
+    is_completed = SerializerMethodField()
+
+    class Meta:
+        model = League
+        fields = ["id", "season", "level", "status", "active_player", "is_completed"]
+
+    def get_is_completed(self, obj):
+        from league.queries import is_league_finished
+        return is_league_finished(obj)
+
 class LeagueStandingSerializer(serializers.ModelSerializer):
     profile_name = serializers.CharField(source="player_profile.profile_name", read_only=True)
     user_id = serializers.IntegerField(source="player_profile.user.id", read_only=True)

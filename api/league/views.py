@@ -9,7 +9,7 @@ from rest_framework.viewsets import ReadOnlyModelViewSet, ModelViewSet
 from api.constants import get_ban_amount_for_success
 from game.models import SelectedGame, BanDecision
 from league.models import League, LeagueStanding, GameStanding
-from league.serializer import LeagueDetailSerializer, LeagueStandingSerializer, GameStandingSerializer, LeagueSerializer
+from league.serializer import LeagueDetailSerializer, LeagueStandingSerializer, GameStandingSerializer, LeagueSerializer, LeagueListSerializer
 from services.standings_snapshot import rebuild_league_snapshot, rebuild_game_snapshot
 
 
@@ -20,6 +20,11 @@ class LeagueViewSet(ModelViewSet):
     serializer_class = LeagueSerializer
     filterset_fields = ['season', 'members__profile']
     permission_classes = [IsAuthenticated]
+
+    def get_serializer_class(self):
+        if self.action == 'list':
+            return LeagueListSerializer
+        return super().get_serializer_class()
 
     def get_permissions(self):
         if self.action == 'rebuild_standings':
@@ -90,19 +95,21 @@ class LeagueViewSet(ModelViewSet):
             .annotate(ban_count=Count('bandecision'))
             .filter(ban_count__lt=required_bans)
             .select_related('game')
+            .prefetch_related('game__resultconfig_set')
             .order_by('id')
         )
-        selected_game_list = [
-            {
+        selected_game_list = []
+        for sg in selected_games:
+            # Avoid N+1 by using the prefetched resultconfig_set
+            configs = list(sg.game.resultconfig_set.all())
+            selected_game_list.append({
                 "id": sg.id,
                 "game_name": sg.game.name,
                 "game_short_name": sg.game.short_name,
-                "has_points": sg.game.resultconfig_set.first().has_points if sg.game.resultconfig_set.exists() else True,
+                "has_points": configs[0].has_points if configs else True,
                 "selected_by_id": sg.profile.id if sg.profile else None,
                 "selected_by_name": sg.profile.profile_name if sg.profile else None,
-            }
-            for sg in selected_games
-        ]
+            })
         selected_game_ids = [sg.id for sg in selected_games]
 
         # 2. Get league standings (for row ordering & totals)
@@ -117,7 +124,6 @@ class LeagueViewSet(ModelViewSet):
         game_standings = (
             GameStanding.objects
             .filter(league=league)
-            .select_related('player_profile__user')
         )
 
         # Build a lookup: {player_profile_id: {selected_game_id: {...}}}

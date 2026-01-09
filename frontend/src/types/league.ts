@@ -35,7 +35,7 @@ export type TLeagueDto = {
   id: number;
   level: number | string;
   season: number;
-  members: TSeasonParticipantDto[];
+  members?: TSeasonParticipantDto[];
   status?: TLeagueStatus;
   is_completed?: boolean;
 };
