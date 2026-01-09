@@ -176,7 +176,18 @@ async function load() {
     league.value = await fetchLeagueDetails(leagueId);
     if (!league.value) throw new Error('Failed to load league data.');
     season.value = await fetchSeason(league.value.season);
-    await fetchMatchResults();
+
+    // Results are now included in league.value.members[].selected_games[].results
+    // Populate matchResultsBySelectedGameId from the prefetched data
+    const newResults: Record<number, TMatchResult[]> = {};
+    (league.value.members || []).forEach(member => {
+      (member.selected_games || []).forEach(selGame => {
+        if (selGame.results) {
+          newResults[selGame.id] = selGame.results;
+        }
+      });
+    });
+    matchResultsBySelectedGameId.value = newResults;
   } catch (e: any) {
     error.value = e?.message || 'Failed to load league/season data.';
   } finally {
@@ -184,17 +195,10 @@ async function load() {
   }
 }
 
-async function fetchMatchResults() {
-  const tasks = (league.value?.members || []).flatMap(member =>
-    (member.selected_games || []).map(selGame => fetchMatchResult(selGame))
-  );
-  await Promise.all(tasks);
-}
-
 async function fetchMatchResult(selGame: TSelectedGameDto) {
   try {
     const { data } = await api.get(
-      `result/results/?season=${season.value?.id}&league=${league.value?.id}&selected_game=${selGame.id}`
+      `result/results/?selected_game=${selGame.id}`
     );
     matchResultsBySelectedGameId.value[selGame.id] = Array.isArray(data) ? data : [];
   } catch (e) {

@@ -246,7 +246,8 @@ class LeagueDetailViewSet(ReadOnlyModelViewSet):
                     'profile__selected_games',
                     queryset=SelectedGame.objects
                     .filter(league=league)
-                    .select_related('game'),
+                    .select_related('game')
+                    .prefetch_related('result_set'),  # Added prefetch for results
                     to_attr='selected_in_this_league',
                 ),
                 # Prefetch bans made BY this player (via player_banning)

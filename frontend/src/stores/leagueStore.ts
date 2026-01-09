@@ -123,6 +123,15 @@ export const useLeagueStore = (id: number) => {
         leagueData.value = data;
         members.value = data.members;
         leagueStatus.value = data.status;
+
+        // Populate matchResultsBySelectedGame from the prefetched data
+        (data.members || []).forEach(member => {
+          (member.selected_games || []).forEach(selGame => {
+            if (selGame.results) {
+              setResultsForGame(selGame.id, selGame.results);
+            }
+          });
+        });
       } finally {
         loading.value = false;
       }
@@ -194,7 +203,8 @@ export const useLeagueStore = (id: number) => {
       initPromise = (async () => {
         try {
           await updateLeagueData();
-          await getMatchResults();
+          // getMatchResults is now redundant for initial load as data is prefetched
+          // await getMatchResults();
           initialized.value = true;
           startPolling();
         } finally {

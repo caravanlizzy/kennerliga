@@ -116,10 +116,17 @@ class SelectedGameSerializer(serializers.ModelSerializer):
     )
 
     manage_only = serializers.BooleanField(write_only=True, required=False)
+    results = serializers.SerializerMethodField()
 
     class Meta:
         model = SelectedGame
-        fields = ['id', 'game', 'game_name', 'selected_options', 'league', 'profile', 'manage_only', 'successfully_banned', 'has_points', 'results_uploaded']
+        fields = ['id', 'game', 'game_name', 'selected_options', 'league', 'profile', 'manage_only', 'successfully_banned', 'has_points', 'results_uploaded', 'results']
+
+    def get_results(self, obj):
+        from result.serializers import ResultSerializer
+        # We assume results are prefetched via result_set if called from optimized views
+        results = getattr(obj, 'result_set', obj.result_set.all())
+        return ResultSerializer(results, many=True).data
 
     def validate(self, attrs):
         game = attrs.get('game', None)

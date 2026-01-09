@@ -101,6 +101,7 @@ export type TSelectedGameDto = {
   successfully_banned?: boolean;
   has_points?: boolean;
   results_uploaded?: boolean;
+  results?: TMatchResultDto[];
 };
 
 export type TSelectedGameDtoPayload = {
