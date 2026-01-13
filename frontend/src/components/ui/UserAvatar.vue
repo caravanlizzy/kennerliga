@@ -49,16 +49,14 @@ function hash(str: string) {
   return Math.abs(h)
 }
 const hue = computed(() => hash(clean.value || 'user') % 360)
-const hue2 = computed(() => (hue.value + 30) % 360) // offset for gradient
 const sat = 55
 const light = 70
-const light2 = 60 // slightly darker for gradient end
 
 const textClass = computed(() => (light >= 65 ? 'text-dark' : 'text-white'))
 const borderColor = computed(() => `hsl(${hue.value} ${sat}% ${Math.max(light - 18, 35)}%)`)
 
 const avatarStyle = computed(() => ({
-  background: `linear-gradient(135deg, hsl(${hue.value} ${sat}% ${light}%) 0%, hsl(${hue2.value} ${sat}% ${light2}%) 100%)`,
+  backgroundColor: `hsl(${hue.value} ${sat}% ${light}%)`,
   border: props.border ? `1px solid ${borderColor.value}` : 'none'
 } as Record<string, string>))
 

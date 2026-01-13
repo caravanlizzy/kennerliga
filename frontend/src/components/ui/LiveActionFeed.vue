@@ -182,7 +182,7 @@ function getColorHex(type: TLiveEventType) {
     case 'BAN': return '#d63a38'; // negative
     case 'GAME_FINISHED': return '#4bb26a'; // positive
     case 'LEAGUE_FINISHED': return '#e67e22'; // warning
-    case 'SEASON_FINISHED': return '#5e35b1'; // accent
+    case 'SEASON_FINISHED': return '#26c6da'; // secondary
     default: return '#9e9e9e';
   }
 }
