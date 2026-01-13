@@ -113,7 +113,7 @@ const typeColors = {
 
 <style scoped>
 .announcement-card {
-  border-radius: 0;
+  border-radius: 16px;
   transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
   background: rgba(255, 255, 255, 0.6);
   backdrop-filter: blur(8px);
@@ -122,11 +122,26 @@ const typeColors = {
   width: 100%;
 }
 
-.announcement-card--info { border-left-color: var(--q-primary) !important; }
-.announcement-card--winner { border-left-color: var(--q-warning) !important; }
-.announcement-card--register { border-left-color: var(--q-secondary) !important; }
-.announcement-card--warning { border-left-color: var(--q-negative) !important; }
-.announcement-card--neutral { border-left-color: #9e9e9e !important; }
+.announcement-card--info {
+  border-left-color: var(--q-primary) !important;
+  background: linear-gradient(to right, rgba(55, 71, 79, 0.05), transparent);
+}
+.announcement-card--winner {
+  border-left-color: var(--q-warning) !important;
+  background: linear-gradient(to right, rgba(230, 126, 34, 0.05), transparent);
+}
+.announcement-card--register {
+  border-left-color: var(--q-primary) !important;
+  background: linear-gradient(to right, rgba(55, 71, 79, 0.05), transparent);
+}
+.announcement-card--warning {
+  border-left-color: var(--q-negative) !important;
+  background: linear-gradient(to right, rgba(214, 58, 56, 0.05), transparent);
+}
+.announcement-card--neutral {
+  border-left-color: #9e9e9e !important;
+  background: linear-gradient(to right, rgba(158, 158, 158, 0.05), transparent);
+}
 
 .no-border-radius {
   border-radius: 0 !important;
@@ -134,12 +149,13 @@ const typeColors = {
 
 .announcement-card:hover:not(.no-border-radius) {
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  background: rgba(255, 255, 255, 0.8);
 }
 
 .icon-wrapper {
   width: 48px;
   height: 48px;
-  border-radius: 14px;
+  border-radius: 25% / 35%;
   flex-shrink: 0;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
@@ -147,7 +163,7 @@ const typeColors = {
 .icon-wrapper--mobile {
   width: 40px;
   height: 40px;
-  border-radius: 10px;
+  border-radius: 25% / 35%;
   margin-right: 12px !important;
 }
 

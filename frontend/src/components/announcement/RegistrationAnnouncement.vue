@@ -21,7 +21,7 @@
                 <q-icon
                   name="how_to_reg"
                   :size="isMobile ? '28px' : '32px'"
-                  color="secondary"
+                  color="primary"
                 />
               </div>
 
@@ -29,7 +29,7 @@
         <div class="col">
           <!-- Header & Actions -->
           <div class="row items-center justify-between no-wrap q-mb-xs">
-            <div class="text-h6 text-weight-bolder lh-tight text-secondary col">
+            <div class="text-h6 text-weight-bolder lh-tight text-primary col">
               {{ announcement.title }}
             </div>
 
@@ -41,8 +41,8 @@
                 dense
                 no-caps
                 color="primary"
-                :disable="!isAuthenticated"
-                class="q-px-md rounded-borders"
+                shape="squircle"
+                class="q-px-md"
                 @click="register"
               >
                 Register
@@ -78,7 +78,7 @@
                 Registered Players
               </div>
               <q-badge
-                color="secondary"
+                color="primary"
                 :label="participants?.length ?? 0"
                 rounded
                 class="text-weight-bold"
@@ -93,7 +93,7 @@
                 type="rect"
                 :width="isMobile ? '40px' : '60px'"
                 :height="isMobile ? '20px' : '28px'"
-                class="rounded-borders"
+                style="border-radius: 25% / 35%"
               />
             </div>
             <template v-else-if="participantsLoaded">
@@ -121,8 +121,8 @@
             dense
             no-caps
             color="primary"
-            :disable="!isAuthenticated"
-            class="q-px-md rounded-borders"
+            shape="squircle"
+            class="q-px-md"
             @click="register"
           >
             Register
@@ -222,7 +222,7 @@ onMounted(async () => {
 
 <style scoped>
 .announcement-card {
-  border-radius: 0;
+  border-radius: 16px;
   transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
   background: rgba(255, 255, 255, 0.6);
   backdrop-filter: blur(8px);
@@ -232,7 +232,8 @@ onMounted(async () => {
 }
 
 .announcement-card--register {
-  border-left-color: var(--q-secondary) !important;
+  border-left-color: var(--q-primary) !important;
+  background: linear-gradient(to right, rgba(55, 71, 79, 0.05), transparent);
 }
 
 .no-border-radius {
@@ -241,12 +242,13 @@ onMounted(async () => {
 
 .announcement-card:hover:not(.no-border-radius) {
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  background: rgba(255, 255, 255, 0.8);
 }
 
 .icon-wrapper {
   width: 48px;
   height: 48px;
-  border-radius: 14px;
+  border-radius: 25% / 35%;
   flex-shrink: 0;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
@@ -254,7 +256,7 @@ onMounted(async () => {
 .icon-wrapper--mobile {
   width: 40px;
   height: 40px;
-  border-radius: 10px;
+  border-radius: 25% / 35%;
   margin-right: 12px !important;
 }
 
@@ -266,7 +268,7 @@ onMounted(async () => {
   font-size: 12px;
   background: rgba(248, 249, 250, 0.7);
   padding: 4px 12px;
-  border-radius: 8px;
+  border-radius: 25% / 35%;
   color: #2c3e50;
   font-weight: 600;
   border: 1px solid rgba(0, 0, 0, 0.05);
@@ -276,7 +278,7 @@ onMounted(async () => {
 .participant-chip--mobile {
   font-size: 10px;
   padding: 2px 8px;
-  border-radius: 6px;
+  border-radius: 25% / 35%;
 }
 
 .tracking-widest {
