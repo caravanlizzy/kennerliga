@@ -3,7 +3,7 @@
     :to="forwardName ? { name: forwardName } : undefined"
     @click="handleClick"
     clickable
-    class="drawer-item q-mx-sm q-my-xs rounded-borders"
+    class="drawer-item q-mx-sm q-my-xs squircle-shape"
     active-class="drawer-item--active"
   >
     <q-item-section avatar class="drawer-item__icon-section">
@@ -44,12 +44,17 @@ function handleClick() {
 
 <style scoped lang="scss">
 .drawer-item {
-  min-height: 48px;
-  transition: all 0.2s ease;
-  color: #444;
+  min-height: 44px;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  color: #555;
+
+  &.squircle-shape {
+    border-radius: 25% / 35% !important;
+  }
 
   &:hover {
-    background: rgba(0, 0, 0, 0.03);
+    background: rgba(0, 0, 0, 0.04);
+    transform: translateX(4px);
     color: var(--q-primary);
 
     .q-icon {

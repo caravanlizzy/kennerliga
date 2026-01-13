@@ -4,7 +4,7 @@
       v-if="isAuthenticated"
       :display-username="user?.username || ''"
       shape="squircle"
-      size="32px"
+      size="36px"
     />
 
     <KennerButton
@@ -12,8 +12,9 @@
       flat
       dense
       shape="squircle"
-      color="dark"
+      color="grey-7"
       icon="menu"
+      class="nav-section-btn"
       style="height: 40px; min-width: 40px;"
       @click="onToggle"
     />
@@ -25,6 +26,7 @@
       shape="squircle"
       color="primary"
       icon="login"
+      class="nav-section-btn"
       style="height: 40px; min-width: 40px;"
       :to="{ name: 'login' }"
     />

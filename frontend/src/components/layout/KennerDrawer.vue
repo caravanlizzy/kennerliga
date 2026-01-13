@@ -1,5 +1,13 @@
 <template>
-  <div class="column full-height kenner-drawer-container">
+  <div class="column full-height kenner-drawer-container glass-effect">
+    <!-- Drawer Header -->
+    <div class="q-pa-md q-mb-sm row items-center border-bottom-subtle">
+      <q-icon name="img:icons/favicon.svg" size="32px" class="q-mr-sm" />
+      <span class="text-h6 text-weight-bold text-dark tracking-tighter" style="letter-spacing: -0.5px;">Kenner<span class="text-accent">Liga</span></span>
+      <q-space />
+      <q-btn flat round dense icon="close" color="grey-7" @click="drawerState = false" />
+    </div>
+
     <!-- Drawer Content -->
     <div class="col scroll">
       <q-list class="q-py-md">
@@ -68,11 +76,21 @@ async function doLogout(): Promise<void> {
 
 <style lang="scss">
 .kenner-drawer-container {
-  background-color: #fbfbfb;
+  background: rgba(255, 255, 255, 0.9) !important;
+}
+
+.glass-effect {
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+.border-bottom-subtle {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
 }
 
 .drawer-separator {
-  opacity: 0.5;
+  opacity: 0.3;
+  margin: 12px 16px;
 }
 
 .kenner-drawer {

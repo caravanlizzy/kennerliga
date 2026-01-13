@@ -9,8 +9,8 @@
       v-model="drawerState"
       :width="300"
       :behavior="isMobile ? 'mobile' : 'desktop'"
-      :overlay="isMobile"
-      class="kenner-drawer glass-drawer"
+      :overlay="true"
+      class="kenner-drawer"
     >
       <KennerDrawer v-model="drawerState" />
     </q-drawer>
