@@ -4,7 +4,7 @@
       v-if="isAuthenticated"
       :display-username="user?.username || ''"
       shape="squircle"
-      size="40px"
+      size="32px"
     />
 
     <KennerButton
