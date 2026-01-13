@@ -178,10 +178,10 @@ onUnmounted(() => {
 
 function getColorHex(type: TLiveEventType) {
   switch (type) {
-    case 'PICK': return '#364058'; // primary
+    case 'PICK': return '#37474f'; // primary (from quasar.variables.scss)
     case 'BAN': return '#d63a38'; // negative
     case 'GAME_FINISHED': return '#4bb26a'; // positive
-    case 'LEAGUE_FINISHED': return '#facb48'; // warning
+    case 'LEAGUE_FINISHED': return '#e67e22'; // warning
     case 'SEASON_FINISHED': return '#5e35b1'; // accent
     default: return '#9e9e9e';
   }

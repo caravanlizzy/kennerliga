@@ -16,7 +16,7 @@
           <q-icon name="img:icons/favicon.svg" size="64px" class="q-mb-md" />
           <div class="text-h4 text-weight-bolder text-dark tracking-tighter">Login</div>
           <div class="text-subtitle2 text-grey-6 q-mt-xs text-center">
-            Welcome back to Kenner<span class="text-primary">Liga</span>
+            Welcome back to Kenner<span class="text-accent">Liga</span>
           </div>
         </div>
 

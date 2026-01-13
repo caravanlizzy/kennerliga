@@ -6,7 +6,6 @@
         <UserAvatar
           :display-username="user.username"
           size="64px"
-          shape="circle"
         />
         <div class="column">
           <div class="text-h4 text-weight-bolder text-dark tracking-tighter line-height-1">

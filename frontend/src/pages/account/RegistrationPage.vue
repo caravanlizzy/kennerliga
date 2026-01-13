@@ -16,7 +16,7 @@
           <q-icon name="img:icons/favicon.svg" size="64px" class="q-mb-md" />
           <div class="text-h4 text-weight-bolder text-dark tracking-tighter">Sign Up</div>
           <div class="text-subtitle2 text-grey-6 q-mt-xs text-center">
-            Join the Kenner<span class="text-primary">Liga</span> community
+            Join the Kenner<span class="text-accent">Liga</span> community
           </div>
         </div>
 
