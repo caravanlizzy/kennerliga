@@ -4,6 +4,7 @@
     class="user-avatar"
     :class="shapeClass"
     :style="avatarStyle"
+    :square="shape === 'rounded' || shape === 'squircle'"
     role="img"
     @click="router.push({ name: 'user-detail', params: { username: displayUsername } })"
   >
@@ -27,7 +28,7 @@ const props = withDefaults(defineProps<{
 }>(), {
   size: '32px',
   maxLetters: 2,
-  shape: 'rounded',
+  shape: 'circle',
   border: false,
 })
 
@@ -64,7 +65,7 @@ const avatarStyle = computed(() => ({
 /* shape */
 const shapeClass = computed(() => {
   switch (props.shape) {
-    case 'circle': return 'rounded-lg'
+    case 'circle': return '' // q-avatar is circular by default
     case 'squircle': return 'squircle-shape'
     default: return 'rounded-borders'
   }

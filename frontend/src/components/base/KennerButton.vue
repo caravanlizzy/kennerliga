@@ -2,9 +2,11 @@
   <q-btn
     unelevated
     filled
-    rounded
+    :rounded="shape === 'rounded' || !shape"
+    :round="shape === 'circle'"
     :dense="isMobile"
     class="q-mx-xs"
+    :class="{ 'squircle-shape': shape === 'squircle' }"
     :color="color"
     :icon="icon"
     size="md"
@@ -21,6 +23,13 @@ import { TKennerButton } from 'src/types';
 
 withDefaults(defineProps<TKennerButton>(), {
   color: 'dark',
+  shape: 'rounded',
 });
 const { isMobile } = useResponsive();
 </script>
+
+<style scoped>
+.squircle-shape {
+  border-radius: 25% / 35% !important;
+}
+</style>
