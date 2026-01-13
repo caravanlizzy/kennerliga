@@ -4,14 +4,14 @@
       v-if="isAuthenticated"
       :to="{ name: 'my-league' }"
       unelevated
-      color="secondary"
-      class="nav-item-radius text-weight-bold league-btn"
+      color="primary"
+      class="league-btn text-weight-bold"
       :class="{ 'is-active': isMeActivePlayer }"
       no-caps
     >
-      <q-icon name="ads_click" color="white" />
-      <span v-show="!isMobile" class="q-ml-xs text-white">My League</span>
-      <q-badge v-if="isMeActivePlayer" floating rounded style="top: -4px; right: -4px; border: 2px solid white" color="positive" />
+      <q-icon name="ads_click" class="q-mr-xs" />
+      <span v-show="!isMobile">My League</span>
+      <q-badge v-if="isMeActivePlayer" floating rounded style="top: -6px; right: -6px; border: 2px solid white" color="warning" text-color="white" label="!" />
     </KennerButton>
   </div>
 </template>
@@ -28,13 +28,3 @@ const isMeActivePlayer = computed(() => user.value?.isMyTurn ?? false);
 
 
 </script>
-
-<style lang="scss" scoped>
-.league-btn {
-  transition: all 0.3s ease;
-
-  &.is-active {
-    border: 2px solid white;
-  }
-}
-</style>
