@@ -1,22 +1,20 @@
 <template>
-  <div
-    class="row items-center q-pa-xs no-wrap q-gutter-x-xs bg-grey-1 nav-item-radius border-subtle"
-    style="z-index: 1"
-  >
+  <div class="row items-center no-wrap q-gutter-x-sm">
     <UserAvatar
       v-if="isAuthenticated"
       :display-username="user?.username || ''"
-      class="q-ml-xs q-mr-xs"
-      shape="circle"
+      shape="squircle"
+      size="40px"
     />
 
     <KennerButton
       v-if="isAuthenticated"
       flat
       dense
-      round
+      shape="squircle"
       color="dark"
       icon="menu"
+      style="height: 40px; min-width: 40px;"
       @click="onToggle"
     />
 
@@ -24,9 +22,10 @@
       v-else
       flat
       dense
-      round
+      shape="squircle"
       color="primary"
       icon="login"
+      style="height: 40px; min-width: 40px;"
       :to="{ name: 'login' }"
     />
   </div>

@@ -22,13 +22,12 @@
             v-for="section in navSections"
             :key="section.id"
             flat
-            round
             dense
             :icon="section.icon"
-            :color="section.color"
+            color="grey-7"
             :size="isMobile ? 'sm' : 'md'"
             @click="handleSectionClick(section)"
-            class="nav-section-btn"
+            class="nav-section-btn squircle-shape"
             :class="{ 'is-active': unref(section.isActive) }"
           >
             <q-tooltip>Scroll to {{ section.title }}</q-tooltip>
@@ -41,12 +40,11 @@
         <div v-if="isAuthenticated && !isMobile" class="row no-wrap items-center q-mr-xs">
           <q-btn
             flat
-            round
             dense
             :icon="chatDrawerOpen ? 'speaker_notes_off' : 'chat'"
-            :color="chatDrawerOpen ? 'blue-grey-4' : 'blue-grey-6'"
+            :color="chatDrawerOpen ? 'grey-5' : 'grey-7'"
             @click="toggleChat"
-            class="nav-section-btn"
+            class="nav-section-btn squircle-shape"
           >
             <q-tooltip>{{ chatDrawerOpen ? 'Hide Chat' : 'Show Chat' }}</q-tooltip>
           </q-btn>
@@ -54,13 +52,13 @@
 
         <NavMyLeague v-if="user && user.myCurrentLeagueId" />
 
-        <NavProfileMenu :onToggle="onToggle" />
+        <NavProfileMenu :onToggle="onToggle" class="q-ml-xs" />
       </div>
     </q-toolbar>
 
     <!-- Center: Mobile Tabs (Second Row) -->
     <div v-if="isMobile" class="row justify-center q-pb-sm q-px-sm">
-      <div class="row no-wrap items-center bg-blue-grey-1 rounded-borders q-pa-none full-width justify-center" style="height: 40px; border: 1px solid rgba(54, 64, 88, 0.08);">
+      <div class="row no-wrap items-center bg-grey-2 rounded-borders q-pa-none full-width justify-center" style="height: 40px; border: 1px solid rgba(0, 0, 0, 0.05);">
         <q-tabs
           :model-value="activeTab"
           class="text-dark compact-tabs full-width"
@@ -164,37 +162,32 @@ function scrollToSection(id: string) {
 .navbar {
   position: relative;
   min-height: 64px;
+  display: flex;
+  align-items: center;
 }
 
 .compact-tabs {
   .q-tab {
     min-height: 40px !important;
     padding: 0 !important;
-    border-radius: 4px !important;
+    border-radius: 25% / 35% !important;
     transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
   }
   .q-tab__content {
     padding: 0 !important;
     min-width: 44px !important;
     position: relative;
+    border-radius: inherit;
   }
-  .tab-welcome .q-icon { color: var(--q-primary); }
-  .tab-live .q-icon { color: var(--q-accent); }
-  .tab-seasons .q-icon { color: var(--q-primary); }
-  .tab-chat .q-icon { color: #455a64; } // blue-grey-8
-  .tab-leaderboard .q-icon { color: var(--q-warning); }
+  .tab-welcome .q-icon { color: #616161; }
+  .tab-live .q-icon { color: #616161; }
+  .tab-seasons .q-icon { color: #616161; }
+  .tab-chat .q-icon { color: #616161; } // grey-7
+  .tab-leaderboard .q-icon { color: #616161; }
 
   .q-tab--active {
     background: white !important;
-    &.tab-leaderboard {
-      color: var(--q-warning) !important;
-    }
-    &.tab-live {
-      color: var(--q-accent) !important;
-    }
-    &.tab-seasons {
-      color: var(--q-primary) !important;
-    }
+    color: var(--q-primary) !important;
   }
 }
 
@@ -202,13 +195,13 @@ function scrollToSection(id: string) {
   background: rgba(255, 255, 255, 0.82) !important;
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border-bottom: 2px solid #cfd8dc;
+  border-bottom: 2px solid #eeeeee;
 }
 
 /* Compact version for mobile */
 .nav-item-radius {
   padding: 4px 12px;
-  border-radius: 12px;
+  border-radius: 25% / 35% !important;
 }
 
 .border-subtle {
@@ -226,6 +219,12 @@ function scrollToSection(id: string) {
 .nav-section-btn {
   opacity: 0.7;
   transition: all 0.3s ease;
+  height: 40px;
+  min-width: 40px;
+
+  &.squircle-shape {
+    border-radius: 25% / 35% !important;
+  }
 
   &:hover {
     opacity: 1;
@@ -237,6 +236,7 @@ function scrollToSection(id: string) {
     opacity: 1;
     transform: translateY(-2px);
     background: rgba(0, 0, 0, 0.05);
+    color: var(--q-primary) !important;
   }
 
   &.minimized-btn {

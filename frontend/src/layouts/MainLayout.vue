@@ -85,7 +85,7 @@ function toggleDrawer(): void {
   border-bottom: 1px solid rgba(0, 0, 0, 0.05);
 }
 .chat-drawer {
-  border-right: 2px solid #cfd8dc !important;
+  border-right: 2px solid #eeeeee !important;
 }
 .glass-drawer {
   background: rgba(255, 255, 255, 0.4) !important;
@@ -94,7 +94,7 @@ function toggleDrawer(): void {
 .glass-toggle {
   background: rgba(255, 255, 255, 0.7) !important;
   backdrop-filter: blur(8px);
-  border: 1px solid rgba(54, 64, 88, 0.1);
+  border: 1px solid rgba(0, 0, 0, 0.05);
   color: $primary !important;
 }
 </style>

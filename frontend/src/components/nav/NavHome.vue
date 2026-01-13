@@ -6,10 +6,11 @@
       flat
       color="dark"
       :class="[isMobile ? 'q-px-xs' : 'nav-item-radius', 'text-weight-bold']"
+      style="height: 40px; min-width: 40px; border-radius: 0 !important;"
     >
       <div class="row items-center no-wrap">
         <q-icon size="md" name="img:icons/favicon.svg" class="q-mr-sm" />
-        <span v-if="!isMobile" class="text-h5 text-dark text-weight-bold tracking-tight" style="letter-spacing: -0.5px;">Kenner<span class="text-primary">Liga</span></span>
+        <span v-if="!isMobile" class="text-h5 text-dark text-weight-bold tracking-tight" style="letter-spacing: -0.5px;">Kenner<span class="text-accent">Liga</span></span>
       </div>
     </KennerButton>
 
