@@ -1,89 +1,94 @@
 <template>
-  <q-page class="column col q-pa-md">
-    <div class="row justify-center">
-      <AnnouncementDisplay class="col-12" style="max-width: 800px" />
+  <q-page class="column col q-pa-none">
+    <div class="row">
+      <AnnouncementDisplay class="col-12" />
     </div>
 
-    <WelcomeSection v-if="!isMobile || mobileContent === 'welcome'" :is-authenticated="isAuthenticated" />
+    <div
+      class="q-pa-md q-mx-auto"
+      style="max-width: 1300px; width: 100%; "
+    >
+      <WelcomeSection v-if="!isMobile || mobileContent === 'welcome'" :is-authenticated="isAuthenticated" />
 
-    <template v-if="isAuthenticated">
-      <div v-if="isMobile && user?.myCurrentLeagueId" class="row justify-center q-pt-sm q-px-md">
-        <NavMyLeague />
-      </div>
+      <template v-if="isAuthenticated">
+        <div v-if="isMobile && user?.myCurrentLeagueId" class="row justify-center q-pt-sm q-px-md">
+          <NavMyLeague />
+        </div>
 
-      <div v-if="!isMobile" class="column col q-pt-none">
-        <div class="row col">
-          <div class="col-12 col-md">
-            <ContentSection
-              id="seasons"
-              icon="military_tech"
-              :bordered="false"
-              title="Seasons"
-              class="col-12"
-              color="primary"
-            >
-              <template #header-extra>
-                <div v-if="!loadingSeasonInit" class="row no-wrap q-gutter-x-sm q-ml-md">
-                  <div style="width: 110px">
+        <div v-if="!isMobile" class="column col q-pt-none">
+          <div class="row col">
+            <div class="col-12 col-md">
+              <ContentSection
+                id="seasons"
+                icon="military_tech"
+                :bordered="false"
+                title="Seasons"
+                class="col-12"
+                color="primary"
+              >
+                <template #header-extra>
+                  <div v-if="!loadingSeasonInit" class="row no-wrap q-gutter-x-sm q-ml-md">
+                    <div style="width: 110px">
+                      <KennerSelect
+                        v-model="selectedSeasonYear"
+                        :options="seasonYearOptions"
+                        label="Year"
+                        emit-value
+                        map-options
+                      />
+                    </div>
+                    <div style="width: 110px">
+                      <KennerSelect
+                        v-model="selectedSeasonMonth"
+                        :options="seasonMonthOptions"
+                        label="Month"
+                        emit-value
+                        map-options
+                      />
+                    </div>
+                  </div>
+                </template>
+                <SeasonStandings v-if="!loadingSeasonInit" :seasonId="selectedSeasonId" class="col-12" />
+                <div v-else class="flex flex-center q-pa-xl">
+                  <LoadingSpinner text="Initializing seasons..." />
+                </div>
+              </ContentSection>
+              <ContentSection
+                v-if="isAuthenticated"
+                id="live-action"
+                title="Live Action"
+                icon="bolt"
+                color="accent"
+                :bordered="false"
+                class="col-12"
+              >
+                <LiveActionFeed />
+              </ContentSection>
+              <ContentSection
+                :bordered="false"
+                id="leaderboard"
+                icon="stars"
+                title="Leaderboard"
+                class="col-12"
+                color="warning"
+              >
+                <template #header-extra>
+                  <div style="min-width: 120px" class="q-ml-md">
                     <KennerSelect
-                      v-model="selectedSeasonYear"
-                      :options="seasonYearOptions"
-                      label="Year"
+                      v-model="selectedYear"
+                      :options="availableYears"
                       emit-value
                       map-options
                     />
                   </div>
-                  <div style="width: 110px">
-                    <KennerSelect
-                      v-model="selectedSeasonMonth"
-                      :options="seasonMonthOptions"
-                      label="Month"
-                      emit-value
-                      map-options
-                    />
-                  </div>
-                </div>
-              </template>
-              <SeasonStandings v-if="!loadingSeasonInit" :seasonId="selectedSeasonId" class="col-12" />
-              <div v-else class="flex flex-center q-pa-xl">
-                <LoadingSpinner text="Initializing seasons..." />
-              </div>
-            </ContentSection>
-            <ContentSection
-              v-if="isAuthenticated"
-              id="live-action"
-              title="Live Action"
-              icon="bolt"
-              color="accent"
-              :bordered="false"
-              class="col-12"
-            >
-              <LiveActionFeed />
-            </ContentSection>
-            <ContentSection
-              :bordered="false"
-              id="leaderboard"
-              icon="stars"
-              title="Leaderboard"
-              class="col-12"
-              color="warning"
-            >
-              <template #header-extra>
-                <div style="min-width: 120px" class="q-ml-md">
-                  <KennerSelect
-                    v-model="selectedYear"
-                    :options="availableYears"
-                    emit-value
-                    map-options
-                  />
-                </div>
-              </template>
-              <LeaderBoard :year="selectedYear" />
-            </ContentSection>
+                </template>
+                <LeaderBoard :year="selectedYear" />
+              </ContentSection>
+            </div>
           </div>
         </div>
-      </div>
-    </template>
+      </template>
+    </div>
   </q-page>
 </template>
 

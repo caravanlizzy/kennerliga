@@ -34,9 +34,14 @@
               <div
                 v-if="announcementIcons[a.type]"
                 class="icon-wrapper flex flex-center q-mr-lg"
-                :class="[typeColors[a.type], isMobile ? 'icon-wrapper--mobile' : '']"
+                :class="[isMobile ? 'icon-wrapper--mobile' : '']"
+                :style="{ background: 'transparent', boxShadow: 'none' }"
               >
-                <q-icon :name="announcementIcons[a.type]" :size="isMobile ? '20px' : '24px'" />
+                <q-icon
+                  :name="announcementIcons[a.type]"
+                  :size="isMobile ? '28px' : '32px'"
+                  :class="textColors[a.type]"
+                />
               </div>
 
               <!-- Content -->
@@ -108,17 +113,20 @@ const typeColors = {
 
 <style scoped>
 .announcement-card {
-  border-radius: 16px;
+  border-radius: 0;
   transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-  background-color: white;
-  border: 1px solid rgba(0, 0, 0, 0.05);
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-left-width: 6px;
+  width: 100%;
 }
 
-.announcement-card--info { background: #e3f2fd; border-color: #bbdefb; }
-.announcement-card--winner { background: #fff8e1; border-color: #ffecb3; }
-.announcement-card--register { background: #e0f2f1; border-color: #b2dfdb; }
-.announcement-card--warning { background: #ffebee; border-color: #ffcdd2; }
-.announcement-card--neutral { background: #f5f5f5; border-color: #e0e0e0; }
+.announcement-card--info { border-left-color: var(--q-primary) !important; }
+.announcement-card--winner { border-left-color: var(--q-warning) !important; }
+.announcement-card--register { border-left-color: var(--q-secondary) !important; }
+.announcement-card--warning { border-left-color: var(--q-negative) !important; }
+.announcement-card--neutral { border-left-color: #9e9e9e !important; }
 
 .no-border-radius {
   border-radius: 0 !important;
@@ -153,13 +161,13 @@ const typeColors = {
 
 .participant-chip {
   font-size: 12px;
-  background: white;
+  background: rgba(248, 249, 250, 0.7);
   padding: 4px 12px;
   border-radius: 8px;
   color: #2c3e50;
   font-weight: 600;
-  border: 1px solid rgba(0, 0, 0, 0.08);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
 }
 
 .tracking-widest {

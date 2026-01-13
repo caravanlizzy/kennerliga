@@ -12,13 +12,18 @@
     >
       <!-- Content Header (Icon + Text) -->
       <div class="row items-center no-wrap col q-px-md">
-        <!-- Icon Circle -->
-        <div
-          class="icon-wrapper flex flex-center q-mr-lg bg-secondary text-white"
-          :class="[isMobile ? 'icon-wrapper--mobile' : '']"
-        >
-          <q-icon name="how_to_reg" :size="isMobile ? '20px' : '24px'" />
-        </div>
+              <!-- Icon Circle -->
+              <div
+                class="icon-wrapper flex flex-center q-mr-lg"
+                :class="[isMobile ? 'icon-wrapper--mobile' : '']"
+                style="background: transparent; box-shadow: none;"
+              >
+                <q-icon
+                  name="how_to_reg"
+                  :size="isMobile ? '28px' : '32px'"
+                  color="secondary"
+                />
+              </div>
 
         <!-- Content -->
         <div class="col">
@@ -217,15 +222,17 @@ onMounted(async () => {
 
 <style scoped>
 .announcement-card {
-  border-radius: 16px;
+  border-radius: 0;
   transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-  background-color: white;
-  border: 1px solid rgba(0, 0, 0, 0.05);
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-left-width: 6px;
+  width: 100%;
 }
 
 .announcement-card--register {
-  background: #e0f2f1;
-  border-color: #b2dfdb;
+  border-left-color: var(--q-secondary) !important;
 }
 
 .no-border-radius {
@@ -257,13 +264,13 @@ onMounted(async () => {
 
 .participant-chip {
   font-size: 12px;
-  background: white;
+  background: rgba(248, 249, 250, 0.7);
   padding: 4px 12px;
   border-radius: 8px;
   color: #2c3e50;
   font-weight: 600;
-  border: 1px solid rgba(0, 0, 0, 0.08);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
 }
 
 .participant-chip--mobile {
