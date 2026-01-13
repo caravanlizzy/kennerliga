@@ -228,13 +228,11 @@ function scrollToSection(id: string) {
 
   &:hover {
     opacity: 1;
-    transform: translateY(-2px);
     background: rgba(0, 0, 0, 0.05);
   }
 
   &.is-active {
     opacity: 1;
-    transform: translateY(-2px);
     background: rgba(0, 0, 0, 0.05);
     color: var(--q-primary) !important;
   }

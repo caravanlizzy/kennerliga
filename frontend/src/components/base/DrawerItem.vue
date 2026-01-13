@@ -49,12 +49,11 @@ function handleClick() {
   color: #555;
 
   &.squircle-shape {
-    border-radius: 25% / 35% !important;
+    border-radius: 4px !important;
   }
 
   &:hover {
     background: rgba(0, 0, 0, 0.04);
-    transform: translateX(4px);
     color: var(--q-primary);
 
     .q-icon {
