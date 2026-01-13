@@ -1,8 +1,8 @@
 <template>
   <q-page class="column col bg-white">
     <div class="q-pa-md row items-center border-bottom-subtle bg-white">
-      <q-icon name="chat" color="blue-grey-8" size="sm" class="q-mr-sm" />
-      <div class="text-h5 text-weight-bold">KennerChat</div>
+      <q-icon name="chat" color="primary" size="sm" class="q-mr-sm" />
+      <div class="text-h5 text-weight-bold text-primary">KennerChat</div>
     </div>
     <KennerChat class="col bg-white" />
   </q-page>

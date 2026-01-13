@@ -27,10 +27,10 @@
       <div class="column full-height">
         <div class="q-pa-md row items-center justify-between border-bottom-subtle bg-white">
           <div class="row items-center">
-            <q-icon name="chat" color="blue-grey-6" size="sm" class="q-mr-sm" />
-            <div class="text-h6 text-weight-bold text-blue-grey-6">KennerChat</div>
+            <q-icon name="chat" color="primary" size="sm" class="q-mr-sm" />
+            <div class="text-h6 text-weight-bold text-primary">KennerChat</div>
           </div>
-          <q-btn flat round dense icon="chevron_left" size="sm" color="blue-grey-6" @click="toggleChat">
+          <q-btn flat round dense icon="chevron_left" size="sm" color="primary" @click="toggleChat">
             <q-tooltip>Minimize Chat</q-tooltip>
           </q-btn>
         </div>
@@ -95,6 +95,6 @@ function toggleDrawer(): void {
   background: rgba(255, 255, 255, 0.7) !important;
   backdrop-filter: blur(8px);
   border: 1px solid rgba(54, 64, 88, 0.1);
-  color: #607d8b !important; // blue-grey-6
+  color: $primary !important;
 }
 </style>

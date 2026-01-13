@@ -55,7 +55,7 @@
             flat
             round
             dense
-            color="blue-grey-6"
+            color="primary"
             icon="expand_more"
             style="pointer-events: auto"
             @click="scrollToBottom(true, true)"
@@ -81,7 +81,7 @@
             round
             dense
             icon="send"
-            color="blue-grey-6"
+            color="primary"
             :loading="sending"
             @click="send"
           />
@@ -364,7 +364,7 @@ onUnmounted(() => {
   :deep(.q-message-name) {
     font-size: 0.75rem;
     font-weight: 700;
-    color: #607d8b; // blue-grey-6
+    color: $primary;
     margin-bottom: 4px;
     opacity: 0.9;
   }
@@ -389,7 +389,7 @@ onUnmounted(() => {
 
   &.chat-message-sent {
     :deep(.q-message-text) {
-      background: #607d8b !important;
+      background: $primary !important;
       color: white !important;
       border-bottom-right-radius: 4px !important;
     }
@@ -425,7 +425,7 @@ onUnmounted(() => {
 
   &.q-field--focused {
     background: white !important;
-    border-color: #607d8b !important;
+    border-color: $primary !important;
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08) !important;
   }
 
