@@ -41,7 +41,6 @@
                 dense
                 no-caps
                 color="primary"
-                shape="squircle"
                 class="q-px-md"
                 @click="register"
               >
@@ -93,7 +92,7 @@
                 type="rect"
                 :width="isMobile ? '40px' : '60px'"
                 :height="isMobile ? '20px' : '28px'"
-                style="border-radius: 25% / 35%"
+                class="rounded-borders"
               />
             </div>
             <template v-else-if="participantsLoaded">
@@ -121,7 +120,6 @@
             dense
             no-caps
             color="primary"
-            shape="squircle"
             class="q-px-md"
             @click="register"
           >
@@ -248,7 +246,7 @@ onMounted(async () => {
 .icon-wrapper {
   width: 48px;
   height: 48px;
-  border-radius: 25% / 35%;
+  border-radius: 12px;
   flex-shrink: 0;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
@@ -256,7 +254,7 @@ onMounted(async () => {
 .icon-wrapper--mobile {
   width: 40px;
   height: 40px;
-  border-radius: 25% / 35%;
+  border-radius: 12px;
   margin-right: 12px !important;
 }
 
@@ -268,7 +266,7 @@ onMounted(async () => {
   font-size: 12px;
   background: rgba(248, 249, 250, 0.7);
   padding: 4px 12px;
-  border-radius: 25% / 35%;
+  border-radius: 8px;
   color: #2c3e50;
   font-weight: 600;
   border: 1px solid rgba(0, 0, 0, 0.05);
@@ -278,7 +276,7 @@ onMounted(async () => {
 .participant-chip--mobile {
   font-size: 10px;
   padding: 2px 8px;
-  border-radius: 25% / 35%;
+  border-radius: 6px;
 }
 
 .tracking-widest {

@@ -121,7 +121,7 @@ const textColors = {
 .icon-wrapper {
   width: 48px;
   height: 48px;
-  border-radius: 25% / 35%;
+  border-radius: 12px;
   flex-shrink: 0;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
@@ -129,7 +129,7 @@ const textColors = {
 .icon-wrapper--mobile {
   width: 40px;
   height: 40px;
-  border-radius: 25% / 35%;
+  border-radius: 12px;
   margin-right: 12px !important;
 }
 

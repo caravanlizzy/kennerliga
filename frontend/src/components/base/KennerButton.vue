@@ -30,6 +30,6 @@ const { isMobile } = useResponsive();
 
 <style scoped>
 .squircle-shape {
-  border-radius: 25% / 35% !important;
+  border-radius: 12px !important;
 }
 </style>
