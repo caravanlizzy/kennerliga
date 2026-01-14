@@ -5,7 +5,7 @@
       unelevated
       flat
       color="dark"
-      :class="[isMobile ? 'q-px-xs' : 'nav-item-radius', 'text-weight-bold']"
+      :class="[isMobile ? 'q-px-xs' : 'q-px-md', 'text-weight-bold']"
       style="height: 40px; min-width: 40px; border-radius: 0 !important;"
     >
       <div class="row items-center no-wrap">

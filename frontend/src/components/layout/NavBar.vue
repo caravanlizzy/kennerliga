@@ -46,12 +46,12 @@
 
     <!-- Center: Mobile Tabs (Second Row) -->
     <div v-if="isMobile" class="row justify-center q-pb-sm q-px-sm">
-      <div class="row no-wrap items-center bg-grey-2 rounded-borders q-pa-none full-width justify-center" style="height: 40px; border: 1px solid rgba(0, 0, 0, 0.05);">
+      <div class="row no-wrap items-center full-width justify-center" style="height: 40px; border-bottom: 1px solid rgba(0, 0, 0, 0.05);">
         <q-tabs
           :model-value="activeTab"
           class="text-dark compact-tabs full-width"
           active-color="primary"
-          indicator-color="transparent"
+          indicator-color="primary"
           align="justify"
           dense
           no-caps
@@ -157,14 +157,12 @@ function scrollToSection(id: string) {
   .q-tab {
     min-height: 40px !important;
     padding: 0 !important;
-    border-radius: 25% / 35% !important;
     transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
   }
   .q-tab__content {
     padding: 0 !important;
     min-width: 44px !important;
     position: relative;
-    border-radius: inherit;
   }
   .tab-welcome .q-icon { color: #616161; }
   .tab-live .q-icon { color: #616161; }
@@ -173,8 +171,11 @@ function scrollToSection(id: string) {
   .tab-leaderboard .q-icon { color: #616161; }
 
   .q-tab--active {
-    background: white !important;
     color: var(--q-primary) !important;
+    .q-tab__indicator {
+      height: 3px;
+      border-radius: 3px 3px 0 0;
+    }
   }
 }
 
@@ -185,11 +186,6 @@ function scrollToSection(id: string) {
   border-bottom: 2px solid #eeeeee;
 }
 
-/* Compact version for mobile */
-.nav-item-radius {
-  padding: 4px 12px;
-  border-radius: 25% / 35% !important;
-}
 
 .border-subtle {
   border: 1px solid rgba(0, 0, 0, 0.05);
@@ -210,7 +206,7 @@ function scrollToSection(id: string) {
   min-width: 40px;
 
   &.squircle-shape {
-    border-radius: 25% / 35% !important;
+    border-radius: 12px !important;
   }
 
   &:hover {
