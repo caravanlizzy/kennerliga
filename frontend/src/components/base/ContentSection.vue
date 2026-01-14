@@ -59,7 +59,7 @@
   </template>
 
   <script setup lang="ts">
-  import { computed, onMounted, onUnmounted } from 'vue';
+  import { computed, onMounted, onUnmounted, onActivated } from 'vue';
   import { useUiStore } from 'src/stores/uiStore';
   import { useResponsive } from 'src/composables/responsive';
 
@@ -88,14 +88,17 @@
 
   const sectionId = computed(() => props.id || props.title.toLowerCase().replace(/\s+/g, '-'));
 
-  onMounted(() => {
+  const register = () => {
     uiStore.registerSection({
       id: sectionId.value,
       title: props.title,
       icon: props.icon || 'article',
       color: props.color
     });
-  });
+  };
+
+  onMounted(register);
+  onActivated(register);
 
   onUnmounted(() => {
     uiStore.unregisterSection(sectionId.value);
