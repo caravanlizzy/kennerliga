@@ -8,6 +8,7 @@ import {
 
 import routes from './routes';
 import { useUserStore } from 'stores/userStore';
+import { useUiStore } from 'stores/uiStore';
 
 /*
  * If not building with SSR mode, you can
@@ -33,6 +34,9 @@ export default route(async function(/* { store, ssrContext } */) {
     history: createHistory(process.env.VUE_ROUTER_BASE)
   });
   Router.beforeEach(function(to, from, next) {
+    const uiStore = useUiStore();
+    uiStore.clearSections();
+
     if (!to.meta.requiresAuth) return next();
     const userStore = useUserStore();
     const { user } = userStore;

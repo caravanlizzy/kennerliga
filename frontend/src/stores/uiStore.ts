@@ -1,38 +1,27 @@
 import { defineStore } from 'pinia';
-import { ref, watch } from 'vue';
-import { LocalStorage } from 'quasar';
+import { ref, shallowRef, type Ref } from 'vue';
 
 export interface NavSection {
   id: string;
   title: string;
   icon: string;
   color: string;
-  isActive?: boolean | import('vue').Ref<boolean>;
+  isActive?: boolean | Ref<boolean>;
   onClick?: () => void;
 }
 
 export const useUiStore = defineStore('ui', () => {
   const isDev = ref(false);
-  const navSections = ref<NavSection[]>([]);
+  const navSections = shallowRef<NavSection[]>([]);
   const chatDrawerOpen = ref(false);
-
-  function showDev() {
-    isDev.value = true;
-  }
-  function hideDev() {
-    isDev.value = false;
-  }
-  function toggleDev() {
-    isDev.value = !isDev.value;
-  }
 
   function toggleChat() {
     chatDrawerOpen.value = !chatDrawerOpen.value;
   }
 
   function registerSection(section: NavSection) {
-    if (!navSections.value.find(s => s.id === section.id)) {
-      navSections.value.push(section);
+    if (!navSections.value.find((s: NavSection) => s.id === section.id)) {
+      navSections.value = [...navSections.value, section];
     }
   }
 
@@ -40,14 +29,16 @@ export const useUiStore = defineStore('ui', () => {
     navSections.value = navSections.value.filter(s => s.id !== id);
   }
 
+  function clearSections() {
+    navSections.value = [];
+  }
+
   return {
     isDev,
-    showDev,
-    hideDev,
-    toggleDev,
     navSections,
     registerSection,
     unregisterSection,
+    clearSections,
     chatDrawerOpen,
     toggleChat
   };
