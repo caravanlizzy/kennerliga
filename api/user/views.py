@@ -11,6 +11,7 @@ from rest_framework.permissions import IsAuthenticated, IsAdminUser, AllowAny
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet, ViewSet
 
+from chat.service import create_chat_announcement
 from league.models import League, LeagueStanding
 from league.serializer import LeagueSerializer
 from result.models import Result
@@ -256,6 +257,7 @@ class UserRegistrationViewSet(ViewSet):
                 # Delete invite after success
                 invite.delete()
 
+            create_chat_announcement(f"New user registered: {username}")
             return Response({"detail": f"User {username} created successfully."}, status=201)
 
         except UserInviteLink.DoesNotExist:
