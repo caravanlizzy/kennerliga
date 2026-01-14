@@ -62,7 +62,6 @@ const responsive = useResponsive();
 const { logout } = useUserStore();
 const { isAdmin } = storeToRefs(useUserStore());
 
-const { isMobile } = responsive;
 const router = useRouter();
 
 provide('closeDrawer', () => (drawerState.value = false));

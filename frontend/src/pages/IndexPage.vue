@@ -4,14 +4,17 @@
       <AnnouncementDisplay class="col-12 q-px-md" />
     </div>
 
-    <div
-      class="q-pa-md q-mx-auto"
-      style="max-width: 1300px; width: 100%; "
-    >
-      <WelcomeSection v-if="!isMobile || mobileContent === 'welcome'" :is-authenticated="isAuthenticated" />
+    <div class="q-pa-md q-mx-auto" style="max-width: 1300px; width: 100%">
+      <WelcomeSection
+        v-if="!isMobile || mobileContent === 'welcome'"
+        :is-authenticated="isAuthenticated"
+      />
 
       <template v-if="isAuthenticated">
-        <div v-if="isMobile && user?.myCurrentLeagueId" class="row justify-center q-pt-sm q-px-md">
+        <div
+          v-if="isMobile && user?.myCurrentLeagueId"
+          class="row justify-center q-pt-sm q-px-md"
+        >
           <NavMyLeague />
         </div>
 
@@ -27,7 +30,10 @@
                 color="primary"
               >
                 <template #header-extra>
-                  <div v-if="!loadingSeasonInit" class="row no-wrap q-gutter-x-sm q-ml-md">
+                  <div
+                    v-if="!loadingSeasonInit"
+                    class="row no-wrap q-gutter-x-sm q-ml-md"
+                  >
                     <div style="width: 110px">
                       <KennerSelect
                         v-model="selectedSeasonYear"
@@ -48,7 +54,11 @@
                     </div>
                   </div>
                 </template>
-                <SeasonStandings v-if="!loadingSeasonInit" :seasonId="selectedSeasonId" class="col-12" />
+                <SeasonStandings
+                  v-if="!loadingSeasonInit"
+                  :seasonId="selectedSeasonId"
+                  class="col-12"
+                />
                 <div v-else class="flex flex-center q-pa-xl">
                   <LoadingSpinner text="Initializing seasons..." />
                 </div>
@@ -113,6 +123,7 @@ import {
   fetchSeasons,
 } from 'src/services/seasonService';
 import type { TSeasonDto } from 'src/types';
+import LoadingSpinner from 'components/base/LoadingSpinner.vue';
 
 const { isMobile } = useResponsive();
 const { isAuthenticated } = storeToRefs(useUserStore());
@@ -187,16 +198,14 @@ onMounted(async () => {
       const currentSeasonId = await fetchCurrentSeasonId();
 
       // 2. Then fetch years and seasons
-      const years = await fetchAvailableYears();
-      availableYears.value = years;
+      availableYears.value = await fetchAvailableYears();
 
       if (currentSeasonId) {
         const season = await fetchSeason(currentSeasonId);
         if (season) {
           selectedYear.value = season.year;
 
-          const seasons = await fetchSeasons({ year: season.year });
-          seasonsForYear.value = seasons;
+          seasonsForYear.value = await fetchSeasons({ year: season.year });
 
           selectedSeasonYear.value = season.year;
           selectedSeasonMonth.value = season.month;

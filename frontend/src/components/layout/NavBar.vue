@@ -84,10 +84,9 @@ import { useRouter } from 'vue-router';
 const { getScrollTarget, setVerticalScrollPosition } = scroll;
 
 defineProps<{ onToggle: () => void }>();
-const { user, isAuthenticated } = storeToRefs(useUserStore());
+const { user } = storeToRefs(useUserStore());
 const uiStore = useUiStore();
-const { navSections, chatDrawerOpen } = storeToRefs(uiStore);
-const { toggleChat } = uiStore;
+const { navSections } = storeToRefs(uiStore);
 const route = useRoute();
 const router = useRouter();
 const { isMobile } = useResponsive();

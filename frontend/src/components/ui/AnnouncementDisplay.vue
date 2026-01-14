@@ -67,11 +67,9 @@
 
 <script setup lang="ts">
 import { storeToRefs } from 'pinia';
-import { ref, computed } from 'vue';
+import { computed } from 'vue';
 import { useAnnouncementStore } from 'stores/announcementStore';
 import { useResponsive } from 'src/composables/responsive';
-import KennerButton from 'components/base/KennerButton.vue';
-import KennerTooltip from 'components/base/KennerTooltip.vue';
 import RegistrationAnnouncement from 'components/announcement/RegistrationAnnouncement.vue';
 import { useQuasar } from 'quasar';
 
@@ -102,13 +100,6 @@ const textColors = {
   NEUTRAL: 'text-grey-9',
 };
 
-const typeColors = {
-  INFO: 'bg-primary text-white',
-  WINNER: 'bg-warning text-white',
-  REGISTER: 'bg-secondary text-white',
-  WARNING: 'bg-negative text-white',
-  NEUTRAL: 'bg-grey-4 text-grey-9',
-};
 </script>
 
 <style scoped>
@@ -120,31 +111,6 @@ const typeColors = {
   border: 1px solid rgba(0, 0, 0, 0.08);
   border-left-width: 6px;
   width: 100%;
-}
-
-.announcement-card--info {
-  border-left-color: var(--q-primary) !important;
-  background: linear-gradient(to right, rgba(55, 71, 79, 0.05), transparent);
-}
-.announcement-card--winner {
-  border-left-color: var(--q-warning) !important;
-  background: linear-gradient(to right, rgba(230, 126, 34, 0.05), transparent);
-}
-.announcement-card--register {
-  border-left-color: var(--q-primary) !important;
-  background: linear-gradient(to right, rgba(55, 71, 79, 0.05), transparent);
-}
-.announcement-card--warning {
-  border-left-color: var(--q-negative) !important;
-  background: linear-gradient(to right, rgba(214, 58, 56, 0.05), transparent);
-}
-.announcement-card--neutral {
-  border-left-color: #9e9e9e !important;
-  background: linear-gradient(to right, rgba(158, 158, 158, 0.05), transparent);
-}
-
-.no-border-radius {
-  border-radius: 0 !important;
 }
 
 .announcement-card:hover:not(.no-border-radius) {

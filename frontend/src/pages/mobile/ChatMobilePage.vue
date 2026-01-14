@@ -10,10 +10,6 @@
 
 <script setup lang="ts">
 import KennerChat from 'components/chat/KennerChat.vue';
-import { onMounted } from 'vue';
-import { useUiStore } from 'stores/uiStore';
-
-const uiStore = useUiStore();
 </script>
 
 <style scoped>

@@ -131,7 +131,6 @@
 
 <script setup lang="ts">
 import KennerButton from 'components/base/KennerButton.vue';
-import { useUiStore } from 'src/stores/uiStore';
 import { useResponsive } from 'src/composables/responsive';
 import { onMounted, onUnmounted } from 'vue';
 
