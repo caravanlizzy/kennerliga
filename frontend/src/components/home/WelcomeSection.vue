@@ -21,7 +21,7 @@
               <span class="text-primary">Kenner</span><span class="text-accent">Liga</span>
             </h1>
             <p :class="[isMobile ? 'text-subtitle1' : 'text-h5', 'text-grey-8 q-mt-md q-mb-xl']">
-              A private space for our boardgame league. We manage everything from season registration and auto league assignment to game picking, banning, and result uploads. Stay connected via community chat and keep an eye on past season stats and overviews.
+              A private space for our boardgame league. We manage everything from season registration and auto league assignment to game picking, banning, and results. Stay connected via community chat and keep an eye on past season stats and overviews.
             </p>
             <div class="row q-gutter-md justify-center">
               <KennerButton
@@ -29,6 +29,14 @@
                 label="Login"
                 icon="login"
                 to="/login"
+                :size="isMobile ? 'md' : 'lg'"
+              />
+              <KennerButton
+                color="secondary"
+                outline
+                label="Rules"
+                icon="gavel"
+                to="/rules"
                 :size="isMobile ? 'md' : 'lg'"
               />
             </div>
@@ -93,7 +101,7 @@
                 <q-icon name="ads_click" color="secondary" size="24px" class="q-mr-md q-mt-xs" />
                 <div class="column">
                   <span class="text-subtitle2 text-weight-bold text-dark">My League</span>
-                  <span class="text-body2 text-grey-7">Handle game picking, banning, and results uploading.</span>
+                  <span class="text-body2 text-grey-7">Handle game picking, banning, and results.</span>
                 </div>
               </div>
             </div>
@@ -119,6 +127,13 @@
                 <div class="column">
                   <span class="text-subtitle2 text-weight-bold text-dark">Statistics</span>
                   <span class="text-body2 text-grey-7">Everything is tracked so you can check your performance.</span>
+                </div>
+              </div>
+              <div class="row no-wrap items-start">
+                <q-icon name="gavel" color="primary" size="24px" class="q-mr-md q-mt-xs" />
+                <div class="column">
+                  <span class="text-subtitle2 text-weight-bold text-dark">Rules</span>
+                  <span class="text-body2 text-grey-7">Clear rules for game picking, seasons and fair play.</span>
                 </div>
               </div>
             </div>

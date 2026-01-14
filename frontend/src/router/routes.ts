@@ -81,6 +81,12 @@ const routes: RouteRecordRaw[] = [
       seasonRoutes,
       leagueRoutes,
       {
+        path: 'rules',
+        name: 'rules',
+        component: () => import('pages/RulesPage.vue'),
+        meta: { icon: 'gavel', label: 'Rules' }
+      },
+      {
         path: 'm/seasons',
         name: 'mobile-seasons',
         component: () => import('src/pages/mobile/SeasonsMobilePage.vue'),

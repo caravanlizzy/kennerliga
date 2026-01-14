@@ -18,7 +18,7 @@
         </div>
         <div v-else-if="props.value.isCompleted">
           <q-icon name="check_circle" color="positive" size="xs">
-            <q-tooltip>Complete (all games selected and results uploaded)</q-tooltip>
+            <q-tooltip>Complete (all games selected and results reported)</q-tooltip>
           </q-icon>
         </div>
         <div v-else-if="props.value.isIncomplete">

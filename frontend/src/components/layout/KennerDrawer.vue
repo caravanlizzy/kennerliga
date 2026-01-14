@@ -20,6 +20,7 @@
           forward-name="seasons"
         />
         <DrawerItem icon="group" icon-color="teal-7" label="Members" forward-name="users" />
+        <DrawerItem icon="gavel" icon-color="primary" label="Rules" forward-name="rules" />
 
         <template v-if="isAdmin">
           <q-separator class="q-my-sm drawer-separator" />
