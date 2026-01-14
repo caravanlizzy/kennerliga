@@ -6,35 +6,37 @@
       style="border-bottom: none;"
     >
       <!-- Left: Brand -->
-      <NavHome />
+      <div class="row no-wrap items-center">
+        <NavHome />
+      </div>
+
+      <q-space />
+
+      <!-- Center: Section Navigation Icons -->
+      <div
+        v-if="!isMobile && navSections.length"
+        class="row no-wrap items-center absolute-center"
+      >
+        <q-btn
+          v-for="section in navSections"
+          :key="section.id"
+          flat
+          dense
+          :icon="section.icon"
+          color="grey-7"
+          :size="isMobile ? 'sm' : 'md'"
+          @click="handleSectionClick(section)"
+          class="nav-section-btn squircle-shape"
+          :class="{ 'is-active': unref(section.isActive) }"
+        >
+          <q-tooltip>Scroll to {{ section.title }}</q-tooltip>
+        </q-btn>
+      </div>
 
       <q-space />
 
       <!-- Right: Controls -->
       <div class="row no-wrap items-center" :class="isMobile ? 'q-gutter-x-xs' : 'q-gutter-x-sm'">
-
-        <!-- Section Navigation Icons -->
-        <div
-          v-if="!isMobile && navSections.length"
-          class="row no-wrap items-center q-gutter-x-xs"
-        >
-          <q-btn
-            v-for="section in navSections"
-            :key="section.id"
-            flat
-            dense
-            :icon="section.icon"
-            color="grey-7"
-            :size="isMobile ? 'sm' : 'md'"
-            @click="handleSectionClick(section)"
-            class="nav-section-btn squircle-shape"
-            :class="{ 'is-active': unref(section.isActive) }"
-          >
-            <q-tooltip>Scroll to {{ section.title }}</q-tooltip>
-          </q-btn>
-
-          <q-separator vertical inset class="q-mx-sm opacity-10" />
-        </div>
 
         <!-- Main CTA -->
         <div v-if="isAuthenticated && !isMobile" class="row no-wrap items-center q-mr-xs">
