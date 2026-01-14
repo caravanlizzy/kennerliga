@@ -17,8 +17,8 @@
           <!-- Hero Section -->
           <div class="column items-center text-center" :class="isMobile ? 'q-mb-lg' : 'q-mb-xl'">
             <q-icon name="img:icons/favicon.svg" :size="isMobile ? '80px' : '120px'" class="q-mb-lg" />
-            <h1 :class="[isMobile ? 'text-h4' : 'text-h2', 'text-weight-bold q-my-none text-dark tracking-tighter']" style="letter-spacing: -2px; text-shadow: 0 2px 4px rgba(0,0,0,0.05)">
-              Kenner<span class="text-accent">Liga</span>
+            <h1 :class="[isMobile ? 'text-h4' : 'text-h2', 'text-weight-bold q-my-none tracking-tighter']" style="letter-spacing: -2px; text-shadow: 0 2px 4px rgba(0,0,0,0.05)">
+              <span class="text-primary">Kenner</span><span class="text-accent">Liga</span>
             </h1>
             <p :class="[isMobile ? 'text-subtitle1' : 'text-h5', 'text-grey-8 q-mt-md q-mb-xl']">
               A private space for our boardgame league. We manage everything from season registration and auto league assignment to game picking, banning, and result uploads. Stay connected via community chat and keep an eye on past season stats and overviews.
@@ -110,7 +110,7 @@
               <div class="row no-wrap items-start">
                 <q-icon name="chat" color="blue-grey-6" size="24px" class="q-mr-md q-mt-xs" />
                 <div class="column">
-                  <span class="text-subtitle2 text-weight-bold text-dark">KennerChat</span>
+                  <span class="text-subtitle2 text-weight-bold"><span class="text-primary">Kenner</span><span class="text-accent">Chat</span></span>
                   <span class="text-body2 text-grey-7">Catch up with the community and plan your next session.</span>
                 </div>
               </div>

@@ -1,7 +1,6 @@
 <template>
   <q-table
     flat
-    :title="title"
     :filter="filter"
     :rows-per-page-options="[20, 50, 0]"
     v-model:pagination="pagination"
@@ -9,6 +8,16 @@
     class="rounded-borders"
     table-class="text-grey-8"
   >
+    <template v-slot:top-left>
+      <div v-if="title" class="text-h6 text-weight-bold">
+        <template v-if="title.includes('KennerLiga')">
+          {{ title.split('KennerLiga')[0] }}<span class="text-primary">Kenner</span><span class="text-accent">Liga</span>{{ title.split('KennerLiga')[1] }}
+        </template>
+        <template v-else>
+          {{ title }}
+        </template>
+      </div>
+    </template>
     <!-- forward ALL incoming slots (including scoped slots like body-cell-*) -->
     <template v-for="(_, slotName) in $slots" v-slot:[slotName]="slotProps">
       <slot :name="slotName" v-bind="slotProps" />
