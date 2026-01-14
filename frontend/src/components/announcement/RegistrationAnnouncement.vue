@@ -21,7 +21,7 @@
                 <q-icon
                   name="how_to_reg"
                   :size="isMobile ? '28px' : '32px'"
-                  color="secondary"
+                  color="primary"
                 />
               </div>
 
@@ -29,7 +29,7 @@
         <div class="col">
           <!-- Header & Actions -->
           <div class="row items-center justify-between no-wrap q-mb-xs">
-            <div class="text-h6 text-weight-bolder lh-tight text-secondary col">
+            <div class="text-h6 text-weight-bolder lh-tight text-primary col">
               {{ announcement.title }}
             </div>
 
@@ -40,7 +40,7 @@
                 unelevated
                 dense
                 no-caps
-                color="secondary"
+                color="primary"
                 class="q-px-md"
                 @click="register"
               >
@@ -77,7 +77,7 @@
                 Registered Players
               </div>
               <q-badge
-                color="secondary"
+                color="primary"
                 :label="participants?.length ?? 0"
                 rounded
                 class="text-weight-bold"
@@ -119,7 +119,7 @@
             unelevated
             dense
             no-caps
-            color="secondary"
+            color="primary"
             class="q-px-md"
             @click="register"
           >
@@ -230,7 +230,7 @@ onMounted(async () => {
 }
 
 .announcement-card--register {
-  border-left-color: var(--q-secondary) !important;
+  border-left-color: var(--q-primary) !important;
   background: linear-gradient(to right, rgba(55, 71, 79, 0.05), transparent);
 }
 

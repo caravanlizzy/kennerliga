@@ -389,12 +389,12 @@ onUnmounted(() => {
 
   &.chat-message-sent {
     :deep(.q-message-text) {
-      background: $primary !important;
-      color: white !important;
+      background: rgba($primary, 0.1) !important;
+      color: $primary !important;
       border-bottom-right-radius: 4px !important;
     }
     :deep(.q-message-text-content) {
-      color: white !important;
+      color: $primary !important;
     }
   }
 
