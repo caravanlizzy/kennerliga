@@ -1,7 +1,7 @@
 <template>
   <q-page class="column col q-pa-none">
     <div class="row">
-      <AnnouncementDisplay class="col-12" />
+      <AnnouncementDisplay class="col-12 q-px-md" />
     </div>
 
     <div

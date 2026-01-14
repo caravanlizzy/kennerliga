@@ -1,5 +1,5 @@
 <template>
-  <div v-if="isVisible" :class="isMobile ? 'q-mb-sm' : 'q-mb-lg'">
+  <div v-if="isVisible" :class="isMobile ? 'q-mb-sm' : 'q-mt-md q-mb-lg'">
     <transition-group
       appear
       enter-active-class="animated fadeInDown"
