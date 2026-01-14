@@ -5,13 +5,17 @@
       :to="{ name: 'my-league' }"
       unelevated
       color="primary"
+      shape="squircle"
       class="league-btn text-weight-bold"
       :class="{ 'is-active': isMeActivePlayer }"
+      style="height: 36px; min-width: 36px;"
       no-caps
     >
-      <q-icon name="ads_click" class="q-mr-xs" />
-      <span v-show="!isMobile">My League</span>
-      <q-badge v-if="isMeActivePlayer" floating rounded style="top: -6px; right: -6px; border: 2px solid white" color="warning" text-color="white" label="!" />
+      <div class="row items-center no-wrap">
+        <q-icon name="ads_click" color="secondary" :class="{ 'q-mr-xs': !isMobile }" />
+        <span v-if="!isMobile">My League</span>
+      </div>
+      <q-badge v-if="isMeActivePlayer" floating rounded class="notification-dot" color="warning" />
     </KennerButton>
   </div>
 </template>
@@ -28,3 +32,16 @@ const isMeActivePlayer = computed(() => user.value?.isMyTurn ?? false);
 
 
 </script>
+
+<style scoped>
+.notification-dot {
+  width: 14px;
+  height: 14px;
+  min-height: 14px;
+  padding: 0;
+  top: -2px !important;
+  right: -2px !important;
+  border: 2px solid white;
+  border-radius: 50% !important;
+}
+</style>
