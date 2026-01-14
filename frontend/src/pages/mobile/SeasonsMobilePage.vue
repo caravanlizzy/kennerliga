@@ -2,8 +2,8 @@
   <q-page class="bg-white">
     <div class="q-pa-md row items-center justify-between no-wrap border-bottom-subtle">
       <div class="text-h5 text-weight-bold text-dark">Seasons</div>
-      <div v-if="!loadingSeasonInit" class="row no-wrap q-gutter-x-xs">
-        <div style="width: 100px">
+      <div v-if="!loadingSeasonInit" class="row no-wrap items-center q-gutter-x-sm">
+        <div style="min-width: 80px">
           <KennerSelect
             v-model="selectedSeasonYear"
             :options="seasonYearOptions"
@@ -13,7 +13,7 @@
             map-options
           />
         </div>
-        <div style="width: 80px">
+        <div style="min-width: 100px">
           <KennerSelect
             v-model="selectedSeasonMonth"
             :options="seasonMonthOptions"
@@ -23,6 +23,7 @@
             map-options
           />
         </div>
+        <q-icon name="military_tech" size="sm" color="primary" />
       </div>
     </div>
     <SeasonStandings v-if="!loadingSeasonInit" :seasonId="selectedSeasonId" />

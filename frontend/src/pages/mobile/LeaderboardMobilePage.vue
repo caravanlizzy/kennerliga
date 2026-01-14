@@ -4,14 +4,19 @@
       <div class="text-h5 text-weight-bold text-dark">
         Leaderboard
       </div>
-      <div style="min-width: 100px">
-        <KennerSelect
-          v-model="selectedYear"
-          :options="availableYears"
-          class="full-width"
-          emit-value
-          map-options
-        />
+      <div class="row items-center no-wrap q-gutter-x-sm">
+        <div style="min-width: 80px">
+          <KennerSelect
+            v-model="selectedYear"
+            :options="availableYears"
+            class="full-width"
+            label="Year"
+            emit-value
+            map-options
+            dense
+          />
+        </div>
+        <q-icon name="stars" size="sm" color="primary" />
       </div>
     </div>
     <LeaderBoard :year="selectedYear" />
