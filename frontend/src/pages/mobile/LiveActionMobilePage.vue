@@ -13,11 +13,10 @@
 </template>
 
 <script setup lang="ts">
+defineOptions({ name: 'LiveActionMobilePage' });
 import LiveActionFeed from 'components/ui/LiveActionFeed.vue';
-import { onMounted } from 'vue';
 import { useUiStore } from 'stores/uiStore';
 
-const uiStore = useUiStore();
 </script>
 
 <style scoped>

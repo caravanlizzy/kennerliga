@@ -24,13 +24,12 @@
 </template>
 
 <script setup lang="ts">
+defineOptions({ name: 'LeaderboardMobilePage' });
 import { ref, onMounted } from 'vue';
 import LeaderBoard from 'components/season/LeaderBoard.vue';
 import KennerSelect from 'components/base/KennerSelect.vue';
 import { fetchAvailableYears, fetchCurrentSeasonId, fetchSeason } from 'src/services/seasonService';
-import { useUiStore } from 'stores/uiStore';
 
-const uiStore = useUiStore();
 const selectedYear = ref(new Date().getFullYear());
 const availableYears = ref<number[]>([]);
 

@@ -64,7 +64,11 @@
         class="q-mx-auto"
         style="max-width: 1300px; width: 100%; "
       >
-        <router-view />
+        <router-view v-slot="{ Component }">
+          <keep-alive>
+            <component :is="Component" />
+          </keep-alive>
+        </router-view>
         <ConfirmDialog />
       </div>
     </q-page-container>

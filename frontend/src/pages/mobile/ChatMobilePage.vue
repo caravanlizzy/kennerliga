@@ -9,6 +9,7 @@
 </template>
 
 <script setup lang="ts">
+defineOptions({ name: 'ChatMobilePage' });
 import KennerChat from 'components/chat/KennerChat.vue';
 </script>
 

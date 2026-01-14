@@ -1,8 +1,13 @@
 <template>
   <q-page class="bg-white">
-    <div class="q-pa-md row items-center justify-between no-wrap border-bottom-subtle">
+    <div
+      class="q-pa-md row items-center justify-between no-wrap border-bottom-subtle"
+    >
       <div class="text-h5 text-weight-bold text-dark">Seasons</div>
-      <div v-if="!loadingSeasonInit" class="row no-wrap items-center q-gutter-x-sm">
+      <div
+        v-if="!loadingSeasonInit"
+        class="row no-wrap items-center q-gutter-x-sm"
+      >
         <div style="min-width: 80px">
           <KennerSelect
             v-model="selectedSeasonYear"
@@ -34,6 +39,9 @@
 </template>
 
 <script setup lang="ts">
+import LoadingSpinner from 'components/base/LoadingSpinner.vue';
+
+defineOptions({ name: 'SeasonsMobilePage' });
 import { ref, computed, onMounted, watch } from 'vue';
 import SeasonStandings from 'components/season/SeasonStandings.vue';
 import KennerSelect from 'components/base/KennerSelect.vue';
@@ -46,7 +54,6 @@ import {
 import { useUiStore } from 'stores/uiStore';
 import type { TSeasonDto } from 'src/types';
 
-const uiStore = useUiStore();
 const availableYears = ref<number[]>([]);
 const seasonsForYear = ref<TSeasonDto[]>([]);
 const selectedSeasonYear = ref<number | null>(null);
@@ -105,14 +112,12 @@ onMounted(async () => {
     const currentSeasonId = await fetchCurrentSeasonId();
 
     // 2. Then fetch years and seasons
-    const years = await fetchAvailableYears();
-    availableYears.value = years;
+    availableYears.value = await fetchAvailableYears();
 
     if (currentSeasonId) {
       const season = await fetchSeason(currentSeasonId);
       if (season) {
-        const seasons = await fetchSeasons({ year: season.year });
-        seasonsForYear.value = seasons;
+        seasonsForYear.value = await fetchSeasons({ year: season.year });
 
         selectedSeasonYear.value = season.year;
         selectedSeasonMonth.value = season.month;

@@ -103,6 +103,7 @@
 </template>
 
 <script setup lang="ts">
+defineOptions({ name: 'IndexPage' });
 import NavMyLeague from 'src/components/nav/NavMyLeague.vue';
 import LiveActionFeed from 'components/ui/LiveActionFeed.vue';
 import SeasonStandings from 'components/season/SeasonStandings.vue';
