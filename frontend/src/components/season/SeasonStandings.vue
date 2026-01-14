@@ -68,7 +68,7 @@
 
 <script setup lang="ts">
 import { ref, watch, computed } from 'vue';
-import { useRouter, useRoute } from 'vue-router';
+import { useRoute } from 'vue-router';
 import LeagueMatchResults from 'components/league/LeagueMatchResults.vue';
 import LeagueStandingsMatrix from 'components/league/LeagueStandingsMatrix.vue';
 import LoadingSpinner from 'components/base/LoadingSpinner.vue';
