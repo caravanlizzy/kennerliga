@@ -122,7 +122,7 @@ const textColors = {
 }
 
 .announcement-card--register {
-  border-left-color: var(--q-secondary) !important;
+  border-left-color: var(--q-accent) !important;
 }
 
 .announcement-card--warning {

@@ -21,7 +21,7 @@
                 <q-icon
                   name="how_to_reg"
                   :size="isMobile ? '28px' : '32px'"
-                  color="primary"
+                  color="accent"
                 />
               </div>
 
@@ -77,7 +77,7 @@
                 Registered Players
               </div>
               <q-badge
-                color="primary"
+                color="accent"
                 :label="participants?.length ?? 0"
                 rounded
                 class="text-weight-bold"
@@ -230,8 +230,8 @@ onMounted(async () => {
 }
 
 .announcement-card--register {
-  border-left-color: var(--q-primary) !important;
-  background: linear-gradient(to right, rgba(55, 71, 79, 0.05), transparent);
+  border-left-color: var(--q-accent) !important;
+  background: linear-gradient(to right, rgba($accent, 0.05), transparent);
 }
 
 .no-border-radius {
@@ -269,7 +269,7 @@ onMounted(async () => {
   border-radius: 8px;
   color: #2c3e50;
   font-weight: 600;
-  border: 1px solid rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba($accent, 0.1);
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
 }
 
