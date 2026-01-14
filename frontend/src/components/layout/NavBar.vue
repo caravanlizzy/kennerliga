@@ -38,20 +38,6 @@
       <!-- Right: Controls -->
       <div class="row no-wrap items-center" :class="isMobile ? 'q-gutter-x-xs' : 'q-gutter-x-sm'">
 
-        <!-- Main CTA -->
-        <div v-if="isAuthenticated && !isMobile" class="row no-wrap items-center q-mr-xs">
-          <q-btn
-            flat
-            dense
-            :icon="chatDrawerOpen ? 'speaker_notes_off' : 'chat'"
-            :color="chatDrawerOpen ? 'grey-5' : 'grey-7'"
-            @click="toggleChat"
-            class="nav-section-btn squircle-shape"
-          >
-            <q-tooltip>{{ chatDrawerOpen ? 'Hide Chat' : 'Show Chat' }}</q-tooltip>
-          </q-btn>
-        </div>
-
         <NavMyLeague v-if="user && user.myCurrentLeagueId" />
 
         <NavProfileMenu :onToggle="onToggle" class="q-ml-xs" />

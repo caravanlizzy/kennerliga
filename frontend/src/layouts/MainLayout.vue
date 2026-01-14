@@ -31,12 +31,33 @@
             <div class="text-h6 text-weight-bold"><span class="text-primary">Kenner</span><span class="text-accent">Chat</span></div>
           </div>
           <q-btn flat round dense icon="chevron_left" size="sm" color="primary" @click="toggleChat">
-            <q-tooltip>Minimize Chat</q-tooltip>
+            <q-tooltip>Hide Chat</q-tooltip>
           </q-btn>
         </div>
         <KennerChat class="col bg-white" />
       </div>
     </q-drawer>
+
+    <div
+      v-if="isAuthenticated && !chatDrawerOpen && !isMobile"
+      class="fixed-left z-max"
+      style="top: 66px;"
+    >
+      <q-btn
+        flat
+        dense
+        color="primary"
+        class="chat-mini-toggle glass-toggle"
+        @click="toggleChat"
+      >
+        <div class="column items-center q-py-sm">
+          <q-icon name="chat" size="xs" />
+          <div class="vertical-text text-weight-bold q-mt-xs">CHAT</div>
+          <q-icon name="chevron_right" size="xs" class="q-mt-xs" />
+        </div>
+        <q-tooltip anchor="center right" self="center left">Show Chat</q-tooltip>
+      </q-btn>
+    </div>
 
     <q-page-container class="col column bg-white">
       <div
@@ -96,5 +117,25 @@ function toggleDrawer(): void {
   backdrop-filter: blur(8px);
   border: 1px solid rgba(0, 0, 0, 0.05);
   color: $primary !important;
+}
+
+.chat-mini-toggle {
+  border-radius: 0 0 12px 0 !important;
+  border-left: none !important;
+  border-top: none !important;
+  box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+
+  &:hover {
+    padding-left: 8px;
+    background: rgba(255, 255, 255, 0.9) !important;
+  }
+}
+
+.vertical-text {
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  letter-spacing: 2px;
+  font-size: 10px;
 }
 </style>
