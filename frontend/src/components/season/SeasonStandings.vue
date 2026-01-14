@@ -13,33 +13,53 @@
     <div v-else-if="leagues.length === 0 && seasonId" class="column items-center q-pa-xl text-grey-6 bg-white rounded-borders border-subtle">
        <q-icon name="upcoming" size="48px" class="q-mb-md opacity-20" />
        <div class="text-h6 text-weight-bold">No leagues found</div>
-       <div class="text-caption">This season hasn't been set up with any leagues yet.</div>
+       <div class="text-caption q-mb-lg">This season hasn't been set up with any leagues yet.</div>
+       <KennerButton
+         v-if="!isOverviewPage"
+         outline
+         color="primary"
+         icon="visibility"
+         label="Season Overview"
+         :to="{ name: 'season-overview', params: { id: seasonId } }"
+       />
     </div>
 
-    <div v-else class="column q-gutter-y-xl">
-      <div v-for="league in leagues" :key="league.id" class="league-wrapper">
-        <div class="row items-center q-mb-md q-px-sm">
-          <div class="league-badge q-mr-md">
-            {{ league.level }}
-          </div>
-          <div class="column">
-            <div class="text-h6 text-weight-bold text-grey-9 line-height-1">
-              League {{ league.level }}
+    <div v-else class="column q-gutter-y-md">
+      <div v-if="seasonId && !isOverviewPage" class="row justify-end q-px-sm">
+        <KennerButton
+          outline
+          color="primary"
+          icon="visibility"
+          label="Season Overview"
+          :to="{ name: 'season-overview', params: { id: seasonId } }"
+        />
+      </div>
+
+      <div class="column q-gutter-y-xl">
+        <div v-for="league in leagues" :key="league.id" class="league-wrapper">
+          <div class="row items-center q-mb-md q-px-sm">
+            <div class="league-badge q-mr-md">
+              {{ league.level }}
             </div>
-            <div class="text-caption text-grey-6 uppercase letter-spacing-1">
-              {{ mode === 'results' ? 'Match Results' : 'Division Standings' }}
+            <div class="column">
+              <div class="text-h6 text-weight-bold text-grey-9 line-height-1">
+                League {{ league.level }}
+              </div>
+              <div class="text-caption text-grey-6 uppercase letter-spacing-1">
+                {{ mode === 'results' ? 'Match Results' : 'Division Standings' }}
+              </div>
             </div>
+            <q-space />
+            <KennerButton flat round icon="info" color="grey-4" size="sm">
+              <KennerTooltip>
+                {{ mode === 'results' ? 'Detailed match results' : 'Current standings' }} for League {{ league.level }}
+              </KennerTooltip>
+            </KennerButton>
           </div>
-          <q-space />
-          <KennerButton flat round icon="info" color="grey-4" size="sm">
-            <KennerTooltip>
-              {{ mode === 'results' ? 'Detailed match results' : 'Current standings' }} for League {{ league.level }}
-            </KennerTooltip>
-          </KennerButton>
-        </div>
-        <div class="results-container">
-          <LeagueMatchResults v-if="mode === 'results'" :leagueId="league.id" />
-          <LeagueStandingsMatrix v-else :leagueId="league.id" :prefetchedData="allStandingsData[league.id]" />
+          <div class="results-container">
+            <LeagueMatchResults v-if="mode === 'results'" :leagueId="league.id" />
+            <LeagueStandingsMatrix v-else :leagueId="league.id" :prefetchedData="allStandingsData[league.id]" />
+          </div>
         </div>
       </div>
     </div>
@@ -47,7 +67,8 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from 'vue';
+import { ref, watch, computed } from 'vue';
+import { useRouter, useRoute } from 'vue-router';
 import LeagueMatchResults from 'components/league/LeagueMatchResults.vue';
 import LeagueStandingsMatrix from 'components/league/LeagueStandingsMatrix.vue';
 import LoadingSpinner from 'components/base/LoadingSpinner.vue';
@@ -59,6 +80,7 @@ import { useResponsive } from 'src/composables/responsive';
 import { useLeagueStore } from 'stores/leagueStore';
 
 const { isMobile } = useResponsive();
+const route = useRoute();
 
 interface League {
   id: number;
@@ -76,6 +98,8 @@ const props = withDefaults(defineProps<{
 const leagues = ref<League[]>([]);
 const allStandingsData = ref<Record<number, any>>({});
 const loadingLeagues = ref(false);
+
+const isOverviewPage = computed(() => route.name === 'season-overview');
 
 async function loadLeaguesForSeason(seasonId: number) {
   loadingLeagues.value = true;
