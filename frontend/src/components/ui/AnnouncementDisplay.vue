@@ -113,6 +113,26 @@ const textColors = {
   width: 100%;
 }
 
+.announcement-card--info {
+  border-left-color: var(--q-primary) !important;
+}
+
+.announcement-card--winner {
+  border-left-color: var(--q-warning) !important;
+}
+
+.announcement-card--register {
+  border-left-color: var(--q-secondary) !important;
+}
+
+.announcement-card--warning {
+  border-left-color: var(--q-negative) !important;
+}
+
+.announcement-card--neutral {
+  border-left-color: #424242 !important; /* text-grey-9 */
+}
+
 .announcement-card:hover:not(.no-border-radius) {
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
   background: rgba(255, 255, 255, 0.8);
