@@ -8,7 +8,10 @@
     role="img"
     @click="router.push({ name: 'user-detail', params: { username: displayUsername } })"
   >
-    <span class="avatar-text" :class="textClass">{{ initials }}</span>
+    <div class="avatar-inner full-width full-height flex flex-center">
+      <span class="avatar-text">{{ initials }}</span>
+    </div>
+    <q-tooltip>{{ displayUsername }}</q-tooltip>
     <slot />
   </q-avatar>
 </template>
@@ -52,13 +55,19 @@ const hue = computed(() => hash(clean.value || 'user') % 360)
 const sat = 55
 const light = 70
 
-const textClass = computed(() => (light >= 65 ? 'text-dark' : 'text-white'))
-const borderColor = computed(() => `hsl(${hue.value} ${sat}% ${Math.max(light - 18, 35)}%)`)
 
-const avatarStyle = computed(() => ({
-  backgroundColor: `hsl(${hue.value} ${sat}% ${light}%)`,
-  border: props.border ? `1px solid ${borderColor.value}` : 'none'
-} as Record<string, string>))
+const avatarStyle = computed(() => {
+  const baseHue = hue.value;
+  const borderColor = `hsla(${baseHue}, ${sat}%, ${Math.max(light - 20, 40)}%, 0.6)`;
+  const textColor = `hsl(${baseHue}, ${sat}%, ${Math.max(light - 30, 30)}%)`;
+
+  return {
+    '--avatar-border-color': borderColor,
+    '--avatar-text-color': textColor,
+    '--avatar-hue': baseHue.toString(),
+    boxShadow: `0 2px 8px hsla(${baseHue}, ${sat}%, 20%, 0.05)`
+  } as Record<string, string>
+})
 
 /* shape */
 const shapeClass = computed(() => {
@@ -78,19 +87,25 @@ const shapeClass = computed(() => {
   justify-content: center;
   flex-shrink: 0;
   cursor: pointer;
-  transition: transform 0.2s ease;
+  border: 1px solid var(--avatar-border-color);
+  color: var(--avatar-text-color);
+}
+
+.avatar-inner {
+  border-radius: inherit;
 }
 
 .avatar-text {
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   font-weight: 600;
   line-height: 1;
-  letter-spacing: 0.2px;
+  letter-spacing: 0.5px;
   user-select: none;
+  text-transform: uppercase;
 }
 
 /* squircle magic: quadratic border radius ratio */
 .squircle-shape {
-  border-radius: 12px;
+  border-radius: 35% !important;
 }
 </style>
