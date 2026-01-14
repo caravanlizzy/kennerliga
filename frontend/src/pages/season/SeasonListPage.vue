@@ -37,7 +37,7 @@
           color="secondary"
           icon="visibility"
           label="View"
-          :to="{ name: 'season-detail', params: { id: props.row.id } }"
+          :to="{ name: 'season-overview', params: { id: props.row.id } }"
           @click.stop
         />
         <KennerButton
@@ -47,7 +47,7 @@
           color="primary"
           icon="settings"
           label="Manage"
-          :to="{ name: 'season-detail', params: { id: props.row.id } }"
+          :to="{ name: 'season-manage', params: { id: props.row.id } }"
           @click.stop
         />
       </q-td>
@@ -105,7 +105,7 @@ const getSeasonStats = (s: SeasonExtra) => {
 // navigation
 const router = useRouter();
 function onRowClick(_evt: unknown, row: SeasonExtra) {
-  router.push({ name: 'season-detail', params: { id: row.id } });
+  router.push({ name: 'season-overview', params: { id: row.id } });
 }
 
 // display helpers

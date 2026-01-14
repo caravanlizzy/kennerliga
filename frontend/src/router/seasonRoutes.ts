@@ -14,7 +14,7 @@ export default {
     },
     {
       path: ':id/manage',
-      name: 'season-detail',
+      name: 'season-manage',
       component: () => import('pages/season/SeasonManagePage.vue'),
     },
     {
