@@ -6,7 +6,6 @@
         <UserAvatar
           :display-username="m.username"
           size="32px"
-          shape="squircle"
         />
         <div class="text-subtitle1 text-weight-bold q-ml-sm text-primary">
           {{ m.profile_name }}

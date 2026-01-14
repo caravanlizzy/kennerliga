@@ -57,7 +57,6 @@
                   <UserAvatar
                     :display-username="props.row.username"
                     size="28px"
-                    shape="squircle"
                   >
                     <KennerTooltip v-if="isMobile && props.row.username">
                       {{ props.row.username }}

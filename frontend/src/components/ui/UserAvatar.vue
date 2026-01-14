@@ -28,7 +28,7 @@ const props = withDefaults(defineProps<{
 }>(), {
   size: '32px',
   maxLetters: 2,
-  shape: 'circle',
+  shape: 'squircle',
   border: false,
 })
 
@@ -91,6 +91,6 @@ const shapeClass = computed(() => {
 
 /* squircle magic: quadratic border radius ratio */
 .squircle-shape {
-  border-radius: 25% / 35%;
+  border-radius: 12px;
 }
 </style>

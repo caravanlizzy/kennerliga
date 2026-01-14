@@ -3,7 +3,6 @@
     <UserAvatar
       v-if="isAuthenticated"
       :display-username="user?.username || ''"
-      shape="squircle"
       size="36px"
     />
 
