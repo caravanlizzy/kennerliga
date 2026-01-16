@@ -8,7 +8,20 @@
     @row-click="onRowClick"
     :rows="data"
     :columns="columns"
-  />
+  >
+    <template v-slot:body-cell-selectable="props">
+      <q-td :props="props">
+        <div v-if="!props.row.selectable" class="row items-center text-negative">
+          <q-icon name="block" size="xs" class="q-mr-xs" />
+          <span class="text-caption text-weight-bold">NOT SELECTABLE</span>
+        </div>
+        <div v-else class="row items-center text-grey-6">
+          <q-icon name="check" size="xs" class="q-mr-xs" />
+          <span class="text-caption">Selectable</span>
+        </div>
+      </q-td>
+    </template>
+  </KennerTable>
 
   <div v-else class="q-pa-md">
     <q-banner v-if="error" rounded dense class="q-mb-sm">
@@ -31,7 +44,7 @@ type GameRow = {
   id: number | string;
   name: string;
   platform: number | string; // id
-  // ...any other fields your table needs
+  selectable: boolean;
 };
 
 type Platform = { id: number | string; name: string };
@@ -41,7 +54,7 @@ const {
   data,
   isFinished,
   error: gamesError,
-} = useAxios<GameRow[]>('game/games', api);
+} = useAxios<GameRow[]>('game/games?manage_only=true', api);
 
 // Fetch platforms
 const {
@@ -97,6 +110,13 @@ const columns = computed(() => [
     name: 'platform',
     label: 'Platform',
     field: (x: GameRow) => lookupPlatform(x),
+    align: 'left',
+    sortable: true,
+  },
+  {
+    name: 'selectable',
+    label: 'Status',
+    field: (x: GameRow) => x.selectable,
     align: 'left',
     sortable: true,
   },

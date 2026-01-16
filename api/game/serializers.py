@@ -118,10 +118,18 @@ class SelectedGameSerializer(serializers.ModelSerializer):
 
     manage_only = serializers.BooleanField(write_only=True, required=False)
     results = serializers.SerializerMethodField()
+    is_selectable = serializers.SerializerMethodField()
 
     class Meta:
         model = SelectedGame
-        fields = ['id', 'game', 'game_name', 'selected_options', 'league', 'profile', 'manage_only', 'successfully_banned', 'has_points', 'results_uploaded', 'results']
+        fields = ['id', 'game', 'game_name', 'selected_options', 'league', 'profile', 'manage_only', 'successfully_banned', 'has_points', 'results_uploaded', 'results', 'is_selectable']
+
+    def get_is_selectable(self, obj):
+        # The rightmost chip is the one with the highest ID in the league for the profile
+        # However, looking at the UI context, maybe it's just the last one in the league overall?
+        # Let's assume it's per league, as chips are usually displayed per league.
+        last_game = SelectedGame.objects.filter(league=obj.league).order_by('id').last()
+        return obj == last_game
 
     def get_results(self, obj):
         from result.serializers import ResultSerializer

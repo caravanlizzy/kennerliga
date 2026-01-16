@@ -49,6 +49,25 @@
                     :rules="[(val: number) => !!val || 'Please select a platform']"
                   />
                 </div>
+                <div class="col-12 col-sm-4">
+                  <q-checkbox v-model="selectable" label="Selectable" />
+                </div>
+                <div class="col-12 col-sm-4">
+                  <KennerInput
+                    label="Min Players"
+                    v-model.number="minPlayers"
+                    type="number"
+                    :rules="[val => val !== null && val !== undefined || 'Required', val => val >= 1 || 'Min 1 player']"
+                  />
+                </div>
+                <div class="col-12 col-sm-4">
+                  <KennerInput
+                    label="Max Players"
+                    v-model.number="maxPlayers"
+                    type="number"
+                    :rules="[val => val !== null && val !== undefined || 'Required', val => val >= (minPlayers || 1) || 'Must be >= min players']"
+                  />
+                </div>
               </div>
             </section>
 
@@ -412,6 +431,9 @@ const loading = ref(true);
 const platforms = ref<TPlatform[]>([]);
 const name = ref('');
 const shortName = ref('');
+const selectable = ref(true);
+const minPlayers = ref(2);
+const maxPlayers = ref(4);
 const platform = ref<number | null>(null);
 const gameOptions = ref<UiOption[]>([]);
 
@@ -445,6 +467,9 @@ onMounted(async () => {
     // but GameCreatePage uses it. We'll use what's available.
     // Based on GameCreatePage: short_name might be there.
     shortName.value = (gameData as any).short_name || '';
+    selectable.value = (gameData as any).selectable ?? true;
+    minPlayers.value = (gameData as any).min_players ?? 2;
+    maxPlayers.value = (gameData as any).max_players ?? 4;
     platform.value = gameData.platform;
 
     // Load Result Config
@@ -759,6 +784,9 @@ const onSubmit = async () => {
       name: name.value,
       short_name: shortName.value.trim() !== '' ? shortName.value.trim() : name.value,
       platform: platform.value,
+      selectable: selectable.value,
+      min_players: minPlayers.value,
+      max_players: maxPlayers.value,
       options: gameOptions.value.map((opt) => ({
         id: opt.id,
         ref: opt.ref,

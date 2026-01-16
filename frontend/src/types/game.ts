@@ -8,6 +8,9 @@ export type TGameDto = {
   name: string;
   short_name: string;
   platform: number;
+  selectable?: boolean;
+  min_players?: number;
+  max_players?: number;
 };
 
 export type TGameOptionChoice = {
@@ -46,6 +49,9 @@ export type TFullGameDto = {
   name: string;
   short_name: string;
   platform: number;
+  selectable?: boolean;
+  min_players?: number;
+  max_players?: number;
   options: TFullGameOptionDto[];
 };
 

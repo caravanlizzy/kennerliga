@@ -58,6 +58,19 @@ class GameAPITests(TestCase):
         response = self.client.post('/api/game/selected-games/', data, format='json')
         self.assertEqual(response.status_code, 201)
         self.assertEqual(SelectedGame.objects.count(), 1)
+        self.assertTrue(response.data['is_selectable'])
         
+        # Select another game
+        game2 = Game.objects.create(name='Catan 2', min_players=1, max_players=4, platform=self.platform)
+        data['game'] = game2.id
+        response = self.client.post('/api/game/selected-games/', data, format='json')
+        self.assertEqual(response.status_code, 201)
+        self.assertTrue(response.data['is_selectable'])
+        
+        # Check the first game again - it should NOT be selectable anymore
+        first_game_id = SelectedGame.objects.order_by('id').first().id
+        response = self.client.get(f'/api/game/selected-games/{first_game_id}/')
+        self.assertFalse(response.data['is_selectable'])
+
         self.league.refresh_from_db()
         self.assertEqual(self.league.status, LeagueStatus.BANNING)

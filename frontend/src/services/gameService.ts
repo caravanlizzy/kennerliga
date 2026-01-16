@@ -308,7 +308,7 @@ export async function fetchGameOptionChoices(optionId: number): Promise<TGameOpt
 
 export async function fetchFullGame(gameId: number): Promise<TFullGameDto> {
   try {
-    const { data } = await api(`game/games-full/${gameId}/`);
+    const { data } = await api(`game/games-full/${gameId}/?manage_only=true`);
     return data;
   } catch (error) {
     throw new Error(`Error fetching full game with id ${gameId}: ${error}`);

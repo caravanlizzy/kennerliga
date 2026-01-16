@@ -25,19 +25,37 @@
             </div>
           </q-card-section>
 
-          <q-card-section class="q-pa-md bg-grey-1 row items-center q-gutter-sm">
-            <q-chip dense square color="white" text-color="grey-8" class="shadow-1">
-              <q-icon name="tune" color="primary" class="q-mr-xs" />
-              Options: {{ game.options?.length ?? 0 }}
-            </q-chip>
-            <q-chip v-if="yesNoOptions.length" dense square color="white" text-color="grey-8" class="shadow-1">
-              <q-icon name="toggle_on" color="secondary" class="q-mr-xs" />
-              Toggles: {{ yesNoOptions.length }}
-            </q-chip>
-            <q-chip v-if="choiceOptions.length" dense square color="white" text-color="grey-8" class="shadow-1">
-              <q-icon name="list" color="secondary" class="q-mr-xs" />
-              Lists: {{ choiceOptions.length }}
-            </q-chip>
+          <q-card-section class="q-pa-md bg-grey-1 row items-center justify-between">
+            <div class="row items-center q-gutter-sm">
+              <q-chip dense square color="white" text-color="grey-8" class="shadow-1">
+                <q-icon name="tune" color="primary" class="q-mr-xs" />
+                Options: {{ game.options?.length ?? 0 }}
+              </q-chip>
+              <q-chip v-if="yesNoOptions.length" dense square color="white" text-color="grey-8" class="shadow-1">
+                <q-icon name="toggle_on" color="secondary" class="q-mr-xs" />
+                Toggles: {{ yesNoOptions.length }}
+              </q-chip>
+              <q-chip v-if="choiceOptions.length" dense square color="white" text-color="grey-8" class="shadow-1">
+                <q-icon name="list" color="secondary" class="q-mr-xs" />
+                Lists: {{ choiceOptions.length }}
+              </q-chip>
+              <q-separator vertical inset class="q-mx-xs" />
+              <q-chip dense square color="white" text-color="grey-8" class="shadow-1">
+                <q-icon name="groups" color="accent" class="q-mr-xs" />
+                Players: {{ game.min_players ?? 2 }} - {{ game.max_players ?? 4 }}
+              </q-chip>
+            </div>
+
+            <div class="row items-center">
+              <div v-if="!(game.selectable ?? true)" class="row items-center text-negative bg-red-1 q-px-sm q-py-xs rounded-borders border-negative">
+                <q-icon name="block" size="xs" class="q-mr-xs" />
+                <span class="text-caption text-weight-bold">NOT SELECTABLE</span>
+              </div>
+              <div v-else class="row items-center text-grey-6 q-px-sm">
+                <q-icon name="check" size="xs" class="q-mr-xs" />
+                <span class="text-caption">Selectable</span>
+              </div>
+            </div>
           </q-card-section>
         </q-card>
 
@@ -158,7 +176,14 @@
   </q-page>
 </template>
 
+<style scoped>
+.border-negative {
+  border: 1px solid currentColor;
+}
+</style>
+
 <script setup lang="ts">
+import { TFullGameDto, TPlatform } from 'src/types/game';
 import { api } from 'boot/axios';
 import { useRoute, useRouter } from 'vue-router';
 import ResultConfiguration from 'components/game/ResultConfiguration.vue';
@@ -170,15 +195,15 @@ const route = useRoute();
 const router = useRouter();
 const isLoading = ref(true);
 
-const { data: game } = await api(`game/games-full/${route.params.id}`);
+const { data: game } = await api.get<TFullGameDto>(`game/games-full/${route.params.id}/?manage_only=true`);
 const {
   data: [resultConfig],
-} = await api(`game/result-configs/?game=${route.params.id}`);
-const { data: tieBreakers } = await api(
+} = await api.get<any[]>(`game/result-configs/?game=${route.params.id}`);
+const { data: tieBreakers } = await api.get<any[]>(
   `game/tie-breakers/?result_config=${resultConfig.id}`
 );
-const { data: factions } = await api(`game/factions/?game=${route.params.id}`);
-const { data: platform } = await api(`game/platforms/${game.platform}`);
+const { data: factions } = await api.get<any[]>(`game/factions/?game=${route.params.id}`);
+const { data: platform } = await api.get<TPlatform>(`game/platforms/${game.platform}/`);
 
 isLoading.value = false;
 

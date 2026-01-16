@@ -46,6 +46,25 @@
                     :rules="[(val: string) => !!val || 'Please select a platform']"
                   />
                 </div>
+                <div class="col-12 col-sm-4">
+                  <q-checkbox v-model="selectable" label="Selectable" />
+                </div>
+                <div class="col-12 col-sm-4">
+                  <KennerInput
+                    label="Min Players"
+                    v-model.number="minPlayers"
+                    type="number"
+                    :rules="[val => val !== null && val !== undefined || 'Required', val => val >= 1 || 'Min 1 player']"
+                  />
+                </div>
+                <div class="col-12 col-sm-4">
+                  <KennerInput
+                    label="Max Players"
+                    v-model.number="maxPlayers"
+                    type="number"
+                    :rules="[val => val !== null && val !== undefined || 'Required', val => val >= (minPlayers || 1) || 'Must be >= min players']"
+                  />
+                </div>
               </div>
             </section>
 
@@ -468,6 +487,9 @@ const { data: platforms } = await api('game/platforms/');
 const name = ref('');
 const shortName = ref('');
 const platform: Ref<TPlatform | undefined> = ref(undefined);
+const selectable = ref(true);
+const minPlayers = ref(2);
+const maxPlayers = ref(4);
 
 let resultConfig: TResultConfig | undefined = undefined;
 function updateResultConfig(newResultConfig: TResultConfig) {
@@ -715,6 +737,9 @@ const onSubmit = async () => {
       name: name.value,
       short_name: effectiveShortName,
       platform: platform.value.id,
+      selectable: selectable.value,
+      min_players: minPlayers.value,
+      max_players: maxPlayers.value,
       options: gameOptions.value.map((opt) => ({
         ref: opt.ref,
         name: opt.name,
