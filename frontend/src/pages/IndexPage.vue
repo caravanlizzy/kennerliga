@@ -26,7 +26,7 @@
                 icon="military_tech"
                 :bordered="false"
                 title="Seasons"
-                class="col-12"
+                class="col-12 q-mt-none"
                 color="primary"
               >
                 <template #header-extra>
@@ -70,7 +70,7 @@
                 icon="bolt"
                 color="accent"
                 :bordered="false"
-                class="col-12"
+                class="col-12 q-mt-md"
               >
                 <LiveActionFeed />
               </ContentSection>
@@ -79,7 +79,7 @@
                 id="leaderboard"
                 icon="stars"
                 title="Leaderboard"
-                class="col-12"
+                class="col-12 q-mt-md"
                 color="warning"
               >
                 <template #header-extra>

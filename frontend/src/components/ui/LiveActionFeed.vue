@@ -36,11 +36,16 @@
       </div>
 
       <div v-for="event in filteredEvents" :key="event.id" class="event-item q-mb-sm">
-        <q-card flat class="event-card" :style="{ borderLeftColor: getColorHex(event.type) }">
+        <q-card flat class="event-card">
           <q-card-section class="q-pa-sm">
             <div class="row items-center no-wrap">
               <div class="col-auto q-mr-sm">
-                <q-icon :name="getIcon(event.type)" :color="getColor(event.type)" size="sm" />
+                <div
+                  class="icon-wrapper flex flex-center"
+                  :style="{ backgroundColor: getColorHex(event.type) + '15', border: `1px solid ${getColorHex(event.type)}30` }"
+                >
+                  <q-icon :name="getIcon(event.type)" :color="getColor(event.type)" size="xs" />
+                </div>
               </div>
               <div class="col">
                 <div class="text-caption text-grey-7 flex justify-between items-center">
@@ -209,16 +214,15 @@ function getColorHex(type: TLiveEventType) {
 
 .event-card {
   transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-  border-left: 3px solid currentColor;
   background: rgba(255, 255, 255, 0.5);
   backdrop-filter: blur(4px);
   border-radius: 8px;
-  margin-left: 1px;
 }
-.event-card:hover {
-  transform: translateX(4px);
-  background: rgba(255, 255, 255, 0.8);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+
+.icon-wrapper {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
 }
 .event-content {
   font-size: 0.9rem;
