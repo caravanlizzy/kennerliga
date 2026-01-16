@@ -359,7 +359,7 @@ class FullGameSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Game
-        fields = ['id', 'name', 'short_name', 'platform', 'options']
+        fields = ['id', 'name', 'short_name', 'platform', 'selectable', 'options']
 
     @transaction.atomic
     def create(self, validated_data):
@@ -408,6 +408,7 @@ class FullGameSerializer(serializers.ModelSerializer):
         instance.name = validated_data.get('name', instance.name)
         instance.short_name = validated_data.get('short_name', instance.short_name)
         instance.platform = validated_data.get('platform', instance.platform)
+        instance.selectable = validated_data.get('selectable', instance.selectable)
         instance.save()
 
         existing_options_by_id = {opt.id: opt for opt in instance.options.all()}

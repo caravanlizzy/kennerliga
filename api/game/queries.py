@@ -4,7 +4,9 @@ from game.models import Game, SelectedGame, BanDecision, Faction, TieBreaker, Re
 from league.models import League
 from api.constants import get_ban_amount_for_success
 
-def get_all_games() -> QuerySet:
+def get_all_games(selectable_only=True) -> QuerySet:
+    if selectable_only:
+        return Game.objects.filter(selectable=True)
     return Game.objects.all()
 
 def get_game_by_id(game_id: int) -> Optional[Game]:

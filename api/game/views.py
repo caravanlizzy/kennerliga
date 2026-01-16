@@ -24,6 +24,9 @@ class GameViewSet(ModelViewSet):
         manage_only = self.request.query_params.get("manage_only", "false").lower() == "true"
         is_admin = self.request.user and self.request.user.is_staff
 
+        if manage_only and is_admin:
+            queryset = Game.objects.all()
+
         if league_id:
             try:
                 league = League.objects.get(id=league_id)
@@ -136,3 +139,13 @@ class FullGameViewSet(ModelViewSet):
     queryset = Game.objects.all().prefetch_related('options__choices')
     serializer_class = FullGameSerializer
     permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        manage_only = self.request.query_params.get("manage_only", "false").lower() == "true"
+        is_admin = self.request.user and self.request.user.is_staff
+
+        if not (manage_only and is_admin):
+            queryset = queryset.filter(selectable=True)
+
+        return queryset

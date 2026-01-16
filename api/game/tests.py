@@ -30,6 +30,24 @@ class GameAPITests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertGreaterEqual(len(response.data), 1)
 
+    def test_filter_games_for_selection(self):
+        # Create a game that should not be used for selection
+        game2 = Game.objects.create(name='Old Game', min_players=1, max_players=4, platform=self.platform, selectable=False)
+        
+        # Regular request
+        response = self.client.get('/api/game/games/')
+        self.assertEqual(response.status_code, 200)
+        game_names = [g['name'] for g in response.data]
+        self.assertIn('Catan', game_names)
+        self.assertNotIn('Old Game', game_names)
+        
+        # Admin request with manage_only=true
+        response = self.client.get('/api/game/games/?manage_only=true')
+        self.assertEqual(response.status_code, 200)
+        game_names = [g['name'] for g in response.data]
+        self.assertIn('Catan', game_names)
+        self.assertIn('Old Game', game_names)
+
     def test_select_game(self):
         data = {
             "game": self.game.id,

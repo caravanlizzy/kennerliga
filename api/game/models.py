@@ -11,6 +11,7 @@ class Game(models.Model):
     platform = models.ForeignKey(Platform, on_delete=models.CASCADE)
     min_players = models.PositiveIntegerField(default=2)
     max_players = models.PositiveIntegerField(default=4)
+    selectable = models.BooleanField(default=True)
 
     class Meta:
         constraints = [
