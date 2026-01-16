@@ -23,11 +23,14 @@
           flat
           dense
           :icon="section.icon"
-          color="grey-7"
+          :color="unref(section.isActive) ? (section.color || 'primary') : 'grey-7'"
           :size="isMobile ? 'sm' : 'md'"
           @click="handleSectionClick(section)"
           class="nav-section-btn squircle-shape"
-          :class="{ 'is-active': unref(section.isActive) }"
+          :class="[
+            { 'is-active': unref(section.isActive) },
+            section.color ? `nav-section-btn--${section.color}` : ''
+          ]"
         >
           <q-tooltip>Scroll to {{ section.title }}</q-tooltip>
         </q-btn>
@@ -57,11 +60,11 @@
           no-caps
           @update:model-value="handleTabChange"
         >
-          <q-tab icon="home" name="welcome" class="tab-welcome" />
-          <q-tab icon="military_tech" name="seasons" class="tab-seasons" />
-          <q-tab icon="bolt" name="live" class="tab-live" />
-          <q-tab icon="chat" name="chat" class="tab-chat" />
-          <q-tab icon="stars" name="leaderboard" class="tab-leaderboard" />
+          <q-tab icon="home" name="welcome" class="tab-welcome" label="Home" />
+          <q-tab icon="military_tech" name="seasons" class="tab-seasons" label="Seasons" />
+          <q-tab icon="bolt" name="live" class="tab-live" label="Live" />
+          <q-tab icon="chat" name="chat" class="tab-chat" label="Chat" />
+          <q-tab icon="stars" name="leaderboard" class="tab-leaderboard" label="Stats" />
         </q-tabs>
       </div>
     </div>
@@ -156,25 +159,53 @@ function scrollToSection(id: string) {
 .compact-tabs {
   .q-tab {
     min-height: 40px !important;
-    padding: 0 !important;
+    padding: 0 4px !important;
     transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
   }
   .q-tab__content {
-    padding: 0 !important;
+    padding: 4px 0 !important;
     min-width: 44px !important;
     position: relative;
   }
-  .tab-welcome .q-icon { color: #616161; }
-  .tab-live .q-icon { color: #616161; }
-  .tab-seasons .q-icon { color: #616161; }
-  .tab-chat .q-icon { color: #616161; } // grey-7
-  .tab-leaderboard .q-icon { color: #616161; }
+  .q-tab__label {
+    font-size: 10px;
+    font-weight: 700;
+  }
+  .q-icon {
+    font-size: 20px !important;
+  }
+  .tab-welcome .q-icon, .tab-welcome .q-tab__label { color: #616161; }
+  .tab-live .q-icon, .tab-live .q-tab__label { color: #616161; }
+  .tab-seasons .q-icon, .tab-seasons .q-tab__label { color: #616161; }
+  .tab-chat .q-icon, .tab-chat .q-tab__label { color: #616161; } // grey-7
+  .tab-leaderboard .q-icon, .tab-leaderboard .q-tab__label { color: #616161; }
+
+  @each $name, $color in (
+    "welcome": #1976D2,
+    "seasons": #1976D2,
+    "live": #9C27B0,
+    "chat": #26A69A,
+    "leaderboard": #F2C037
+  ) {
+    .tab-#{$name} {
+      &:hover {
+        background: rgba($color, 0.05);
+        .q-icon, .q-tab__label {
+          color: $color !important;
+        }
+      }
+      &.q-tab--active {
+        color: $color !important;
+        background: rgba($color, 0.08);
+      }
+    }
+  }
 
   .q-tab--active {
-    color: var(--q-primary) !important;
     .q-tab__indicator {
       height: 3px;
       border-radius: 3px 3px 0 0;
+      background: currentColor !important;
     }
   }
 }
@@ -216,8 +247,27 @@ function scrollToSection(id: string) {
 
   &.is-active {
     opacity: 1;
-    background: rgba(0, 0, 0, 0.05);
-    color: var(--q-primary) !important;
+    background: rgba(0, 0, 0, 0.03);
+    // color: var(--q-primary) !important; // Handled by dynamic :color prop
+  }
+
+  @each $name, $color in (
+    "primary": #1976D2,
+    "secondary": #26A69A,
+    "accent": #9C27B0,
+    "warning": #F2C037,
+    "negative": #C10015,
+    "info": #31CCEC
+  ) {
+    &.nav-section-btn--#{$name} {
+      &:hover {
+        background: rgba($color, 0.08) !important;
+        color: $color !important;
+      }
+      &.is-active {
+        background: rgba($color, 0.1) !important;
+      }
+    }
   }
 
   &.minimized-btn {
