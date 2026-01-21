@@ -144,7 +144,6 @@ watch(() => props.seasonId, (id) => {
   }
   loadLeaguesForSeason(id);
 }, { immediate: true });
-
 </script>
 
 <style scoped lang="scss">

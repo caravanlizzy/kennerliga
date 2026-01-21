@@ -65,9 +65,7 @@
         style="max-width: 1300px; width: 100%; "
       >
         <router-view v-slot="{ Component }">
-          <keep-alive>
-            <component :is="Component" />
-          </keep-alive>
+          <component :is="Component" />
         </router-view>
         <ConfirmDialog />
       </div>

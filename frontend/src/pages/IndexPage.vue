@@ -191,7 +191,7 @@ watch(selectedSeasonYear, async (newYear) => {
   }
 });
 
-onMounted(async () => {
+const initData = async () => {
   if (isAuthenticated.value) {
     loadingSeasonInit.value = true;
     try {
@@ -220,12 +220,14 @@ onMounted(async () => {
 
         selectedSeasonYear.value = year;
         if (seasons.length > 0) {
-          selectedSeasonMonth.value = Math.max(...seasons.map(s => s.month));
+          selectedSeasonMonth.value = Math.max(...seasons.map((s) => s.month));
         }
       }
     } finally {
       loadingSeasonInit.value = false;
     }
   }
-});
+};
+
+onMounted(initData);
 </script>
