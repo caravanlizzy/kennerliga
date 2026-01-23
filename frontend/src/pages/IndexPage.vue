@@ -19,8 +19,9 @@
         </div>
 
         <div v-if="!isMobile" class="column col q-pt-none">
-          <div class="row col">
-            <div class="col-12 col-md">
+          <div class="row q-col-gutter-xl">
+            <!-- Left Column: Primary Info -->
+            <div class="col-12 col-md-8">
               <ContentSection
                 id="seasons"
                 icon="military_tech"
@@ -63,23 +64,13 @@
                   <LoadingSpinner text="Initializing seasons..." />
                 </div>
               </ContentSection>
-              <ContentSection
-                v-if="isAuthenticated"
-                id="live-action"
-                title="Live Action"
-                icon="bolt"
-                color="accent"
-                :bordered="false"
-                class="col-12 q-mt-md"
-              >
-                <LiveActionFeed />
-              </ContentSection>
+
               <ContentSection
                 :bordered="false"
                 id="leaderboard"
                 icon="stars"
                 title="Leaderboard"
-                class="col-12 q-mt-md"
+                class="col-12 q-mt-xl"
                 color="warning"
               >
                 <template #header-extra>
@@ -93,6 +84,21 @@
                   </div>
                 </template>
                 <LeaderBoard :year="selectedYear" />
+              </ContentSection>
+            </div>
+
+            <!-- Right Column: Secondary Info -->
+            <div class="col-12 col-md-4">
+              <ContentSection
+                v-if="isAuthenticated"
+                id="live-action"
+                title="Live Action"
+                icon="bolt"
+                color="accent"
+                :bordered="false"
+                class="col-12 q-mt-none"
+              >
+                <LiveActionFeed />
               </ContentSection>
             </div>
           </div>

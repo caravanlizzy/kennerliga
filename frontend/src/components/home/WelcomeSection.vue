@@ -54,89 +54,15 @@
     </template>
     <template v-else>
       <div
-        class="relative-position q-mb-xl"
-        :class="isMobile ? 'q-pa-md' : 'q-px-lg q-pt-lg q-pb-lg'"
+        class="relative-position q-mb-md"
+        :class="isMobile ? 'q-pa-md' : 'q-px-lg q-pt-md q-pb-none'"
       >
-        <!-- Background Watermark -->
-        <div
-          class="absolute-top-right q-ma-md"
-          style="opacity: 0.04; pointer-events: none; transform: rotate(-15deg); z-index: 0"
-        >
-          <q-icon name="img:icons/favicon.svg" :size="isMobile ? '100px' : '140px'" />
-        </div>
-
         <div class="relative-position" style="z-index: 1">
           <div
             :class="[isMobile ? 'text-h5' : 'text-h4', 'text-weight-bold text-dark tracking-tighter']"
             style="letter-spacing: -1px;"
           >
             Welcome back!
-          </div>
-          <p
-            :class="[isMobile ? 'text-body1' : 'text-subtitle1', 'text-grey-7 q-mt-sm q-mb-lg']"
-            style="max-width: 800px; line-height: 1.4"
-          >
-            Glad to have you here! This is your central hub for everything KennerLiga.
-            Check out what's happening right now or dive into the stats.
-          </p>
-
-          <div class="row q-col-gutter-lg">
-            <!-- Left Column -->
-            <div class="col-12 col-md-6 column q-gutter-y-md">
-              <div class="row no-wrap items-start">
-                <q-icon name="bolt" color="accent" size="24px" class="q-mr-md q-mt-xs" />
-                <div class="column">
-                  <span class="text-subtitle2 text-weight-bold text-dark">Live Action</span>
-                  <span class="text-body2 text-grey-7">See what's happening right now across the leagues.</span>
-                </div>
-              </div>
-              <div class="row no-wrap items-start">
-                <q-icon name="military_tech" color="primary" size="24px" class="q-mr-md q-mt-xs" />
-                <div class="column">
-                  <span class="text-subtitle2 text-weight-bold text-dark">Seasons</span>
-                  <span class="text-body2 text-grey-7">Check current standings and dive into past season data.</span>
-                </div>
-              </div>
-              <div class="row no-wrap items-start">
-                <q-icon name="ads_click" color="secondary" size="24px" class="q-mr-md q-mt-xs" />
-                <div class="column">
-                  <span class="text-subtitle2 text-weight-bold text-dark">My League</span>
-                  <span class="text-body2 text-grey-7">Handle game picking, banning, and results.</span>
-                </div>
-              </div>
-            </div>
-
-            <!-- Right Column -->
-            <div class="col-12 col-md-6 column q-gutter-y-md">
-              <div class="row no-wrap items-start">
-                <q-icon name="stars" color="warning" size="24px" class="q-mr-md q-mt-xs" />
-                <div class="column">
-                  <span class="text-subtitle2 text-weight-bold text-dark">Leaderboard</span>
-                  <span class="text-body2 text-grey-7">See the overall rankings and who's leading this year.</span>
-                </div>
-              </div>
-              <div class="row no-wrap items-start">
-                <q-icon name="chat" color="blue-grey-6" size="24px" class="q-mr-md q-mt-xs" />
-                <div class="column">
-                  <span class="text-subtitle2 text-weight-bold"><span class="text-primary">Kenner</span><span class="text-accent">Chat</span></span>
-                  <span class="text-body2 text-grey-7">Catch up with the community and plan your next session.</span>
-                </div>
-              </div>
-              <div class="row no-wrap items-start">
-                <q-icon name="analytics" color="info" size="24px" class="q-mr-md q-mt-xs" />
-                <div class="column">
-                  <span class="text-subtitle2 text-weight-bold text-dark">Statistics</span>
-                  <span class="text-body2 text-grey-7">Everything is tracked so you can check your performance.</span>
-                </div>
-              </div>
-              <div class="row no-wrap items-start">
-                <q-icon name="gavel" color="primary" size="24px" class="q-mr-md q-mt-xs" />
-                <div class="column">
-                  <span class="text-subtitle2 text-weight-bold text-dark">Rules</span>
-                  <span class="text-body2 text-grey-7">Clear rules for game picking, seasons and fair play.</span>
-                </div>
-              </div>
-            </div>
           </div>
         </div>
       </div>

@@ -1,11 +1,11 @@
 <template>
-  <div v-if="isVisible" :class="isMobile ? 'q-mb-sm' : 'q-mt-md q-mb-lg'">
+  <div v-if="isVisible" :class="isMobile ? 'q-mb-sm' : 'q-mt-md q-mb-md'">
     <transition-group
       appear
       enter-active-class="animated fadeInDown"
       leave-active-class="animated fadeOutUp"
     >
-      <div v-for="a in visibleAnnouncements" :key="a.id" class="q-mb-md">
+      <div v-for="a in visibleAnnouncements" :key="a.id" class="q-mb-sm">
         <!-- Special Handling for Registration -->
         <RegistrationAnnouncement
           v-if="a.type === 'REGISTER'"
@@ -24,7 +24,7 @@
         >
           <q-card-section
             :class="[
-              isMobile ? 'q-py-md' : 'q-py-lg',
+              isMobile ? 'q-py-sm' : 'q-py-md',
               'relative-position row items-center no-wrap'
             ]"
           >
@@ -33,13 +33,13 @@
               <!-- Icon Circle -->
               <div
                 v-if="announcementIcons[a.type]"
-                class="icon-wrapper flex flex-center q-mr-lg"
+                class="icon-wrapper flex flex-center q-mr-md"
                 :class="[isMobile ? 'icon-wrapper--mobile' : '']"
                 :style="{ background: 'transparent', boxShadow: 'none' }"
               >
                 <q-icon
                   :name="announcementIcons[a.type]"
-                  :size="isMobile ? '28px' : '32px'"
+                  :size="isMobile ? '24px' : '28px'"
                   :class="textColors[a.type]"
                 />
               </div>
@@ -47,12 +47,12 @@
               <!-- Content -->
               <div class="col">
                 <div
-                  class="text-h6 text-weight-bolder lh-tight"
+                  class="text-subtitle1 text-weight-bolder lh-tight"
                   :class="textColors[a.type]"
                 >
                   {{ a.title }}
                 </div>
-                <div v-if="a.content" class="text-subtitle2 text-grey-8 q-mt-xs">
+                <div v-if="a.content" class="text-body2 text-grey-8">
                   {{ a.content }}
                 </div>
               </div>
@@ -104,12 +104,12 @@ const textColors = {
 
 <style scoped>
 .announcement-card {
-  border-radius: 16px;
+  border-radius: 12px;
   transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-  background: rgba(255, 255, 255, 0.6);
-  backdrop-filter: blur(8px);
-  border: 1px solid rgba(0, 0, 0, 0.08);
-  border-left-width: 6px;
+  background: rgba(255, 255, 255, 0.5);
+  backdrop-filter: blur(4px);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  border-left-width: 4px;
   width: 100%;
 }
 
