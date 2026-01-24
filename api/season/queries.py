@@ -25,7 +25,7 @@ def get_previous_season() -> Season:
     """
     Retrieves the most recently completed season.
     """
-    return Season.objects.filter(status=Season.SeasonStatus.DONE).last()
+    return Season.objects.filter(status=Season.SeasonStatus.DONE).order_by("-year", "-month").first()
 
 
 def get_participants(season_name: str) -> List[PlayerProfile]:

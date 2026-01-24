@@ -1,32 +1,34 @@
 import logging
 from league.models import League, LeagueStanding
-from season.models import Season
+from season.models import Season, SeasonParticipant
 from season.queries import get_running_season, get_open_season
 from random import shuffle
 from typing import List, Dict, Optional, Any
 from season.queries import get_previous_season
 from user.models import PlayerProfile
 
-def close_running(season: Season):
+def close_season(season: Season):
     if not season:
         logging.warning("No running season to close")
         return
     season.status = Season.SeasonStatus.DONE
     season.save()
 
-def open_new():
-    open_season = get_open_season()
-    if not open_season:
+def start_open_season(season: Season):
+    if not season:
         logging.warning("No open season found")
         return
-    open_season.status = Season.SeasonStatus.RUNNING
-    open_season.save()
-    return open_season
+    if not season.status == Season.SeasonStatus.OPEN:
+        logging.warning("Season is not open")
+        return
+    season.status = Season.SeasonStatus.RUNNING
+    season.save()
+    return season
 
-def create_next(season: Season) -> Season:
-    if not season:
+def create_next_season(current_season: Season) -> Season:
+    if not current_season:
         raise ValueError("No running season found")
-    new_month, new_year = _next_month_year(season.month, season.year)
+    new_month, new_year = _next_month_year(current_season.month, current_season.year)
     new = Season(year=new_year, month=new_month, status=Season.SeasonStatus.OPEN)
     new.save()
     return new
@@ -65,36 +67,30 @@ def _players_per_league(count: int) -> List[int]:
     return players
 
 
-def rank_participants(season: Season, participants: List[Any]) -> List[Any]:
+def rank_participants(season: Season, participants: List[SeasonParticipant]) -> List[SeasonParticipant]:
     """
-    Ranks participants based on their previous participation and randomizes the order of new participants.
-
-    The method separates previously known participants from new ones. Previously known participants are ordered
-    using a custom ordering function, while new participants are shuffled to avoid any implicit ordering by
-    registration timestamps. The method then creates a fully ranked list by combining ordered previous participants
-    and shuffled new participants.
-
-    Parameters:
-        participants (List[Any]): List of participants to rank. Participants can be objects or any type
-        implementing the required comparison logic.
-
-    Returns:
-        List[Any]: A combined list of previously ordered participants and newly shuffled participants.
+    This function should order the participants and give them a rank. all participants that have participated in the previous season get rank according how they performed. winner of L1 gets rank1, second in l1 gets #2 etc. first 4 ranks go to L1, then rank 5 is winner of L2 etc. after all participants of the previous seasons have been ranked, the remaining participants get their rank randomly (but increase by one for each nexct participant. the so the last players rank is the amount of players this season
     """
-    # participant_profiles = [self._to_profile(p) for p in participants]
-    # participant_profiles = [p for p in participant_profiles if p is not None]
+    profiles = [p.profile for p in participants]
+    prev_participants_profiles = get_previous_participants_list(profiles)
+    new_participants_profiles = [p for p in profiles if p not in prev_participants_profiles]
 
-    prev_participants = get_previous_participants_list(participants)
-    new_participants = [p for p in participants if p not in prev_participants]
+    ordered_prev_profiles = order_previous(prev_participants_profiles)
 
-    # Shuffle participants to avoid ranking by registration timestamp
-    shuffle(new_participants)
-    sorted_prev = order_previous(prev_participants)
-    fully_ranked = sorted_prev + new_participants
-    for (index, participant) in enumerate(fully_ranked):
-        participant.rank = index + 1
+    shuffle(new_participants_profiles)
+
+    final_ordered_profiles = ordered_prev_profiles + new_participants_profiles
+
+    # Map back to SeasonParticipant and set rank
+    profile_to_participant = {p.profile_id: p for p in participants}
+    ranked_participants = []
+    for i, profile in enumerate(final_ordered_profiles, start=1):
+        participant = profile_to_participant[profile.id]
+        participant.rank = i
         participant.save()
-    return fully_ranked
+        ranked_participants.append(participant)
+
+    return ranked_participants
 
 def get_previous_participants_list(participants) -> List:
     """
@@ -112,20 +108,20 @@ def get_previous_participants_list(participants) -> List:
     Returns:
         List containing only participants who were part of the previous season.
     """
-    prev_season = get_running_season()
+    prev_season = get_previous_season()
     if not prev_season:
         return []
-    prev_participants = set(prev_season.participants.all())
-    return [p for p in participants if p in prev_participants]
+    prev_participants_profiles = set(prev_season.participants.values_list('profile_id', flat=True))
+    return [p for p in participants if p.id in prev_participants_profiles]
 
 def get_previous_result(profile: PlayerProfile) -> Optional[dict]:
     prev_season = get_previous_season()
-    last_season = Season.objects.filter(participants=profile).order_by("-year", "-month").first()
-    if prev_season != last_season:
+    last_season = Season.objects.filter(participants__profile=profile, status=Season.SeasonStatus.DONE).order_by("-year", "-month").first()
+    if not prev_season or prev_season != last_season:
         return None
 
     try:
-        league = League.objects.get(season=prev_season, members=profile)
+        league = League.objects.get(season=prev_season, members__profile=profile)
     except League.DoesNotExist:
         return None
 
@@ -171,6 +167,6 @@ def apply_promotion(participants: List[dict]) -> List[dict]:
     participants_copy = participants.copy()
     for i, current in enumerate(participants_copy[1:], start=1):
         prev = participants_copy[i - 1]
-        if prev["is_last"] and current["league"] - 1 == prev["league"]:
+        if prev["is_last"] and current["league"] - 1 == prev["league"] and current["position"] == 1:
             participants_copy[i], participants_copy[i - 1] = prev, current
     return participants_copy
