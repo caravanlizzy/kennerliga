@@ -1,23 +1,20 @@
 <template>
   <q-page class="column col q-pa-none">
-    <div class="row">
+    <div v-if="!isMobile" class="row">
       <AnnouncementDisplay class="col-12 q-px-md" />
     </div>
 
     <div class="q-pa-md q-mx-auto" style="max-width: 1300px; width: 100%">
+      <div v-if="isMobile" class="q-mb-md">
+        <AnnouncementDisplay />
+      </div>
+
       <WelcomeSection
         v-if="!isMobile || mobileContent === 'welcome'"
         :is-authenticated="isAuthenticated"
       />
 
       <template v-if="isAuthenticated">
-        <div
-          v-if="isMobile && user?.myCurrentLeagueId"
-          class="row justify-center q-pt-sm q-px-md"
-        >
-          <NavMyLeague />
-        </div>
-
         <div v-if="!isMobile" class="column col q-pt-none">
           <div class="row q-col-gutter-xl">
             <!-- Left Column: Primary Info -->

@@ -54,16 +54,18 @@
     </template>
     <template v-else>
       <div
-        class="relative-position q-mb-md"
-        :class="isMobile ? 'q-pa-md' : 'q-px-lg q-pt-md q-pb-none'"
+        class="relative-position"
+        :class="isMobile ? 'q-pa-none' : 'q-px-lg q-pt-md q-pb-none q-mb-md'"
       >
         <div class="relative-position" style="z-index: 1">
           <div
+            v-if="!isMobile"
             :class="[isMobile ? 'text-h5' : 'text-h4', 'text-weight-bold text-dark tracking-tighter']"
             style="letter-spacing: -1px;"
           >
             Welcome back!
           </div>
+          <MobileAppLauncher v-if="isMobile" />
         </div>
       </div>
     </template>
@@ -71,6 +73,7 @@
 </template>
 
 <script setup lang="ts">
+import MobileAppLauncher from 'components/home/MobileAppLauncher.vue';
 import KennerButton from 'components/base/KennerButton.vue';
 import { useResponsive } from 'src/composables/responsive';
 import { onMounted, onUnmounted } from 'vue';

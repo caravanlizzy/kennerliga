@@ -1,7 +1,7 @@
 <template>
   <div class="row items-center no-wrap">
     <KennerButton
-      v-if="isAuthenticated"
+      v-if="isAuthenticated && user?.myCurrentLeagueId"
       :to="{ name: 'my-league' }"
       unelevated
       color="primary"
