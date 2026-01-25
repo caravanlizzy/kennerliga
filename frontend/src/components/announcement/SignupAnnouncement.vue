@@ -1,7 +1,7 @@
 <template>
   <q-card
     flat
-    class="announcement-card overflow-hidden announcement-card--register"
+    class="announcement-card overflow-hidden announcement-card--signup"
     :class="{ 'no-border-radius': shouldRemoveBorders }"
   >
     <q-card-section
@@ -36,17 +36,17 @@
             <!-- Mobile Action Button -->
             <div v-if="isMobile" class="col-auto">
               <KennerButton
-                v-if="!isRegisteredForOpenSeason"
+                v-if="!isSignedUpForOpenSeason"
                 unelevated
                 dense
                 no-caps
                 color="primary"
                 class="q-px-md"
-                @click="register"
+                @click="signUp"
               >
                 Sign up
                 <KennerTooltip v-if="!isAuthenticated" class="bg-grey-9">
-                  Login to register for upcoming season
+                  Login to sign up for upcoming season
                 </KennerTooltip>
               </KennerButton>
 
@@ -55,7 +55,7 @@
                 class="row items-center q-gutter-x-xs text-positive text-weight-bold text-caption"
               >
                 <q-icon name="check_circle" size="16px" />
-                <span>Registered</span>
+                <span>Signed up</span>
               </div>
             </div>
           </div>
@@ -74,7 +74,7 @@
                 class="text-caption text-weight-bolder text-grey-8 uppercase tracking-widest"
                 :style="isMobile ? 'font-size: 0.6rem' : 'font-size: 0.65rem'"
               >
-                Registered Players
+                Signed up
               </div>
               <q-badge
                 color="accent"
@@ -104,7 +104,7 @@
                 </div>
               </div>
               <div v-else class="text-caption text-grey-6 italic">
-                No participants yet. Be the first to join!
+                Nobody signed up yet. Be the first!
               </div>
             </template>
           </div>
@@ -115,17 +115,17 @@
       <div class="row items-center q-gutter-sm absolute-top-right q-pa-md">
         <template v-if="!isMobile">
           <KennerButton
-            v-if="!isRegisteredForOpenSeason"
+            v-if="!isSignedUpForOpenSeason"
             unelevated
             dense
             no-caps
             color="primary"
             class="q-px-md"
-            @click="register"
+            @click="signUp"
           >
             Sign up
             <KennerTooltip v-if="!isAuthenticated" class="bg-grey-9">
-              Login to register for upcoming season
+              Login to sign up for upcoming season
             </KennerTooltip>
           </KennerButton>
 
@@ -134,7 +134,7 @@
             class="row items-center q-gutter-x-xs text-positive text-weight-bold text-caption q-px-sm"
           >
             <q-icon name="check_circle" size="16px" />
-            <span>Registered</span>
+            <span>Signed up</span>
           </div>
         </template>
       </div>
@@ -172,7 +172,7 @@ const shouldRemoveBorders = ref($q.screen.lt.sm);
 const userStore = useUserStore();
 const { isAuthenticated } = storeToRefs(userStore);
 
-const isRegisteredForOpenSeason = ref(false);
+const isSignedUpForOpenSeason = ref(false);
 const openSeasonId = ref<number | null>(null);
 const participants = ref<TSeasonParticipantDto[] | null>(null);
 const participantsLoading = ref(false);
@@ -196,7 +196,7 @@ async function loadParticipants() {
   }
 }
 
-async function register() {
+async function signUp() {
   const seasonId = announcement.season_id || openSeasonId.value;
   if (!seasonId) {
     console.error('No season_id found in announcement or open season');
@@ -204,7 +204,7 @@ async function register() {
   }
   const res = await registerForSeason(seasonId);
   if (res && res.status === 200) {
-    isRegisteredForOpenSeason.value = true;
+    isSignedUpForOpenSeason.value = true;
     await loadParticipants();
   }
 }
@@ -213,7 +213,7 @@ onMounted(async () => {
   const status = await fetchRegistrationStatus();
   openSeasonId.value = status.season_id;
   if (isAuthenticated.value) {
-    isRegisteredForOpenSeason.value = status.registered;
+    isSignedUpForOpenSeason.value = status.registered;
   }
   await loadParticipants();
 });
@@ -230,7 +230,7 @@ onMounted(async () => {
   width: 100%;
 }
 
-.announcement-card--register {
+.announcement-card--signup {
   border-left-color: var(--q-accent) !important;
   background: linear-gradient(to right, rgba($accent, 0.05), transparent);
 }
