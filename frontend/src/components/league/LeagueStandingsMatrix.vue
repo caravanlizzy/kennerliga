@@ -321,7 +321,7 @@ const tableColumns = computed<QTableColumn[]>(() => {
       name: `game_${game.id}`,
       // 🔹 short name on mobile, full name otherwise
       label:
-        isMobile && game.game_short_name
+        isMobile.value && game.game_short_name
           ? game.game_short_name
           : game.game_name,
       field: `game_${game.id}`,
