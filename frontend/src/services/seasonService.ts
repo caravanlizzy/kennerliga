@@ -10,6 +10,20 @@ export async function registerForSeason(seasonId: number): Promise<AxiosResponse
   }
 }
 
+export async function fetchRegistrationStatus(): Promise<{
+  has_open_season: boolean;
+  registered: boolean;
+  season_id: number | null;
+}> {
+  try {
+    const { data } = await api.get('/season/seasons/registration-status/');
+    return data;
+  } catch (error) {
+    console.error('Failed to fetch registration status:', error);
+    return { has_open_season: false, registered: false, season_id: null };
+  }
+}
+
 export async function fetchIsRegisteredForSeason(seasonId?: number): Promise<boolean> {
   try {
     const params = seasonId ? { season: seasonId } : {};

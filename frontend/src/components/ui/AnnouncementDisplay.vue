@@ -7,7 +7,7 @@
     >
       <div v-for="a in visibleAnnouncements" :key="a.id" class="q-mb-sm">
         <!-- Special Handling for Registration -->
-        <RegistrationAnnouncement
+        <SignupAnnouncement
           v-if="a.type === 'REGISTER'"
           :announcement="a"
         />
@@ -70,7 +70,7 @@ import { storeToRefs } from 'pinia';
 import { computed } from 'vue';
 import { useAnnouncementStore } from 'stores/announcementStore';
 import { useResponsive } from 'src/composables/responsive';
-import RegistrationAnnouncement from 'components/announcement/RegistrationAnnouncement.vue';
+import SignupAnnouncement from 'components/announcement/SignupAnnouncement.vue';
 import { useQuasar } from 'quasar';
 
 const $q = useQuasar();

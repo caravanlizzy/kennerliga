@@ -44,7 +44,7 @@
                 class="q-px-md"
                 @click="register"
               >
-                Register
+                Sign up
                 <KennerTooltip v-if="!isAuthenticated" class="bg-grey-9">
                   Login to register for upcoming season
                 </KennerTooltip>
@@ -123,7 +123,7 @@
             class="q-px-md"
             @click="register"
           >
-            Register
+            Sign up
             <KennerTooltip v-if="!isAuthenticated" class="bg-grey-9">
               Login to register for upcoming season
             </KennerTooltip>
@@ -151,7 +151,7 @@ import KennerButton from 'components/base/KennerButton.vue';
 import KennerTooltip from 'components/base/KennerTooltip.vue';
 import { useQuasar } from 'quasar';
 import {
-  fetchIsRegisteredForSeason,
+  fetchRegistrationStatus,
   fetchOpenSeasonParticipants,
   fetchSeasonParticipants,
   registerForSeason,
@@ -173,6 +173,7 @@ const userStore = useUserStore();
 const { isAuthenticated } = storeToRefs(userStore);
 
 const isRegisteredForOpenSeason = ref(false);
+const openSeasonId = ref<number | null>(null);
 const participants = ref<TSeasonParticipantDto[] | null>(null);
 const participantsLoading = ref(false);
 const participantsLoaded = ref(false);
@@ -181,7 +182,7 @@ async function loadParticipants() {
   if (participantsLoading.value) return;
   participantsLoading.value = true;
   try {
-    const seasonId = announcement.season_id;
+    const seasonId = announcement.season_id || openSeasonId.value;
     if (seasonId) {
       participants.value = await fetchSeasonParticipants(seasonId);
     } else {
@@ -196,9 +197,9 @@ async function loadParticipants() {
 }
 
 async function register() {
-  const seasonId = announcement.season_id;
+  const seasonId = announcement.season_id || openSeasonId.value;
   if (!seasonId) {
-    console.error('No season_id found in announcement');
+    console.error('No season_id found in announcement or open season');
     return;
   }
   const res = await registerForSeason(seasonId);
@@ -209,10 +210,10 @@ async function register() {
 }
 
 onMounted(async () => {
+  const status = await fetchRegistrationStatus();
+  openSeasonId.value = status.season_id;
   if (isAuthenticated.value) {
-    isRegisteredForOpenSeason.value = await fetchIsRegisteredForSeason(
-      announcement.season_id
-    );
+    isRegisteredForOpenSeason.value = status.registered;
   }
   await loadParticipants();
 });
