@@ -29,9 +29,8 @@ export async function fetchOpenSeasonParticipants(): Promise<TSeasonParticipantD
     const openSeason = seasons.length > 0 ? seasons[0] : null;
 
     if (!openSeason) {
-      // Fallback: If no OPEN season, maybe try 'current' as before or return empty
-      const { data } = await api.get('/season/season-participants/current/');
-      return Array.isArray(data) ? data : data.results || [];
+      console.error('No open season found.');
+      return [];
     }
 
     // 2. Fetch participants for that specific season
