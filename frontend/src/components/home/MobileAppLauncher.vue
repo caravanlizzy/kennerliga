@@ -1,32 +1,21 @@
 <template>
-  <div class="row q-col-gutter-md q-pt-md">
+  <div class="launcher-grid q-pt-md">
     <template v-for="tile in tiles" :key="tile.title">
-      <div v-if="tile.visible" class="col-6">
+      <div v-if="tile.visible" class="launcher-item">
         <q-card
           flat
-          bordered
           v-ripple
-          class="launcher-tile column items-center justify-center q-pa-md cursor-pointer relative-position overflow-hidden"
+          class="launcher-tile column items-center justify-center cursor-pointer relative-position overflow-hidden"
           @click="navigateTo(tile.route)"
         >
-          <div
-            class="absolute-top-right q-ma-sm opacity-10"
-            style="pointer-events: none"
-          >
-            <q-icon :name="tile.icon" size="64px" :color="tile.color" />
-          </div>
-
           <q-icon
             :name="tile.icon"
             :color="tile.color"
-            size="40px"
-            class="q-mb-sm"
+            size="28px"
+            class="q-mb-xs"
           />
-          <div class="text-subtitle1 text-weight-bold text-center">
+          <div class="text-caption text-weight-bold text-center text-dark">
             {{ tile.title }}
-          </div>
-          <div class="text-caption text-grey-7 text-center">
-            {{ tile.helpText }}
           </div>
         </q-card>
       </div>
@@ -47,7 +36,6 @@ const tiles = computed(() => [
     title: 'My League',
     icon: 'ads_click',
     color: 'primary',
-    helpText: 'Go to your current league',
     route: { name: 'my-league' },
     visible: !!userStore.user?.myCurrentLeagueId,
   },
@@ -55,32 +43,28 @@ const tiles = computed(() => [
     title: 'Seasons',
     icon: 'military_tech',
     color: 'primary',
-    helpText: 'View current and past standings',
-    route: '/m/seasons',
+    route: { name: 'mobile-seasons' },
     visible: true,
   },
   {
     title: 'Leaderboard',
     icon: 'stars',
     color: 'warning',
-    helpText: 'See overall player rankings',
-    route: '/m/leaderboard',
+    route: { name: 'mobile-leaderboard' },
     visible: true,
   },
   {
     title: 'Live',
     icon: 'bolt',
     color: 'accent',
-    helpText: 'Real-time active games updates',
-    route: '/m/live',
+    route: { name: 'mobile-live' },
     visible: true,
   },
   {
     title: 'Chat',
     icon: 'chat',
     color: 'primary',
-    helpText: 'Connect with other members',
-    route: '/m/chat',
+    route: { name: 'mobile-chat' },
     visible: true,
   },
 ]);
@@ -91,20 +75,26 @@ function navigateTo(route: any) {
 </script>
 
 <style scoped lang="scss">
-.launcher-tile {
-  height: 140px;
-  border-radius: 16px;
-  background: #ffffff;
-  transition: all 0.2s ease-in-out;
-  border: 1px solid rgba(0, 0, 0, 0.05);
-
-  &:active {
-    transform: scale(0.97);
-    background: #f5f5f5;
-  }
+.launcher-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
 }
 
-.opacity-10 {
-  opacity: 0.1;
+.launcher-tile {
+  height: 90px;
+  border-radius: 16px;
+  background: #f8f9fa;
+  transition: all 0.2s ease-in-out;
+  border: 1px solid rgba(0, 0, 0, 0.03);
+
+  &:active {
+    transform: scale(0.95);
+    background: #f0f0f0;
+  }
+
+  .q-icon {
+    opacity: 0.9;
+  }
 }
 </style>

@@ -46,28 +46,6 @@
         <NavProfileMenu :onToggle="onToggle" class="q-ml-xs" />
       </div>
     </q-toolbar>
-
-    <!-- Center: Mobile Tabs (Second Row) -->
-    <div v-if="isMobile" class="row justify-center q-pb-sm q-px-sm">
-      <div class="row no-wrap items-center full-width justify-center" style="height: 40px; border-bottom: 1px solid rgba(0, 0, 0, 0.05);">
-        <q-tabs
-          :model-value="activeTab"
-          class="text-dark compact-tabs full-width"
-          active-color="primary"
-          indicator-color="primary"
-          align="justify"
-          dense
-          no-caps
-          @update:model-value="handleTabChange"
-        >
-          <q-tab icon="home" name="welcome" class="tab-welcome" label="Home" />
-          <q-tab icon="military_tech" name="seasons" class="tab-seasons" label="Seasons" />
-          <q-tab icon="bolt" name="live" class="tab-live" label="Live" />
-          <q-tab icon="chat" name="chat" class="tab-chat" label="Chat" />
-          <q-tab icon="stars" name="leaderboard" class="tab-leaderboard" label="Stats" />
-        </q-tabs>
-      </div>
-    </div>
   </div>
 </template>
 
@@ -96,40 +74,6 @@ const { isMobile } = useResponsive();
 
 const isIndexPage = computed(() => route.name === 'home');
 
-const activeTab = computed(() => {
-  const name = route.name as string;
-  if (name === 'home') return 'welcome';
-  if (name === 'mobile-seasons') return 'seasons';
-  if (name === 'mobile-live') return 'live';
-  if (name === 'mobile-chat') return 'chat';
-  if (name === 'mobile-leaderboard') return 'leaderboard';
-  return null;
-});
-
-function handleTabChange(value: string) {
-  if (isMobile.value) {
-    switch (value) {
-      case 'seasons':
-        router.push({ name: 'mobile-seasons' });
-        break;
-      case 'live':
-        router.push({ name: 'mobile-live' });
-        break;
-      case 'chat':
-        router.push({ name: 'mobile-chat' });
-        break;
-      case 'leaderboard':
-        router.push({ name: 'mobile-leaderboard' });
-        break;
-      case 'welcome':
-        router.push({ name: 'home' });
-        break;
-    }
-  } else if (!isIndexPage.value) {
-    router.push({ name: 'home' });
-  }
-}
-
 function handleSectionClick(section: NavSection) {
   if (section.onClick) {
     section.onClick();
@@ -154,60 +98,6 @@ function scrollToSection(id: string) {
   min-height: 64px;
   display: flex;
   align-items: center;
-}
-
-.compact-tabs {
-  .q-tab {
-    min-height: 40px !important;
-    padding: 0 4px !important;
-    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-  }
-  .q-tab__content {
-    padding: 4px 0 !important;
-    min-width: 44px !important;
-    position: relative;
-  }
-  .q-tab__label {
-    font-size: 10px;
-    font-weight: 700;
-  }
-  .q-icon {
-    font-size: 20px !important;
-  }
-  .tab-welcome .q-icon, .tab-welcome .q-tab__label { color: #616161; }
-  .tab-live .q-icon, .tab-live .q-tab__label { color: #616161; }
-  .tab-seasons .q-icon, .tab-seasons .q-tab__label { color: #616161; }
-  .tab-chat .q-icon, .tab-chat .q-tab__label { color: #616161; } // grey-7
-  .tab-leaderboard .q-icon, .tab-leaderboard .q-tab__label { color: #616161; }
-
-  @each $name, $color in (
-    "welcome": #1976D2,
-    "seasons": #1976D2,
-    "live": #9C27B0,
-    "chat": #26A69A,
-    "leaderboard": #F2C037
-  ) {
-    .tab-#{$name} {
-      &:hover {
-        background: rgba($color, 0.05);
-        .q-icon, .q-tab__label {
-          color: $color !important;
-        }
-      }
-      &.q-tab--active {
-        color: $color !important;
-        background: rgba($color, 0.08);
-      }
-    }
-  }
-
-  .q-tab--active {
-    .q-tab__indicator {
-      height: 3px;
-      border-radius: 3px 3px 0 0;
-      background: currentColor !important;
-    }
-  }
 }
 
 .glass-effect {

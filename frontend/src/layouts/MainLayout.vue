@@ -70,10 +70,13 @@
         <ConfirmDialog />
       </div>
     </q-page-container>
+
+    <MobileBottomNav />
   </q-layout>
 </template>
 
 <script setup lang="ts">
+import MobileBottomNav from 'components/layout/MobileBottomNav.vue';
 import NavBar from 'components/layout/NavBar.vue';
 import { ref, Ref, onMounted } from 'vue';
 import KennerDrawer from 'components/layout/KennerDrawer.vue';
