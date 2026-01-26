@@ -36,7 +36,7 @@ class SeasonRegistrationView(APIView):
         # if not player_profile in current_season.participants.all():
         if not is_profile_registered(player_profile, open_season):
             register(player_profile)
-            create_chat_announcement(f"{player_profile.user.username} registered for {open_season.name}")
+            create_chat_announcement(f"{player_profile.user.username} signed up for {open_season.name}")
             return Response(f'Participant {player_profile.profile_name} has been added to the current season.')
         return Response(f'Player {player_profile.profile_name} is already registered')
 
