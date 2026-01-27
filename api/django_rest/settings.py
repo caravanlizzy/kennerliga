@@ -55,6 +55,7 @@ MY_APPS = [
     'announcement',
     'result',
     'user',
+    'api',
 ]
 
 INSTALLED_APPS = DJANGO_APPS + MY_APPS
