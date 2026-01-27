@@ -33,12 +33,12 @@ const routes: RouteRecordRaw[] = [
     ],
   },
   {
-    path: '/signUp',
+    path: '/register',
     component: () => import('layouts/LoginLayout.vue'),
     children: [
       {
         path: '',
-        name: 'signUp',
+        name: 'register',
         component: () => import('pages/account/RegistrationPage.vue'),
       },
     ],
