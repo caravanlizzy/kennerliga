@@ -7,4 +7,4 @@ VENV_PYTHON="/home/haligh/.virtualenvs/kennerliga-venv/bin/python"
 
 # Run the registration announcement command
 export DJANGO_SETTINGS_MODULE="django_rest.settings_production"
-"$VENV_PYTHON" "$PROJECT_DIR/prod_manage.py" create_registration_announcement
+"$VENV_PYTHON" "$PROJECT_DIR/prod_manage.py" open_next_season

@@ -4,7 +4,7 @@ from rest_framework.test import APIClient
 from season.queries import get_open_season
 from user.models import User, PlayerProfile
 from season.models import Season, SeasonParticipant
-from season.services import create_next_season, start_open_season, close_season, rank_participants
+from season.services import create_next_season, start_open_season, close_season, rank_participants, open_registration
 from league.models import League, LeagueStanding
 from season_manager import start_new_season
 
@@ -47,10 +47,14 @@ class SeasonLogicTests(TestCase):
         season.refresh_from_db()
         self.assertEqual(season.status, Season.SeasonStatus.DONE)
         
-        # Create next (OPEN)
+        # Create next (NEXT)
         next_season = create_next_season(season)
         self.assertEqual(next_season.year, 2026)
         self.assertEqual(next_season.month, 2)
+        self.assertEqual(next_season.status, Season.SeasonStatus.NEXT)
+        
+        # Open registration (OPEN)
+        open_registration(next_season)
         self.assertEqual(next_season.status, Season.SeasonStatus.OPEN)
         
         # Open it (RUNNING)

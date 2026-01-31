@@ -29,7 +29,7 @@ def create_next_season(current_season: Season) -> Season:
     if not current_season:
         raise ValueError("No running season found")
     new_month, new_year = _next_month_year(current_season.month, current_season.year)
-    new = Season(year=new_year, month=new_month, status=Season.SeasonStatus.OPEN)
+    new = Season(year=new_year, month=new_month, status=Season.SeasonStatus.NEXT)
     new.save()
     return new
 

@@ -1,13 +1,21 @@
 from django.core.management.base import BaseCommand
 from django.utils import timezone
 from announcement.models import Announcement
+from season.models import Season
 from season.queries import get_open_season
 from datetime import datetime, timedelta
 
 class Command(BaseCommand):
-    help = 'Create a registration announcement 1 week before the next month'
+    help = 'Open the next season and create a registration announcement'
 
     def handle(self, *args, **options):
+        # Find the next season and make it open
+        next_season = Season.objects.filter(status=Season.SeasonStatus.NEXT).order_by('year', 'month').first()
+        if next_season:
+            next_season.status = Season.SeasonStatus.OPEN
+            next_season.save()
+            self.stdout.write(self.style.SUCCESS(f"Season {next_season.name} is now OPEN."))
+        
         open_season = get_open_season()
         if not open_season:
             self.stdout.write(self.style.WARNING("No open season found. Cannot create announcement."))
