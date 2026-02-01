@@ -37,8 +37,8 @@
             <q-chat-message
               v-else
               :sent="isMine(m)"
-              :text="[m.text]"
-              :name="isMine(m) ? undefined : m.sender"
+              :text="[decodeHtmlEntities(m.text)]"
+              :name="isMine(m) ? undefined : decodeHtmlEntities(m.sender)"
               :stamp="timeAgo(m.datetime)"
               class="chat-message"
               :class="isMine(m) ? 'chat-message-sent' : 'chat-message-received'"
@@ -101,6 +101,7 @@ import { storeToRefs } from 'pinia';
 import LoadingSpinner from 'components/base/LoadingSpinner.vue';
 import KennerButton from 'components/base/KennerButton.vue';
 import KennerInput from 'components/base/KennerInput.vue';
+import { decodeHtmlEntities } from 'src/helpers';
 
 const { user, isAuthenticated } = storeToRefs(useUserStore());
 

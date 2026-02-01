@@ -38,3 +38,28 @@ export function formatNumbers(value: string | number): string {
   if (isNaN(num)) return '';
   return num.toString();
 }
+
+/**
+ * Decodes common HTML entities like &quot;, &amp;, &lt;, &gt;, &#39;, and others.
+ * Use this to display strings that might have been escaped on the backend.
+ */
+export function decodeHtmlEntities(text: string | null | undefined): string {
+  if (!text) return '';
+  const entities: Record<string, string> = {
+    '&quot;': '"',
+    '&amp;': '&',
+    '&lt;': '<',
+    '&gt;': '>',
+    '&#39;': "'",
+    '&apos;': "'",
+    '&Auml;': 'Ä',
+    '&auml;': 'ä',
+    '&Ouml;': 'Ö',
+    '&ouml;': 'ö',
+    '&Uuml;': 'Ü',
+    '&uuml;': 'ü',
+    '&szlig;': 'ß',
+    '&nbsp;': ' ',
+  };
+  return text.replace(/&[a-zA-Z0-9#]+;/g, (match) => entities[match] || match);
+}
