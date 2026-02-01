@@ -3,7 +3,7 @@ from rest_framework.test import APIClient
 from user.models import User, PlayerProfile, Platform
 from season.models import Season, SeasonParticipant
 from league.models import League, LeagueStatus
-from game.models import Game, SelectedGame, ResultConfig, StartingPointSystem
+from game.models import Game, SelectedGame, ResultConfig, StartingPointSystem, BanDecision
 
 class GameAPITests(TestCase):
     def setUp(self):
@@ -74,3 +74,13 @@ class GameAPITests(TestCase):
 
         self.league.refresh_from_db()
         self.assertEqual(self.league.status, LeagueStatus.BANNING)
+
+    def test_create_ban_decision(self):
+        data = {
+            "player_banning": self.profile.id,
+            "league": self.league.id,
+            "selected_game_id": None
+        }
+        response = self.client.post('/api/game/ban-decisions/', data, format='json')
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(BanDecision.objects.count(), 1)

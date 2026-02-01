@@ -21,13 +21,12 @@ def create_selected_game(game, league, profile, selected_options_data, manage_on
             
         return selected_game
 
-def create_ban_decision(league, profile, game=None, selected_game=None, manage_only=False):
+def create_ban_decision(league, profile, selected_game=None, manage_only=False):
     with transaction.atomic():
         ban_decision, _ = BanDecision.objects.update_or_create(
             league=league,
             player_banning=profile,
             defaults={
-                'game': game,
                 'selected_game': selected_game
             }
         )
