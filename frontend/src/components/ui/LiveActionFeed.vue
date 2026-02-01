@@ -3,12 +3,18 @@
     <div v-if="loading" class="flex flex-center q-pa-md">
       <q-spinner color="primary" size="2em" />
     </div>
-    <div v-else-if="events.length === 0" class="text-center q-pa-md text-grey-6 italic">
+    <div
+      v-else-if="events.length === 0"
+      class="text-center q-pa-md text-grey-6 italic"
+    >
       No live actions yet.
     </div>
     <div v-else class="events-list q-pa-sm">
       <!-- League Filters -->
-      <div v-if="availableLeagues.length > 1" class="row q-gutter-xs q-mb-md q-px-xs">
+      <div
+        v-if="availableLeagues.length > 1"
+        class="row q-gutter-xs q-mb-md q-px-xs"
+      >
         <q-chip
           clickable
           :outline="!isAllSelected"
@@ -35,47 +41,80 @@
         </q-chip>
       </div>
 
-      <div v-for="event in filteredEvents" :key="event.id" class="event-item q-mb-sm">
+      <div
+        v-for="event in filteredEvents"
+        :key="event.id"
+        class="event-item q-mb-sm"
+      >
         <q-card flat class="event-card">
           <q-card-section class="q-pa-sm">
             <div class="row items-center no-wrap">
               <div class="col-auto q-mr-sm">
                 <div
                   class="icon-wrapper flex flex-center"
-                  :style="{ backgroundColor: getColorHex(event.type) + '15', border: `1px solid ${getColorHex(event.type)}30` }"
+                  :style="{
+                    backgroundColor: getColorHex(event.type) + '15',
+                    border: `1px solid ${getColorHex(event.type)}30`,
+                  }"
                 >
-                  <q-icon :name="getIcon(event.type)" :color="getColor(event.type)" size="xs" />
+                  <q-icon
+                    :name="getIcon(event.type)"
+                    :color="getColor(event.type)"
+                    size="xs"
+                  />
                 </div>
               </div>
               <div class="col">
-                <div class="text-caption text-grey-7 flex justify-between items-center">
+                <div
+                  class="text-caption text-grey-7 flex justify-between items-center"
+                >
                   <span class="row items-center">
-                    <q-badge color="grey-3" text-color="grey-9" class="q-mr-xs text-weight-bold" style="font-size: 0.65rem">
+                    <q-badge
+                      color="grey-3"
+                      text-color="grey-9"
+                      class="q-mr-xs text-weight-bold"
+                      style="font-size: 0.65rem"
+                    >
                       L{{ event.leagueLevel }}
                     </q-badge>
                   </span>
-                  <span style="font-size: 0.7rem; opacity: 0.8">{{ formatTime(event.timestamp) }}</span>
+                  <span style="font-size: 0.7rem; opacity: 0.8">{{
+                    formatTime(event.timestamp)
+                  }}</span>
                 </div>
                 <div class="event-content q-mt-xs">
                   <span v-if="event.type === 'PICK'">
-                    <strong>{{ event.data.playerName }}</strong> picked <strong>{{ event.data.gameName }}</strong>
+                    <strong>{{ event.data.playerName }}</strong> picked
+                    <strong>{{ event.data.gameName }}</strong>
                   </span>
                   <span v-else-if="event.type === 'BAN'">
                     <template v-if="event.data.gameName">
-                      <strong>{{ event.data.playerName }}</strong> banned <strong>{{ event.data.gameName }}</strong>
+                      <template v-if="event.data.gameName === 'Unknown'">
+                        <strong>{{ event.data.playerName }}</strong> skipped
+                        ban.
+                      </template>
+                      <template v-else>
+                        <strong>{{ event.data.playerName }}</strong> banned
+                        <strong>{{ event.data.gameName }}</strong>
+                      </template>
                     </template>
                     <template v-else>
-                      <strong>{{ event.data.playerName }}</strong> skipped their ban
+                      <strong>{{ event.data.playerName }}</strong> skipped their
+                      ban
                     </template>
                   </span>
                   <span v-else-if="event.type === 'GAME_FINISHED'">
-                    Game <strong>{{ event.data.gameName }}</strong> finished! {{ event.data.summary }}
+                    Game <strong>{{ event.data.gameName }}</strong> finished!
+                    {{ event.data.summary }}
                   </span>
                   <span v-else-if="event.type === 'LEAGUE_FINISHED'">
-                    League {{ event.leagueLevel }} finished! Winner: <strong>{{ event.data.winners?.join(', ') }}</strong>
+                    League {{ event.leagueLevel }} finished! Winner:
+                    <strong>{{ event.data.winners?.join(', ') }}</strong>
                   </span>
                   <span v-else-if="event.type === 'SEASON_FINISHED'">
-                    Season finished! Shout out to <strong>{{ event.data.seasonWinner }}</strong>!
+                    Season finished! Shout out to
+                    <strong>{{ event.data.seasonWinner }}</strong
+                    >!
                   </span>
                 </div>
               </div>
@@ -108,7 +147,10 @@ const isAllSelected = computed(() => selectedLeagues.value.size === 0);
 
 const filteredEvents = computed(() => {
   if (isAllSelected.value) return events.value;
-  return events.value.filter((e) => e.leagueLevel !== undefined && selectedLeagues.value.has(e.leagueLevel));
+  return events.value.filter(
+    (e) =>
+      e.leagueLevel !== undefined && selectedLeagues.value.has(e.leagueLevel)
+  );
 });
 
 function toggleLeagueFilter(lvl: number | string) {
@@ -140,23 +182,35 @@ async function fetchEvents() {
 
 function getIcon(type: TLiveEventType) {
   switch (type) {
-    case 'PICK': return 'add_circle';
-    case 'BAN': return 'block';
-    case 'GAME_FINISHED': return 'check_circle';
-    case 'LEAGUE_FINISHED': return 'emoji_events';
-    case 'SEASON_FINISHED': return 'celebration';
-    default: return 'info';
+    case 'PICK':
+      return 'add_circle';
+    case 'BAN':
+      return 'block';
+    case 'GAME_FINISHED':
+      return 'check_circle';
+    case 'LEAGUE_FINISHED':
+      return 'emoji_events';
+    case 'SEASON_FINISHED':
+      return 'celebration';
+    default:
+      return 'info';
   }
 }
 
 function getColor(type: TLiveEventType) {
   switch (type) {
-    case 'PICK': return 'primary';
-    case 'BAN': return 'negative';
-    case 'GAME_FINISHED': return 'positive';
-    case 'LEAGUE_FINISHED': return 'warning';
-    case 'SEASON_FINISHED': return 'accent';
-    default: return 'grey';
+    case 'PICK':
+      return 'primary';
+    case 'BAN':
+      return 'negative';
+    case 'GAME_FINISHED':
+      return 'positive';
+    case 'LEAGUE_FINISHED':
+      return 'warning';
+    case 'SEASON_FINISHED':
+      return 'accent';
+    default:
+      return 'grey';
   }
 }
 
@@ -183,12 +237,18 @@ onUnmounted(() => {
 
 function getColorHex(type: TLiveEventType) {
   switch (type) {
-    case 'PICK': return '#37474f'; // primary (from quasar.variables.scss)
-    case 'BAN': return '#d63a38'; // negative
-    case 'GAME_FINISHED': return '#4bb26a'; // positive
-    case 'LEAGUE_FINISHED': return '#e67e22'; // warning
-    case 'SEASON_FINISHED': return '#26c6da'; // secondary
-    default: return '#9e9e9e';
+    case 'PICK':
+      return '#37474f'; // primary (from quasar.variables.scss)
+    case 'BAN':
+      return '#d63a38'; // negative
+    case 'GAME_FINISHED':
+      return '#4bb26a'; // positive
+    case 'LEAGUE_FINISHED':
+      return '#e67e22'; // warning
+    case 'SEASON_FINISHED':
+      return '#26c6da'; // secondary
+    default:
+      return '#9e9e9e';
   }
 }
 </script>
@@ -232,5 +292,4 @@ function getColorHex(type: TLiveEventType) {
 strong {
   color: var(--q-primary);
 }
-
 </style>
