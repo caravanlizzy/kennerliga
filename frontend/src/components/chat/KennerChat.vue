@@ -28,7 +28,7 @@
             No more messages
           </div>
 
-          <template v-for="m in messages" :key="m.id">
+          <template v-for="(m, index) in messages" :key="m.id">
             <q-chat-message
               v-if="m.label"
               :label="m.label"
@@ -38,10 +38,13 @@
               v-else
               :sent="isMine(m)"
               :text="[decodeHtmlEntities(m.text)]"
-              :name="isMine(m) ? undefined : decodeHtmlEntities(m.sender)"
+              :name="isMine(m) || (index > 0 && messages[index-1].sender === m.sender) ? undefined : decodeHtmlEntities(m.sender)"
               :stamp="timeAgo(m.datetime)"
               class="chat-message"
-              :class="isMine(m) ? 'chat-message-sent' : 'chat-message-received'"
+              :class="[
+                isMine(m) ? 'chat-message-sent' : 'chat-message-received',
+                index > 0 && messages[index-1].sender === m.sender ? 'chat-message-grouped' : ''
+              ]"
             />
           </template>
         </q-scroll-area>
@@ -348,102 +351,152 @@ onUnmounted(() => {
 
 <style lang="scss" scoped>
 .chat-body {
-  background: rgba(241, 243, 245, 0.4);
+  background: rgba(248, 249, 250, 0.6);
 }
 
 .chat-footer {
   background: white;
+  border-top: 1px solid rgba(0, 0, 0, 0.04);
 }
 
 .chat-scroll-area {
-  background: linear-gradient(to bottom, transparent, rgba(96, 125, 139, 0.02));
+  background: radial-gradient(circle at center, rgba(255, 255, 255, 0.1) 0%, rgba(96, 125, 139, 0.05) 100%);
 }
 
 .chat-label-message {
   :deep(.q-message-label) {
-    font-size: 0.7rem;
-    font-weight: 500;
-    color: #9e9e9e; // grey-5
-    letter-spacing: 0.05em;
+    font-size: 0.65rem;
+    font-weight: 600;
+    color: #bdbdbd;
+    letter-spacing: 0.1em;
     text-transform: uppercase;
-    margin: 16px 0 8px;
-    opacity: 0.8;
+    margin: 24px 0 12px;
   }
 }
 
 .chat-message {
-  margin-bottom: 8px;
+  margin-bottom: 12px;
+  transition: transform 0.2s ease;
+
+  &.chat-message-grouped {
+    margin-top: -8px;
+  }
+
+  :deep(.q-message-container) {
+    align-items: flex-end;
+  }
 
   :deep(.q-message-name) {
-    font-size: 0.75rem;
-    font-weight: 700;
-    color: $primary;
-    margin-bottom: 4px;
-    opacity: 0.9;
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: #546e7a;
+    margin-bottom: 2px;
+    margin-left: 8px;
+    margin-right: 8px;
   }
 
   :deep(.q-message-stamp) {
-    font-size: 0.7rem;
-    opacity: 0.6;
+    font-size: 0.65rem;
+    opacity: 0.5;
     margin-top: 4px;
   }
 
   :deep(.q-message-text) {
-    border-radius: 12px !important;
-    padding: 10px 14px;
-    line-height: 1.5;
+    border-radius: 18px !important;
+    padding: 10px 16px;
+    line-height: 1.4;
     min-height: unset;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
-    border: 1px solid rgba(0, 0, 0, 0.05);
-    font-weight: 450;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    border: none;
+    font-weight: 400;
+    width: fit-content;
+    max-width: 100%;
+    word-break: normal;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
 
     &:before {
       display: none;
     }
   }
 
+  :deep(.q-message-container) {
+    align-items: flex-end;
+    max-width: 85%;
+    width: fit-content;
+  }
+
   &.chat-message-sent {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+
+    :deep(.q-message-container) {
+      margin-left: auto;
+      justify-content: flex-end;
+    }
     :deep(.q-message-text) {
-      background: rgba($primary, 0.18) !important;
-      color: darken($primary, 10%) !important;
-      border-color: rgba($primary, 0.25) !important;
+      background: linear-gradient(135deg, $primary 0%, darken($primary, 10%) 100%) !important;
+      color: white !important;
       border-bottom-right-radius: 4px !important;
+      box-shadow: 0 4px 15px rgba($primary, 0.25);
     }
     :deep(.q-message-text-content) {
-      color: darken($primary, 10%) !important;
+      color: white !important;
+    }
+    :deep(.q-message-name) {
+      text-align: right;
+    }
+    &.chat-message-grouped {
+      :deep(.q-message-text) {
+        border-top-right-radius: 4px !important;
+      }
     }
   }
 
   &.chat-message-received {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+
+    :deep(.q-message-container) {
+      margin-right: auto;
+      justify-content: flex-start;
+    }
     :deep(.q-message-text) {
-      background: #e3f2fd !important;
-      color: #1976d2 !important;
-      border-color: #bbdefb !important;
-      border-top-left-radius: 4px !important;
+      background: white !important;
+      color: #263238 !important;
+      border-bottom-left-radius: 4px !important;
+      border-top-left-radius: 18px !important;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
     }
     :deep(.q-message-text-content) {
-      color: #1976d2 !important;
+      color: #263238 !important;
+    }
+    &.chat-message-grouped {
+      :deep(.q-message-text) {
+        border-top-left-radius: 4px !important;
+      }
     }
   }
 }
 
 .composer-input {
-  background: rgba(255, 255, 255, 0.8) !important;
-  backdrop-filter: blur(8px);
-  border-radius: 12px !important;
-  padding: 0 4px 0 16px !important;
-  border: 1px solid rgba(0, 0, 0, 0.08) !important;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.03) !important;
+  background: white !important;
+  border-radius: 24px !important;
+  padding: 4px 6px 4px 20px !important;
+  border: 1px solid rgba(0, 0, 0, 0.06) !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04) !important;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
 
   &:hover {
-    background: rgba(255, 255, 255, 0.9) !important;
-    border-color: rgba(0, 0, 0, 0.12) !important;
+    border-color: rgba(0, 0, 0, 0.1) !important;
+    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.06) !important;
   }
 
   &.q-field--focused {
-    background: white !important;
-    border-color: $primary !important;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08) !important;
+    border-color: rgba($primary, 0.4) !important;
+    box-shadow: 0 8px 30px rgba($primary, 0.12) !important;
   }
 
   :deep(.q-field__control) {
@@ -451,11 +504,13 @@ onUnmounted(() => {
     border: none !important;
     box-shadow: none !important;
     padding: 0 !important;
+    min-height: 44px;
   }
 
   :deep(.q-field__native) {
-    font-weight: 500 !important;
+    font-weight: 400 !important;
     font-size: 0.95rem;
+    color: #37474f;
   }
 }
 </style>
