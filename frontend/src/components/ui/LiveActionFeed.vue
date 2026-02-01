@@ -174,7 +174,7 @@ function formatTime(timestamp: string) {
 
 onMounted(() => {
   fetchEvents();
-  pollInterval = setInterval(fetchEvents, 30000); // Poll every 30s
+  pollInterval = setInterval(fetchEvents, 90000); // Poll every 90s
 });
 
 onUnmounted(() => {
