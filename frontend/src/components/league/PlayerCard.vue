@@ -31,6 +31,9 @@
                   {{ game.game_name }}
                 </KennerTooltip>
               </q-item-label>
+              <q-item-label v-if="game.platform_name" caption class="text-grey-7 text-weight-medium">
+                {{ game.platform_name }}
+              </q-item-label>
             </q-item-section>
 
             <q-item-section side>
@@ -64,6 +67,9 @@
                 Picked by {{ getOwnerName(m.my_banned_game.profile) }}
               </KennerTooltip>
             </q-item-label>
+            <q-item-label v-if="m.my_banned_game.platform_name" caption class="text-blue-grey-4">
+              {{ m.my_banned_game.platform_name }}
+            </q-item-label>
           </q-item-section>
         </q-item>
 
@@ -90,6 +96,9 @@
             <q-item-section>
               <q-item-label class="game-name text-grey-6 text-strike">
                 {{ game.game_name }}
+              </q-item-label>
+              <q-item-label v-if="game.platform_name" caption class="text-grey-5 text-strike" style="margin-top: -2px;">
+                {{ game.platform_name }}
               </q-item-label>
               <q-item-label caption class="text-blue-grey-4">
                 Successfully Banned

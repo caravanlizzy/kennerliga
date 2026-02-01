@@ -100,6 +100,7 @@ class SelectedOptionSerializer(serializers.ModelSerializer):
 class SelectedGameSerializer(serializers.ModelSerializer):
     # game_name is read only
     game_name = serializers.SerializerMethodField()
+    platform_name = serializers.SerializerMethodField()
     selected_options = SelectedOptionSerializer(many=True)
     successfully_banned = serializers.SerializerMethodField()
     has_points = serializers.SerializerMethodField()
@@ -122,7 +123,7 @@ class SelectedGameSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = SelectedGame
-        fields = ['id', 'game', 'game_name', 'selected_options', 'league', 'profile', 'manage_only', 'successfully_banned', 'has_points', 'results_uploaded', 'results', 'is_selectable']
+        fields = ['id', 'game', 'game_name', 'platform_name', 'selected_options', 'league', 'profile', 'manage_only', 'successfully_banned', 'has_points', 'results_uploaded', 'results', 'is_selectable']
 
     def get_is_selectable(self, obj):
         # The rightmost chip is the one with the highest ID in the league for the profile
@@ -180,6 +181,9 @@ class SelectedGameSerializer(serializers.ModelSerializer):
 
     def get_game_name(self, obj):
         return obj.game.name if obj.game else None
+
+    def get_platform_name(self, obj):
+        return obj.game.platform.name if obj.game and obj.game.platform else None
 
     def get_has_points(self, obj):
         return obj.game.resultconfig_set.first().has_points if obj.game.resultconfig_set.exists() else True

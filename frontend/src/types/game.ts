@@ -101,6 +101,7 @@ export type TSelectedGameDto = {
   profile: number;
   game: number;
   game_name?: string;
+  platform_name?: string;
   league: number;
   selected_options: TSelectedGameOptionDto[];
   created_at?: string;

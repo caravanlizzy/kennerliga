@@ -44,6 +44,7 @@ export type TBannedGameFull = {
   id: number;
   game: number;
   game_name: string;
+  platform_name?: string;
   profile: number;
   selected_options: TSelectedGameOptionDto[];
 };
