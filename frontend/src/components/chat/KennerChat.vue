@@ -32,7 +32,7 @@
             <q-chat-message
               v-if="m.label"
               :label="m.label"
-              class="text-secondary text-weight-bold"
+              class="chat-label-message"
             />
             <q-chat-message
               v-else
@@ -359,6 +359,18 @@ onUnmounted(() => {
   background: linear-gradient(to bottom, transparent, rgba(96, 125, 139, 0.02));
 }
 
+.chat-label-message {
+  :deep(.q-message-label) {
+    font-size: 0.7rem;
+    font-weight: 500;
+    color: #9e9e9e; // grey-5
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    margin: 16px 0 8px;
+    opacity: 0.8;
+  }
+}
+
 .chat-message {
   margin-bottom: 8px;
 
@@ -381,7 +393,9 @@ onUnmounted(() => {
     padding: 10px 14px;
     line-height: 1.5;
     min-height: unset;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    font-weight: 450;
 
     &:before {
       display: none;
@@ -390,23 +404,25 @@ onUnmounted(() => {
 
   &.chat-message-sent {
     :deep(.q-message-text) {
-      background: rgba($primary, 0.1) !important;
-      color: $primary !important;
+      background: rgba($primary, 0.18) !important;
+      color: darken($primary, 10%) !important;
+      border-color: rgba($primary, 0.25) !important;
       border-bottom-right-radius: 4px !important;
     }
     :deep(.q-message-text-content) {
-      color: $primary !important;
+      color: darken($primary, 10%) !important;
     }
   }
 
   &.chat-message-received {
     :deep(.q-message-text) {
-      background: #f1f3f5 !important;
-      color: #2c3e50 !important;
-      border-bottom-left-radius: 4px !important;
+      background: #e3f2fd !important;
+      color: #1976d2 !important;
+      border-color: #bbdefb !important;
+      border-top-left-radius: 4px !important;
     }
     :deep(.q-message-text-content) {
-      color: #2c3e50 !important;
+      color: #1976d2 !important;
     }
   }
 }
