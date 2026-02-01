@@ -93,7 +93,7 @@
                 icon="bolt"
                 color="accent"
                 :bordered="false"
-                class="col-12 q-mt-none"
+                class="col-12 q-mt-none sticky-column"
               >
                 <LiveActionFeed />
               </ContentSection>
@@ -234,3 +234,11 @@ const initData = async () => {
 
 onMounted(initData);
 </script>
+
+<style scoped>
+@media (min-width: 1024px) {
+  .sticky-column {
+    position: sticky;
+  }
+}
+</style>

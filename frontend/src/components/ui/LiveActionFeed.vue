@@ -259,6 +259,14 @@ function getColorHex(type: TLiveEventType) {
   overflow-y: auto;
 }
 
+@media (min-width: 1024px) {
+  .live-action-feed {
+    max-height: none;
+    height: calc(100vh - 250px);
+    min-height: 400px;
+  }
+}
+
 .custom-scrollbar {
   &::-webkit-scrollbar {
     width: 4px;
