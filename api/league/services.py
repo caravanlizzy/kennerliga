@@ -39,8 +39,8 @@ def get_full_standings_data(league: League) -> Dict:
         LeagueStanding.objects
         .filter(league=league)
         .select_related('player_profile__user')
-        .order_by('-league_points', '-wins', 'player_profile__profile_name')
     )
+    league_standing_dict = {ls.player_profile_id: ls for ls in league_standings}
 
     # 3. Get all game standings for this league
     game_standings = (
@@ -63,10 +63,18 @@ def get_full_standings_data(league: League) -> Dict:
             "tie_breaker_value": gs.tie_breaker_value,
         }
 
-    # 4. Build the response rows
+    # 4. Get all members of the league to ensure everyone is listed even if they have no standings yet
+    members = (
+        league.members
+        .select_related('profile__user')
+        .order_by('rank', 'profile__profile_name')
+    )
+
+    # 5. Build the response rows
     standings_list = []
-    for ls in league_standings:
-        pid = ls.player_profile_id
+    for member in members:
+        pid = member.profile_id
+        ls = league_standing_dict.get(pid)
         player_games = game_data_by_player.get(pid, {})
 
         games_dict = {}
@@ -78,17 +86,26 @@ def get_full_standings_data(league: League) -> Dict:
 
         standings_list.append({
             "player_profile_id": pid,
-            "profile_name": ls.player_profile.profile_name,
-            "user_id": ls.player_profile.user.id if ls.player_profile.user else None,
-            "username": ls.player_profile.user.username if ls.player_profile.user else None,
-            "total_league_points": str(ls.league_points),
-            "total_wins": str(ls.wins),
+            "profile_name": member.profile.profile_name,
+            "user_id": member.profile.user.id if member.profile.user else None,
+            "username": member.profile.user.username if member.profile.user else None,
+            "total_league_points": str(ls.league_points) if ls else "0",
+            "total_wins": str(ls.wins) if ls else "0",
             "games": games_dict,
         })
 
+    # Sort standings_list: if we have LeagueStandings, sort by them, otherwise stick to member rank
+    if league_standings.exists():
+        standings_list.sort(key=lambda x: (
+            -float(x["total_league_points"]),
+            -float(x["total_wins"]),
+            x["profile_name"]
+        ))
+
     return {
         "selected_games": selected_game_list,
-        "standings": standings_list
+        "standings": standings_list,
+        "season_id": league.season_id
     }
 
 def rotate_active_player(league: League, reverse_order: bool = False, members=None) -> Optional[SeasonParticipant]:

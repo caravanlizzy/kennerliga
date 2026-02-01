@@ -3,7 +3,7 @@
     <!-- Table / states -->
     <div class="overflow-auto">
       <q-table
-        v-if="standings && (standings.standings.length > 0 || standings.selected_games.length > 0)"
+        v-if="standings && (standings.standings.length > 0 || (standings.selected_games && standings.selected_games.length > 0))"
         :rows="tableRows"
         :columns="tableColumns"
         row-key="player_profile_id"
@@ -95,7 +95,7 @@
               </template>
 
               <!-- League Leader Celebration (First Row) -->
-              <div v-if="!isMobile && props.rowIndex === 0" class="leader-crown q-ml-sm">
+              <div v-if="!isMobile && props.rowIndex === 0 && (standings?.selected_games && standings.selected_games.length > 0)" class="leader-crown q-ml-sm">
                 <q-icon
                   name="emoji_events"
                   color="amber-8"
@@ -316,7 +316,7 @@ const tableColumns = computed<QTableColumn[]>(() => {
     },
   ];
 
-  standings.value.selected_games.forEach((game) => {
+  standings.value.selected_games?.forEach((game) => {
     cols.push({
       name: `game_${game.id}`,
       // 🔹 short name on mobile, full name otherwise
@@ -353,7 +353,7 @@ const tableRows = computed(() => {
       total: standing.total_league_points,
     };
 
-    standings.value.selected_games.forEach((game) => {
+    standings.value.selected_games?.forEach((game) => {
       const gameData = standing.games[game.id.toString()];
       row[`game_${game.id}`] = gameData || null;
     });
@@ -362,9 +362,16 @@ const tableRows = computed(() => {
   });
 });
 
-// highlight winner row (first row) gently
-const rowClass = (_row: unknown, index: number) =>
-  index === 0 ? 'league-leader-row' : '';
+const rowClass = (row: any, index: number) => {
+  // Only highlight if there are actually points (total > 0) or if games have been played
+  // Actually, usually we only highlight if total_league_points is non-zero or if we want to show current leader even at 0-0.
+  // The user said "just headers with profile names", so maybe don't highlight yet?
+  // But if we use index === 0, it will highlight the first person.
+  // Let's check if there are any games.
+  const hasGames = standings.value?.selected_games && standings.value.selected_games.length > 0;
+  if (!hasGames) return '';
+  return index === 0 ? 'league-leader-row' : '';
+};
 
 const formatNumber = (value: string | number): string => {
   const num = typeof value === 'string' ? parseFloat(value) : value;
