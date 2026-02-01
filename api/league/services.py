@@ -16,7 +16,7 @@ def get_full_standings_data(league: League) -> Dict:
         .filter(league=league)
         .annotate(ban_count=Count('bandecision'))
         .filter(ban_count__lt=required_bans)
-        .select_related('game', 'profile')
+        .select_related('game__platform', 'profile')
         .prefetch_related('game__resultconfig_set')
         .order_by('id')
     )
@@ -28,6 +28,7 @@ def get_full_standings_data(league: League) -> Dict:
             "id": sg.id,
             "game_name": sg.game.name,
             "game_short_name": sg.game.short_name,
+            "platform_name": sg.game.platform.name,
             "has_points": configs[0].has_points if configs else True,
             "selected_by_id": sg.profile.id if sg.profile else None,
             "selected_by_name": sg.profile.profile_name if sg.profile else None,

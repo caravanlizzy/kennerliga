@@ -40,6 +40,9 @@
               </div>
               <div v-else-if="col.name.startsWith('game_')" class="column items-center">
                 <span>{{ col.label }}</span>
+                <div v-if="(col as any).platformName" class="text-grey-7 text-weight-medium" style="font-size: 0.55rem; line-height: 1; margin-top: 1px;">
+                  {{ (col as any).platformName }}
+                </div>
                 <div v-if="(col as any).selectedByName" class="text-grey-6" style="font-size: 0.6rem; font-weight: normal; margin-top: 2px;">
                   <span class="text-grey-5">by </span>{{ (col as any).selectedByName }}
                 </div>
@@ -260,6 +263,7 @@ interface SelectedGame {
   id: number;
   game_name: string;
   game_short_name: string;
+  platform_name?: string;
   has_points: boolean; // 🔹 added
   selected_by_name?: string;
 }
@@ -327,6 +331,7 @@ const tableColumns = computed<QTableColumn[]>(() => {
       field: `game_${game.id}`,
       align: 'center',
       selectedByName: game.selected_by_name,
+      platformName: game.platform_name,
       hasPoints: game.has_points,
     });
   });
