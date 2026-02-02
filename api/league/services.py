@@ -145,7 +145,8 @@ def advance_turn(league: League):
             league.active_player = None
             league.save(update_fields=["status", "active_player"])
         else:
-            rotate_active_player(league)
+            players_to_repick = q.get_players_to_repick(league)
+            rotate_active_player(league, members=players_to_repick)
 
     elif league.status == LeagueStatus.BANNING:
         if q.all_players_have_banned(league):
