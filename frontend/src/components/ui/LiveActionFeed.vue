@@ -1,5 +1,5 @@
 <template>
-  <div class="live-action-feed custom-scrollbar">
+  <div>
     <div v-if="loading" class="flex flex-center q-pa-md">
       <q-spinner color="primary" size="2em" />
     </div>

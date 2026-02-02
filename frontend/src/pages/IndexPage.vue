@@ -93,7 +93,7 @@
                 icon="bolt"
                 color="accent"
                 :bordered="false"
-                class="col-12 q-mt-none sticky-column"
+                class="col-12 q-mt-none"
               >
                 <LiveActionFeed />
               </ContentSection>
