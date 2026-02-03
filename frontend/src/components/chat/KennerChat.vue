@@ -406,7 +406,7 @@ onUnmounted(() => {
     padding: 10px 16px;
     line-height: 1.4;
     min-height: unset;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.03);
     border: none;
     font-weight: 400;
     width: fit-content;
@@ -438,8 +438,8 @@ onUnmounted(() => {
     :deep(.q-message-text) {
       background: linear-gradient(135deg, $primary 0%, darken($primary, 10%) 100%) !important;
       color: white !important;
-      border-bottom-right-radius: 4px !important;
-      box-shadow: 0 4px 15px rgba($primary, 0.25);
+      border-top-right-radius: 4px !important;
+      box-shadow: 0 2px 8px rgba($primary, 0.15);
     }
     :deep(.q-message-text-content) {
       color: white !important;
@@ -449,7 +449,7 @@ onUnmounted(() => {
     }
     &.chat-message-grouped {
       :deep(.q-message-text) {
-        border-top-right-radius: 4px !important;
+        border-top-right-radius: 18px !important;
       }
     }
   }
@@ -466,16 +466,15 @@ onUnmounted(() => {
     :deep(.q-message-text) {
       background: white !important;
       color: #263238 !important;
-      border-bottom-left-radius: 4px !important;
-      border-top-left-radius: 18px !important;
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+      border-top-left-radius: 4px !important;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
     }
     :deep(.q-message-text-content) {
       color: #263238 !important;
     }
     &.chat-message-grouped {
       :deep(.q-message-text) {
-        border-top-left-radius: 4px !important;
+        border-top-left-radius: 18px !important;
       }
     }
   }
@@ -486,17 +485,17 @@ onUnmounted(() => {
   border-radius: 24px !important;
   padding: 4px 6px 4px 20px !important;
   border: 1px solid rgba(0, 0, 0, 0.06) !important;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04) !important;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03) !important;
   transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
 
   &:hover {
     border-color: rgba(0, 0, 0, 0.1) !important;
-    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.06) !important;
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.04) !important;
   }
 
   &.q-field--focused {
     border-color: rgba($primary, 0.4) !important;
-    box-shadow: 0 8px 30px rgba($primary, 0.12) !important;
+    box-shadow: 0 4px 15px rgba($primary, 0.08) !important;
   }
 
   :deep(.q-field__control) {
