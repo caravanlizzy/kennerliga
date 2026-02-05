@@ -64,6 +64,35 @@ class ResultViewSet(ModelViewSet):
 
 
 class MatchResultViewSet(ViewSet):
+    """
+    Manages match results within a league with support for operations like creation, retrieval,
+    tie resolution, and listing results.
+
+    This class extends a `ViewSet` to provide API endpoints for handling match results. It includes
+    tie-breaking logic and ensures the validation and finalization of results while considering league
+    configurations, game selections, and player profiles. The class works interactively with serializers
+    and external utility functions for result processing and tie detection.
+
+    Attributes:
+        None
+
+    Methods:
+        get_permissions():
+            Determines the permissions required for the requested action.
+
+        create(request, *args, **kwargs):
+            Handles the creation of match results, including validation, tie resolution, and
+            result finalization.
+
+        list(request):
+            Retrieves a list of match results filtered by season, league, and selected game.
+
+        retrieve(request, pk=None):
+            Fetches a specific match result by its primary key.
+
+        seasons_with_results(request):
+            Retrieves a list of seasons that have associated match results.
+    """
     def get_permissions(self):
         if self.action == 'create':
             permission_classes = [IsAdminOrMemberInCurrentLeague]
