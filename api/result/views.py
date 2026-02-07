@@ -121,10 +121,10 @@ class MatchResultViewSet(ViewSet):
 
     def create(self, request, *args, **kwargs):
         selected_game_id = request.data.get("selected_game")
-        data = request.data.get("results", [])
+        result_data = request.data.get("results", [])
         requested_tb_id = (request.data.get("tiebreaker") or {}).get("id")
 
-        if not selected_game_id or not isinstance(data, list) or len(data) < 2:
+        if not selected_game_id or not isinstance(result_data, list) or len(result_data) < 2:
             return Response({"detail": "Invalid payload."}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
@@ -137,11 +137,11 @@ class MatchResultViewSet(ViewSet):
             TieBreaker.objects.filter(result_config=result_config).order_by("-order"))
         use_points, base_field = result_config.has_points, ("points" if result_config.has_points else "position")
 
-        if len(data) != league.members.count():
+        if len(result_data) != league.members.count():
             return Response({"detail": "Incorrect result count."}, status=status.HTTP_400_BAD_REQUEST)
 
         serializers, seen = [], set()
-        for entry in data:
+        for entry in result_data:
             entry.update({"selected_game": selected_game.id, "league": league.id, "season": season.id})
             player_profile_id = entry.get("player_profile")
             if player_profile_id in seen:
