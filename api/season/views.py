@@ -469,8 +469,10 @@ class LiveEventViewSet(ViewSet):
                 # Game is finished. Sort results to find winner.
                 sorted_res = sorted(
                     res_list,
-                    key=lambda x: x.points if x.points is not None else x.position,
-                    reverse=True,
+                    key=lambda x: (
+                        x.points is None,  # points first
+                        -x.points if x.points is not None else x.position,
+                    )
                 )
                 winner = sorted_res[0]
                 # The timestamp should be the time of the LAST result.
