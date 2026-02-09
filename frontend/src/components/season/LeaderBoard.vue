@@ -12,7 +12,8 @@
     <q-markup-table flat dense separator="none" class="leaderboard-table bg-transparent">
       <thead>
       <tr class="text-uppercase text-grey-6 text-caption text-weight-bold header-row">
-        <th class="text-left q-pl-lg" style="width: 40%">Player</th>
+        <th class="text-left q-pl-lg" style="width: 5%">#</th>
+        <th class="text-left" style="width: 35%">Player</th>
 
         <th class="text-center">
             <div class="column items-center">
@@ -49,37 +50,35 @@
         v-for="(row, index) in standings.standings"
         :key="row.player_profile_id"
       >
-        <!-- Group Separator Row -->
-        <tr v-if="shouldShowGroupHeader(index) && bestLeague(row) !== null" class="group-separator-row">
-          <td colspan="5" class="q-pa-none">
-            <div class="group-header-content row items-center q-px-lg q-pt-md q-pb-xs">
-              <div class="group-line col"></div>
-              <div class="group-label-chip q-mx-sm" :class="'bg-' + leagueBadgeColor(bestLeague(row)!) + '-1'">
-                 <span class="group-label-text" :class="'text-' + leagueBadgeColor(bestLeague(row)!)">
-                   League {{ bestLeague(row) }}
-                 </span>
-              </div>
-              <div class="group-line col"></div>
-            </div>
-          </td>
-        </tr>
-
         <tr
           class="leaderboard-row"
           :class="{
             'top-rank-bg': index === 0,
           }"
         >
+          <!-- Rank -->
+          <td class="text-left q-pl-lg text-weight-bold text-grey-7">
+            {{ index + 1 }}
+          </td>
+
           <!-- Player -->
           <td class="text-left relative-position q-py-md">
-            <div class="row items-center q-gutter-x-md q-pl-lg">
+            <div class="row items-center q-gutter-x-md">
               <UserAvatar
                 :display-username="row.profile_name"
                 size="32px"
               />
               <div class="column">
-                <div class="row items-center q-gutter-x-xs">
+                <div class="row items-center q-gutter-x-sm">
                   <span class="text-subtitle2 text-weight-bold text-grey-9">{{ row.profile_name }}</span>
+                  <q-badge
+                    v-if="bestLeague(row)"
+                    outline
+                    :color="leagueBadgeColor(bestLeague(row)!)"
+                    class="league-indicator"
+                  >
+                    L{{ bestLeague(row) }}
+                  </q-badge>
                   <q-icon
                     v-if="index === 0"
                     name="stars"
@@ -95,53 +94,45 @@
 
           <!-- 1st -->
         <td class="text-center">
-            <q-badge
+            <span
               v-if="row.totals.first > 0"
-              color="amber-1"
-              text-color="amber-10"
-              class="text-weight-bold"
+              class="text-weight-bold text-grey-9"
             >
               {{ row.totals.first }}
-            </q-badge>
+            </span>
             <span v-else class="text-grey-4">-</span>
         </td>
 
         <!-- 2nd -->
         <td class="text-center">
-            <q-badge
+            <span
               v-if="row.totals.second > 0"
-              color="blue-grey-1"
-              text-color="blue-grey-10"
-              class="text-weight-bold"
+              class="text-weight-bold text-grey-8"
             >
               {{ row.totals.second }}
-            </q-badge>
+            </span>
             <span v-else class="text-grey-4">-</span>
         </td>
 
         <!-- 3rd -->
         <td class="text-center">
-            <q-badge
+            <span
               v-if="row.totals.third > 0"
-              color="brown-1"
-              text-color="brown-10"
-              class="text-weight-bold"
+              class="text-weight-bold text-grey-8"
             >
               {{ row.totals.third }}
-            </q-badge>
+            </span>
             <span v-else class="text-grey-4">-</span>
         </td>
 
         <!-- 4th -->
         <td class="text-center">
-            <q-badge
+            <span
               v-if="row.totals.fourth > 0"
-              color="red-1"
-              text-color="red-10"
-              class="text-weight-bold"
+              class="text-weight-bold text-grey-8"
             >
               {{ row.totals.fourth }}
-            </q-badge>
+            </span>
             <span v-else class="text-grey-4">-</span>
         </td>
       </tr>
@@ -154,8 +145,8 @@
       <div class="row items-center q-gutter-x-xs">
         <q-icon name="info" size="14px" />
         <span>
-          <strong>Legend:</strong> "League X" indicates the highest league level a player has participated in at least once.
-          Higher league participation results in a higher leaderboard position.
+          <strong>Legend:</strong> "LX" indicates the highest league level a player has participated in at least once.
+          Higher league participation (smaller X) results in a higher leaderboard position.
         </span>
       </div>
     </div>
@@ -231,16 +222,6 @@ function totalPoints(row: PlayerYearStanding): number {
   return (row.totals.first * 4) + (row.totals.second * 3) + (row.totals.third * 2) + (row.totals.fourth * 1);
 }
 
-function shouldShowGroupHeader(index: number): boolean {
-  if (!standings.value || !standings.value.standings[index]) return false;
-  if (index === 0) return true;
-
-  const currentBest = bestLeague(standings.value.standings[index]);
-  const prevBest = bestLeague(standings.value.standings[index - 1]);
-
-  return currentBest !== prevBest;
-}
-
 // lower league number => more "winner-like" color
 function leagueBadgeColor(league: number): string {
   if (league <= 1) return 'amber-8'; // best
@@ -290,31 +271,11 @@ watch(
   background-color: rgba(255, 249, 230, 0.4);
 }
 
-.group-separator-row {
-  background: transparent !important;
-}
-
-.group-header-content {
-  opacity: 0.8;
-}
-
-.group-line {
-  height: 1px;
-  background: rgba(54, 64, 88, 0.08);
-}
-
-.group-label-chip {
-  padding: 2px 10px;
-  border-radius: 20px;
-  border: 1px solid rgba(54, 64, 88, 0.05);
-  white-space: nowrap;
-}
-
-.group-label-text {
+.league-indicator {
   font-size: 10px;
-  font-weight: 800;
-  text-transform: uppercase;
-  letter-spacing: 1px;
+  padding: 2px 4px;
+  font-weight: 700;
+  line-height: 1;
 }
 
 .border-top-subtle {
