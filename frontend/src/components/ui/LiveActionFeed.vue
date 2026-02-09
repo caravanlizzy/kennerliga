@@ -104,7 +104,9 @@
                     </template>
                   </span>
                   <span v-else-if="event.type === 'GAME_FINISHED'">
-                    {{ event.data.summary }}
+                    <strong>{{ event.data.winner }}</strong> wins
+                    <strong>{{ event.data.gameName }}</strong>
+                    <span v-if="event.data.points"> ({{event.data.points}})</span>
                   </span>
                   <span v-else-if="event.type === 'LEAGUE_FINISHED'">
                     League {{ event.leagueLevel }} finished! Winner:

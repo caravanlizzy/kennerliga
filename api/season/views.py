@@ -478,10 +478,6 @@ class LiveEventViewSet(ViewSet):
                 # The timestamp should be the time of the LAST result.
                 last_result_time = max(r.created_at for r in res_list)
 
-                summary = f'{winner.player_profile.profile_name} wins {res_list[0].selected_game.game.name}'
-                if winner.points is not None:
-                    summary += f' with ({winner.points} pts)'
-
                 events.append({
                     'id': f'finish-{sg_id}',
                     'type': 'GAME_FINISHED',
@@ -490,7 +486,8 @@ class LiveEventViewSet(ViewSet):
                     'leagueId': league_id,
                     'data': {
                         'gameName': res_list[0].selected_game.game.name,
-                        'summary': summary
+                        'winner': winner.player_profile.profile_name,
+                        'points': winner.points
                     }
                 })
 
