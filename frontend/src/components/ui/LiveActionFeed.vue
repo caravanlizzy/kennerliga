@@ -104,7 +104,6 @@
                     </template>
                   </span>
                   <span v-else-if="event.type === 'GAME_FINISHED'">
-                    Game <strong>{{ event.data.gameName }}</strong> finished!
                     {{ event.data.summary }}
                   </span>
                   <span v-else-if="event.type === 'LEAGUE_FINISHED'">
