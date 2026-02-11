@@ -176,28 +176,6 @@
                     flat
                     dense
                     round
-                    color="grey-7"
-                    icon="settings"
-                    size="sm"
-                    @click="$emit('edit-game', { member, selGame })"
-                  >
-                    <KennerTooltip>Edit Settings</KennerTooltip>
-                  </KennerButton>
-                  <KennerButton
-                    flat
-                    dense
-                    round
-                    :color="hasResult(selGame) ? 'secondary' : 'primary'"
-                    :icon="hasResult(selGame) ? 'edit_note' : 'post_add'"
-                    size="sm"
-                    @click="() => hasResult(selGame) ? $emit('edit-result', selGame.id) : $emit('post-result', selGame)"
-                  >
-                    <KennerTooltip>{{ hasResult(selGame) ? 'Edit Result' : 'Post Result' }}</KennerTooltip>
-                  </KennerButton>
-                  <KennerButton
-                    flat
-                    dense
-                    round
                     color="red-5"
                     icon="delete_outline"
                     size="sm"
@@ -228,6 +206,20 @@
                 <q-item-section>
                   <div class="text-weight-bold text-grey-7 text-uppercase" style="font-size: 0.75rem; letter-spacing: 0.05em;">Settings</div>
                 </q-item-section>
+                <q-space />
+                <q-item-section side>
+                  <KennerButton
+                    flat
+                    dense
+                    round
+                    color="grey-7"
+                    icon="settings"
+                    size="sm"
+                    @click="$emit('edit-game', { member, selGame })"
+                  >
+                    <KennerTooltip>Edit Settings</KennerTooltip>
+                  </KennerButton>
+                </q-item-section>
               </template>
               <q-card-section class="bg-white q-pa-md">
                 <GameSettingsDisplay
@@ -251,6 +243,20 @@
                 </q-item-section>
                 <q-item-section>
                   <div class="text-weight-bold text-grey-7 text-uppercase" style="font-size: 0.75rem; letter-spacing: 0.05em;">Match Result</div>
+                </q-item-section>
+                <q-space />
+                <q-item-section side>
+                  <KennerButton
+                    flat
+                    dense
+                    round
+                    :color="hasResult(selGame) ? 'secondary' : 'primary'"
+                    :icon="hasResult(selGame) ? 'edit_note' : 'post_add'"
+                    size="sm"
+                    @click="() => hasResult(selGame) ? $emit('edit-result', selGame.id) : $emit('post-result', selGame)"
+                  >
+                    <KennerTooltip>{{ hasResult(selGame) ? 'Edit Result' : 'Post Result' }}</KennerTooltip>
+                  </KennerButton>
                 </q-item-section>
               </template>
               <q-card-section class="bg-white q-pa-md">
