@@ -1,149 +1,152 @@
 <template>
-  <div class="col-12">
-    <!-- Member Group Header -->
-    <div class="row items-center q-mb-sm q-gutter-sm">
-      <q-avatar color="primary" text-color="white" size="md">
-        {{ member.profile_name.charAt(0).toUpperCase() }}
-      </q-avatar>
-      <div class="text-h5 text-weight-bolder text-grey-9">
-        {{ member.profile_name }}
-      </div>
-      <!-- Banned Game Display -->
-      <q-chip
-        v-if="member.my_banned_game"
-        unelevated
-        square
-        color="red-1"
-        text-color="red-7"
-        icon="block"
-        class="q-ml-sm text-weight-bold"
-      >
-        Banned: {{ member.my_banned_game.game_name }}
-        <span
-          v-if="getOwnerName(member.my_banned_game.profile)"
-          class="text-weight-light q-ml-xs"
-        >
-          (by {{ getOwnerName(member.my_banned_game.profile) }})
-        </span>
-        <KennerButton
-          flat
-          round
-          dense
-          size="xs"
-          icon="remove"
-          class="q-ml-xs"
-        >
-          <KennerTooltip>Remove Ban</KennerTooltip>
-        </KennerButton>
-      </q-chip>
+  <div class="col-12 q-mb-xl">
+    <q-card flat bordered class="rounded-borders shadow-1 bg-grey-1">
+      <!-- Member Group Header -->
+      <q-card-section class="q-pb-none">
+        <div class="row items-center q-gutter-sm">
+          <q-avatar color="primary" text-color="white" size="md">
+            {{ member.profile_name.charAt(0).toUpperCase() }}
+          </q-avatar>
+          <div class="text-h5 text-weight-bolder text-grey-9">
+            {{ member.profile_name }}
+          </div>
 
-      <q-chip
-        v-for="banner in getBannersInfo(member)"
-        :key="banner.id"
-        unelevated
-        square
-        color="orange-1"
-        text-color="orange-9"
-        icon="group"
-        class="q-ml-sm text-weight-bold"
-      >
-        Banned Pick: {{ banner.game_name }} (by
-        {{ formatBannerNames(banner.banner_names) }})
-      </q-chip>
-
-      <template v-if="!member.my_banned_game">
-        <q-chip
-          v-if="member.has_banned"
-          unelevated
-          square
-          color="grey-2"
-          text-color="grey-7"
-          icon="skip_next"
-          class="q-ml-sm text-weight-bold"
-        >
-          Ban Skipped
-          <KennerButton
-            flat
-            round
-            dense
-            size="xs"
-            icon="remove"
-            class="q-ml-xs"
+          <!-- Banned Game Display -->
+          <q-chip
+            v-if="member.my_banned_game"
+            unelevated
+            square
+            color="red-1"
+            text-color="red-7"
+            icon="block"
+            size="sm"
+            class="q-ml-sm text-weight-bold"
           >
-            <KennerTooltip>Remove Skip</KennerTooltip>
-          </KennerButton>
-        </q-chip>
-      </template>
-      <q-space />
-      <div
-        v-if="
-          ['PICKING', 'REPICKING', 'BANNING'].includes(league.status) &&
-          season?.status === 'RUNNING'
-        "
-      >
-        <q-badge
-          v-if="member.id === league.active_player"
-          color="positive"
-          text-color="white"
-          class="q-py-xs q-px-sm"
-        >
-          <q-icon size="xs" name="star" class="q-mr-xs" />
-          <span class="text-weight-bold">Active Player</span>
-        </q-badge>
-      </div>
-    </div>
+            Banned: {{ member.my_banned_game.game_name }}
+            <span
+              v-if="getOwnerName(member.my_banned_game.profile)"
+              class="text-weight-light q-ml-xs"
+            >
+              (by {{ getOwnerName(member.my_banned_game.profile) }})
+            </span>
+          </q-chip>
 
-    <!-- Quick Actions Bar -->
-    <div class="row q-gutter-sm q-mb-md">
-      <KennerButton
-        v-if="(member.selected_games?.length || 0) < maxGames"
-        unelevated
-        rounded
-        color="primary"
-        icon="add_circle"
-        label="Add Game"
-        class="q-px-md text-weight-bold"
-        @click="$emit('add-game', member)"
-      />
-      <KennerButton
-        v-if="!member.my_banned_game && !member.has_banned"
-        unelevated
-        rounded
-        color="red-7"
-        icon="block"
-        label="Ban Game"
-        class="q-px-md text-weight-bold"
-        @click="$emit('ban-game', member)"
-      />
-      <KennerButton
-        v-if="
-          member.id !== league.active_player &&
-          ['PICKING', 'REPICKING', 'BANNING'].includes(league.status) &&
-          season?.status === 'RUNNING'
-        "
-        unelevated
-        rounded
-        color="secondary"
-        icon="person_outline"
-        label="Set Active"
-        class="q-px-md text-weight-bold"
-        @click="$emit('set-active', member.profile)"
-      />
-    </div>
+          <q-chip
+            v-for="banner in getBannersInfo(member)"
+            :key="banner.id"
+            unelevated
+            square
+            color="orange-1"
+            text-color="orange-9"
+            icon="group"
+            size="sm"
+            class="q-ml-sm text-weight-bold"
+          >
+            Banned Pick: {{ banner.game_name }} (by
+            {{ formatBannerNames(banner.banner_names) }})
+          </q-chip>
 
-    <div class="row q-col-gutter-lg">
-      <!-- Card per selected game -->
-      <div
-        v-for="selGame in (member.selected_games || [])"
-        :key="`${member.id}-${selGame.id}`"
-        class="col-12 col-md-4"
-      >
-        <q-card
-          flat
-          bordered
-          class="fit rounded-borders overflow-hidden shadow-1 hover-shadow"
-          :class="{ 'opacity-60 grayscale': selGame.successfully_banned }"
-        >
+          <template v-if="!member.my_banned_game">
+            <q-chip
+              v-if="member.has_banned"
+              unelevated
+              square
+              color="grey-2"
+              text-color="grey-7"
+              icon="skip_next"
+              size="sm"
+              class="q-ml-sm text-weight-bold"
+            >
+              Ban Skipped
+              <KennerButton
+                flat
+                round
+                dense
+                size="xs"
+                icon="close"
+                class="q-ml-xs"
+              >
+                <KennerTooltip>Remove Skip</KennerTooltip>
+              </KennerButton>
+            </q-chip>
+          </template>
+
+          <q-space />
+
+          <!-- Quick Actions Bar integrated in header -->
+          <div class="row q-gutter-xs">
+            <KennerButton
+              v-if="(member.selected_games?.length || 0) < maxGames"
+              flat
+              color="primary"
+              icon="add_circle"
+              label="Add Game"
+              size="sm"
+              class="text-weight-bold"
+              @click="$emit('add-game', member)"
+            />
+            <KennerButton
+              v-if="!member.my_banned_game && !member.has_banned"
+              flat
+              color="red-7"
+              icon="block"
+              label="Ban Game"
+              size="sm"
+              class="text-weight-bold"
+              @click="$emit('ban-game', member)"
+            />
+            <KennerButton
+              v-if="
+                member.id !== league.active_player &&
+                ['PICKING', 'REPICKING', 'BANNING'].includes(league.status) &&
+                season?.status === 'RUNNING'
+              "
+              flat
+              color="secondary"
+              icon="person_outline"
+              label="Set Active"
+              size="sm"
+              class="text-weight-bold"
+              @click="$emit('set-active', member.profile)"
+            />
+          </div>
+
+          <div
+            v-if="
+              ['PICKING', 'REPICKING', 'BANNING'].includes(league.status) &&
+              season?.status === 'RUNNING'
+            "
+            class="q-ml-sm"
+          >
+            <q-badge
+              v-if="member.id === league.active_player"
+              color="positive"
+              text-color="white"
+              class="q-py-xs q-px-sm"
+            >
+              <q-icon size="xs" name="star" class="q-mr-xs" />
+              <span class="text-weight-bold uppercase" style="font-size: 0.7rem">Active</span>
+            </q-badge>
+          </div>
+        </div>
+      </q-card-section>
+
+      <q-separator inset v-if="member.selected_games?.length > 0" />
+
+      <q-card-section class="q-pt-md">
+        <div class="row q-col-gutter-md">
+          <!-- Card per selected game -->
+          <div
+            v-for="selGame in (member.selected_games || [])"
+            :key="`${member.id}-${selGame.id}`"
+            class="col-12 col-md-4"
+          >
+          <q-card
+            flat
+            bordered
+            class="fit rounded-borders overflow-hidden shadow-sm hover-shadow bg-white"
+            :class="{ 'opacity-60 grayscale': selGame.successfully_banned }"
+          >
           <!-- Header Section -->
           <q-card-section
             class="q-pa-md text-grey-9"
@@ -275,7 +278,9 @@
         </q-card>
       </div>
     </div>
-  </div>
+  </q-card-section>
+</q-card>
+</div>
 </template>
 
 <script setup lang="ts">
