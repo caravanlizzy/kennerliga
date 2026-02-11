@@ -60,10 +60,8 @@
   <script setup lang="ts">
   import { computed, onMounted, onUnmounted } from 'vue';
   import { useUiStore } from 'src/stores/uiStore';
-  import { useResponsive } from 'src/composables/responsive';
 
   const uiStore = useUiStore();
-  const { isMobile } = useResponsive();
 
   const isOpened = defineModel<boolean>('isOpened', { default: true });
 
@@ -73,14 +71,12 @@
       title: string;
       color: string;
       icon?: string;
-      bordered?: boolean;
       titleEnd?: boolean;
       expandable?: boolean;
     }>(),
     {
       titleEnd: false,
       expandable: false,
-      bordered: true,
       icon: 'article'
     }
   );

@@ -22,7 +22,6 @@
               <ContentSection
                 id="seasons"
                 icon="military_tech"
-                :bordered="false"
                 title="Seasons"
                 class="col-12 q-mt-none"
                 color="primary"
@@ -63,7 +62,6 @@
               </ContentSection>
 
               <ContentSection
-                :bordered="false"
                 id="leaderboard"
                 icon="stars"
                 title="Leaderboard"
@@ -92,7 +90,6 @@
                 title="Live Action"
                 icon="bolt"
                 color="accent"
-                :bordered="false"
                 class="col-12 q-mt-none"
               >
                 <LiveActionFeed />
@@ -107,7 +104,6 @@
 
 <script setup lang="ts">
 defineOptions({ name: 'IndexPage' });
-import NavMyLeague from 'src/components/nav/NavMyLeague.vue';
 import LiveActionFeed from 'components/ui/LiveActionFeed.vue';
 import SeasonStandings from 'components/season/SeasonStandings.vue';
 import AnnouncementDisplay from 'components/ui/AnnouncementDisplay.vue';
