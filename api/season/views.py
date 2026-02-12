@@ -434,8 +434,9 @@ class LiveEventViewSet(ViewSet):
             })
 
         # 2. BAN events
-        bans = BanDecision.objects.filter(league__in=leagues, skipped_ban=False).select_related('player_banning', 'selected_game__game', 'league')
+        bans = BanDecision.objects.filter(league__in=leagues).select_related('player_banning', 'selected_game__game', 'league')
         for ban in bans:
+            game_name = ban.selected_game.game.name if ban.selected_game else None
             events.append({
                 'id': f'ban-{ban.id}',
                 'type': 'BAN',
@@ -444,7 +445,8 @@ class LiveEventViewSet(ViewSet):
                 'leagueId': ban.league.id,
                 'data': {
                     'playerName': ban.player_banning.profile_name,
-                    'gameName': ban.selected_game.game.name if ban.selected_game else "Unknown"
+                    'gameName': game_name,
+                    'skippedBan': ban.skipped_ban
                 }
             })
 
@@ -515,6 +517,7 @@ class LiveEventViewSet(ViewSet):
                 'leagueLevel': league.level,
                 'leagueId': league.id,
                 'data': {
+                    'leagueLevel': league.level,
                     'winners': winners
                 }
             })
@@ -536,6 +539,7 @@ class LiveEventViewSet(ViewSet):
                 'timestamp': season.updated_at,
                 'leagueId': None,
                 'data': {
+                    'seasonName': f"{season.year}-{season.month:02d}",
                     'seasonWinner': winner_name
                 }
             })

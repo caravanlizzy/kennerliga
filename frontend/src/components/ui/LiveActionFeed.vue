@@ -84,22 +84,16 @@
                 </div>
                 <div class="event-content q-mt-xs">
                   <span v-if="event.type === 'PICK'">
-                    <strong>{{ event.data.playerName }}</strong> picked
+                    <strong>{{ event.data.playerName }}</strong> picks
                     <strong>{{ event.data.gameName }}</strong>
                   </span>
                   <span v-else-if="event.type === 'BAN'">
-                    <template v-if="event.data.gameName">
-                      <template v-if="event.data.gameName === 'Unknown'">
-                        <strong>{{ event.data.playerName }}</strong> skipped
-                        ban.
-                      </template>
-                      <template v-else>
-                        <strong>{{ event.data.playerName }}</strong> banned
-                        <strong>{{ event.data.gameName }}</strong>
-                      </template>
+                    <template v-if="!event.data.skippedBan && event.data.gameName">
+                      <strong>{{ event.data.playerName }}</strong> bans
+                      <strong>{{ event.data.gameName }}</strong>
                     </template>
                     <template v-else>
-                      <strong>{{ event.data.playerName }}</strong> skipped their
+                      <strong>{{ event.data.playerName }}</strong> skips their
                       ban
                     </template>
                   </span>
@@ -109,11 +103,11 @@
                     <span v-if="event.data.points"> ({{event.data.points}})</span>
                   </span>
                   <span v-else-if="event.type === 'LEAGUE_FINISHED'">
-                    League {{ event.leagueLevel }} finished! Winner:
+                    League {{ event.data.leagueLevel || event.leagueLevel }} finishes! Winner:
                     <strong>{{ event.data.winners?.join(', ') }}</strong>
                   </span>
                   <span v-else-if="event.type === 'SEASON_FINISHED'">
-                    Season finished! Shout out to
+                    Season {{ event.data.seasonName }} finishes! Shout out to
                     <strong>{{ event.data.seasonWinner }}</strong
                     >!
                   </span>
