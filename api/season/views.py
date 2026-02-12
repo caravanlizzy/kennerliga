@@ -2,7 +2,8 @@
 from collections import defaultdict
 from typing import List, Dict
 
-from django.db.models import Prefetch
+from django.db import models
+from django.db.models import Prefetch, Q
 from django.http import HttpResponseNotFound
 from rest_framework import status
 from rest_framework.decorators import action
@@ -434,7 +435,10 @@ class LiveEventViewSet(ViewSet):
             })
 
         # 2. BAN events
-        bans = BanDecision.objects.filter(league__in=leagues).select_related('player_banning', 'selected_game__game', 'league')
+        bans = BanDecision.objects.filter(
+            Q(league__in=leagues) & 
+            (Q(skipped_ban=True) | Q(selected_game__isnull=False))
+        ).select_related('player_banning', 'selected_game__game', 'league')
         for ban in bans:
             game_name = ban.selected_game.game.name if ban.selected_game else None
             events.append({
@@ -544,14 +548,15 @@ class LiveEventViewSet(ViewSet):
                 }
             })
 
-        # Sort and limit
+        # Sort
         events.sort(key=lambda x: x['timestamp'], reverse=True)
-        limit = request.query_params.get('limit', 20)
-        try:
-            limit = int(limit)
-        except ValueError:
-            limit = 20
-        events = events[:limit]
+        limit = request.query_params.get('limit')
+        if limit:
+            try:
+                limit = int(limit)
+                events = events[:limit]
+            except ValueError:
+                pass
 
         serializer = TLiveEventSerializer(events, many=True)
         return Response(serializer.data)
