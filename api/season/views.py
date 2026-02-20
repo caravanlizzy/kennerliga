@@ -484,6 +484,23 @@ class LiveEventViewSet(ViewSet):
                 # The timestamp should be the time of the LAST result.
                 last_result_time = max(r.created_at for r in res_list)
 
+                # Prepare full results list with positions and points
+                full_results = sorted(
+                    res_list,
+                    key=lambda r: (
+                        r.position is None,
+                        r.position if r.position is not None else -((r.points if r.points is not None else -10**9))
+                    )
+                )
+                results_payload = [
+                    {
+                        'playerName': r.player_profile.profile_name,
+                        'position': r.position,
+                        'points': r.points,
+                    }
+                    for r in full_results
+                ]
+
                 events.append({
                     'id': f'finish-{sg_id}',
                     'type': 'GAME_FINISHED',
@@ -493,7 +510,8 @@ class LiveEventViewSet(ViewSet):
                     'data': {
                         'gameName': res_list[0].selected_game.game.name,
                         'winner': winner.player_profile.profile_name,
-                        'points': winner.points
+                        'points': winner.points,
+                        'results': results_payload,
                     }
                 })
 
