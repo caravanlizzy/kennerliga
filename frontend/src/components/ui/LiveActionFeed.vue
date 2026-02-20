@@ -101,6 +101,15 @@
                     <strong>{{ event.data.winner }}</strong> wins
                     <strong>{{ event.data.gameName }}</strong>
                     <span v-if="event.data.points"> ({{event.data.points}})</span>
+                    <div v-if="event.data.results" class="q-mt-xs">
+                      <div class="row q-gutter-x-xs text-caption text-grey-8" style="font-size: 0.75rem;">
+                        <span v-for="(res, idx) in event.data.results" :key="idx" class="position-item">
+                          <span v-if="idx > 0" class="q-mr-xs">•</span>
+                          <span class="text-weight-bold">{{ res.position || idx + 1 }}.</span>
+                          {{ res.playerName }}
+                        </span>
+                      </div>
+                    </div>
                   </span>
                   <span v-else-if="event.type === 'LEAGUE_FINISHED'">
                     League {{ event.data.leagueLevel || event.leagueLevel }} finishes! Winner:
@@ -291,6 +300,11 @@ function getColorHex(type: TLiveEventType) {
   font-size: 0.9rem;
   line-height: 1.4;
   color: #2c3e50;
+}
+.position-item {
+  display: flex;
+  align-items: center;
+  white-space: nowrap;
 }
 strong {
   color: var(--q-primary);
