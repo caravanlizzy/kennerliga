@@ -472,15 +472,7 @@ class LiveEventViewSet(ViewSet):
             league_id = res_list[0].league_id
             member_count = league_member_counts.get(league_id, 0)
             if len(res_list) == member_count and member_count > 0:
-                # Game is finished. Sort results to find winner.
-                sorted_res = sorted(
-                    res_list,
-                    key=lambda x: (
-                        x.points is None,  # points first
-                        -x.points if x.points is not None else x.position,
-                    )
-                )
-                winner = sorted_res[0]
+                # Game is finished.
                 # The timestamp should be the time of the LAST result.
                 last_result_time = max(r.created_at for r in res_list)
 
@@ -492,6 +484,8 @@ class LiveEventViewSet(ViewSet):
                         r.position if r.position is not None else -((r.points if r.points is not None else -10**9))
                     )
                 )
+                # Winner is the first item in the fully sorted results (robust when points or position are missing)
+                winner = full_results[0]
                 results_payload = [
                     {
                         'playerName': r.player_profile.profile_name,
