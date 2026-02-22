@@ -142,11 +142,6 @@ export const useLeagueStore = (id: number) => {
       await getMatchResults();
     }
 
-    function startPolling() {
-      if (pollingInterval) return;
-      pollingInterval = setInterval(refresh, 5 * 60 * 1000); // 5 minutes
-    }
-
     function stopPolling() {
       if (pollingInterval) {
         clearInterval(pollingInterval);
@@ -206,7 +201,6 @@ export const useLeagueStore = (id: number) => {
           // getMatchResults is now redundant for initial load as data is prefetched
           // await getMatchResults();
           initialized.value = true;
-          startPolling();
         } finally {
           loading.value = false;
           initPromise = null;
@@ -278,8 +272,6 @@ export const useLeagueStore = (id: number) => {
       updateLeagueData,
       refreshResultsForGame,
       hasSelectedGameResult,
-      startPolling,
-      stopPolling,
       refresh,
     };
   });

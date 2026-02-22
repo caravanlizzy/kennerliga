@@ -123,7 +123,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref, watch, watchEffect } from 'vue';
+import { onMounted, onUnmounted, ref, watch, watchEffect } from 'vue';
 import GameSelectionView from 'components/game/selectedGame/GameSelectionView.vue';
 import { useLeagueStore } from 'stores/leagueStore';
 import { storeToRefs } from 'pinia';
@@ -140,6 +140,7 @@ import LoadingSpinner from 'components/base/LoadingSpinner.vue';
 import { banGame } from 'src/services/gameService';
 import { TGameSelection } from 'src/types';
 import MatchResult from 'components/league/MatchResult.vue';
+import { api } from 'boot/axios';
 
 const { user } = storeToRefs(useUserStore());
 const myLeagueStore = useLeagueStore(user.value?.myCurrentLeagueId ?? 0)();
@@ -170,6 +171,9 @@ function updateGameSelection(newSelection: TGameSelection) {
 
 const { setDialog } = useDialog();
 const $q = useQuasar();
+
+let pollTimer: number | undefined;
+let lastUpdateCheck = new Date().toISOString();
 
 function handleSkipBan() {
   setDialog(
@@ -231,8 +235,29 @@ function handleBanGame(selectedGameId: number, gameName: string) {
   );
 }
 
-onMounted(() => {
-  myLeagueStore.init();
+onMounted(async () => {
+  await myLeagueStore.init();
+
+  pollTimer = window.setInterval(async () => {
+    try {
+      const { data } = await api.get<{ updates: string[] }>(
+        `/needs-update/?since=${encodeURIComponent(lastUpdateCheck)}`
+      );
+      lastUpdateCheck = new Date().toISOString();
+      if (data.updates.includes('/league/')) {
+        await myLeagueStore.refresh();
+      }
+    } catch (e) {
+      console.error('Error checking for updates:', e);
+    }
+  }, 10000); // 10 seconds for league page
+});
+
+onUnmounted(() => {
+  if (pollTimer) {
+    clearInterval(pollTimer);
+    pollTimer = undefined;
+  }
 });
 
 function manageActionBar() {
