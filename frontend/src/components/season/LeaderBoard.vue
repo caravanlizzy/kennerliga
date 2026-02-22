@@ -95,10 +95,10 @@
           <!-- 1st -->
         <td class="text-center">
             <span
-              v-if="row.totals.first > 0"
+              v-if="getHighestLeagueCounts(row).first > 0"
               class="text-weight-bold text-grey-9"
             >
-              {{ row.totals.first }}
+              {{ getHighestLeagueCounts(row).first }}
             </span>
             <span v-else class="text-grey-4">-</span>
         </td>
@@ -106,10 +106,10 @@
         <!-- 2nd -->
         <td class="text-center">
             <span
-              v-if="row.totals.second > 0"
+              v-if="getHighestLeagueCounts(row).second > 0"
               class="text-weight-bold text-grey-8"
             >
-              {{ row.totals.second }}
+              {{ getHighestLeagueCounts(row).second }}
             </span>
             <span v-else class="text-grey-4">-</span>
         </td>
@@ -117,10 +117,10 @@
         <!-- 3rd -->
         <td class="text-center">
             <span
-              v-if="row.totals.third > 0"
+              v-if="getHighestLeagueCounts(row).third > 0"
               class="text-weight-bold text-grey-8"
             >
-              {{ row.totals.third }}
+              {{ getHighestLeagueCounts(row).third }}
             </span>
             <span v-else class="text-grey-4">-</span>
         </td>
@@ -128,10 +128,10 @@
         <!-- 4th -->
         <td class="text-center">
             <span
-              v-if="row.totals.fourth > 0"
+              v-if="getHighestLeagueCounts(row).fourth > 0"
               class="text-weight-bold text-grey-8"
             >
-              {{ row.totals.fourth }}
+              {{ getHighestLeagueCounts(row).fourth }}
             </span>
             <span v-else class="text-grey-4">-</span>
         </td>
@@ -179,7 +179,6 @@ interface PlayerYearStanding {
   player_profile_id: number;
   profile_name: string;
   per_level: Record<string, PerLevelCounts>;
-  totals: PerLevelCounts;
 }
 interface LeaderBoardResponse {
   year: number;
@@ -218,8 +217,15 @@ function bestLeague(row: PlayerYearStanding): number | null {
   return Math.min(...levels);
 }
 
+function getHighestLeagueCounts(row: PlayerYearStanding): PerLevelCounts {
+  const highestLvl = bestLeague(row);
+  if (highestLvl === null) return { first: 0, second: 0, third: 0, fourth: 0 };
+  return row.per_level[String(highestLvl)] || { first: 0, second: 0, third: 0, fourth: 0 };
+}
+
 function totalPoints(row: PlayerYearStanding): number {
-  return (row.totals.first * 4) + (row.totals.second * 3) + (row.totals.third * 2) + (row.totals.fourth * 1);
+  const counts = getHighestLeagueCounts(row);
+  return (counts.first * 4) + (counts.second * 3) + (counts.third * 2) + (counts.fourth * 1);
 }
 
 // lower league number => more "winner-like" color
