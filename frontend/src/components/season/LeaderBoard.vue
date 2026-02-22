@@ -301,11 +301,6 @@ function getHighestLeagueCounts(row: PlayerYearStanding): PerLevelCounts {
   return row.per_level[String(highestLvl)] || { first: 0, second: 0, third: 0, fourth: 0 };
 }
 
-function totalPoints(row: PlayerYearStanding): number {
-  const counts = getHighestLeagueCounts(row);
-  return (counts.first * 4) + (counts.second * 3) + (counts.third * 2) + (counts.fourth * 1);
-}
-
 // lower league number => more "winner-like" color
 function leagueBadgeColor(league: number): string {
   if (league <= 1) return 'amber-8'; // best
