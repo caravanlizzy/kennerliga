@@ -100,7 +100,7 @@
                   <span v-else-if="event.type === 'GAME_FINISHED'">
                     <strong>{{ event.data.winner }}</strong> wins
                     <strong>{{ event.data.gameName }}</strong>
-                    <span v-if="event.data.points"> ({{event.data.points}})</span>
+                    <span v-if="event.data.points"> ({{event.data.points}} VP)</span>
                     <div v-if="event.data.results" class="q-mt-xs">
                       <div class="row q-gutter-x-xs text-caption text-grey-8" style="font-size: 0.75rem;">
                         <span v-for="(res, idx) in event.data.results" :key="idx" class="position-item">
