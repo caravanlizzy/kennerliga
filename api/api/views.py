@@ -122,7 +122,7 @@ class LeaderboardViewSet(APIView):
 
         # Distinct league levels used in that year (sorted, 1 is top)
         levels = sorted(
-            standings_qs.values_list("league__level", flat=True).distinct()
+            list(set(standings_qs.values_list("league__level", flat=True)))
         )
 
         # Aggregation:
