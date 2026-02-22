@@ -52,14 +52,12 @@
 import DrawerItem from 'components/base/DrawerItem.vue';
 import DrawerSubGroup from 'components/base/DrawerSubGroup.vue';
 import { useUserStore } from 'stores/userStore';
-import { useResponsive } from 'src/composables/responsive';
 import { storeToRefs } from 'pinia';
 import { useRouter } from 'vue-router';
 import { provide } from 'vue';
 
 const drawerState = defineModel();
 
-const responsive = useResponsive();
 const { logout } = useUserStore();
 const { isAdmin } = storeToRefs(useUserStore());
 

@@ -68,7 +68,7 @@ interface SelectedOption {
   value: boolean | null
 }
 
-const props = defineProps<{
+defineProps<{
   selectedOptions: SelectedOption[]
 }>()
 

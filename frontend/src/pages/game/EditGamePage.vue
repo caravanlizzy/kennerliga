@@ -384,7 +384,6 @@ import KennerTooltip from 'components/base/KennerTooltip.vue';
 import LoadingSpinner from 'components/base/LoadingSpinner.vue';
 import { useRoute, useRouter } from 'vue-router';
 import { TPlatform, TResultConfig } from 'src/types';
-import { useResponsive } from 'src/composables/responsive';
 import { fetchFullGame, updateResultConfigData } from 'src/services/gameService';
 import CreateResultConfig from 'components/game/CreateResultConfig.vue';
 

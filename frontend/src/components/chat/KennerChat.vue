@@ -98,7 +98,6 @@
 import { ref, type Ref, nextTick, onMounted, onUnmounted } from 'vue';
 import { QScrollArea } from 'quasar';
 import { postMessage, fetchMessages } from 'src/services/chatService';
-import { api } from 'boot/axios';
 import type { TMessageDto } from 'src/types';
 import { useUserStore } from 'stores/userStore';
 import { storeToRefs } from 'pinia';

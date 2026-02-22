@@ -15,7 +15,6 @@
 <script setup lang="ts">
 defineOptions({ name: 'LiveActionMobilePage' });
 import LiveActionFeed from 'components/ui/LiveActionFeed.vue';
-import { useUiStore } from 'stores/uiStore';
 
 </script>
 

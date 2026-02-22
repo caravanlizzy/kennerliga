@@ -31,7 +31,7 @@ type TKennerItem = {
   forwardName?: string;
   active?: boolean;
 }
-const props = defineProps<TKennerItem>();
+defineProps<TKennerItem>();
 const emit = defineEmits(['click']);
 
 const closeDrawer = inject('closeDrawer') as () => void;

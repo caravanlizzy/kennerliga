@@ -68,11 +68,7 @@ defineProps<{ onToggle: () => void }>();
 const { user } = storeToRefs(useUserStore());
 const uiStore = useUiStore();
 const { navSections } = storeToRefs(uiStore);
-const route = useRoute();
-const router = useRouter();
 const { isMobile } = useResponsive();
-
-const isIndexPage = computed(() => route.name === 'home');
 
 function handleSectionClick(section: NavSection) {
   if (section.onClick) {

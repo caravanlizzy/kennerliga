@@ -51,7 +51,6 @@ import {
   fetchSeason,
   fetchSeasons
 } from 'src/services/seasonService';
-import { useUiStore } from 'stores/uiStore';
 import type { TSeasonDto } from 'src/types';
 
 const availableYears = ref<number[]>([]);

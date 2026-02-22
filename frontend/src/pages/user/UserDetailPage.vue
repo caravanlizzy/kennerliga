@@ -171,7 +171,7 @@ import UserAvatar from 'components/ui/UserAvatar.vue';
 import KennerButton from 'components/base/KennerButton.vue';
 import ContentSection from 'components/base/ContentSection.vue';
 import LoadingSpinner from 'components/base/LoadingSpinner.vue';
-import { TUserDto, TSeasonParticipantDto, TMatchResultDto, TSeasonDto } from 'src/types';
+import { TUserDto, TSeasonParticipantDto, TSeasonDto } from 'src/types';
 
 const route = useRoute();
 const router = useRouter();

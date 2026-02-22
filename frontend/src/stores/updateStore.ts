@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import { ref, onUnmounted } from 'vue';
+import { ref } from 'vue';
 import { api } from 'boot/axios';
 
 export const useUpdateStore = defineStore('update', () => {

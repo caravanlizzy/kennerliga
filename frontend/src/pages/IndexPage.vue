@@ -127,7 +127,6 @@ import LoadingSpinner from 'components/base/LoadingSpinner.vue';
 
 const { isMobile } = useResponsive();
 const { isAuthenticated } = storeToRefs(useUserStore());
-const { user } = storeToRefs(useUserStore());
 const route = useRoute();
 
 const mobileContent = computed(() => {

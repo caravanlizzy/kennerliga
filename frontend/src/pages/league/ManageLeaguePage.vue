@@ -151,9 +151,9 @@ import LoadingSpinner from 'components/base/LoadingSpinner.vue';
 import MemberGameCard from 'components/league/manager/MemberGameCard.vue';
 import EmptyMembersState from 'components/league/manager/EmptyMembersState.vue';
 import LeagueStandings from 'components/league/LeagueStandings.vue';
-import ManagerFormsDialog, { type TActiveForm } from 'components/league/manager/ManagerFormsDialog.vue';
+import ManagerFormsDialog from 'components/league/manager/ManagerFormsDialog.vue';
 import { useDialog } from 'src/composables/dialog';
-import type { TSeasonDto, TLeagueDto, TSeasonParticipantDto, TSelectedGameDto, TMatchResult } from 'src/types';
+import type { TSeasonDto, TLeagueDto, TSelectedGameDto, TMatchResult } from 'src/types';
 
 const route = useRoute();
 const $q = useQuasar();
@@ -192,17 +192,6 @@ async function load() {
     error.value = e?.message || 'Failed to load league/season data.';
   } finally {
     loading.value = false;
-  }
-}
-
-async function fetchMatchResult(selGame: TSelectedGameDto) {
-  try {
-    const { data } = await api.get(
-      `result/results/?selected_game=${selGame.id}`
-    );
-    matchResultsBySelectedGameId.value[selGame.id] = Array.isArray(data) ? data : [];
-  } catch (e) {
-    matchResultsBySelectedGameId.value[selGame.id] = [];
   }
 }
 

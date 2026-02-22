@@ -35,7 +35,6 @@ const { user } = storeToRefs(useUserStore());
 const myLeagueStore = useLeagueStore(props.leagueId || user.value.myCurrentLeagueId)();
 const { leagueId: storeLeagueId } = storeToRefs(myLeagueStore);
 const { isMobile } = useResponsive();
-
 interface LeagueStanding {
   player_profile: number;
   profile_name: string;

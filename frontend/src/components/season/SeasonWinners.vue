@@ -134,7 +134,6 @@ const podiumSpots = computed(() => {
 const restOfLeagues = computed(() => {
   return winners.value.filter(w => ![1, 2, 3].includes(w.level));
 });
-const levelLabel = (pos: number) => `L${pos}`;
 </script>
 
 <style scoped>

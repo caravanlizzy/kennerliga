@@ -72,7 +72,7 @@ import { computed } from 'vue';
 import { storeToRefs } from 'pinia';
 import { useUserStore } from 'stores/userStore';
 import type { QTableProps } from 'quasar';
-import type { TKennerButton, TLeagueDto, TSeasonDto } from 'src/types';
+import type { TKennerButton, TSeasonDto } from 'src/types';
 import KennerButton from 'src/components/base/KennerButton.vue';
 
 type SeasonExtra = TSeasonDto & {
