@@ -98,6 +98,7 @@
 import { ref, type Ref, nextTick, onMounted, onUnmounted } from 'vue';
 import { QScrollArea } from 'quasar';
 import { postMessage, fetchMessages } from 'src/services/chatService';
+import { api } from 'boot/axios';
 import type { TMessageDto } from 'src/types';
 import { useUserStore } from 'stores/userStore';
 import { storeToRefs } from 'pinia';
@@ -336,8 +337,17 @@ onMounted(async () => {
 
   await scrollToBottom(false); // now the scroll area exists
   pollTimer = window.setInterval(async () => {
-    await loadMessages();
-    await scrollToBottom(); // optional / conditional
+    try {
+      const { data } = await api.get<{ updates: string[] }>(
+        `/needs-update/${lastDateTime ? `?since=${encodeURIComponent(lastDateTime)}` : ''}`
+      );
+      if (data.updates.includes('/chat/')) {
+        await loadMessages();
+        await scrollToBottom();
+      }
+    } catch (e) {
+      console.error('Error checking for updates:', e);
+    }
   }, 5000);
 });
 
