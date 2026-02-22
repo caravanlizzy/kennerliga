@@ -72,10 +72,13 @@
             <th class="text-center level-group-header" :style="{ borderLeft: '1px solid rgba(0,0,0,0.05)' }">
               <div class="column items-center">
                 <span class="text-caption text-weight-bolder text-primary q-mb-xs">L{{ level }}</span>
-                <div class="row q-gutter-x-sm justify-center">
+                <div class="row justify-center items-center no-wrap">
                   <q-icon name="emoji_events" class="text-amber-8" size="14px" />
+                  <div class="pos-sep"></div>
                   <q-icon name="military_tech" class="text-blue-grey-4" size="14px" />
+                  <div class="pos-sep"></div>
                   <q-icon name="military_tech" class="text-brown-5" size="14px" />
+                  <div class="pos-sep"></div>
                   <q-icon name="flag" class="text-red-5" size="14px" />
                 </div>
               </div>
@@ -145,7 +148,7 @@
             </td>
 
             <!-- 2nd -->
-            <td class="text-center">
+            <td class="text-center border-left-subtle-2">
                 <span
                   v-if="getHighestLeagueCounts(row).second > 0"
                   class="text-weight-bold text-grey-8"
@@ -156,7 +159,7 @@
             </td>
 
             <!-- 3rd -->
-            <td class="text-center">
+            <td class="text-center border-left-subtle-2">
                 <span
                   v-if="getHighestLeagueCounts(row).third > 0"
                   class="text-weight-bold text-grey-8"
@@ -167,7 +170,7 @@
             </td>
 
             <!-- 4th -->
-            <td class="text-center">
+            <td class="text-center border-left-subtle-2">
                 <span
                   v-if="getHighestLeagueCounts(row).fourth > 0"
                   class="text-weight-bold text-grey-8"
@@ -181,23 +184,26 @@
           <template v-else>
             <template v-for="level in standings.levels" :key="level">
               <td class="text-center q-px-sm" :style="{ borderLeft: '1px solid rgba(0,0,0,0.03)' }">
-                <div class="row q-gutter-x-sm justify-center items-center no-wrap">
-                  <div class="column items-center">
+                <div class="row justify-center items-center no-wrap">
+                  <div class="column items-center pos-num">
                     <span :class="row.per_level[level]?.first ? 'text-weight-bold text-grey-9' : 'text-grey-4'" style="font-size: 11px">
                       {{ row.per_level[level]?.first || '-' }}
                     </span>
                   </div>
-                  <div class="column items-center">
+                  <div class="pos-sep"></div>
+                  <div class="column items-center pos-num">
                     <span :class="row.per_level[level]?.second ? 'text-weight-bold text-grey-8' : 'text-grey-4'" style="font-size: 11px">
                       {{ row.per_level[level]?.second || '-' }}
                     </span>
                   </div>
-                  <div class="column items-center">
+                  <div class="pos-sep"></div>
+                  <div class="column items-center pos-num">
                     <span :class="row.per_level[level]?.third ? 'text-weight-bold text-grey-8' : 'text-grey-4'" style="font-size: 11px">
                       {{ row.per_level[level]?.third || '-' }}
                     </span>
                   </div>
-                  <div class="column items-center">
+                  <div class="pos-sep"></div>
+                  <div class="column items-center pos-num">
                     <span :class="row.per_level[level]?.fourth ? 'text-weight-bold text-grey-8' : 'text-grey-4'" style="font-size: 11px">
                       {{ row.per_level[level]?.fourth || '-' }}
                     </span>
@@ -370,6 +376,21 @@ watch(
 
 .border-primary-1 {
   border: 1px solid var(--q-primary);
+}
+
+.pos-sep {
+  width: 1px;
+  height: 12px;
+  background-color: rgba(0, 0, 0, 0.05);
+  margin: 0 6px;
+}
+
+.pos-num {
+  min-width: 16px;
+}
+
+.border-left-subtle-2 {
+  border-left: 1px solid rgba(0, 0, 0, 0.03) !important;
 }
 
 .divide-y tr:last-child {
