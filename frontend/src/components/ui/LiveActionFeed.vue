@@ -134,11 +134,13 @@
 import { ref, computed, onMounted, onUnmounted } from 'vue';
 import { TLiveEvent, TLiveEventType } from 'src/types';
 import { fetchLiveActionEvents } from 'src/services/seasonService';
+import { useUpdateStore } from 'stores/updateStore';
 
+const updateStore = useUpdateStore();
 const events = ref<TLiveEvent[]>([]);
 const loading = ref(true);
 const selectedLeagues = ref<Set<number | string>>(new Set());
-let pollInterval: any = null;
+let unsubscribe: (() => void) | null = null;
 
 const availableLeagues = computed(() => {
   const lvls = events.value
@@ -232,11 +234,11 @@ function formatTime(timestamp: string) {
 
 onMounted(() => {
   fetchEvents();
-  pollInterval = setInterval(fetchEvents, 90000); // Poll every 90s
+  unsubscribe = updateStore.subscribe('/season/', fetchEvents);
 });
 
 onUnmounted(() => {
-  if (pollInterval) clearInterval(pollInterval);
+  if (unsubscribe) unsubscribe();
 });
 
 function getColorHex(type: TLiveEventType) {

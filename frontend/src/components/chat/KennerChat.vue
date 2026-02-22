@@ -106,8 +106,10 @@ import LoadingSpinner from 'components/base/LoadingSpinner.vue';
 import KennerButton from 'components/base/KennerButton.vue';
 import KennerInput from 'components/base/KennerInput.vue';
 import { decodeHtmlEntities } from 'src/helpers';
+import { useUpdateStore } from 'stores/updateStore';
 
 const { user, isAuthenticated } = storeToRefs(useUserStore());
+const updateStore = useUpdateStore();
 
 // ---------- State ----------
 let lastDateTime: string | undefined;
@@ -123,7 +125,7 @@ const showScrollDown = ref(false);
 const inputRef = ref<any>(null);
 const scrollAreaRef = ref<QScrollArea | null>(null);
 
-let pollTimer: number | undefined;
+let unsubscribe: () => void;
 
 // ---------- Helpers ----------
 async function onScroll(info: {
@@ -336,25 +338,15 @@ onMounted(async () => {
   }
 
   await scrollToBottom(false); // now the scroll area exists
-  pollTimer = window.setInterval(async () => {
-    try {
-      const { data } = await api.get<{ updates: string[] }>(
-        `/needs-update/${lastDateTime ? `?since=${encodeURIComponent(lastDateTime)}` : ''}`
-      );
-      if (data.updates.includes('/chat/')) {
-        await loadMessages();
-        await scrollToBottom();
-      }
-    } catch (e) {
-      console.error('Error checking for updates:', e);
-    }
-  }, 5000);
+  unsubscribe = updateStore.subscribe('/chat/', async () => {
+    await loadMessages();
+    await scrollToBottom();
+  });
 });
 
 onUnmounted(() => {
-  if (pollTimer) {
-    clearInterval(pollTimer);
-    pollTimer = undefined;
+  if (unsubscribe) {
+    unsubscribe();
   }
 });
 </script>

@@ -140,7 +140,7 @@ import LoadingSpinner from 'components/base/LoadingSpinner.vue';
 import { banGame } from 'src/services/gameService';
 import { TGameSelection } from 'src/types';
 import MatchResult from 'components/league/MatchResult.vue';
-import { api } from 'boot/axios';
+import { useUpdateStore } from 'stores/updateStore';
 
 const { user } = storeToRefs(useUserStore());
 const myLeagueStore = useLeagueStore(user.value?.myCurrentLeagueId ?? 0)();
@@ -171,9 +171,9 @@ function updateGameSelection(newSelection: TGameSelection) {
 
 const { setDialog } = useDialog();
 const $q = useQuasar();
+const updateStore = useUpdateStore();
 
-let pollTimer: number | undefined;
-let lastUpdateCheck = new Date().toISOString();
+let unsubscribe: () => void;
 
 function handleSkipBan() {
   setDialog(
@@ -238,25 +238,14 @@ function handleBanGame(selectedGameId: number, gameName: string) {
 onMounted(async () => {
   await myLeagueStore.init();
 
-  pollTimer = window.setInterval(async () => {
-    try {
-      const { data } = await api.get<{ updates: string[] }>(
-        `/needs-update/?since=${encodeURIComponent(lastUpdateCheck)}`
-      );
-      lastUpdateCheck = new Date().toISOString();
-      if (data.updates.includes('/league/')) {
-        await myLeagueStore.refresh();
-      }
-    } catch (e) {
-      console.error('Error checking for updates:', e);
-    }
-  }, 10000); // 10 seconds for league page
+  unsubscribe = updateStore.subscribe('/league/', async () => {
+    await myLeagueStore.refresh();
+  });
 });
 
 onUnmounted(() => {
-  if (pollTimer) {
-    clearInterval(pollTimer);
-    pollTimer = undefined;
+  if (unsubscribe) {
+    unsubscribe();
   }
 });
 

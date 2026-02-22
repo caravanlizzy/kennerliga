@@ -112,7 +112,6 @@ export const useLeagueStore = (id: number) => {
 
     const initialized = ref(false);
     let initPromise: Promise<void> | null = null;
-    let pollingInterval: ReturnType<typeof setInterval> | null = null;
 
     async function updateLeagueData() {
       if (leagueId.value == null) return;
@@ -140,13 +139,6 @@ export const useLeagueStore = (id: number) => {
     async function refresh() {
       await updateLeagueData();
       await getMatchResults();
-    }
-
-    function stopPolling() {
-      if (pollingInterval) {
-        clearInterval(pollingInterval);
-        pollingInterval = null;
-      }
     }
 
     // Helper to set results atomically & dedup on id
