@@ -22,7 +22,7 @@
         unelevated
         dense
         rounded
-        class="border-primary-1"
+        class="border-primary-1 full-width-mobile"
         :options="[
           { label: 'Highest League', value: false },
           { label: 'All Leagues', value: true }
@@ -34,8 +34,8 @@
     <q-markup-table flat dense separator="none" class="leaderboard-table bg-transparent">
       <thead>
       <tr class="text-uppercase text-grey-6 text-caption text-weight-bold header-row">
-        <th class="text-left q-pl-lg" style="width: 5%">#</th>
-        <th class="text-left" style="width: 35%">Player</th>
+        <th class="text-left q-pl-lg" style="width: 40px">#</th>
+        <th class="text-left player-column">Player</th>
 
         <template v-if="!showAllLeagues">
           <th class="text-center">
@@ -335,6 +335,30 @@ watch(
 
 .leaderboard-table {
   min-width: 600px;
+
+  @media (max-width: 600px) {
+    min-width: 100%;
+    table-layout: fixed;
+  }
+}
+
+.player-column {
+  width: 35%;
+  @media (max-width: 600px) {
+    width: auto;
+    min-width: 120px;
+  }
+}
+
+.full-width-mobile {
+  @media (max-width: 480px) {
+    width: 100%;
+    margin-top: 12px;
+
+    :deep(.q-btn) {
+      flex: 1;
+    }
+  }
 }
 
 .header-row {
