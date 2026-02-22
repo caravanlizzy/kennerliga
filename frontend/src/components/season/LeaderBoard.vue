@@ -8,6 +8,28 @@
     v-else-if="standings && standings.standings.length > 0"
     class="leaderboard-container"
   >
+    <!-- View Toggle -->
+    <div class="q-px-lg q-py-md row items-center justify-between border-bottom-subtle">
+      <div class="row items-center q-gutter-x-sm">
+        <q-icon name="analytics" color="primary" size="20px" />
+        <span class="text-subtitle2 text-weight-bold text-grey-8">League Statistics</span>
+      </div>
+      <q-btn-toggle
+        v-model="showAllLeagues"
+        toggle-color="primary"
+        color="white"
+        text-color="primary"
+        unelevated
+        dense
+        rounded
+        class="border-primary-1"
+        :options="[
+          { label: 'Highest League', value: false },
+          { label: 'All Leagues', value: true }
+        ]"
+      />
+    </div>
+
     <!-- Table -->
     <q-markup-table flat dense separator="none" class="leaderboard-table bg-transparent">
       <thead>
@@ -15,33 +37,51 @@
         <th class="text-left q-pl-lg" style="width: 5%">#</th>
         <th class="text-left" style="width: 35%">Player</th>
 
-        <th class="text-center">
-            <div class="column items-center">
-              <q-icon name="emoji_events" class="text-amber-8" size="22px" />
-              <span class="q-mt-xs">1st</span>
-            </div>
-        </th>
+        <template v-if="!showAllLeagues">
+          <th class="text-center">
+              <div class="column items-center">
+                <q-icon name="emoji_events" class="text-amber-8" size="22px" />
+                <span class="q-mt-xs">1st</span>
+              </div>
+          </th>
 
-        <th class="text-center">
-            <div class="column items-center">
-              <q-icon name="military_tech" class="text-blue-grey-4" size="22px" />
-              <span class="q-mt-xs">2nd</span>
-            </div>
-        </th>
+          <th class="text-center">
+              <div class="column items-center">
+                <q-icon name="military_tech" class="text-blue-grey-4" size="22px" />
+                <span class="q-mt-xs">2nd</span>
+              </div>
+          </th>
 
-        <th class="text-center">
-            <div class="column items-center">
-              <q-icon name="military_tech" class="text-brown-5" size="22px" />
-              <span class="q-mt-xs">3rd</span>
-            </div>
-        </th>
+          <th class="text-center">
+              <div class="column items-center">
+                <q-icon name="military_tech" class="text-brown-5" size="22px" />
+                <span class="q-mt-xs">3rd</span>
+              </div>
+          </th>
 
-        <th class="text-center">
-            <div class="column items-center">
-              <q-icon name="flag" class="text-red-5" size="22px" />
-              <span class="q-mt-xs">4th</span>
-            </div>
-        </th>
+          <th class="text-center">
+              <div class="column items-center">
+                <q-icon name="flag" class="text-red-5" size="22px" />
+                <span class="q-mt-xs">4th</span>
+              </div>
+          </th>
+        </template>
+
+        <template v-else>
+          <template v-for="level in standings.levels" :key="level">
+            <th class="text-center level-group-header" :style="{ borderLeft: '1px solid rgba(0,0,0,0.05)' }">
+              <div class="column items-center">
+                <span class="text-caption text-weight-bolder text-primary q-mb-xs">L{{ level }}</span>
+                <div class="row q-gutter-x-sm justify-center">
+                  <q-icon name="emoji_events" class="text-amber-8" size="14px" />
+                  <q-icon name="military_tech" class="text-blue-grey-4" size="14px" />
+                  <q-icon name="military_tech" class="text-brown-5" size="14px" />
+                  <q-icon name="flag" class="text-red-5" size="14px" />
+                </div>
+              </div>
+            </th>
+          </template>
+        </template>
       </tr>
       </thead>
 
@@ -92,50 +132,81 @@
             </div>
           </td>
 
-          <!-- 1st -->
-        <td class="text-center">
-            <span
-              v-if="getHighestLeagueCounts(row).first > 0"
-              class="text-weight-bold text-grey-9"
-            >
-              {{ getHighestLeagueCounts(row).first }}
-            </span>
-            <span v-else class="text-grey-4">-</span>
-        </td>
+          <template v-if="!showAllLeagues">
+            <!-- 1st -->
+            <td class="text-center">
+                <span
+                  v-if="getHighestLeagueCounts(row).first > 0"
+                  class="text-weight-bold text-grey-9"
+                >
+                  {{ getHighestLeagueCounts(row).first }}
+                </span>
+                <span v-else class="text-grey-4">-</span>
+            </td>
 
-        <!-- 2nd -->
-        <td class="text-center">
-            <span
-              v-if="getHighestLeagueCounts(row).second > 0"
-              class="text-weight-bold text-grey-8"
-            >
-              {{ getHighestLeagueCounts(row).second }}
-            </span>
-            <span v-else class="text-grey-4">-</span>
-        </td>
+            <!-- 2nd -->
+            <td class="text-center">
+                <span
+                  v-if="getHighestLeagueCounts(row).second > 0"
+                  class="text-weight-bold text-grey-8"
+                >
+                  {{ getHighestLeagueCounts(row).second }}
+                </span>
+                <span v-else class="text-grey-4">-</span>
+            </td>
 
-        <!-- 3rd -->
-        <td class="text-center">
-            <span
-              v-if="getHighestLeagueCounts(row).third > 0"
-              class="text-weight-bold text-grey-8"
-            >
-              {{ getHighestLeagueCounts(row).third }}
-            </span>
-            <span v-else class="text-grey-4">-</span>
-        </td>
+            <!-- 3rd -->
+            <td class="text-center">
+                <span
+                  v-if="getHighestLeagueCounts(row).third > 0"
+                  class="text-weight-bold text-grey-8"
+                >
+                  {{ getHighestLeagueCounts(row).third }}
+                </span>
+                <span v-else class="text-grey-4">-</span>
+            </td>
 
-        <!-- 4th -->
-        <td class="text-center">
-            <span
-              v-if="getHighestLeagueCounts(row).fourth > 0"
-              class="text-weight-bold text-grey-8"
-            >
-              {{ getHighestLeagueCounts(row).fourth }}
-            </span>
-            <span v-else class="text-grey-4">-</span>
-        </td>
-      </tr>
+            <!-- 4th -->
+            <td class="text-center">
+                <span
+                  v-if="getHighestLeagueCounts(row).fourth > 0"
+                  class="text-weight-bold text-grey-8"
+                >
+                  {{ getHighestLeagueCounts(row).fourth }}
+                </span>
+                <span v-else class="text-grey-4">-</span>
+            </td>
+          </template>
+
+          <template v-else>
+            <template v-for="level in standings.levels" :key="level">
+              <td class="text-center q-px-sm" :style="{ borderLeft: '1px solid rgba(0,0,0,0.03)' }">
+                <div class="row q-gutter-x-sm justify-center items-center no-wrap">
+                  <div class="column items-center">
+                    <span :class="row.per_level[level]?.first ? 'text-weight-bold text-grey-9' : 'text-grey-4'" style="font-size: 11px">
+                      {{ row.per_level[level]?.first || '-' }}
+                    </span>
+                  </div>
+                  <div class="column items-center">
+                    <span :class="row.per_level[level]?.second ? 'text-weight-bold text-grey-8' : 'text-grey-4'" style="font-size: 11px">
+                      {{ row.per_level[level]?.second || '-' }}
+                    </span>
+                  </div>
+                  <div class="column items-center">
+                    <span :class="row.per_level[level]?.third ? 'text-weight-bold text-grey-8' : 'text-grey-4'" style="font-size: 11px">
+                      {{ row.per_level[level]?.third || '-' }}
+                    </span>
+                  </div>
+                  <div class="column items-center">
+                    <span :class="row.per_level[level]?.fourth ? 'text-weight-bold text-grey-8' : 'text-grey-4'" style="font-size: 11px">
+                      {{ row.per_level[level]?.fourth || '-' }}
+                    </span>
+                  </div>
+                </div>
+              </td>
+            </template>
+          </template>
+        </tr>
       </template>
       </tbody>
     </q-markup-table>
@@ -189,6 +260,7 @@ interface LeaderBoardResponse {
 const standings = ref<LeaderBoardResponse | null>(null);
 const loading = ref(false);
 const error = ref(false);
+const showAllLeagues = ref(false);
 
 async function fetchStandings(): Promise<void> {
   loading.value = true;
@@ -248,11 +320,15 @@ watch(
 
 <style scoped lang="scss">
 .leaderboard-container, .leaderboard-empty {
-  overflow: hidden;
+  overflow: auto;
   background: rgba(255, 255, 255, 0.4);
   backdrop-filter: blur(8px);
   border: 1px solid rgba(54, 64, 88, 0.08);
   border-radius: 12px;
+}
+
+.leaderboard-table {
+  min-width: 600px;
 }
 
 .header-row {
@@ -286,6 +362,14 @@ watch(
 
 .border-top-subtle {
   border-top: 1px solid rgba(54, 64, 88, 0.05);
+}
+
+.border-bottom-subtle {
+  border-bottom: 1px solid rgba(54, 64, 88, 0.05);
+}
+
+.border-primary-1 {
+  border: 1px solid var(--q-primary);
 }
 
 .divide-y tr:last-child {
