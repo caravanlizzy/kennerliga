@@ -77,7 +77,6 @@ class LeaderboardViewSet(APIView):
             "1": {"first": 3, "second": 1, "third": 0, "fourth": 0},
             "2": {"first": 1, "second": 2, "third": 0, "fourth": 0}
           },
-          "totals": {"first": 4, "second": 3, "third": 0, "fourth": 0}
         },
         ...
       ]
@@ -108,9 +107,10 @@ class LeaderboardViewSet(APIView):
             )
             .select_related("league", "league__season", "player_profile")
             .order_by(
-                "league__level",  # level first (1 = best)
-                "league_id",  # then league within that level
-                "-league_points", "-wins" # then positions within the league
+                "league__level",   # group by level first (1 = best)
+                "league_id",       # then by league to ensure ranks reset per league
+                "-league_points",  # then intra-league ordering for podium
+                "-wins"
             )
         )
 
@@ -134,7 +134,6 @@ class LeaderboardViewSet(APIView):
         #       "2": {...},
         #       ...
         #   },
-        #   "totals": {"first": ..., "second": ..., "third": ..., "fourth": ...}
         # }
         players_stats = {}
 
@@ -170,7 +169,6 @@ class LeaderboardViewSet(APIView):
                     "per_level": defaultdict(
                         lambda: {"first": 0, "second": 0, "third": 0, "fourth": 0}
                     ),
-                    "totals": {"first": 0, "second": 0, "third": 0, "fourth": 0},
                 }
 
             pstats = players_stats[player_id]
@@ -180,7 +178,6 @@ class LeaderboardViewSet(APIView):
 
             # Increment per-level and total counters
             pstats["per_level"][level_key][pos_key] += 1
-            pstats["totals"][pos_key] += 1
 
         # Convert defaultdicts to normal dicts and sort players
         standings_list = []
@@ -193,24 +190,34 @@ class LeaderboardViewSet(APIView):
                 "player_profile_id": p["player_profile_id"],
                 "profile_name": p["profile_name"],
                 "per_level": per_level_clean,
-                "totals": p["totals"],
             })
 
-        # Sort players:
-        # 1) per_level (level order from `levels`, then 1st/2nd/3rd/4th within each level)
-        # 2) then overall totals (as before)
-        # 3) then name
+        # Sort players per requested rules:
+        # 1) Highest league level the player reached (smallest level number wins)
+        # 2) Best position counts in that highest league: first, then second, then third, then fourth
+        # 3) As deterministic tiebreak: position counts across remaining levels in best-to-worst order (ascending level)
+        # 4) Then name
         def sort_key(item):
+            zeros = {"first": 0, "second": 0, "third": 0, "fourth": 0}
             per_level = item["per_level"]
-            per_level_tuple = []
+
+            # Determine best (i.e., smallest number) level the player played
+            played_levels = sorted(int(k) for k in per_level.keys()) if per_level else []
+            best_level = played_levels[0] if played_levels else 10**9  # huge if none
+
+            # Counts in best level
+            c_best = per_level.get(str(best_level), zeros)
+            best_tuple = (-c_best["first"], -c_best["second"], -c_best["third"], -c_best["fourth"]) 
+
+            # Remaining levels in best-to-worst order (ascending level), using global levels for determinism
+            remaining_tuple = []
             for lvl in levels:
-                c = per_level.get(str(lvl), {"first": 0, "second": 0, "third": 0, "fourth": 0})
-                per_level_tuple.extend([-c["first"], -c["second"], -c["third"], -c["fourth"]])
+                if lvl == best_level:
+                    continue
+                c = per_level.get(str(lvl), zeros)
+                remaining_tuple.extend([-c["first"], -c["second"], -c["third"], -c["fourth"]])
 
-            t = item["totals"]
-            totals_tuple = (-t["first"], -t["second"], -t["third"], -t["fourth"])
-
-            return (*per_level_tuple, *totals_tuple, item["profile_name"].lower())
+            return (best_level, *best_tuple, *remaining_tuple, item["profile_name"].lower())
 
         standings_list.sort(key=sort_key)
 
