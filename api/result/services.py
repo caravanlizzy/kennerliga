@@ -1,6 +1,7 @@
 from django.db import transaction
+from django.db.models import Count
 from result.models import Result
-from game.models import Faction, TieBreaker
+from game.models import Faction, TieBreaker, SelectedGame
 from league.models import LeagueStatus, GameStanding
 from league.queries import is_league_finished
 from services.standings_snapshot import rebuild_game_snapshot, rebuild_league_snapshot
@@ -47,9 +48,27 @@ def finalize_results(serializers, rows, base_field, use_points, tbs, selected_ga
         rebuild_game_snapshot(selected_game, win_mode="fractional")
         rebuild_league_snapshot(league, win_mode="fractional")
 
-        if league.is_finished:
-            league.status = LeagueStatus.DONE
-            league.save(update_fields=["status"])
+        # Mark league as DONE when all SelectedGames in this league have results uploaded
+        member_count = league.members.count()
+        # Get all SelectedGames that belong to this league
+        sg_ids = list(
+            SelectedGame.objects.filter(league=league).values_list("id", flat=True)
+        )
+
+        if sg_ids:
+            # Count GameStanding rows per SelectedGame (created on snapshot rebuild)
+            per_game_counts = (
+                GameStanding.objects
+                .filter(league=league, selected_game_id__in=sg_ids)
+                .values("selected_game_id")
+                .annotate(c=Count("id"))
+            )
+            counts_map = {row["selected_game_id"]: row["c"] for row in per_game_counts}
+            all_games_have_results = all(counts_map.get(sg_id, 0) >= member_count for sg_id in sg_ids)
+
+            if all_games_have_results:
+                league.status = LeagueStatus.DONE
+                league.save(update_fields=["status"])
 
     return saved
 
