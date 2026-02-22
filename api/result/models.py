@@ -47,6 +47,7 @@ class Result(models.Model):
     )
     tie_breaker_resolved = models.BooleanField(default=False)
     created_at = models.DateTimeField(default=timezone.now)
+    updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
         indexes = [

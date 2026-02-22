@@ -53,6 +53,51 @@ class LogoutApiView(APIView):
             return Response({'error': 'No token provided or invalid token'}, status=status.HTTP_400_BAD_REQUEST)
 
 
+from django.utils import timezone
+from datetime import timedelta
+from chat.models import Chat
+from league.models import League
+from game.models import SelectedGame
+from result.models import Result
+
+class NeedsUpdateView(APIView):
+    """
+    Generic endpoint to check if certain resources need updates.
+    Returns a list of API paths that have new data.
+    """
+    def get(self, request, *args, **kwargs):
+        updates = []
+        
+        since = request.query_params.get('since')
+        since_dt = None
+        if since:
+            try:
+                since_dt = timezone.datetime.fromisoformat(since.replace('Z', '+00:00'))
+            except (ValueError, TypeError):
+                pass
+        
+        if not since_dt:
+            # Fallback: check last 30 seconds
+            since_dt = timezone.now() - timedelta(seconds=30)
+
+        # Check for chat updates
+        if Chat.objects.filter(datetime__gt=since_dt).exists():
+            updates.append('/chat/')
+        
+        # Check for league updates
+        # For simplicity, we check if ANY league relevant to the current user (if any) or ANY league at all changed.
+        # But usually we'd want to be more specific. 
+        # For a "needs-update" generic endpoint, we can just return /league/ if any relevant model changed.
+        if League.objects.filter(updated_at__gt=since_dt).exists():
+            updates.append('/league/')
+        elif SelectedGame.objects.filter(updated_at__gt=since_dt).exists():
+            updates.append('/league/')
+        elif Result.objects.filter(updated_at__gt=since_dt).exists():
+            updates.append('/league/')
+        
+        return Response({"updates": updates}, status=status.HTTP_200_OK)
+
+
 # no better place to put currently, maybe lateron in a statistic module
 class LeaderboardViewSet(APIView):
     """

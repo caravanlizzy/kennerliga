@@ -8,13 +8,14 @@ from drf_spectacular.views import (
     SpectacularRedocView,
 )
 
-from api.views import LoginApiView, LogoutApiView, LeaderboardViewSet
+from api.views import LoginApiView, LogoutApiView, LeaderboardViewSet, NeedsUpdateView
 
 router = DefaultRouter()
 
 urlpatterns = [
     path('login/', LoginApiView.as_view()),
     path('logout/', LogoutApiView.as_view()),
+    path('needs-update/', NeedsUpdateView.as_view(), name='needs-update'),
     path('', include(router.urls)),
     path('game/', include('game.urls')),
     path('season/', include('season.urls')),

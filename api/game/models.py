@@ -160,6 +160,7 @@ class SelectedGame(models.Model):
     game = models.ForeignKey(Game, on_delete=models.CASCADE, related_name='game_selections')
     league = models.ForeignKey("league.League", on_delete=models.CASCADE, related_name='game_selections')
     created_at = models.DateTimeField(default=timezone.now)
+    updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
         constraints = [
