@@ -121,8 +121,8 @@ export const useLeagueStore = (id: number) => {
       try {
         const data = await fetchLeagueDetails(leagueId.value);
         leagueData.value = data;
-        members.value = data.members;
-        leagueStatus.value = data.status;
+        members.value = data.members || [];
+        leagueStatus.value = data.status || 'PICKING';
 
         // Populate matchResultsBySelectedGame from the prefetched data
         (data.members || []).forEach(member => {
