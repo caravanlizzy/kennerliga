@@ -1,8 +1,7 @@
 from django.contrib.auth import authenticate
 from rest_framework.authtoken.models import Token
 
-from league.models import LeagueStanding
-from season.models import Season
+from league.models import LeagueStanding, LeagueStatus
 from user.models import PlatformPlayer
 
 from collections import defaultdict
@@ -105,7 +104,8 @@ class LeaderboardViewSet(APIView):
             LeagueStanding.objects
             .filter(
                 league__season__year=year,
-                league__season__status=Season.SeasonStatus.DONE,
+                # Use only completed leagues for leaderboard aggregation
+                league__status=LeagueStatus.DONE,
             )
             .select_related("league", "league__season", "player_profile")
             .order_by(
