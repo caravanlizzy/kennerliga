@@ -1,11 +1,8 @@
 from django.db import transaction
 from django.db.models import Count
-from result.models import Result
-from game.models import Faction, TieBreaker, SelectedGame
+from game.models import SelectedGame
 from league.models import LeagueStatus, GameStanding
-from league.queries import is_league_finished
 from services.standings_snapshot import rebuild_game_snapshot, rebuild_league_snapshot
-from .serializers import ResultSerializer
 from league.serializer import GameStandingSerializer
 
 def finalize_results(serializers, rows, base_field, use_points, tbs, selected_game, league, decisive_tb=None, needing_pids=None):
@@ -68,7 +65,7 @@ def finalize_results(serializers, rows, base_field, use_points, tbs, selected_ga
 
             if all_games_have_results:
                 league.status = LeagueStatus.DONE
-                league.save(update_fields=["status"])
+                league.save(update_fields=["status", "updated_at"])
 
     return saved
 
