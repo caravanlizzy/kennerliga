@@ -2,7 +2,7 @@
   <LoadingSpinner v-if="loading" />
   <q-card
     v-else
-    flat
+    flatU
     class="column col bg-transparent"
     style="min-width: 350px; min-height: 400px"
   >
@@ -30,9 +30,14 @@
 
           <template v-for="(m, index) in messages" :key="m.id">
             <q-chat-message
-              v-if="m.label"
-              :label="m.label"
-              class="chat-label-message"
+            v-if="m.label"
+            :label="m.label"
+            class="chat-label-message"
+            :class="[
+                m.label.includes('open for registration')
+                ? 'text-accent'
+                : 'text-warning'
+            ]"
             />
             <q-chat-message
               v-else
@@ -368,7 +373,6 @@ onUnmounted(() => {
   :deep(.q-message-label) {
     font-size: 0.65rem;
     font-weight: 600;
-    color: var(--q-warning);
     letter-spacing: 0.1em;
     text-transform: uppercase;
     margin: 24px 0 12px;
