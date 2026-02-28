@@ -3,6 +3,7 @@ from django.utils import timezone
 from announcement.models import Announcement
 from season.models import Season
 from season.queries import get_open_season
+from chat.service import create_chat_announcement
 from datetime import datetime, timedelta
 
 class Command(BaseCommand):
@@ -50,4 +51,6 @@ class Command(BaseCommand):
             visible_until=visible_until
         )
 
+        # --- Add chat announcement ---
+        create_chat_announcement(f"Season {open_season.name} is open for registration")
         self.stdout.write(self.style.SUCCESS(f"Created registration announcement for {open_season.name}"))
