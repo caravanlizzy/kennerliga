@@ -1,7 +1,7 @@
 <template>
   <div :class="isMobile ? 'q-pa-sm' : 'q-pa-md'" class="column season-standings">
     <!-- State primary -->
-    <LoadingSpinner v-if="loadingLeagues" />
+    <LoadingSpinner v-if="loadingLeagues" text="Loading standings..." />
 
     <!-- Leagues + matrices -->
     <div v-else-if="!seasonId && !loadingLeagues" class="column items-center q-pa-xl text-grey-6">

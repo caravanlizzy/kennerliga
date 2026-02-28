@@ -33,7 +33,7 @@
     </div>
     <SeasonStandings v-if="!loadingSeasonInit" :seasonId="selectedSeasonId" />
     <div v-else class="flex flex-center q-pa-xl">
-      <LoadingSpinner text="Initializing seasons..." />
+      <LoadingSpinner text="Loading seasons..." />
     </div>
   </q-page>
 </template>
@@ -110,9 +110,6 @@ onMounted(async () => {
     // 1. Fetch current season ID first as requested
     const currentSeasonId = await fetchCurrentSeasonId();
 
-    // 2. Then fetch years and seasons
-    availableYears.value = await fetchAvailableYears();
-
     if (currentSeasonId) {
       const season = await fetchSeason(currentSeasonId);
       if (season) {
@@ -121,7 +118,18 @@ onMounted(async () => {
         selectedSeasonYear.value = season.year;
         selectedSeasonMonth.value = season.month;
       }
-    } else if (availableYears.value.length > 0) {
+    }
+
+    // Stop loading the spinner if we have a seasonId and basic year info
+    if (selectedSeasonId.value) {
+      loadingSeasonInit.value = false;
+    }
+
+    // 2. Then fetch years (lower priority)
+    availableYears.value = await fetchAvailableYears();
+
+    // 3. Fallback
+    if (!selectedSeasonId.value && availableYears.value.length > 0) {
       const year = availableYears.value[0];
       const seasons = await fetchSeasons({ year });
       seasonsForYear.value = seasons;

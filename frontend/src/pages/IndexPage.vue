@@ -57,7 +57,7 @@
                   class="col-12"
                 />
                 <div v-else class="flex flex-center q-pa-xl">
-                  <LoadingSpinner text="Initializing seasons..." />
+                  <LoadingSpinner text="Loading seasons..." />
                 </div>
               </ContentSection>
 
@@ -193,23 +193,32 @@ const initData = async () => {
   if (isAuthenticated.value) {
     loadingSeasonInit.value = true;
     try {
-      // 1. Fetch current season ID first as requested
+      // 1. Fetch current season ID first to get started as soon as possible
       const currentSeasonId = await fetchCurrentSeasonId();
-
-      // 2. Then fetch years and seasons
-      availableYears.value = await fetchAvailableYears();
 
       if (currentSeasonId) {
         const season = await fetchSeason(currentSeasonId);
         if (season) {
           selectedYear.value = season.year;
 
+          // We fetch seasons for the selected year immediately to have them ready for the dropdowns
           seasonsForYear.value = await fetchSeasons({ year: season.year });
 
           selectedSeasonYear.value = season.year;
           selectedSeasonMonth.value = season.month;
         }
-      } else if (availableYears.value.length > 0) {
+      }
+
+      // We can stop loading the spinner here if we have a seasonId and basic year info
+      if (selectedSeasonId.value) {
+        loadingSeasonInit.value = false;
+      }
+
+      // 2. Then fetch years (lower priority)
+      availableYears.value = await fetchAvailableYears();
+
+      // 3. Handle fallback if no currentSeasonId was found
+      if (!selectedSeasonId.value && availableYears.value.length > 0) {
         const year = availableYears.value[0];
         selectedYear.value = year;
 
