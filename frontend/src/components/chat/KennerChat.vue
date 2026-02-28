@@ -368,7 +368,7 @@ onUnmounted(() => {
   :deep(.q-message-label) {
     font-size: 0.65rem;
     font-weight: 600;
-    color: #bdbdbd;
+    color: var(--q-warning);
     letter-spacing: 0.1em;
     text-transform: uppercase;
     margin: 24px 0 12px;
