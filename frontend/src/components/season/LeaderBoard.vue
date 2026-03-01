@@ -12,7 +12,7 @@
     <div class="q-px-lg q-py-md row items-center justify-between border-bottom-subtle">
       <div class="row items-center q-gutter-x-sm">
         <q-icon name="analytics" color="primary" size="20px" />
-        <span class="text-subtitle2 text-weight-bold text-grey-8">League Statistics</span>
+        <span class="text-subtitle2 text-weight-bold text-grey-8">Annual Championship</span>
       </div>
       <q-btn-toggle
         v-model="showAllLeagues"
@@ -97,6 +97,7 @@
           class="leaderboard-row"
           :class="{
             'top-rank-bg': index === 0,
+            ['bg-' + getLeagueBgColor(bestLeague(row) || 0)]: !!bestLeague(row)
           }"
         >
           <!-- Rank -->
@@ -117,7 +118,7 @@
                   <q-badge
                     v-if="bestLeague(row)"
                     outline
-                    :color="leagueBadgeColor(bestLeague(row)!)"
+                    :color="getLeagueColor(bestLeague(row)!)"
                     class="league-indicator"
                   >
                     L{{ bestLeague(row) }}
@@ -243,8 +244,10 @@ import { ref, watch } from 'vue';
 import LoadingSpinner from 'components/base/LoadingSpinner.vue';
 import ErrorDisplay from 'components/base/ErrorDisplay.vue';
 import UserAvatar from 'components/ui/UserAvatar.vue';
+import { useLeagueColors } from 'src/composables/useLeagueColors';
 
 const props = defineProps<{ year: number }>();
+const { getLeagueColor, getLeagueBgColor } = useLeagueColors();
 
 interface PerLevelCounts {
   first: number;
@@ -302,16 +305,6 @@ function getHighestLeagueCounts(row: PlayerYearStanding): PerLevelCounts {
 }
 
 // lower league number => more "winner-like" color
-function leagueBadgeColor(league: number): string {
-  if (league <= 1) return 'amber-8'; // best
-  if (league === 2) return 'blue-grey-5';
-  if (league === 3) return 'brown-6';
-  if (league === 4) return 'red-6';
-  if (league <= 6) return 'deep-purple-6';
-  if (league <= 10) return 'indigo-6';
-  return 'grey-6';
-}
-
 watch(
   () => props.year,
   () => fetchStandings(),

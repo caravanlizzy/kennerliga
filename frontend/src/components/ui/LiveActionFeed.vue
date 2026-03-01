@@ -70,8 +70,7 @@
                 >
                   <span class="row items-center">
                     <q-badge
-                      color="grey-3"
-                      text-color="grey-9"
+                      :color="getLeagueColor(Number(event.leagueLevel))"
                       class="q-mr-xs text-weight-bold"
                       style="font-size: 0.65rem"
                     >
@@ -132,11 +131,13 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from 'vue';
+import { useLeagueColors } from 'src/composables/useLeagueColors';
 import { TLiveEvent, TLiveEventType } from 'src/types';
 import { fetchLiveActionEvents } from 'src/services/seasonService';
 import { useUpdateStore } from 'stores/updateStore';
 
 const updateStore = useUpdateStore();
+const { getLeagueColor } = useLeagueColors();
 const events = ref<TLiveEvent[]>([]);
 const loading = ref(true);
 const selectedLeagues = ref<Set<number | string>>(new Set());
