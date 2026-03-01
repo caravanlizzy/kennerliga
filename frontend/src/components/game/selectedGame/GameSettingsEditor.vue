@@ -50,7 +50,8 @@ onMounted(async () => {
   gameSelection.profileId = props.profileId;
   await initGameInformation(game);
   gameSelection.selectedOptions = apiToGameSelectionOptions(
-    selection.selected_options
+    selection.selected_options,
+    gameInformation.options
   );
   isLoading.value = false;
 });
@@ -71,23 +72,35 @@ async function onSubmit() {
   }
 }
 
-function apiToGameSelectionOptions(options) {
-  return options.map((option) => {
-    const result =
-      option.choice !== null
+function apiToGameSelectionOptions(apiOptions, allGameOptions) {
+  const apiOptionsMap = new Map(
+    apiOptions.map((o) => [o.game_option.id, o])
+  );
+
+  return allGameOptions.map((gameOpt) => {
+    const apiOpt = apiOptionsMap.get(gameOpt.id);
+    if (apiOpt) {
+      return apiOpt.choice !== null
         ? {
-            id: option.game_option.id,
+            game_option: gameOpt.id,
             value: null,
-            choice: option.choice,
+            choice: apiOpt.choice,
             selected_game: props.selectedGameId,
           }
         : {
-            id: option.game_option.id,
-            value: option.value,
+            game_option: gameOpt.id,
+            value: apiOpt.value,
             choice: null,
             selected_game: props.selectedGameId,
           };
-    return result;
+    }
+    // Default for options that were not set yet
+    return {
+      game_option: gameOpt.id,
+      selected_game: props.selectedGameId,
+      value: gameOpt.has_choices ? undefined : false,
+      choice: undefined,
+    };
   });
 }
 </script>

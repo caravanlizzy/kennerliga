@@ -194,7 +194,9 @@ function findSelectedOption(optionId: number) {
     (o) => o.game_option === optionId
   );
   if (!found) {
-    throw new Error(`Selected option not found for optionId: ${optionId}`);
+    // If we can't find it, we should return a dummy object to avoid crashing
+    // instead of throwing an error. This can happen if props are out of sync.
+    return { value: false, choice: null };
   }
   return found;
 }
