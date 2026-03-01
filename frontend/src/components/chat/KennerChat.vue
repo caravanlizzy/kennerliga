@@ -83,6 +83,26 @@
         :disable="sending"
         @keydown.enter.prevent="send"
       >
+        <template #prepend>
+          <q-btn flat round dense icon="sentiment_satisfied_alt" color="grey-7">
+            <q-menu anchor="top left" self="bottom left" class="q-pa-sm" :offset="[0, 8]">
+              <div class="row q-gutter-xs justify-center" style="width: 360px; max-height: 300px; overflow-y: auto">
+                <q-btn
+                  v-for="emoji in emojiList"
+                  :key="emoji"
+                  flat
+                  dense
+                  round
+                  :label="emoji"
+                  size="lg"
+                  class="text-h5"
+                  @click="addEmoji(emoji)"
+                  v-close-popup
+                />
+              </div>
+            </q-menu>
+          </q-btn>
+        </template>
         <template #append>
           <KennerButton
             flat
@@ -124,6 +144,37 @@ const hasMoreOlder = ref(true);
 const messages: Ref<TMessageDto[]> = ref([]);
 const newMessage = ref('');
 const sending = ref(false);
+
+const emojiList = [
+  '😀', '😃', '😄', '😁', '😆', '😅', '😂', '🤣', '😊', '😇',
+  '🙂', '🙃', '😉', '😌', '😍', '🥰', '😘', '😗', '😙', '😚',
+  '😋', '😛', '😝', '😜', '🤪', '🤨', '🧐', '🤓', '😎', '🤩',
+  '🥳', '😏', '😒', '😞', '😔', '😟', '😕', '🙁', '☹️', '😣',
+  '😖', '😫', '😩', '🥺', '😢', '😭', '😤', '😠', '😡', '🤬',
+  '🤯', '😳', '🥵', '🥶', '😱', '😨', '😰', '😥', '😓', '🤔',
+  '🤭', '🤫', '🤥', '😶', '😐', '😑', '😬', '🙄', '😯', '😦',
+  '😧', '😮', '😲', '🥱', '😴', '🤤', '😪', '😵', '🤐', '🥴',
+  '🤢', '🤮', '🤧', '👍', '👎', '👌', '✌️', '🤞', '🤟', '🤘',
+  '🤙', '🖐', '✋', '🖖', '👋', '🤚', '✍️', '👏', '👐', '🙌',
+  '🤲', '🙏', '🤝', '💅', '👂', '👃', '🦶', '🦵', '🧠', '🦷',
+  '🦴', '👀', '👅', '👄', '👶', '🧒', '👦', '👧', '🧑', '👨',
+  '👩', '👴', '👵', '🔥', '✨', '⭐', '🌟', '💥', '💯', '💢',
+  '💨', '💦', '💤', '🎉', '🎊', '🎈', '🎁', '🎂', '🥂', '🍻',
+  '🍺', '🍹', '🍷', '🎲', '🎮', '🕹️', '🎰', '🎯', '🎳', '🧩',
+  '♟️', '🃏', '🀄', '❤️'
+];
+
+function addEmoji(emoji: string) {
+  newMessage.value += emoji;
+  nextTick(() => {
+    if (inputRef.value?.$el) {
+      const input = inputRef.value.$el.querySelector('input') || inputRef.value.$el.querySelector('textarea');
+      if (input) {
+        input.focus();
+      }
+    }
+  });
+}
 const showScrollDown = ref(false);
 
 const inputRef = ref<any>(null);
