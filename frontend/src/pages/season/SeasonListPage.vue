@@ -36,7 +36,7 @@
           dense
           color="secondary"
           icon="visibility"
-          label="View"
+          :label="isMobile ? undefined : 'View'"
           :to="{ name: 'season-overview', params: { id: props.row.id } }"
           @click.stop
         />
@@ -46,7 +46,7 @@
           dense
           color="primary"
           icon="settings"
-          label="Manage"
+          :label="isMobile ? undefined : 'Manage'"
           :to="{ name: 'season-manage', params: { id: props.row.id } }"
           @click.stop
         />
@@ -74,6 +74,7 @@ import { useUserStore } from 'stores/userStore';
 import type { QTableProps } from 'quasar';
 import type { TKennerButton, TSeasonDto } from 'src/types';
 import KennerButton from 'src/components/base/KennerButton.vue';
+import { useResponsive } from 'src/composables/responsive';
 
 type SeasonExtra = TSeasonDto & {
   is_empty?: boolean;
@@ -82,6 +83,7 @@ type SeasonExtra = TSeasonDto & {
 
 const userStore = useUserStore();
 const { isAdmin } = storeToRefs(userStore);
+const { isMobile } = useResponsive();
 
 // fetch seasons
 const {
@@ -133,23 +135,6 @@ const columns = computed<QTableProps['columns']>(() => ([
     format: (val: string, row: SeasonExtra) => val, // keep value for filtering/sorting if KennerTable uses it
     headerStyle: 'white-space: nowrap',
     style: 'white-space: nowrap; max-width: 0',
-  },
-  {
-    name: 'year',
-    label: 'Year',
-    field: 'year',
-    align: 'left',
-    sortable: true,
-    headerStyle: 'white-space: nowrap',
-  },
-  {
-    name: 'month',
-    label: 'S',
-    field: 'month',
-    align: 'left',
-    sortable: true,
-    format: (v: number) => `S${v}`,
-    headerStyle: 'white-space: nowrap',
   },
   {
     name: 'status',
