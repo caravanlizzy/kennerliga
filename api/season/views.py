@@ -125,7 +125,6 @@ class SeasonViewSet(ModelViewSet):
         )
 
     @action(detail=True, methods=["get"], url_path="league-winners")
-    @action(detail=True, methods=["get"], url_path="league-winners")
     def league_winners(self, request, pk=None):
         """
         GET /seasons/{id}/league-winners/
