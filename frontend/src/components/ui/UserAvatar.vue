@@ -106,6 +106,6 @@ const shapeClass = computed(() => {
 
 /* squircle magic: quadratic border radius ratio */
 .squircle-shape {
-  border-radius: 35% !important;
+  border-radius: 12px !important;
 }
 </style>

@@ -1,11 +1,11 @@
 <template>
   <section class="season-winners">
-    <header class="season-winners__header">
-      <h2
-        class="season-winners__title q-ma-none text-h5 text-dark text-weight-bold"
+    <header class="season-winners__header q-mb-md">
+      <div
+        class="season-winners__title q-ma-none text-subtitle1 text-grey-7 text-weight-bold text-uppercase letter-spacing-1"
       >
-        Season {{ season }}
-      </h2>
+        Season Results
+      </div>
     </header>
 
     <div
@@ -187,9 +187,13 @@ const restOfLeagues = computed(() => {
 }
 
 .season-winners__empty {
-  border: 1px dashed rgba(0, 0, 0, 0.2);
+  border: 1px dashed rgba(0, 0, 0, 0.1);
   border-radius: 12px;
-  opacity: 0.9;
+  background: rgba(0, 0, 0, 0.02);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100px;
 }
 
 /* Podium */

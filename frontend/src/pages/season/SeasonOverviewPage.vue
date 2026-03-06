@@ -1,29 +1,41 @@
 <template>
   <q-page class="q-pa-md">
     <!-- Header Area -->
-    <div class="row items-center justify-between q-mb-md">
-      <div class="row items-center q-gutter-x-sm">
+    <div class="row items-center justify-between q-mb-lg">
+      <div class="row items-center q-gutter-x-md">
         <KennerButton
           flat
           icon="arrow_back"
-          round
+          shape="squircle"
           color="grey-7"
           size="md"
           @click="router.back()"
         >
-          <KennerTooltip>Back</KennerTooltip>
+          <KennerTooltip>Back to seasons</KennerTooltip>
         </KennerButton>
-        <q-icon name="military_tech" size="md" color="primary" />
-        <div class="text-h4 text-weight-bolder text-dark tracking-tighter">
-          Season {{ season?.name || '…' }} Overview
+        <div class="column">
+          <div class="row items-center q-gutter-x-xs">
+            <q-icon name="military_tech" size="sm" color="primary" />
+            <span class="text-overline text-grey-7">Season Overview</span>
+          </div>
+          <div class="text-h4 text-weight-bolder text-dark tracking-tighter">
+            {{ season?.name || '…' }}
+          </div>
         </div>
       </div>
       <div class="row items-center q-gutter-x-sm">
+        <div
+          v-if="seasonStatusLabel"
+          class="q-px-md q-py-xs rounded-borders-12 text-weight-bold text-caption shadow-1"
+          :class="`bg-${statusColor} text-white`"
+        >
+          {{ seasonStatusLabel }}
+        </div>
         <KennerButton
           v-if="!loading && season"
           flat
           icon="refresh"
-          round
+          shape="squircle"
           color="primary"
           size="md"
           @click="load"
@@ -45,35 +57,39 @@
     <div v-else-if="!error && season">
       <!-- Season Info Section -->
       <div class="row q-col-gutter-md q-mb-lg">
-        <div class="col-12 col-md-6">
+        <div class="col-12 col-md-4">
           <ContentSection
-            title="Season Info"
-            icon="info"
+            title="League Distribution"
+            icon="hub"
             color="primary"
             style="margin-top: 0"
-            :bordered="false"
           >
-            <div class="row q-gutter-sm items-center">
-              <q-badge align="middle" color="grey-2" text-color="grey-9" class="q-pa-sm text-weight-bold">
-                {{ leagues.length }} leagues
-              </q-badge>
-              <q-badge
-                v-if="seasonStatusLabel"
-                :color="statusColor"
-                class="q-pa-sm text-weight-bold"
-                :label="seasonStatusLabel"
-              />
+            <div class="column q-gutter-y-sm">
+              <div class="row items-center justify-between q-pa-md bg-grey-1 rounded-borders-12 border-subtle">
+                <div class="row items-center q-gutter-x-sm">
+                  <q-icon name="groups" color="grey-7" size="sm" />
+                  <span class="text-weight-medium">Total Leagues</span>
+                </div>
+                <span class="text-h6 text-weight-bold">{{ leagues.length }}</span>
+              </div>
+
+              <div class="row items-center justify-between q-pa-md bg-grey-1 rounded-borders-12 border-subtle">
+                <div class="row items-center q-gutter-x-sm">
+                  <q-icon name="person" color="grey-7" size="sm" />
+                  <span class="text-weight-medium">Participants</span>
+                </div>
+                <span class="text-h6 text-weight-bold">{{ participants.length }}</span>
+              </div>
             </div>
           </ContentSection>
         </div>
 
-        <div class="col-12 col-md-6">
+        <div class="col-12 col-md-8">
           <ContentSection
-            title="Season Winners"
+            title="Champions"
             icon="emoji_events"
             color="amber-8"
             style="margin-top: 0"
-            :bordered="false"
           >
             <SeasonWinners :season-id="seasonId" />
           </ContentSection>

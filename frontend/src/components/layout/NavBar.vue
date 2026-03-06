@@ -5,7 +5,6 @@
       :class="isMobile ? 'q-px-sm' : 'q-px-md'"
       style="border-bottom: none;"
     >
-      <!-- Left: Brand -->
       <div class="row no-wrap items-center">
         <NavHome />
       </div>
@@ -14,15 +13,17 @@
 
       <!-- Center: Current Champion -->
       <div
+        v-if="!isMobile"
         class="row no-wrap items-center absolute-center"
       >
         <CurrentChampion />
       </div>
 
-      <q-space />
-
       <!-- Right: Controls -->
       <div class="row no-wrap items-center" :class="isMobile ? 'q-gutter-x-xs' : 'q-gutter-x-sm'">
+        <div v-if="isMobile" class="q-mr-xs">
+          <CurrentChampion />
+        </div>
 
         <NavMyLeague v-if="user && user.myCurrentLeagueId" />
 
@@ -55,10 +56,11 @@ const { isMobile } = useResponsive();
 }
 
 .glass-effect {
-  background: rgba(255, 255, 255, 0.82) !important;
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border-bottom: 2px solid #eeeeee;
+  background: rgba(255, 255, 255, 0.75) !important;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.03);
 }
 
 

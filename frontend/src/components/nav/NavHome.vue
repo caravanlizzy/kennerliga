@@ -6,7 +6,7 @@
       flat
       color="dark"
       :class="[isMobile ? 'q-px-xs' : 'q-px-md', 'text-weight-bold']"
-      style="height: 40px; min-width: 40px; border-radius: 0 !important;"
+      style="height: 44px; min-width: 44px;"
     >
       <div class="row items-center no-wrap">
         <q-icon size="md" name="img:icons/favicon.svg" class="q-mr-sm" />

@@ -109,11 +109,35 @@ onMounted(loadCurrentChampion);
   border: 1px solid rgba(0, 0, 0, 0.08);
   transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  position: relative;
+  overflow: hidden;
+
+  &::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 50%;
+    height: 100%;
+    background: linear-gradient(
+      to right,
+      transparent,
+      rgba(255, 193, 7, 0.1),
+      transparent
+    );
+    transform: skewX(-25deg);
+    transition: none;
+  }
 
   &:hover {
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
     border-color: rgba(255, 193, 7, 0.4);
     background: #fafafa;
+
+    &::after {
+      left: 150%;
+      transition: left 0.7s ease-in-out;
+    }
   }
 
   &:active {
