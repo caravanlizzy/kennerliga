@@ -188,7 +188,7 @@ const restOfLeagues = computed(() => {
 
 .season-winners__empty {
   border: 1px dashed rgba(0, 0, 0, 0.2);
-  border-radius: 10px;
+  border-radius: 12px;
   opacity: 0.9;
 }
 
@@ -250,7 +250,7 @@ const restOfLeagues = computed(() => {
 }
 
 .next__item {
-  border-radius: 10px;
+  border-radius: 12px;
   background: rgba(0, 0, 0, 0.04);
   display: flex;
   align-items: center;

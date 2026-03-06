@@ -5,7 +5,7 @@
     :rows-per-page-options="[20, 50, 0]"
     v-model:pagination="pagination"
     table-header-class="text-dark text-weight-medium bg-grey-2"
-    class="rounded-borders"
+    class="rounded-borders-12"
     table-class="text-grey-8"
   >
     <template v-slot:top-left>

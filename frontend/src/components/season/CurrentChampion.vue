@@ -121,7 +121,7 @@ onMounted(loadCurrentChampion);
   }
 
   &.mobile-display {
-    border-radius: 8px;
+    border-radius: 12px;
     padding: 4px 10px;
   }
 }

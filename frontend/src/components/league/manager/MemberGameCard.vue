@@ -1,6 +1,6 @@
 <template>
   <div class="col-12 q-mb-xl">
-    <q-card flat bordered class="rounded-borders shadow-1 bg-grey-1">
+    <q-card flat bordered class="rounded-borders-12 shadow-1 bg-grey-1">
       <!-- Member Group Header -->
       <q-card-section class="q-pb-none">
         <div class="row items-center q-gutter-sm">

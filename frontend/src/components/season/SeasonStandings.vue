@@ -10,7 +10,7 @@
       <div>Please select year and month that contain a league.</div>
     </div>
 
-    <div v-else-if="leagues.length === 0 && seasonId" class="column items-center q-pa-xl text-grey-6 bg-white rounded-borders border-subtle">
+    <div v-else-if="leagues.length === 0 && seasonId" class="column items-center q-pa-xl text-grey-6 bg-white rounded-borders-12 border-subtle">
        <q-icon name="upcoming" size="48px" class="q-mb-md opacity-20" />
        <div class="text-h6 text-weight-bold">No leagues found</div>
        <div class="text-caption q-mb-lg">This season hasn't been set up with any leagues yet.</div>
