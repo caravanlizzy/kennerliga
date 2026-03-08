@@ -2,7 +2,7 @@
 <template>
   <div class="game-settings-options">
     <div
-      v-for="selected in selectedOptions"
+      v-for="selected in orderedOptions"
       :key="selected.id"
       class="option-row"
     >
@@ -42,6 +42,8 @@
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue'
+
 interface GameOption {
   id: number
   name: string
@@ -68,9 +70,13 @@ interface SelectedOption {
   value: boolean | null
 }
 
-defineProps<{
+const props = defineProps<{
   selectedOptions: SelectedOption[]
 }>()
+
+const orderedOptions = computed(() => {
+  return [...props.selectedOptions].reverse()
+})
 
 /**
  * Liefert den anzuzeigenden Text für eine Choice-Option
