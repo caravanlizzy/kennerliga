@@ -1,7 +1,6 @@
 <template>
     <q-page class="column col bg-white">
-    <div class="q-pa-md row items-center justify-between no-wrap border-bottom-subtle bg-white">
-      <div class="text-h5 text-weight-bold"><span class="text-primary">Kenner</span><span class="text-negative">Chat</span></div>
+    <div class="q-pa-md row items-center justify-end no-wrap border-bottom-subtle bg-white">
       <q-icon name="chat" color="negative" size="sm" />
     </div>
     <KennerChat class="col bg-white" />

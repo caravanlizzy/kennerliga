@@ -19,7 +19,7 @@
       v-if="isAuthenticated"
       side="left"
       v-model="chatDrawerOpen"
-      :width="380"
+      :width="320"
       :behavior="isMobile ? 'mobile' : 'desktop'"
       :overlay="isMobile"
       class="chat-drawer glass-drawer"
@@ -28,7 +28,6 @@
         <div class="q-pa-md row items-center justify-between border-bottom-subtle bg-white">
           <div class="row items-center">
             <q-icon name="chat" color="negative" size="sm" class="q-mr-sm" />
-            <div class="text-h6 text-weight-bold"><span class="text-primary">Kenner</span><span class="text-negative">Chat</span></div>
           </div>
           <q-btn flat round dense icon="chevron_left" size="sm" color="primary" @click="toggleChat">
             <q-tooltip>Hide Chat</q-tooltip>

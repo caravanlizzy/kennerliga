@@ -4,7 +4,7 @@
     v-else
     flatU
     class="column col bg-transparent"
-    style="min-width: 350px; min-height: 400px"
+    style="min-width: 250px; min-height: 400px"
   >
     <!-- Messages -->
     <q-card-section class="q-pa-none col column relative-position chat-body">
