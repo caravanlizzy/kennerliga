@@ -27,7 +27,7 @@
       <div class="column full-height">
         <div class="q-pa-md row items-center justify-between border-bottom-subtle bg-white">
           <div class="row items-center">
-            <q-icon name="chat" color="negative" size="sm" class="q-mr-sm" />
+            <q-icon name="chat" color="accent" size="sm" class="q-mr-sm" />
           </div>
           <q-btn flat round dense icon="chevron_left" size="sm" color="primary" @click="toggleChat">
             <q-tooltip>Hide Chat</q-tooltip>

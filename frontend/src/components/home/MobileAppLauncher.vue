@@ -64,7 +64,7 @@ const tiles = computed(() => [
   {
     title: 'Chat',
     icon: 'chat',
-    color: 'pink',
+    color: 'accent',
     route: { name: 'mobile-chat' },
     visible: true,
   },
@@ -105,7 +105,7 @@ function navigateTo(route: any) {
 .bg-blue-soft { background: #eff6ff; }
 .bg-orange-soft { background: #fff8f0; }
 .bg-deep-purple-soft { background: #f6f2ff; }
-.bg-pink-soft { background: #fdf2f8; }
+.bg-accent-soft { background: #fdf2f8; }
 
 @media (min-width: 600px) {
   .launcher-grid {
