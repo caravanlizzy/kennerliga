@@ -9,7 +9,6 @@
       v-model="drawerState"
       :width="300"
       :behavior="isMobile ? 'mobile' : 'desktop'"
-      :overlay="true"
       class="kenner-drawer"
     >
       <KennerDrawer v-model="drawerState" />
@@ -21,8 +20,7 @@
       v-model="chatDrawerOpen"
       :width="320"
       :behavior="isMobile ? 'mobile' : 'desktop'"
-      :overlay="isMobile"
-      class="chat-drawer glass-drawer"
+      class="chat-drawer"
     >
       <div class="column full-height">
         <div class="q-pa-md row items-center justify-between border-bottom-subtle bg-white">
@@ -40,14 +38,14 @@
     <div
       v-if="isAuthenticated"
       class="fixed-left z-max"
-      style="top: 66px;"
+      style="top: 100px;"
     >
       <q-btn
         v-if="!chatDrawerOpen && !isMobile"
         flat
         dense
         color="primary"
-        class="chat-mini-toggle glass-toggle"
+        class="chat-mini-toggle"
         @click="toggleChat"
       >
         <div class="column items-center q-py-sm">
@@ -95,7 +93,7 @@ const { chatDrawerOpen } = storeToRefs(uiStore);
 const { toggleChat } = uiStore;
 
 onMounted(() => {
-  chatDrawerOpen.value = isAuthenticated.value && !isMobile.value;
+  chatDrawerOpen.value = false;
 });
 
 function toggleDrawer(): void {
@@ -111,28 +109,20 @@ function toggleDrawer(): void {
   border-bottom: 1px solid rgba(0, 0, 0, 0.05);
 }
 .chat-drawer {
-  border-right: 2px solid #eeeeee !important;
+  border-right: 1px solid rgba(0, 0, 0, 0.05) !important;
 }
-.glass-drawer {
-  background: rgba(255, 255, 255, 0.4) !important;
-  backdrop-filter: blur(12px);
-}
-.glass-toggle {
-  background: rgba(255, 255, 255, 0.7) !important;
-  backdrop-filter: blur(8px);
-  border: 1px solid rgba(0, 0, 0, 0.05);
-  color: $primary !important;
+.kenner-drawer {
+  border-left: 1px solid rgba(0, 0, 0, 0.05) !important;
 }
 
 .chat-mini-toggle {
-  border-radius: 0 0 12px 0 !important;
+  border-radius: 0 12px 12px 0 !important;
   border-left: none !important;
-  border-top: none !important;
   box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.05);
   transition: all 0.3s ease;
 
   &:hover {
-    padding-left: 8px;
+    padding-left: 12px;
     background: rgba(255, 255, 255, 0.9) !important;
   }
 }

@@ -1,26 +1,43 @@
 <template>
-  <div class="launcher-grid q-pt-md">
-    <template v-for="tile in tiles" :key="tile.title">
-      <div
-        v-if="tile.visible"
-        v-ripple
-        class="launcher-item column items-center justify-center cursor-pointer relative-position overflow-hidden"
-        :class="`bg-${tile.color}-soft`"
-        @click="navigateTo(tile.route)"
-      >
-        <div class="tile-content column items-center">
-          <q-icon
-            :name="tile.icon"
-            :color="tile.color"
-            size="32px"
-            class="q-mb-xs"
-          />
-          <div class="text-subtitle2 text-weight-medium text-center text-dark title-text">
-            {{ tile.title }}
+  <div class="launcher-container q-pa-md">
+    <div class="staggered-list">
+      <template v-for="tile in tiles" :key="tile.title">
+        <div
+          v-if="tile.visible"
+          v-ripple
+          class="launcher-tile cursor-pointer relative-position"
+          :class="[
+            `theme-${tile.color}`,
+            tile.featured ? 'featured-tile' : ''
+          ]"
+          @click="navigateTo(tile.route)"
+        >
+          <div class="tile-inner row no-wrap items-center">
+            <div class="tile-icon-box flex flex-center">
+              <q-icon
+                :name="tile.icon"
+                size="32px"
+                class="main-icon"
+              />
+              <div class="icon-blob"></div>
+            </div>
+
+            <div class="tile-info q-ml-lg col">
+              <div class="row items-center justify-between">
+                <div>
+                  <div class="text-h6 text-weight-bold title-text">{{ tile.title }}</div>
+                  <div class="text-caption text-grey-7 description-text">{{ tile.description }}</div>
+                </div>
+                <q-icon name="chevron_right" size="xs" color="grey-5" class="arrow-icon" />
+              </div>
+            </div>
           </div>
+
+          <!-- Decorative element -->
+          <div class="decorative-circle"></div>
         </div>
-      </div>
-    </template>
+      </template>
+    </div>
   </div>
 </template>
 
@@ -35,81 +52,199 @@ const userStore = useUserStore();
 const tiles = computed(() => [
   {
     title: 'My League',
+    description: 'Pick, post and see standings',
     icon: 'ads_click',
     color: 'secondary',
     route: { name: 'my-league' },
     visible: !!userStore.user?.myCurrentLeagueId,
+    featured: true,
   },
   {
     title: 'Seasons',
+    description: 'Browse past and current seasons',
     icon: 'military_tech',
     color: 'blue',
     route: { name: 'mobile-seasons' },
     visible: true,
+    featured: false,
   },
   {
     title: 'Leaderboard',
+    description: 'Check who is currently on top',
     icon: 'stars',
     color: 'orange',
     route: { name: 'mobile-leaderboard' },
     visible: true,
+    featured: false,
   },
   {
     title: 'Live',
+    description: 'Get info about what is going on in the leagues',
     icon: 'bolt',
     color: 'deep-purple',
     route: { name: 'mobile-live' },
     visible: true,
+    featured: false,
   },
   {
     title: 'Chat',
+    description: 'Connect with other league members',
     icon: 'chat',
     color: 'accent',
     route: { name: 'mobile-chat' },
     visible: true,
+    featured: false,
   },
 ]);
 
-function navigateTo(route: any) {
-  router.push(route);
+function navigateTo(route: Record<string, unknown>) {
+  router.push(route as any);
 }
 </script>
 
 <style scoped lang="scss">
-.launcher-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 12px;
-  padding: 12px;
+.launcher-container {
+  max-width: 600px;
+  margin: 0 auto;
 }
 
-.launcher-item {
-  height: 110px;
-  border-radius: 16px;
-  transition: transform 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
-  border: none;
+.tracking-tighter {
+  letter-spacing: -1.5px;
+}
+
+.staggered-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.launcher-tile {
+  background: white;
+  border-radius: 28px;
+  padding: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+  border: 1px solid rgba(0, 0, 0, 0.04);
+  transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+  overflow: hidden;
+
+  &:hover {
+    transform: translateX(8px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
+    border-color: rgba(0, 0, 0, 0.08);
+
+    .arrow-icon {
+      transform: translateX(4px);
+      color: var(--theme-color) !important;
+    }
+
+    .icon-blob {
+      transform: scale(1.2) rotate(15deg);
+    }
+  }
 
   &:active {
-    transform: scale(0.96);
+    transform: scale(0.98) translateX(4px);
+  }
+}
+
+.tile-inner {
+  position: relative;
+  z-index: 2;
+}
+
+.tile-icon-box {
+  width: 64px;
+  height: 64px;
+  position: relative;
+
+  .main-icon {
+    color: var(--theme-color);
+    z-index: 2;
+  }
+
+  .icon-blob {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: var(--theme-bg);
+    border-radius: 22px;
+    z-index: 1;
+    transition: all 0.5s ease;
+  }
+}
+
+.title-text {
+  color: #1a1a1a;
+  letter-spacing: -0.5px;
+  margin-bottom: 2px;
+}
+
+.description-text {
+  font-size: 0.8rem;
+  line-height: 1.2;
+}
+
+.arrow-icon {
+  transition: all 0.3s ease;
+}
+
+.decorative-circle {
+  position: absolute;
+  top: -20px;
+  right: -20px;
+  width: 80px;
+  height: 80px;
+  background: var(--theme-bg);
+  border-radius: 50%;
+  opacity: 0.3;
+  z-index: 1;
+}
+
+/* Featured Tile Styles */
+.featured-tile {
+  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+  padding: 24px;
+  border: 2px solid var(--theme-bg);
+
+  .tile-icon-box {
+    width: 72px;
+    height: 72px;
   }
 
   .title-text {
-    font-size: 0.9rem;
-    letter-spacing: 0.01em;
-    opacity: 0.85;
+    font-size: 1.4rem;
   }
 }
 
-// Minimal background colors for a clean grid look
-.bg-secondary-soft { background: #effcfc; }
-.bg-blue-soft { background: #eff6ff; }
-.bg-orange-soft { background: #fff8f0; }
-.bg-deep-purple-soft { background: #f6f2ff; }
-.bg-accent-soft { background: #fdf2f8; }
+/* Theme color definitions */
+.theme-secondary {
+  --theme-color: #26c6da;
+  --theme-bg: #e0f7fa;
+}
+.theme-blue {
+  --theme-color: #2196f3;
+  --theme-bg: #e3f2fd;
+}
+.theme-orange {
+  --theme-color: #ff9800;
+  --theme-bg: #fff3e0;
+}
+.theme-deep-purple {
+  --theme-color: #673ab7;
+  --theme-bg: #ede7f6;
+}
+.theme-accent {
+  --theme-color: #5e35b1;
+  --theme-bg: #f3e5f5;
+}
 
 @media (min-width: 600px) {
-  .launcher-grid {
-    grid-template-columns: repeat(3, 1fr);
+  .staggered-list {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .featured-tile {
+    grid-column: span 2;
   }
 }
 </style>
