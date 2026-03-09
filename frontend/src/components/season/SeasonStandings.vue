@@ -38,11 +38,17 @@
       <div class="column q-gutter-y-xl">
         <div v-for="league in leagues" :key="league.id" class="league-wrapper">
           <div class="row items-center q-mb-md q-px-sm">
-            <div class="league-badge q-mr-md">
+            <div
+              class="league-badge q-mr-md"
+              :class="`bg-${getLeagueColor(league.level)} shadow-${getLeagueColor(league.level)}`"
+            >
               {{ league.level }}
             </div>
             <div class="column">
-              <div class="text-h6 text-weight-bold text-grey-9 line-height-1">
+              <div
+                class="text-h6 text-weight-bold line-height-1"
+                :class="`text-${getLeagueColor(league.level)}`"
+              >
                 League {{ league.level }}
               </div>
               <div class="text-caption text-grey-6 uppercase letter-spacing-1">
@@ -50,7 +56,7 @@
               </div>
             </div>
             <q-space />
-            <KennerButton flat round icon="info" color="grey-4" size="sm">
+            <KennerButton flat round icon="info" :color="getLeagueColor(league.level)" size="sm">
               <KennerTooltip>
                 {{ mode === 'results' ? 'Detailed match results' : 'Current standings' }} for League {{ league.level }}
               </KennerTooltip>
@@ -76,10 +82,12 @@ import { api } from 'boot/axios';
 import KennerButton from 'components/base/KennerButton.vue';
 import KennerTooltip from 'components/base/KennerTooltip.vue';
 import { useResponsive } from 'src/composables/responsive';
+import { useLeagueColors } from 'src/composables/useLeagueColors';
 
 import { useLeagueStore } from 'stores/leagueStore';
 
 const { isMobile } = useResponsive();
+const { getLeagueColor } = useLeagueColors();
 const route = useRoute();
 
 interface League {
@@ -161,18 +169,25 @@ watch(() => props.seasonId, (id) => {
 }
 
 .league-badge {
-  background: var(--q-primary);
   color: white;
-  width: 40px;
-  height: 40px;
-  border-radius: 12px;
+  width: 42px;
+  height: 42px;
+  border-radius: 14px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-weight: 800;
-  font-size: 1.2rem;
-  box-shadow: 0 2px 4px rgba(var(--q-primary), 0.3);
+  font-weight: 900;
+  font-size: 1.3rem;
+  transition: all 0.3s ease;
 }
+
+.shadow-amber-8 { box-shadow: 0 4px 12px rgba(255, 143, 0, 0.3); }
+.shadow-blue-grey-5 { box-shadow: 0 4px 12px rgba(96, 125, 139, 0.3); }
+.shadow-brown-6 { box-shadow: 0 4px 12px rgba(121, 85, 72, 0.3); }
+.shadow-red-6 { box-shadow: 0 4px 12px rgba(244, 67, 54, 0.3); }
+.shadow-deep-purple-6 { box-shadow: 0 4px 12px rgba(103, 58, 183, 0.3); }
+.shadow-indigo-6 { box-shadow: 0 4px 12px rgba(63, 81, 181, 0.3); }
+.shadow-grey-7 { box-shadow: 0 4px 12px rgba(158, 158, 158, 0.3); }
 
 .line-height-1 {
   line-height: 1;
