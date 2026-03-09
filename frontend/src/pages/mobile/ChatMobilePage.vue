@@ -1,8 +1,8 @@
 <template>
-  <q-page class="column col bg-white">
+    <q-page class="column col bg-white">
     <div class="q-pa-md row items-center justify-between no-wrap border-bottom-subtle bg-white">
-      <div class="text-h5 text-weight-bold"><span class="text-primary">Kenner</span><span class="text-accent">Chat</span></div>
-      <q-icon name="chat" color="primary" size="sm" />
+      <div class="text-h5 text-weight-bold"><span class="text-primary">Kenner</span><span class="text-negative">Chat</span></div>
+      <q-icon name="chat" color="negative" size="sm" />
     </div>
     <KennerChat class="col bg-white" />
   </q-page>
@@ -18,3 +18,4 @@ import KennerChat from 'components/chat/KennerChat.vue';
   border-bottom: 1px solid rgba(0, 0, 0, 0.05);
 }
 </style>
+

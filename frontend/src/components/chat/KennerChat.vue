@@ -413,7 +413,7 @@ onUnmounted(() => {
 
 .chat-footer {
   background: white;
-  border-top: 1px solid rgba(0, 0, 0, 0.04);
+  border-top: 1px solid rgba(0, 0, 0, 0.05);
 }
 
 .chat-scroll-area {

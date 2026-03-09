@@ -15,17 +15,11 @@
     </q-tooltip>
 
     <div class="champion-card-inner row no-wrap items-center">
-      <!-- Icon/Avatar Section -->
+      <!-- Icon Section -->
       <div class="champion-icon-wrapper flex flex-center">
         <div class="crown-overlay">
-          <q-icon name="workspace_premium" size="18px" color="amber-8" />
+          <q-icon name="workspace_premium" size="22px" color="amber-8" />
         </div>
-        <UserAvatar
-          :display-username="champion.username"
-          size="34px"
-          shape="squircle"
-          class="champion-avatar"
-        />
       </div>
 
       <!-- Text Content Section -->
@@ -64,7 +58,6 @@ import { useRouter } from 'vue-router';
 import { api } from 'boot/axios';
 import { fetchSeasons } from 'src/services/seasonService';
 import { useResponsive } from 'src/composables/responsive';
-import UserAvatar from 'components/ui/UserAvatar.vue';
 
 interface ChampionInfo {
   username: string;
@@ -124,7 +117,8 @@ onMounted(loadCurrentChampion);
   cursor: pointer;
   background: white;
   border-radius: 12px;
-  padding: 4px 10px 4px 6px;
+  padding: 4px 8px;
+  margin: 0 4px;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   overflow: hidden;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
@@ -135,16 +129,12 @@ onMounted(loadCurrentChampion);
     background: #fffdf5;
 
     .shine-effect {
-      left: 150%;
+      left: 100%;
       transition: left 0.8s ease-in-out;
     }
 
     .action-arrow {
       color: var(--q-primary) !important;
-    }
-
-    .champion-avatar {
-      // No scale change
     }
   }
 
@@ -153,7 +143,8 @@ onMounted(loadCurrentChampion);
   }
 
   &.is-mobile {
-    padding: 2px 8px 2px 4px;
+    padding: 2px 8px;
+    margin: 0 2px;
     border-radius: 20px;
     background: rgba(255, 193, 7, 0.05);
   }
@@ -166,27 +157,26 @@ onMounted(loadCurrentChampion);
 
 .champion-icon-wrapper {
   position: relative;
-  padding: 2px;
+  padding: 4px;
+  width: 38px;
+  height: 38px;
 }
 
 .crown-overlay {
   position: absolute;
-  top: -8px;
-  right: -6px;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
   z-index: 2;
   filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1));
   animation: crown-float 2s ease-in-out infinite;
 }
 
 @keyframes crown-float {
-  0%, 100% { transform: translateY(0) rotate(10deg); }
-  50% { transform: translateY(-2px) rotate(15deg); }
+  0%, 100% { transform: translate(-50%, -50%) scale(1) rotate(10deg); }
+  50% { transform: translate(-50%, -60%) scale(1.1) rotate(15deg); }
 }
 
-.champion-avatar {
-  transition: transform 0.3s ease;
-  background: white !important;
-}
 
 .champion-info-section {
   min-width: 0;
@@ -227,8 +217,8 @@ onMounted(loadCurrentChampion);
 .shine-effect {
   position: absolute;
   top: 0;
-  left: -150%;
-  width: 100%;
+  left: -200%;
+  width: 200%;
   height: 100%;
   background: linear-gradient(
     90deg,
