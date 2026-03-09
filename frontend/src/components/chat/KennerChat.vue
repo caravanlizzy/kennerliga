@@ -35,7 +35,7 @@
             class="chat-label-message"
             :class="[
                 m.label.includes('open for registration')
-                ? 'text-accent'
+                ? 'text-teal'
                 : 'text-warning'
             ]"
             />
@@ -109,7 +109,7 @@
             round
             dense
             icon="send"
-            color="accent"
+            color="teal"
             :loading="sending"
             @click="send"
           />
@@ -540,18 +540,18 @@ onUnmounted(() => {
   background: white !important;
   border-radius: 24px !important;
   padding: 4px 6px 4px 20px !important;
-  border: 1px solid rgba($accent, 0.2) !important;
+  border: 1px solid rgba(#009688, 0.2) !important;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03) !important;
   transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
 
   &:hover {
-    border-color: rgba($accent, 0.4) !important;
+    border-color: rgba(#009688, 0.4) !important;
     box-shadow: 0 3px 12px rgba(0, 0, 0, 0.04) !important;
   }
 
   &.q-field--focused {
-    border-color: $accent !important;
-    box-shadow: 0 4px 15px rgba($accent, 0.08) !important;
+    border-color: #009688 !important;
+    box-shadow: 0 4px 15px rgba(#009688, 0.08) !important;
   }
 
   :deep(.q-field__control) {

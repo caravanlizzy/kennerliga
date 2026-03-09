@@ -90,7 +90,7 @@ const tiles = computed(() => [
     title: 'Chat',
     description: 'Connect with other league members',
     icon: 'chat',
-    color: 'accent',
+    color: 'teal',
     route: { name: 'mobile-chat' },
     visible: true,
     featured: false,
@@ -233,9 +233,9 @@ function navigateTo(route: Record<string, unknown>) {
   --theme-color: #673ab7;
   --theme-bg: #ede7f6;
 }
-.theme-accent {
-  --theme-color: #5e35b1;
-  --theme-bg: #f3e5f5;
+.theme-teal {
+  --theme-color: #009688;
+  --theme-bg: #e0f2f1;
 }
 
 @media (min-width: 600px) {
