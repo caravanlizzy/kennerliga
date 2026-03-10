@@ -257,7 +257,7 @@ class UserRegistrationViewSet(ViewSet):
                 # Delete invite after success
                 invite.delete()
 
-            create_chat_announcement(f"New user registered: {username}")
+            create_chat_announcement(f"Welcome {username} to kennerliga")
             return Response({"detail": f"User {username} created successfully."}, status=201)
 
         except UserInviteLink.DoesNotExist:
