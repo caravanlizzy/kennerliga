@@ -35,8 +35,8 @@
             class="chat-label-message"
             :class="[
                 m.label.includes('open for registration')
-                ? 'text-teal'
-                : 'text-warning'
+                ? 'chat-label-special'
+                : 'chat-label-default'
             ]"
             />
             <q-chat-message
@@ -63,7 +63,7 @@
             flat
             round
             dense
-            color="primary"
+            color="teal"
             icon="expand_more"
             style="pointer-events: auto"
             @click="scrollToBottom(true, true)"
@@ -422,11 +422,24 @@ onUnmounted(() => {
 
 .chat-label-message {
   :deep(.q-message-label) {
-    font-size: 0.65rem;
-    font-weight: 600;
-    letter-spacing: 0.1em;
+    font-weight: 700;
+    font-size: 0.75rem;
+    letter-spacing: 0.05em;
     text-transform: uppercase;
-    margin: 24px 0 12px;
+    padding: 12px 0;
+    opacity: 0.8;
+  }
+
+  &.chat-label-default {
+    :deep(.q-message-label) {
+      color: $accent;
+    }
+  }
+
+  &.chat-label-special {
+    :deep(.q-message-label) {
+      color: $accent;
+    }
   }
 }
 
@@ -528,6 +541,9 @@ onUnmounted(() => {
     :deep(.q-message-text-content) {
       color: #263238 !important;
     }
+    :deep(.q-message-name) {
+      color: $chat !important;
+    }
     &.chat-message-grouped {
       :deep(.q-message-text) {
         border-top-left-radius: 18px !important;
@@ -540,18 +556,18 @@ onUnmounted(() => {
   background: white !important;
   border-radius: 24px !important;
   padding: 4px 6px 4px 20px !important;
-  border: 1px solid rgba(#009688, 0.2) !important;
+  border: 1px solid rgba($chat, 0.2) !important;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03) !important;
   transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
 
   &:hover {
-    border-color: rgba(#009688, 0.4) !important;
+    border-color: rgba($chat, 0.4) !important;
     box-shadow: 0 3px 12px rgba(0, 0, 0, 0.04) !important;
   }
 
   &.q-field--focused {
-    border-color: #009688 !important;
-    box-shadow: 0 4px 15px rgba(#009688, 0.08) !important;
+    border-color: $chat !important;
+    box-shadow: 0 4px 15px rgba($chat, 0.08) !important;
   }
 
   :deep(.q-field__control) {

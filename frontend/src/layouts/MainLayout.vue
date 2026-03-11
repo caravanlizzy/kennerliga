@@ -27,7 +27,7 @@
           <div class="row items-center">
             <q-icon name="chat" color="teal" size="sm" class="q-mr-sm" />
           </div>
-          <q-btn flat round dense icon="chevron_left" size="sm" color="primary" @click="toggleChat">
+          <q-btn flat round dense icon="chevron_left" size="sm" color="teal" @click="toggleChat">
             <q-tooltip>Hide Chat</q-tooltip>
           </q-btn>
         </div>
@@ -44,7 +44,7 @@
         v-if="!chatDrawerOpen && !isMobile"
         flat
         dense
-        color="primary"
+        color="teal"
         class="chat-mini-toggle"
         @click="toggleChat"
       >
