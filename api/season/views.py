@@ -474,16 +474,38 @@ class LiveEventViewSet(ViewSet):
                 # The timestamp should be the time of the LAST result.
                 last_result_time = max(r.created_at for r in res_list)
 
-                # Prepare full results list with positions and points
+                # Prepare full results list. Use finalized MatchResults (Result.position) as the base.
+                # Keep a stable secondary order by player name only for display purposes.
                 full_results = sorted(
                     res_list,
                     key=lambda r: (
                         r.position is None,
-                        r.position if r.position is not None else -((r.points if r.points is not None else -10**9))
+                        r.position if r.position is not None else 10**9,
+                        (r.player_profile.profile_name or "")
                     )
                 )
-                # Winner is the first item in the fully sorted results (robust when points or position are missing)
-                winner = full_results[0]
+
+                # Determine winners respecting ties: all players with the best (lowest) position.
+                # This leverages MatchResult finalization which already applied tie-breakers; remaining equal
+                # positions represent a genuine tie.
+                min_pos = None
+                winners = []
+                for r in full_results:
+                    if r.position is None:
+                        continue
+                    if min_pos is None:
+                        min_pos = r.position
+                    if r.position == min_pos:
+                        winners.append(r)
+                    else:
+                        break
+
+                # Backward compatibility: expose both 'winners' (array) and a legacy 'winner' string.
+                # 'winner' will now reflect all winners joined by comma to avoid implying a single victor.
+                primary_winner = winners[0] if winners else (full_results[0] if full_results else None)
+                winners_names = [w.player_profile.profile_name for w in winners] if winners else (
+                    ([] if primary_winner is None else [primary_winner.player_profile.profile_name])
+                )
                 results_payload = [
                     {
                         'playerName': r.player_profile.profile_name,
@@ -501,8 +523,9 @@ class LiveEventViewSet(ViewSet):
                     'leagueId': league_id,
                     'data': {
                         'gameName': res_list[0].selected_game.game.name,
-                        'winner': winner.player_profile.profile_name,
-                        'points': winner.points,
+                        'winner': ", ".join(winners_names) if winners_names else None,
+                        'winners': winners_names,
+                        'points': primary_winner.points if primary_winner else None,
                         'results': results_payload,
                     }
                 })
