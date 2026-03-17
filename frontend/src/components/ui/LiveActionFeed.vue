@@ -44,26 +44,19 @@
       <div
         v-for="event in filteredEvents"
         :key="event.id"
-        class="event-item q-mb-sm"
+        class="event-item q-mb-md"
       >
-        <q-card flat class="event-card">
-          <q-card-section class="q-pa-sm">
+        <q-card
+          flat
+          bordered
+          class="event-card"
+        >
+          <div
+            class="event-accent"
+            :style="{ backgroundColor: getColorHex(event.type) }"
+          ></div>
+          <q-card-section class="q-pa-sm q-pl-md">
             <div class="row items-center no-wrap">
-              <div class="col-auto q-mr-sm">
-                <div
-                  class="icon-wrapper flex flex-center"
-                  :style="{
-                    backgroundColor: getColorHex(event.type) + '15',
-                    border: `1px solid ${getColorHex(event.type)}30`,
-                  }"
-                >
-                  <q-icon
-                    :name="getIcon(event.type)"
-                    :color="getColor(event.type)"
-                    size="xs"
-                  />
-                </div>
-              </div>
               <div class="col">
                 <div
                   class="text-caption text-grey-7 flex justify-between items-center"
@@ -99,15 +92,22 @@
                   <span v-else-if="event.type === 'GAME_FINISHED'">
                     <strong>{{ event.data.winner }}</strong> wins
                     <strong>{{ event.data.gameName }}</strong>
-                    <span v-if="event.data.points"> ({{event.data.points}} VP)</span>
-                    <div v-if="event.data.results" class="q-mt-xs">
-                      <div class="row q-gutter-x-xs text-caption text-grey-8" style="font-size: 0.75rem;">
-                        <span v-for="(res, idx) in event.data.results" :key="idx" class="position-item">
-                          <span v-if="idx > 0" class="q-mr-xs">•</span>
-                          <span class="text-weight-bold">{{ res.position || idx + 1 }}.</span>
-                          {{ res.playerName }}
-                        </span>
-                      </div>
+                    <div v-if="event.data.results" class="q-mt-sm results-container">
+                      <table class="results-table full-width">
+                        <tbody>
+                          <tr v-for="(res, idx) in event.data.results" :key="idx">
+                            <td class="text-weight-bold text-grey-7 q-pr-sm" style="width: 20px;">
+                              {{ res.position || idx + 1 }}.
+                            </td>
+                            <td class="playerName text-weight-medium">
+                              {{ res.playerName }}
+                            </td>
+                            <td class="text-right text-grey-6 text-caption italic" v-if="res.points">
+                              {{ res.points }} VP
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
                     </div>
                   </span>
                   <span v-else-if="event.type === 'LEAGUE_FINISHED'">
@@ -187,40 +187,6 @@ async function fetchEvents() {
   }
 }
 
-function getIcon(type: TLiveEventType) {
-  switch (type) {
-    case 'PICK':
-      return 'add_circle';
-    case 'BAN':
-      return 'block';
-    case 'GAME_FINISHED':
-      return 'check_circle';
-    case 'LEAGUE_FINISHED':
-      return 'emoji_events';
-    case 'SEASON_FINISHED':
-      return 'celebration';
-    default:
-      return 'info';
-  }
-}
-
-function getColor(type: TLiveEventType) {
-  switch (type) {
-    case 'PICK':
-      return 'primary';
-    case 'BAN':
-      return 'negative';
-    case 'GAME_FINISHED':
-      return 'positive';
-    case 'LEAGUE_FINISHED':
-      return 'warning';
-    case 'SEASON_FINISHED':
-      return 'accent';
-    default:
-      return 'grey';
-  }
-}
-
 function formatTime(timestamp: string) {
   const date = new Date(timestamp);
   const now = new Date();
@@ -288,21 +254,58 @@ function getColorHex(type: TLiveEventType) {
 }
 
 .event-card {
-  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-  background: rgba(255, 255, 255, 0.5);
-  backdrop-filter: blur(4px);
-  border-radius: 8px;
+  position: relative;
+  transition: all 0.2s ease-in-out;
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid rgba(0, 0, 0, 0.06);
 }
 
-.icon-wrapper {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
+.event-accent {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 4px;
 }
+
+.event-card:hover {
+  border-color: rgba(0, 0, 0, 0.15);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
 .event-content {
   font-size: 0.9rem;
   line-height: 1.4;
   color: #2c3e50;
+}
+.results-container {
+  padding-left: 8px;
+  margin-left: 4px;
+  background: rgba(75, 178, 106, 0.03);
+  border-radius: 0 4px 4px 0;
+}
+.results-table {
+  border-collapse: collapse;
+  font-size: 0.8rem;
+  margin-top: 4px;
+}
+.results-table tr {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+.results-table tr:last-child {
+  border-bottom: none;
+}
+.results-table td {
+  padding: 4px 0;
+  vertical-align: middle;
+}
+.results-table .playerName {
+  max-width: 140px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 .position-item {
   display: flex;
