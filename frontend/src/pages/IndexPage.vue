@@ -66,7 +66,7 @@
                 icon="stars"
                 title="Leaderboard"
                 class="col-12 q-mt-xl"
-                color="warning"
+                color="secondary"
               >
                 <template #header-extra>
                   <div style="min-width: 120px" class="q-ml-md">
