@@ -27,8 +27,19 @@ export function useLeagueColors() {
     return 'grey-2';
   };
 
+  const getHexLeagueColor = (league: number): string => {
+    if (league <= 1) return '#ffb300'; // amber-8
+    if (league === 2) return '#607d8b'; // blue-grey-5
+    if (league === 3) return '#6d4c41'; // brown-6
+    if (league === 4) return '#e53935'; // red-6
+    if (league <= 6) return '#5e35b1'; // deep-purple-6
+    if (league <= 10) return '#3949ab'; // indigo-6
+    return '#616161'; // grey-7
+  };
+
   return {
     getLeagueColor,
-    getLeagueBgColor
+    getLeagueBgColor,
+    getHexLeagueColor
   };
 }

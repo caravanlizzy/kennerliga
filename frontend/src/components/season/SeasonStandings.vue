@@ -40,7 +40,7 @@
           <div class="row items-center q-mb-md q-px-sm">
             <div
               class="league-badge q-mr-md"
-              :class="`bg-${getLeagueColor(league.level)} shadow-${getLeagueColor(league.level)}`"
+              :class="`bg-${getLeagueColor(league.level)}`"
             >
               {{ league.level }}
             </div>

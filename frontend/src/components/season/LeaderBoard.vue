@@ -69,7 +69,7 @@
 
         <template v-else>
           <template v-for="level in standings.levels" :key="level">
-            <th class="text-center level-group-header" :style="{ borderLeft: '1px solid rgba(0,0,0,0.05)' }">
+            <th class="text-center level-group-header" :style="{ borderLeft: '1.5px solid rgba(54, 64, 88, 0.12)' }">
               <div class="column items-center">
                 <span class="text-caption text-weight-bolder text-primary q-mb-xs">L{{ level }}</span>
                 <div class="row justify-center items-center no-wrap">
@@ -93,11 +93,20 @@
         v-for="(row, index) in standings.standings"
         :key="row.player_profile_id"
       >
+        <!-- League level separator (e.g. L1 to L2) -->
+        <tr v-if="index > 0 && bestLeague(row) !== bestLeague(standings.standings[index-1])" class="league-separator-row">
+          <td :colspan="showAllLeagues ? 2 + standings.levels.length : 6" class="q-pa-none">
+            <div class="league-separator-divider"></div>
+          </td>
+        </tr>
+
         <tr
           class="leaderboard-row"
           :class="{
-            'top-rank-bg': index === 0,
-            ['bg-' + getLeagueBgColor(bestLeague(row) || 0)]: !!bestLeague(row)
+            'top-rank-bg': index === 0
+          }"
+          :style="{
+            backgroundColor: !!bestLeague(row) ? `${getHexLeagueColor(bestLeague(row)!)}0D` : undefined
           }"
         >
           <!-- Rank -->
@@ -138,7 +147,7 @@
 
           <template v-if="!showAllLeagues">
             <!-- 1st -->
-            <td class="text-center">
+            <td class="text-center border-left-subtle-2">
                 <span
                   v-if="getHighestLeagueCounts(row).first > 0"
                   class="text-weight-bold text-grey-9"
@@ -184,7 +193,7 @@
 
           <template v-else>
             <template v-for="level in standings.levels" :key="level">
-              <td class="text-center q-px-sm" :style="{ borderLeft: '1px solid rgba(0,0,0,0.03)' }">
+              <td class="text-center q-px-sm" :style="{ borderLeft: '1.5px solid rgba(54, 64, 88, 0.08)' }">
                 <div class="row justify-center items-center no-wrap">
                   <div class="column items-center pos-num">
                     <span :class="row.per_level[level]?.first ? 'text-weight-bold text-grey-9' : 'text-grey-4'" style="font-size: 11px">
@@ -247,7 +256,7 @@ import UserAvatar from 'components/ui/UserAvatar.vue';
 import { useLeagueColors } from 'src/composables/useLeagueColors';
 
 const props = defineProps<{ year: number }>();
-const { getLeagueColor, getLeagueBgColor } = useLeagueColors();
+const { getLeagueColor, getLeagueBgColor, getHexLeagueColor } = useLeagueColors();
 
 interface PerLevelCounts {
   first: number;
@@ -351,14 +360,14 @@ watch(
 
 .header-row {
   background: rgba(248, 249, 250, 0.5);
-  border-bottom: 1px solid rgba(54, 64, 88, 0.05);
-  height: 64px;
+  border-bottom: 1.5px solid rgba(54, 64, 88, 0.12);
+  height: 48px;
 }
 
 .leaderboard-row {
   position: relative;
   transition: all 0.2s ease;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.03);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
 
   &:hover {
     background-color: rgba(255, 255, 255, 0.6) !important;
@@ -368,7 +377,8 @@ watch(
 }
 
 .top-rank-bg {
-  background-color: rgba(255, 249, 230, 0.4);
+  /* Using a very subtle amber overlay for the first rank, compatible with league backgrounds */
+  background-image: linear-gradient(rgba(255, 215, 0, 0.05), rgba(255, 215, 0, 0.05)) !important;
 }
 
 .league-indicator {
@@ -379,11 +389,11 @@ watch(
 }
 
 .border-top-subtle {
-  border-top: 1px solid rgba(54, 64, 88, 0.05);
+  border-top: 1px solid rgba(54, 64, 88, 0.1);
 }
 
 .border-bottom-subtle {
-  border-bottom: 1px solid rgba(54, 64, 88, 0.05);
+  border-bottom: 1px solid rgba(54, 64, 88, 0.1);
 }
 
 .border-primary-1 {
@@ -402,10 +412,20 @@ watch(
 }
 
 .border-left-subtle-2 {
-  border-left: 1px solid rgba(0, 0, 0, 0.03) !important;
+  border-left: 1px solid rgba(0, 0, 0, 0.08) !important;
 }
 
 .divide-y tr:last-child {
   border-bottom: none;
+}
+
+.league-separator-row {
+  background: rgba(255, 255, 255, 0.4);
+}
+
+.league-separator-divider {
+  height: 2px;
+  background-image: linear-gradient(to right, transparent 0%, rgba(54, 64, 88, 0.08) 50%, transparent 100%);
+  margin: 1px 0;
 }
 </style>
