@@ -63,7 +63,12 @@
             </KennerButton>
           </div>
           <div class="results-container">
-            <LeagueMatchResults v-if="mode === 'results'" :leagueId="league.id" />
+            <LeagueMatchResults
+              v-if="mode === 'results'"
+              :leagueId="league.id"
+              :show-standings="isOverviewPage"
+            />
+            <LeagueStandings v-else-if="mode === 'standings-simple'" :leagueId="league.id" />
             <LeagueStandingsMatrix v-else :leagueId="league.id" :prefetchedData="allStandingsData[league.id]" />
           </div>
         </div>
@@ -76,6 +81,7 @@
 import { ref, watch, computed } from 'vue';
 import { useRoute } from 'vue-router';
 import LeagueMatchResults from 'components/league/LeagueMatchResults.vue';
+import LeagueStandings from 'components/league/LeagueStandings.vue';
 import LeagueStandingsMatrix from 'components/league/LeagueStandingsMatrix.vue';
 import LoadingSpinner from 'components/base/LoadingSpinner.vue';
 import { api } from 'boot/axios';
@@ -98,7 +104,7 @@ interface League {
 
 const props = withDefaults(defineProps<{
   seasonId?: number | null;
-  mode?: 'standings' | 'results';
+  mode?: 'standings' | 'results' | 'standings-simple';
 }>(), {
   mode: 'standings'
 });
@@ -129,7 +135,7 @@ async function loadLeaguesForSeason(seasonId: number) {
           standingsMap[r.id] = r.data;
         });
         allStandingsData.value = standingsMap;
-      } else {
+      } else if (props.mode === 'results') {
         // In results mode, initialize all league stores in parallel
         const storePromises = leaguesData.map(l => {
           const store = useLeagueStore(l.id)();

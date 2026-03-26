@@ -96,7 +96,7 @@
         </div>
       </div>
 
-      <!-- Leagues Grid -->
+      <!-- Match Results Grid (with standings integrated) -->
       <div class="q-mt-xl">
         <SeasonStandings :season-id="seasonId" mode="results" />
       </div>
