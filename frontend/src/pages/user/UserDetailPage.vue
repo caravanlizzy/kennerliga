@@ -54,19 +54,34 @@
 
     <div v-else-if="user" class="q-px-md q-py-lg max-width-container mx-auto">
       <div class="row q-col-gutter-lg">
-        <!-- Sidebar: Standings Distribution -->
+        <!-- Sidebar: Game Performance -->
         <div class="col-12 col-md-4">
           <q-card flat bordered class="rounded-borders sticky-top overflow-hidden">
             <q-card-section class="bg-grey-2 text-weight-bold text-uppercase letter-spacing-1 text-grey-8">
-              Standings Distribution
+              Game Performance
             </q-card-section>
             <q-card-section class="q-pa-md">
+              <div class="row q-col-gutter-sm q-mb-lg">
+                <div class="col-6">
+                  <div class="column items-center q-pa-sm bg-grey-1 rounded-borders border-grey-2 bordered">
+                    <div class="text-h5 text-weight-bolder text-positive">{{ (overallStats.wins / (overallStats.total_games || 1) * 100).toFixed(0) }}%</div>
+                    <div class="text-caption text-grey-6 uppercase text-weight-bold" style="font-size: 0.6rem">Win Rate</div>
+                  </div>
+                </div>
+                <div class="col-6">
+                  <div class="column items-center q-pa-sm bg-grey-1 rounded-borders border-grey-2 bordered">
+                    <div class="text-h5 text-weight-bolder text-primary">#{{ (overallStats.avg_pos || 0).toFixed(1) }}</div>
+                    <div class="text-caption text-grey-6 uppercase text-weight-bold" style="font-size: 0.6rem">Avg Pos</div>
+                  </div>
+                </div>
+              </div>
+
               <div class="column q-gutter-y-md">
                 <div v-for="pos in [1, 2, 3, 4]" :key="pos" class="distribution-row row items-center q-col-gutter-sm">
                   <div class="col-2 text-weight-bold text-grey-7">{{ pos }}{{ getOrdinal(pos) }}</div>
                   <div class="col">
                     <q-linear-progress
-                      :value="(leagueStats.distribution[pos]?.percentage || 0) / 100"
+                      :value="(overallStats.positions[pos] || 0) / (overallStats.total_games || 1)"
                       size="12px"
                       :color="getPosColor(pos)"
                       track-color="grey-3"
@@ -75,9 +90,9 @@
                   </div>
                   <div class="col-3 text-right">
                     <div class="text-weight-bolder" :class="getPosColorClass(pos)">
-                      {{ (leagueStats.distribution[pos]?.percentage || 0).toFixed(0) }}%
+                      {{ ((overallStats.positions[pos] || 0) / (overallStats.total_games || 1) * 100).toFixed(0) }}%
                     </div>
-                    <div class="text-caption text-grey-5">{{ leagueStats.distribution[pos]?.count || 0 }}x</div>
+                    <div class="text-caption text-grey-5">{{ overallStats.positions[pos] || 0 }}x</div>
                   </div>
                 </div>
               </div>
@@ -252,7 +267,13 @@ const gameSearch = ref('');
 
 const leagueStats = ref({
   totalLeagues: 0,
-  distribution: {} as Record<number, { count: number; percentage: number }>
+});
+const overallStats = ref({
+  total_games: 0,
+  wins: 0,
+  podiums: 0,
+  avg_pos: 0,
+  positions: {} as Record<number, number>
 });
 const gameStats = ref<any[]>([]);
 const topGames = ref<any[]>([]);
@@ -267,7 +288,7 @@ async function load() {
       params: { username }
     });
 
-    let foundUser: TUserDto | null = null;
+    let foundUser: TUserDto | null;
     const users = Array.isArray(usersResponse) ? usersResponse : usersResponse.results || [];
     foundUser = users.find((u: TUserDto) => u.username.toLowerCase() === username.toLowerCase()) || null;
 
@@ -283,6 +304,7 @@ async function load() {
 
         const participants: TSeasonParticipantDto[] = Array.isArray(seasonsRes.data) ? seasonsRes.data : seasonsRes.data.results || [];
         leagueStats.value = statsRes.data.league_stats;
+        overallStats.value = statsRes.data.overall_stats;
         gameStats.value = statsRes.data.game_stats;
         topGames.value = statsRes.data.top_games || [];
 
@@ -404,9 +426,14 @@ onMounted(load);
 .letter-spacing-1 { letter-spacing: 1px; }
 
 .distribution-row {
+  transition: background 0.2s ease;
   &:hover {
     background: rgba(0,0,0,0.02);
   }
+}
+
+.bordered {
+  border: 1px solid rgba(0,0,0,0.05);
 }
 
 .top-game-card {

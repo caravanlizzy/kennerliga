@@ -92,37 +92,32 @@ class UserViewSet(ModelViewSet):
         user = self.get_object()
         profile = user.profile
 
-        # 1. League Statistics
-        standings = LeagueStanding.objects.filter(player_profile=profile).select_related('league')
-        total_leagues = standings.count()
-        distribution = {}
-        
-        # Initialize distribution
-        for pos in [1, 2, 3, 4]:
-            distribution[pos] = {"count": 0, "percentage": 0}
-
-        for s in standings:
-            # Calculate rank in this specific league using the same logic as in season services/views
-            # Higher league_points, then higher wins, then lower id (as tie-breaker)
-            better_count = LeagueStanding.objects.filter(
-                league=s.league
-            ).filter(
-                Q(league_points__gt=s.league_points) | 
-                Q(league_points=s.league_points, wins__gt=s.wins) |
-                Q(league_points=s.league_points, wins=s.wins, id__lt=s.id)
-            ).count()
-            rank = better_count + 1
-            
-            if rank in distribution:
-                distribution[rank]["count"] += 1
-        
-        # Calculate percentages
-        for pos in [1, 2, 3, 4]:
-            count = distribution[pos]["count"]
-            distribution[pos]["percentage"] = (count / total_leagues * 100) if total_leagues > 0 else 0
-
-        # 2. Game Statistics
+        # 1. Game Statistics (Aggregated)
         results = Result.objects.filter(player_profile=profile).select_related('selected_game__game')
+        
+        # Aggregated game metrics (overall)
+        overall_stats = {
+            "total_games": results.count(),
+            "wins": 0,
+            "podiums": 0, # 1, 2, 3
+            "avg_pos": 0,
+            "positions": {} # Distribution of positions across all games
+        }
+        
+        pos_sum = 0
+        for r in results:
+            if r.position is not None:
+                pos_sum += r.position
+                overall_stats["positions"][r.position] = overall_stats["positions"].get(r.position, 0) + 1
+                if r.position == 1:
+                    overall_stats["wins"] += 1
+                if r.position <= 3:
+                    overall_stats["podiums"] += 1
+        
+        if overall_stats["total_games"] > 0:
+            overall_stats["avg_pos"] = pos_sum / overall_stats["total_games"]
+            
+        # Per-game statistics
         stats_map = {}
         for r in results:
             game_name = r.selected_game.game.name if r.selected_game and r.selected_game.game else f"Game {r.selected_game_id}"
@@ -148,6 +143,11 @@ class UserViewSet(ModelViewSet):
         # Sort by count descending for the default list
         game_stats.sort(key=lambda x: x["count"], reverse=True)
 
+        # 2. League Statistics (Minimal, as requested to be less prominent)
+        standings = LeagueStanding.objects.filter(player_profile=profile).select_related('league')
+        total_leagues = standings.count()
+        # (Distribution logic removed as it's considered "useless" by the user)
+
         # Derive Top 3 games by highest win rate (then by more plays, then by better avg position)
         top_games = sorted(
             game_stats,
@@ -160,9 +160,9 @@ class UserViewSet(ModelViewSet):
         )[:3]
 
         return Response({
+            "overall_stats": overall_stats,
             "league_stats": {
                 "totalLeagues": total_leagues,
-                "distribution": distribution
             },
             "game_stats": game_stats,
             "top_games": top_games,
