@@ -11,6 +11,31 @@
     </div>
 
     <div v-else class="row q-col-gutter-md">
+      <!-- Standings card -->
+      <div v-if="showStandings" class="col-12 col-md-6 col-lg-4">
+        <q-card flat bordered class="match-game-card full-height">
+          <q-card-section class="q-pb-none">
+            <div class="row items-center no-wrap">
+              <div class="game-icon-box q-mr-sm">
+                <q-icon name="leaderboard" color="primary" size="24px" />
+              </div>
+              <div class="column">
+                <div class="text-subtitle1 text-weight-bolder text-dark line-height-1 ellipsis">
+                  League Standings
+                </div>
+                <div class="text-caption text-grey-6 text-uppercase letter-spacing-1">
+                  Current overview
+                </div>
+              </div>
+            </div>
+          </q-card-section>
+
+          <q-card-section class="q-pt-sm">
+            <LeagueStandings :league-id="leagueId" />
+          </q-card-section>
+        </q-card>
+      </div>
+
       <div
         v-for="game in selectedGamesWithResults"
         :key="game.id"
@@ -39,31 +64,6 @@
                :display-game-name="false"
                :match-results="matchResultsBySelectedGame"
              />
-          </q-card-section>
-        </q-card>
-      </div>
-
-      <!-- Standings card -->
-      <div v-if="showStandings" class="col-12 col-md-6 col-lg-4">
-        <q-card flat bordered class="match-game-card full-height">
-          <q-card-section class="q-pb-none">
-            <div class="row items-center no-wrap">
-              <div class="game-icon-box q-mr-sm">
-                <q-icon name="leaderboard" color="primary" size="24px" />
-              </div>
-              <div class="column">
-                <div class="text-subtitle1 text-weight-bolder text-dark line-height-1 ellipsis">
-                  League Standings
-                </div>
-                <div class="text-caption text-grey-6 text-uppercase letter-spacing-1">
-                  Current overview
-                </div>
-              </div>
-            </div>
-          </q-card-section>
-
-          <q-card-section class="q-pt-sm">
-            <LeagueStandings :league-id="leagueId" />
           </q-card-section>
         </q-card>
       </div>

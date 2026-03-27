@@ -52,7 +52,7 @@
                 League {{ league.level }}
               </div>
               <div class="text-caption text-grey-6 uppercase letter-spacing-1">
-                {{ mode === 'results' ? 'Match Results' : 'Division Standings' }}
+                {{ mode === 'results' ? 'Division Overview' : 'Division Standings' }}
               </div>
             </div>
             <q-space />

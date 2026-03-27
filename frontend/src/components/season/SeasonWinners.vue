@@ -15,31 +15,29 @@
       No winners recorded yet.
     </div>
 
-    <template v-else>
-      <!-- Season Winner (Level 1 Winner) -->
-      <div v-if="seasonWinner" class="season-winner-crown text-center q-mb-lg">
-        <div class="relative-position display-inline-block">
-          <q-icon name="workspace_premium" color="amber-8" size="64px" class="crown-icon" />
-          <q-badge color="amber-1" text-color="amber-9" floating class="text-weight-bold" style="top: 10px; right: -5px">
-            Winner
-          </q-badge>
-        </div>
-        <div class="text-h4 text-weight-bolder text-dark q-mt-sm">{{ seasonWinner.username }}</div>
-        <div class="text-subtitle1 text-grey-7 text-uppercase letter-spacing-1">Season Winner</div>
-      </div>
-
-      <q-separator class="q-my-md" />
-      <div class="text-overline text-grey-6 text-center">League Winners</div>
+    <template v-else-if="isAnyWinner">
+      <div class="text-overline text-grey-6 text-center q-mt-md">League Winners</div>
 
       <!-- Podium (top 3) -->
-      <div class="podium q-gutter-sm" aria-label="Podium">
+      <div class="podium q-gutter-sm q-mt-lg" aria-label="Podium">
         <div
           v-for="spot in podiumSpots"
           :key="spot.level"
           class="podium__spot"
-          :class="`podium__spot--${spot.class}`"
+          :class="[
+            `podium__spot--${spot.class}`,
+            { 'podium__spot--winner-animation': spot.level === 1 }
+          ]"
           :aria-label="`${spot.label} place`"
         >
+          <!-- Special Icon for Season Winner (Level 1) -->
+          <div v-if="spot.level === 1" class="relative-position q-mb-sm">
+            <q-icon name="workspace_premium" color="amber-8" size="48px" class="crown-icon" />
+            <q-badge color="amber-1" text-color="amber-9" floating class="text-weight-bold" style="top: 5px; right: -8px">
+              Winner
+            </q-badge>
+          </div>
+
           <div class="podium__name text-weight-bold text-capitalize">
             {{ spot.winner?.username || '-' }}
           </div>
@@ -116,20 +114,23 @@ onMounted(async () => {
     .filter((x) => x.username !== '');
 });
 
-const seasonWinner = computed(() => winners.value.find(w => w.level === 1));
-
 const podiumSpots = computed(() => {
   const levels = [2, 1, 3];
   const classes = ['second', 'first', 'third'];
   const labels = ['Second', 'First', 'Third'];
 
-  return levels.map((lvl, idx) => ({
-    level: lvl,
-    class: classes[idx],
-    label: labels[idx],
-    winner: winners.value.find(w => w.level === lvl)
-  }));
+  return levels.map((lvl, idx) => {
+    const winner = winners.value.find(w => w.level === lvl);
+    return {
+      level: lvl,
+      class: classes[idx],
+      label: labels[idx],
+      winner: winner
+    };
+  });
 });
+
+const isAnyWinner = computed(() => winners.value.length > 0);
 
 const restOfLeagues = computed(() => {
   return winners.value.filter(w => ![1, 2, 3].includes(w.level));
@@ -137,7 +138,7 @@ const restOfLeagues = computed(() => {
 </script>
 
 <style scoped>
-.season-winner-crown {
+.podium__spot--winner-animation {
   animation: fadeInDown 0.8s ease-out;
 }
 
