@@ -92,6 +92,7 @@ def get_full_standings_data(league: League) -> Dict:
             "username": member.profile.user.username if member.profile.user else None,
             "total_league_points": str(ls.league_points) if ls else "0",
             "total_wins": str(ls.wins) if ls else "0",
+            "unresolved_tie_group": ls.unresolved_tie_group if ls else None,
             "games": games_dict,
         })
 
@@ -162,17 +163,26 @@ def get_full_standings_data(league: League) -> Dict:
 
     # Merge: unresolved first, then add resolved groups that aren't currently unresolved
     tie_groups: List[Dict] = []
-    # Add unresolved groups (if a resolution also exists, keep unresolved flag true but attach resolution info)
+    
+    # 7. Check for each group if it has a resolution
+    resolutions_qs = LeagueTieResolution.objects.filter(league=league)
+    has_resolution = {res.group_key: True for res in resolutions_qs}
+    
+    # Add unresolved groups
     for key, group in unresolved_map.items():
+        merged = group.copy()
+        # If there is a resolution object, it's NOT unresolved anymore for the UI's "unresolved" badges
+        # but it keeps its asterisk and reason.
         if key in resolution_map:
-            merged = group.copy()
-            merged["unresolved"] = True
+            merged["unresolved"] = not resolution_map[key]["resolution"]["is_resolved"]
             merged["resolution"] = resolution_map[key]["resolution"]
             # prefer current unresolved membership ordering; do not override members
-            tie_groups.append(merged)
         else:
-            tie_groups.append(group)
-    # Add purely resolved groups (no longer unresolved in snapshot)
+            merged["unresolved"] = True
+            
+        tie_groups.append(merged)
+        
+    # Add purely resolved groups (no longer tied in snapshot points/wins - though this shouldn't happen with current snapshot logic)
     for key, group in resolution_map.items():
         if key not in unresolved_map:
             tie_groups.append(group)
