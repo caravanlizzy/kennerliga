@@ -377,12 +377,93 @@ class SeasonParticipantViewSet(ModelViewSet):
     serializer_class = SeasonParticipantSerializer
     filterset_fields = ["season", "profile", "profile__profile_name"]
 
+    def _previous_season_for(self, season: Season):
+        if not season:
+            return None
+        # Try exact previous month
+        prev_year = season.year
+        prev_month = season.month - 1
+        if prev_month == 0:
+            prev_month = 12
+            prev_year -= 1
+
+        prev = Season.objects.filter(year=prev_year, month=prev_month).first()
+        if prev:
+            return prev
+        # Fallback: any earlier season
+        return (
+            Season.objects
+            .filter((Q(year__lt=season.year)) | (Q(year=season.year) & Q(month__lt=season.month)))
+            .order_by('-year', '-month')
+            .first()
+        )
+
+    def _augment_with_prev_unregistered(self, season: Season, data_list: list):
+        """Append entries for profiles from the previous season who are not in the given season."""
+        if not season:
+            return data_list
+        prev = self._previous_season_for(season)
+        if not prev:
+            return data_list
+
+        # Current registered profiles
+        current_profiles = set(
+            SeasonParticipant.objects.filter(season=season).values_list('profile_id', flat=True)
+        )
+        # Previous season profiles
+        prev_profiles = list(
+            SeasonParticipant.objects.filter(season=prev).values_list('profile_id', flat=True)
+        )
+
+        missing_ids = [pid for pid in prev_profiles if pid not in current_profiles]
+        if not missing_ids:
+            return data_list
+
+        # Load profiles with related user for names
+        profiles = PlayerProfile.objects.select_related('user').filter(id__in=missing_ids)
+        # Prepare season details once
+        season_details = SeasonSerializer(season).data
+
+        for p in profiles:
+            data_list.append({
+                'id': None,
+                'season': season.id,
+                'profile': p.id,
+                'rank': None,
+                'username': getattr(getattr(p, 'user', None), 'username', None),
+                'profile_name': p.profile_name,
+                'season_details': season_details,
+                'selected_games': [],
+                'has_banned': False,
+                'is_active_player': False,
+                'is_prev_unregistered': True,
+                'my_banned_game': None,
+            })
+        return data_list
+
+    def list(self, request, *args, **kwargs):
+        # Use default list to get current registered entries, then augment if season provided
+        season_id = request.query_params.get('season')
+        response = super().list(request, *args, **kwargs)
+        if not season_id:
+            return response
+        try:
+            season = Season.objects.get(pk=season_id)
+        except Season.DoesNotExist:
+            return response
+
+        data = list(response.data)
+        data = self._augment_with_prev_unregistered(season, data)
+        return Response(data)
+
     @action(detail=False, methods=["get"], url_path="current")
     def current(self, request):
         """
         GET /season-participants/current/
 
-        Returns all participants of the current running or open season.
+        Returns all participants of the current running or open season, and also
+        includes players who participated in the previous season but have not yet
+        registered in the current one.
         If no such season exists, returns an empty list.
         """
         season = get_running_season()
@@ -390,12 +471,13 @@ class SeasonParticipantViewSet(ModelViewSet):
             season = get_open_season()
 
         if not season:
-            # frontend can just treat this as "no participants / no open season"
             return Response([], status=200)
 
         qs = self.get_queryset().filter(season=season)
         serializer = self.get_serializer(qs, many=True)
-        return Response(serializer.data)
+        data = list(serializer.data)
+        data = self._augment_with_prev_unregistered(season, data)
+        return Response(data)
 
 
 class LiveEventViewSet(ViewSet):

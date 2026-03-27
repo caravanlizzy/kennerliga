@@ -98,6 +98,9 @@ class SeasonParticipantSerializer(ModelSerializer):
     my_banned_game = SerializerMethodField()
     has_banned = BooleanField(read_only=True)
     is_active_player = SerializerMethodField()
+    # Extra marker to indicate entries coming from previous season and not yet registered
+    # Existing clients can ignore it; defaults to False for real participants
+    is_prev_unregistered = serializers.BooleanField(read_only=True, default=False)
 
     class Meta:
         model = SeasonParticipant
@@ -105,7 +108,7 @@ class SeasonParticipantSerializer(ModelSerializer):
             'id', 'season', 'profile', 'rank',  # write
             'username', 'profile_name', 'season_details',
             'selected_games',  # read
-            'has_banned', 'is_active_player',
+            'has_banned', 'is_active_player', 'is_prev_unregistered',
             'my_banned_game',
         ]
 
