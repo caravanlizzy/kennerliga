@@ -1,5 +1,5 @@
 <template>
-  <div class="row items-center no-wrap">
+  <div v-if="!isMobile" class="row items-center no-wrap">
     <KennerButton
       unelevated
       color="teal"
