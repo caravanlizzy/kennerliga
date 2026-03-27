@@ -246,6 +246,9 @@ def rebuild_league_snapshot(league: League, *, win_mode: str = "fractional"):
 
         # If there is a manual tie-break priority set for this player, do not
         # mark it as an unresolved tie group, even if points/wins indicate a tie.
+        # But WE SHOULD STILL keep it as a tie group if it was already resolved
+        # and has a resolution entry, or if others in the group are still tied.
+        # For now, let's stick to the existing logic but ensure it's cleared correctly.
         if obj is not None and getattr(obj, "tie_break_priority", 0) > 0:
             group_key = None
 
