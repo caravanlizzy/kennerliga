@@ -59,6 +59,37 @@
 
       <!-- Game Search & Stats Section -->
       <ContentSection title="Game Statistics" icon="videogame_asset" color="indigo-7">
+        <div v-if="topGames.length > 0" class="q-mb-lg">
+          <div class="text-subtitle2 q-mb-sm text-grey-8 uppercase letter-spacing-1">Top 3 Games (by Winrate)</div>
+          <div class="row q-col-gutter-md">
+            <div v-for="(game, idx) in topGames" :key="'top-'+game.name" class="col-12 col-sm-4">
+              <q-card flat bordered class="bg-indigo-1 border-indigo-2 relative-position">
+                <q-badge
+                  floating
+                  :color="idx === 0 ? 'amber-8' : (idx === 1 ? 'blue-grey-4' : 'orange-9')"
+                  class="text-weight-bold"
+                  style="top: -10px; right: -10px; padding: 4px 8px; border-radius: 4px;"
+                >
+                  #{{ idx + 1 }}
+                </q-badge>
+                <q-card-section class="q-pa-sm">
+                  <div class="text-subtitle2 text-weight-bold text-dark ellipsis">{{ game.name }}</div>
+                  <div class="row items-center justify-between q-mt-xs">
+                    <div class="column">
+                      <div class="text-caption text-grey-7" style="font-size: 0.7rem">WIN RATE</div>
+                      <div class="text-subtitle1 text-weight-bolder text-positive">{{ game.winRate.toFixed(0) }}%</div>
+                    </div>
+                    <div class="column items-end">
+                      <div class="text-caption text-grey-7" style="font-size: 0.7rem">AVG POS</div>
+                      <div class="text-subtitle1 text-weight-bolder text-primary">#{{ game.avgPos.toFixed(1) }}</div>
+                    </div>
+                  </div>
+                </q-card-section>
+              </q-card>
+            </div>
+          </div>
+        </div>
+
         <div class="q-mb-md">
           <q-input
             v-model="gameSearch"
@@ -185,6 +216,7 @@ const leagueStats = ref({
   distribution: {} as Record<number, { count: number; percentage: number }>
 });
 const gameStats = ref<any[]>([]);
+const topGames = ref<any[]>([]);
 
 async function load() {
   loading.value = true;
@@ -219,6 +251,7 @@ async function load() {
         // Map backend statistics
         leagueStats.value = statsRes.data.league_stats;
         gameStats.value = statsRes.data.game_stats;
+        topGames.value = statsRes.data.top_games || [];
 
         // 3. Fetch season details for each participant entry to get the season name
         const seasonIds = [...new Set(participants.map(p => p.season))];
@@ -299,5 +332,11 @@ onMounted(load);
 }
 .opacity-20 {
   opacity: 0.2;
+}
+.bg-indigo-1 {
+  background: #e8eaf6 !important;
+}
+.border-indigo-2 {
+  border: 1px solid #c5cae9 !important;
 }
 </style>
