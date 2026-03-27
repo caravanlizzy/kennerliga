@@ -23,7 +23,7 @@
                 id="seasons"
                 icon="military_tech"
                 title="Seasons"
-                class="col-12 q-mt-none"
+                class="col-12"
                 color="primary"
               >
                 <template #header-extra>
@@ -90,7 +90,7 @@
                 title="Live Action"
                 icon="bolt"
                 color="accent"
-                class="col-12 q-mt-none"
+                class="col-12"
               >
                 <LiveActionFeed />
               </ContentSection>

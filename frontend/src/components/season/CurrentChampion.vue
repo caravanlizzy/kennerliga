@@ -23,22 +23,10 @@
       </div>
 
       <!-- Text Content Section -->
-      <div class="champion-info-section column justify-center q-ml-sm" v-if="!isMobile">
-        <div class="label-row row no-wrap items-center">
-          <span class="champion-label">CURRENT CHAMPION</span>
-          <q-icon name="star" size="10px" color="amber-8" class="q-ml-xs" />
-        </div>
+      <div class="champion-info-section column justify-center q-ml-sm">
         <div class="name-row row no-wrap items-baseline">
           <span class="champion-name">{{ champion.username }}</span>
-          <span class="season-tag" v-if="champion.seasonName">
-            {{ champion.seasonName }}
-          </span>
         </div>
-      </div>
-
-      <!-- Mobile Minimal Text -->
-      <div class="mobile-info q-ml-xs" v-if="isMobile">
-        <span class="champion-name">{{ champion.username }}</span>
       </div>
 
       <!-- Action Icon (Desktop) -->
@@ -182,14 +170,6 @@ onMounted(loadCurrentChampion);
   min-width: 0;
 }
 
-.champion-label {
-  font-size: 0.65rem;
-  font-weight: 800;
-  color: #b08d00;
-  letter-spacing: 0.06em;
-  line-height: 1;
-}
-
 .champion-name {
   font-size: 0.95rem;
   font-weight: 800;
@@ -198,16 +178,6 @@ onMounted(loadCurrentChampion);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-}
-
-.season-tag {
-  font-size: 0.75rem;
-  color: #888;
-  font-weight: 500;
-  margin-left: 6px;
-  background: rgba(0, 0, 0, 0.04);
-  padding: 1px 6px;
-  border-radius: 4px;
 }
 
 .action-arrow {
@@ -228,12 +198,5 @@ onMounted(loadCurrentChampion);
   );
   transform: skewX(-20deg);
   z-index: 0;
-}
-
-.mobile-info {
-  .champion-name {
-    font-size: 0.85rem;
-    color: var(--q-primary);
-  }
 }
 </style>

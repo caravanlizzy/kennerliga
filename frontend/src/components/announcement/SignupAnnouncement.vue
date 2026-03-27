@@ -7,21 +7,25 @@
     <q-card-section
       :class="[
         isMobile ? 'q-py-md' : 'q-py-lg',
-        'relative-position row items-center no-wrap',
+        'relative-position row items-center no-wrap signup-content',
       ]"
     >
+      <!-- Background Ornament -->
+      <div class="signup-ornament absolute-right overflow-hidden">
+        <q-icon name="campaign" size="180px" color="accent" />
+      </div>
+
       <!-- Content Header (Icon + Text) -->
-      <div class="row items-center no-wrap col q-px-md">
+      <div class="row items-center no-wrap col q-px-md content-layer">
               <!-- Icon Circle -->
               <div
                 class="icon-wrapper flex flex-center q-mr-lg"
                 :class="[isMobile ? 'icon-wrapper--mobile' : '']"
-                style="background: transparent; box-shadow: none;"
               >
                 <q-icon
                   name="how_to_reg"
-                  :size="isMobile ? '28px' : '32px'"
-                  color="accent"
+                  :size="isMobile ? '32px' : '40px'"
+                  color="white"
                 />
               </div>
 
@@ -112,7 +116,7 @@
       </div>
 
       <!-- Actions (Desktop all) -->
-      <div class="row items-center q-gutter-sm absolute-top-right q-pa-md">
+      <div class="row items-center q-gutter-sm absolute-top-right q-pa-md content-layer">
         <template v-if="!isMobile">
           <KennerButton
             v-if="!isSignedUpForOpenSeason"
@@ -222,17 +226,28 @@ onMounted(async () => {
 <style scoped>
 .announcement-card {
   border-radius: 16px;
-  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-  background: rgba(255, 255, 255, 0.6);
-  backdrop-filter: blur(8px);
+  transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+  background: white;
   border: 1px solid rgba(0, 0, 0, 0.08);
-  border-left-width: 6px;
   width: 100%;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
 }
 
 .announcement-card--signup {
-  border-left-color: var(--q-accent) !important;
-  background: linear-gradient(to right, rgba($accent, 0.05), transparent);
+  border-top: 4px solid var(--q-accent);
+  background: linear-gradient(135deg, rgba($accent, 0.03) 0%, white 100%);
+  position: relative;
+}
+
+.signup-ornament {
+  opacity: 0.03;
+  pointer-events: none;
+  transform: rotate(-15deg) translateY(10%);
+  z-index: 0;
+}
+
+.content-layer {
+  z-index: 1;
 }
 
 .no-border-radius {
@@ -240,23 +255,30 @@ onMounted(async () => {
 }
 
 .announcement-card:hover:not(.no-border-radius) {
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-  background: rgba(255, 255, 255, 0.8);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
 }
 
 .icon-wrapper {
-  width: 48px;
-  height: 48px;
-  border-radius: 12px;
+  width: 64px;
+  height: 64px;
+  border-radius: 20px;
   flex-shrink: 0;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  background: var(--q-accent);
+  box-shadow: 0 8px 16px rgba($accent, 0.25);
+  animation: pulse-shadow 3s infinite;
+}
+
+@keyframes pulse-shadow {
+  0% { box-shadow: 0 8px 16px rgba($accent, 0.25); }
+  50% { box-shadow: 0 8px 24px rgba($accent, 0.4); }
+  100% { box-shadow: 0 8px 16px rgba($accent, 0.25); }
 }
 
 .icon-wrapper--mobile {
-  width: 40px;
-  height: 40px;
-  border-radius: 12px;
-  margin-right: 12px !important;
+  width: 52px;
+  height: 52px;
+  border-radius: 16px;
+  margin-right: 16px !important;
 }
 
 .lh-tight {

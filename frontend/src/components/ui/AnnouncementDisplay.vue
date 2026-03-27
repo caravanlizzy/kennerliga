@@ -104,38 +104,37 @@ const textColors = {
 
 <style scoped>
 .announcement-card {
-  border-radius: 12px;
-  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-  background: rgba(255, 255, 255, 0.5);
-  backdrop-filter: blur(4px);
-  border: 1px solid rgba(0, 0, 0, 0.05);
-  border-left-width: 4px;
+  border-radius: 16px;
+  transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+  background: white;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-top-width: 4px;
   width: 100%;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
 }
 
 .announcement-card--info {
-  border-left-color: var(--q-primary) !important;
+  border-top-color: var(--q-primary) !important;
 }
 
 .announcement-card--winner {
-  border-left-color: var(--q-warning) !important;
+  border-top-color: var(--q-warning) !important;
 }
 
 .announcement-card--register {
-  border-left-color: var(--q-accent) !important;
+  border-top-color: var(--q-accent) !important;
 }
 
 .announcement-card--warning {
-  border-left-color: var(--q-negative) !important;
+  border-top-color: var(--q-negative) !important;
 }
 
 .announcement-card--neutral {
-  border-left-color: #424242 !important; /* text-grey-9 */
+  border-top-color: #424242 !important; /* text-grey-9 */
 }
 
 .announcement-card:hover:not(.no-border-radius) {
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-  background: rgba(255, 255, 255, 0.8);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
 }
 
 .icon-wrapper {
@@ -143,7 +142,7 @@ const textColors = {
   height: 48px;
   border-radius: 12px;
   flex-shrink: 0;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  background: rgba(0, 0, 0, 0.03);
 }
 
 .icon-wrapper--mobile {
