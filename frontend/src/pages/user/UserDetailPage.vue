@@ -30,11 +30,6 @@
               <div class="text-h4 text-weight-bolder">{{ gameStats.length }}</div>
               <div class="text-caption text-uppercase letter-spacing-1 text-white-60">Games</div>
             </div>
-            <div class="separator-vertical" />
-            <div class="column items-center">
-              <div class="text-h4 text-weight-bolder">{{ userSeasonList.length }}</div>
-              <div class="text-caption text-uppercase letter-spacing-1 text-white-60">Seasons</div>
-            </div>
           </div>
         </div>
         <div class="absolute-top-right q-pa-md z-index-2">
