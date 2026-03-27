@@ -51,23 +51,27 @@
           bordered
           class="event-card"
         >
-          <div
-            class="event-accent"
-            :style="{ backgroundColor: getColorHex(event.type) }"
-          ></div>
-          <q-card-section class="q-pa-sm q-pl-md">
+          <q-card-section class="q-pa-sm">
             <div class="row items-center no-wrap">
               <div class="col">
                 <div
                   class="text-caption text-grey-7 flex justify-between items-center"
                 >
-                  <span class="row items-center">
+                  <span class="row items-center q-gutter-x-sm">
                     <q-badge
                       :color="getLeagueColor(Number(event.leagueLevel))"
-                      class="q-mr-xs text-weight-bold"
+                      class="text-weight-bold"
                       style="font-size: 0.65rem"
                     >
                       L{{ event.leagueLevel }}
+                    </q-badge>
+
+                    <q-badge
+                      :style="{ backgroundColor: getColorHex(event.type) }"
+                      class="text-weight-bold"
+                      style="font-size: 0.65rem"
+                    >
+                      {{ getEventDisplayType(event.type) }}
                     </q-badge>
                   </span>
                   <span style="font-size: 0.7rem; opacity: 0.8">{{
@@ -199,6 +203,23 @@ function formatTime(timestamp: string) {
   return date.toLocaleDateString([], { month: 'short', day: 'numeric' });
 }
 
+function getEventDisplayType(type: TLiveEventType) {
+  switch (type) {
+    case 'PICK':
+      return 'PICK';
+    case 'BAN':
+      return 'BAN';
+    case 'GAME_FINISHED':
+      return 'WIN';
+    case 'LEAGUE_FINISHED':
+      return 'LEAGUE';
+    case 'SEASON_FINISHED':
+      return 'SEASON';
+    default:
+      return type.replace('_', ' ');
+  }
+}
+
 onMounted(() => {
   fetchEvents();
   unsubscribe = updateStore.subscribe('/season/', fetchEvents);
@@ -260,14 +281,6 @@ function getColorHex(type: TLiveEventType) {
   border-radius: 12px;
   overflow: hidden;
   border: 1px solid rgba(0, 0, 0, 0.06);
-}
-
-.event-accent {
-  position: absolute;
-  left: 0;
-  top: 0;
-  bottom: 0;
-  width: 4px;
 }
 
 .event-card:hover {
