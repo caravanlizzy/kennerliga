@@ -34,86 +34,88 @@
           </q-avatar>
         </q-item-section>
 
-        <!-- Name + optional note + tie-breaker -->
+        <!-- Name + optional note + tie-breaker + Stats -->
         <q-item-section>
-          <q-item-label class="row items-center no-wrap">
-            <q-icon
-              v-if="result.position != null && result.position <= 3"
-              :name="rankIcon(result.position)"
-              :color="rankColor(result.position)"
-              size="18px"
-              class="q-mr-xs"
-            />
-            <span class="text-weight-medium ellipsis">
-              {{ result.profile_name }}
-            </span>
-          </q-item-label>
+          <div class="row items-center full-width content-container">
+            <div class="player-name-col">
+              <q-item-label class="row items-center no-wrap">
+                <q-icon
+                  v-if="result.position != null && result.position <= 3"
+                  :name="rankIcon(result.position)"
+                  :color="rankColor(result.position)"
+                  size="18px"
+                  class="q-mr-xs shrink-0"
+                />
+                <span class="text-weight-medium ellipsis">
+                  {{ result.profile_name }}
+                </span>
+              </q-item-label>
 
-          <q-item-label
-            v-if="result.notes || result.decisive_tie_breaker"
-            caption
-            class="text-grey-7"
-          >
-            <template v-if="result.notes">
-              <q-icon name="notes" size="14px" class="q-mr-xs" />
-              {{ result.notes }}
-            </template>
-            <span
-              v-if="result.notes && result.decisive_tie_breaker"
-              class="q-mx-xs"
-              >•</span
-            >
-            <template v-if="result.decisive_tie_breaker">
-              <q-icon name="equalizer" size="14px" class="q-mr-xs" />
-              <span class="text-weight-bold">TB:</span> {{ result.decisive_tie_breaker }} ({{
-                result.tie_breaker_value
-              }})
-            </template>
-          </q-item-label>
-        </q-item-section>
+              <q-item-label
+                v-if="result.notes || result.decisive_tie_breaker"
+                caption
+                class="text-grey-7 ellipsis"
+              >
+                <template v-if="result.notes">
+                  <q-icon name="notes" size="14px" class="q-mr-xs" />
+                  {{ result.notes }}
+                </template>
+                <span
+                  v-if="result.notes && result.decisive_tie_breaker"
+                  class="q-mx-xs"
+                  >•</span
+                >
+                <template v-if="result.decisive_tie_breaker">
+                  <q-icon name="equalizer" size="14px" class="q-mr-xs" />
+                  <span class="text-weight-bold">TB:</span> {{ result.decisive_tie_breaker }} ({{
+                    result.tie_breaker_value
+                  }})
+                </template>
+              </q-item-label>
+            </div>
 
-        <!-- Stats -->
-        <q-item-section side class="stats-col">
-          <div class="row items-center justify-end q-gutter-xs">
-            <q-badge
-              v-if="result.points != null && selectedGame.has_points !== false"
-              :color="result.position === 1 ? 'amber-7' : 'grey-6'"
-              class="stat-badge"
-            >
-              <q-icon name="star" size="14px" class="q-mr-xs" />
-              {{ result.points }}
-            </q-badge>
+            <!-- Stats -->
+            <div class="stats-col-new row items-center justify-end q-gutter-xs">
+              <q-badge
+                v-if="result.points != null && selectedGame.has_points !== false"
+                :color="result.position === 1 ? 'amber-7' : 'grey-6'"
+                class="stat-badge"
+              >
+                <q-icon name="star" size="14px" class="q-mr-xs" />
+                {{ result.points }}
+              </q-badge>
 
-            <q-badge
-              v-if="result.starting_position"
-              color="grey-5"
-              class="stat-badge"
-            >
-              <q-icon name="flag" size="14px" class="q-mr-xs" />
-              {{ result.starting_position }}
-            </q-badge>
+              <q-badge
+                v-if="result.starting_position"
+                color="grey-5"
+                class="stat-badge"
+              >
+                <q-icon name="flag" size="14px" class="q-mr-xs" />
+                {{ result.starting_position }}
+              </q-badge>
 
-            <q-badge
-              v-if="result.starting_points != null"
-              color="blue-grey-4"
-              class="stat-badge"
-            >
-              <q-icon name="bolt" size="14px" class="q-mr-xs" />
-              {{ result.starting_points }}
-            </q-badge>
+              <q-badge
+                v-if="result.starting_points != null"
+                color="blue-grey-4"
+                class="stat-badge"
+              >
+                <q-icon name="bolt" size="14px" class="q-mr-xs" />
+                {{ result.starting_points }}
+              </q-badge>
 
-            <!-- Multiple Factions Displayed by Level -->
-            <q-badge
-              v-for="faction in result.factions"
-              :key="faction.id"
-              color="indigo-6"
-              class="stat-badge"
-            >
-              <q-icon name="shield" size="14px" class="q-mr-xs" />
-              <span class="ellipsis" style="max-width: 120px">
-                {{ faction.name }}
-              </span>
-            </q-badge>
+              <!-- Multiple Factions Displayed by Level -->
+              <q-badge
+                v-for="faction in result.factions"
+                :key="faction.id"
+                color="indigo-6"
+                class="stat-badge"
+              >
+                <q-icon name="shield" size="14px" class="q-mr-xs" />
+                <span class="ellipsis max-faction-width">
+                  {{ faction.name }}
+                </span>
+              </q-badge>
+            </div>
           </div>
         </q-item-section>
       </q-item>
@@ -237,5 +239,35 @@ function rowClass(position: number | null) {
 .stat-badge {
   padding: 4px 8px;
   border-radius: 999px;
+  height: 24px;
+}
+.content-container {
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.player-name-col {
+  flex: 1 1 120px;
+  min-width: 0;
+  overflow: hidden;
+}
+.stats-col-new {
+  flex: 1 1 auto;
+  min-width: 0;
+  flex-wrap: wrap;
+}
+.shrink-0 {
+  flex-shrink: 0;
+}
+.max-faction-width {
+  max-width: 120px;
+}
+
+@media (max-width: 480px) {
+  .player-name-col {
+    flex-basis: 100%;
+  }
+  .stats-col-new {
+    justify-content: flex-start !important;
+  }
 }
 </style>

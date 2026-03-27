@@ -25,6 +25,8 @@
           <CurrentChampion />
         </div>
 
+        <NavChat v-if="isAuthenticated" />
+
         <NavMyLeague v-if="user && user.myCurrentLeagueId" />
 
         <NavProfileMenu :onToggle="onToggle" class="q-ml-xs" />
@@ -36,6 +38,7 @@
 <script setup lang="ts">
 import NavHome from 'components/nav/NavHome.vue';
 import NavMyLeague from 'components/nav/NavMyLeague.vue';
+import NavChat from 'components/nav/NavChat.vue';
 import NavProfileMenu from 'components/nav/NavProfileMenu.vue';
 import CurrentChampion from 'components/season/CurrentChampion.vue';
 import { useUserStore } from 'stores/userStore';
@@ -43,7 +46,7 @@ import { storeToRefs } from 'pinia';
 import { useResponsive } from 'src/composables/responsive';
 
 defineProps<{ onToggle: () => void }>();
-const { user } = storeToRefs(useUserStore());
+const { user, isAuthenticated } = storeToRefs(useUserStore());
 const { isMobile } = useResponsive();
 </script>
 

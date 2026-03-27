@@ -27,6 +27,7 @@ export type TSeasonParticipantDto = {
   my_banned_game: TBannedGame;
   has_banned: boolean;
   is_active_player: boolean;
+  is_prev_unregistered?: boolean;
   position: number;
   banned_by: string[];
 };

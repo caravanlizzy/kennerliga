@@ -18,44 +18,25 @@
       v-if="isAuthenticated"
       side="left"
       v-model="chatDrawerOpen"
-      :width="320"
+      :width="350"
       :behavior="isMobile ? 'mobile' : 'desktop'"
       class="chat-drawer"
     >
-      <div class="column full-height">
+      <div class="column full-height bg-grey-1">
         <div class="q-pa-md row items-center justify-between border-bottom-subtle bg-white">
           <div class="row items-center">
             <q-icon name="chat" color="teal" size="sm" class="q-mr-sm" />
+            <div class="text-subtitle1 text-weight-bold text-teal">KennerChat</div>
           </div>
-          <q-btn flat round dense icon="chevron_left" size="sm" color="teal" @click="toggleChat">
-            <q-tooltip>Hide Chat</q-tooltip>
+          <q-btn flat round dense icon="close" size="sm" color="grey-7" @click="toggleChat">
+            <q-tooltip>Close Chat</q-tooltip>
           </q-btn>
         </div>
-        <KennerChat class="col bg-white" />
+        <KennerChat class="col bg-transparent" />
       </div>
     </q-drawer>
 
-    <div
-      v-if="isAuthenticated"
-      class="fixed-left z-max"
-      style="top: 100px;"
-    >
-      <q-btn
-        v-if="!chatDrawerOpen && !isMobile"
-        flat
-        dense
-        color="teal"
-        class="chat-mini-toggle"
-        @click="toggleChat"
-      >
-        <div class="column items-center q-py-sm">
-          <q-icon name="chat" size="xs" />
-          <div class="vertical-text text-weight-bold q-mt-xs">CHAT</div>
-          <q-icon name="chevron_right" size="xs" class="q-mt-xs" />
-        </div>
-        <q-tooltip anchor="center right" self="center left">Show Chat</q-tooltip>
-      </q-btn>
-    </div>
+    <!-- Removed fixed chat toggle -->
 
     <q-page-container class="col column bg-white">
       <div
@@ -109,28 +90,12 @@ function toggleDrawer(): void {
   border-bottom: 1px solid rgba(0, 0, 0, 0.05);
 }
 .chat-drawer {
-  border-right: 1px solid rgba(0, 0, 0, 0.05) !important;
+  border-right: 1px solid rgba(0, 0, 0, 0.1) !important;
+  background: #f8f9fa !important;
 }
 .kenner-drawer {
   border-left: 1px solid rgba(0, 0, 0, 0.05) !important;
 }
 
-.chat-mini-toggle {
-  border-radius: 0 12px 12px 0 !important;
-  border-left: none !important;
-  box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.05);
-  transition: all 0.3s ease;
-
-  &:hover {
-    padding-left: 12px;
-    background: rgba(255, 255, 255, 0.9) !important;
-  }
-}
-
-.vertical-text {
-  writing-mode: vertical-rl;
-  text-orientation: mixed;
-  letter-spacing: 2px;
-  font-size: 10px;
-}
+// Removed unused styles: .chat-mini-toggle, .vertical-text
 </style>

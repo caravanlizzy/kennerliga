@@ -73,7 +73,7 @@
     </q-card-section>
 
     <!-- Composer -->
-    <q-card-section class="col-auto q-pa-md border-top-subtle chat-footer" v-if="isAuthenticated">
+    <q-card-section class="col-auto q-pa-md border-top-subtle bg-white chat-footer" v-if="isAuthenticated">
       <KennerInput
         ref="inputRef"
         v-model="newMessage"
