@@ -101,14 +101,14 @@
             </div>
             <template v-else-if="participantsLoaded">
               <div v-if="activeParticipants.length" class="row q-gutter-xs">
-                <div v-for="p in activeParticipants" :key="p.profile" class="col-auto">
+                <div v-for="(p, index) in activeParticipants" :key="p.id || index" class="col-auto">
                   <div class="participant-chip" :class="{ 'participant-chip--mobile': isMobile }">
                     {{ p.profile_name || 'Anonymous' }}
                   </div>
                 </div>
               </div>
               <div v-else class="text-caption text-grey-6 italic">
-                Nobody signed up yet. Be the first!
+                {{ isAuthenticated ? 'Nobody signed up yet. Be the first!' : 'Nobody signed up yet.' }}
               </div>
 
               <!-- Missing Participants -->
@@ -122,7 +122,7 @@
                   </div>
                 </div>
                 <div class="row q-gutter-xs">
-                  <div v-for="p in missingParticipants" :key="p.profile" class="col-auto">
+                  <div v-for="(p, index) in missingParticipants" :key="p.id || index" class="col-auto">
                     <div
                       class="participant-chip participant-chip--missing"
                       :class="{ 'participant-chip--mobile': isMobile }"
