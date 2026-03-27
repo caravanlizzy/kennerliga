@@ -62,6 +62,19 @@
           @submitted="$emit('success')"
         />
       </FormLayout>
+
+      <!-- Resolve Tie -->
+      <FormLayout v-if="activeForm.type === 'resolve-tie'" @onClose="$emit('close')">
+        <template #head>
+          Resolve Tie Group
+        </template>
+        <ResolveTieForm
+          :leagueId="league.id"
+          :groupKey="activeForm.groupKey"
+          :members="activeForm.members"
+          @onSuccess="$emit('success')"
+        />
+      </FormLayout>
     </div>
   </q-dialog>
 </template>
@@ -73,12 +86,14 @@ import GameSettingsEditor from 'components/game/selectedGame/GameSettingsEditor.
 import MatchResultForm from 'components/league/MatchResultForm.vue';
 import BanGameForm from 'components/game/selectedGame/BanGameForm.vue';
 import type { TLeagueDto, TSeasonParticipantDto, TSelectedGameDto } from 'src/types';
+import ResolveTieForm from 'components/league/manager/ResolveTieForm.vue';
 
 export type TActiveForm =
   | { type: 'edit'; member: TSeasonParticipantDto; selGame: TSelectedGameDto }
   | { type: 'add'; member: TSeasonParticipantDto }
   | { type: 'ban'; member: TSeasonParticipantDto }
-  | { type: 'post-result'; selGame: TSelectedGameDto };
+  | { type: 'post-result'; selGame: TSelectedGameDto }
+  | { type: 'resolve-tie'; groupKey: string; members: TSeasonParticipantDto[] };
 
 defineProps<{
   league: TLeagueDto;

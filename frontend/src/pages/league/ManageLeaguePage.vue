@@ -82,7 +82,11 @@
           style="margin-top: 0"
           :bordered="false"
         >
-          <LeagueStandings :league-id="league.id" />
+          <LeagueStandings
+            :league-id="league.id"
+            admin-mode
+            @resolve-tie="onResolveTie"
+          />
         </ContentSection>
       </div>
     </div>
@@ -151,9 +155,9 @@ import LoadingSpinner from 'components/base/LoadingSpinner.vue';
 import MemberGameCard from 'components/league/manager/MemberGameCard.vue';
 import EmptyMembersState from 'components/league/manager/EmptyMembersState.vue';
 import LeagueStandings from 'components/league/LeagueStandings.vue';
-import ManagerFormsDialog from 'components/league/manager/ManagerFormsDialog.vue';
+import ManagerFormsDialog, { TActiveForm } from 'components/league/manager/ManagerFormsDialog.vue';
 import { useDialog } from 'src/composables/dialog';
-import type { TSeasonDto, TLeagueDto, TSelectedGameDto, TMatchResult } from 'src/types';
+import type { TSeasonDto, TLeagueDto, TSelectedGameDto, TMatchResult, TSeasonParticipantDto } from 'src/types';
 
 const route = useRoute();
 const $q = useQuasar();
@@ -233,6 +237,22 @@ function findSelGame(id: number): TSelectedGameDto | undefined {
     if (found) return found;
   }
   return undefined;
+}
+
+function onResolveTie(group: any) {
+  if (!league.value) return;
+  // Map tie group members to full participant objects
+  const members = group.members.map((m: any) => {
+    return (league.value?.members || []).find(
+      (p: TSeasonParticipantDto) => p.profile === m.player_profile_id
+    );
+  }).filter(Boolean);
+
+  activeForm.value = {
+    type: 'resolve-tie',
+    groupKey: group.group_key,
+    members: members
+  };
 }
 
 function onSuccess() {

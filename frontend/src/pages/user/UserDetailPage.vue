@@ -1,26 +1,26 @@
 <template>
   <q-page class="q-pa-none bg-grey-1">
     <!-- User Profile Hero Section -->
-    <div v-if="user" class="profile-hero bg-primary text-white q-pa-xl relative-position overflow-hidden">
-      <div class="hero-content row items-center q-col-gutter-xl relative-position z-index-1">
+    <div v-if="user" class="profile-hero bg-primary text-white q-pa-lg relative-position overflow-hidden">
+      <div class="hero-content row items-center q-col-gutter-lg relative-position z-index-1">
         <div class="col-12 col-md-auto flex justify-center">
           <div class="avatar-container shadow-10 rounded-borders bg-white q-pa-xs">
             <UserAvatar
               :display-username="user.username"
-              size="128px"
+              size="96px"
               shape="rounded"
             />
           </div>
         </div>
         <div class="col-12 col-md column items-start text-center-mobile">
           <div class="row items-center q-gutter-x-md full-width-mobile justify-center-mobile">
-            <h1 class="text-h2 text-weight-bolder q-ma-none tracking-tighter">{{ user.username }}</h1>
+            <h1 class="text-h3 text-weight-bolder q-ma-none tracking-tighter">{{ user.username }}</h1>
             <q-badge v-if="user.admin" color="amber-8" class="text-dark text-weight-bold q-px-sm" label="ADMIN" />
           </div>
-          <div v-if="user.profile?.name" class="text-h5 text-white-80 text-weight-light q-mt-sm">
+          <div v-if="user.profile?.name" class="text-h6 text-white-80 text-weight-light q-mt-xs">
             {{ user.profile.name }}
           </div>
-          <div class="row q-gutter-x-lg q-mt-lg full-width-mobile justify-center-mobile">
+          <div class="row q-gutter-x-lg q-mt-md full-width-mobile justify-center-mobile">
             <div class="column items-center">
               <div class="text-h4 text-weight-bolder">{{ leagueStats.totalLeagues }}</div>
               <div class="text-caption text-uppercase letter-spacing-1 text-white-60">Leagues</div>
@@ -45,7 +45,7 @@
       </div>
       <!-- Decorative background elements -->
       <div class="hero-bg-overlay absolute-full" />
-      <q-icon name="person" class="hero-watermark absolute-bottom-right text-white" size="300px" />
+      <q-icon name="person" class="hero-watermark absolute-bottom-right text-white" size="200px" />
     </div>
 
     <div v-if="loading" class="flex justify-center q-my-xl">
@@ -345,7 +345,7 @@ onMounted(load);
 
 <style scoped lang="scss">
 .profile-hero {
-  min-height: 350px;
+  min-height: 250px;
   background: linear-gradient(135deg, var(--q-primary) 0%, darken(#2d3436, 10%) 100%);
 }
 
@@ -461,7 +461,7 @@ onMounted(load);
   .text-center-mobile { text-align: center; }
   .full-width-mobile { width: 100%; }
   .justify-center-mobile { justify-content: center; }
-  .profile-hero { padding: 40px 20px !important; }
+  .profile-hero { padding: 32px 16px !important; min-height: 200px; }
 }
 
 .z-index-1 { z-index: 1; }

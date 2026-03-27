@@ -55,6 +55,8 @@
                 {{ mode === 'results' ? 'Division Overview' : 'Division Standings' }}
               </div>
             </div>
+
+
             <q-space />
             <KennerButton flat round icon="info" :color="getLeagueColor(league.level)" size="sm">
               <KennerTooltip>
@@ -172,6 +174,10 @@ watch(() => props.seasonId, (id) => {
 .season-standings {
   max-width: 1200px;
   margin: 0 auto;
+}
+
+.border-orange-2 {
+  border: 1px solid #ffcc80;
 }
 
 .league-badge {

@@ -106,6 +106,20 @@
                 />
                 <KennerTooltip>League Leader</KennerTooltip>
               </div>
+
+              <!-- Tie Group Indicator -->
+              <template v-if="props.row.unresolved_tie_group">
+                <span class="text-orange q-ml-xs cursor-pointer" style="font-size: 1.1rem; line-height: 1;">
+                  *
+                  <KennerTooltip>unresolved tie</KennerTooltip>
+                </span>
+              </template>
+              <template v-else-if="props.row.resolved_tie_reason">
+                <span class="text-green q-ml-xs cursor-pointer" style="font-size: 1.1rem; line-height: 1;">
+                  *
+                  <KennerTooltip>{{ props.row.resolved_tie_reason }}</KennerTooltip>
+                </span>
+              </template>
             </div>
           </q-td>
         </template>
@@ -191,6 +205,17 @@
         <div class="text-caption">The standings will appear here once the season starts.</div>
       </div>
 
+      <!-- Unresolved Tie Info (Shown here only if leagueId is provided and we have unresolved groups) -->
+      <div v-if="leagueId && standings?.tie_groups?.some(g => g.unresolved)" class="q-mb-md q-px-sm">
+        <div class="row items-center q-gutter-x-sm bg-orange-1 q-pa-sm rounded-borders border-orange-2">
+          <q-icon name="warning" color="orange-9" size="16px" />
+          <div class="text-caption text-orange-9 text-weight-bold">unresolved</div>
+          <div class="text-caption text-grey-8">
+            {{ standings.tie_groups.filter(g => g.unresolved).map(g => g.members.map(m => m.profile_name).join(' vs ')).join(' | ') }}
+          </div>
+        </div>
+      </div>
+
       <!-- Footer Actions -->
       <div v-if="standings && standings.season_id" class="row justify-end q-mt-md">
         <KennerButton
@@ -225,6 +250,12 @@
   </div>
 </template>
 
+<style scoped>
+.border-orange-2 {
+  border: 1px solid #ffcc80;
+}
+</style>
+
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue';
 import { api } from 'boot/axios';
@@ -257,6 +288,31 @@ interface Standing {
   total_league_points: string;
   total_wins: string;
   games: Record<string, GameStats>;
+  unresolved_tie_group?: string;
+  resolved_tie_reason?: string;
+}
+
+interface TieGroupMember {
+  player_profile_id: number;
+  profile_name: string;
+  user_id?: number;
+  username?: string;
+}
+
+interface TieResolution {
+  reason: string;
+  reason_display: string;
+  note?: string;
+  is_resolved: boolean;
+}
+
+interface TieGroup {
+  group_key: string;
+  unresolved: boolean;
+  members: TieGroupMember[];
+  league_points?: string;
+  wins?: string;
+  resolution?: TieResolution;
 }
 
 interface SelectedGame {
@@ -272,6 +328,7 @@ interface StandingsData {
   selected_games: SelectedGame[];
   standings: Standing[];
   season_id?: number;
+  tie_groups?: TieGroup[];
 }
 
 const standings = ref<StandingsData | null>(props.prefetchedData || null);
@@ -356,6 +413,11 @@ const tableRows = computed(() => {
       profile_name: standing.profile_name,
       username: standing.username,
       total: standing.total_league_points,
+      unresolved_tie_group: standing.unresolved_tie_group,
+      resolved_tie_reason: (() => {
+        const group = standings.value?.tie_groups?.find(g => g.group_key === standing.unresolved_tie_group);
+        return (group && !group.unresolved) ? group.resolution?.reason_display : undefined;
+      })()
     };
 
     standings.value.selected_games?.forEach((game) => {
