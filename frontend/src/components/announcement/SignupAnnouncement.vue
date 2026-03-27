@@ -82,7 +82,7 @@
               </div>
               <q-badge
                 color="accent"
-                :label="participants?.length ?? 0"
+                :label="activeParticipants.length"
                 rounded
                 class="text-weight-bold"
                 :style="isMobile ? 'font-size: 9px; padding: 1px 4px' : 'font-size: 10px; padding: 2px 6px'"
@@ -100,8 +100,8 @@
               />
             </div>
             <template v-else-if="participantsLoaded">
-              <div v-if="participants?.length" class="row q-gutter-xs">
-                <div v-for="p in participants" :key="p.id" class="col-auto">
+              <div v-if="activeParticipants.length" class="row q-gutter-xs">
+                <div v-for="p in activeParticipants" :key="p.profile" class="col-auto">
                   <div class="participant-chip" :class="{ 'participant-chip--mobile': isMobile }">
                     {{ p.profile_name || 'Anonymous' }}
                   </div>
@@ -109,6 +109,29 @@
               </div>
               <div v-else class="text-caption text-grey-6 italic">
                 Nobody signed up yet. Be the first!
+              </div>
+
+              <!-- Missing Participants -->
+              <div v-if="missingParticipants.length" class="q-mt-md">
+                <div class="row items-center q-gutter-x-sm q-mb-xs">
+                  <div
+                    class="text-caption text-weight-bolder text-grey-6 uppercase tracking-widest"
+                    :style="isMobile ? 'font-size: 0.55rem' : 'font-size: 0.6rem'"
+                  >
+                    Missing from previous season
+                  </div>
+                </div>
+                <div class="row q-gutter-xs">
+                  <div v-for="p in missingParticipants" :key="p.profile" class="col-auto">
+                    <div
+                      class="participant-chip participant-chip--missing"
+                      :class="{ 'participant-chip--mobile': isMobile }"
+                    >
+                      <q-icon name="history" size="12px" class="q-mr-xs" />
+                      {{ p.profile_name || 'Anonymous' }}
+                    </div>
+                  </div>
+                </div>
               </div>
             </template>
           </div>
@@ -148,7 +171,7 @@
 
 <script setup lang="ts">
 import { storeToRefs } from 'pinia';
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import { useUserStore } from 'stores/userStore';
 import { useResponsive } from 'src/composables/responsive';
 import KennerButton from 'components/base/KennerButton.vue';
@@ -181,6 +204,14 @@ const openSeasonId = ref<number | null>(null);
 const participants = ref<TSeasonParticipantDto[] | null>(null);
 const participantsLoading = ref(false);
 const participantsLoaded = ref(false);
+
+const activeParticipants = computed(() => {
+  return (participants.value || []).filter((p) => !p.is_prev_unregistered);
+});
+
+const missingParticipants = computed(() => {
+  return (participants.value || []).filter((p) => p.is_prev_unregistered);
+});
 
 async function loadParticipants() {
   if (participantsLoading.value) return;
@@ -294,6 +325,18 @@ onMounted(async () => {
   font-weight: 600;
   border: 1px solid rgba($accent, 0.1);
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
+}
+
+.participant-chip--missing {
+  background: rgba(0, 0, 0, 0.02);
+  color: #777;
+  border: 1px dashed rgba(0, 0, 0, 0.15);
+  font-weight: 500;
+  box-shadow: none;
+}
+
+.opacity-60 {
+  opacity: 0.6;
 }
 
 .participant-chip--mobile {
