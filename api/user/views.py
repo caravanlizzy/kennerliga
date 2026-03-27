@@ -145,15 +145,27 @@ class UserViewSet(ModelViewSet):
                 "positions": g["positions"]
             })
         
-        # Sort by count descending
+        # Sort by count descending for the default list
         game_stats.sort(key=lambda x: x["count"], reverse=True)
+
+        # Derive Top 3 games by highest win rate (then by more plays, then by better avg position)
+        top_games = sorted(
+            game_stats,
+            key=lambda x: (
+                -(x["winRate"] or 0),   # highest win rate first
+                -(x["count"] or 0),     # then more games played
+                (x["avgPos"] or 0),     # then lower average position (better)
+                x["name"],              # stable final tie-breaker
+            )
+        )[:3]
 
         return Response({
             "league_stats": {
                 "totalLeagues": total_leagues,
                 "distribution": distribution
             },
-            "game_stats": game_stats
+            "game_stats": game_stats,
+            "top_games": top_games,
         })
 
 
