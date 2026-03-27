@@ -8,7 +8,7 @@ from rest_framework.viewsets import ReadOnlyModelViewSet, ModelViewSet
 
 from api.constants import get_ban_amount_for_success
 from game.models import SelectedGame, BanDecision
-from league.models import League, LeagueStanding, GameStanding
+from league.models import League, LeagueStanding, GameStanding, LeagueTieResolution, LeagueTieResolutionEntry, TieResolutionReason
 from league.serializer import LeagueDetailSerializer, LeagueStandingSerializer, GameStandingSerializer, LeagueSerializer, LeagueListSerializer
 from services.standings_snapshot import rebuild_league_snapshot, rebuild_game_snapshot
 from league.services import advance_turn, get_full_standings_data
@@ -28,7 +28,7 @@ class LeagueViewSet(ModelViewSet):
         return super().get_serializer_class()
 
     def get_permissions(self):
-        if self.action == 'rebuild_standings':
+        if self.action in ['rebuild_standings', 'resolve_tie']:
             return [IsAdminUser()]
         return super().get_permissions()
 
@@ -38,7 +38,7 @@ class LeagueViewSet(ModelViewSet):
             LeagueStanding.objects
             .filter(league=pk)
             .select_related("player_profile")
-            .order_by("-league_points", "-wins", "player_profile__profile_name")
+            .order_by("-league_points", "-wins", "-tie_break_priority", "player_profile__profile_name")
         )
         return Response(LeagueStandingSerializer(qs, many=True).data, status=status.HTTP_200_OK)
 
@@ -89,7 +89,108 @@ class LeagueViewSet(ModelViewSet):
             LeagueStanding.objects
             .filter(league=league)
             .select_related("player_profile__user")
-            .order_by("-league_points", "-wins", "player_profile__profile_name")
+            .order_by("-league_points", "-wins", "-tie_break_priority", "player_profile__profile_name")
+        )
+        return Response(LeagueStandingSerializer(qs, many=True).data, status=status.HTTP_200_OK)
+
+    @action(detail=True, methods=['post'], url_path='resolve-tie')
+    def resolve_tie(self, request, pk=None):
+        """
+        Admin-only endpoint to resolve a general tie group by providing a
+        group_key, a reason, and the exact player order within the tied group.
+
+        Expected payload example:
+        {
+          "group_key": "lp:12.00|w:5.00",
+          "reason": "WINNER_PERCENTAGE"|"CANT_STOP",
+          "player_order": [player_profile_id_1, player_profile_id_2, ...],
+          "note": "optional"
+        }
+        """
+        league = self.get_object()
+
+        group_key = request.data.get("group_key")
+        reason_raw = request.data.get("reason")
+        player_order = request.data.get("player_order", [])
+        note = request.data.get("note")
+
+        if group_key is None or reason_raw is None or not isinstance(player_order, list) or len(player_order) == 0:
+            return Response({
+                "detail": "group_key, reason and non-empty player_order are required."
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        # Validate reason against enum
+        if reason_raw not in dict(TieResolutionReason.choices):
+            return Response({
+                "detail": f"Invalid reason. Allowed: {list(dict(TieResolutionReason.choices).keys())}"
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        # Ensure all players belong to this league
+        valid_ids = set(
+            LeagueStanding.objects.filter(league=league, player_profile_id__in=player_order)
+            .values_list('player_profile_id', flat=True)
+        )
+        if set(player_order) != valid_ids:
+            return Response({
+                "detail": "player_order must contain only player_profile ids present in this league standings."
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        # Optional: verify that listed players currently match the provided group_key
+        current_groups = set(
+            LeagueStanding.objects.filter(league=league, player_profile_id__in=player_order)
+            .values_list('unresolved_tie_group', flat=True)
+        )
+        # If players are already resolved, their group will be None; allow that (admin may re-order).
+        # But if any non-None groups exist and they differ from group_key, warn.
+        mismatched = [g for g in current_groups if g not in (None, group_key)]
+        if mismatched:
+            return Response({
+                "detail": f"Provided group_key does not match current standings groups: {sorted(set(mismatched))}"
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        # Upsert resolution by (league, group_key)
+        resolution, _created = LeagueTieResolution.objects.update_or_create(
+            league=league,
+            group_key=group_key,
+            defaults={
+                'reason': reason_raw,
+                'note': note,
+                'is_resolved': True,
+            }
+        )
+
+        # Replace entries
+        resolution.entries.all().delete()
+        LeagueTieResolutionEntry.objects.bulk_create([
+            LeagueTieResolutionEntry(
+                resolution=resolution,
+                player_profile_id=pp_id,
+                order_index=index + 1,
+            ) for index, pp_id in enumerate(player_order)
+        ])
+
+        # Update LeagueStanding: clear tie group and set tie priorities for these players
+        standings = list(
+            LeagueStanding.objects.filter(league=league, player_profile_id__in=player_order)
+        )
+        # Highest priority for first in order
+        max_priority = len(player_order)
+        id_to_priority = {pp_id: (max_priority - idx) for idx, pp_id in enumerate(player_order)}
+
+        for ls in standings:
+            ls.unresolved_tie_group = None
+            ls.tie_break_priority = id_to_priority.get(ls.player_profile_id, 0)
+
+        LeagueStanding.objects.bulk_update(standings, [
+            'unresolved_tie_group', 'tie_break_priority'
+        ])
+
+        # Return refreshed standings
+        qs = (
+            LeagueStanding.objects
+            .filter(league=league)
+            .select_related("player_profile__user")
+            .order_by("-league_points", "-wins", "-tie_break_priority", "player_profile__profile_name")
         )
         return Response(LeagueStandingSerializer(qs, many=True).data, status=status.HTTP_200_OK)
 

@@ -196,25 +196,74 @@ def rebuild_league_snapshot(league: League, *, win_mode: str = "fractional"):
 
     table = compute_league_table(rows, win_mode=win_mode, return_decimals=True)
 
+    # Detect generalized tie groups anywhere in the table based on
+    # equality of (league_points, wins). Each tie group (>1) gets a stable
+    # group_key we can store on LeagueStanding.unresolved_tie_group.
+    # Sort desc by (league_points, wins)
+    sorted_table = sorted(table, key=lambda r: (r["league_points"], r["wins"]), reverse=True)
+
+    # Build contiguous groups of equal (league_points, wins)
+    groups: list[tuple[str, list[dict]]]= []
+    current_group: list[dict] = []
+    current_key: str | None = None
+
+    def make_key(lp, wins) -> str:
+        # Use quantized strings to ensure stable keys
+        lp_s = f"{lp:.2f}" if hasattr(lp, 'quantize') else str(lp)
+        wins_s = f"{wins:.2f}" if hasattr(wins, 'quantize') else str(wins)
+        return f"lp:{lp_s}|w:{wins_s}"
+
+    for row in sorted_table:
+        key = make_key(row["league_points"], row["wins"]) 
+        if current_key is None:
+            current_key = key
+            current_group = [row]
+        elif key == current_key:
+            current_group.append(row)
+        else:
+            if current_group:
+                groups.append((current_key, current_group))
+            current_key = key
+            current_group = [row]
+    if current_group:
+        groups.append((current_key, current_group))
+
+    # Map player_id -> group_key if in a tie group (>1)
+    player_to_group: dict[int, str] = {}
+    for gkey, members in groups:
+        if len(members) > 1:
+            for m in members:
+                player_to_group[m["player_id"]] = gkey
+
     # upsert LeagueStanding (NO raw points)
     existing = {ls.player_profile_id: ls for ls in LeagueStanding.objects.filter(league=league)}
     to_create, to_update = [], []
 
     for r in table:
         obj = existing.get(r["player_id"])
+        # Determine group key for this row
+        group_key = player_to_group.get(r["player_id"])  # may be None
+
+        # If there is a manual tie-break priority set for this player, do not
+        # mark it as an unresolved tie group, even if points/wins indicate a tie.
+        if obj is not None and getattr(obj, "tie_break_priority", 0) > 0:
+            group_key = None
+
         if obj is None:
             to_create.append(LeagueStanding(
                 league=league,
                 player_profile_id=r["player_id"],
                 wins=r["wins"],
                 league_points=r["league_points"],
+                unresolved_tie_group=group_key,
             ))
         else:
             obj.wins = r["wins"]
             obj.league_points = r["league_points"]
+            obj.unresolved_tie_group = group_key
             to_update.append(obj)
 
     if to_create:
         LeagueStanding.objects.bulk_create(to_create)
     if to_update:
-        LeagueStanding.objects.bulk_update(to_update, ["wins", "league_points"])
+        LeagueStanding.objects.bulk_update(to_update, ["wins", "league_points", "unresolved_tie_group"])

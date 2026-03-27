@@ -50,16 +50,71 @@ class LeagueStanding(models.Model):
     player_profile = models.ForeignKey(PlayerProfile, on_delete=models.CASCADE)
     wins = models.DecimalField(max_digits=10, decimal_places=2, default=0)  # per your win_mode
     league_points = models.DecimalField(max_digits=10, decimal_places=2, default=0)  # 6/3/1/0 with tie-sharing
+    # General unresolved tie group identifier. If not null, this player is
+    # currently part of a tie group (any position) that needs manual
+    # resolution. All members of the same tie share this key.
+    unresolved_tie_group = models.CharField(max_length=64, null=True, blank=True)
+    # Optional manual priority to break ties after an admin resolves them.
+    # Higher value ranks higher among otherwise tied players.
+    tie_break_priority = models.IntegerField(default=0)
     updated_at = models.DateTimeField(default=timezone.now)
 
     class Meta:
         unique_together = ("league", "player_profile")
         indexes = [
             models.Index(fields=["league", "-league_points", "-wins"]),
+            models.Index(fields=["league", "unresolved_tie_group"]),
         ]
 
     def __str__(self):
         return f"{self.league} - {self.player_profile}: {self.league_points}"
+
+
+class TieResolutionReason(models.TextChoices):
+    WINNER_PERCENTAGE = 'WINNER_PERCENTAGE', 'Percentage by winner'
+    CANT_STOP = 'CANT_STOP', 'Cant Stop'
+
+
+class LeagueTieResolution(models.Model):
+    """
+    Stores an admin decision to resolve a tie for a league side (top/bottom).
+    The concrete ordering of players involved in the tie is stored via
+    LeagueTieResolutionEntry.
+    """
+    league = models.ForeignKey(League, on_delete=models.CASCADE, related_name='tie_resolutions')
+    # Generalized group key identifying the tie group being resolved. This
+    # should match LeagueStanding.unresolved_tie_group used during snapshot.
+    group_key = models.CharField(max_length=64)
+    reason = models.CharField(max_length=40, choices=TieResolutionReason.choices)
+    note = models.CharField(max_length=255, blank=True, null=True)
+    is_resolved = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        unique_together = ("league", "group_key")
+
+    def __str__(self):
+        return f"{self.league} {self.group_key} tie resolved: {self.get_reason_display()}"
+
+
+class LeagueTieResolutionEntry(models.Model):
+    """
+    The ordered list of players in a resolved tie. Lower order_index means
+    higher ranking within the tie group.
+    """
+    resolution = models.ForeignKey(LeagueTieResolution, on_delete=models.CASCADE, related_name='entries')
+    player_profile = models.ForeignKey(PlayerProfile, on_delete=models.CASCADE)
+    order_index = models.PositiveIntegerField()
+
+    class Meta:
+        unique_together = ("resolution", "player_profile")
+        indexes = [
+            models.Index(fields=["resolution", "order_index"]),
+        ]
+
+    def __str__(self):
+        return f"{self.resolution} -> {self.player_profile} ({self.order_index})"
 
 
 class GameStanding(models.Model):
