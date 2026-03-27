@@ -34,6 +34,7 @@
     <q-markup-table flat dense separator="none" class="leaderboard-table bg-transparent">
       <thead>
       <tr class="text-uppercase text-grey-6 text-caption text-weight-bold header-row">
+        <th class="q-pa-none" style="width: 4px"></th>
         <th class="text-left q-pl-lg" style="width: 40px">#</th>
         <th class="text-left player-column">Player</th>
 
@@ -95,7 +96,7 @@
       >
         <!-- League level separator (e.g. L1 to L2) -->
         <tr v-if="index > 0 && bestLeague(row) !== bestLeague(standings.standings[index-1])" class="league-separator-row">
-          <td :colspan="showAllLeagues ? 2 + standings.levels.length : 6" class="q-pa-none">
+          <td :colspan="showAllLeagues ? 3 + standings.levels.length : 7" class="q-pa-none">
             <div class="league-separator-divider"></div>
           </td>
         </tr>
@@ -105,10 +106,20 @@
           :class="{
             'top-rank-bg': index === 0
           }"
-          :style="{
-            backgroundColor: !!bestLeague(row) ? `${getHexLeagueColor(bestLeague(row)!)}0D` : undefined
-          }"
         >
+
+          <!-- League Level Indicator Strip -->
+          <td class="q-pa-none relative-position" style="width: 4px; padding: 0 !important;">
+            <div
+              v-if="bestLeague(row)"
+              class="league-strip"
+              :style="{ backgroundColor: getHexLeagueColor(bestLeague(row)!) }"
+            >
+              <q-tooltip anchor="center right" self="center left">
+                League {{ bestLeague(row) }}
+              </q-tooltip>
+            </div>
+          </td>
           <!-- Rank -->
           <td class="text-left q-pl-lg text-weight-bold text-grey-7">
             {{ index + 1 }}
@@ -124,14 +135,6 @@
               <div class="column">
                 <div class="row items-center q-gutter-x-sm">
                   <span class="text-subtitle2 text-weight-bold text-grey-9">{{ row.profile_name }}</span>
-                  <q-badge
-                    v-if="bestLeague(row)"
-                    outline
-                    :color="getLeagueColor(bestLeague(row)!)"
-                    class="league-indicator"
-                  >
-                    L{{ bestLeague(row) }}
-                  </q-badge>
                   <q-icon
                     v-if="index === 0"
                     name="stars"
@@ -232,8 +235,8 @@
       <div class="row items-center q-gutter-x-xs">
         <q-icon name="info" size="14px" />
         <span>
-          <strong>Legend:</strong> "LX" indicates the highest league level a player has participated in at least once.
-          Higher league participation (smaller X) results in a higher leaderboard position.
+          <strong>Legend:</strong> The colored strip on the left indicates the highest league level a player has participated in.
+          Higher league participation results in a higher leaderboard position.
         </span>
       </div>
     </div>
@@ -367,14 +370,25 @@ watch(
 .leaderboard-row {
   position: relative;
   transition: all 0.2s ease;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+  background: white;
 
   &:hover {
-    background-color: rgba(255, 255, 255, 0.6) !important;
+    background-color: rgba(248, 250, 252, 1) !important;
     z-index: 1;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
   }
 }
+
+.league-strip {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  z-index: 2;
+}
+
 
 .top-rank-bg {
   /* Using a very subtle amber overlay for the first rank, compatible with league backgrounds */
