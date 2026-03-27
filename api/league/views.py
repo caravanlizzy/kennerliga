@@ -1,4 +1,4 @@
-from django.db.models import Prefetch, Count
+from django.db.models import Prefetch
 from django.db.models import prefetch_related_objects
 from rest_framework import status
 from rest_framework.decorators import action
@@ -6,12 +6,11 @@ from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import ReadOnlyModelViewSet, ModelViewSet
 
-from api.constants import get_ban_amount_for_success
 from game.models import SelectedGame, BanDecision
 from league.models import League, LeagueStanding, GameStanding, LeagueTieResolution, LeagueTieResolutionEntry, TieResolutionReason
 from league.serializer import LeagueDetailSerializer, LeagueStandingSerializer, GameStandingSerializer, LeagueSerializer, LeagueListSerializer
 from services.standings_snapshot import rebuild_league_snapshot, rebuild_game_snapshot
-from league.services import advance_turn, get_full_standings_data
+from league.services import get_full_standings_data
 
 
 class LeagueViewSet(ModelViewSet):

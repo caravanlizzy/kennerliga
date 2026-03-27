@@ -1,6 +1,4 @@
-from collections import defaultdict
-
-from django.db.models import Count, Exists, OuterRef
+from django.db.models import Exists, OuterRef
 from rest_framework.fields import SerializerMethodField
 from rest_framework import serializers
 
