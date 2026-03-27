@@ -1,6 +1,6 @@
 from django.db.models import Count
-from typing import List
-from league.models import League
+from typing import List, Dict, Any
+from league.models import League, LeagueStanding
 from game.models import SelectedGame, BanDecision
 from api.constants import get_game_picks_per_player
 
@@ -144,3 +144,55 @@ def is_league_finished(league: League) -> bool:
             return False
             
     return True
+
+
+def detect_unresolved_tie_groups(league: League) -> List[Dict[str, Any]]:
+    """
+    Detect unresolved tie groups for a given league based on LeagueStanding.
+
+    Returns a list of dicts:
+    {
+      "group_key": str,
+      "members": [player_profile_id, ...],
+      "size": int,
+      "league_points": Decimal,   # shared among group
+      "wins": Decimal             # shared among group
+    }
+
+    Notes:
+    - This relies on `services.standings_snapshot.rebuild_league_snapshot` having
+      been run, which populates `unresolved_tie_group` whenever players share
+      the same (league_points, wins) and no manual tie priority is present.
+    - Groups with size == 1 are not returned.
+    """
+    qs = (
+        LeagueStanding.objects
+        .filter(league=league, unresolved_tie_group__isnull=False)
+        .only("player_profile_id", "league_points", "wins", "unresolved_tie_group")
+    )
+
+    buckets: Dict[str, Dict[str, Any]] = {}
+    for ls in qs:
+        key = ls.unresolved_tie_group
+        if key not in buckets:
+            buckets[key] = {
+                "group_key": key,
+                "members": [],
+                "size": 0,
+                "league_points": ls.league_points,
+                "wins": ls.wins,
+            }
+        buckets[key]["members"].append(ls.player_profile_id)
+        buckets[key]["size"] += 1
+
+    # Filter out singleton groups just in case
+    groups = [g for g in buckets.values() if g["size"] > 1]
+
+    # Stable ordering: highest points/wins first, then by key
+    groups.sort(key=lambda g: (-g["league_points"], -g["wins"], g["group_key"]))
+    return groups
+
+
+def has_unresolved_ties(league: League) -> bool:
+    """Quick boolean check for any unresolved tie groups in a league."""
+    return LeagueStanding.objects.filter(league=league, unresolved_tie_group__isnull=False).exists()
