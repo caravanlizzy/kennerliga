@@ -193,6 +193,17 @@ class LeagueViewSet(ModelViewSet):
         )
         return Response(LeagueStandingSerializer(qs, many=True).data, status=status.HTTP_200_OK)
 
+    @action(detail=True, methods=['get'], url_path='tie-resolution-reasons')
+    def tie_resolution_reasons(self, request, pk=None):
+        """
+        Returns the available reasons for resolving a tie.
+        """
+        reasons = [
+            {"value": val, "label": label}
+            for val, label in TieResolutionReason.choices
+        ]
+        return Response(reasons, status=status.HTTP_200_OK)
+
     @action(detail=True, methods=['post'], url_path='set-active-player')
     def set_active_player(self, request, pk=None):
         """
