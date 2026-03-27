@@ -5,22 +5,24 @@
       :class="isMobile ? 'q-px-sm' : 'q-px-md'"
       style="border-bottom: none;"
     >
-      <div class="row no-wrap items-center">
+      <div class="row no-wrap items-center flex-shrink-0">
         <NavHome />
       </div>
 
-      <q-space />
+      <div class="flex-spacer" />
 
       <!-- Center: Current Champion -->
       <div
         v-if="!isMobile"
-        class="row no-wrap items-center absolute-center"
+        class="row no-wrap items-center champion-container"
       >
         <CurrentChampion />
       </div>
 
+      <div class="flex-spacer" />
+
       <!-- Right: Controls -->
-      <div class="row no-wrap items-center" :class="isMobile ? 'q-gutter-x-xs' : 'q-gutter-x-sm'">
+      <div class="row no-wrap items-center flex-shrink-0" :class="isMobile ? 'q-gutter-x-xs' : 'q-gutter-x-sm'">
         <div v-if="isMobile" class="q-mr-xs">
           <CurrentChampion />
         </div>
@@ -56,6 +58,22 @@ const { isMobile } = useResponsive();
   min-height: 64px;
   display: flex;
   align-items: center;
+  justify-content: space-between;
+}
+
+.flex-spacer {
+  flex: 1;
+}
+
+.flex-shrink-0 {
+  flex-shrink: 0;
+}
+
+.champion-container {
+  flex: 0 1 auto;
+  min-width: 0;
+  justify-content: center;
+  margin: 0 16px;
 }
 
 .glass-effect {

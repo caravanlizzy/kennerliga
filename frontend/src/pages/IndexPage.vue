@@ -9,10 +9,10 @@
         <AnnouncementDisplay />
       </div>
 
-<!--      <WelcomeSection-->
-<!--        v-if="!isMobile || mobileContent === 'welcome'"-->
-<!--        :is-authenticated="isAuthenticated"-->
-<!--      />-->
+      <WelcomeSection
+        v-if="isMobile || mobileContent === 'welcome'"
+        :is-authenticated="isAuthenticated"
+      />
 
       <template v-if="isAuthenticated">
         <div v-if="!isMobile" class="column col q-pt-none">

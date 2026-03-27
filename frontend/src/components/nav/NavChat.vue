@@ -11,8 +11,8 @@
       @click="toggleChat"
     >
       <div class="row items-center no-wrap">
-        <q-icon name="chat" :class="{ 'q-mr-xs': !isMobile }" />
-        <span v-if="!isMobile" class="text-weight-bold">Chat</span>
+        <q-icon name="chat" class="q-mr-xs" />
+        <span class="text-weight-bold">CHAT</span>
       </div>
       <q-badge v-if="unreadCount > 0" floating rounded color="red" class="unread-badge">
         {{ unreadCount }}
