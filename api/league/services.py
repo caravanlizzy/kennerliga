@@ -2,7 +2,7 @@ from typing import Optional, List, Dict
 from django.db import transaction
 from django.db.models import Count
 from game.models import SelectedGame, BanDecision
-from league.models import League, LeagueStatus, LeagueStanding, GameStanding
+from league.models import League, LeagueStatus, LeagueStanding, GameStanding, LeagueTieResolution
 from season.models import SeasonParticipant
 from league import queries as q
 from api.constants import get_ban_amount_for_success
@@ -103,10 +103,93 @@ def get_full_standings_data(league: League) -> Dict:
             x["profile_name"]
         ))
 
+    # 6. Build tie groups information (unresolved and resolved)
+    # Unresolved groups from current snapshot
+    unresolved_qs = (
+        LeagueStanding.objects
+        .filter(league=league, unresolved_tie_group__isnull=False)
+        .select_related('player_profile__user')
+    )
+    unresolved_map: Dict[str, Dict] = {}
+    for ls in unresolved_qs:
+        key = ls.unresolved_tie_group
+        if key not in unresolved_map:
+            unresolved_map[key] = {
+                "group_key": key,
+                "unresolved": True,
+                "members": [],
+                # optional snapshot metrics (useful for UI hints)
+                "league_points": str(ls.league_points),
+                "wins": str(ls.wins),
+                "resolution": None,
+            }
+        unresolved_map[key]["members"].append({
+            "player_profile_id": ls.player_profile_id,
+            "profile_name": ls.player_profile.profile_name,
+            "user_id": ls.player_profile.user.id if ls.player_profile.user else None,
+            "username": ls.player_profile.user.username if ls.player_profile.user else None,
+        })
+
+    # Resolutions (may include groups already resolved and thus not present as unresolved anymore)
+    resolutions = (
+        LeagueTieResolution.objects
+        .filter(league=league)
+        .prefetch_related('entries__player_profile__user')
+    )
+    resolution_map: Dict[str, Dict] = {}
+    for res in resolutions:
+        # Members ordered by order_index for display
+        ordered_entries = sorted(res.entries.all(), key=lambda e: e.order_index)
+        members = [{
+            "player_profile_id": e.player_profile_id,
+            "profile_name": e.player_profile.profile_name,
+            "user_id": e.player_profile.user.id if e.player_profile.user else None,
+            "username": e.player_profile.user.username if e.player_profile.user else None,
+            "order_index": e.order_index,
+        } for e in ordered_entries]
+
+        resolution_map[res.group_key] = {
+            "group_key": res.group_key,
+            "unresolved": False,
+            "members": members,
+            "resolution": {
+                "reason": res.reason,
+                "reason_display": res.get_reason_display(),
+                "note": res.note,
+                "is_resolved": res.is_resolved,
+            }
+        }
+
+    # Merge: unresolved first, then add resolved groups that aren't currently unresolved
+    tie_groups: List[Dict] = []
+    # Add unresolved groups (if a resolution also exists, keep unresolved flag true but attach resolution info)
+    for key, group in unresolved_map.items():
+        if key in resolution_map:
+            merged = group.copy()
+            merged["unresolved"] = True
+            merged["resolution"] = resolution_map[key]["resolution"]
+            # prefer current unresolved membership ordering; do not override members
+            tie_groups.append(merged)
+        else:
+            tie_groups.append(group)
+    # Add purely resolved groups (no longer unresolved in snapshot)
+    for key, group in resolution_map.items():
+        if key not in unresolved_map:
+            tie_groups.append(group)
+
+    # Stable sort: unresolved groups first by points/wins desc, then resolved by group_key
+    def _tg_sort_key(g):
+        if g.get("unresolved"):
+            return (0, -(float(g.get("league_points") or 0)), -(float(g.get("wins") or 0)), g["group_key"])
+        return (1, 0, 0, g["group_key"])
+
+    tie_groups.sort(key=_tg_sort_key)
+
     return {
         "selected_games": selected_game_list,
         "standings": standings_list,
-        "season_id": league.season_id
+        "season_id": league.season_id,
+        "tie_groups": tie_groups,
     }
 
 def rotate_active_player(league: League, reverse_order: bool = False, members=None) -> Optional[SeasonParticipant]:
