@@ -20,15 +20,18 @@
       v-model="chatDrawerOpen"
       :width="350"
       :behavior="isMobile ? 'mobile' : 'desktop'"
-      class="chat-drawer"
+      class="chat-drawer glass-effect shadow-10"
     >
-      <div class="column full-height bg-grey-1">
-        <div class="q-pa-md row items-center justify-between border-bottom-subtle bg-white">
+      <div class="column full-height kenner-drawer-container">
+        <div class="q-pa-lg q-mb-sm row items-center border-bottom-subtle bg-white/50">
           <div class="row items-center">
-            <q-icon name="chat" color="teal" size="sm" class="q-mr-sm" />
-            <div class="text-subtitle1 text-weight-bold text-teal">KennerChat</div>
+            <q-icon name="chat" color="teal" size="32px" class="q-mr-sm" />
+            <span class="text-h5 text-weight-bolder tracking-tighter" style="letter-spacing: -1px;">
+              <span class="text-teal">Kenner</span><span class="text-grey-9">Chat</span>
+            </span>
           </div>
-          <q-btn flat round dense icon="close" size="sm" color="grey-7" @click="toggleChat">
+          <q-space />
+          <q-btn flat round dense icon="close" color="grey-7" class="hover-scale" @click="toggleChat">
             <q-tooltip>Close Chat</q-tooltip>
           </q-btn>
         </div>
@@ -90,11 +93,12 @@ function toggleDrawer(): void {
   border-bottom: 1px solid rgba(0, 0, 0, 0.05);
 }
 .chat-drawer {
-  border-right: 1px solid rgba(0, 0, 0, 0.1) !important;
-  background: #f8f9fa !important;
+  border-right: 1px solid rgba(0, 0, 0, 0.08) !important;
+  box-shadow: 10px 0 30px rgba(0, 0, 0, 0.05);
 }
 .kenner-drawer {
-  border-left: 1px solid rgba(0, 0, 0, 0.05) !important;
+  border-left: 1px solid rgba(0, 0, 0, 0.08) !important;
+  box-shadow: -10px 0 30px rgba(0, 0, 0, 0.05);
 }
 
 // Removed unused styles: .chat-mini-toggle, .vertical-text

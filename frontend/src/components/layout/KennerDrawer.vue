@@ -1,16 +1,18 @@
 <template>
   <div class="column full-height kenner-drawer-container glass-effect">
     <!-- Drawer Header -->
-    <div class="q-pa-md q-mb-sm row items-center border-bottom-subtle">
-      <q-icon name="img:icons/favicon.svg" size="32px" class="q-mr-sm" />
-      <span class="text-h6 text-weight-bold tracking-tighter" style="letter-spacing: -0.5px;"><span class="text-primary">Kenner</span><span class="text-accent">Liga</span></span>
+    <div class="q-pa-lg q-mb-sm row items-center border-bottom-subtle bg-white/50">
+      <q-icon name="img:icons/favicon.svg" size="36px" class="q-mr-sm" />
+      <span class="text-h5 text-weight-bolder tracking-tighter" style="letter-spacing: -1px;">
+        <span class="text-primary">Kenner</span><span class="text-accent">Liga</span>
+      </span>
       <q-space />
-      <q-btn flat round dense icon="close" color="grey-7" @click="drawerState = false" />
+      <q-btn flat round dense icon="close" color="grey-7" class="hover-scale" @click="drawerState = false" />
     </div>
 
     <!-- Drawer Content -->
-    <div class="col scroll">
-      <q-list class="q-py-md">
+    <div class="col scroll q-px-sm">
+      <q-list class="q-py-sm">
         <DrawerSubGroup>General</DrawerSubGroup>
         <DrawerItem icon="feedback" icon-color="orange-8" label="Feedback" forward-name="feedback" />
         <DrawerItem
@@ -42,8 +44,9 @@
       </q-list>
     </div>
 
-    <div class="q-pb-lg">
-      <DrawerItem icon="logout" icon-color="red-7" label="Logout" @click="doLogout" />
+    <div class="q-pa-md q-pb-xl">
+      <q-separator class="q-mb-md drawer-separator" />
+      <DrawerItem icon="logout" icon-color="red-7" label="Logout" class="logout-item" @click="doLogout" />
     </div>
   </div>
 </template>
@@ -74,25 +77,39 @@ async function doLogout(): Promise<void> {
 
 <style lang="scss">
 .kenner-drawer-container {
-  background: rgba(255, 255, 255, 0.9) !important;
+  background: rgba(255, 255, 255, 0.85) !important;
 }
 
 .glass-effect {
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(25px) saturate(180%);
+  -webkit-backdrop-filter: blur(25px) saturate(180%);
 }
 
 .border-bottom-subtle {
-  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.03);
 }
 
 .drawer-separator {
-  opacity: 0.3;
-  margin: 12px 16px;
+  opacity: 0.15;
+  margin: 16px 24px;
+}
+
+.logout-item {
+  border: 1px solid rgba(255, 0, 0, 0.05);
+  background: rgba(255, 0, 0, 0.02);
+  &:hover {
+    background: rgba(255, 0, 0, 0.06);
+    color: #d32f2f !important;
+  }
+}
+
+.hover-scale {
+  transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  &:hover {
+    transform: scale(1.1);
+  }
 }
 
 .kenner-drawer {
-  border-left: 2px solid #cfd8dc !important;
-  box-shadow: -2px 0 10px rgba(0, 0, 0, 0.02);
 }
 </style>

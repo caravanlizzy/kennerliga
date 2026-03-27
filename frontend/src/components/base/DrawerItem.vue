@@ -49,28 +49,41 @@ function handleClick() {
   color: #555;
 
   &.squircle-shape {
-    border-radius: 4px !important;
+    border-radius: 12px !important;
   }
 
   &:hover {
-    background: rgba(0, 0, 0, 0.04);
+    background: rgba(var(--q-primary), 0.05);
     color: var(--q-primary);
 
     .q-icon {
       color: var(--q-primary);
+      transform: scale(1.05);
     }
   }
 
   &--active {
-    background: rgba(var(--q-primary), 0.08);
+    background: linear-gradient(90deg, rgba(var(--q-primary), 0.1) 0%, rgba(var(--q-primary), 0.02) 100%);
     color: var(--q-primary);
     font-weight: 600;
+
+    &::before {
+      content: '';
+      position: absolute;
+      left: -8px;
+      top: 15%;
+      height: 70%;
+      width: 4px;
+      background: var(--q-primary);
+      border-radius: 0 4px 4px 0;
+    }
   }
 }
 
 .drawer-item__icon-section {
-  min-width: 40px !important;
+  min-width: 36px !important;
   padding-right: 0 !important;
+  transition: transform 0.2s ease;
 }
 
 .drawer-item__text-section {
