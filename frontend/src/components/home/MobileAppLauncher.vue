@@ -28,7 +28,6 @@
                   <div class="text-h6 text-weight-bold title-text">{{ tile.title }}</div>
                   <div class="text-caption text-grey-7 description-text">{{ tile.description }}</div>
                 </div>
-                <q-icon name="chevron_right" size="xs" color="grey-5" class="arrow-icon" />
               </div>
             </div>
           </div>
@@ -132,11 +131,6 @@ function navigateTo(route: Record<string, unknown>) {
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
     border-color: rgba(0, 0, 0, 0.08);
 
-    .arrow-icon {
-      transform: translateX(4px);
-      color: var(--theme-color) !important;
-    }
-
     .icon-blob {
       transform: scale(1.2) rotate(15deg);
     }
@@ -182,10 +176,6 @@ function navigateTo(route: Record<string, unknown>) {
 .description-text {
   font-size: 0.8rem;
   line-height: 1.2;
-}
-
-.arrow-icon {
-  transition: all 0.3s ease;
 }
 
 .decorative-circle {
