@@ -444,6 +444,10 @@ class SeasonParticipantViewSet(ModelViewSet):
     def list(self, request, *args, **kwargs):
         # Use default list to get current registered entries, then augment if season provided
         season_id = request.query_params.get('season')
+        # Opt-in flag: only include previous unregistered players when explicitly requested
+        include_prev_unregistered = str(request.query_params.get('include_prev_unregistered', '')).lower() in (
+            '1', 'true', 'yes', 'y', 't'
+        )
         response = super().list(request, *args, **kwargs)
         if not season_id:
             return response
@@ -452,9 +456,12 @@ class SeasonParticipantViewSet(ModelViewSet):
         except Season.DoesNotExist:
             return response
 
-        data = list(response.data)
-        data = self._augment_with_prev_unregistered(season, data)
-        return Response(data)
+        if include_prev_unregistered:
+            data = list(response.data)
+            data = self._augment_with_prev_unregistered(season, data)
+            return Response(data)
+        # Default behaviour: return only registered participants
+        return response
 
     @action(detail=False, methods=["get"], url_path="current")
     def current(self, request):
@@ -466,6 +473,9 @@ class SeasonParticipantViewSet(ModelViewSet):
         registered in the current one.
         If no such season exists, returns an empty list.
         """
+        include_prev_unregistered = str(request.query_params.get('include_prev_unregistered', '')).lower() in (
+            '1', 'true', 'yes', 'y', 't'
+        )
         season = get_running_season()
         if not season:
             season = get_open_season()
@@ -475,9 +485,12 @@ class SeasonParticipantViewSet(ModelViewSet):
 
         qs = self.get_queryset().filter(season=season)
         serializer = self.get_serializer(qs, many=True)
-        data = list(serializer.data)
-        data = self._augment_with_prev_unregistered(season, data)
-        return Response(data)
+        if include_prev_unregistered:
+            data = list(serializer.data)
+            data = self._augment_with_prev_unregistered(season, data)
+            return Response(data)
+        # Default behaviour: return only registered participants
+        return Response(serializer.data)
 
 
 class LiveEventViewSet(ViewSet):

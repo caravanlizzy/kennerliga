@@ -35,7 +35,7 @@ export async function fetchIsRegisteredForSeason(seasonId?: number): Promise<boo
   }
 }
 
-export async function fetchOpenSeasonParticipants(): Promise<TSeasonParticipantDto[]> {
+export async function fetchOpenSeasonParticipants(includePrevUnregistered = false): Promise<TSeasonParticipantDto[]> {
   try {
     // 1. Find the season that is currently 'OPEN' (registration phase)
     const { data } = await api.get('/season/seasons/?status=OPEN');
@@ -48,7 +48,7 @@ export async function fetchOpenSeasonParticipants(): Promise<TSeasonParticipantD
     }
 
     // 2. Fetch participants for that specific season
-    return await fetchSeasonParticipants(openSeason.id);
+    return await fetchSeasonParticipants(openSeason.id, { includePrevUnregistered });
   } catch (error) {
     console.error('Failed to fetch open season participants:', error);
     return []; // safe fallback
@@ -92,9 +92,13 @@ export async function createSeason(targetYear: number, targetMonth: number): Pro
   return season as TSeasonDto; // { id, year, month, ... }
 }
 
-export async function fetchSeasonParticipants(seasonId: number): Promise<TSeasonParticipantDto[]> {
+export async function fetchSeasonParticipants(
+  seasonId: number,
+  opts?: { includePrevUnregistered?: boolean }
+): Promise<TSeasonParticipantDto[]> {
   // Season detail should include participants array
-  const { data } = await api.get(`/season/season-participants/?season=${seasonId}`);
+  const include = opts?.includePrevUnregistered ? '&include_prev_unregistered=true' : '';
+  const { data } = await api.get(`/season/season-participants/?season=${seasonId}${include}`);
   const arr = Array.isArray(data) ? data : data?.results || [];
   return arr;
 }

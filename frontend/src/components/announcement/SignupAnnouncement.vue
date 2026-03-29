@@ -219,9 +219,10 @@ async function loadParticipants() {
   try {
     const seasonId = announcement.season_id || openSeasonId.value;
     if (seasonId) {
-      participants.value = await fetchSeasonParticipants(seasonId);
+      // Include previous-season unregistered players for announcement context
+      participants.value = await fetchSeasonParticipants(seasonId, { includePrevUnregistered: true });
     } else {
-      participants.value = await fetchOpenSeasonParticipants();
+      participants.value = await fetchOpenSeasonParticipants(true);
     }
   } catch {
     participants.value = [];
