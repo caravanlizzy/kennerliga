@@ -9,9 +9,9 @@
     @click="router.push({ name: 'user-detail', params: { username: displayUsername } })"
   >
     <div class="avatar-inner full-width full-height flex flex-center">
-      <span class="avatar-text">{{ initials }}</span>
+      <span class="avatar-text" :style="textStyle">{{ initials }}</span>
     </div>
-    <q-tooltip>{{ displayUsername }}</q-tooltip>
+    <q-tooltip v-if="displayUsername">{{ displayUsername }}</q-tooltip>
     <slot />
   </q-avatar>
 </template>
@@ -52,21 +52,31 @@ function hash(str: string) {
   return Math.abs(h)
 }
 const hue = computed(() => hash(clean.value || 'user') % 360)
-const sat = 55
-const light = 70
-
+const sat = 45
+const light = 88
 
 const avatarStyle = computed(() => {
   const baseHue = hue.value;
-  const borderColor = `hsla(${baseHue}, ${sat}%, ${Math.max(light - 20, 40)}%, 0.6)`;
-  const textColor = `hsl(${baseHue}, ${sat}%, ${Math.max(light - 30, 30)}%)`;
+  const bgColor = `hsla(${baseHue}, ${sat}%, ${light}%, 0.9)`;
+  const borderColor = `hsla(${baseHue}, ${sat}%, ${Math.max(light - 20, 60)}%, 0.3)`;
+  const textColor = `hsl(${baseHue}, ${sat}%, ${Math.max(light - 60, 25)}%)`;
 
   return {
+    '--avatar-bg-color': bgColor,
     '--avatar-border-color': borderColor,
     '--avatar-text-color': textColor,
-    '--avatar-hue': baseHue.toString(),
-    boxShadow: `0 2px 8px hsla(${baseHue}, ${sat}%, 20%, 0.05)`
+    backgroundColor: bgColor,
+    boxShadow: `0 2px 8px hsla(${baseHue}, ${sat}%, 20%, 0.04)`
   } as Record<string, string>
+})
+
+const textStyle = computed(() => {
+  // Simple heuristic for font-size based on avatar size
+  const numericSize = parseFloat(props.size || '32');
+  const fontSize = numericSize * 0.42;
+  return {
+    fontSize: `${fontSize}px`
+  }
 })
 
 /* shape */
@@ -89,23 +99,30 @@ const shapeClass = computed(() => {
   cursor: pointer;
   border: 1px solid var(--avatar-border-color);
   color: var(--avatar-text-color);
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.user-avatar:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08) !important;
+  border-color: rgba(0, 0, 0, 0.1);
 }
 
 .avatar-inner {
   border-radius: inherit;
+  transition: background-color 0.25s ease;
 }
 
 .avatar-text {
-  font-size: 0.85rem;
-  font-weight: 600;
+  font-weight: 700;
   line-height: 1;
-  letter-spacing: 0.5px;
+  letter-spacing: -0.01em;
   user-select: none;
   text-transform: uppercase;
+  opacity: 0.9;
 }
 
-/* squircle magic: quadratic border radius ratio */
+/* squircle magic: proportional border radius */
 .squircle-shape {
-  border-radius: 12px !important;
+  border-radius: 28% !important;
 }
 </style>
