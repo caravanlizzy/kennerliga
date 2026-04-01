@@ -5,15 +5,15 @@
     class="action-bar-card q-mb-md"
   >
     <!-- Status Header Row -->
-    <div class="status-header q-pa-sm">
+    <div class="status-header q-px-md q-py-sm">
       <div class="row items-center no-wrap">
         <!-- Center: Status chip -->
         <div class="col flex items-center">
           <q-badge
-            color="white"
-            text-color="primary"
-            class="text-uppercase text-bold q-px-sm q-py-xs shadow-1"
-            style="border-radius: 4px; border: 1px solid rgba(0,0,0,0.05)"
+            color="grey-1"
+            text-color="grey-8"
+            class="text-uppercase text-bold q-px-sm q-py-xs"
+            style="border-radius: 6px; letter-spacing: 0.05em; font-size: 0.7rem; border: 1px solid rgba(0,0,0,0.05)"
           >
             <template v-if="loading">
               Loading
@@ -28,10 +28,11 @@
         <div class="col-auto flex justify-end">
           <q-chip
             v-if="activePlayer"
-            :color="isMeActivePlayer ? 'positive' : 'grey-4'"
-            :text-color="isMeActivePlayer ? 'white' : 'dark'"
-            class="text-weight-bold"
-            style="border-radius: 8px"
+            outline
+            :color="isMeActivePlayer ? 'positive' : 'grey-7'"
+            :text-color="isMeActivePlayer ? 'positive' : 'grey-8'"
+            class="text-weight-bold q-ma-none"
+            style="border-radius: 6px; font-size: 0.8rem;"
           >
             <q-icon :name="isMeActivePlayer ? 'bolt' : 'schedule'" size="16px" class="q-mr-xs" />
             <span v-if="isMeActivePlayer">Your turn</span>
@@ -127,21 +128,18 @@ async function handleAction(action: any) {
 .action-bar-card {
   border-radius: 12px;
   overflow: hidden;
-  background: rgba(255, 255, 255, 0.7);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(54, 64, 88, 0.1);
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+  background: white;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
   transition: all 0.3s ease;
 
   &:hover {
-    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.06);
-    background: rgba(255, 255, 255, 0.8);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
   }
 }
 
 .status-header {
-  background: rgba(248, 249, 250, 0.5);
-  border-bottom: 1px solid rgba(54, 64, 88, 0.05);
+  background: transparent;
 }
 
 .action-content {
