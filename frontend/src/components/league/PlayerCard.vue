@@ -2,13 +2,19 @@
   <div class="player-card">
     <div v-for="m in allMembers" :key="m.id" class="member-section">
       <!-- Member Header -->
-      <div class="member-header q-mb-sm">
+      <div class="member-header">
         <UserAvatar
           :display-username="m.username"
-          size="32px"
+          size="40px"
+          class="avatar-shadow"
         />
-        <div class="text-subtitle1 text-weight-bold q-ml-sm text-primary">
-          {{ m.profile_name }}
+        <div class="header-content q-ml-md">
+          <div class="text-subtitle1 text-weight-bold player-name">
+            {{ m.profile_name }}
+          </div>
+          <div v-if="m.has_banned && !m.my_banned_game?.game" class="text-caption text-grey-6 italic">
+            Skipped ban
+          </div>
         </div>
       </div>
 
@@ -21,7 +27,9 @@
         >
           <q-item class="game-item">
             <q-item-section avatar>
-              <q-icon name="sports_esports" color="primary" size="24px" />
+              <div class="game-icon-bg">
+                <q-icon name="sports_esports" color="primary" size="20px" />
+              </div>
             </q-item-section>
 
             <q-item-section>
@@ -31,7 +39,7 @@
                   {{ game.game_name }}
                 </KennerTooltip>
               </q-item-label>
-              <q-item-label v-if="game.platform_name" caption class="text-grey-7 text-weight-medium">
+              <q-item-label v-if="game.platform_name" caption class="platform-label">
                 {{ game.platform_name }}
               </q-item-label>
             </q-item-section>
@@ -41,6 +49,7 @@
                 flat
                 round
                 size="sm"
+                color="grey-6"
                 :icon="isExpanded(game.id) ? 'expand_less' : 'expand_more'"
                 @click="toggleExpanded(game.id)"
               />
@@ -48,41 +57,29 @@
           </q-item>
 
           <q-slide-transition>
-            <div v-if="isExpanded(game.id)" class="game-details q-px-md q-pb-sm">
+            <div v-if="isExpanded(game.id)" class="game-details q-px-md q-pb-md">
               <GameSettingsDisplay :selectedOptions="game.selected_options" />
             </div>
           </q-slide-transition>
         </div>
 
-        <!-- 2. The Game they Banned -->
-        <q-item v-if="m.my_banned_game?.game" class="ban-item">
+        <!-- 2. The Game they Banned (The Action they took) -->
+        <q-item v-if="m.my_banned_game?.game" class="ban-action-item">
           <q-item-section avatar>
-            <q-icon name="gavel" color="blue-grey-4" size="20px" />
+            <q-icon name="gavel" color="blue-grey-4" size="18px" />
           </q-item-section>
           <q-item-section>
-            <q-item-label class="row items-center">
-              <span class="text-blue-grey-7 text-weight-medium q-mr-sm">Banned:</span>
-              <span class="text-weight-medium">{{ m.my_banned_game.game_name }}</span>
+            <q-item-label class="row items-center ban-text">
+              <span class="text-blue-grey-6 q-mr-xs">Banned</span>
+              <span class="text-weight-medium text-blue-grey-8">{{ m.my_banned_game.game_name }}</span>
               <KennerTooltip v-if="getOwnerName(m.my_banned_game.profile)">
                 Picked by {{ getOwnerName(m.my_banned_game.profile) }}
               </KennerTooltip>
             </q-item-label>
-            <q-item-label v-if="m.my_banned_game.platform_name" caption class="text-blue-grey-4">
-              {{ m.my_banned_game.platform_name }}
-            </q-item-label>
           </q-item-section>
         </q-item>
 
-        <q-item v-else-if="m.has_banned" class="ban-item skipped">
-          <q-item-section avatar>
-            <q-icon name="gavel" color="grey-5" size="20px" />
-          </q-item-section>
-          <q-item-section>
-            <q-item-label class="text-grey-6 italic">Player skipped ban</q-item-label>
-          </q-item-section>
-        </q-item>
-
-        <!-- 3. Their own game that has been successfully banned -->
+        <!-- 3. Their own game that has been successfully banned (The State of their pick) -->
         <div
           v-for="game in getSuccessfullyBannedPicks(m)"
           :key="'banned-' + game.id"
@@ -90,18 +87,17 @@
         >
           <q-item class="game-item">
             <q-item-section avatar>
-              <q-icon name="block" color="negative" size="20px" />
+              <div class="game-icon-bg banned">
+                <q-icon name="block" color="negative" size="18px" />
+              </div>
             </q-item-section>
 
             <q-item-section>
-              <q-item-label class="game-name text-grey-6 text-strike">
+              <q-item-label class="game-name text-grey-5 text-strike">
                 {{ game.game_name }}
               </q-item-label>
-              <q-item-label v-if="game.platform_name" caption class="text-grey-5 text-strike" style="margin-top: -2px;">
-                {{ game.platform_name }}
-              </q-item-label>
-              <q-item-label caption class="text-blue-grey-4">
-                Successfully Banned
+              <q-item-label caption class="banned-by-label">
+                Banned
                 <span v-if="getBannerNames(game.id).length > 0">
                   by {{ formatBannerNames(getBannerNames(game.id)) }}
                 </span>
@@ -113,6 +109,7 @@
                 flat
                 round
                 size="sm"
+                color="grey-4"
                 :icon="isExpanded(game.id) ? 'expand_less' : 'expand_more'"
                 @click="toggleExpanded(game.id)"
               />
@@ -120,7 +117,7 @@
           </q-item>
 
           <q-slide-transition>
-            <div v-if="isExpanded(game.id)" class="game-details q-px-md q-pb-sm opacity-50">
+            <div v-if="isExpanded(game.id)" class="game-details q-px-md q-pb-md opacity-50">
               <GameSettingsDisplay :selectedOptions="game.selected_options" />
             </div>
           </q-slide-transition>
@@ -199,7 +196,7 @@ function formatBannerNames(names: string[]) {
   padding: 8px 0;
   display: grid;
   grid-template-columns: 1fr;
-  gap: 16px;
+  gap: 20px;
 
   @media (min-width: 1024px) {
     grid-template-columns: repeat(2, 1fr);
@@ -208,24 +205,34 @@ function formatBannerNames(names: string[]) {
 
 .member-section {
   background: white;
-  border-radius: 12px;
+  border-radius: 16px;
   overflow: hidden;
-  transition: all 0.3s ease;
-  border: 1px solid rgba(0, 0, 0, 0.08);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
 
   &:hover {
-    border-color: var(--q-primary);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 12px 30px -5px rgba(0, 0, 0, 0.04), 0 8px 10px -6px rgba(0, 0, 0, 0.04);
   }
 }
 
 .member-header {
   display: flex;
   align-items: center;
-  padding: 12px 16px;
-  background: rgba(var(--q-primary), 0.05);
-  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  padding: 16px 20px;
+  background: linear-gradient(to right, rgba(var(--q-primary), 0.03), transparent);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+}
+
+.avatar-shadow {
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+  border: 1px solid white;
+}
+
+.player-name {
+  font-size: 1.1rem;
+  letter-spacing: -0.01em;
+  color: var(--q-dark);
 }
 
 .game-list {
@@ -240,37 +247,71 @@ function formatBannerNames(names: string[]) {
 }
 
 .game-item {
-  padding: 8px 16px;
-  min-height: 48px;
+  padding: 12px 20px;
+  min-height: 56px;
+}
+
+.game-icon-bg {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: rgba(var(--q-primary), 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &.banned {
+    background: rgba(var(--q-negative), 0.08);
+  }
 }
 
 .game-name {
   font-size: 15px;
   font-weight: 600;
-  color: var(--q-dark);
+  color: #2c3e50;
+  line-height: 1.2;
 }
 
-.ban-item {
-  min-height: 40px;
-  padding: 4px 16px;
-  background: rgba(var(--q-blue-grey), 0.05);
-  border-bottom: 1px solid rgba(0, 0, 0, 0.03);
+.platform-label {
+  color: #7f8c8d;
+  font-weight: 500;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  margin-top: 2px;
+}
 
-  &.skipped {
-    background: transparent;
-  }
+.ban-action-item {
+  min-height: 44px;
+  padding: 8px 20px;
+  background: rgba(var(--q-blue-grey), 0.03);
+  border-top: 1px solid rgba(0, 0, 0, 0.02);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.02);
+}
+
+.ban-text {
+  font-size: 13px;
+}
+
+.banned-by-label {
+  font-size: 12px;
+  color: #94a3b8;
+  margin-top: 2px;
 }
 
 .game-details {
-  border-top: 1px dashed rgba(0, 0, 0, 0.05);
+  border-top: 1px dashed rgba(0, 0, 0, 0.06);
   background: rgba(0, 0, 0, 0.01);
+  margin: 0 10px;
+  border-radius: 0 0 8px 8px;
 }
 
 .opacity-50 {
-  opacity: 0.5;
+  opacity: 0.6;
 }
 
 .text-strike {
   text-decoration: line-through;
+  text-decoration-thickness: 1.5px;
 }
 </style>
