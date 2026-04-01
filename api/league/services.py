@@ -239,7 +239,10 @@ def advance_turn(league: League):
             league.save(update_fields=["status", "active_player"])
         else:
             players_to_repick = q.get_players_to_repick(league)
-            rotate_active_player(league, members=players_to_repick)
+            # rotate_active_player expects a queryset (uses order_by),
+            # so convert the returned list of members to a queryset
+            qs = league.members.filter(id__in=[m.id for m in players_to_repick])
+            rotate_active_player(league, members=qs)
 
     elif league.status == LeagueStatus.BANNING:
         if q.all_players_have_banned(league):
