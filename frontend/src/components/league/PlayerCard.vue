@@ -5,6 +5,7 @@
       <div class="member-header">
         <UserAvatar
           :display-username="m.username"
+          :subtitle="m.profile_name !== m.username ? m.profile_name : undefined"
           size="40px"
           class="avatar-shadow"
         />
