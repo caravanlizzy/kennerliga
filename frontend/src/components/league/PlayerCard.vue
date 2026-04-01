@@ -7,7 +7,6 @@
           :display-username="m.username"
           :subtitle="m.profile_name !== m.username ? m.profile_name : undefined"
           size="40px"
-          class="avatar-shadow"
         />
         <div class="header-content q-ml-md">
           <div class="text-subtitle1 text-weight-bold player-name">
@@ -225,10 +224,6 @@ function formatBannerNames(names: string[]) {
   border-bottom: 1px solid rgba(0, 0, 0, 0.04);
 }
 
-.avatar-shadow {
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
-  border: 1px solid white;
-}
 
 .player-name {
   font-size: 1.1rem;

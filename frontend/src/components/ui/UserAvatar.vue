@@ -12,7 +12,7 @@
       <span class="avatar-text" :style="textStyle">{{ initials }}</span>
     </div>
 
-    <KennerTooltip v-if="displayUsername">
+    <KennerTooltip v-if="displayUsername" :color="avatarStyle.backgroundColor">
       <div class="column items-center">
         <div class="row items-center no-wrap q-mb-xs">
           <q-icon name="account_circle" size="18px" class="q-mr-xs text-primary opacity-80" />

@@ -8,12 +8,28 @@
     transition-show="jump-up"
     transition-hide="fade"
     :offset="[10, 10]"
+    :style="tooltipStyle"
   >
-    <div class="row items-center no-wrap">
+    <div class="column items-center justify-center">
       <slot />
     </div>
   </q-tooltip>
 </template>
+
+<script setup lang="ts">
+import { computed } from 'vue'
+
+const props = defineProps<{
+  color?: string
+}>()
+
+const tooltipStyle = computed(() => {
+  if (!props.color) return {}
+  return {
+    border: `2px solid ${props.color}`,
+  }
+})
+</script>
 
 <style scoped lang="scss">
 .kenner-tooltip {
