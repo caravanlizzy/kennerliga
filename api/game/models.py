@@ -257,6 +257,14 @@ class ResultConfig(models.Model):
         return f"ResultConfig for {self.game}"
 
 
+class WinCondition(models.Model):
+    result_config = models.ForeignKey(ResultConfig, on_delete=models.CASCADE, related_name='win_conditions')
+    name = models.CharField(max_length=255)
+
+    def __str__(self):
+        return f"{self.name} ({self.result_config.game.name})"
+
+
 class TieBreaker(models.Model):
     result_config = models.ForeignKey(ResultConfig, on_delete=models.CASCADE)
     name = models.CharField(max_length=255)

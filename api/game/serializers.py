@@ -7,21 +7,9 @@ from result.models import Result
 from result.serializers import ResultSerializer
 from .services import create_selected_game, create_ban_decision
 from . import queries as game_q
-from game.models import (
-    Game,
-    GameOption,
-    GameOptionChoice,
-    Faction,
-    TieBreaker,
-    ResultConfig,
-    StartingPointSystem,
-    Platform,
-    SelectedGame,
-    SelectedOption,
-    BanDecision,
-    GameOptionAvailabilityGroup,
-    GameOptionAvailabilityCondition,
-)
+from game.models import Game, GameOption, GameOptionChoice, Faction, TieBreaker, ResultConfig, StartingPointSystem, \
+    Platform, SelectedGame, SelectedOption, BanDecision, GameOptionAvailabilityGroup, GameOptionAvailabilityCondition, \
+    WinCondition
 from league.models import League
 from user.models import PlayerProfile
 
@@ -53,7 +41,13 @@ class FactionSerializer(ModelSerializer):
 class TieBreakerSerializer(ModelSerializer):
     class Meta:
         model = TieBreaker
-        fields = "__all__"
+        fields = '__all__'
+
+
+class WinConditionSerializer(ModelSerializer):
+    class Meta:
+        model = WinCondition
+        fields = '__all__'
 
 
 class ResultConfigSerializer(ModelSerializer):
@@ -64,6 +58,7 @@ class ResultConfigSerializer(ModelSerializer):
     starting_points_system = serializers.PrimaryKeyRelatedField(
         queryset=StartingPointSystem.objects.all(), required=False, allow_null=True
     )
+    win_conditions = WinConditionSerializer(many=True, read_only=True)
 
     class Meta:
         model = ResultConfig

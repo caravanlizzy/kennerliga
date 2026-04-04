@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from game.models import ResultConfig, Faction, TieBreaker
+from game.models import ResultConfig, Faction, TieBreaker, WinCondition
 from .models import Result
 
 
@@ -12,25 +12,31 @@ class ResultSerializer(serializers.ModelSerializer):
     decisive_tie_breaker = serializers.PrimaryKeyRelatedField(
         queryset=TieBreaker.objects.all(), required=False, allow_null=True
     )
+    win_condition = serializers.PrimaryKeyRelatedField(
+        queryset=WinCondition.objects.all(),
+        required=False,
+        allow_null=True
+    )
     game_name = serializers.CharField(source="selected_game.game.name", read_only=True)
 
     class Meta:
         model = Result
         fields = [
-            "id",
-            "player_profile",
-            "player_profile_name",
-            "selected_game",
-            "game_name",
-            "points",
-            "starting_points",
-            "starting_position",
-            "position",
-            "notes",
-            "tie_breaker_value",
-            "decisive_tie_breaker",
-            "faction_ids",
-            "factions",
+            'id',
+            'player_profile',
+            'player_profile_name',
+            'selected_game',
+            'game_name',
+            'points',
+            'starting_points',
+            'starting_position',
+            'position',
+            'win_condition',
+            'notes',
+            'tie_breaker_value',
+            'decisive_tie_breaker',
+            'faction_ids',
+            'factions',
         ]
 
     def get_factions(self, obj):
@@ -47,6 +53,11 @@ class ResultSerializer(serializers.ModelSerializer):
             ret["decisive_tie_breaker"] = {
                 "id": instance.decisive_tie_breaker.id,
                 "name": instance.decisive_tie_breaker.name,
+            }
+        if instance.win_condition:
+            ret['win_condition'] = {
+                "id": instance.win_condition.id,
+                "name": instance.win_condition.name
             }
         return ret
 
@@ -89,6 +100,12 @@ class ResultSerializer(serializers.ModelSerializer):
         if result_config.has_points:
             if "points" not in data:
                 raise serializers.ValidationError("Points are required for this game.")
+
+        # ✅ Validate win condition
+        win_condition = data.get('win_condition')
+        if win_condition:
+            if win_condition.result_config.game != selected_game.game:
+                raise serializers.ValidationError("Win condition must belong to the selected game.")
 
         return data
 
