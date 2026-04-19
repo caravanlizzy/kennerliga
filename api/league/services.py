@@ -202,6 +202,11 @@ def get_full_standings_data(league: League) -> Dict:
         "tie_groups": tie_groups,
     }
 
+def set_league_active_player(league: League, participant) -> None:
+    league.active_player = participant
+    league.save(update_fields=["active_player"])
+
+
 def rotate_active_player(league: League, reverse_order: bool = False, members=None) -> Optional[SeasonParticipant]:
     players = members if members is not None else league.members.all()
     ordered_players = list(players.order_by("-rank" if reverse_order else "rank"))

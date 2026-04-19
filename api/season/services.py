@@ -1,5 +1,6 @@
 import logging
 from league.models import League, LeagueStanding
+from league.services import set_league_active_player
 from season.models import Season, SeasonParticipant
 from season.queries import get_running_season, get_open_season
 from random import shuffle
@@ -39,15 +40,27 @@ def open_registration(season: Season):
     season.status = Season.SeasonStatus.OPEN
     season.save()
 
+
 def create_leagues(season: Season, participants: List) -> List[League]:
     players_per_league = _players_per_league(len(participants))
-    leagues = [League.objects.create(season=season, level=i + 1)
-               for i in range(len(players_per_league))]
+    leagues = [
+        League.objects.create(season=season, level=i + 1)
+        for i in range(len(players_per_league))
+    ]
     counter = 0
+
     for league, size in zip(leagues, players_per_league):
-        for _ in range(size):
-            league.members.add(participants[counter])
+        first_participant = None
+        for i in range(size):
+            participant = participants[counter]
+            league.members.add(participant)
+            if i == 0:
+                first_participant = participant
             counter += 1
+
+        if first_participant is not None:
+            set_league_active_player(league, first_participant)
+
     return leagues
 
 def _next_month_year(month: int, year: int):
