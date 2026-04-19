@@ -1,6 +1,7 @@
 from django.db import transaction
 from season.queries import get_registered_participants, get_open_season, get_running_season
 from season.services import close_season, rank_participants, create_leagues, start_open_season, create_next_season
+from announcement.services import delete_registration_announcements
 
 
 def start_new_season():
@@ -11,6 +12,7 @@ def start_new_season():
         raise ValueError("No open season found to start")
 
     with transaction.atomic():
+        delete_registration_announcements()
         close_season(running_season)
 
         participants = list(get_registered_participants())
