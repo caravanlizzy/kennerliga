@@ -39,7 +39,12 @@
         <template v-if="isAdmin">
           <q-separator class="q-my-sm drawer-separator" />
           <DrawerSubGroup>Development</DrawerSubGroup>
-          <DrawerItem icon="terminal" icon-color="grey-9" label="Hijack (Dev)" forward-name="dev" />
+          <DrawerItem
+            icon="task_alt"
+            icon-color="green-7"
+            label="Task Board"
+            @click="openTaskBoard"
+          />
         </template>
       </q-list>
     </div>
@@ -67,6 +72,10 @@ const { isAdmin } = storeToRefs(useUserStore());
 const router = useRouter();
 
 provide('closeDrawer', () => (drawerState.value = false));
+
+function openTaskBoard(): void {
+  window.open('https://task-board-production-6055.up.railway.app/', '_blank');
+}
 
 async function doLogout(): Promise<void> {
   await logout();
