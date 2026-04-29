@@ -212,7 +212,7 @@ function getEventDisplayType(type: TLiveEventType) {
     case 'GAME_FINISHED':
       return 'WIN';
     case 'LEAGUE_FINISHED':
-      return 'LEAGUE';
+      return 'COMPLETE';
     case 'SEASON_FINISHED':
       return 'SEASON';
     default:
