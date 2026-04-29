@@ -13,7 +13,7 @@ def get_full_standings_data(league: League) -> Dict:
     # 1. Get all selected games for this league (column headers)
     selected_games = (
         SelectedGame.objects
-        .filter(league=league)
+        .filter(league_id=league.id)
         .annotate(ban_count=Count('bandecision'))
         .filter(ban_count__lt=required_bans)
         .select_related('game__platform', 'profile')
@@ -38,15 +38,16 @@ def get_full_standings_data(league: League) -> Dict:
     # 2. Get league standings (for row ordering & totals)
     league_standings = (
         LeagueStanding.objects
-        .filter(league=league)
+        .filter(league_id=league.id)
         .select_related('player_profile__user')
     )
-    league_standing_dict = {ls.player_profile_id: ls for ls in league_standings}
+    league_standing_list = list(league_standings)
+    league_standing_dict = {ls.player_profile_id: ls for ls in league_standing_list}
 
     # 3. Get all game standings for this league
     game_standings = (
         GameStanding.objects
-        .filter(league=league)
+        .filter(league_id=league.id)
         .select_related('decisive_tie_breaker')
     )
 
@@ -97,7 +98,7 @@ def get_full_standings_data(league: League) -> Dict:
         })
 
     # Sort standings_list: if we have LeagueStandings, sort by them, otherwise stick to member rank
-    if league_standings.exists():
+    if league_standing_list:
         standings_list.sort(key=lambda x: (
             -float(x["total_league_points"]),
             -float(x["total_wins"]),
@@ -108,7 +109,7 @@ def get_full_standings_data(league: League) -> Dict:
     # Unresolved groups from current snapshot
     unresolved_qs = (
         LeagueStanding.objects
-        .filter(league=league, unresolved_tie_group__isnull=False)
+        .filter(league_id=league.id, unresolved_tie_group__isnull=False)
         .select_related('player_profile__user')
     )
     unresolved_map: Dict[str, Dict] = {}
@@ -132,9 +133,10 @@ def get_full_standings_data(league: League) -> Dict:
         })
 
     # Resolutions (may include groups already resolved and thus not present as unresolved anymore)
+    # 7. Get tie resolutions
     resolutions = (
         LeagueTieResolution.objects
-        .filter(league=league)
+        .filter(league_id=league.id)
         .prefetch_related('entries__player_profile__user')
     )
     resolution_map: Dict[str, Dict] = {}
@@ -163,10 +165,6 @@ def get_full_standings_data(league: League) -> Dict:
 
     # Merge: unresolved first, then add resolved groups that aren't currently unresolved
     tie_groups: List[Dict] = []
-    
-    # 7. Check for each group if it has a resolution
-    resolutions_qs = LeagueTieResolution.objects.filter(league=league)
-    has_resolution = {res.group_key: True for res in resolutions_qs}
     
     # Add unresolved groups
     for key, group in unresolved_map.items():

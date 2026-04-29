@@ -21,6 +21,11 @@ class LeagueViewSet(ModelViewSet):
     filterset_fields = ['season', 'members__profile']
     permission_classes = [IsAuthenticated]
 
+    def get_queryset(self):
+        if self.action == "full_standings":
+            return League.objects.all()
+        return super().get_queryset()
+
     def get_serializer_class(self):
         if self.action == 'list':
             return LeagueListSerializer
