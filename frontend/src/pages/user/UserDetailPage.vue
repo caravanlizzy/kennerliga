@@ -54,24 +54,55 @@
 
     <div v-else-if="user" class="q-px-md q-py-lg max-width-container mx-auto">
       <div class="row q-col-gutter-lg">
-        <!-- Sidebar: Game Performance -->
+        <!-- Left Column: User Summary & Actions -->
         <div class="col-12 col-md-4">
-          <q-card flat bordered class="rounded-borders sticky-top overflow-hidden">
+          <!-- Selection Limit Status (Moved from sidebar to prominent position) -->
+          <q-card flat bordered class="rounded-borders overflow-hidden q-mb-lg bg-white">
+            <q-card-section class="bg-grey-2 text-weight-bold text-uppercase letter-spacing-1 text-grey-8 row items-center justify-between">
+              <div>Selections {{ new Date().getFullYear() }}</div>
+              <q-icon name="info_outline" size="xs">
+                <q-tooltip>Maximum {{ maxGameLimit }} selections per game per year</q-tooltip>
+              </q-icon>
+            </q-card-section>
+            <q-list separator>
+              <q-item v-for="game in selectedGamesThisYear" :key="game.name + game.platform">
+                <q-item-section>
+                  <q-item-label class="text-weight-bold">{{ game.name }}</q-item-label>
+                  <q-item-label caption>{{ game.platform }}</q-item-label>
+                </q-item-section>
+                <q-item-section side>
+                  <q-badge
+                    :color="game.limit_exceeded ? 'negative' : 'primary'"
+                    :label="`${game.count} / ${maxGameLimit}`"
+                    class="text-weight-bold q-px-sm"
+                  />
+                </q-item-section>
+              </q-item>
+              <q-item v-if="selectedGamesThisYear.length === 0">
+                <q-item-section class="text-grey-6 italic text-center q-pa-md">
+                  No selections yet
+                </q-item-section>
+              </q-item>
+            </q-list>
+          </q-card>
+
+          <!-- Overall Performance Summary -->
+          <q-card flat bordered class="rounded-borders overflow-hidden bg-white">
             <q-card-section class="bg-grey-2 text-weight-bold text-uppercase letter-spacing-1 text-grey-8">
-              Game Performance
+              Overall Performance
             </q-card-section>
             <q-card-section class="q-pa-md">
               <div class="row q-col-gutter-sm q-mb-lg">
                 <div class="col-6">
-                  <div class="column items-center q-pa-sm bg-grey-1 rounded-borders border-grey-2 bordered">
+                  <div class="column items-center q-pa-md bg-grey-1 rounded-borders border-grey-2 bordered">
                     <div class="text-h5 text-weight-bolder text-positive">{{ (overallStats.wins / (overallStats.total_games || 1) * 100).toFixed(0) }}%</div>
-                    <div class="text-caption text-grey-6 uppercase text-weight-bold" style="font-size: 0.6rem">Win Rate</div>
+                    <div class="text-caption text-grey-6 uppercase text-weight-bold">Win Rate</div>
                   </div>
                 </div>
                 <div class="col-6">
-                  <div class="column items-center q-pa-sm bg-grey-1 rounded-borders border-grey-2 bordered">
+                  <div class="column items-center q-pa-md bg-grey-1 rounded-borders border-grey-2 bordered">
                     <div class="text-h5 text-weight-bolder text-primary">#{{ (overallStats.avg_pos || 0).toFixed(1) }}</div>
-                    <div class="text-caption text-grey-6 uppercase text-weight-bold" style="font-size: 0.6rem">Avg Pos</div>
+                    <div class="text-caption text-grey-6 uppercase text-weight-bold">Avg Pos</div>
                   </div>
                 </div>
               </div>
@@ -92,142 +123,172 @@
                     <div class="text-weight-bolder" :class="getPosColorClass(pos)">
                       {{ ((overallStats.positions[pos] || 0) / (overallStats.total_games || 1) * 100).toFixed(0) }}%
                     </div>
-                    <div class="text-caption text-grey-5">{{ overallStats.positions[pos] || 0 }}x</div>
                   </div>
                 </div>
               </div>
             </q-card-section>
           </q-card>
-
-          <!-- Recent Seasons in Sidebar -->
-          <q-card flat bordered class="rounded-borders q-mt-lg overflow-hidden">
-            <q-card-section class="bg-grey-2 text-weight-bold text-uppercase letter-spacing-1 text-grey-8">
-              Recent Seasons
-            </q-card-section>
-            <q-list separator>
-              <q-item
-                v-for="sp in userSeasonList.slice(0, 5)"
-                :key="sp.id"
-                clickable
-                v-ripple
-                @click="router.push({ name: 'season-overview', params: { id: sp.season } })"
-              >
-                <q-item-section>
-                  <q-item-label class="text-weight-bold">{{ sp.season_details?.name || `Season ${sp.season}` }}</q-item-label>
-                  <q-item-label caption v-if="sp.rank">League {{ sp.rank }}</q-item-label>
-                </q-item-section>
-                <q-item-section side>
-                  <q-badge
-                    :color="getPosBadgeColor(sp.position || 0)"
-                    class="text-weight-bold"
-                  >
-                    #{{ sp.position || '-' }}
-                  </q-badge>
-                </q-item-section>
-              </q-item>
-              <q-item v-if="userSeasonList.length === 0">
-                <q-item-section class="text-grey-6 italic text-center">No seasons joined yet</q-item-section>
-              </q-item>
-            </q-list>
-          </q-card>
         </div>
 
-        <!-- Main Content -->
+        <!-- Right Column: Tabs for detailed view -->
         <div class="col-12 col-md-8">
-          <!-- Top Games Highlight -->
-          <div v-if="topGames.length > 0" class="q-mb-xl">
-            <div class="row items-center q-mb-md">
-              <q-icon name="emoji_events" color="amber-8" size="24px" class="q-mr-sm" />
-              <div class="text-h5 text-weight-bolder text-dark tracking-tighter">Top 3 Performing Games</div>
-            </div>
-            <div class="row q-col-gutter-md">
-              <div v-for="(game, idx) in topGames" :key="'top-'+game.name" class="col-12 col-sm-4">
-                <q-card flat class="top-game-card relative-position transition-all overflow-hidden" :class="`rank-${idx+1}`">
-                  <div class="rank-badge absolute-top-left q-pa-sm text-white text-weight-bolder">
-                    #{{ idx + 1 }}
+          <q-tabs
+            v-model="tab"
+            dense
+            class="text-grey-7 bg-white rounded-borders bordered q-mb-lg"
+            active-color="primary"
+            indicator-color="primary"
+            align="justify"
+            narrow-indicator
+          >
+            <q-tab name="games" icon="videogame_asset" label="Games" />
+            <q-tab name="seasons" icon="event" label="Seasons" />
+          </q-tabs>
+
+          <q-tab-panels v-model="tab" animated class="bg-transparent">
+            <!-- Games Tab -->
+            <q-tab-panel name="games" class="q-pa-none">
+              <!-- Top Games Highlight -->
+              <div v-if="topGames.length > 0" class="q-mb-xl">
+                <div class="row items-center q-mb-md">
+                  <q-icon name="emoji_events" color="amber-8" size="24px" class="q-mr-sm" />
+                  <div class="text-h5 text-weight-bolder text-dark tracking-tighter">Top Performing Games</div>
+                </div>
+                <div class="row q-col-gutter-md">
+                  <div v-for="(game, idx) in topGames" :key="'top-'+game.name" class="col-12 col-sm-4">
+                    <q-card flat class="top-game-card relative-position transition-all overflow-hidden" :class="`rank-${idx+1}`">
+                      <div class="rank-badge absolute-top-left q-pa-sm text-white text-weight-bolder">
+                        #{{ idx + 1 }}
+                      </div>
+                      <q-card-section class="q-pt-xl q-pb-md text-center">
+                        <div class="text-subtitle1 text-weight-bolder text-dark ellipsis q-mb-sm">{{ game.name }}</div>
+                        <div class="row justify-center q-gutter-x-md">
+                          <div class="column">
+                            <div class="text-h5 text-weight-bolder text-positive">{{ game.winRate.toFixed(0) }}%</div>
+                            <div class="text-caption text-grey-7 uppercase" style="font-size: 0.6rem">Winrate</div>
+                          </div>
+                          <div class="separator-vertical-dark" />
+                          <div class="column">
+                            <div class="text-h5 text-weight-bolder text-primary">#{{ game.avgPos.toFixed(1) }}</div>
+                            <div class="text-caption text-grey-7 uppercase" style="font-size: 0.6rem">Avg Pos</div>
+                          </div>
+                        </div>
+                      </q-card-section>
+                      <div class="card-footer-accent" :class="`bg-rank-${idx+1}`" />
+                    </q-card>
                   </div>
-                  <q-card-section class="q-pt-xl q-pb-md text-center">
-                    <div class="text-subtitle1 text-weight-bolder text-dark ellipsis q-mb-sm">{{ game.name }}</div>
-                    <div class="row justify-center q-gutter-x-md">
-                      <div class="column">
-                        <div class="text-h5 text-weight-bolder text-positive">{{ game.winRate.toFixed(0) }}%</div>
-                        <div class="text-caption text-grey-7 uppercase" style="font-size: 0.6rem">Winrate</div>
-                      </div>
-                      <div class="separator-vertical-dark" />
-                      <div class="column">
-                        <div class="text-h5 text-weight-bolder text-primary">#{{ game.avgPos.toFixed(1) }}</div>
-                        <div class="text-caption text-grey-7 uppercase" style="font-size: 0.6rem">Avg Pos</div>
-                      </div>
-                    </div>
-                  </q-card-section>
-                  <div class="card-footer-accent" :class="`bg-rank-${idx+1}`" />
-                </q-card>
+                </div>
               </div>
-            </div>
-          </div>
 
-          <!-- All Games Statistics -->
-          <div>
-            <div class="row items-center justify-between q-mb-md">
-              <div class="row items-center">
-                <q-icon name="videogame_asset" color="indigo-7" size="24px" class="q-mr-sm" />
-                <div class="text-h5 text-weight-bolder text-dark tracking-tighter">Game Statistics</div>
-              </div>
-              <div style="min-width: 200px">
-                <q-input
-                  v-model="gameSearch"
-                  outlined
-                  dense
-                  rounded
-                  placeholder="Search games..."
-                  class="bg-white"
-                >
-                  <template #append>
-                    <q-icon name="search" size="xs" />
-                  </template>
-                </q-input>
-              </div>
-            </div>
+              <!-- All Games Statistics -->
+              <div>
+                <div class="row items-center justify-between q-mb-md">
+                  <div class="row items-center">
+                    <q-icon name="list" color="indigo-7" size="24px" class="q-mr-sm" />
+                    <div class="text-h5 text-weight-bolder text-dark tracking-tighter">All Games Library</div>
+                  </div>
+                  <div style="min-width: 200px">
+                    <q-input
+                      v-model="gameSearch"
+                      outlined
+                      dense
+                      rounded
+                      placeholder="Search games..."
+                      class="bg-white"
+                    >
+                      <template #append>
+                        <q-icon name="search" size="xs" />
+                      </template>
+                    </q-input>
+                  </div>
+                </div>
 
-            <div v-if="filteredGameStats.length === 0" class="text-center q-pa-xl text-grey-5 bg-white rounded-borders border-dashed border-grey-4">
-              <q-icon name="sports_esports" size="48px" class="q-mb-sm opacity-20" />
-              <div class="text-h6 text-weight-light">No games found</div>
-              <div class="text-caption">Try a different search term</div>
-            </div>
+                <div v-if="filteredGameStats.length === 0" class="text-center q-pa-xl text-grey-5 bg-white rounded-borders border-dashed border-grey-4">
+                  <q-icon name="sports_esports" size="48px" class="q-mb-sm opacity-20" />
+                  <div class="text-h6 text-weight-light">No games found</div>
+                </div>
 
-            <div v-else class="row q-col-gutter-md">
-              <div v-for="game in filteredGameStats" :key="game.name" class="col-12 col-sm-6">
-                <q-card flat bordered class="game-stat-card hover-lift transition-all">
-                  <q-card-section>
-                    <div class="text-subtitle1 text-weight-bold text-dark ellipsis q-mb-sm">{{ game.name }}</div>
-                    <div class="row items-center justify-between">
-                      <div class="column">
-                        <div class="text-h6 text-weight-bolder text-positive">{{ game.winRate.toFixed(0) }}%</div>
-                        <div class="text-caption text-grey-6 uppercase letter-spacing-1" style="font-size: 0.6rem">Win Rate</div>
-                      </div>
-                      <div class="column items-end">
-                        <div class="text-h6 text-weight-bolder text-primary">#{{ game.avgPos.toFixed(1) }}</div>
-                        <div class="text-caption text-grey-6 uppercase letter-spacing-1" style="font-size: 0.6rem">Avg Pos</div>
-                      </div>
-                    </div>
-                    <div class="q-mt-md">
-                      <div class="text-caption text-grey-6 q-mb-xs text-weight-bold uppercase" style="font-size: 0.6rem">Recent Results</div>
-                      <div class="row q-gutter-xs">
-                        <q-badge
-                          v-for="(p, idx) in game.positions.slice(-5).reverse()"
-                          :key="idx"
-                          :color="getPosBadgeColor(p)"
-                          class="text-weight-bold result-badge"
-                        >
-                          {{ p }}
-                        </q-badge>
-                      </div>
-                    </div>
-                  </q-card-section>
-                </q-card>
+                <div v-else class="row q-col-gutter-md">
+                  <div v-for="game in filteredGameStats" :key="game.name" class="col-12 col-sm-6">
+                    <q-card flat bordered class="game-stat-card hover-lift transition-all">
+                      <q-card-section>
+                        <div class="text-subtitle1 text-weight-bold text-dark ellipsis q-mb-sm">{{ game.name }}</div>
+                        <div class="row items-center justify-between">
+                          <div class="column">
+                            <div class="text-h6 text-weight-bolder text-positive">{{ game.winRate.toFixed(0) }}%</div>
+                            <div class="text-caption text-grey-6 uppercase letter-spacing-1" style="font-size: 0.6rem">Win Rate</div>
+                          </div>
+                          <div class="column items-end">
+                            <div class="text-h6 text-weight-bolder text-primary">#{{ game.avgPos.toFixed(1) }}</div>
+                            <div class="text-caption text-grey-6 uppercase letter-spacing-1" style="font-size: 0.6rem">Avg Pos</div>
+                          </div>
+                        </div>
+                        <div class="q-mt-md">
+                          <div class="text-caption text-grey-6 q-mb-xs text-weight-bold uppercase" style="font-size: 0.6rem">Recent Results</div>
+                          <div class="row q-gutter-xs">
+                            <q-badge
+                              v-for="(p, idx) in game.positions.slice(-5).reverse()"
+                              :key="idx"
+                              :color="getPosBadgeColor(p)"
+                              class="text-weight-bold result-badge"
+                            >
+                              {{ p }}
+                            </q-badge>
+                          </div>
+                        </div>
+                      </q-card-section>
+                    </q-card>
+                  </div>
+                </div>
               </div>
-            </div>
-          </div>
+            </q-tab-panel>
+
+            <!-- Seasons Tab -->
+            <q-tab-panel name="seasons" class="q-pa-none">
+              <div class="row items-center q-mb-md">
+                <q-icon name="history" color="teal-7" size="24px" class="q-mr-sm" />
+                <div class="text-h5 text-weight-bolder text-dark tracking-tighter">Season Participation</div>
+              </div>
+              <q-card flat bordered class="rounded-borders overflow-hidden bg-white">
+                <q-list separator>
+                  <q-item
+                    v-for="sp in userSeasonList"
+                    :key="sp.id"
+                    clickable
+                    v-ripple
+                    @click="router.push({ name: 'season-overview', params: { id: sp.season } })"
+                    class="q-py-md"
+                  >
+                    <q-item-section avatar>
+                      <q-avatar color="grey-2" text-color="primary" icon="emoji_events" />
+                    </q-item-section>
+                    <q-item-section>
+                      <q-item-label class="text-h6 text-weight-bold">{{ sp.season_details?.name || `Season ${sp.season}` }}</q-item-label>
+                      <q-item-label caption v-if="sp.rank">League {{ sp.rank }}</q-item-label>
+                    </q-item-section>
+                    <q-item-section side>
+                      <div class="row items-center q-gutter-x-md">
+                        <div class="column items-end">
+                          <div class="text-caption text-grey-6 uppercase">Final Position</div>
+                          <q-badge
+                            :color="getPosBadgeColor(sp.position || 0)"
+                            class="text-weight-bold q-px-sm"
+                            style="font-size: 1rem"
+                          >
+                            #{{ sp.position || '-' }}
+                          </q-badge>
+                        </div>
+                        <q-icon name="chevron_right" color="grey-4" />
+                      </div>
+                    </q-item-section>
+                  </q-item>
+                  <q-item v-if="userSeasonList.length === 0">
+                    <q-item-section class="text-grey-6 italic text-center q-pa-xl">No seasons joined yet</q-item-section>
+                  </q-item>
+                </q-list>
+              </q-card>
+            </q-tab-panel>
+          </q-tab-panels>
         </div>
       </div>
     </div>
@@ -264,6 +325,7 @@ const loading = ref(true);
 const user = ref<TUserDto | null>(null);
 const userSeasonList = ref<(TSeasonParticipantDto & { season_details?: TSeasonDto })[]>([]);
 const gameSearch = ref('');
+const tab = ref('games');
 
 const leagueStats = ref({
   totalLeagues: 0,
@@ -277,6 +339,8 @@ const overallStats = ref({
 });
 const gameStats = ref<any[]>([]);
 const topGames = ref<any[]>([]);
+const selectedGamesThisYear = ref<any[]>([]);
+const maxGameLimit = ref(2);
 
 async function load() {
   loading.value = true;
@@ -307,6 +371,8 @@ async function load() {
         overallStats.value = statsRes.data.overall_stats;
         gameStats.value = statsRes.data.game_stats;
         topGames.value = statsRes.data.top_games || [];
+        selectedGamesThisYear.value = statsRes.data.selected_games_this_year || [];
+        maxGameLimit.value = statsRes.data.max_game_limit || 2;
 
         const seasonIds = [...new Set(participants.map(p => p.season))];
         const seasonsData = await Promise.all(seasonIds.map(id => api.get(`season/seasons/${id}/`)));
@@ -366,6 +432,10 @@ onMounted(load);
 </script>
 
 <style scoped lang="scss">
+.border-top {
+  border-top: 1px solid rgba(0,0,0,0.05);
+}
+
 .profile-hero {
   min-height: 250px;
   background: linear-gradient(135deg, var(--q-primary) 0%, darken(#2d3436, 10%) 100%);

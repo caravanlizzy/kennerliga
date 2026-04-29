@@ -2,8 +2,9 @@ from urllib.parse import urlencode
 
 from django.conf import settings
 from django.db import transaction
-from django.db.models import Q
-from django.db.models.functions import Lower
+from django.db.models import Q, Count
+from django.db.models.functions import Lower, ExtractYear
+from django.utils import timezone
 from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.exceptions import NotFound
@@ -22,6 +23,8 @@ from user.models import User, PlayerProfile, Platform, PlatformPlayer, UserInvit
 from user.serializers import UserSerializer, UserInviteLinkSerializer, UserRegistrationSerializer, \
     PlayerProfileSerializer, FeedbackSerializer
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
+from api.constants import MAX_SAME_GAME_PER_YEAR
+from game.models import SelectedGame
 
 
 # Create your views here.
@@ -143,6 +146,28 @@ class UserViewSet(ModelViewSet):
         # Sort by count descending for the default list
         game_stats.sort(key=lambda x: x["count"], reverse=True)
 
+        # 1b. Selected Games This Year
+        current_year = timezone.now().year
+        # We only count games that were NOT banned.
+        from game.queries import get_successfully_banned_game_ids
+        banned_game_ids = get_successfully_banned_game_ids(year=current_year)
+
+        selected_games_this_year_qs = SelectedGame.objects.filter(
+            profile=profile,
+            league__season__year=current_year
+        ).exclude(id__in=banned_game_ids).values('game_id', 'game__name', 'game__platform__name').annotate(count=Count('id')).order_by('game__name')
+
+        selected_games_this_year = [
+            {
+                "game_id": item['game_id'],
+                "name": item['game__name'],
+                "platform": item['game__platform__name'],
+                "count": item['count'],
+                "limit_exceeded": item['count'] >= MAX_SAME_GAME_PER_YEAR
+            }
+            for item in selected_games_this_year_qs
+        ]
+
         # 2. League Statistics (Minimal, as requested to be less prominent)
         standings = LeagueStanding.objects.filter(player_profile=profile).select_related('league')
         total_leagues = standings.count()
@@ -166,6 +191,8 @@ class UserViewSet(ModelViewSet):
             },
             "game_stats": game_stats,
             "top_games": top_games,
+            "selected_games_this_year": selected_games_this_year,
+            "max_game_limit": MAX_SAME_GAME_PER_YEAR,
         })
 
 

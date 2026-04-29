@@ -1,4 +1,5 @@
 from django.db import transaction
+from django.utils import timezone
 from rest_framework import serializers
 from rest_framework.serializers import ModelSerializer
 
@@ -158,23 +159,27 @@ class SelectedGameSerializer(serializers.ModelSerializer):
                 )
 
             if profile:
-                # A profile can select the same game at most twice per season year
-                season_year = league.season.year
+                current_year = timezone.now().year
 
-                # Count how many times this profile has selected this game in this season year
-                selections_count = SelectedGame.objects.filter(
+                # Count how many times this player has selected this game this year, excluding successfully banned selections
+                from game.queries import get_successfully_banned_game_ids
+                banned_game_ids = get_successfully_banned_game_ids(year=current_year)
+
+                selections_count_qs = SelectedGame.objects.filter(
                     profile=profile,
                     game=game,
-                    league__season__year=season_year
-                )
+                    league__season__year=current_year
+                ).exclude(id__in=banned_game_ids)
 
                 # If updating, exclude the current instance
                 if self.instance:
-                    selections_count = selections_count.exclude(id=self.instance.id)
+                    selections_count_qs = selections_count_qs.exclude(id=self.instance.id)
 
-                if selections_count.count() >= 2:
+                count = selections_count_qs.count()
+
+                if count >= MAX_SAME_GAME_PER_YEAR:
                     raise serializers.ValidationError(
-                        f"You cannot select '{game.name}' more than twice a year. This year is {season_year}."
+                        f"You have already selected '{game.name}' {count} times this year (Limit: {MAX_SAME_GAME_PER_YEAR})."
                     )
 
         return attrs
@@ -214,8 +219,6 @@ class SelectedGameSerializer(serializers.ModelSerializer):
 
     def get_successfully_banned(self, obj):
         return game_q.is_game_successfully_banned(obj)
-
-
 
     def create(self, validated_data):
         manage_only = validated_data.pop('manage_only', False)

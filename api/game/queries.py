@@ -40,6 +40,45 @@ def get_banned_selected_game_ids(league: League) -> List[int]:
         .filter(c__gte=min_bans)
         .values_list("selected_game_id", flat=True))
 
+def get_successfully_banned_game_ids(year: int = None) -> List[int]:
+    """
+    Returns a list of SelectedGame IDs that were successfully banned.
+    A game is successfully banned if the number of BanDecisions for it 
+    reaches the required threshold for its league.
+    """
+    from api.constants import get_ban_amount_for_success
+    
+    qs = BanDecision.objects.filter(selected_game__isnull=False)
+    if year:
+        qs = qs.filter(league__season__year=year)
+        
+    # We need to group by selected_game and check if count >= required_bans
+    # Since required_bans depends on league member count, we need to handle it per league
+    
+    # Efficient way:
+    # 1. Get all selected_game_ids and their ban counts for the given year
+    # 2. Get the required ban count for each of those selected games
+    # 3. Filter those that match
+    
+    ban_counts = qs.values('selected_game_id', 'selected_game__league__members').annotate(
+        c=Count('id')
+    )
+    
+    # Note: selected_game__league__members is a many-to-many, so this might duplicate rows 
+    # if not careful, but we just need the count of members.
+    # Better:
+    selected_games = SelectedGame.objects.filter(id__in=qs.values('selected_game_id'))
+    if year:
+        selected_games = selected_games.filter(league__season__year=year)
+        
+    successfully_banned_ids = []
+    for sg in selected_games.annotate(ban_count=Count('bandecision')):
+        member_count = sg.league.members.count()
+        if sg.ban_count >= get_ban_amount_for_success(member_count):
+            successfully_banned_ids.append(sg.id)
+            
+    return successfully_banned_ids
+
 def get_factions_for_game(game: Game) -> QuerySet:
     return Faction.objects.filter(game=game)
 
