@@ -23,11 +23,11 @@
       class="chat-drawer glass-effect shadow-10"
     >
       <div class="column full-height kenner-drawer-container">
-        <div class="q-pa-lg q-mb-sm row items-center border-bottom-subtle bg-white/50">
+        <div class="q-pa-lg q-mb-sm row items-center border-bottom-subtle bg-chat-header">
           <div class="row items-center">
             <q-icon name="chat" color="teal" size="32px" class="q-mr-sm" />
             <span class="text-h5 text-weight-bolder tracking-tighter" style="letter-spacing: -1px;">
-              <span class="text-teal">Kenner</span><span class="text-grey-9">Chat</span>
+              <span class="text-teal">Kenner</span><span class="text-grey-9 chat-title-suffix">Chat</span>
             </span>
           </div>
           <q-space />
@@ -41,7 +41,7 @@
 
     <!-- Removed fixed chat toggle -->
 
-    <q-page-container class="col column bg-white">
+    <q-page-container class="col column main-container">
       <div
         class="q-mx-auto"
         style="max-width: 1300px; width: 100%; "
@@ -86,6 +86,26 @@ function toggleDrawer(): void {
 </script>
 
 <style lang="scss">
+.main-container {
+}
+
+.body--dark .main-container {
+}
+
+.bg-chat-header {
+}
+
+.body--dark .bg-chat-header {
+}
+
+.body--dark .chat-title-suffix {
+  color: #ccc !important;
+}
+
+.body--dark .border-bottom-subtle {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
+}
+
 .border-bottom {
   border-bottom: 1px solid rgba(0, 0, 0, 0.08);
 }

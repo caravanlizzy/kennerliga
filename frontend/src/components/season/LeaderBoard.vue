@@ -12,12 +12,12 @@
     <div class="q-px-lg q-py-md row items-center justify-between border-bottom-subtle">
       <div class="row items-center q-gutter-x-sm">
         <q-icon name="analytics" color="primary" size="20px" />
-        <span class="text-subtitle2 text-weight-bold text-grey-8">Annual Championship</span>
+        <span class="text-subtitle2 text-weight-bold leaderboard-header-text">Annual Championship</span>
       </div>
       <q-btn-toggle
         v-model="showAllLeagues"
         toggle-color="primary"
-        color="white"
+        color="toggle-bg"
         text-color="primary"
         unelevated
         dense
@@ -121,7 +121,7 @@
             </div>
           </td>
           <!-- Rank -->
-          <td class="text-left q-pl-lg text-weight-bold text-grey-7">
+          <td class="text-left q-pl-lg text-weight-bold leaderboard-rank-text">
             {{ index + 1 }}
           </td>
 
@@ -135,7 +135,7 @@
               />
               <div class="column">
                 <div class="row items-center q-gutter-x-sm">
-                  <span class="text-subtitle2 text-weight-bold text-grey-9">{{ row.profile_name }}</span>
+                  <span class="text-subtitle2 text-weight-bold leaderboard-player-name">{{ row.profile_name }}</span>
                   <q-icon
                     v-if="index === 0"
                     name="stars"
@@ -154,7 +154,7 @@
             <td class="text-center border-left-subtle-2">
                 <span
                   v-if="getHighestLeagueCounts(row).first > 0"
-                  class="text-weight-bold text-grey-9"
+                  class="text-weight-bold leaderboard-count-text"
                 >
                   {{ getHighestLeagueCounts(row).first }}
                 </span>
@@ -165,7 +165,7 @@
             <td class="text-center border-left-subtle-2">
                 <span
                   v-if="getHighestLeagueCounts(row).second > 0"
-                  class="text-weight-bold text-grey-8"
+                  class="text-weight-bold leaderboard-count-text-subtle"
                 >
                   {{ getHighestLeagueCounts(row).second }}
                 </span>
@@ -176,7 +176,7 @@
             <td class="text-center border-left-subtle-2">
                 <span
                   v-if="getHighestLeagueCounts(row).third > 0"
-                  class="text-weight-bold text-grey-8"
+                  class="text-weight-bold leaderboard-count-text-subtle"
                 >
                   {{ getHighestLeagueCounts(row).third }}
                 </span>
@@ -187,7 +187,7 @@
             <td class="text-center border-left-subtle-2">
                 <span
                   v-if="getHighestLeagueCounts(row).fourth > 0"
-                  class="text-weight-bold text-grey-8"
+                  class="text-weight-bold leaderboard-count-text-subtle"
                 >
                   {{ getHighestLeagueCounts(row).fourth }}
                 </span>
@@ -200,25 +200,25 @@
               <td class="text-center q-px-sm" :style="{ borderLeft: '1.5px solid rgba(54, 64, 88, 0.08)' }">
                 <div class="row justify-center items-center no-wrap">
                   <div class="column items-center pos-num">
-                    <span :class="row.per_level[level]?.first ? 'text-weight-bold text-grey-9' : 'text-grey-4'" style="font-size: 11px">
+                    <span :class="row.per_level[level]?.first ? 'text-weight-bold leaderboard-count-text' : 'text-grey-4'" style="font-size: 11px">
                       {{ row.per_level[level]?.first || '-' }}
                     </span>
                   </div>
                   <div class="pos-sep"></div>
                   <div class="column items-center pos-num">
-                    <span :class="row.per_level[level]?.second ? 'text-weight-bold text-grey-8' : 'text-grey-4'" style="font-size: 11px">
+                    <span :class="row.per_level[level]?.second ? 'text-weight-bold leaderboard-count-text-subtle' : 'text-grey-4'" style="font-size: 11px">
                       {{ row.per_level[level]?.second || '-' }}
                     </span>
                   </div>
                   <div class="pos-sep"></div>
                   <div class="column items-center pos-num">
-                    <span :class="row.per_level[level]?.third ? 'text-weight-bold text-grey-8' : 'text-grey-4'" style="font-size: 11px">
+                    <span :class="row.per_level[level]?.third ? 'text-weight-bold leaderboard-count-text-subtle' : 'text-grey-4'" style="font-size: 11px">
                       {{ row.per_level[level]?.third || '-' }}
                     </span>
                   </div>
                   <div class="pos-sep"></div>
                   <div class="column items-center pos-num">
-                    <span :class="row.per_level[level]?.fourth ? 'text-weight-bold text-grey-8' : 'text-grey-4'" style="font-size: 11px">
+                    <span :class="row.per_level[level]?.fourth ? 'text-weight-bold leaderboard-count-text-subtle' : 'text-grey-4'" style="font-size: 11px">
                       {{ row.per_level[level]?.fourth || '-' }}
                     </span>
                   </div>
@@ -329,11 +329,35 @@ watch(
 <style scoped lang="scss">
 .leaderboard-container, .leaderboard-empty {
   overflow: auto;
-  background: rgba(255, 255, 255, 0.4);
+  background: var(--leaderboard-bg, rgba(255, 255, 255, 0.4));
   backdrop-filter: blur(8px);
-  border: 1px solid rgba(54, 64, 88, 0.08);
+  border: 1px solid var(--leaderboard-border, rgba(54, 64, 88, 0.08));
   border-radius: 12px;
 }
+
+:global(.body--dark) {
+  .leaderboard-container, .leaderboard-empty {
+    --leaderboard-bg: rgba(30, 30, 30, 0.8);
+    --leaderboard-border: rgba(255, 255, 255, 0.1);
+    --leaderboard-header-bg: rgba(40, 40, 40, 0.5);
+    --leaderboard-header-text: #bdbdbd;
+    --leaderboard-row-bg: #1d1d1d;
+    --leaderboard-row-hover: #262626;
+    --leaderboard-row-border: rgba(255, 255, 255, 0.05);
+    --leaderboard-player-text: #ececec;
+    --leaderboard-rank-text: #9e9e9e;
+    --leaderboard-count-text: #ececec;
+    --leaderboard-count-text-subtle: #bdbdbd;
+    --leaderboard-sep: rgba(255, 255, 255, 0.1);
+    --toggle-bg: #1d1d1d;
+  }
+}
+
+.leaderboard-header-text { color: var(--leaderboard-header-text, #616161); } /* text-grey-8 */
+.leaderboard-player-name { color: var(--leaderboard-player-text, #212121); } /* text-grey-9 */
+.leaderboard-rank-text { color: var(--leaderboard-rank-text, #757575); } /* text-grey-7 */
+.leaderboard-count-text { color: var(--leaderboard-count-text, #212121); } /* text-grey-9 */
+.leaderboard-count-text-subtle { color: var(--leaderboard-count-text-subtle, #424242); } /* text-grey-8 */
 
 .leaderboard-table {
   min-width: 600px;
@@ -364,19 +388,19 @@ watch(
 }
 
 .header-row {
-  background: rgba(248, 249, 250, 0.5);
-  border-bottom: 1.5px solid rgba(54, 64, 88, 0.12);
+  background: var(--leaderboard-header-bg, rgba(248, 249, 250, 0.5));
+  border-bottom: 1.5px solid var(--leaderboard-border, rgba(54, 64, 88, 0.12));
   height: 48px;
 }
 
 .leaderboard-row {
   position: relative;
   transition: all 0.2s ease;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.04);
-  background: white;
+  border-bottom: 1px solid var(--leaderboard-row-border, rgba(0, 0, 0, 0.04));
+  background: var(--leaderboard-row-bg, white);
 
   &:hover {
-    background-color: rgba(248, 250, 252, 1) !important;
+    background-color: var(--leaderboard-row-hover, rgba(248, 250, 252, 1)) !important;
     z-index: 1;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
   }
@@ -419,7 +443,7 @@ watch(
 .pos-sep {
   width: 1px;
   height: 12px;
-  background-color: rgba(0, 0, 0, 0.05);
+  background-color: var(--leaderboard-sep, rgba(0, 0, 0, 0.05));
   margin: 0 6px;
 }
 
@@ -428,7 +452,7 @@ watch(
 }
 
 .border-left-subtle-2 {
-  border-left: 1px solid rgba(0, 0, 0, 0.08) !important;
+  border-left: 1px solid var(--leaderboard-sep, rgba(0, 0, 0, 0.08)) !important;
 }
 
 .divide-y tr:last-child {
@@ -436,7 +460,7 @@ watch(
 }
 
 .league-separator-row {
-  background: rgba(255, 255, 255, 0.4);
+  background: var(--leaderboard-bg, rgba(255, 255, 255, 0.4));
 }
 
 .league-separator-divider {

@@ -61,6 +61,10 @@ const { isMobile } = useResponsive();
   justify-content: space-between;
 }
 
+.body--dark .navbar {
+  color: white !important;
+}
+
 .flex-spacer {
   flex: 1;
 }
@@ -77,13 +81,10 @@ const { isMobile } = useResponsive();
 }
 
 .glass-effect {
-  background: rgba(255, 255, 255, 0.75) !important;
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.03);
 }
 
+.body--dark .glass-effect {
+}
 
 .border-subtle {
   border: 1px solid rgba(0, 0, 0, 0.05);

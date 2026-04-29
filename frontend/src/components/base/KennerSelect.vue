@@ -1,5 +1,6 @@
 <template>
   <q-select
+    :dark="$q.dark.isActive"
     v-model="modelValue"
     v-bind="$attrs"
     :options="options"
@@ -17,6 +18,10 @@
 </template>
 
 <script setup lang="ts">
+import { useQuasar } from 'quasar';
+
+const $q = useQuasar();
+
 const modelValue = defineModel()
 
 defineProps<{
@@ -38,6 +43,28 @@ defineProps<{
 
   &:hover {
     background: rgba(0, 0, 0, 0.06);
+  }
+
+  :global(.body--dark) & {
+    background: rgba(255, 255, 255, 0.05);
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    &.q-field--focused {
+      background: #2a2a2a;
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+
+    .q-field__native, .q-field__prefix, .q-field__suffix, .q-field__input {
+      color: white;
+    }
+
+    &.q-field--float .q-field__label {
+      background: #1e1e1e;
+      color: var(--q-primary);
+    }
   }
 
   &.q-field--focused {
@@ -94,6 +121,26 @@ defineProps<{
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1) !important;
   border: 1px solid rgba(0, 0, 0, 0.05);
   margin-top: 4px;
+
+  :global(.body--dark) & {
+    background: #1e1e1e;
+    border-color: rgba(255, 255, 255, 0.1);
+    color: white;
+
+    .q-item {
+      color: rgba(255, 255, 255, 0.7);
+
+      &.q-manual-focusable--focused, &:hover {
+        background: rgba(255, 255, 255, 0.1) !important;
+        color: white;
+      }
+
+      &.q-item--active {
+        background: var(--q-primary) !important;
+        color: white !important;
+      }
+    }
+  }
 
   .q-item {
     min-height: 40px;

@@ -12,7 +12,7 @@
         hide-pagination
         :pagination="{ rowsPerPage: 0 }"
         :row-class="rowClass"
-        class="bg-white rounded-borders text-caption"
+        class="bg-standings-table rounded-borders text-caption"
       >
         <template #no-data>
           <!-- This slot will not be used because of v-if above, but good practice -->
@@ -66,7 +66,7 @@
                     </KennerTooltip>
                   </UserAvatar>
                   <div v-if="!isMobile" class="column">
-                    <span class="text-subtitle2 text-weight-bold text-dark line-height-1">
+                    <span class="text-subtitle2 text-weight-bold line-height-1">
                       {{ props.row.username }}
                     </span>
                     <span
@@ -93,7 +93,7 @@
                   </q-badge>
                 </template>
                 <template v-else>
-                  <span class="text-weight-bold text-dark">{{ props.value }}</span>
+                  <span class="text-weight-bold">{{ props.value }}</span>
                 </template>
               </template>
 
@@ -127,7 +127,7 @@
         <!-- Total column -->
         <template #body-cell-total="props">
           <q-td :props="props" class="text-right" style="padding: 4px 8px">
-            <div class="text-dark text-weight-bold text-caption">
+            <div class="text-weight-bold text-caption">
               {{ formatNumber(props.value) }}
             </div>
           </q-td>
@@ -165,7 +165,7 @@
             >
               <div
                 v-if="props.value.points"
-                class="text-weight-bold text-dark row items-baseline"
+                class="text-weight-bold row items-baseline"
                 style="font-size: 0.9rem"
               >
                 <span>{{ displayPointsValue(props.value.points, (props.col as any).hasPoints) }}</span>
@@ -199,7 +199,7 @@
       <LoadingSpinner v-else-if="loading" text="Loading standings..." />
 
       <!-- Empty state -->
-      <div v-else-if="standings && standings.standings.length === 0 && standings.selected_games.length === 0" class="column items-center q-pa-xl text-grey-6 bg-white rounded-borders">
+      <div v-else-if="standings && standings.standings.length === 0 && standings.selected_games.length === 0" class="column items-center q-pa-xl text-grey-6 bg-standings-table rounded-borders">
         <q-icon name="upcoming" size="40px" class="q-mb-sm opacity-50" />
         <div class="text-subtitle2">No participants yet</div>
         <div class="text-caption">The standings will appear here once the season starts.</div>
@@ -231,7 +231,7 @@
       <!-- Error state -->
       <div
         v-else-if="error"
-        class="column items-center q-pa-md bg-white rounded-borders"
+        class="column items-center q-pa-md bg-standings-table rounded-borders"
       >
         <q-icon name="error_outline" size="24px" color="negative" />
         <span class="q-mt-xs text-negative text-caption">
@@ -509,7 +509,7 @@ function getRankIndicatorClass(rank: number) {
 }
 
 .header-row {
-  background-color: #f8f9fa;
+  background-color: var(--standings-header-bg, #f8f9fa);
   border-bottom: 2px solid rgba(0, 0, 0, 0.05);
 }
 
@@ -528,8 +528,20 @@ function getRankIndicatorClass(rank: number) {
 }
 
 .league-leader-row {
-  background-color: #fffaf0 !important; /* very light orange */
+  background-color: var(--standings-leader-bg, #fffaf0) !important; /* very light orange */
   border-left: 4px solid var(--q-amber-6) !important;
+}
+
+.bg-standings-table {
+  background: white !important;
+  color: #2c3e50;
+}
+
+:global(.body--dark) .bg-standings-table {
+  background: #1d1d1d !important;
+  color: #ececec;
+  --standings-header-bg: #262626;
+  --standings-leader-bg: #2d281e;
 }
 
 .line-height-1 {
@@ -537,11 +549,23 @@ function getRankIndicatorClass(rank: number) {
 }
 
 /* Ensure the background doesn't override the hover effect of q-table if any */
-:deep(.q-table tbody tr:hover) td.bg-amber-1,
-:deep(.q-table tbody tr:hover) td.bg-blue-grey-1,
-:deep(.q-table tbody tr:hover) td.bg-brown-1,
-:deep(.q-table tbody tr.bg-orange-1:hover) {
+:global(.q-table tbody tr:hover) td.bg-amber-1,
+:global(.q-table tbody tr:hover) td.bg-blue-grey-1,
+:global(.q-table tbody tr:hover) td.bg-brown-1,
+:global(.q-table tbody tr.bg-orange-1:hover) {
   filter: brightness(0.97);
+}
+
+:global(.body--dark) {
+  :global(.q-table tbody tr:hover) td.bg-amber-1,
+  :global(.q-table tbody tr:hover) td.bg-blue-grey-1,
+  :global(.q-table tbody tr:hover) td.bg-brown-1 {
+     filter: brightness(1.2);
+  }
+
+  .bg-amber-1 { background: rgba(255, 193, 7, 0.2) !important; }
+  .bg-blue-grey-1 { background: rgba(144, 164, 174, 0.2) !important; }
+  .bg-brown-1 { background: rgba(141, 110, 99, 0.2) !important; }
 }
 
 .overflow-auto {

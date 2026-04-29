@@ -272,6 +272,10 @@ function getColorHex(type: TLiveEventType) {
     background: rgba(0, 0, 0, 0.1);
     border-radius: 10px;
   }
+
+  :global(.body--dark) &::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.15);
+  }
 }
 
 .event-card {
@@ -283,9 +287,19 @@ function getColorHex(type: TLiveEventType) {
   border: 1px solid rgba(0, 0, 0, 0.06);
 }
 
+:global(.body--dark) .event-card {
+  background: #1d1d1d;
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
 .event-card:hover {
   border-color: rgba(0, 0, 0, 0.15);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+:global(.body--dark) .event-card:hover {
+  border-color: rgba(255, 255, 255, 0.2);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
 .event-content {
@@ -293,19 +307,34 @@ function getColorHex(type: TLiveEventType) {
   line-height: 1.4;
   color: #2c3e50;
 }
+
+:global(.body--dark) .event-content {
+  color: #ececec;
+}
+
 .results-container {
   padding-left: 8px;
   margin-left: 4px;
   background: rgba(75, 178, 106, 0.03);
   border-radius: 0 4px 4px 0;
 }
+
+:global(.body--dark) .results-container {
+  background: rgba(75, 178, 106, 0.1);
+}
+
 .results-table {
   border-collapse: collapse;
   font-size: 0.8rem;
   margin-top: 4px;
 }
+
 .results-table tr {
   border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+:global(.body--dark) .results-table tr {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
 .results-table tr:last-child {
   border-bottom: none;

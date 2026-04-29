@@ -95,6 +95,7 @@
                 dense
                 color="primary"
                 class="font-weight-600"
+                :dark="$q.dark.isActive"
               />
             </div>
           </div>

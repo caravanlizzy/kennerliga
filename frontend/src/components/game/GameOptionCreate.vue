@@ -25,12 +25,13 @@
         <!-- Toggles -->
         <div class="row q-col-gutter-md">
           <div class="col-12 col-sm-6">
-            <q-toggle
-              :model-value="gameOption.hasChoices"
-              @update:model-value="updateHasChoices"
-              label="Choices"
-              dense
-            />
+              <q-toggle
+                :model-value="gameOption.hasChoices"
+                @update:model-value="updateHasChoices"
+                label="Choices"
+                dense
+                :dark="$q.dark.isActive"
+              />
             <div v-if="gameOption.hasChoices" class="text-caption text-grey-7 q-pl-xs q-mt-xs">
               Add selectable values for this option.
             </div>
@@ -42,6 +43,7 @@
               :model-value="hasRestrictions"
               @update:model-value="hasRestrictions = !hasRestrictions; deleteRestriction()"
               dense
+              :dark="$q.dark.isActive"
             />
             <div class="text-caption text-grey-7 q-pl-xs q-mt-xs">
               Only apply this option when another option meets a condition.
@@ -98,6 +100,9 @@ import GameOptionRestrictionCreate from 'components/game/GameOptionRestrictionCr
 import GameOptionCard from 'components/cards/OverviewCard.vue';
 import { createRandomId } from 'src/helpers';
 import { TGameOption, TGameOptionChoice } from 'src/types';
+import { useQuasar } from 'quasar';
+
+const $q = useQuasar();
 
 const props = defineProps<{ gameOption: TGameOption }>();
 const { gameOption } = props;

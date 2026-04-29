@@ -1,7 +1,7 @@
 <template>
   <div class="column full-height kenner-drawer-container glass-effect">
     <!-- Drawer Header -->
-    <div class="q-pa-lg q-mb-sm row items-center border-bottom-subtle bg-white/50">
+    <div class="q-pa-lg q-mb-sm row items-center border-bottom-subtle bg-drawer-header">
       <q-icon name="img:icons/favicon.svg" size="36px" class="q-mr-sm" />
       <span class="text-h5 text-weight-bolder tracking-tighter" style="letter-spacing: -1px;">
         <span class="text-primary">Kenner</span><span class="text-accent">Liga</span>
@@ -23,6 +23,30 @@
         />
         <DrawerItem icon="group" icon-color="teal-7" label="Members" forward-name="users" />
         <DrawerItem icon="gavel" icon-color="primary" label="Rules" forward-name="rules" />
+
+        <q-separator class="q-my-sm drawer-separator" />
+        <DrawerSubGroup>Appearance</DrawerSubGroup>
+        <q-item class="drawer-item q-mx-sm q-my-xs squircle-shape">
+          <q-item-section avatar class="drawer-item__icon-section">
+            <q-icon
+              :name="$q.dark.isActive ? 'dark_mode' : 'light_mode'"
+              size="22px"
+              :color="$q.dark.isActive ? 'amber' : 'grey-7'"
+            />
+          </q-item-section>
+          <q-item-section class="drawer-item__text-section">
+            <q-item-label class="text-subtitle2 text-weight-medium">
+              Dark Mode
+            </q-item-label>
+          </q-item-section>
+          <q-item-section side>
+            <q-toggle
+              :model-value="$q.dark.isActive"
+              @update:model-value="toggleDarkMode"
+              color="primary"
+            />
+          </q-item-section>
+        </q-item>
 
         <template v-if="isAdmin">
           <q-separator class="q-my-sm drawer-separator" />
@@ -63,6 +87,7 @@ import { useUserStore } from 'stores/userStore';
 import { storeToRefs } from 'pinia';
 import { useRouter } from 'vue-router';
 import { provide } from 'vue';
+import { useQuasar } from 'quasar';
 
 const drawerState = defineModel();
 
@@ -70,8 +95,13 @@ const { logout } = useUserStore();
 const { isAdmin } = storeToRefs(useUserStore());
 
 const router = useRouter();
+const $q = useQuasar();
 
 provide('closeDrawer', () => (drawerState.value = false));
+
+function toggleDarkMode(val: boolean): void {
+  $q.dark.set(val);
+}
 
 function openTaskBoard(): void {
   window.open('https://task-board-production-6055.up.railway.app/', '_blank');
@@ -86,12 +116,24 @@ async function doLogout(): Promise<void> {
 
 <style lang="scss">
 .kenner-drawer-container {
-  background: rgba(255, 255, 255, 0.85) !important;
+}
+
+.body--dark .kenner-drawer-container {
+}
+
+.body--dark .border-bottom-subtle {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
+}
+
+.bg-drawer-header {
+}
+
+.body--dark .bg-drawer-header {
 }
 
 .glass-effect {
-  backdrop-filter: blur(25px) saturate(180%);
-  -webkit-backdrop-filter: blur(25px) saturate(180%);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
 }
 
 .border-bottom-subtle {

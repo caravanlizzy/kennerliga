@@ -98,28 +98,24 @@
   </script>
 
   <style scoped lang="scss">
-  .content-section-container {
-    transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
-    position: relative;
-    background: white;
-    border-radius: 16px;
-    border: 1px solid rgba(0, 0, 0, 0.08);
-    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
-    overflow: hidden;
+.content-section-container {
+  transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+  position: relative;
+  background: white;
+  border-radius: 16px;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+  overflow: hidden;
 
-    &:hover {
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
-    }
-
-    &.indicator-primary { border-top: 4px solid var(--q-primary); --separator-color: var(--q-primary); }
-    &.indicator-secondary { border-top: 4px solid var(--q-secondary); --separator-color: var(--q-secondary); }
-    &.indicator-accent { border-top: 4px solid var(--q-accent); --separator-color: var(--q-accent); }
-    &.indicator-dark { border-top: 4px solid var(--q-dark); --separator-color: var(--q-dark); }
-    &.indicator-info { border-top: 4px solid var(--q-info); --separator-color: var(--q-info); }
-    &.indicator-warning { border-top: 4px solid var(--q-warning); --separator-color: var(--q-warning); }
-    &.indicator-negative { border-top: 4px solid var(--q-negative); --separator-color: var(--q-negative); }
-    &.indicator-positive { border-top: 4px solid var(--q-positive); --separator-color: var(--q-positive); }
-  }
+  &.indicator-primary { border-top: 4px solid var(--q-primary); --separator-color: var(--q-primary); }
+  &.indicator-secondary { border-top: 4px solid var(--q-secondary); --separator-color: var(--q-secondary); }
+  &.indicator-accent { border-top: 4px solid var(--q-accent); --separator-color: var(--q-accent); }
+  &.indicator-dark { border-top: 4px solid var(--q-dark); --separator-color: var(--q-dark); }
+  &.indicator-info { border-top: 4px solid var(--q-info); --separator-color: var(--q-info); }
+  &.indicator-warning { border-top: 4px solid var(--q-warning); --separator-color: var(--q-warning); }
+  &.indicator-negative { border-top: 4px solid var(--q-negative); --separator-color: var(--q-negative); }
+  &.indicator-positive { border-top: 4px solid var(--q-positive); --separator-color: var(--q-positive); }
+}
 
   .section-header {
     padding: 0 0 12px 0;
