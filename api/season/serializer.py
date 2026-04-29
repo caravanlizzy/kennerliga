@@ -102,6 +102,7 @@ class SeasonParticipantSerializer(ModelSerializer):
     # Extra marker to indicate entries coming from previous season and not yet registered
     # Existing clients can ignore it; defaults to False for real participants
     is_prev_unregistered = serializers.BooleanField(read_only=True, default=False)
+    league = SerializerMethodField()
 
     class Meta:
         model = SeasonParticipant
@@ -110,8 +111,15 @@ class SeasonParticipantSerializer(ModelSerializer):
             'username', 'profile_name', 'season_details',
             'selected_games',  # read
             'has_banned', 'is_active_player', 'is_prev_unregistered',
-            'my_banned_game', 'league_position',
+            'my_banned_game', 'league_position', 'league',
         ]
+
+    def get_league(self, obj):
+        # Find the league this participant is in for this season
+        league = obj.leagues_member.filter(season=obj.season).first()
+        if not league:
+            return None
+        return {'id': league.id, 'level': league.level}
 
     def get_league_position(self, obj):
         from league.models import LeagueStanding

@@ -264,7 +264,7 @@
                     </q-item-section>
                     <q-item-section>
                       <q-item-label class="text-h6 text-weight-bold">{{ sp.season_details?.name || `Season ${sp.season}` }}</q-item-label>
-                      <q-item-label caption v-if="sp.rank">League {{ sp.rank }}</q-item-label>
+                      <q-item-label caption v-if="sp.league">League {{ sp.league.level }}</q-item-label>
                     </q-item-section>
                     <q-item-section side>
                       <div class="row items-center q-gutter-x-md">
