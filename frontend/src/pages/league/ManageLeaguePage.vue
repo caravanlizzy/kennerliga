@@ -59,7 +59,7 @@
               text-color="white"
               class="text-weight-bold"
             >
-              {{ season?.status }}
+              {{ league?.status }}
             </q-chip>
             <q-chip
               square
