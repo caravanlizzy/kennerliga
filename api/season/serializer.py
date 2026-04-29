@@ -98,6 +98,7 @@ class SeasonParticipantSerializer(ModelSerializer):
     my_banned_game = SerializerMethodField()
     has_banned = BooleanField(read_only=True)
     is_active_player = SerializerMethodField()
+    league_position = SerializerMethodField()
     # Extra marker to indicate entries coming from previous season and not yet registered
     # Existing clients can ignore it; defaults to False for real participants
     is_prev_unregistered = serializers.BooleanField(read_only=True, default=False)
@@ -109,8 +110,29 @@ class SeasonParticipantSerializer(ModelSerializer):
             'username', 'profile_name', 'season_details',
             'selected_games',  # read
             'has_banned', 'is_active_player', 'is_prev_unregistered',
-            'my_banned_game',
+            'my_banned_game', 'league_position',
         ]
+
+    def get_league_position(self, obj):
+        from league.models import LeagueStanding
+        # Find the league this participant is in for this season
+        league = obj.leagues_member.filter(season=obj.season).first()
+        if not league:
+            return None
+
+        # Get all standings for this league, ordered by the same rules as the standings view
+        standings = list(
+            LeagueStanding.objects
+            .filter(league=league)
+            .order_by("-league_points", "-wins", "-tie_break_priority", "player_profile__profile_name")
+            .values_list('player_profile_id', flat=True)
+        )
+
+        try:
+            # Rank is index + 1
+            return standings.index(obj.profile_id) + 1
+        except ValueError:
+            return None
 
     def get_my_banned_game(self, obj):
         league = self.context.get('league')

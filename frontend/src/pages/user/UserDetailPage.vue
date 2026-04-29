@@ -271,11 +271,11 @@
                         <div class="column items-end">
                           <div class="text-caption text-grey-6 uppercase">Final Position</div>
                           <q-badge
-                            :color="getPosBadgeColor(sp.position || 0)"
+                            :color="getPosBadgeColor(sp.league_position || 0)"
                             class="text-weight-bold q-px-sm"
                             style="font-size: 1rem"
                           >
-                            #{{ sp.position || '-' }}
+                            #{{ sp.league_position || '-' }}
                           </q-badge>
                         </div>
                         <q-icon name="chevron_right" color="grey-4" />
