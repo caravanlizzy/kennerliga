@@ -7,15 +7,14 @@ from rest_framework import status, permissions
 from django.db import transaction
 
 from game.models import SelectedGame, ResultConfig, TieBreaker
-from league.models import GameStanding
+from league.models import GameStanding, LeagueStatus
+from services.standings_snapshot import rebuild_game_snapshot, rebuild_league_snapshot
 from league.serializer import GameStandingSerializer
 from season.models import Season
 from season.serializer import SeasonSerializer
-from services.standings_snapshot import rebuild_game_snapshot, rebuild_league_snapshot
 from .models import Result
 from .serializers import ResultSerializer
 from .services import finalize_results, get_game_standings_data, get_tie_groups
-from league.models import LeagueStatus
 from league.queries import is_league_finished
 
 
@@ -226,6 +225,38 @@ class MatchResultViewSet(ViewSet):
             return Response(ResultSerializer(obj).data)
         except Result.DoesNotExist:
             return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
+
+    def destroy(self, request, pk=None):
+        """
+        Deletes all Results for the given selected_game id (pk).
+        """
+        try:
+            selected_game = SelectedGame.objects.get(pk=pk)
+            results = Result.objects.filter(selected_game=selected_game)
+            if not results.exists():
+                return Response({"detail": "No results found for this game."}, status=status.HTTP_404_NOT_FOUND)
+
+            with transaction.atomic():
+                # Delete results
+                results.delete()
+                # Delete game standings
+                GameStanding.objects.filter(selected_game=selected_game).delete()
+
+                # Revert league status if it was DONE
+                league = selected_game.league
+                if league.status == LeagueStatus.DONE:
+                    league.status = LeagueStatus.PLAYING
+                    league.save(update_fields=["status", "updated_at"])
+
+                # Rebuild snapshots (this will effectively clear them since results are gone)
+                rebuild_game_snapshot(selected_game, win_mode="fractional")
+                rebuild_league_snapshot(league, win_mode="fractional")
+
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        except SelectedGame.DoesNotExist:
+            return Response({"detail": "SelectedGame not found."}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response({"detail": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
     @action(detail=False, methods=["get"], url_path="seasons-with-results")
     def seasons_with_results(self, request):

@@ -124,6 +124,7 @@
           @edit-game="data => (activeForm = { type: 'edit', member: data.member, selGame: data.selGame })"
           @post-result="selGame => (activeForm = { type: 'post-result', selGame })"
           @edit-result="selGameId => (activeForm = { type: 'post-result', selGame: findSelGame(selGameId) })"
+          @delete-result="selGame => onDeleteResult(selGame)"
           @delete-game="data => onDeleteSelectedGame(data.selGame)"
         />
       </div>
@@ -224,6 +225,25 @@ async function onDeleteSelectedGame(selGame: TSelectedGameDto) {
         $q.notify({ type: 'positive', message: 'Selection deleted' });
       } catch (err) {
         $q.notify({ type: 'negative', message: 'Failed to delete selection' });
+      }
+    },
+    undefined,
+    'Delete'
+  );
+}
+
+async function onDeleteResult(selGame: TSelectedGameDto) {
+  setDialog(
+    'Delete Match Results',
+    `Permanently delete results for "${selGame.game_name}"? This allows for reposting.`,
+    'warning',
+    async () => {
+      try {
+        await api.delete(`result/match-results/${selGame.id}/`);
+        await load();
+        $q.notify({ type: 'positive', message: 'Match results deleted' });
+      } catch (err) {
+        $q.notify({ type: 'negative', message: 'Failed to delete results' });
       }
     },
     undefined,

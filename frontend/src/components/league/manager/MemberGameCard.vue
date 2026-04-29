@@ -212,7 +212,7 @@
                 <q-space />
                 <q-item-section side>
                   <KennerButton
-                    flat
+                    outline
                     dense
                     round
                     color="grey-7"
@@ -249,17 +249,31 @@
                 </q-item-section>
                 <q-space />
                 <q-item-section side>
-                  <KennerButton
-                    flat
-                    dense
-                    round
-                    :color="hasResult(selGame) ? 'secondary' : 'primary'"
-                    :icon="hasResult(selGame) ? 'edit_note' : 'post_add'"
-                    size="sm"
-                    @click="() => hasResult(selGame) ? $emit('edit-result', selGame.id) : $emit('post-result', selGame)"
-                  >
-                    <KennerTooltip>{{ hasResult(selGame) ? 'Edit Result' : 'Post Result' }}</KennerTooltip>
-                  </KennerButton>
+                  <div class="row q-gutter-x-xs no-wrap">
+                    <KennerButton
+                      v-if="hasResult(selGame)"
+                      outline
+                      dense
+                      round
+                      color="red-7"
+                      icon="delete_outline"
+                      size="sm"
+                      @click="$emit('delete-result', selGame)"
+                    >
+                      <KennerTooltip>Delete Result</KennerTooltip>
+                    </KennerButton>
+                    <KennerButton
+                      outline
+                      dense
+                      round
+                      :color="hasResult(selGame) ? 'secondary' : 'primary'"
+                      :icon="hasResult(selGame) ? 'edit_note' : 'post_add'"
+                      size="sm"
+                      @click="() => hasResult(selGame) ? $emit('edit-result', selGame.id) : $emit('post-result', selGame)"
+                    >
+                      <KennerTooltip>{{ hasResult(selGame) ? 'Edit Result' : 'Post Result' }}</KennerTooltip>
+                    </KennerButton>
+                  </div>
                 </q-item-section>
               </template>
               <q-card-section class="bg-white q-pa-md">
@@ -309,6 +323,7 @@ defineEmits([
   'set-active',
   'edit-game',
   'edit-result',
+  'delete-result',
   'post-result',
   'delete-game'
 ]);
