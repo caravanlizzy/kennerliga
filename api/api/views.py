@@ -152,7 +152,7 @@ class LeaderboardViewSet(APIView):
                 # Use only completed leagues for leaderboard aggregation
                 league__status=LeagueStatus.DONE,
             )
-            .select_related("league", "league__season", "player_profile")
+            .select_related("league", "league__season", "player_profile", "player_profile__user")
             .order_by(
                 "league__level",   # group by level first (1 = best)
                 "league_id",       # then by league to ensure ranks reset per league
@@ -213,6 +213,7 @@ class LeaderboardViewSet(APIView):
                 players_stats[player_id] = {
                     "player_profile_id": player_id,
                     "profile_name": ls.player_profile.profile_name,
+                    "username": ls.player_profile.user.username if ls.player_profile.user else None,
                     "per_level": defaultdict(
                         lambda: {"first": 0, "second": 0, "third": 0, "fourth": 0}
                     ),
@@ -236,6 +237,7 @@ class LeaderboardViewSet(APIView):
             standings_list.append({
                 "player_profile_id": p["player_profile_id"],
                 "profile_name": p["profile_name"],
+                "username": p["username"],
                 "per_level": per_level_clean,
             })
 

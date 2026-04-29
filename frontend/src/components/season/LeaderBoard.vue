@@ -130,6 +130,7 @@
             <div class="row items-center q-gutter-x-md">
               <UserAvatar
                 :display-username="row.profile_name"
+                :navigation-name="row.username"
                 size="32px"
               />
               <div class="column">
@@ -259,7 +260,7 @@ import UserAvatar from 'components/ui/UserAvatar.vue';
 import { useLeagueColors } from 'src/composables/useLeagueColors';
 
 const props = defineProps<{ year: number }>();
-const { getLeagueColor, getLeagueBgColor, getHexLeagueColor } = useLeagueColors();
+const {  getHexLeagueColor } = useLeagueColors();
 
 interface PerLevelCounts {
   first: number;
@@ -270,6 +271,7 @@ interface PerLevelCounts {
 interface PlayerYearStanding {
   player_profile_id: number;
   profile_name: string;
+  username: string;
   per_level: Record<string, PerLevelCounts>;
 }
 interface LeaderBoardResponse {

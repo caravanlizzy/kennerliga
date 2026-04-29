@@ -6,7 +6,7 @@
     :style="avatarStyle"
     :square="shape === 'rounded' || shape === 'squircle'"
     role="img"
-    @click="router.push({ name: 'user-detail', params: { username: displayUsername } })"
+    @click="router.push({ name: 'user-detail', params: { username: navigationUserName } })"
   >
     <div class="avatar-inner full-width full-height flex flex-center">
       <span class="avatar-text" :style="textStyle">{{ initials }}</span>
@@ -37,6 +37,7 @@ const router = useRouter()
 
 const props = withDefaults(defineProps<{
   displayUsername: string
+  navigationName?: string
   subtitle?: string
   size?: string
   maxLetters?: 1 | 2
@@ -48,6 +49,8 @@ const props = withDefaults(defineProps<{
   shape: 'squircle',
   border: false,
 })
+
+const navigationUserName = computed(() => props.navigationName ?? props.displayUsername)
 
 /* initials */
 const clean = computed(() => (props.displayUsername ?? '').trim())
