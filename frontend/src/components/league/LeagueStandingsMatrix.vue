@@ -149,12 +149,6 @@
               Resolved by {{ props.value.decisive_tie_breaker_name }}: {{ props.value.tie_breaker_value }}
             </KennerTooltip>
 
-            <!-- Rank Indicator Bar -->
-            <div
-              v-if="props.value?.rank && props.value.rank <= 4"
-              class="rank-indicator"
-              :class="getRankIndicatorClass(props.value.rank)"
-            ></div>
 
             <div
               v-if="
@@ -482,31 +476,9 @@ function getRankBgClass(rank: number | undefined) {
   }
 }
 
-function getRankIndicatorClass(rank: number) {
-  switch (rank) {
-    case 1:
-      return 'bg-amber-6';
-    case 2:
-      return 'bg-blue-grey-4';
-    case 3:
-      return 'bg-brown-4';
-    case 4:
-      return 'bg-red-4';
-    default:
-      return '';
-  }
-}
 </script>
 
 <style scoped lang="scss">
-.rank-indicator {
-  position: absolute;
-  top: 0;
-  left: 0;
-  bottom: 0;
-  width: 3px;
-  opacity: 0.8;
-}
 
 .header-row {
   background-color: var(--standings-header-bg, #f8f9fa);
@@ -529,7 +501,6 @@ function getRankIndicatorClass(rank: number) {
 
 .league-leader-row {
   background-color: var(--standings-leader-bg, #fffaf0) !important; /* very light orange */
-  border-left: 4px solid var(--q-amber-6) !important;
 }
 
 .bg-standings-table {
