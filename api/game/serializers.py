@@ -3,6 +3,7 @@ from django.utils import timezone
 from rest_framework import serializers
 from rest_framework.serializers import ModelSerializer
 
+from api.constants import MAX_SAME_GAME_PER_YEAR
 from .services import create_selected_game, create_ban_decision
 from . import queries as game_q
 from game.models import Game, GameOption, GameOptionChoice, Faction, TieBreaker, ResultConfig, StartingPointSystem, \
