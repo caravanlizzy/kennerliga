@@ -1,11 +1,8 @@
-from urllib.parse import urlencode
 
-from django.conf import settings
 from django.db import transaction
-from django.db.models import Q, Count
-from django.db.models.functions import Lower, ExtractYear
+from django.db.models import Count
+from django.db.models.functions import Lower
 from django.utils import timezone
-from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.exceptions import NotFound
 from rest_framework.permissions import IsAuthenticated, IsAdminUser, AllowAny
@@ -19,17 +16,27 @@ from result.models import Result
 from result.serializers import ResultSerializer
 from season.models import Season, SeasonParticipant
 from season.serializer import SeasonSerializer
-from user.models import User, PlayerProfile, Platform, PlatformPlayer, UserInviteLink, Feedback
-from user.serializers import UserSerializer, UserInviteLinkSerializer, UserRegistrationSerializer, \
-    PlayerProfileSerializer, FeedbackSerializer
-from rest_framework.permissions import IsAuthenticated, IsAdminUser
+from user.models import (
+    User,
+    PlayerProfile,
+    Platform,
+    UserInviteLink,
+    Feedback,
+)
+from user.serializers import (
+    UserSerializer,
+    UserInviteLinkSerializer,
+    UserRegistrationSerializer,
+    PlayerProfileSerializer,
+    FeedbackSerializer,
+)
 from api.constants import MAX_SAME_GAME_PER_YEAR
 from game.models import SelectedGame
 
 
 # Create your views here.
 class UserViewSet(ModelViewSet):
-    queryset = User.objects.all().order_by(Lower('username'))
+    queryset = User.objects.all().order_by(Lower("username"))
     serializer_class = UserSerializer
 
     class UserViewSet(ModelViewSet):
@@ -37,7 +44,13 @@ class UserViewSet(ModelViewSet):
         serializer_class = UserSerializer
 
         def get_permissions(self):
-            if self.action in ['list', 'retrieve', 'user_leagues', 'user_seasons', 'user_results']:
+            if self.action in [
+                "list",
+                "retrieve",
+                "user_leagues",
+                "user_seasons",
+                "user_results",
+            ]:
                 permission_classes = [IsAuthenticated]
             else:
                 permission_classes = [IsAdminUser]
@@ -56,7 +69,7 @@ class UserViewSet(ModelViewSet):
             raise NotFound("User not found.")
         return user
 
-    @action(detail=True, methods=['get'], url_path='leagues')
+    @action(detail=True, methods=["get"], url_path="leagues")
     def user_leagues(self, request, pk=None):
         """
         Custom action to return the leagues for a specific user.
@@ -66,7 +79,7 @@ class UserViewSet(ModelViewSet):
         serializer = LeagueSerializer(leagues, many=True)
         return Response(serializer.data)
 
-    @action(detail=True, methods=['get'], url_path='seasons')
+    @action(detail=True, methods=["get"], url_path="seasons")
     def user_seasons(self, request, pk=None):
         """
         Custom action to return the leagues for a specific user.
@@ -76,7 +89,7 @@ class UserViewSet(ModelViewSet):
         serializer = SeasonSerializer(season, many=True)
         return Response(serializer.data)
 
-    @action(detail=True, methods=['get'], url_path='results')
+    @action(detail=True, methods=["get"], url_path="results")
     def user_results(self, request, pk=None):
         """
         Custom action to return the leagues for a specific user.
@@ -86,7 +99,7 @@ class UserViewSet(ModelViewSet):
         serializer = ResultSerializer(results, many=True)
         return Response(serializer.data)
 
-    @action(detail=True, methods=['get'], url_path='statistics')
+    @action(detail=True, methods=["get"], url_path="statistics")
     def user_statistics(self, request, pk=None):
         """
         GET /user/users/{id|username}/statistics/
@@ -96,37 +109,45 @@ class UserViewSet(ModelViewSet):
         profile = user.profile
 
         # 1. Game Statistics (Aggregated)
-        results = Result.objects.filter(player_profile=profile).select_related('selected_game__game')
-        
+        results = Result.objects.filter(player_profile=profile).select_related(
+            "selected_game__game"
+        )
+
         # Aggregated game metrics (overall)
         overall_stats = {
             "total_games": results.count(),
             "wins": 0,
-            "podiums": 0, # 1, 2, 3
+            "podiums": 0,  # 1, 2, 3
             "avg_pos": 0,
-            "positions": {} # Distribution of positions across all games
+            "positions": {},  # Distribution of positions across all games
         }
-        
+
         pos_sum = 0
         for r in results:
             if r.position is not None:
                 pos_sum += r.position
-                overall_stats["positions"][r.position] = overall_stats["positions"].get(r.position, 0) + 1
+                overall_stats["positions"][r.position] = (
+                    overall_stats["positions"].get(r.position, 0) + 1
+                )
                 if r.position == 1:
                     overall_stats["wins"] += 1
                 if r.position <= 3:
                     overall_stats["podiums"] += 1
-        
+
         if overall_stats["total_games"] > 0:
             overall_stats["avg_pos"] = pos_sum / overall_stats["total_games"]
-            
+
         # Per-game statistics
         stats_map = {}
         for r in results:
-            game_name = r.selected_game.game.name if r.selected_game and r.selected_game.game else f"Game {r.selected_game_id}"
+            game_name = (
+                r.selected_game.game.name
+                if r.selected_game and r.selected_game.game
+                else f"Game {r.selected_game_id}"
+            )
             if game_name not in stats_map:
                 stats_map[game_name] = {"name": game_name, "positions": [], "wins": 0}
-            
+
             if r.position is not None:
                 stats_map[game_name]["positions"].append(r.position)
                 if r.position == 1:
@@ -135,14 +156,16 @@ class UserViewSet(ModelViewSet):
         game_stats = []
         for g in stats_map.values():
             count = len(g["positions"])
-            game_stats.append({
-                "name": g["name"],
-                "winRate": (g["wins"] / count * 100) if count > 0 else 0,
-                "avgPos": (sum(g["positions"]) / count) if count > 0 else 0,
-                "count": count,
-                "positions": g["positions"]
-            })
-        
+            game_stats.append(
+                {
+                    "name": g["name"],
+                    "winRate": (g["wins"] / count * 100) if count > 0 else 0,
+                    "avgPos": (sum(g["positions"]) / count) if count > 0 else 0,
+                    "count": count,
+                    "positions": g["positions"],
+                }
+            )
+
         # Sort by count descending for the default list
         game_stats.sort(key=lambda x: x["count"], reverse=True)
 
@@ -150,26 +173,34 @@ class UserViewSet(ModelViewSet):
         current_year = timezone.now().year
         # We only count games that were NOT banned.
         from game.queries import get_successfully_banned_game_ids
+
         banned_game_ids = get_successfully_banned_game_ids(year=current_year)
 
-        selected_games_this_year_qs = SelectedGame.objects.filter(
-            profile=profile,
-            league__season__year=current_year
-        ).exclude(id__in=banned_game_ids).values('game_id', 'game__name', 'game__platform__name').annotate(count=Count('id')).order_by('game__name')
+        selected_games_this_year_qs = (
+            SelectedGame.objects.filter(
+                profile=profile, league__season__year=current_year
+            )
+            .exclude(id__in=banned_game_ids)
+            .values("game_id", "game__name", "game__platform__name")
+            .annotate(count=Count("id"))
+            .order_by("game__name")
+        )
 
         selected_games_this_year = [
             {
-                "game_id": item['game_id'],
-                "name": item['game__name'],
-                "platform": item['game__platform__name'],
-                "count": item['count'],
-                "limit_exceeded": item['count'] >= MAX_SAME_GAME_PER_YEAR
+                "game_id": item["game_id"],
+                "name": item["game__name"],
+                "platform": item["game__platform__name"],
+                "count": item["count"],
+                "limit_exceeded": item["count"] >= MAX_SAME_GAME_PER_YEAR,
             }
             for item in selected_games_this_year_qs
         ]
 
         # 2. League Statistics (Minimal, as requested to be less prominent)
-        standings = LeagueStanding.objects.filter(player_profile=profile).select_related('league')
+        standings = LeagueStanding.objects.filter(
+            player_profile=profile
+        ).select_related("league")
         total_leagues = standings.count()
         # (Distribution logic removed as it's considered "useless" by the user)
 
@@ -177,56 +208,63 @@ class UserViewSet(ModelViewSet):
         top_games = sorted(
             game_stats,
             key=lambda x: (
-                -(x["winRate"] or 0),   # highest win rate first
-                -(x["count"] or 0),     # then more games played
-                (x["avgPos"] or 0),     # then lower average position (better)
-                x["name"],              # stable final tie-breaker
-            )
+                -(x["winRate"] or 0),  # highest win rate first
+                -(x["count"] or 0),  # then more games played
+                (x["avgPos"] or 0),  # then lower average position (better)
+                x["name"],  # stable final tie-breaker
+            ),
         )[:3]
 
-        return Response({
-            "overall_stats": overall_stats,
-            "league_stats": {
-                "totalLeagues": total_leagues,
-            },
-            "game_stats": game_stats,
-            "top_games": top_games,
-            "selected_games_this_year": selected_games_this_year,
-            "max_game_limit": MAX_SAME_GAME_PER_YEAR,
-        })
+        return Response(
+            {
+                "overall_stats": overall_stats,
+                "league_stats": {
+                    "totalLeagues": total_leagues,
+                },
+                "game_stats": game_stats,
+                "top_games": top_games,
+                "selected_games_this_year": selected_games_this_year,
+                "max_game_limit": MAX_SAME_GAME_PER_YEAR,
+            }
+        )
 
 
 class MeViewSet(ViewSet):
     permission_classes = [IsAuthenticated]
 
-    @action(detail=False, methods=['get'], url_path='current-league')
+    @action(detail=False, methods=["get"], url_path="current-league")
     def current_league(self, request):
         from league.serializer import LeagueMinimalSerializer
+
         profile = request.user.profile
 
         participant = (
-            SeasonParticipant.objects
-            .filter(profile=profile, season__status=Season.SeasonStatus.RUNNING)
-            .select_related('season')
+            SeasonParticipant.objects.filter(
+                profile=profile, season__status=Season.SeasonStatus.RUNNING
+            )
+            .select_related("season")
             .first()
         )
 
         if not participant:
-            return Response({'detail': 'No running season participation found.'}, status=404)
+            return Response(
+                {"detail": "No running season participation found."}, status=404
+            )
 
         league = League.objects.filter(
-            members=participant,
-            season=participant.season
+            members=participant, season=participant.season
         ).first()
 
         if not league:
-            return Response({'detail': 'No league found for current season.'}, status=404)
+            return Response(
+                {"detail": "No league found for current season."}, status=404
+            )
 
         data = LeagueMinimalSerializer(league).data
-        data['is_my_turn'] = league.active_player == participant
+        data["is_my_turn"] = league.active_player == participant
         return Response(data)
 
-    @action(detail=False, methods=['get'], url_path='results')
+    @action(detail=False, methods=["get"], url_path="results")
     def results(self, request):
         results = Result.objects.filter(player_profile=request.user.profile)
         return Response(ResultSerializer(results, many=True).data)
@@ -240,6 +278,7 @@ class UserInviteLinkViewSet(ModelViewSet):
       - GET    /invite-links/{id}/   retrieve
       - DELETE /invite-links/{id}/   destroy
     """
+
     queryset = UserInviteLink.objects.select_related("created_by").all()
     serializer_class = UserInviteLinkSerializer
     permission_classes = [IsAdminUser]
@@ -255,6 +294,7 @@ class UserRegistrationViewSet(ViewSet):
       - POST /register/                 -> create user (consumes invite)
       - GET  /register/validate/?key=.. -> check invite validity
     """
+
     permission_classes = [AllowAny]
 
     def create(self, request):
@@ -283,7 +323,9 @@ class UserRegistrationViewSet(ViewSet):
                     player_profile.save()
                 else:
                     # Create a new PlayerProfile
-                    player_profile = PlayerProfile.objects.create(user=user, profile_name=username)
+                    player_profile = PlayerProfile.objects.create(
+                        user=user, profile_name=username
+                    )
 
                     # Remove PlatformPlayer handling for now
                     # BGA = Platform.objects.get(name="BGA")
@@ -297,7 +339,9 @@ class UserRegistrationViewSet(ViewSet):
                 invite.delete()
 
             create_chat_announcement(f"Welcome {username} to kennerliga")
-            return Response({"detail": f"User {username} created successfully."}, status=201)
+            return Response(
+                {"detail": f"User {username} created successfully."}, status=201
+            )
 
         except UserInviteLink.DoesNotExist:
             return Response({"detail": "Invalid invite key."}, status=400)
@@ -316,18 +360,18 @@ class PlayerProfileViewSet(ModelViewSet):
         queryset = PlayerProfile.objects.all()
 
         # Check for user__isnull query parameter
-        user_isnull = self.request.query_params.get('user__isnull', None)
+        user_isnull = self.request.query_params.get("user__isnull", None)
 
         if user_isnull is not None:
             # Strip whitespace and slashes, then convert to lowercase
-            user_isnull = user_isnull.strip().strip('/').lower()
+            user_isnull = user_isnull.strip().strip("/").lower()
 
-            if user_isnull in ['true', '1', 'yes']:
+            if user_isnull in ["true", "1", "yes"]:
                 queryset = queryset.filter(user__isnull=True)
-            elif user_isnull in ['false', '0', 'no']:
+            elif user_isnull in ["false", "0", "no"]:
                 queryset = queryset.filter(user__isnull=False)
 
-        return queryset.order_by(Lower('profile_name'))
+        return queryset.order_by(Lower("profile_name"))
 
 
 class FeedbackViewSet(ModelViewSet):

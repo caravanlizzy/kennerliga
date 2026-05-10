@@ -6,4 +6,4 @@ from announcement.models import Announcement
 class AnnouncementSerializer(ModelSerializer):
     class Meta:
         model = Announcement
-        fields = '__all__'
+        fields = "__all__"

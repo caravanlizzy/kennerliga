@@ -5,27 +5,34 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
     dependencies = [
-        ('season', '0001_initial'),
-        ('user', '0001_initial'),
+        ("season", "0001_initial"),
+        ("user", "0001_initial"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='seasonparticipant',
-            name='profile',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='season_participants', to='user.playerprofile'),
+            model_name="seasonparticipant",
+            name="profile",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="season_participants",
+                to="user.playerprofile",
+            ),
         ),
         migrations.AddField(
-            model_name='seasonparticipant',
-            name='season',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='participants', to='season.season'),
+            model_name="seasonparticipant",
+            name="season",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="participants",
+                to="season.season",
+            ),
         ),
         migrations.AlterUniqueTogether(
-            name='seasonparticipant',
-            unique_together={('season', 'profile')},
+            name="seasonparticipant",
+            unique_together={("season", "profile")},
         ),
     ]

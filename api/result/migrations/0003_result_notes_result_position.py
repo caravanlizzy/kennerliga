@@ -4,20 +4,19 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('result', '0002_initial'),
+        ("result", "0002_initial"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='result',
-            name='notes',
+            model_name="result",
+            name="notes",
             field=models.TextField(blank=True, null=True),
         ),
         migrations.AddField(
-            model_name='result',
-            name='position',
+            model_name="result",
+            name="position",
             field=models.PositiveIntegerField(blank=True, null=True),
         ),
     ]

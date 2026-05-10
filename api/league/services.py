@@ -2,53 +2,57 @@ from typing import Optional, List, Dict
 from django.db import transaction
 from django.db.models import Count
 from game.models import SelectedGame, BanDecision
-from league.models import League, LeagueStatus, LeagueStanding, GameStanding, LeagueTieResolution
+from league.models import (
+    League,
+    LeagueStatus,
+    LeagueStanding,
+    GameStanding,
+    LeagueTieResolution,
+)
 from season.models import SeasonParticipant
 from league import queries as q
 from api.constants import get_ban_amount_for_success
+
 
 def get_full_standings_data(league: League) -> Dict:
     required_bans = get_ban_amount_for_success(league.members.count())
 
     # 1. Get all selected games for this league (column headers)
     selected_games = (
-        SelectedGame.objects
-        .filter(league_id=league.id)
-        .annotate(ban_count=Count('bandecision'))
+        SelectedGame.objects.filter(league_id=league.id)
+        .annotate(ban_count=Count("bandecision"))
         .filter(ban_count__lt=required_bans)
-        .select_related('game__platform', 'profile')
-        .prefetch_related('game__resultconfig_set')
-        .order_by('id')
+        .select_related("game__platform", "profile")
+        .prefetch_related("game__resultconfig_set")
+        .order_by("id")
     )
-    
+
     selected_game_list = []
     for sg in selected_games:
         configs = list(sg.game.resultconfig_set.all())
-        selected_game_list.append({
-            "id": sg.id,
-            "game_name": sg.game.name,
-            "game_short_name": sg.game.short_name,
-            "platform_name": sg.game.platform.name,
-            "has_points": configs[0].has_points if configs else True,
-            "selected_by_id": sg.profile.id if sg.profile else None,
-            "selected_by_name": sg.profile.profile_name if sg.profile else None,
-        })
+        selected_game_list.append(
+            {
+                "id": sg.id,
+                "game_name": sg.game.name,
+                "game_short_name": sg.game.short_name,
+                "platform_name": sg.game.platform.name,
+                "has_points": configs[0].has_points if configs else True,
+                "selected_by_id": sg.profile.id if sg.profile else None,
+                "selected_by_name": sg.profile.profile_name if sg.profile else None,
+            }
+        )
     selected_game_ids = [sg.id for sg in selected_games]
 
     # 2. Get league standings (for row ordering & totals)
-    league_standings = (
-        LeagueStanding.objects
-        .filter(league_id=league.id)
-        .select_related('player_profile__user')
-    )
+    league_standings = LeagueStanding.objects.filter(
+        league_id=league.id
+    ).select_related("player_profile__user")
     league_standing_list = list(league_standings)
     league_standing_dict = {ls.player_profile_id: ls for ls in league_standing_list}
 
     # 3. Get all game standings for this league
-    game_standings = (
-        GameStanding.objects
-        .filter(league_id=league.id)
-        .select_related('decisive_tie_breaker')
+    game_standings = GameStanding.objects.filter(league_id=league.id).select_related(
+        "decisive_tie_breaker"
     )
 
     # Build a lookup: {player_profile_id: {selected_game_id: {...}}}
@@ -61,15 +65,15 @@ def get_full_standings_data(league: League) -> Dict:
             "points": str(gs.points),
             "league_points": str(gs.league_points),
             "rank": gs.rank,
-            "decisive_tie_breaker_name": gs.decisive_tie_breaker.name if gs.decisive_tie_breaker else None,
+            "decisive_tie_breaker_name": gs.decisive_tie_breaker.name
+            if gs.decisive_tie_breaker
+            else None,
             "tie_breaker_value": gs.tie_breaker_value,
         }
 
     # 4. Get all members of the league to ensure everyone is listed even if they have no standings yet
-    members = (
-        league.members
-        .select_related('profile__user')
-        .order_by('rank', 'profile__profile_name')
+    members = league.members.select_related("profile__user").order_by(
+        "rank", "profile__profile_name"
     )
 
     # 5. Build the response rows
@@ -84,34 +88,42 @@ def get_full_standings_data(league: League) -> Dict:
             if sg_id in player_games:
                 games_dict[str(sg_id)] = player_games[sg_id]
             else:
-                games_dict[str(sg_id)] = {"points": None, "league_points": None, "rank": None}
+                games_dict[str(sg_id)] = {
+                    "points": None,
+                    "league_points": None,
+                    "rank": None,
+                }
 
-        standings_list.append({
-            "player_profile_id": pid,
-            "profile_name": member.profile.profile_name,
-            "user_id": member.profile.user.id if member.profile.user else None,
-            "username": member.profile.user.username if member.profile.user else None,
-            "total_league_points": str(ls.league_points) if ls else "0",
-            "total_wins": str(ls.wins) if ls else "0",
-            "unresolved_tie_group": ls.unresolved_tie_group if ls else None,
-            "games": games_dict,
-        })
+        standings_list.append(
+            {
+                "player_profile_id": pid,
+                "profile_name": member.profile.profile_name,
+                "user_id": member.profile.user.id if member.profile.user else None,
+                "username": member.profile.user.username
+                if member.profile.user
+                else None,
+                "total_league_points": str(ls.league_points) if ls else "0",
+                "total_wins": str(ls.wins) if ls else "0",
+                "unresolved_tie_group": ls.unresolved_tie_group if ls else None,
+                "games": games_dict,
+            }
+        )
 
     # Sort standings_list: if we have LeagueStandings, sort by them, otherwise stick to member rank
     if league_standing_list:
-        standings_list.sort(key=lambda x: (
-            -float(x["total_league_points"]),
-            -float(x["total_wins"]),
-            x["profile_name"]
-        ))
+        standings_list.sort(
+            key=lambda x: (
+                -float(x["total_league_points"]),
+                -float(x["total_wins"]),
+                x["profile_name"],
+            )
+        )
 
     # 6. Build tie groups information (unresolved and resolved)
     # Unresolved groups from current snapshot
-    unresolved_qs = (
-        LeagueStanding.objects
-        .filter(league_id=league.id, unresolved_tie_group__isnull=False)
-        .select_related('player_profile__user')
-    )
+    unresolved_qs = LeagueStanding.objects.filter(
+        league_id=league.id, unresolved_tie_group__isnull=False
+    ).select_related("player_profile__user")
     unresolved_map: Dict[str, Dict] = {}
     for ls in unresolved_qs:
         key = ls.unresolved_tie_group
@@ -125,31 +137,40 @@ def get_full_standings_data(league: League) -> Dict:
                 "wins": str(ls.wins),
                 "resolution": None,
             }
-        unresolved_map[key]["members"].append({
-            "player_profile_id": ls.player_profile_id,
-            "profile_name": ls.player_profile.profile_name,
-            "user_id": ls.player_profile.user.id if ls.player_profile.user else None,
-            "username": ls.player_profile.user.username if ls.player_profile.user else None,
-        })
+        unresolved_map[key]["members"].append(
+            {
+                "player_profile_id": ls.player_profile_id,
+                "profile_name": ls.player_profile.profile_name,
+                "user_id": ls.player_profile.user.id
+                if ls.player_profile.user
+                else None,
+                "username": ls.player_profile.user.username
+                if ls.player_profile.user
+                else None,
+            }
+        )
 
     # Resolutions (may include groups already resolved and thus not present as unresolved anymore)
     # 7. Get tie resolutions
-    resolutions = (
-        LeagueTieResolution.objects
-        .filter(league_id=league.id)
-        .prefetch_related('entries__player_profile__user')
-    )
+    resolutions = LeagueTieResolution.objects.filter(
+        league_id=league.id
+    ).prefetch_related("entries__player_profile__user")
     resolution_map: Dict[str, Dict] = {}
     for res in resolutions:
         # Members ordered by order_index for display
         ordered_entries = sorted(res.entries.all(), key=lambda e: e.order_index)
-        members = [{
-            "player_profile_id": e.player_profile_id,
-            "profile_name": e.player_profile.profile_name,
-            "user_id": e.player_profile.user.id if e.player_profile.user else None,
-            "username": e.player_profile.user.username if e.player_profile.user else None,
-            "order_index": e.order_index,
-        } for e in ordered_entries]
+        members = [
+            {
+                "player_profile_id": e.player_profile_id,
+                "profile_name": e.player_profile.profile_name,
+                "user_id": e.player_profile.user.id if e.player_profile.user else None,
+                "username": e.player_profile.user.username
+                if e.player_profile.user
+                else None,
+                "order_index": e.order_index,
+            }
+            for e in ordered_entries
+        ]
 
         resolution_map[res.group_key] = {
             "group_key": res.group_key,
@@ -160,12 +181,12 @@ def get_full_standings_data(league: League) -> Dict:
                 "reason_display": res.get_reason_display(),
                 "note": res.note,
                 "is_resolved": res.is_resolved,
-            }
+            },
         }
 
     # Merge: unresolved first, then add resolved groups that aren't currently unresolved
     tie_groups: List[Dict] = []
-    
+
     # Add unresolved groups
     for key, group in unresolved_map.items():
         merged = group.copy()
@@ -177,9 +198,9 @@ def get_full_standings_data(league: League) -> Dict:
             # prefer current unresolved membership ordering; do not override members
         else:
             merged["unresolved"] = True
-            
+
         tie_groups.append(merged)
-        
+
     # Add purely resolved groups (no longer tied in snapshot points/wins - though this shouldn't happen with current snapshot logic)
     for key, group in resolution_map.items():
         if key not in unresolved_map:
@@ -188,7 +209,12 @@ def get_full_standings_data(league: League) -> Dict:
     # Stable sort: unresolved groups first by points/wins desc, then resolved by group_key
     def _tg_sort_key(g):
         if g.get("unresolved"):
-            return (0, -(float(g.get("league_points") or 0)), -(float(g.get("wins") or 0)), g["group_key"])
+            return (
+                0,
+                -(float(g.get("league_points") or 0)),
+                -(float(g.get("wins") or 0)),
+                g["group_key"],
+            )
         return (1, 0, 0, g["group_key"])
 
     tie_groups.sort(key=_tg_sort_key)
@@ -200,12 +226,15 @@ def get_full_standings_data(league: League) -> Dict:
         "tie_groups": tie_groups,
     }
 
+
 def set_league_active_player(league: League, participant) -> None:
     league.active_player = participant
     league.save(update_fields=["active_player"])
 
 
-def rotate_active_player(league: League, reverse_order: bool = False, members=None) -> Optional[SeasonParticipant]:
+def rotate_active_player(
+    league: League, reverse_order: bool = False, members=None
+) -> Optional[SeasonParticipant]:
     players = members if members is not None else league.members.all()
     ordered_players = list(players.order_by("-rank" if reverse_order else "rank"))
     if not ordered_players:
@@ -221,6 +250,7 @@ def rotate_active_player(league: League, reverse_order: bool = False, members=No
     league.active_player = next_player
     league.save(update_fields=["active_player"])
     return next_player
+
 
 @transaction.atomic
 def advance_turn(league: League):
@@ -264,10 +294,12 @@ def advance_turn(league: League):
 
     # PLAYING/DONE → do nothing
 
+
 def select_game(league: League, player, game):
     if league.active_player != player:
         raise ValueError("It's not this player's turn to select a game.")
     return SelectedGame.objects.create(league=league, player=player, game=game)
+
 
 def ban_game(league: League, player, game):
     if league.active_player != player:

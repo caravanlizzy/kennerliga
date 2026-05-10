@@ -1,6 +1,5 @@
 import logging
 
-from django.core.exceptions import ObjectDoesNotExist
 
 from league.models import League
 from season.models import Season
@@ -8,7 +7,7 @@ from user.models import PlayerProfile, User, PlatformPlayer
 
 
 def create_profile_for_user(user):
-    profile_name = user.username + '_profile'
+    profile_name = user.username + "_profile"
     new_profile = PlayerProfile(user=user, profile_name=profile_name)
     new_profile.save()
 
@@ -50,7 +49,9 @@ def create_platform_player(profile, platform):
     try:
         name = f"{profile.profile_name}_{platform.name}"
         print(name)
-        new_platform_player = PlatformPlayer(player_profile=profile, platform=platform, name=name)
+        new_platform_player = PlatformPlayer(
+            player_profile=profile, platform=platform, name=name
+        )
         new_platform_player.save()
         return new_platform_player  # Return the created object
     except Exception as e:
@@ -69,7 +70,7 @@ def create_bga_platform_players_based_on_existing_users():
 
     usernames = list(User.objects.all())
     try:
-        bga = Platform.objects.get(name='BGA')
+        bga = Platform.objects.get(name="BGA")
         if bga and usernames:
             [create_platform_player_by_user(user.username, bga) for user in usernames]
     except Platform.DoesNotExist:

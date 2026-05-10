@@ -5,21 +5,25 @@ import django.db.models.deletion
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('game', '0013_game_max_players_game_min_players'),
-        ('league', '0004_remove_gamestanding_league_game_league__9b635e_idx_and_more'),
+        ("game", "0013_game_max_players_game_min_players"),
+        ("league", "0004_remove_gamestanding_league_game_league__9b635e_idx_and_more"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='gamestanding',
-            name='decisive_tie_breaker',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to='game.tiebreaker'),
+            model_name="gamestanding",
+            name="decisive_tie_breaker",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.SET_NULL,
+                to="game.tiebreaker",
+            ),
         ),
         migrations.AddField(
-            model_name='gamestanding',
-            name='tie_breaker_value',
+            model_name="gamestanding",
+            name="tie_breaker_value",
             field=models.CharField(blank=True, max_length=255, null=True),
         ),
     ]

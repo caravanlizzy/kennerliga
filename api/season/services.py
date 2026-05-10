@@ -2,11 +2,11 @@ import logging
 from league.models import League, LeagueStanding
 from league.services import set_league_active_player
 from season.models import Season, SeasonParticipant
-from season.queries import get_running_season, get_open_season
 from random import shuffle
-from typing import List, Dict, Optional, Any
+from typing import List, Optional
 from season.queries import get_previous_season
 from user.models import PlayerProfile
+
 
 def close_season(season: Season):
     if not season:
@@ -14,6 +14,7 @@ def close_season(season: Season):
         return
     season.status = Season.SeasonStatus.DONE
     season.save()
+
 
 def start_open_season(season: Season):
     if not season:
@@ -26,6 +27,7 @@ def start_open_season(season: Season):
     season.save()
     return season
 
+
 def create_next_season(current_season: Season) -> Season:
     if not current_season:
         raise ValueError("No running season found")
@@ -33,6 +35,7 @@ def create_next_season(current_season: Season) -> Season:
     new = Season(year=new_year, month=new_month, status=Season.SeasonStatus.NEXT)
     new.save()
     return new
+
 
 def open_registration(season: Season):
     if not season:
@@ -63,8 +66,10 @@ def create_leagues(season: Season, participants: List) -> List[League]:
 
     return leagues
 
+
 def _next_month_year(month: int, year: int):
     return (1, year + 1) if month == 12 else (month + 1, year)
+
 
 def _players_per_league(count: int) -> List[int]:
     league_count, rest = divmod(count, 4)
@@ -80,13 +85,17 @@ def _players_per_league(count: int) -> List[int]:
     return players
 
 
-def rank_participants(season: Season, participants: List[SeasonParticipant]) -> List[SeasonParticipant]:
+def rank_participants(
+    season: Season, participants: List[SeasonParticipant]
+) -> List[SeasonParticipant]:
     """
     This function should order the participants and give them a rank. all participants that have participated in the previous season get rank according how they performed. winner of L1 gets rank1, second in l1 gets #2 etc. first 4 ranks go to L1, then rank 5 is winner of L2 etc. after all participants of the previous seasons have been ranked, the remaining participants get their rank randomly (but increase by one for each nexct participant. the so the last players rank is the amount of players this season
     """
     profiles = [p.profile for p in participants]
     prev_participants_profiles = get_previous_participants_list(profiles)
-    new_participants_profiles = [p for p in profiles if p not in prev_participants_profiles]
+    new_participants_profiles = [
+        p for p in profiles if p not in prev_participants_profiles
+    ]
 
     ordered_prev_profiles = order_previous(prev_participants_profiles)
 
@@ -104,6 +113,7 @@ def rank_participants(season: Season, participants: List[SeasonParticipant]) -> 
         ranked_participants.append(participant)
 
     return ranked_participants
+
 
 def get_previous_participants_list(participants) -> List:
     """
@@ -124,12 +134,21 @@ def get_previous_participants_list(participants) -> List:
     prev_season = get_previous_season()
     if not prev_season:
         return []
-    prev_participants_profiles = set(prev_season.participants.values_list('profile_id', flat=True))
+    prev_participants_profiles = set(
+        prev_season.participants.values_list("profile_id", flat=True)
+    )
     return [p for p in participants if p.id in prev_participants_profiles]
+
 
 def get_previous_result(profile: PlayerProfile) -> Optional[dict]:
     prev_season = get_previous_season()
-    last_season = Season.objects.filter(participants__profile=profile, status=Season.SeasonStatus.DONE).order_by("-year", "-month").first()
+    last_season = (
+        Season.objects.filter(
+            participants__profile=profile, status=Season.SeasonStatus.DONE
+        )
+        .order_by("-year", "-month")
+        .first()
+    )
     if not prev_season or prev_season != last_season:
         return None
 
@@ -140,22 +159,26 @@ def get_previous_result(profile: PlayerProfile) -> Optional[dict]:
 
     # Get standings for this league ordered by performance (descending)
     standings = list(
-        LeagueStanding.objects.filter(league=league)
-        .order_by("-league_points", "-wins", "player_profile__profile_name")
+        LeagueStanding.objects.filter(league=league).order_by(
+            "-league_points", "-wins", "player_profile__profile_name"
+        )
     )
-    
+
     # Find this player's standing and rank
-    player_standing = next((s for s in standings if s.player_profile_id == profile.id), None)
+    player_standing = next(
+        (s for s in standings if s.player_profile_id == profile.id), None
+    )
     if not player_standing:
         return None
-        
+
     rank = standings.index(player_standing) + 1
-    
+
     return {
         "league": league.level,
         "position": rank,
         "is_last": (rank == len(standings) and len(standings) > 1),
     }
+
 
 def order_previous(participants: List[PlayerProfile]) -> List[PlayerProfile]:
     data = []
@@ -175,11 +198,16 @@ def order_previous(participants: List[PlayerProfile]) -> List[PlayerProfile]:
     promoted = apply_promotion(sorted_list)
     return [row["profile"] for row in promoted]
 
+
 def apply_promotion(participants: List[dict]) -> List[dict]:
     # Apply simple promotion/relegation rule
     participants_copy = participants.copy()
     for i, current in enumerate(participants_copy[1:], start=1):
         prev = participants_copy[i - 1]
-        if prev["is_last"] and current["league"] - 1 == prev["league"] and current["position"] == 1:
+        if (
+            prev["is_last"]
+            and current["league"] - 1 == prev["league"]
+            and current["position"] == 1
+        ):
             participants_copy[i], participants_copy[i - 1] = prev, current
     return participants_copy

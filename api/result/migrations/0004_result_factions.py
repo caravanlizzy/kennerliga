@@ -4,16 +4,17 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('game', '0007_alter_tiebreaker_order'),
-        ('result', '0003_result_notes_result_position'),
+        ("game", "0007_alter_tiebreaker_order"),
+        ("result", "0003_result_notes_result_position"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='result',
-            name='factions',
-            field=models.ManyToManyField(blank=True, related_name='results', to='game.faction'),
+            model_name="result",
+            name="factions",
+            field=models.ManyToManyField(
+                blank=True, related_name="results", to="game.faction"
+            ),
         ),
     ]

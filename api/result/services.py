@@ -6,7 +6,18 @@ from league.models import LeagueStatus, GameStanding
 from services.standings_snapshot import rebuild_game_snapshot, rebuild_league_snapshot
 from league.serializer import GameStandingSerializer
 
-def finalize_results(serializers, rows, base_field, use_points, tbs, selected_game, league, decisive_tb=None, needing_pids=None):
+
+def finalize_results(
+    serializers,
+    rows,
+    base_field,
+    use_points,
+    tbs,
+    selected_game,
+    league,
+    decisive_tb=None,
+    needing_pids=None,
+):
     if needing_pids is None:
         needing_pids = set()
 
@@ -21,7 +32,9 @@ def finalize_results(serializers, rows, base_field, use_points, tbs, selected_ga
         key = [-base_val] if use_points else [base_val]
         for tb in tbs:
             val = fnum(row.get("tie_breaker_value"))
-            key.append(float("inf") if val is None else (-val if tb.higher_wins else val))
+            key.append(
+                float("inf") if val is None else (-val if tb.higher_wins else val)
+            )
         return tuple(key)
 
     sorted_rows = sorted(rows, key=get_full_sort_key)
@@ -51,19 +64,22 @@ def finalize_results(serializers, rows, base_field, use_points, tbs, selected_ga
         # Get all SelectedGames that belong to this league, excluding successfully banned ones
         banned_ids = set(get_banned_selected_game_ids(league))
         sg_ids = list(
-            SelectedGame.objects.filter(league=league).exclude(id__in=banned_ids).values_list("id", flat=True)
+            SelectedGame.objects.filter(league=league)
+            .exclude(id__in=banned_ids)
+            .values_list("id", flat=True)
         )
 
         if sg_ids:
             # Count GameStanding rows per SelectedGame (created on snapshot rebuild)
             per_game_counts = (
-                GameStanding.objects
-                .filter(league=league, selected_game_id__in=sg_ids)
+                GameStanding.objects.filter(league=league, selected_game_id__in=sg_ids)
                 .values("selected_game_id")
                 .annotate(c=Count("id"))
             )
             counts_map = {row["selected_game_id"]: row["c"] for row in per_game_counts}
-            all_games_have_results = all(counts_map.get(sg_id, 0) >= member_count for sg_id in sg_ids)
+            all_games_have_results = all(
+                counts_map.get(sg_id, 0) >= member_count for sg_id in sg_ids
+            )
 
             if all_games_have_results:
                 league.status = LeagueStatus.DONE
@@ -71,12 +87,15 @@ def finalize_results(serializers, rows, base_field, use_points, tbs, selected_ga
 
     return saved
 
+
 def get_game_standings_data(league, selected_game_id):
-    standings = GameStanding.objects.filter(
-        league=league, 
-        selected_game_id=selected_game_id
-    ).select_related("player_profile").order_by("rank", "player_profile__profile_name")
+    standings = (
+        GameStanding.objects.filter(league=league, selected_game_id=selected_game_id)
+        .select_related("player_profile")
+        .order_by("rank", "player_profile__profile_name")
+    )
     return GameStandingSerializer(standings, many=True).data
+
 
 def get_tie_groups(rows, base_field, use_points, tbs, level):
     """
@@ -86,6 +105,7 @@ def get_tie_groups(rows, base_field, use_points, tbs, level):
     If level == -1, we only check the base_field.
     If level >= 0, we check base_field AND tbs[0...level].
     """
+
     def fnum(x, default=None):
         try:
             return float(x)
@@ -99,7 +119,11 @@ def get_tie_groups(rows, base_field, use_points, tbs, level):
         key = [row.get(base_field)]
         for i in range(lvl + 1):
             tb = tbs[i]
-            val = fnum(row.get("tie_breaker_value")) if i == lvl else fnum(row.get(f"tb_{tb.id}"))
+            val = (
+                fnum(row.get("tie_breaker_value"))
+                if i == lvl
+                else fnum(row.get(f"tb_{tb.id}"))
+            )
             # Note: the view logic seems to assume 'tie_breaker_value' is the one currently being submitted.
             # This is a bit tricky if we have multiple levels of ties.
             key.append(val)

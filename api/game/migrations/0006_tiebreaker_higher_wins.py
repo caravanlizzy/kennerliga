@@ -4,15 +4,17 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('game', '0005_gameoptionavailabilitygroup_and_more'),
+        ("game", "0005_gameoptionavailabilitygroup_and_more"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='tiebreaker',
-            name='higher_wins',
-            field=models.BooleanField(default=True, help_text='If True, higher values win. If False, lower values win.'),
+            model_name="tiebreaker",
+            name="higher_wins",
+            field=models.BooleanField(
+                default=True,
+                help_text="If True, higher values win. If False, lower values win.",
+            ),
         ),
     ]

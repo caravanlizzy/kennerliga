@@ -5,15 +5,14 @@ import django.utils.timezone
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('game', '0010_alter_tiebreaker_options'),
+        ("game", "0010_alter_tiebreaker_options"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='selectedgame',
-            name='created_at',
+            model_name="selectedgame",
+            name="created_at",
             field=models.DateTimeField(default=django.utils.timezone.now),
         ),
     ]

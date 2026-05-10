@@ -1,4 +1,3 @@
-from collections import defaultdict
 
 from rest_framework.decorators import action
 from rest_framework.viewsets import ModelViewSet, ViewSet
@@ -9,13 +8,11 @@ from django.db import transaction
 from game.models import SelectedGame, ResultConfig, TieBreaker
 from league.models import GameStanding, LeagueStatus
 from services.standings_snapshot import rebuild_game_snapshot, rebuild_league_snapshot
-from league.serializer import GameStandingSerializer
 from season.models import Season
 from season.serializer import SeasonSerializer
 from .models import Result
 from .serializers import ResultSerializer
 from .services import finalize_results, get_game_standings_data, get_tie_groups
-from league.queries import is_league_finished
 
 
 class IsAdminOrMemberInCurrentLeague(permissions.BasePermission):
@@ -27,13 +24,15 @@ class IsAdminOrMemberInCurrentLeague(permissions.BasePermission):
             return True
 
         # For 'create' action, we need to check the SelectedGame in the payload
-        if view.action == 'create':
-            selected_game_id = request.data.get('selected_game')
+        if view.action == "create":
+            selected_game_id = request.data.get("selected_game")
             if not selected_game_id:
                 return False
 
             try:
-                selected_game = SelectedGame.objects.select_related('league__season').get(id=selected_game_id)
+                selected_game = SelectedGame.objects.select_related(
+                    "league__season"
+                ).get(id=selected_game_id)
                 season = selected_game.league.season
 
                 # Check if season is current  or RUNNING)
@@ -42,7 +41,9 @@ class IsAdminOrMemberInCurrentLeague(permissions.BasePermission):
 
                 # Check if user is a member of the league
                 # League.members is M2M to SeasonParticipant. SeasonParticipant.profile.user = user
-                return selected_game.league.members.filter(profile__user=request.user).exists()
+                return selected_game.league.members.filter(
+                    profile__user=request.user
+                ).exists()
             except SelectedGame.DoesNotExist:
                 return False
 
@@ -52,10 +53,10 @@ class IsAdminOrMemberInCurrentLeague(permissions.BasePermission):
 class ResultViewSet(ModelViewSet):
     queryset = Result.objects.all()
     serializer_class = ResultSerializer
-    filterset_fields = ['selected_game', 'player_profile']
+    filterset_fields = ["selected_game", "player_profile"]
 
     def get_permissions(self):
-        if self.action == 'create':
+        if self.action == "create":
             permission_classes = [IsAdminOrMemberInCurrentLeague]
         else:
             permission_classes = []
@@ -92,8 +93,9 @@ class MatchResultViewSet(ViewSet):
         seasons_with_results(request):
             Retrieves a list of seasons that have associated match results.
     """
+
     def get_permissions(self):
-        if self.action == 'create':
+        if self.action == "create":
             permission_classes = [IsAdminOrMemberInCurrentLeague]
         else:
             permission_classes = []
@@ -108,53 +110,108 @@ class MatchResultViewSet(ViewSet):
     def _get_tie_groups(self, rows, base_field, use_points, tbs, level):
         return get_tie_groups(rows, base_field, use_points, tbs, level)
 
-    def _finalize_results(self, serializers, rows, base_field, use_points, tbs, selected_game, league, decisive_tb=None,
-                          needing_pids=None):
-        saved = finalize_results(serializers, rows, base_field, use_points, tbs, selected_game, league, decisive_tb,
-                                  needing_pids)
+    def _finalize_results(
+        self,
+        serializers,
+        rows,
+        base_field,
+        use_points,
+        tbs,
+        selected_game,
+        league,
+        decisive_tb=None,
+        needing_pids=None,
+    ):
+        saved = finalize_results(
+            serializers,
+            rows,
+            base_field,
+            use_points,
+            tbs,
+            selected_game,
+            league,
+            decisive_tb,
+            needing_pids,
+        )
         game_standings = get_game_standings_data(league, selected_game.id)
-        return Response({
-            "results": ResultSerializer(saved, many=True).data,
-            "game_standings": game_standings,
-        }, status=status.HTTP_201_CREATED)
+        return Response(
+            {
+                "results": ResultSerializer(saved, many=True).data,
+                "game_standings": game_standings,
+            },
+            status=status.HTTP_201_CREATED,
+        )
 
     def create(self, request, *args, **kwargs):
         selected_game_id = request.data.get("selected_game")
         result_data = request.data.get("results", [])
         requested_tb_id = (request.data.get("tiebreaker") or {}).get("id")
 
-        if not selected_game_id or not isinstance(result_data, list) or len(result_data) < 2:
-            return Response({"detail": "Invalid payload."}, status=status.HTTP_400_BAD_REQUEST)
+        if (
+            not selected_game_id
+            or not isinstance(result_data, list)
+            or len(result_data) < 2
+        ):
+            return Response(
+                {"detail": "Invalid payload."}, status=status.HTTP_400_BAD_REQUEST
+            )
 
         try:
-            selected_game = SelectedGame.objects.select_related("game", "league__season").get(pk=selected_game_id)
+            selected_game = SelectedGame.objects.select_related(
+                "game", "league__season"
+            ).get(pk=selected_game_id)
             result_config = ResultConfig.objects.get(game=selected_game.game)
         except (SelectedGame.DoesNotExist, ResultConfig.DoesNotExist):
-            return Response({"detail": "Game or Config not found."}, status=status.HTTP_404_NOT_FOUND)
+            return Response(
+                {"detail": "Game or Config not found."},
+                status=status.HTTP_404_NOT_FOUND,
+            )
 
-        league, season, tbs = selected_game.league, selected_game.league.season, list(
-            TieBreaker.objects.filter(result_config=result_config).order_by("-order"))
-        use_points, base_field = result_config.has_points, ("points" if result_config.has_points else "position")
+        league, season, tbs = (
+            selected_game.league,
+            selected_game.league.season,
+            list(
+                TieBreaker.objects.filter(result_config=result_config).order_by(
+                    "-order"
+                )
+            ),
+        )
+        use_points, base_field = (
+            result_config.has_points,
+            ("points" if result_config.has_points else "position"),
+        )
 
         if len(result_data) != league.members.count():
-            return Response({"detail": "Incorrect result count."}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                {"detail": "Incorrect result count."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
 
         serializers, seen = [], set()
         for entry in result_data:
-            entry.update({"selected_game": selected_game.id, "league": league.id, "season": season.id})
+            entry.update(
+                {
+                    "selected_game": selected_game.id,
+                    "league": league.id,
+                    "season": season.id,
+                }
+            )
             player_profile_id = entry.get("player_profile")
             if player_profile_id in seen:
-                return Response({"detail": "Duplicate player."}, status=status.HTTP_400_BAD_REQUEST)
+                return Response(
+                    {"detail": "Duplicate player."}, status=status.HTTP_400_BAD_REQUEST
+                )
             seen.add(player_profile_id)
 
             # Check for existing result to update
             existing_result = Result.objects.filter(
-                selected_game=selected_game,
-                player_profile_id=player_profile_id
+                selected_game=selected_game, player_profile_id=player_profile_id
             ).first()
 
             if existing_result:
-                s = ResultSerializer(existing_result, data=entry, context={"request": request})
+                s = ResultSerializer(
+                    existing_result, data=entry, context={"request": request}
+                )
             else:
                 s = ResultSerializer(data=entry, context={"request": request})
 
@@ -168,55 +225,117 @@ class MatchResultViewSet(ViewSet):
         if requested_tb_id is None:
             groups = self._get_tie_groups(rows, base_field, use_points, tbs, -1)
             if not groups or not tbs:
-                return self._finalize_results(serializers, rows, base_field, use_points, tbs, selected_game, league)
+                return self._finalize_results(
+                    serializers,
+                    rows,
+                    base_field,
+                    use_points,
+                    tbs,
+                    selected_game,
+                    league,
+                )
 
             next_tb = tbs[0]
-            return Response({
-                "detail": "Tie detected.", "unresolved_tie": True,
-                "required_tie_breaker": {"id": next_tb.id, "name": next_tb.name, "order": next_tb.order,
-                                         "higher_wins": next_tb.higher_wins},
-                "tie_groups": [{"points": g[0].get("points"), "position": g[0].get("position"),
-                                "players": [r["player_profile"].id for r in g]} for g in groups]
-            }, status=status.HTTP_202_ACCEPTED)
+            return Response(
+                {
+                    "detail": "Tie detected.",
+                    "unresolved_tie": True,
+                    "required_tie_breaker": {
+                        "id": next_tb.id,
+                        "name": next_tb.name,
+                        "order": next_tb.order,
+                        "higher_wins": next_tb.higher_wins,
+                    },
+                    "tie_groups": [
+                        {
+                            "points": g[0].get("points"),
+                            "position": g[0].get("position"),
+                            "players": [r["player_profile"].id for r in g],
+                        }
+                        for g in groups
+                    ],
+                },
+                status=status.HTTP_202_ACCEPTED,
+            )
 
         # TB Resolution
         tb_map = {tb.id: idx for idx, tb in enumerate(tbs)}
         if requested_tb_id not in tb_map:
-            return Response({"detail": "Invalid TB."}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                {"detail": "Invalid TB."}, status=status.HTTP_400_BAD_REQUEST
+            )
 
         level = tb_map[requested_tb_id]
         prev_groups = self._get_tie_groups(rows, base_field, use_points, tbs, level - 1)
         needing_pids = {r["player_profile"].id for g in prev_groups for r in g}
 
-        if any(self._fnum(r.get("tie_breaker_value")) is None for r in rows if r["player_profile"].id in needing_pids):
-            return Response({"detail": "Missing TB values.", "required_tie_breaker": {"id": requested_tb_id}},
-                            status=status.HTTP_400_BAD_REQUEST)
+        if any(
+            self._fnum(r.get("tie_breaker_value")) is None
+            for r in rows
+            if r["player_profile"].id in needing_pids
+        ):
+            return Response(
+                {
+                    "detail": "Missing TB values.",
+                    "required_tie_breaker": {"id": requested_tb_id},
+                },
+                status=status.HTTP_400_BAD_REQUEST,
+            )
 
         remaining = self._get_tie_groups(rows, base_field, use_points, tbs, level)
         if remaining and level + 1 < len(tbs):
             next_tb = tbs[level + 1]
-            return Response({
-                "detail": "Still tied.", "unresolved_tie": True,
-                "required_tie_breaker": {"id": next_tb.id, "name": next_tb.name, "order": next_tb.order,
-                                         "higher_wins": next_tb.higher_wins},
-                "tie_groups": [{"points": g[0].get("points"), "position": g[0].get("position"),
-                                "players": [r["player_profile"].id for r in g]} for g in remaining]
-            }, status=status.HTTP_202_ACCEPTED)
+            return Response(
+                {
+                    "detail": "Still tied.",
+                    "unresolved_tie": True,
+                    "required_tie_breaker": {
+                        "id": next_tb.id,
+                        "name": next_tb.name,
+                        "order": next_tb.order,
+                        "higher_wins": next_tb.higher_wins,
+                    },
+                    "tie_groups": [
+                        {
+                            "points": g[0].get("points"),
+                            "position": g[0].get("position"),
+                            "players": [r["player_profile"].id for r in g],
+                        }
+                        for g in remaining
+                    ],
+                },
+                status=status.HTTP_202_ACCEPTED,
+            )
 
-        return self._finalize_results(serializers, rows, base_field, use_points, tbs, selected_game, league,
-                                      decisive_tb=tbs[level], needing_pids=needing_pids)
+        return self._finalize_results(
+            serializers,
+            rows,
+            base_field,
+            use_points,
+            tbs,
+            selected_game,
+            league,
+            decisive_tb=tbs[level],
+            needing_pids=needing_pids,
+        )
 
     def list(self, request):
         season_id = request.query_params.get("season")
         league = request.query_params.get("league")
         selected_game_id = request.query_params.get("selected_game")
 
-        if any(v == 'undefined' for v in [season_id, league, selected_game_id]):
-            return Response({"detail": "Invalid parameters."}, status=status.HTTP_400_BAD_REQUEST)
+        if any(v == "undefined" for v in [season_id, league, selected_game_id]):
+            return Response(
+                {"detail": "Invalid parameters."}, status=status.HTTP_400_BAD_REQUEST
+            )
 
         if not all([season_id, league, selected_game_id]):
-            return Response({"detail": "Parameters required."}, status=status.HTTP_400_BAD_REQUEST)
-        qs = Result.objects.filter(season_id=season_id, league=league, selected_game_id=selected_game_id)
+            return Response(
+                {"detail": "Parameters required."}, status=status.HTTP_400_BAD_REQUEST
+            )
+        qs = Result.objects.filter(
+            season_id=season_id, league=league, selected_game_id=selected_game_id
+        )
         return Response(ResultSerializer(qs, many=True).data)
 
     def retrieve(self, request, pk=None):
@@ -234,7 +353,10 @@ class MatchResultViewSet(ViewSet):
             selected_game = SelectedGame.objects.get(pk=pk)
             results = Result.objects.filter(selected_game=selected_game)
             if not results.exists():
-                return Response({"detail": "No results found for this game."}, status=status.HTTP_404_NOT_FOUND)
+                return Response(
+                    {"detail": "No results found for this game."},
+                    status=status.HTTP_404_NOT_FOUND,
+                )
 
             with transaction.atomic():
                 # Delete results
@@ -254,7 +376,9 @@ class MatchResultViewSet(ViewSet):
 
             return Response(status=status.HTTP_204_NO_CONTENT)
         except SelectedGame.DoesNotExist:
-            return Response({"detail": "SelectedGame not found."}, status=status.HTTP_404_NOT_FOUND)
+            return Response(
+                {"detail": "SelectedGame not found."}, status=status.HTTP_404_NOT_FOUND
+            )
         except Exception as e:
             return Response({"detail": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 

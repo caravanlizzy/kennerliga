@@ -5,18 +5,21 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
     dependencies = [
-        ('game', '0001_initial'),
-        ('league', '0001_initial'),
+        ("game", "0001_initial"),
+        ("league", "0001_initial"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='bandecision',
-            name='league',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='ban_decisions', to='league.league'),
+            model_name="bandecision",
+            name="league",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="ban_decisions",
+                to="league.league",
+            ),
         ),
     ]

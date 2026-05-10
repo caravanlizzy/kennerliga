@@ -20,8 +20,10 @@ DEFAULT_LEAGUE_POINTS = {
     4: Decimal("0"),
 }
 
+
 def get_league_points(player_count: int) -> dict[int, Decimal]:
     return LEAGUE_POINTS_DISTRIBUTION.get(player_count, DEFAULT_LEAGUE_POINTS)
+
 
 # Game picks per player
 # 2 players: 2 per player

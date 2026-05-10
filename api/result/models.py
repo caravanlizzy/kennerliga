@@ -16,16 +16,8 @@ class Result(models.Model):
         SelectedGame,
         on_delete=models.CASCADE,
     )
-    league = models.ForeignKey(
-        League,
-        on_delete=models.CASCADE,
-        related_name='results'
-    )
-    season = models.ForeignKey(
-        Season,
-        on_delete=models.CASCADE,
-        related_name='results'
-    )
+    league = models.ForeignKey(League, on_delete=models.CASCADE, related_name="results")
+    season = models.ForeignKey(Season, on_delete=models.CASCADE, related_name="results")
     points = models.IntegerField(blank=True, null=True)
     starting_points = models.IntegerField(blank=True, null=True)
     starting_position = models.IntegerField(blank=True, null=True)
@@ -36,14 +28,14 @@ class Result(models.Model):
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
-        related_name='decisive_results'
+        related_name="decisive_results",
     )
     tie_breaker_value = models.CharField(max_length=255, null=True, blank=True)
-    faction = models.ForeignKey('game.Faction', on_delete=models.SET_NULL, null=True, blank=True)
+    faction = models.ForeignKey(
+        "game.Faction", on_delete=models.SET_NULL, null=True, blank=True
+    )
     factions = models.ManyToManyField(
-        'game.Faction',
-        blank=True,
-        related_name='results'
+        "game.Faction", blank=True, related_name="results"
     )
     tie_breaker_resolved = models.BooleanField(default=False)
     created_at = models.DateTimeField(default=timezone.now)
@@ -51,8 +43,8 @@ class Result(models.Model):
 
     class Meta:
         indexes = [
-            models.Index(fields=['selected_game', 'player_profile']),
-            models.Index(fields=['league', 'season']),
+            models.Index(fields=["selected_game", "player_profile"]),
+            models.Index(fields=["league", "season"]),
         ]
 
     def __str__(self):

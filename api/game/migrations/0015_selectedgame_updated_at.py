@@ -4,15 +4,14 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('game', '0014_game_selectable'),
+        ("game", "0014_game_selectable"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='selectedgame',
-            name='updated_at',
+            model_name="selectedgame",
+            name="updated_at",
             field=models.DateTimeField(auto_now=True),
         ),
     ]

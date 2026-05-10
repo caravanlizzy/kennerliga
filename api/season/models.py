@@ -1,7 +1,6 @@
 from datetime import datetime
 
 from django.utils import timezone
-from django.utils.timezone import now  # Use timezone-aware datetime
 from django.core.validators import MinValueValidator, MaxValueValidator
 
 from django.db import models
@@ -11,20 +10,18 @@ from user.models import PlayerProfile  # Assuming this is your participant model
 # Create your models here.
 class Season(models.Model):
     class SeasonStatus(models.TextChoices):
-        NEXT = 'NEXT'
-        OPEN = 'OPEN'
-        RUNNING = 'RUNNING'
-        DONE = 'DONE'
+        NEXT = "NEXT"
+        OPEN = "OPEN"
+        RUNNING = "RUNNING"
+        DONE = "DONE"
 
     year = models.IntegerField()
     month = models.IntegerField(
-        'month in the current year',
-        validators=[MinValueValidator(1), MaxValueValidator(12)]
+        "month in the current year",
+        validators=[MinValueValidator(1), MaxValueValidator(12)],
     )
     status = models.CharField(
-        max_length=15,
-        choices=SeasonStatus.choices,
-        default=SeasonStatus.NEXT
+        max_length=15, choices=SeasonStatus.choices, default=SeasonStatus.NEXT
     )
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -59,16 +56,20 @@ class Season(models.Model):
 
 
 class SeasonParticipant(models.Model):
-    season = models.ForeignKey(Season, on_delete=models.CASCADE, related_name='participants')
-    profile = models.ForeignKey(PlayerProfile, on_delete=models.CASCADE, related_name='season_participants')
+    season = models.ForeignKey(
+        Season, on_delete=models.CASCADE, related_name="participants"
+    )
+    profile = models.ForeignKey(
+        PlayerProfile, on_delete=models.CASCADE, related_name="season_participants"
+    )
     rank = models.IntegerField(null=True, blank=True)
 
     class Meta:
-        unique_together = ('season', 'profile')
-        ordering = ['rank']
+        unique_together = ("season", "profile")
+        ordering = ["rank"]
         indexes = [
-            models.Index(fields=['season', 'profile']),
-            models.Index(fields=['season', 'rank']),
+            models.Index(fields=["season", "profile"]),
+            models.Index(fields=["season", "rank"]),
         ]
 
     def __str__(self):

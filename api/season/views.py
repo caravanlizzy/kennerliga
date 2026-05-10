@@ -2,7 +2,6 @@
 from collections import defaultdict
 from typing import List, Dict
 
-from django.db import models
 from django.db.models import Prefetch, Q
 from django.http import HttpResponseNotFound
 from rest_framework import status
@@ -14,21 +13,32 @@ from django.utils import timezone
 from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet, ViewSet
 
-from chat.service import create_chat_announcement
 from game.models import SelectedGame, BanDecision
-from league.models import League, LeagueStanding, GameStanding, LeagueStatus
+from league.models import League, LeagueStanding, GameStanding
 from result.models import Result
-from season.queries import register, is_profile_registered, get_open_season, get_running_season
+from season.queries import (
+    register,
+    is_profile_registered,
+    get_open_season,
+    get_running_season,
+)
 from season.models import Season, SeasonParticipant
-from season.serializer import SeasonSerializer, SeasonParticipantSerializer, TLiveEventSerializer, SeasonWithLeaguesSerializer
+from season.serializer import (
+    SeasonSerializer,
+    SeasonParticipantSerializer,
+    TLiveEventSerializer,
+    SeasonWithLeaguesSerializer,
+)
 from user.models import PlayerProfile
 
 
 class SeasonRegistrationView(APIView):
     def post(self, request, *args, **kwargs):
         if not self.request.user:
-            return Response({"detail": "Authentication credentials were not provided."},
-                            status=status.HTTP_401_UNAUTHORIZED)
+            return Response(
+                {"detail": "Authentication credentials were not provided."},
+                status=status.HTTP_401_UNAUTHORIZED,
+            )
         try:
             player_profile = PlayerProfile.objects.get(user=self.request.user)
         except PlayerProfile.DoesNotExist:
@@ -37,38 +47,49 @@ class SeasonRegistrationView(APIView):
         # if not player_profile in current_season.participants.all():
         if not is_profile_registered(player_profile, open_season):
             register(player_profile)
-            return Response(f'Participant {player_profile.profile_name} has been added to the current season.')
-        return Response(f'Player {player_profile.profile_name} is already registered')
+            return Response(
+                f"Participant {player_profile.profile_name} has been added to the current season."
+            )
+        return Response(f"Player {player_profile.profile_name} is already registered")
 
 
 class SeasonViewSet(ModelViewSet):
-    queryset = Season.objects.all().order_by('-year', '-month')
+    queryset = Season.objects.all().order_by("-year", "-month")
     serializer_class = SeasonSerializer
-    filterset_fields = ['year', 'month', 'status']
+    filterset_fields = ["year", "month", "status"]
 
     def get_serializer_class(self):
-        if self.action == 'list' and self.request.query_params.get('include_details') == '1':
+        if (
+            self.action == "list"
+            and self.request.query_params.get("include_details") == "1"
+        ):
             return SeasonWithLeaguesSerializer
         return super().get_serializer_class()
 
     def get_queryset(self):
         qs = super().get_queryset()
-        if self.request.query_params.get('with_leagues') == '1':
+        if self.request.query_params.get("with_leagues") == "1":
             return qs.filter(leagues__isnull=False).distinct()
         return qs
 
     def get_permissions(self):
-        if self.action in ['list', 'retrieve', 'registration_status', 'league_winners', 'seasons_with_leagues']:
+        if self.action in [
+            "list",
+            "retrieve",
+            "registration_status",
+            "league_winners",
+            "seasons_with_leagues",
+        ]:
             return [IsAuthenticated()]
         return [IsAdminUser()]
 
-    @action(detail=False, methods=['get'], url_path='seasons-with-leagues')
+    @action(detail=False, methods=["get"], url_path="seasons-with-leagues")
     def seasons_with_leagues(self, request):
         queryset = self.get_queryset().filter(leagues__isnull=False).distinct()
         serializer = SeasonWithLeaguesSerializer(queryset, many=True)
         return Response(serializer.data)
 
-    @action(detail=False, methods=['get'], url_path='registration-status')
+    @action(detail=False, methods=["get"], url_path="registration-status")
     def registration_status(self, request):
         """
         Check if the current user is registered in the open season.
@@ -149,15 +170,10 @@ class SeasonViewSet(ModelViewSet):
             pk=pk,
         )
 
-        leagues = (
-            League.objects
-            .filter(season_id=season.id)
-            .order_by("level", "id")
-        )
+        leagues = League.objects.filter(season_id=season.id).order_by("level", "id")
 
         standings = (
-            LeagueStanding.objects
-            .filter(league__in=leagues)
+            LeagueStanding.objects.filter(league__in=leagues)
             .select_related("league", "player_profile", "player_profile__user")
             .order_by("league_id", "-league_points", "-wins", "id")
         )
@@ -191,7 +207,11 @@ class SeasonViewSet(ModelViewSet):
 
         return Response(
             {
-                "season": {"id": season.id, "name": season.name, "status": season.status},
+                "season": {
+                    "id": season.id,
+                    "name": season.name,
+                    "status": season.status,
+                },
                 "winners": winners_payload,
             },
             status=status.HTTP_200_OK,
@@ -214,21 +234,21 @@ def build_league_scoreboard_payload(league: League) -> dict:
     """
     # Establish player order once (rank, then id)
     members_qs = (
-        league.members
-        .select_related('profile__user')
-        .order_by('rank', 'id')
-        .values('profile', 'profile__profile_name')
+        league.members.select_related("profile__user")
+        .order_by("rank", "id")
+        .values("profile", "profile__profile_name")
     )
     members = list(members_qs)
-    player_order: List[int] = [m['profile'] for m in members]
-    player_names: Dict[int, str] = {m['profile']: m['profile__profile_name'] for m in members}
+    player_order: List[int] = [m["profile"] for m in members]
+    player_names: Dict[int, str] = {
+        m["profile"]: m["profile__profile_name"] for m in members
+    }
 
     # All per-game standings for this league
     gs_qs = (
-        GameStanding.objects
-        .filter(league=league.id)
-        .select_related('player_profile', 'selected_game__game')
-        .order_by('selected_game_id', 'rank')
+        GameStanding.objects.filter(league=league.id)
+        .select_related("player_profile", "selected_game__game")
+        .order_by("selected_game_id", "rank")
     )
 
     # Group rows by selected_game
@@ -238,57 +258,71 @@ def build_league_scoreboard_payload(league: League) -> dict:
         by_game[row.selected_game_id].append(row)
         if row.selected_game_id not in game_meta:
             game_meta[row.selected_game_id] = {
-                'game_name': getattr(row.selected_game.game, 'name', str(row.selected_game.game))
+                "game_name": getattr(
+                    row.selected_game.game, "name", str(row.selected_game.game)
+                )
             }
 
     # Columns: "Game" + players
-    columns = ["Game"] + [player_names.get(pid, f"Player {pid}") for pid in player_order]
+    columns = ["Game"] + [
+        player_names.get(pid, f"Player {pid}") for pid in player_order
+    ]
 
     # Build game rows
     rows: List[dict] = []
     for selected_game_id, standings in by_game.items():
-        points_by_player = {s.player_profile: getattr(s, 'ingame_points', None) for s in standings}
+        points_by_player = {
+            s.player_profile: getattr(s, "ingame_points", None) for s in standings
+        }
 
         cells = []
         for pid in player_order:
             val = points_by_player.get(pid)
-            cells.append({
-                "player_id": pid,
-                "profile_name": player_names.get(pid, f"Player {pid}"),
-                "value": val,
-                "display": (f"{val} pts" if val is not None else "—"),
-            })
+            cells.append(
+                {
+                    "player_id": pid,
+                    "profile_name": player_names.get(pid, f"Player {pid}"),
+                    "value": val,
+                    "display": (f"{val} pts" if val is not None else "—"),
+                }
+            )
 
-        rows.append({
-            "type": "game",
-            "selected_game_id": selected_game_id,
-            "game": game_meta[selected_game_id]["game_name"],
-            "cells": cells,
-        })
+        rows.append(
+            {
+                "type": "game",
+                "selected_game_id": selected_game_id,
+                "game": game_meta[selected_game_id]["game_name"],
+                "cells": cells,
+            }
+        )
 
     # Final league totals row
-    ls_qs = (
-        LeagueStanding.objects
-        .filter(league=league.id)
-        .select_related('player_profile')
+    ls_qs = LeagueStanding.objects.filter(league=league.id).select_related(
+        "player_profile"
     )
-    league_points_by_player = {ls.player_profile: getattr(ls, 'league_points', 0) for ls in ls_qs}
+    league_points_by_player = {
+        ls.player_profile: getattr(ls, "league_points", 0) for ls in ls_qs
+    }
 
     total_cells = []
     for pid in player_order:
         val = league_points_by_player.get(pid, 0)
-        total_cells.append({
-            "player_id": pid,
-            "profile_name": player_names.get(pid, f"Player {pid}"),
-            "value": val,
-            "display": f"{val} pts",
-        })
+        total_cells.append(
+            {
+                "player_id": pid,
+                "profile_name": player_names.get(pid, f"Player {pid}"),
+                "value": val,
+                "display": f"{val} pts",
+            }
+        )
 
-    rows.append({
-        "type": "league_totals",
-        "label": "League Points",
-        "cells": total_cells,
-    })
+    rows.append(
+        {
+            "type": "league_totals",
+            "label": "League Points",
+            "cells": total_cells,
+        }
+    )
 
     return {
         "league": {"id": league.id, "name": league.level},
@@ -303,40 +337,42 @@ class SeasonScoreboardViewSet(ViewSet):
     Returns scoreboards for every league in the season.
     """
 
-    @action(detail=True, methods=['get'], url_path='scoreboards')
+    @action(detail=True, methods=["get"], url_path="scoreboards")
     def scoreboards(self, request, pk=None):
         # Load fields needed for 'name' property (year, month) to avoid extra queries
         season = get_object_or_404(
-            Season.objects.only('id', 'year', 'month', 'status'),
-            pk=pk
+            Season.objects.only("id", "year", "month", "status"), pk=pk
         )
 
         # Fetch leagues for this season (Level 1 = highest)
         leagues = (
-            League.objects
-            .filter(season_id=season.id)
-            .select_related('season')
+            League.objects.filter(season_id=season.id)
+            .select_related("season")
             .prefetch_related(
                 Prefetch(
-                    'members',
+                    "members",
                     queryset=(
-                        League._meta.get_field('members').remote_field.model.objects
-                        .select_related('profile__user')
-                        .order_by('rank', 'id')
-                    )
+                        League._meta.get_field("members")
+                        .remote_field.model.objects.select_related("profile__user")
+                        .order_by("rank", "id")
+                    ),
                 )
             )
-            .order_by('level', 'id')
+            .order_by("level", "id")
         )
 
         payloads = [build_league_scoreboard_payload(league) for league in leagues]
 
         return Response(
             {
-                "season": {"id": season.id, "name": season.name, "status": season.status},
+                "season": {
+                    "id": season.id,
+                    "name": season.name,
+                    "status": season.status,
+                },
                 "leagues": payloads,
             },
-            status=status.HTTP_200_OK
+            status=status.HTTP_200_OK,
         )
 
 
@@ -368,11 +404,13 @@ class CurrentSeasonView(APIView):
             status=status.HTTP_200_OK,
         )
 
+
 class SeasonParticipantViewSet(ModelViewSet):
     """
     list:   GET  /season-participants/?season=<id>&profile=<id>
     create: POST /season-participants/  {season, profile, rank?}
     """
+
     queryset = SeasonParticipant.objects.select_related("season", "profile")
     serializer_class = SeasonParticipantSerializer
     filterset_fields = ["season", "profile", "profile__profile_name"]
@@ -392,9 +430,11 @@ class SeasonParticipantViewSet(ModelViewSet):
             return prev
         # Fallback: any earlier season
         return (
-            Season.objects
-            .filter((Q(year__lt=season.year)) | (Q(year=season.year) & Q(month__lt=season.month)))
-            .order_by('-year', '-month')
+            Season.objects.filter(
+                (Q(year__lt=season.year))
+                | (Q(year=season.year) & Q(month__lt=season.month))
+            )
+            .order_by("-year", "-month")
             .first()
         )
 
@@ -408,11 +448,15 @@ class SeasonParticipantViewSet(ModelViewSet):
 
         # Current registered profiles
         current_profiles = set(
-            SeasonParticipant.objects.filter(season=season).values_list('profile_id', flat=True)
+            SeasonParticipant.objects.filter(season=season).values_list(
+                "profile_id", flat=True
+            )
         )
         # Previous season profiles
         prev_profiles = list(
-            SeasonParticipant.objects.filter(season=prev).values_list('profile_id', flat=True)
+            SeasonParticipant.objects.filter(season=prev).values_list(
+                "profile_id", flat=True
+            )
         )
 
         missing_ids = [pid for pid in prev_profiles if pid not in current_profiles]
@@ -420,34 +464,38 @@ class SeasonParticipantViewSet(ModelViewSet):
             return data_list
 
         # Load profiles with related user for names
-        profiles = PlayerProfile.objects.select_related('user').filter(id__in=missing_ids)
+        profiles = PlayerProfile.objects.select_related("user").filter(
+            id__in=missing_ids
+        )
         # Prepare season details once
         season_details = SeasonSerializer(season).data
 
         for p in profiles:
-            data_list.append({
-                'id': None,
-                'season': season.id,
-                'profile': p.id,
-                'rank': None,
-                'username': getattr(getattr(p, 'user', None), 'username', None),
-                'profile_name': p.profile_name,
-                'season_details': season_details,
-                'selected_games': [],
-                'has_banned': False,
-                'is_active_player': False,
-                'is_prev_unregistered': True,
-                'my_banned_game': None,
-            })
+            data_list.append(
+                {
+                    "id": None,
+                    "season": season.id,
+                    "profile": p.id,
+                    "rank": None,
+                    "username": getattr(getattr(p, "user", None), "username", None),
+                    "profile_name": p.profile_name,
+                    "season_details": season_details,
+                    "selected_games": [],
+                    "has_banned": False,
+                    "is_active_player": False,
+                    "is_prev_unregistered": True,
+                    "my_banned_game": None,
+                }
+            )
         return data_list
 
     def list(self, request, *args, **kwargs):
         # Use default list to get current registered entries, then augment if season provided
-        season_id = request.query_params.get('season')
+        season_id = request.query_params.get("season")
         # Opt-in flag: only include previous unregistered players when explicitly requested
-        include_prev_unregistered = str(request.query_params.get('include_prev_unregistered', '')).lower() in (
-            '1', 'true', 'yes', 'y', 't'
-        )
+        include_prev_unregistered = str(
+            request.query_params.get("include_prev_unregistered", "")
+        ).lower() in ("1", "true", "yes", "y", "t")
         response = super().list(request, *args, **kwargs)
         if not season_id:
             return response
@@ -473,9 +521,9 @@ class SeasonParticipantViewSet(ModelViewSet):
         registered in the current one.
         If no such season exists, returns an empty list.
         """
-        include_prev_unregistered = str(request.query_params.get('include_prev_unregistered', '')).lower() in (
-            '1', 'true', 'yes', 'y', 't'
-        )
+        include_prev_unregistered = str(
+            request.query_params.get("include_prev_unregistered", "")
+        ).lower() in ("1", "true", "yes", "y", "t")
         season = get_running_season()
         if not season:
             season = get_open_season()
@@ -497,14 +545,14 @@ class LiveEventViewSet(ViewSet):
     permission_classes = [IsAuthenticated]
 
     def list(self, request):
-        season_id = request.query_params.get('season_id')
+        season_id = request.query_params.get("season_id")
         if not season_id:
             season = get_running_season()
             if not season:
                 season = get_open_season()
             if not season:
                 # Fallback to most recent season
-                season = Season.objects.order_by('-year', '-month').first()
+                season = Season.objects.order_by("-year", "-month").first()
             if not season:
                 return Response([])
             season_id = season.id
@@ -513,43 +561,51 @@ class LiveEventViewSet(ViewSet):
         events = []
 
         # 1. PICK events
-        picks = SelectedGame.objects.filter(league__in=leagues).select_related('profile', 'game', 'league')
+        picks = SelectedGame.objects.filter(league__in=leagues).select_related(
+            "profile", "game", "league"
+        )
         for pick in picks:
-            events.append({
-                'id': f'pick-{pick.id}',
-                'type': 'PICK',
-                'timestamp': pick.created_at,
-                'leagueLevel': pick.league.level,
-                'leagueId': pick.league.id,
-                'data': {
-                    'playerName': pick.profile.profile_name,
-                    'gameName': pick.game.name
+            events.append(
+                {
+                    "id": f"pick-{pick.id}",
+                    "type": "PICK",
+                    "timestamp": pick.created_at,
+                    "leagueLevel": pick.league.level,
+                    "leagueId": pick.league.id,
+                    "data": {
+                        "playerName": pick.profile.profile_name,
+                        "gameName": pick.game.name,
+                    },
                 }
-            })
+            )
 
         # 2. BAN events
         bans = BanDecision.objects.filter(
-            Q(league__in=leagues) & 
-            (Q(skipped_ban=True) | Q(selected_game__isnull=False))
-        ).select_related('player_banning', 'selected_game__game', 'league')
+            Q(league__in=leagues)
+            & (Q(skipped_ban=True) | Q(selected_game__isnull=False))
+        ).select_related("player_banning", "selected_game__game", "league")
         for ban in bans:
             game_name = ban.selected_game.game.name if ban.selected_game else None
-            events.append({
-                'id': f'ban-{ban.id}',
-                'type': 'BAN',
-                'timestamp': ban.created_at,
-                'leagueLevel': ban.league.level,
-                'leagueId': ban.league.id,
-                'data': {
-                    'playerName': ban.player_banning.profile_name,
-                    'gameName': game_name,
-                    'skippedBan': ban.skipped_ban
+            events.append(
+                {
+                    "id": f"ban-{ban.id}",
+                    "type": "BAN",
+                    "timestamp": ban.created_at,
+                    "leagueLevel": ban.league.level,
+                    "leagueId": ban.league.id,
+                    "data": {
+                        "playerName": ban.player_banning.profile_name,
+                        "gameName": game_name,
+                        "skippedBan": ban.skipped_ban,
+                    },
                 }
-            })
+            )
 
         # 3. GAME_FINISHED events
         # Get all results for these leagues
-        results = Result.objects.filter(league__in=leagues).select_related('player_profile', 'selected_game__game', 'league')
+        results = Result.objects.filter(league__in=leagues).select_related(
+            "player_profile", "selected_game__game", "league"
+        )
         # Group results by selected_game
         results_by_game = defaultdict(list)
         for r in results:
@@ -576,8 +632,8 @@ class LiveEventViewSet(ViewSet):
                     key=lambda r: (
                         r.position is None,
                         r.position if r.position is not None else 10**9,
-                        (r.player_profile.profile_name or "")
-                    )
+                        (r.player_profile.profile_name or ""),
+                    ),
                 )
 
                 # Determine winners respecting ties: all players with the best (lowest) position.
@@ -597,62 +653,78 @@ class LiveEventViewSet(ViewSet):
 
                 # Backward compatibility: expose both 'winners' (array) and a legacy 'winner' string.
                 # 'winner' will now reflect all winners joined by comma to avoid implying a single victor.
-                primary_winner = winners[0] if winners else (full_results[0] if full_results else None)
-                winners_names = [w.player_profile.profile_name for w in winners] if winners else (
-                    ([] if primary_winner is None else [primary_winner.player_profile.profile_name])
+                primary_winner = (
+                    winners[0]
+                    if winners
+                    else (full_results[0] if full_results else None)
+                )
+                winners_names = (
+                    [w.player_profile.profile_name for w in winners]
+                    if winners
+                    else (
+                        []
+                        if primary_winner is None
+                        else [primary_winner.player_profile.profile_name]
+                    )
                 )
                 results_payload = [
                     {
-                        'playerName': r.player_profile.profile_name,
-                        'position': r.position,
-                        'points': r.points,
+                        "playerName": r.player_profile.profile_name,
+                        "position": r.position,
+                        "points": r.points,
                     }
                     for r in full_results
                 ]
 
-                events.append({
-                    'id': f'finish-{sg_id}',
-                    'type': 'GAME_FINISHED',
-                    'timestamp': last_result_time,
-                    'leagueLevel': res_list[0].league.level,
-                    'leagueId': league_id,
-                    'data': {
-                        'gameName': res_list[0].selected_game.game.name,
-                        'winner': ", ".join(winners_names) if winners_names else None,
-                        'winners': winners_names,
-                        'points': primary_winner.points if primary_winner else None,
-                        'results': results_payload,
+                events.append(
+                    {
+                        "id": f"finish-{sg_id}",
+                        "type": "GAME_FINISHED",
+                        "timestamp": last_result_time,
+                        "leagueLevel": res_list[0].league.level,
+                        "leagueId": league_id,
+                        "data": {
+                            "gameName": res_list[0].selected_game.game.name,
+                            "winner": ", ".join(winners_names)
+                            if winners_names
+                            else None,
+                            "winners": winners_names,
+                            "points": primary_winner.points if primary_winner else None,
+                            "results": results_payload,
+                        },
                     }
-                })
+                )
 
         # 4. LEAGUE_FINISHED events
         for league in leagues:
             if not league.is_finished:
                 continue
 
-            standings = LeagueStanding.objects.filter(league=league).order_by('-league_points', '-wins')
+            standings = LeagueStanding.objects.filter(league=league).order_by(
+                "-league_points", "-wins"
+            )
             if standings.exists():
                 top_standing = standings.first()
                 # Get all players tied for first place
                 winners = [
-                    s.player_profile.profile_name 
-                    for s in standings 
-                    if s.league_points == top_standing.league_points and s.wins == top_standing.wins
+                    s.player_profile.profile_name
+                    for s in standings
+                    if s.league_points == top_standing.league_points
+                    and s.wins == top_standing.wins
                 ]
             else:
                 winners = []
 
-            events.append({
-                'id': f'league-done-{league.id}',
-                'type': 'LEAGUE_FINISHED',
-                'timestamp': league.updated_at,
-                'leagueLevel': league.level,
-                'leagueId': league.id,
-                'data': {
-                    'leagueLevel': league.level,
-                    'winners': winners
+            events.append(
+                {
+                    "id": f"league-done-{league.id}",
+                    "type": "LEAGUE_FINISHED",
+                    "timestamp": league.updated_at,
+                    "leagueLevel": league.level,
+                    "leagueId": league.id,
+                    "data": {"leagueLevel": league.level, "winners": winners},
                 }
-            })
+            )
 
         # 5. SEASON_FINISHED events
         season = Season.objects.filter(id=season_id).first()
@@ -661,24 +733,30 @@ class LiveEventViewSet(ViewSet):
             l1 = leagues.filter(level=1).first()
             winner_name = "Unknown"
             if l1:
-                top_standing = LeagueStanding.objects.filter(league=l1).order_by('-league_points', '-wins').first()
+                top_standing = (
+                    LeagueStanding.objects.filter(league=l1)
+                    .order_by("-league_points", "-wins")
+                    .first()
+                )
                 if top_standing:
                     winner_name = top_standing.player_profile.profile_name
 
-            events.append({
-                'id': f'season-done-{season.id}',
-                'type': 'SEASON_FINISHED',
-                'timestamp': season.updated_at,
-                'leagueId': None,
-                'data': {
-                    'seasonName': f"{season.year}-{season.month:02d}",
-                    'seasonWinner': winner_name
+            events.append(
+                {
+                    "id": f"season-done-{season.id}",
+                    "type": "SEASON_FINISHED",
+                    "timestamp": season.updated_at,
+                    "leagueId": None,
+                    "data": {
+                        "seasonName": f"{season.year}-{season.month:02d}",
+                        "seasonWinner": winner_name,
+                    },
                 }
-            })
+            )
 
         # Sort
-        events.sort(key=lambda x: x['timestamp'], reverse=True)
-        limit = request.query_params.get('limit')
+        events.sort(key=lambda x: x["timestamp"], reverse=True)
+        limit = request.query_params.get("limit")
         if limit:
             try:
                 limit = int(limit)

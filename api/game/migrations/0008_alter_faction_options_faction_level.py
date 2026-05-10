@@ -4,19 +4,21 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('game', '0007_alter_tiebreaker_order'),
+        ("game", "0007_alter_tiebreaker_order"),
     ]
 
     operations = [
         migrations.AlterModelOptions(
-            name='faction',
-            options={'ordering': ['level', 'name']},
+            name="faction",
+            options={"ordering": ["level", "name"]},
         ),
         migrations.AddField(
-            model_name='faction',
-            name='level',
-            field=models.PositiveIntegerField(default=0, help_text='The sequence level: 0 for Country, 1 for Leader, etc.'),
+            model_name="faction",
+            name="level",
+            field=models.PositiveIntegerField(
+                default=0,
+                help_text="The sequence level: 0 for Country, 1 for Leader, etc.",
+            ),
         ),
     ]

@@ -5,9 +5,9 @@ from result.views import ResultViewSet, MatchResultViewSet
 
 router = DefaultRouter()
 
-router.register('results', ResultViewSet, basename='results')
-router.register('match-results', MatchResultViewSet, basename='match-results')
+router.register("results", ResultViewSet, basename="results")
+router.register("match-results", MatchResultViewSet, basename="match-results")
 
 urlpatterns = [
-    path('', include(router.urls)),
+    path("", include(router.urls)),
 ]

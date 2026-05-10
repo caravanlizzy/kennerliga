@@ -22,14 +22,14 @@ class User(AbstractUser):
         unique=True,
         blank=False,
         null=False,
-        help_text='Username is used to login',
+        help_text="Username is used to login",
         validators=[username_validator],
         error_messages={
             "unique": "A user with that username already exists.",
         },
     )
 
-    USERNAME_FIELD = 'username'
+    USERNAME_FIELD = "username"
     REQUIRED_FIELDS = []
 
     def __str__(self):
@@ -44,14 +44,16 @@ class Platform(models.Model):
 
     class Meta:
         constraints = [
-            models.UniqueConstraint(Lower('name'), name='uniq_platform_name_ci'),
+            models.UniqueConstraint(Lower("name"), name="uniq_platform_name_ci"),
         ]
 
 
 class PlayerProfile(models.Model):
     profile_name = models.CharField(max_length=100)
-    user = models.OneToOneField(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='profile')
-    platforms = models.ManyToManyField(Platform, through='PlatformPlayer')
+    user = models.OneToOneField(
+        User, on_delete=models.SET_NULL, null=True, blank=True, related_name="profile"
+    )
+    platforms = models.ManyToManyField(Platform, through="PlatformPlayer")
 
     def __str__(self):
         return self.profile_name
@@ -59,40 +61,44 @@ class PlayerProfile(models.Model):
 
 class PlatformPlayer(models.Model):
     player_profile = models.ForeignKey(
-        PlayerProfile, on_delete=models.CASCADE, related_name='platform_links'
+        PlayerProfile, on_delete=models.CASCADE, related_name="platform_links"
     )
     platform = models.ForeignKey(
-        Platform, on_delete=models.CASCADE, related_name='player_links'
+        Platform, on_delete=models.CASCADE, related_name="player_links"
     )
     name = models.CharField(max_length=100)
 
     class Meta:
         constraints = [
             models.UniqueConstraint(
-                fields=('player_profile', 'platform'),
-                name='uniq_profile_platform',
+                fields=("player_profile", "platform"),
+                name="uniq_profile_platform",
             )
         ]
 
     def __str__(self):
         return f"{self.player_profile} @ {self.platform} as {self.name}"
 
+
 class UserInviteLink(models.Model):
     key = models.CharField(max_length=32, unique=True, db_index=True)
-    label = models.CharField(max_length=300, blank=True,
-              help_text="Admin note to remember who this invite is for.")
+    label = models.CharField(
+        max_length=300,
+        blank=True,
+        help_text="Admin note to remember who this invite is for.",
+    )
     created_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
         related_name="invite_links",
     )
     player_profile = models.ForeignKey(
-        'PlayerProfile',
+        "PlayerProfile",
         on_delete=models.CASCADE,
         null=True,
         blank=True,
         related_name="invite_links",
-        help_text="Optional: Link this invite to an existing PlayerProfile"
+        help_text="Optional: Link this invite to an existing PlayerProfile",
     )
     created_at = models.DateTimeField(auto_now_add=True)
     expires_at = models.DateTimeField(null=True, blank=True)

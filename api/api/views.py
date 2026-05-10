@@ -13,12 +13,15 @@ from rest_framework import status
 class LoginApiView(APIView):
     @staticmethod
     def post(request, *args, **kwargs):
-        username = request.data.get('username')
-        password = request.data.get('password')
+        username = request.data.get("username")
+        password = request.data.get("password")
 
         # Check if both username and password are provided
         if not username or not password:
-            return Response({'error': 'Please provide both username and password'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                {"error": "Please provide both username and password"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
 
         # Authenticate user
         user = authenticate(request, username=username, password=password)
@@ -28,29 +31,42 @@ class LoginApiView(APIView):
             # If authentication successful, return user data or token
             # For example, you can return user data or JWT token here
             # print(get_token(user))
-            return Response({'message': 'Login successful', "user": get_user_information(user)},
-                            status=status.HTTP_200_OK)
+            return Response(
+                {"message": "Login successful", "user": get_user_information(user)},
+                status=status.HTTP_200_OK,
+            )
         else:
             # If authentication failed, return error message
-            return Response({'error': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
+            return Response(
+                {"error": "Invalid credentials"}, status=status.HTTP_401_UNAUTHORIZED
+            )
 
 
 class LogoutApiView(APIView):
     @staticmethod
     def post(request, *args, **kwargs):
         # Check if the user is authenticated
-        token = request.auth  # The token is automatically attached to authenticated requests
+        token = (
+            request.auth
+        )  # The token is automatically attached to authenticated requests
 
         if token:
             # Find and delete the token to log the user out
             try:
                 token_object = Token.objects.get(key=token)
                 token_object.delete()
-                return Response({'message': 'Logout successful'}, status=status.HTTP_200_OK)
+                return Response(
+                    {"message": "Logout successful"}, status=status.HTTP_200_OK
+                )
             except Token.DoesNotExist:
-                return Response({'error': 'Invalid token'}, status=status.HTTP_400_BAD_REQUEST)
+                return Response(
+                    {"error": "Invalid token"}, status=status.HTTP_400_BAD_REQUEST
+                )
         else:
-            return Response({'error': 'No token provided or invalid token'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                {"error": "No token provided or invalid token"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
 
 
 from django.utils import timezone
@@ -60,41 +76,43 @@ from league.models import League
 from game.models import SelectedGame
 from result.models import Result
 
+
 class NeedsUpdateView(APIView):
     """
     Generic endpoint to check if certain resources need updates.
     Returns a list of API paths that have new data.
     """
+
     def get(self, request, *args, **kwargs):
         updates = []
-        
-        since = request.query_params.get('since')
+
+        since = request.query_params.get("since")
         since_dt = None
         if since:
             try:
-                since_dt = timezone.datetime.fromisoformat(since.replace('Z', '+00:00'))
+                since_dt = timezone.datetime.fromisoformat(since.replace("Z", "+00:00"))
             except (ValueError, TypeError):
                 pass
-        
+
         if not since_dt:
             # Fallback: check last 30 seconds
             since_dt = timezone.now() - timedelta(seconds=30)
 
         # Check for chat updates
         if Chat.objects.filter(datetime__gt=since_dt).exists():
-            updates.append('/chat/')
-        
+            updates.append("/chat/")
+
         # Check for league updates
         # For simplicity, we check if ANY league relevant to the current user (if any) or ANY league at all changed.
-        # But usually we'd want to be more specific. 
+        # But usually we'd want to be more specific.
         # For a "needs-update" generic endpoint, we can just return /league/ if any relevant model changed.
         if League.objects.filter(updated_at__gt=since_dt).exists():
-            updates.append('/league/')
+            updates.append("/league/")
         elif SelectedGame.objects.filter(updated_at__gt=since_dt).exists():
-            updates.append('/league/')
+            updates.append("/league/")
         elif Result.objects.filter(updated_at__gt=since_dt).exists():
-            updates.append('/league/')
-        
+            updates.append("/league/")
+
         return Response({"updates": updates}, status=status.HTTP_200_OK)
 
 
@@ -146,18 +164,19 @@ class LeaderboardViewSet(APIView):
 
         # Get all league standings for leagues whose season is in that year
         standings_qs = (
-            LeagueStanding.objects
-            .filter(
+            LeagueStanding.objects.filter(
                 league__season__year=year,
                 # Use only completed leagues for leaderboard aggregation
                 league__status=LeagueStatus.DONE,
             )
-            .select_related("league", "league__season", "player_profile", "player_profile__user")
+            .select_related(
+                "league", "league__season", "player_profile", "player_profile__user"
+            )
             .order_by(
-                "league__level",   # group by level first (1 = best)
-                "league_id",       # then by league to ensure ranks reset per league
+                "league__level",  # group by level first (1 = best)
+                "league_id",  # then by league to ensure ranks reset per league
                 "-league_points",  # then intra-league ordering for podium
-                "-wins"
+                "-wins",
             )
         )
 
@@ -168,9 +187,7 @@ class LeaderboardViewSet(APIView):
             )
 
         # Distinct league levels used in that year (sorted, 1 is top)
-        levels = sorted(
-            list(set(standings_qs.values_list("league__level", flat=True)))
-        )
+        levels = sorted(list(set(standings_qs.values_list("league__level", flat=True))))
 
         # Aggregation:
         # player_id -> {
@@ -213,7 +230,9 @@ class LeaderboardViewSet(APIView):
                 players_stats[player_id] = {
                     "player_profile_id": player_id,
                     "profile_name": ls.player_profile.profile_name,
-                    "username": ls.player_profile.user.username if ls.player_profile.user else None,
+                    "username": ls.player_profile.user.username
+                    if ls.player_profile.user
+                    else None,
                     "per_level": defaultdict(
                         lambda: {"first": 0, "second": 0, "third": 0, "fourth": 0}
                     ),
@@ -231,15 +250,16 @@ class LeaderboardViewSet(APIView):
         standings_list = []
         for p in players_stats.values():
             per_level_clean = {
-                level_key: counts
-                for level_key, counts in p["per_level"].items()
+                level_key: counts for level_key, counts in p["per_level"].items()
             }
-            standings_list.append({
-                "player_profile_id": p["player_profile_id"],
-                "profile_name": p["profile_name"],
-                "username": p["username"],
-                "per_level": per_level_clean,
-            })
+            standings_list.append(
+                {
+                    "player_profile_id": p["player_profile_id"],
+                    "profile_name": p["profile_name"],
+                    "username": p["username"],
+                    "per_level": per_level_clean,
+                }
+            )
 
         # Sort players per requested rules:
         # 1) Highest league level the player reached (smallest level number wins)
@@ -251,12 +271,19 @@ class LeaderboardViewSet(APIView):
             per_level = item["per_level"]
 
             # Determine best (i.e., smallest number) level the player played
-            played_levels = sorted(int(k) for k in per_level.keys()) if per_level else []
+            played_levels = (
+                sorted(int(k) for k in per_level.keys()) if per_level else []
+            )
             best_level = played_levels[0] if played_levels else 10**9  # huge if none
 
             # Counts in best level
             c_best = per_level.get(str(best_level), zeros)
-            best_tuple = (-c_best["first"], -c_best["second"], -c_best["third"], -c_best["fourth"]) 
+            best_tuple = (
+                -c_best["first"],
+                -c_best["second"],
+                -c_best["third"],
+                -c_best["fourth"],
+            )
 
             # Remaining levels in best-to-worst order (ascending level), using global levels for determinism
             remaining_tuple = []
@@ -264,9 +291,16 @@ class LeaderboardViewSet(APIView):
                 if lvl == best_level:
                     continue
                 c = per_level.get(str(lvl), zeros)
-                remaining_tuple.extend([-c["first"], -c["second"], -c["third"], -c["fourth"]])
+                remaining_tuple.extend(
+                    [-c["first"], -c["second"], -c["third"], -c["fourth"]]
+                )
 
-            return (best_level, *best_tuple, *remaining_tuple, item["profile_name"].lower())
+            return (
+                best_level,
+                *best_tuple,
+                *remaining_tuple,
+                item["profile_name"].lower(),
+            )
 
         standings_list.sort(key=sort_key)
 
@@ -303,7 +337,7 @@ def get_user_information(user):
         "admin": user.is_superuser,
         "token": token,
         # "platform_players": get_platform_players(user),
-        "profile": {"id": user.profile.id, "name": user.profile.profile_name}
+        "profile": {"id": user.profile.id, "name": user.profile.profile_name},
     }
     return user
 

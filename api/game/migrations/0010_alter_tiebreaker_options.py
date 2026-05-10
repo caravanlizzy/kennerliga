@@ -4,14 +4,13 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('game', '0009_alter_gameoption_options_and_more'),
+        ("game", "0009_alter_gameoption_options_and_more"),
     ]
 
     operations = [
         migrations.AlterModelOptions(
-            name='tiebreaker',
-            options={'ordering': ['-order']},
+            name="tiebreaker",
+            options={"ordering": ["-order"]},
         ),
     ]

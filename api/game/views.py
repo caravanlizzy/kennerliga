@@ -2,26 +2,53 @@ from django.db.models.functions import Lower
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.viewsets import ModelViewSet
 
-from game.models import Game, GameOption, GameOptionChoice, Faction, TieBreaker, ResultConfig, StartingPointSystem, \
-    Platform, SelectedGame, SelectedOption, BanDecision
-from game.serializers import GameSerializer, GameOptionSerializer, GameOptionChoiceSerializer, FactionSerializer, \
-    TieBreakerSerializer, ResultConfigSerializer, StartingPointSystemSerializer, PlatformSerializer, \
-    SelectedGameSerializer, SelectedOptionSerializer, FullGameSerializer, BanDecisionSerializer
+from game.models import (
+    Game,
+    GameOption,
+    GameOptionChoice,
+    Faction,
+    TieBreaker,
+    ResultConfig,
+    StartingPointSystem,
+    Platform,
+    SelectedGame,
+    SelectedOption,
+    BanDecision,
+)
+from game.serializers import (
+    GameSerializer,
+    GameOptionSerializer,
+    GameOptionChoiceSerializer,
+    FactionSerializer,
+    TieBreakerSerializer,
+    ResultConfigSerializer,
+    StartingPointSystemSerializer,
+    PlatformSerializer,
+    SelectedGameSerializer,
+    SelectedOptionSerializer,
+    FullGameSerializer,
+    BanDecisionSerializer,
+)
 
-from league.services import advance_turn
 from league.models import League
-from .queries import get_all_games, get_selected_games_for_league
+from .queries import (
+    get_all_games,
+    get_selected_game_ids_for_league_including_related,
+    get_max_selected_game_ids_for_profile_in_season_including_related,
+)
 
 
 class GameViewSet(ModelViewSet):
-    queryset = Game.objects.all().order_by(Lower('name'))
+    queryset = Game.objects.all().order_by(Lower("name"))
     serializer_class = GameSerializer
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
         queryset = get_all_games()
         league_id = self.request.query_params.get("league")
-        manage_only = self.request.query_params.get("manage_only", "false").lower() == "true"
+        manage_only = (
+            self.request.query_params.get("manage_only", "false").lower() == "true"
+        )
         is_admin = self.request.user and self.request.user.is_staff
 
         if manage_only and is_admin:
@@ -34,48 +61,59 @@ class GameViewSet(ModelViewSet):
 
                 if not (manage_only and is_admin):
                     queryset = queryset.filter(
-                        min_players__lte=member_count,
-                        max_players__gte=member_count
+                        min_players__lte=member_count, max_players__gte=member_count
                     )
 
-                selected_games = get_selected_games_for_league(league).values_list("game_id", flat=True)
-                queryset = queryset.exclude(id__in=selected_games)
+                selected_games = get_selected_game_ids_for_league_including_related(
+                    league
+                )
+                max_selected = (
+                    get_max_selected_game_ids_for_profile_in_season_including_related(
+                        self.request.user.profile,
+                        league.season,
+                    )
+                )
+
+                queryset = queryset.exclude(id__in=selected_games).exclude(
+                    id__in=max_selected
+                )
             except League.DoesNotExist:
                 pass
 
-        return queryset.order_by(Lower('name'))
+        return queryset.order_by(Lower("name"))
 
 
 class GameOptionViewSet(ModelViewSet):
     queryset = GameOption.objects.all()
     serializer_class = GameOptionSerializer
-    filterset_fields = ['game']
+    filterset_fields = ["game"]
     permission_classes = [IsAuthenticated]
 
 
 class GameOptionChoiceViewSet(ModelViewSet):
     queryset = GameOptionChoice.objects.all()
     serializer_class = GameOptionChoiceSerializer
-    filterset_fields = ['option']
+    filterset_fields = ["option"]
     permission_classes = [IsAuthenticated]
 
 
 class FactionViewSet(ModelViewSet):
     queryset = Faction.objects.all()
     serializer_class = FactionSerializer
-    filterset_fields = ['game']
+    filterset_fields = ["game"]
 
 
 class TieBreakerViewSet(ModelViewSet):
     queryset = TieBreaker.objects.all()
     serializer_class = TieBreakerSerializer
-    filterset_fields = ['result_config']
+    filterset_fields = ["result_config"]
     permission_classes = [IsAuthenticated]
+
 
 class ResultConfigViewSet(ModelViewSet):
     queryset = ResultConfig.objects.all()
     serializer_class = ResultConfigSerializer
-    filterset_fields = ['game']
+    filterset_fields = ["game"]
     permission_classes = [IsAuthenticated]
 
 
@@ -94,7 +132,7 @@ class PlatformViewSet(ModelViewSet):
 class SelectedGameViewSet(ModelViewSet):
     queryset = SelectedGame.objects.all()
     serializer_class = SelectedGameSerializer
-    filterset_fields = ['league', 'profile']
+    filterset_fields = ["league", "profile"]
     permission_classes = [IsAuthenticated]
 
     def perform_create(self, serializer):
@@ -104,7 +142,7 @@ class SelectedGameViewSet(ModelViewSet):
 class BanDecisionViewSet(ModelViewSet):
     queryset = BanDecision.objects.all()
     serializer_class = BanDecisionSerializer
-    filterset_fields = ['league']
+    filterset_fields = ["league"]
     permission_classes = [IsAuthenticated]
 
     def perform_create(self, serializer):
@@ -118,13 +156,15 @@ class SelectedOptionViewSet(ModelViewSet):
 
 
 class FullGameViewSet(ModelViewSet):
-    queryset = Game.objects.all().prefetch_related('options__choices')
+    queryset = Game.objects.all().prefetch_related("options__choices")
     serializer_class = FullGameSerializer
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
         queryset = super().get_queryset()
-        manage_only = self.request.query_params.get("manage_only", "false").lower() == "true"
+        manage_only = (
+            self.request.query_params.get("manage_only", "false").lower() == "true"
+        )
         is_admin = self.request.user and self.request.user.is_staff
 
         if not (manage_only and is_admin):

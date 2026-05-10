@@ -5,49 +5,110 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
-    dependencies = [
-    ]
+    dependencies = []
 
     operations = [
         migrations.CreateModel(
-            name='GameStanding',
+            name="GameStanding",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('points', models.DecimalField(decimal_places=2, default=0, max_digits=10)),
-                ('rank', models.PositiveIntegerField()),
-                ('league_points', models.DecimalField(decimal_places=2, default=0, max_digits=10)),
-                ('win_share', models.DecimalField(decimal_places=2, default=0, max_digits=10)),
-                ('updated_at', models.DateTimeField(default=django.utils.timezone.now)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "points",
+                    models.DecimalField(decimal_places=2, default=0, max_digits=10),
+                ),
+                ("rank", models.PositiveIntegerField()),
+                (
+                    "league_points",
+                    models.DecimalField(decimal_places=2, default=0, max_digits=10),
+                ),
+                (
+                    "win_share",
+                    models.DecimalField(decimal_places=2, default=0, max_digits=10),
+                ),
+                ("updated_at", models.DateTimeField(default=django.utils.timezone.now)),
             ],
         ),
         migrations.CreateModel(
-            name='League',
+            name="League",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('level', models.IntegerField(verbose_name='1 for L1, 2 for L2 etc.')),
-                ('status', models.CharField(choices=[('PICKING', 'Picking'), ('BANNING', 'Banning'), ('REPICKING', 'Repicking'), ('PLAYING', 'Playing'), ('DONE', 'Done')], default='PICKING', max_length=20)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("level", models.IntegerField(verbose_name="1 for L1, 2 for L2 etc.")),
+                (
+                    "status",
+                    models.CharField(
+                        choices=[
+                            ("PICKING", "Picking"),
+                            ("BANNING", "Banning"),
+                            ("REPICKING", "Repicking"),
+                            ("PLAYING", "Playing"),
+                            ("DONE", "Done"),
+                        ],
+                        default="PICKING",
+                        max_length=20,
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
-            name='LeagueResult',
+            name="LeagueResult",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('league_points', models.FloatField()),
-                ('position', models.IntegerField()),
-                ('last', models.BooleanField()),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("league_points", models.FloatField()),
+                ("position", models.IntegerField()),
+                ("last", models.BooleanField()),
             ],
         ),
         migrations.CreateModel(
-            name='LeagueStanding',
+            name="LeagueStanding",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('points', models.DecimalField(decimal_places=2, default=0, max_digits=10)),
-                ('wins', models.DecimalField(decimal_places=2, default=0, max_digits=10)),
-                ('league_points', models.DecimalField(decimal_places=2, default=0, max_digits=10)),
-                ('updated_at', models.DateTimeField(default=django.utils.timezone.now)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "points",
+                    models.DecimalField(decimal_places=2, default=0, max_digits=10),
+                ),
+                (
+                    "wins",
+                    models.DecimalField(decimal_places=2, default=0, max_digits=10),
+                ),
+                (
+                    "league_points",
+                    models.DecimalField(decimal_places=2, default=0, max_digits=10),
+                ),
+                ("updated_at", models.DateTimeField(default=django.utils.timezone.now)),
             ],
         ),
     ]

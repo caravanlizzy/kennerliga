@@ -4,22 +4,24 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('league', '0003_league_updated_at'),
+        ("league", "0003_league_updated_at"),
     ]
 
     operations = [
         migrations.RemoveIndex(
-            model_name='leaguestanding',
-            name='league_leag_league__cc32b5_idx',
+            model_name="leaguestanding",
+            name="league_leag_league__cc32b5_idx",
         ),
         migrations.RemoveField(
-            model_name='leaguestanding',
-            name='points',
+            model_name="leaguestanding",
+            name="points",
         ),
         migrations.AddIndex(
-            model_name='leaguestanding',
-            index=models.Index(fields=['league', '-league_points', '-wins'], name='league_leag_league__71692a_idx'),
+            model_name="leaguestanding",
+            index=models.Index(
+                fields=["league", "-league_points", "-wins"],
+                name="league_leag_league__71692a_idx",
+            ),
         ),
     ]

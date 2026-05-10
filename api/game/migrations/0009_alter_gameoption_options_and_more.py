@@ -4,28 +4,27 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('game', '0008_alter_faction_options_faction_level'),
+        ("game", "0008_alter_faction_options_faction_level"),
     ]
 
     operations = [
         migrations.AlterModelOptions(
-            name='gameoption',
-            options={'ordering': ['order']},
+            name="gameoption",
+            options={"ordering": ["order"]},
         ),
         migrations.AlterModelOptions(
-            name='gameoptionchoice',
-            options={'ordering': ['order']},
+            name="gameoptionchoice",
+            options={"ordering": ["order"]},
         ),
         migrations.AddField(
-            model_name='gameoption',
-            name='order',
+            model_name="gameoption",
+            name="order",
             field=models.PositiveIntegerField(default=0),
         ),
         migrations.AddField(
-            model_name='gameoptionchoice',
-            name='order',
+            model_name="gameoptionchoice",
+            name="order",
             field=models.PositiveIntegerField(default=0),
         ),
     ]

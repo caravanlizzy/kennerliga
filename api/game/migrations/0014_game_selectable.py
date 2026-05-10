@@ -4,15 +4,14 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('game', '0013_game_max_players_game_min_players'),
+        ("game", "0013_game_max_players_game_min_players"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='game',
-            name='selectable',
+            model_name="game",
+            name="selectable",
             field=models.BooleanField(default=True),
         ),
     ]

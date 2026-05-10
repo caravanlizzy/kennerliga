@@ -5,71 +5,111 @@ import django.db.models.deletion
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('user', '0001_initial'),
-        ('league', '0006_delete_leagueresult'),
+        ("user", "0001_initial"),
+        ("league", "0006_delete_leagueresult"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='LeagueTieResolution',
+            name="LeagueTieResolution",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('group_key', models.CharField(max_length=64)),
-                ('reason', models.CharField(choices=[('WINNER_PERCENTAGE', 'Percentage by winner'), ('CANT_STOP', 'Cant Stop')], max_length=40)),
-                ('note', models.CharField(blank=True, max_length=255, null=True)),
-                ('is_resolved', models.BooleanField(default=True)),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("group_key", models.CharField(max_length=64)),
+                (
+                    "reason",
+                    models.CharField(
+                        choices=[
+                            ("WINNER_PERCENTAGE", "Percentage by winner"),
+                            ("CANT_STOP", "Cant Stop"),
+                        ],
+                        max_length=40,
+                    ),
+                ),
+                ("note", models.CharField(blank=True, max_length=255, null=True)),
+                ("is_resolved", models.BooleanField(default=True)),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
             ],
         ),
         migrations.CreateModel(
-            name='LeagueTieResolutionEntry',
+            name="LeagueTieResolutionEntry",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('order_index', models.PositiveIntegerField()),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("order_index", models.PositiveIntegerField()),
             ],
         ),
         migrations.AddField(
-            model_name='leaguestanding',
-            name='tie_break_priority',
+            model_name="leaguestanding",
+            name="tie_break_priority",
             field=models.IntegerField(default=0),
         ),
         migrations.AddField(
-            model_name='leaguestanding',
-            name='unresolved_tie_group',
+            model_name="leaguestanding",
+            name="unresolved_tie_group",
             field=models.CharField(blank=True, max_length=64, null=True),
         ),
         migrations.AddIndex(
-            model_name='leaguestanding',
-            index=models.Index(fields=['league', 'unresolved_tie_group'], name='league_leag_league__ee4d30_idx'),
+            model_name="leaguestanding",
+            index=models.Index(
+                fields=["league", "unresolved_tie_group"],
+                name="league_leag_league__ee4d30_idx",
+            ),
         ),
         migrations.AddField(
-            model_name='leaguetieresolutionentry',
-            name='player_profile',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='user.playerprofile'),
+            model_name="leaguetieresolutionentry",
+            name="player_profile",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE, to="user.playerprofile"
+            ),
         ),
         migrations.AddField(
-            model_name='leaguetieresolutionentry',
-            name='resolution',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='entries', to='league.leaguetieresolution'),
+            model_name="leaguetieresolutionentry",
+            name="resolution",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="entries",
+                to="league.leaguetieresolution",
+            ),
         ),
         migrations.AddField(
-            model_name='leaguetieresolution',
-            name='league',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='tie_resolutions', to='league.league'),
+            model_name="leaguetieresolution",
+            name="league",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="tie_resolutions",
+                to="league.league",
+            ),
         ),
         migrations.AddIndex(
-            model_name='leaguetieresolutionentry',
-            index=models.Index(fields=['resolution', 'order_index'], name='league_leag_resolut_02ec3b_idx'),
+            model_name="leaguetieresolutionentry",
+            index=models.Index(
+                fields=["resolution", "order_index"],
+                name="league_leag_resolut_02ec3b_idx",
+            ),
         ),
         migrations.AlterUniqueTogether(
-            name='leaguetieresolutionentry',
-            unique_together={('resolution', 'player_profile')},
+            name="leaguetieresolutionentry",
+            unique_together={("resolution", "player_profile")},
         ),
         migrations.AlterUniqueTogether(
-            name='leaguetieresolution',
-            unique_together={('league', 'group_key')},
+            name="leaguetieresolution",
+            unique_together={("league", "group_key")},
         ),
     ]

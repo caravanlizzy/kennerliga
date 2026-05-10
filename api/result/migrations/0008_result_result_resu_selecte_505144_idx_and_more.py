@@ -4,18 +4,22 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('result', '0007_result_created_at'),
+        ("result", "0007_result_created_at"),
     ]
 
     operations = [
         migrations.AddIndex(
-            model_name='result',
-            index=models.Index(fields=['selected_game', 'player_profile'], name='result_resu_selecte_505144_idx'),
+            model_name="result",
+            index=models.Index(
+                fields=["selected_game", "player_profile"],
+                name="result_resu_selecte_505144_idx",
+            ),
         ),
         migrations.AddIndex(
-            model_name='result',
-            index=models.Index(fields=['league', 'season'], name='result_resu_league__10398d_idx'),
+            model_name="result",
+            index=models.Index(
+                fields=["league", "season"], name="result_resu_league__10398d_idx"
+            ),
         ),
     ]

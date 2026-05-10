@@ -7,17 +7,23 @@ from user.models import PlayerProfile, Platform
 
 class Game(models.Model):
     name = models.CharField(max_length=120)
-    short_name = models.CharField(max_length=120, blank=True, default='')
+    short_name = models.CharField(max_length=120, blank=True, default="")
     platform = models.ForeignKey(Platform, on_delete=models.CASCADE)
     min_players = models.PositiveIntegerField(default=2)
     max_players = models.PositiveIntegerField(default=4)
     selectable = models.BooleanField(default=True)
+    related_games = models.ManyToManyField(
+        "self",
+        blank=True,
+        symmetrical=True,
+        help_text="Other games considered equivalent (e.g. different version or platform of the same game). "
+        "Used to prevent picking near-duplicate games within a league.",
+    )
 
     class Meta:
         constraints = [
             models.UniqueConstraint(
-                fields=['name', 'platform'],
-                name='unique_game_per_platform'
+                fields=["name", "platform"], name="unique_game_per_platform"
             )
         ]
 
@@ -32,7 +38,9 @@ class Game(models.Model):
 
 class GameOption(models.Model):
     name = models.CharField(max_length=88)
-    game = models.ForeignKey("Game", null=True, blank=True, on_delete=models.CASCADE, related_name="options")
+    game = models.ForeignKey(
+        "Game", null=True, blank=True, on_delete=models.CASCADE, related_name="options"
+    )
     has_choices = models.BooleanField(default=False)
     order = models.PositiveIntegerField(default=0)
 
@@ -57,15 +65,13 @@ class GameOption(models.Model):
         return str(self.name)
 
     class Meta:
-        ordering = ['order']
+        ordering = ["order"]
 
 
 class GameOptionChoice(models.Model):
     name = models.CharField(max_length=139, blank=True, null=True)
     option = models.ForeignKey(
-        GameOption,
-        on_delete=models.CASCADE,
-        related_name='choices'
+        GameOption, on_delete=models.CASCADE, related_name="choices"
     )
     order = models.PositiveIntegerField(default=0)
 
@@ -73,7 +79,7 @@ class GameOptionChoice(models.Model):
         return f"{self.name or '(Unnamed)'} for {self.option.name}"
 
     class Meta:
-        ordering = ['order']
+        ordering = ["order"]
 
 
 class GameOptionAvailabilityGroup(models.Model):
@@ -82,6 +88,7 @@ class GameOptionAvailabilityGroup(models.Model):
     All conditions inside the group must match (AND).
     If any group matches, the option is available (OR across groups).
     """
+
     option = models.ForeignKey(
         GameOption,
         on_delete=models.CASCADE,
@@ -97,6 +104,7 @@ class GameOptionAvailabilityCondition(models.Model):
     A single atomic requirement inside a group.
     Exactly one of expected_value or expected_choice must be set.
     """
+
     group = models.ForeignKey(
         GameOptionAvailabilityGroup,
         on_delete=models.CASCADE,
@@ -129,8 +137,14 @@ class GameOptionAvailabilityCondition(models.Model):
                 name="availability_condition_exactly_one_expected",
                 check=(
                     # (expected_value is null) XOR (expected_choice is null)
-                    (models.Q(expected_value__isnull=False) & models.Q(expected_choice__isnull=True))
-                    | (models.Q(expected_value__isnull=True) & models.Q(expected_choice__isnull=False))
+                    (
+                        models.Q(expected_value__isnull=False)
+                        & models.Q(expected_choice__isnull=True)
+                    )
+                    | (
+                        models.Q(expected_value__isnull=True)
+                        & models.Q(expected_choice__isnull=False)
+                    )
                 ),
             ),
         ]
@@ -142,7 +156,9 @@ class GameOptionAvailabilityCondition(models.Model):
         if self.expected_choice_id and self.depends_on_option_id:
             if self.expected_choice.option_id != self.depends_on_option_id:
                 raise ValidationError(
-                    {"expected_choice": "expected_choice must belong to depends_on_option."}
+                    {
+                        "expected_choice": "expected_choice must belong to depends_on_option."
+                    }
                 )
 
     def __str__(self):
@@ -156,17 +172,22 @@ class GameOptionAvailabilityCondition(models.Model):
 
 
 class SelectedGame(models.Model):
-    profile = models.ForeignKey(PlayerProfile, on_delete=models.CASCADE, related_name='selected_games')
-    game = models.ForeignKey(Game, on_delete=models.CASCADE, related_name='game_selections')
-    league = models.ForeignKey("league.League", on_delete=models.CASCADE, related_name='game_selections')
+    profile = models.ForeignKey(
+        PlayerProfile, on_delete=models.CASCADE, related_name="selected_games"
+    )
+    game = models.ForeignKey(
+        Game, on_delete=models.CASCADE, related_name="game_selections"
+    )
+    league = models.ForeignKey(
+        "league.League", on_delete=models.CASCADE, related_name="game_selections"
+    )
     created_at = models.DateTimeField(default=timezone.now)
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
         constraints = [
             models.UniqueConstraint(
-                fields=['league', 'game'],
-                name='unique_game_per_league'
+                fields=["league", "game"], name="unique_game_per_league"
             ),
         ]
 
@@ -175,10 +196,19 @@ class SelectedGame(models.Model):
 
 
 class SelectedOption(models.Model):
-    selected_game = models.ForeignKey(SelectedGame, on_delete=models.CASCADE, related_name='selected_options')
-    game_option = models.ForeignKey(GameOption, on_delete=models.CASCADE, related_name='selections')
-    choice = models.ForeignKey(GameOptionChoice, on_delete=models.CASCADE, null=True, blank=True,
-                               related_name='selections')
+    selected_game = models.ForeignKey(
+        SelectedGame, on_delete=models.CASCADE, related_name="selected_options"
+    )
+    game_option = models.ForeignKey(
+        GameOption, on_delete=models.CASCADE, related_name="selections"
+    )
+    choice = models.ForeignKey(
+        GameOptionChoice,
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name="selections",
+    )
     value = models.BooleanField(null=True, blank=True)
 
     def __str__(self):
@@ -186,15 +216,21 @@ class SelectedOption(models.Model):
 
 
 class BanDecision(models.Model):
-    league = models.ForeignKey("league.League", on_delete=models.CASCADE, related_name='ban_decisions')
-    player_banning = models.ForeignKey(PlayerProfile, on_delete=models.CASCADE, related_name='ban_decisions')
-    selected_game = models.ForeignKey(SelectedGame, null=True, blank=True, on_delete=models.SET_NULL)
+    league = models.ForeignKey(
+        "league.League", on_delete=models.CASCADE, related_name="ban_decisions"
+    )
+    player_banning = models.ForeignKey(
+        PlayerProfile, on_delete=models.CASCADE, related_name="ban_decisions"
+    )
+    selected_game = models.ForeignKey(
+        SelectedGame, null=True, blank=True, on_delete=models.SET_NULL
+    )
     skipped_ban = models.BooleanField(default=False)
 
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        unique_together = ('league', 'player_banning')
+        unique_together = ("league", "player_banning")
 
     def __str__(self):
         return f"{self.player_banning} {'banned ' + str(self.selected_game) if self.selected_game else 'skipped banning'} in {self.league}"
@@ -212,7 +248,9 @@ class ResultConfig(models.Model):
     game = models.ForeignKey(Game, on_delete=models.CASCADE)
     is_asymmetric = models.BooleanField(default=False)
     has_starting_player_order = models.BooleanField(default=True)
-    starting_points_system = models.ForeignKey(StartingPointSystem, on_delete=models.SET_NULL, null=True, default=1)
+    starting_points_system = models.ForeignKey(
+        StartingPointSystem, on_delete=models.SET_NULL, null=True, default=1
+    )
     has_points = models.BooleanField(default=True)
 
     def __str__(self):
@@ -222,16 +260,14 @@ class ResultConfig(models.Model):
 class TieBreaker(models.Model):
     result_config = models.ForeignKey(ResultConfig, on_delete=models.CASCADE)
     name = models.CharField(max_length=255)
-    order = models.PositiveIntegerField(
-        help_text="Higher order is more important."
-    )
+    order = models.PositiveIntegerField(help_text="Higher order is more important.")
     higher_wins = models.BooleanField(
         default=True,
-        help_text="If True, higher values win. If False, lower values win."
+        help_text="If True, higher values win. If False, lower values win.",
     )
 
     class Meta:
-        ordering = ['-order']
+        ordering = ["-order"]
 
     def __str__(self):
         return str(self.name)
@@ -241,12 +277,11 @@ class Faction(models.Model):
     game = models.ForeignKey(Game, on_delete=models.CASCADE)
     name = models.CharField(max_length=255)
     level = models.PositiveIntegerField(
-        default=0,
-        help_text="The sequence level: 0 for Country, 1 for Leader, etc."
+        default=0, help_text="The sequence level: 0 for Country, 1 for Leader, etc."
     )
 
     def __str__(self):
         return f"{self.name} (Lvl {self.level} - {self.game.name})"
 
     class Meta:
-        ordering = ['level', 'name']
+        ordering = ["level", "name"]

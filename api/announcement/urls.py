@@ -4,8 +4,8 @@ from rest_framework.routers import DefaultRouter
 from announcement.views import AnnouncementViewSet
 
 router = DefaultRouter()
-router.register('announcements', AnnouncementViewSet, basename='announcements')
+router.register("announcements", AnnouncementViewSet, basename="announcements")
 
 urlpatterns = [
-    path('', include(router.urls)),
+    path("", include(router.urls)),
 ]

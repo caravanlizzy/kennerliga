@@ -4,15 +4,16 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('game', '0006_tiebreaker_higher_wins'),
+        ("game", "0006_tiebreaker_higher_wins"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='tiebreaker',
-            name='order',
-            field=models.PositiveIntegerField(help_text='Higher order is more important.'),
+            model_name="tiebreaker",
+            name="order",
+            field=models.PositiveIntegerField(
+                help_text="Higher order is more important."
+            ),
         ),
     ]

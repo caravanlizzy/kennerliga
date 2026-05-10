@@ -5,26 +5,60 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
     dependencies = [
-        ('game', '0002_initial'),
-        ('league', '0001_initial'),
+        ("game", "0002_initial"),
+        ("league", "0001_initial"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='Result',
+            name="Result",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('points', models.IntegerField(blank=True, null=True)),
-                ('starting_position', models.IntegerField(blank=True, null=True)),
-                ('tie_breaker_value', models.CharField(blank=True, max_length=255, null=True)),
-                ('tie_breaker_resolved', models.BooleanField(default=False)),
-                ('decisive_tie_breaker', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='decisive_results', to='game.tiebreaker')),
-                ('faction', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to='game.faction')),
-                ('league', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='results', to='league.league')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("points", models.IntegerField(blank=True, null=True)),
+                ("starting_position", models.IntegerField(blank=True, null=True)),
+                (
+                    "tie_breaker_value",
+                    models.CharField(blank=True, max_length=255, null=True),
+                ),
+                ("tie_breaker_resolved", models.BooleanField(default=False)),
+                (
+                    "decisive_tie_breaker",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name="decisive_results",
+                        to="game.tiebreaker",
+                    ),
+                ),
+                (
+                    "faction",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        to="game.faction",
+                    ),
+                ),
+                (
+                    "league",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="results",
+                        to="league.league",
+                    ),
+                ),
             ],
         ),
     ]

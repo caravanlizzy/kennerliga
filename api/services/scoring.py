@@ -8,6 +8,7 @@ from typing import Dict, Iterable, List, Literal
 
 from api.constants import get_league_points
 
+
 # Public row DTO you pass into the scorer
 @dataclass(frozen=True)
 class Row:
@@ -15,7 +16,7 @@ class Row:
     player_id: int
     player_name: str
     points: Decimal | int | float  # raw match points
-    position: int | None = None    # rank/position from the game
+    position: int | None = None  # rank/position from the game
 
 
 WinMode = Literal["count_top_block", "fractional", "single"]
@@ -115,6 +116,7 @@ def compute_game_breakdown(
 
 # ---------- internals ----------
 
+
 def _dense_rank_and_share(
     lst: List[Row],
     place_points: Dict[int, Decimal],
@@ -147,7 +149,7 @@ def _dense_rank_and_share(
         share = (total_for_places / block_size) if block_size else Decimal("0")
 
         # Wins assignment
-        is_top_block = (place == 1)
+        is_top_block = place == 1
         if is_top_block:
             if win_mode == "count_top_block":
                 win_shares = [Decimal("1")] * block_size
@@ -157,21 +159,27 @@ def _dense_rank_and_share(
             elif win_mode == "single":
                 win_shares = [Decimal("1")] + [Decimal("0")] * (block_size - 1)
             else:
-                raise ValueError("win_mode must be 'count_top_block', 'fractional', or 'single'.")
+                raise ValueError(
+                    "win_mode must be 'count_top_block', 'fractional', or 'single'."
+                )
         else:
             win_shares = [Decimal("0")] * block_size
 
         # Emit rows
         for k, r in enumerate(block):
-            out.append({
-                "player": r.player_name,
-                "player_id": r.player_id,
-                "points": Decimal(r.points) if r.points is not None else Decimal("0"),
-                "position": r.position,
-                "rank": place,                # dense rank
-                "league_points": share,       # shared by the block
-                "wins": win_shares[k],
-            })
+            out.append(
+                {
+                    "player": r.player_name,
+                    "player_id": r.player_id,
+                    "points": Decimal(r.points)
+                    if r.points is not None
+                    else Decimal("0"),
+                    "position": r.position,
+                    "rank": place,  # dense rank
+                    "league_points": share,  # shared by the block
+                    "wins": win_shares[k],
+                }
+            )
 
         place += block_size
         i = j

@@ -9,8 +9,8 @@ class ChatSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Chat
-        fields = ['id', 'text', 'user', 'datetime', 'sender', 'label']
-        read_only_fields = ['id', 'user', 'datetime', 'sender', 'label']
+        fields = ["id", "text", "user", "datetime", "sender", "label"]
+        read_only_fields = ["id", "user", "datetime", "sender", "label"]
 
     @staticmethod
     def get_sender(obj):
@@ -23,6 +23,6 @@ class ChatSerializer(serializers.ModelSerializer):
         return value
 
     def create(self, validated_data):
-        validated_data['user'] = self.context['request'].user
-        validated_data['text'] = escape(validated_data['text'])
+        validated_data["user"] = self.context["request"].user
+        validated_data["text"] = escape(validated_data["text"])
         return super().create(validated_data)

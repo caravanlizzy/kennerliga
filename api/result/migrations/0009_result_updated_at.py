@@ -4,15 +4,14 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('result', '0008_result_result_resu_selecte_505144_idx_and_more'),
+        ("result", "0008_result_result_resu_selecte_505144_idx_and_more"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='result',
-            name='updated_at',
+            model_name="result",
+            name="updated_at",
             field=models.DateTimeField(auto_now=True),
         ),
     ]

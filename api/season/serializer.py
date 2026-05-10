@@ -1,12 +1,9 @@
-from django.db.models import Count, Q
 from rest_framework import serializers
 from rest_framework.fields import SerializerMethodField, BooleanField, CharField
 from rest_framework.serializers import ModelSerializer
 
 from game.models import SelectedGame, BanDecision
 from game.serializers import SelectedGameSerializer
-from league.models import League
-from result.models import Result
 from season.models import Season, SeasonParticipant
 from user.models import PlayerProfile
 
@@ -57,7 +54,7 @@ class SeasonSerializer(ModelSerializer):
 
     class Meta:
         model = Season
-        fields = '__all__'
+        fields = "__all__"
 
 
 class SeasonWithLeaguesSerializer(SeasonSerializer):
@@ -65,6 +62,7 @@ class SeasonWithLeaguesSerializer(SeasonSerializer):
 
     def get_leagues(self, obj):
         from league.serializer import LeagueSerializer
+
         return LeagueSerializer(obj.leagues.all(), many=True).data
 
 
@@ -83,9 +81,9 @@ class SeasonParticipantMiniSerializer(ModelSerializer):
 
 
 class SeasonParticipantSerializer(ModelSerializer):
-    username = CharField(source='profile.user.username', read_only=True)
-    profile_name = CharField(source='profile.profile_name', read_only=True)
-    season_details = SeasonSerializer(source='season', read_only=True)
+    username = CharField(source="profile.user.username", read_only=True)
+    profile_name = CharField(source="profile.profile_name", read_only=True)
+    season_details = SeasonSerializer(source="season", read_only=True)
     profile = serializers.PrimaryKeyRelatedField(
         queryset=PlayerProfile.objects.all(),
         required=True,
@@ -107,11 +105,20 @@ class SeasonParticipantSerializer(ModelSerializer):
     class Meta:
         model = SeasonParticipant
         fields = [
-            'id', 'season', 'profile', 'rank',  # write
-            'username', 'profile_name', 'season_details',
-            'selected_games',  # read
-            'has_banned', 'is_active_player', 'is_prev_unregistered',
-            'my_banned_game', 'league_position', 'league',
+            "id",
+            "season",
+            "profile",
+            "rank",  # write
+            "username",
+            "profile_name",
+            "season_details",
+            "selected_games",  # read
+            "has_banned",
+            "is_active_player",
+            "is_prev_unregistered",
+            "my_banned_game",
+            "league_position",
+            "league",
         ]
 
     def get_league(self, obj):
@@ -119,10 +126,11 @@ class SeasonParticipantSerializer(ModelSerializer):
         league = obj.leagues_member.filter(season=obj.season).first()
         if not league:
             return None
-        return {'id': league.id, 'level': league.level}
+        return {"id": league.id, "level": league.level}
 
     def get_league_position(self, obj):
         from league.models import LeagueStanding
+
         # Find the league this participant is in for this season
         league = obj.leagues_member.filter(season=obj.season).first()
         if not league:
@@ -130,10 +138,14 @@ class SeasonParticipantSerializer(ModelSerializer):
 
         # Get all standings for this league, ordered by the same rules as the standings view
         standings = list(
-            LeagueStanding.objects
-            .filter(league=league)
-            .order_by("-league_points", "-wins", "-tie_break_priority", "player_profile__profile_name")
-            .values_list('player_profile_id', flat=True)
+            LeagueStanding.objects.filter(league=league)
+            .order_by(
+                "-league_points",
+                "-wins",
+                "-tie_break_priority",
+                "player_profile__profile_name",
+            )
+            .values_list("player_profile_id", flat=True)
         )
 
         try:
@@ -143,36 +155,37 @@ class SeasonParticipantSerializer(ModelSerializer):
             return None
 
     def get_my_banned_game(self, obj):
-        league = self.context.get('league')
+        league = self.context.get("league")
         if not league:
             return None
 
-        ban_decision = BanDecision.objects.filter(
-            league=league,
-            player_banning=obj.profile
-        ).select_related('selected_game').first()
+        ban_decision = (
+            BanDecision.objects.filter(league=league, player_banning=obj.profile)
+            .select_related("selected_game")
+            .first()
+        )
 
         if not ban_decision or not ban_decision.selected_game:
             return None
 
-        return SelectedGameSerializer(ban_decision.selected_game, context=self.context).data
+        return SelectedGameSerializer(
+            ban_decision.selected_game, context=self.context
+        ).data
 
     # ---- public getters -----------------------------------------------------
     def get_selected_games(self, obj):
-        league = self.context.get('league')
+        league = self.context.get("league")
         if not league:
             return []
 
         qs = (
-            SelectedGame.objects
-            .filter(profile=obj.profile, league=league)
-            .select_related('game')
-            .order_by('id')
+            SelectedGame.objects.filter(profile=obj.profile, league=league)
+            .select_related("game")
+            .order_by("id")
         )
 
         return SelectedGameSerializer(qs, many=True, context=self.context).data
 
     def get_is_active_player(self, obj):
-        league = self.context.get('league')
+        league = self.context.get("league")
         return bool(league and obj == league.active_player)
-

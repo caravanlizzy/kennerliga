@@ -5,30 +5,37 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
     dependencies = [
-        ('game', '0003_initial'),
-        ('result', '0001_initial'),
-        ('season', '0001_initial'),
-        ('user', '0001_initial'),
+        ("game", "0003_initial"),
+        ("result", "0001_initial"),
+        ("season", "0001_initial"),
+        ("user", "0001_initial"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='result',
-            name='player_profile',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='user.playerprofile'),
+            model_name="result",
+            name="player_profile",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE, to="user.playerprofile"
+            ),
         ),
         migrations.AddField(
-            model_name='result',
-            name='season',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='results', to='season.season'),
+            model_name="result",
+            name="season",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="results",
+                to="season.season",
+            ),
         ),
         migrations.AddField(
-            model_name='result',
-            name='selected_game',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='game.selectedgame'),
+            model_name="result",
+            name="selected_game",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE, to="game.selectedgame"
+            ),
         ),
     ]

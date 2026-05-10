@@ -5,9 +5,9 @@ from decimal import Decimal, InvalidOperation
 from django.db import transaction
 from result.models import Result
 from api.constants import get_league_points
-from services.scoring import Row, compute_game_breakdown, compute_league_table
+from services.scoring import Row, compute_league_table
 from league.models import LeagueStanding, GameStanding, League
-from game.models import SelectedGame, ResultConfig
+from game.models import ResultConfig
 
 
 @transaction.atomic
@@ -24,10 +24,8 @@ def rebuild_game_snapshot(selected_game, win_mode: str = "fractional") -> None:
         * Rank 1 players share win_share = 1 / number_of_first_place_players.
     """
     # Load all results for this selected game
-    results = (
-        Result.objects
-        .filter(selected_game=selected_game)
-        .select_related("player_profile", "league")
+    results = Result.objects.filter(selected_game=selected_game).select_related(
+        "player_profile", "league"
     )
 
     # If there are no results, clear any old standings and exit
@@ -103,7 +101,9 @@ def rebuild_game_snapshot(selected_game, win_mode: str = "fractional") -> None:
     elif win_mode == "fractional":
         first_group = rank_groups.get(1, [])
         if first_group:
-            share = (Decimal("1.00") / Decimal(len(first_group))).quantize(Decimal("0.01"))
+            share = (Decimal("1.00") / Decimal(len(first_group))).quantize(
+                Decimal("0.01")
+            )
             for row in first_group:
                 row["win_share"] = share
     elif win_mode == "single":
@@ -113,11 +113,7 @@ def rebuild_game_snapshot(selected_game, win_mode: str = "fractional") -> None:
             first_group[0]["win_share"] = Decimal("1.00")
 
     # Then: league points distribution based on player count, with tie handling
-    player_count = (
-        Result.objects
-        .filter(selected_game=selected_game)
-        .count()
-    )
+    player_count = Result.objects.filter(selected_game=selected_game).count()
     POINTS_TABLE = get_league_points(player_count)
 
     # We walk rank groups in order and assign places 1..N
@@ -132,9 +128,9 @@ def rebuild_game_snapshot(selected_game, win_mode: str = "fractional") -> None:
             place = current_place + offset
             raw_points.append(POINTS_TABLE.get(place, Decimal("0")))
 
-        avg_points = (
-            sum(raw_points, Decimal("0")) / group_size
-        ).quantize(Decimal("0.01"))
+        avg_points = (sum(raw_points, Decimal("0")) / group_size).quantize(
+            Decimal("0.01")
+        )
 
         for row in group:
             row["league_points"] = avg_points
@@ -170,10 +166,14 @@ def rebuild_game_snapshot(selected_game, win_mode: str = "fractional") -> None:
 def rebuild_league_snapshot(league: League, *, win_mode: str = "fractional"):
     # compute over all results in league
     qs = (
-        Result.objects
-        .filter(league=league)
+        Result.objects.filter(league=league)
         .select_related("selected_game", "player_profile")
-        .only("selected_game_id", "player_profile", "player_profile__profile_name", "points")
+        .only(
+            "selected_game_id",
+            "player_profile",
+            "player_profile__profile_name",
+            "points",
+        )
     )
 
     def dec_or_zero(value):
@@ -198,10 +198,14 @@ def rebuild_league_snapshot(league: League, *, win_mode: str = "fractional"):
 
     # Sort table by (league_points, wins) to find groups
     # Important: we only group by (league_points, wins) to IDENTIFY the tie group.
-    sorted_table = sorted(table, key=lambda r: (r["league_points"], r["wins"]), reverse=True)
+    sorted_table = sorted(
+        table, key=lambda r: (r["league_points"], r["wins"]), reverse=True
+    )
 
     # upsert LeagueStanding (NO raw points)
-    existing = {ls.player_profile_id: ls for ls in LeagueStanding.objects.filter(league=league)}
+    existing = {
+        ls.player_profile_id: ls for ls in LeagueStanding.objects.filter(league=league)
+    }
 
     # Build contiguous groups of equal (league_points, wins)
     groups: list[tuple[str, list[dict]]] = []
@@ -210,8 +214,8 @@ def rebuild_league_snapshot(league: League, *, win_mode: str = "fractional"):
 
     def make_key(lp, wins) -> str:
         # Use quantized strings to ensure stable keys
-        lp_s = f"{lp:.2f}" if hasattr(lp, 'quantize') else str(lp)
-        wins_s = f"{wins:.2f}" if hasattr(wins, 'quantize') else str(wins)
+        lp_s = f"{lp:.2f}" if hasattr(lp, "quantize") else str(lp)
+        wins_s = f"{wins:.2f}" if hasattr(wins, "quantize") else str(wins)
         return f"lp:{lp_s}|w:{wins_s}"
 
     for row in sorted_table:
@@ -252,13 +256,15 @@ def rebuild_league_snapshot(league: League, *, win_mode: str = "fractional"):
         # The group_key is used to look up LeagueTieResolution.
 
         if obj is None:
-            to_create.append(LeagueStanding(
-                league=league,
-                player_profile_id=r["player_id"],
-                wins=r["wins"],
-                league_points=r["league_points"],
-                unresolved_tie_group=group_key,
-            ))
+            to_create.append(
+                LeagueStanding(
+                    league=league,
+                    player_profile_id=r["player_id"],
+                    wins=r["wins"],
+                    league_points=r["league_points"],
+                    unresolved_tie_group=group_key,
+                )
+            )
         else:
             obj.wins = r["wins"]
             obj.league_points = r["league_points"]
@@ -268,4 +274,6 @@ def rebuild_league_snapshot(league: League, *, win_mode: str = "fractional"):
     if to_create:
         LeagueStanding.objects.bulk_create(to_create)
     if to_update:
-        LeagueStanding.objects.bulk_update(to_update, ["wins", "league_points", "unresolved_tie_group"])
+        LeagueStanding.objects.bulk_update(
+            to_update, ["wins", "league_points", "unresolved_tie_group"]
+        )

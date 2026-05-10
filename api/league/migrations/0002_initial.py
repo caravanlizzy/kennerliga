@@ -5,85 +5,128 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
     dependencies = [
-        ('game', '0003_initial'),
-        ('league', '0001_initial'),
-        ('season', '0001_initial'),
-        ('user', '0001_initial'),
+        ("game", "0003_initial"),
+        ("league", "0001_initial"),
+        ("season", "0001_initial"),
+        ("user", "0001_initial"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='gamestanding',
-            name='player_profile',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='user.playerprofile'),
+            model_name="gamestanding",
+            name="player_profile",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE, to="user.playerprofile"
+            ),
         ),
         migrations.AddField(
-            model_name='gamestanding',
-            name='selected_game',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='standings', to='game.selectedgame'),
+            model_name="gamestanding",
+            name="selected_game",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="standings",
+                to="game.selectedgame",
+            ),
         ),
         migrations.AddField(
-            model_name='league',
-            name='active_player',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to='season.seasonparticipant'),
+            model_name="league",
+            name="active_player",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                to="season.seasonparticipant",
+            ),
         ),
         migrations.AddField(
-            model_name='league',
-            name='members',
-            field=models.ManyToManyField(related_name='leagues_member', to='season.seasonparticipant'),
+            model_name="league",
+            name="members",
+            field=models.ManyToManyField(
+                related_name="leagues_member", to="season.seasonparticipant"
+            ),
         ),
         migrations.AddField(
-            model_name='league',
-            name='season',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='leagues', to='season.season'),
+            model_name="league",
+            name="season",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="leagues",
+                to="season.season",
+            ),
         ),
         migrations.AddField(
-            model_name='gamestanding',
-            name='league',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='game_standings', to='league.league'),
+            model_name="gamestanding",
+            name="league",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="game_standings",
+                to="league.league",
+            ),
         ),
         migrations.AddField(
-            model_name='leagueresult',
-            name='league',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='league.league'),
+            model_name="leagueresult",
+            name="league",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE, to="league.league"
+            ),
         ),
         migrations.AddField(
-            model_name='leagueresult',
-            name='profile',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='league_results', to='user.playerprofile'),
+            model_name="leagueresult",
+            name="profile",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="league_results",
+                to="user.playerprofile",
+            ),
         ),
         migrations.AddField(
-            model_name='leaguestanding',
-            name='league',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='standings', to='league.league'),
+            model_name="leaguestanding",
+            name="league",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="standings",
+                to="league.league",
+            ),
         ),
         migrations.AddField(
-            model_name='leaguestanding',
-            name='player_profile',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='user.playerprofile'),
+            model_name="leaguestanding",
+            name="player_profile",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE, to="user.playerprofile"
+            ),
         ),
         migrations.AddIndex(
-            model_name='gamestanding',
-            index=models.Index(fields=['league', 'selected_game'], name='league_game_league__d50b22_idx'),
+            model_name="gamestanding",
+            index=models.Index(
+                fields=["league", "selected_game"],
+                name="league_game_league__d50b22_idx",
+            ),
         ),
         migrations.AddIndex(
-            model_name='gamestanding',
-            index=models.Index(fields=['league', '-league_points', '-points'], name='league_game_league__9b635e_idx'),
+            model_name="gamestanding",
+            index=models.Index(
+                fields=["league", "-league_points", "-points"],
+                name="league_game_league__9b635e_idx",
+            ),
         ),
         migrations.AlterUniqueTogether(
-            name='gamestanding',
-            unique_together={('selected_game', 'player_profile')},
+            name="gamestanding",
+            unique_together={("selected_game", "player_profile")},
         ),
         migrations.AddIndex(
-            model_name='leaguestanding',
-            index=models.Index(fields=['league', '-league_points', '-wins', '-points'], name='league_leag_league__cc32b5_idx'),
+            model_name="leaguestanding",
+            index=models.Index(
+                fields=["league", "-league_points", "-wins", "-points"],
+                name="league_leag_league__cc32b5_idx",
+            ),
         ),
         migrations.AlterUniqueTogether(
-            name='leaguestanding',
-            unique_together={('league', 'player_profile')},
+            name="leaguestanding",
+            unique_together={("league", "player_profile")},
         ),
     ]
