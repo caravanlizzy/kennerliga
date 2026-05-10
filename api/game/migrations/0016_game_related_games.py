@@ -4,15 +4,18 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('game', '0015_selectedgame_updated_at'),
+        ("game", "0015_selectedgame_updated_at"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='game',
-            name='related_games',
-            field=models.ManyToManyField(blank=True, help_text='Other games considered equivalent (e.g. different version or platform of the same game). Used to prevent picking near-duplicate games within a league.', to='game.game'),
+            model_name="game",
+            name="related_games",
+            field=models.ManyToManyField(
+                blank=True,
+                help_text="Other games considered equivalent (e.g. different version or platform of the same game). Used to prevent picking near-duplicate games within a league.",
+                to="game.game",
+            ),
         ),
     ]
