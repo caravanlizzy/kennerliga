@@ -51,7 +51,7 @@ def get_selected_game_ids_for_league_including_related(league: League) -> set[in
 def get_max_selected_game_ids_for_profile_in_season_including_related(
     profile,
     season,
-    excluded_selected_game_id: int | None = None,
+    excluded_selected_game_id: Optional[int] = None,
 ) -> set[int]:
     selected_games = (
         SelectedGame.objects.filter(
