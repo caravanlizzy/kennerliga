@@ -180,34 +180,49 @@ class SelectedGameSerializer(serializers.ModelSerializer):
         profile = attrs.get("profile", None)
         manage_only = attrs.get("manage_only", False)
 
+        skip_selection_validation = self._should_skip_selection_validation(manage_only)
+
+        if skip_selection_validation or not game or not league:
+            return attrs
+
+        self._validate_league_member_count(game, league)
+
+        if profile:
+            self._validate_season_selection_limit(
+                game=game,
+                league=league,
+                profile=profile,
+            )
+
+        return attrs
+
+    def _should_skip_selection_validation(self, manage_only):
         request = self.context.get("request")
         is_admin = request and request.user and request.user.is_staff
 
-        if manage_only and not is_admin:
-            manage_only = False
+        return manage_only and is_admin
 
-        if not manage_only and game and league:
-            member_count = league.members.count()
-            if member_count < game.min_players or member_count > game.max_players:
-                raise serializers.ValidationError(
-                    f"Game '{game.name}' requires {game.min_players}-{game.max_players} players, but this league has {member_count} members."
-                )
+    def _validate_league_member_count(self, game, league):
+        member_count = league.members.count()
 
-            if profile:
-                excluded_selected_game_id = self.instance.id if self.instance else None
+        if member_count < game.min_players or member_count > game.max_players:
+            raise serializers.ValidationError(
+                f"Game '{game.name}' requires {game.min_players}-{game.max_players} players, but this league has {member_count} members."
+            )
 
-                max_selected_game_ids = game_q.get_max_selected_game_ids_for_profile_in_season_including_related(
-                    profile=profile,
-                    season=league.season,
-                    excluded_selected_game_id=excluded_selected_game_id,
-                )
+    def _validate_season_selection_limit(self, game, league, profile):
+        excluded_selected_game_id = self.instance.id if self.instance else None
 
-                if game.id in max_selected_game_ids:
-                    raise serializers.ValidationError(
-                        f"You have already selected '{game.name}' or a related game {MAX_SAME_GAME_PER_YEAR} times this season."
-                    )
+        max_selected_game_ids = game_q.get_max_selected_game_ids_for_profile_in_season_including_related(
+            profile=profile,
+            season=league.season,
+            excluded_selected_game_id=excluded_selected_game_id,
+        )
 
-        return attrs
+        if game.id in max_selected_game_ids:
+            raise serializers.ValidationError(
+                f"You have already selected '{game.name}' or a related game {MAX_SAME_GAME_PER_YEAR} times this season."
+            )
 
     def get_game_name(self, obj):
         return obj.game.name if obj.game else None
