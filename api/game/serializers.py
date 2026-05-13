@@ -3,6 +3,7 @@ from rest_framework import serializers
 from rest_framework.serializers import ModelSerializer
 
 from api.constants import MAX_SAME_GAME_PER_YEAR
+from result.models import Result
 from result.serializers import ResultSerializer
 from .services import create_selected_game, create_ban_decision
 from . import queries as game_q
@@ -229,14 +230,10 @@ class SelectedGameSerializer(serializers.ModelSerializer):
         return obj.game.platform.name if obj.game and obj.game.platform else None
 
     def get_has_points(self, obj):
-        return (
-            obj.game.resultconfig_set.first().has_points
-            if obj.game.resultconfig_set.exists()
-            else True
-        )
+        result_config = obj.game.resultconfig_set.first() if obj.game else None
+        return result_config.has_points if result_config else True
 
     def get_results_uploaded(self, obj):
-        from result.models import Result
 
         # A game is considered to have results uploaded if there are results for it in its league
         # Usually, a game is finished when all members of the league have a result for it.
