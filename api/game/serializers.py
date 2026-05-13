@@ -254,8 +254,14 @@ class SelectedGameSerializer(serializers.ModelSerializer):
         if not league:
             return False
 
-        member_count = league.members.count()
-        result_count = Result.objects.filter(selected_game=obj).count()
+        # Prefer annotated values (set by the viewset) to avoid N+1 queries.
+        member_count = getattr(obj, "league_member_count", None)
+        if member_count is None:
+            member_count = league.members.count()
+
+        result_count = getattr(obj, "result_count", None)
+        if result_count is None:
+            result_count = Result.objects.filter(selected_game=obj).count()
 
         return result_count >= member_count and member_count > 0
 

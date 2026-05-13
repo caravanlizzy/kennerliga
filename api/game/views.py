@@ -1,4 +1,5 @@
-from django.db.models.functions import Lower
+from django.db.models import Count, IntegerField, OuterRef, Subquery
+from django.db.models.functions import Coalesce, Lower
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.viewsets import ModelViewSet
 
@@ -31,6 +32,7 @@ from game.serializers import (
 )
 
 from league.models import League
+from result.models import Result
 from .queries import (
     get_all_games,
     get_selected_game_ids_for_league_including_related,
@@ -129,8 +131,41 @@ class PlatformViewSet(ModelViewSet):
     permission_classes = [IsAuthenticated]
 
 
+# Subqueries to count members/results without cross-join inflation that
+# would occur when combining multiple Count() annotations on different
+# multi-valued relations of SelectedGame.
+_RESULT_COUNT_SQ = Subquery(
+    Result.objects.filter(selected_game=OuterRef("pk"))
+    .order_by()
+    .values("selected_game")
+    .annotate(c=Count("*"))
+    .values("c"),
+    output_field=IntegerField(),
+)
+_LEAGUE_MEMBER_COUNT_SQ = Subquery(
+    League.members.through.objects.filter(league_id=OuterRef("league_id"))
+    .order_by()
+    .values("league_id")
+    .annotate(c=Count("*"))
+    .values("c"),
+    output_field=IntegerField(),
+)
+
+
 class SelectedGameViewSet(ModelViewSet):
-    queryset = SelectedGame.objects.all()
+    queryset = (
+        SelectedGame.objects.all()
+        .select_related("game", "game__platform", "league", "profile")
+        .prefetch_related(
+            "selected_options__game_option",
+            "selected_options__choice",
+            "result_set",
+        )
+        .annotate(
+            result_count=Coalesce(_RESULT_COUNT_SQ, 0),
+            league_member_count=Coalesce(_LEAGUE_MEMBER_COUNT_SQ, 0),
+        )
+    )
     serializer_class = SelectedGameSerializer
     filterset_fields = ["league", "profile"]
     permission_classes = [IsAuthenticated]
@@ -156,7 +191,15 @@ class SelectedOptionViewSet(ModelViewSet):
 
 
 class FullGameViewSet(ModelViewSet):
-    queryset = Game.objects.all().prefetch_related("options__choices")
+    queryset = (
+        Game.objects.all()
+        .select_related("platform")
+        .prefetch_related(
+            "options__choices",
+            "options__availability_groups__conditions__depends_on_option",
+            "options__availability_groups__conditions__expected_choice",
+        )
+    )
     serializer_class = FullGameSerializer
     permission_classes = [IsAuthenticated]
 
