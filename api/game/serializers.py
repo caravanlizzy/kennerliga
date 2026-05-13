@@ -253,17 +253,6 @@ class SelectedGameSerializer(serializers.ModelSerializer):
 
         return result_count >= member_count and member_count > 0
 
-    def set_player_and_league(self, validated_data):
-        # Set player
-        profile = validated_data.pop("profile", None)
-        validated_data["profile"] = PlayerProfile.objects.get(id=profile)
-        # Set league
-        league = validated_data.pop("league", None)
-        validated_data["league"] = League.objects.get(id=league)
-        return validated_data
-
-    def get_successfully_banned(self, obj):
-        return game_q.is_game_successfully_banned(obj)
 
     def create(self, validated_data):
         manage_only = validated_data.pop("manage_only", False)
