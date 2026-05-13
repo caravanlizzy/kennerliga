@@ -265,6 +265,9 @@ class SelectedGameSerializer(serializers.ModelSerializer):
 
         return result_count >= member_count and member_count > 0
 
+    def get_successfully_banned(self, obj):
+        return game_q.is_game_successfully_banned(obj)
+
     def create(self, validated_data):
         manage_only = validated_data.pop("manage_only", False)
         selected_options_data = validated_data.pop("selected_options", [])
