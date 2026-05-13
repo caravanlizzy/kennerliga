@@ -119,6 +119,17 @@ class SelectedOptionSerializer(serializers.ModelSerializer):
             "choice_id",
         ]
 
+    def validate(self, attrs):
+        game_option = attrs.get("game_option")
+        choice = attrs.get("choice")
+
+        if choice and game_option and choice.option_id != game_option.id:
+            raise serializers.ValidationError(
+                {"choice_id": "Choice must belong to the selected game option."}
+            )
+
+        return attrs
+
 
 class SelectedGameSerializer(serializers.ModelSerializer):
     # game_name is read only
