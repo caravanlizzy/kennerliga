@@ -175,9 +175,9 @@ class SelectedGameSerializer(serializers.ModelSerializer):
         return ResultSerializer(results, many=True).data
 
     def validate(self, attrs):
-        game = attrs.get("game", None)
-        league = attrs.get("league", None)
-        profile = attrs.get("profile", None)
+        game = attrs.get("game") or getattr(self.instance, "game", None)
+        league = attrs.get("league") or getattr(self.instance, "league", None)
+        profile = attrs.get("profile") or getattr(self.instance, "profile", None)
         manage_only = attrs.get("manage_only", False)
 
         skip_selection_validation = self._should_skip_selection_validation(manage_only)
