@@ -3,6 +3,7 @@ from rest_framework import serializers
 from rest_framework.serializers import ModelSerializer
 
 from api.constants import MAX_SAME_GAME_PER_YEAR
+from result.serializers import ResultSerializer
 from .services import create_selected_game, create_ban_decision
 from . import queries as game_q
 from game.models import (
@@ -168,10 +169,7 @@ class SelectedGameSerializer(serializers.ModelSerializer):
         return obj == last_game
 
     def get_results(self, obj):
-        from result.serializers import ResultSerializer
-
-        # We assume results are prefetched via result_set if called from optimized views
-        results = getattr(obj, "result_set", obj.result_set.all())
+        results = obj.result_set.all()
         return ResultSerializer(results, many=True).data
 
     def validate(self, attrs):
