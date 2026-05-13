@@ -253,7 +253,6 @@ class SelectedGameSerializer(serializers.ModelSerializer):
 
         return result_count >= member_count and member_count > 0
 
-
     def create(self, validated_data):
         manage_only = validated_data.pop("manage_only", False)
         selected_options_data = validated_data.pop("selected_options", [])
@@ -474,6 +473,9 @@ class FullGameSerializer(serializers.ModelSerializer):
         instance.platform = validated_data.get("platform", instance.platform)
         instance.selectable = validated_data.get("selectable", instance.selectable)
         instance.save()
+
+        if options_data is None:
+            return instance
 
         existing_options_by_id = {opt.id: opt for opt in instance.options.all()}
 
