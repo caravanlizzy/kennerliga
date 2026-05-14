@@ -70,19 +70,19 @@ class UserViewSet(ModelViewSet):
         """
         Custom action to return the leagues for a specific user.
         """
-        user = self.get_object()  # Fetch the user by the ID from the URL (pk)
-        leagues = League.objects.filter(members=user.profile)
+        user = self.get_object()
+        leagues = League.objects.filter(members__profile=user.profile)
         serializer = LeagueSerializer(leagues, many=True)
         return Response(serializer.data)
 
     @action(detail=True, methods=["get"], url_path="seasons")
     def user_seasons(self, request, pk=None):
         """
-        Custom action to return the leagues for a specific user.
+        Custom action to return the seasons for a specific user.
         """
-        user = self.get_object()  # Fetch the user by the ID from the URL (pk)
-        season = Season.objects.filter(participants=user.profile)
-        serializer = SeasonSerializer(season, many=True)
+        user = self.get_object()
+        seasons = Season.objects.filter(participants__profile=user.profile)
+        serializer = SeasonSerializer(seasons, many=True)
         return Response(serializer.data)
 
     @action(detail=True, methods=["get"], url_path="results")
