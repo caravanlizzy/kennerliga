@@ -119,19 +119,21 @@ class UserViewSet(ModelViewSet):
         }
 
         pos_sum = 0
+        positioned_games = 0
         for r in results:
             if r.position is not None:
+                positioned_games += 1
                 pos_sum += r.position
                 overall_stats["positions"][r.position] = (
-                    overall_stats["positions"].get(r.position, 0) + 1
+                        overall_stats["positions"].get(r.position, 0) + 1
                 )
                 if r.position == 1:
                     overall_stats["wins"] += 1
                 if r.position <= 3:
                     overall_stats["podiums"] += 1
 
-        if overall_stats["total_games"] > 0:
-            overall_stats["avg_pos"] = pos_sum / overall_stats["total_games"]
+        if positioned_games > 0:
+            overall_stats["avg_pos"] = pos_sum / positioned_games
 
         # Per-game statistics
         stats_map = {}
