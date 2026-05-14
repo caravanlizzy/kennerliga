@@ -18,7 +18,6 @@ from season.serializer import SeasonSerializer
 from user.models import (
     User,
     PlayerProfile,
-    Platform,
     UserInviteLink,
     Feedback,
 )
@@ -321,17 +320,9 @@ class UserRegistrationViewSet(ViewSet):
                     player_profile.save()
                 else:
                     # Create a new PlayerProfile
-                    player_profile = PlayerProfile.objects.create(
+                    PlayerProfile.objects.create(
                         user=user, profile_name=username
                     )
-
-                    # Remove PlatformPlayer handling for now
-                    # BGA = Platform.objects.get(name="BGA")
-                    # PlatformPlayer.objects.create(
-                    #     player_profile=player_profile,
-                    #     platform=BGA,
-                    #     name=user.username,
-                    # )
 
                 # Delete invite after success
                 invite.delete()
@@ -343,8 +334,6 @@ class UserRegistrationViewSet(ViewSet):
 
         except UserInviteLink.DoesNotExist:
             return Response({"detail": "Invalid invite key."}, status=400)
-        except Platform.DoesNotExist:
-            return Response({"detail": "Platform 'BGA' not configured."}, status=500)
         except Exception as e:
             return Response({"detail": str(e)}, status=400)
 
