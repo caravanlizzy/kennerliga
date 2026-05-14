@@ -1,245 +1,46 @@
 <template>
   <q-page class="column col q-pa-none">
-    <div v-if="!isMobile" class="row">
-      <AnnouncementDisplay class="col-12 q-px-md" />
-    </div>
+    <HomeAnnouncements :is-mobile="isMobile" />
 
-    <div class="q-pa-md q-mx-auto" style="max-width: 1300px; width: 100%">
-      <div v-if="isMobile" class="q-mb-md">
-        <AnnouncementDisplay />
-      </div>
-
+    <div class="q-pa-md q-mx-auto home-page-container">
       <WelcomeSection
-        v-if="isMobile || mobileContent === 'welcome'"
+        v-if="showWelcome"
         :is-authenticated="isAuthenticated"
       />
 
-      <template v-if="isAuthenticated">
-        <div v-if="!isMobile" class="column col q-pt-none">
-          <div class="row q-col-gutter-xl">
-            <!-- Left Column: Primary Info -->
-            <div class="col-12 col-md-8">
-              <ContentSection
-                id="seasons"
-                icon="military_tech"
-                title="Seasons"
-                class="col-12"
-                color="primary"
-              >
-                <template #header-extra>
-                  <div
-                    v-if="!loadingSeasonInit"
-                    class="row no-wrap q-gutter-x-sm q-ml-md"
-                  >
-                    <div style="width: 110px">
-                      <KennerSelect
-                        v-model="selectedSeasonYear"
-                        :options="seasonYearOptions"
-                        label="Year"
-                        emit-value
-                        map-options
-                      />
-                    </div>
-                    <div style="width: 110px">
-                      <KennerSelect
-                        v-model="selectedSeasonMonth"
-                        :options="seasonMonthOptions"
-                        label="Month"
-                        emit-value
-                        map-options
-                      />
-                    </div>
-                  </div>
-                </template>
-                <SeasonStandings
-                  v-if="!loadingSeasonInit"
-                  :seasonId="selectedSeasonId"
-                  class="col-12"
-                />
-                <div v-else class="flex flex-center q-pa-xl">
-                  <LoadingSpinner text="Loading seasons..." />
-                </div>
-              </ContentSection>
-
-              <ContentSection
-                id="leaderboard"
-                icon="stars"
-                title="Leaderboard"
-                class="col-12 q-mt-xl"
-                color="secondary"
-              >
-                <template #header-extra>
-                  <div style="min-width: 120px" class="q-ml-md">
-                    <KennerSelect
-                      v-model="selectedYear"
-                      :options="availableYears"
-                      emit-value
-                      map-options
-                    />
-                  </div>
-                </template>
-                <LeaderBoard :year="selectedYear" />
-              </ContentSection>
-            </div>
-
-            <!-- Right Column: Secondary Info -->
-            <div class="col-12 col-md-4">
-              <ContentSection
-                v-if="isAuthenticated"
-                id="live-action"
-                title="Live Action"
-                icon="bolt"
-                color="accent"
-                class="col-12"
-              >
-                <LiveActionFeed />
-              </ContentSection>
-            </div>
-          </div>
-        </div>
-      </template>
+      <AuthenticatedHomeDashboard
+        v-if="isAuthenticated && !isMobile"
+      />
     </div>
   </q-page>
 </template>
 
 <script setup lang="ts">
 defineOptions({ name: 'IndexPage' });
-import LiveActionFeed from 'components/ui/LiveActionFeed.vue';
-import SeasonStandings from 'components/season/SeasonStandings.vue';
-import AnnouncementDisplay from 'components/ui/AnnouncementDisplay.vue';
-import { useResponsive } from 'src/composables/responsive';
-import LeaderBoard from 'components/season/LeaderBoard.vue';
-import ContentSection from 'components/base/ContentSection.vue';
-import KennerSelect from 'components/base/KennerSelect.vue';
+import { computed } from 'vue';
 import { useRoute } from 'vue-router';
-import { computed, onMounted, ref, watch } from 'vue';
-import WelcomeSection from 'components/home/WelcomeSection.vue';
-import { useUserStore } from 'stores/userStore';
 import { storeToRefs } from 'pinia';
-import {
-  fetchAvailableYears,
-  fetchCurrentSeasonId,
-  fetchSeason,
-  fetchSeasons,
-} from 'src/services/seasonService';
-import type { TSeasonDto } from 'src/types';
-import LoadingSpinner from 'components/base/LoadingSpinner.vue';
+import { useUserStore } from 'stores/userStore';
+import { useResponsive } from 'src/composables/responsive';
+import HomeAnnouncements from 'components/home/HomeAnnouncements.vue';
+import WelcomeSection from 'components/home/WelcomeSection.vue';
+import AuthenticatedHomeDashboard from 'components/home/AuthenticatedHomeDashboard.vue';
 
 const { isMobile } = useResponsive();
 const { isAuthenticated } = storeToRefs(useUserStore());
 const route = useRoute();
 
-const mobileContent = computed(() => {
-  if (route.name === 'home') return 'welcome';
-  return null;
-});
-
-const selectedYear = ref(new Date().getFullYear());
-const availableYears = ref<number[]>([]);
-const loadingSeasonInit = ref(false);
-
-// Seasons logic
-const seasonsForYear = ref<TSeasonDto[]>([]);
-const selectedSeasonYear = ref<number | null>(null);
-const selectedSeasonMonth = ref<number | null>(null);
-
-const seasonYearOptions = computed(() =>
-  [...availableYears.value]
-    .sort((a, b) => b - a)
-    .map((y) => ({ label: String(y), value: y }))
+const showWelcome = computed(
+  () => isMobile.value || route.name === 'home'
 );
-
-const seasonMonthOptions = computed(() => {
-  return seasonsForYear.value
-    .map((s) => s.month)
-    .sort((a, b) => a - b)
-    .map((m) => ({
-      label: m,
-      value: m,
-    }));
-});
-
-const selectedSeasonId = computed(() => {
-  const found = seasonsForYear.value.find(
-    (s) => s.month === selectedSeasonMonth.value
-  );
-  return found ? found.id : null;
-});
-
-watch(selectedSeasonYear, async (newYear) => {
-  if (newYear) {
-    const seasons = await fetchSeasons({ year: newYear });
-    seasonsForYear.value = seasons;
-
-    // If current selected month is not in new seasons, pick the latest month
-    if (seasons.length > 0) {
-      const months = seasons.map((s) => s.month);
-      if (
-        !selectedSeasonMonth.value ||
-        !months.includes(selectedSeasonMonth.value)
-      ) {
-        selectedSeasonMonth.value = Math.max(...months);
-      }
-    } else {
-      selectedSeasonMonth.value = null;
-    }
-  } else {
-    seasonsForYear.value = [];
-    selectedSeasonMonth.value = null;
-  }
-});
-
-const initData = async () => {
-  if (isAuthenticated.value) {
-    loadingSeasonInit.value = true;
-    try {
-      // 1. Fetch current season ID first to get started as soon as possible
-      const currentSeasonId = await fetchCurrentSeasonId();
-
-      if (currentSeasonId) {
-        const season = await fetchSeason(currentSeasonId);
-        if (season) {
-          selectedYear.value = season.year;
-
-          // We fetch seasons for the selected year immediately to have them ready for the dropdowns
-          seasonsForYear.value = await fetchSeasons({ year: season.year });
-
-          selectedSeasonYear.value = season.year;
-          selectedSeasonMonth.value = season.month;
-        }
-      }
-
-      // We can stop loading the spinner here if we have a seasonId and basic year info
-      if (selectedSeasonId.value) {
-        loadingSeasonInit.value = false;
-      }
-
-      // 2. Then fetch years (lower priority)
-      availableYears.value = await fetchAvailableYears();
-
-      // 3. Handle fallback if no currentSeasonId was found
-      if (!selectedSeasonId.value && availableYears.value.length > 0) {
-        const year = availableYears.value[0];
-        selectedYear.value = year;
-
-        const seasons = await fetchSeasons({ year });
-        seasonsForYear.value = seasons;
-
-        selectedSeasonYear.value = year;
-        if (seasons.length > 0) {
-          selectedSeasonMonth.value = Math.max(...seasons.map((s) => s.month));
-        }
-      }
-    } finally {
-      loadingSeasonInit.value = false;
-    }
-  }
-};
-
-onMounted(initData);
 </script>
 
 <style scoped>
+.home-page-container {
+  max-width: 1300px;
+  width: 100%;
+}
+
 @media (min-width: 1024px) {
   .sticky-column {
     position: sticky;
