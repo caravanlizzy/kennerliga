@@ -38,22 +38,19 @@ class UserViewSet(ModelViewSet):
     queryset = User.objects.all().order_by(Lower("username"))
     serializer_class = UserSerializer
 
-    class UserViewSet(ModelViewSet):
-        queryset = User.objects.all()
-        serializer_class = UserSerializer
-
-        def get_permissions(self):
-            if self.action in [
-                "list",
-                "retrieve",
-                "user_leagues",
-                "user_seasons",
-                "user_results",
-            ]:
-                permission_classes = [IsAuthenticated]
-            else:
-                permission_classes = [IsAdminUser]
-            return [permission() for permission in permission_classes]
+    def get_permissions(self):
+        if self.action in [
+            "list",
+            "retrieve",
+            "user_leagues",
+            "user_seasons",
+            "user_results",
+            "user_statistics",
+        ]:
+            permission_classes = [IsAuthenticated]
+        else:
+            permission_classes = [IsAdminUser]
+        return [permission() for permission in permission_classes]
 
     def get_object(self):
         lookup = self.kwargs["pk"]  # Django REST by default uses pk
