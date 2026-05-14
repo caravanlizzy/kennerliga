@@ -49,7 +49,7 @@ class GameViewSet(ModelViewSet):
         queryset = get_all_games()
         league_id = self.request.query_params.get("league")
         manage_only = (
-            self.request.query_params.get("manage_only", "false").lower() == "true"
+                self.request.query_params.get("manage_only", "false").lower() == "true"
         )
         is_admin = self.request.user and self.request.user.is_staff
 
@@ -66,19 +66,19 @@ class GameViewSet(ModelViewSet):
                         min_players__lte=member_count, max_players__gte=member_count
                     )
 
-                selected_games = get_selected_game_ids_for_league_including_related(
-                    league
-                )
-                max_selected = (
-                    get_max_selected_game_ids_for_profile_in_season_including_related(
-                        self.request.user.profile,
-                        league.season,
+                    selected_games = get_selected_game_ids_for_league_including_related(
+                        league
                     )
-                )
+                    max_selected = (
+                        get_max_selected_game_ids_for_profile_in_season_including_related(
+                            self.request.user.profile,
+                            league.season,
+                        )
+                    )
 
-                queryset = queryset.exclude(id__in=selected_games).exclude(
-                    id__in=max_selected
-                )
+                    queryset = queryset.exclude(id__in=selected_games).exclude(
+                        id__in=max_selected
+                    )
             except League.DoesNotExist:
                 pass
 
@@ -103,7 +103,7 @@ class FactionViewSet(ModelViewSet):
     queryset = Faction.objects.all()
     serializer_class = FactionSerializer
     filterset_fields = ["game"]
-
+    permission_classes = [IsAuthenticated]
 
 class TieBreakerViewSet(ModelViewSet):
     queryset = TieBreaker.objects.all()
@@ -170,18 +170,12 @@ class SelectedGameViewSet(ModelViewSet):
     filterset_fields = ["league", "profile"]
     permission_classes = [IsAuthenticated]
 
-    def perform_create(self, serializer):
-        selected_game = serializer.save()
-
 
 class BanDecisionViewSet(ModelViewSet):
     queryset = BanDecision.objects.all()
     serializer_class = BanDecisionSerializer
     filterset_fields = ["league"]
     permission_classes = [IsAuthenticated]
-
-    def perform_create(self, serializer):
-        ban_decision = serializer.save()
 
 
 class SelectedOptionViewSet(ModelViewSet):
@@ -206,7 +200,7 @@ class FullGameViewSet(ModelViewSet):
     def get_queryset(self):
         queryset = super().get_queryset()
         manage_only = (
-            self.request.query_params.get("manage_only", "false").lower() == "true"
+                self.request.query_params.get("manage_only", "false").lower() == "true"
         )
         is_admin = self.request.user and self.request.user.is_staff
 
