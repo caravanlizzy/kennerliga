@@ -1,3 +1,7 @@
+import logging
+
+logger = logging.getLogger(__name__)
+
 from django.db import transaction
 from django.db.models import Count
 from django.db.models.functions import Lower
@@ -335,6 +339,7 @@ class UserRegistrationViewSet(ViewSet):
         except UserInviteLink.DoesNotExist:
             return Response({"detail": "Invalid invite key."}, status=400)
         except Exception as e:
+            logger.exception("User registration failed.")
             return Response({"detail": str(e)}, status=400)
 
 
