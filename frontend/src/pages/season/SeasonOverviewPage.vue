@@ -55,49 +55,42 @@
 
     <!-- Content -->
     <div v-else-if="!error && season">
-      <!-- Season Info Section -->
-      <div class="row q-col-gutter-md q-mb-lg">
-        <div class="col-12 col-md-4">
-          <ContentSection
-            title="League Distribution"
-            icon="hub"
-            color="primary"
-            style="margin-top: 0"
-          >
-            <div class="column q-gutter-y-sm">
-              <div class="row items-center justify-between q-pa-md bg-grey-1 rounded-borders-12 border-subtle">
-                <div class="row items-center q-gutter-x-sm">
-                  <q-icon name="groups" color="grey-7" size="sm" />
-                  <span class="text-weight-medium">Total Leagues</span>
-                </div>
-                <span class="text-h6 text-weight-bold">{{ leagues.length }}</span>
-              </div>
-
-              <div class="row items-center justify-between q-pa-md bg-grey-1 rounded-borders-12 border-subtle">
-                <div class="row items-center q-gutter-x-sm">
-                  <q-icon name="person" color="grey-7" size="sm" />
-                  <span class="text-weight-medium">Participants</span>
-                </div>
-                <span class="text-h6 text-weight-bold">{{ participants.length }}</span>
-              </div>
-            </div>
-          </ContentSection>
+      <!-- League Distribution - inline stat pills -->
+      <div class="row items-center q-gutter-x-md q-gutter-y-sm q-mb-md">
+        <div class="row items-center q-gutter-x-xs">
+          <q-icon name="hub" color="primary" size="sm" />
+          <span class="text-overline text-grey-7 text-weight-bold">League Distribution</span>
         </div>
-
-        <div class="col-12 col-md-8">
-          <ContentSection
-            title="Champions"
-            icon="emoji_events"
-            color="amber-8"
-            style="margin-top: 0"
-          >
-            <SeasonWinners :season-id="seasonId" />
-          </ContentSection>
+        <div class="row items-center q-gutter-x-sm q-px-md q-py-xs bg-grey-1 rounded-borders-12 border-subtle">
+          <q-icon name="groups" color="grey-7" size="xs" />
+          <span class="text-caption text-grey-8">Total Leagues</span>
+          <span class="text-subtitle2 text-weight-bold">{{ leagues.length }}</span>
+        </div>
+        <div class="row items-center q-gutter-x-sm q-px-md q-py-xs bg-grey-1 rounded-borders-12 border-subtle">
+          <q-icon name="person" color="grey-7" size="xs" />
+          <span class="text-caption text-grey-8">Participants</span>
+          <span class="text-subtitle2 text-weight-bold">{{ participants.length }}</span>
         </div>
       </div>
 
-      <!-- Match Results Grid (with standings integrated) -->
+      <!-- Champions Section -->
+      <div class="q-mb-lg">
+        <ContentSection
+          title="Champions"
+          icon="emoji_events"
+          color="amber-8"
+          style="margin-top: 0"
+        >
+          <SeasonWinners :season-id="seasonId" />
+        </ContentSection>
+      </div>
+
+      <!-- Leagues: standings + match results integrated per league -->
       <div class="q-mt-xl">
+        <div class="row items-center q-gutter-x-xs q-px-md q-mb-sm">
+          <q-icon name="leaderboard" color="primary" size="sm" />
+          <span class="text-overline text-grey-7 text-weight-bold">League Standings &amp; Results</span>
+        </div>
         <SeasonStandings :season-id="seasonId" mode="results" />
       </div>
     </div>
