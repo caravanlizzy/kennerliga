@@ -212,6 +212,24 @@ onMounted(loadCurrentChampion);
   transition: all 0.2s ease;
 }
 
+:global(.body--dark) .champion-card-container {
+  background: #1e1e1e;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+
+  &:hover {
+    background: #2a2620;
+    box-shadow: 0 4px 15px rgba(255, 193, 7, 0.2);
+  }
+
+  &.is-mobile {
+    background: rgba(255, 193, 7, 0.08);
+  }
+
+  .champion-name {
+    color: #ffe082;
+  }
+}
+
 .shine-effect {
   position: absolute;
   top: 0;

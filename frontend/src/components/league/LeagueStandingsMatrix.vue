@@ -508,11 +508,30 @@ function getRankBgClass(rank: number | undefined) {
   color: #2c3e50;
 }
 
-:global(.body--dark) .bg-standings-table {
+:global(.body--dark .bg-standings-table) {
   background: #1d1d1d !important;
   color: #ececec;
   --standings-header-bg: #262626;
   --standings-leader-bg: #2d281e;
+}
+
+:global(.body--dark .bg-standings-table .header-row),
+:global(.body--dark .bg-standings-table thead tr) {
+  background-color: #262626 !important;
+  border-bottom-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+:global(.body--dark .bg-standings-table thead tr th) {
+  color: #cccccc !important;
+}
+
+:global(.body--dark .bg-standings-table tbody tr td) {
+  color: #ececec !important;
+  border-color: rgba(255, 255, 255, 0.05) !important;
+}
+
+:global(.body--dark .bg-standings-table .league-leader-row td) {
+  background-color: #2d281e !important;
 }
 
 .line-height-1 {
@@ -520,23 +539,30 @@ function getRankBgClass(rank: number | undefined) {
 }
 
 /* Ensure the background doesn't override the hover effect of q-table if any */
-:global(.q-table tbody tr:hover) td.bg-amber-1,
-:global(.q-table tbody tr:hover) td.bg-blue-grey-1,
-:global(.q-table tbody tr:hover) td.bg-brown-1,
+:global(.q-table tbody tr:hover td.bg-amber-1),
+:global(.q-table tbody tr:hover td.bg-blue-grey-1),
+:global(.q-table tbody tr:hover td.bg-brown-1),
 :global(.q-table tbody tr.bg-orange-1:hover) {
   filter: brightness(0.97);
 }
 
-:global(.body--dark) {
-  :global(.q-table tbody tr:hover) td.bg-amber-1,
-  :global(.q-table tbody tr:hover) td.bg-blue-grey-1,
-  :global(.q-table tbody tr:hover) td.bg-brown-1 {
-     filter: brightness(1.2);
-  }
+:global(.body--dark .q-table tbody tr:hover td.bg-amber-1),
+:global(.body--dark .q-table tbody tr:hover td.bg-blue-grey-1),
+:global(.body--dark .q-table tbody tr:hover td.bg-brown-1) {
+  filter: brightness(1.2);
+}
 
-  .bg-amber-1 { background: rgba(255, 193, 7, 0.2) !important; }
-  .bg-blue-grey-1 { background: rgba(144, 164, 174, 0.2) !important; }
-  .bg-brown-1 { background: rgba(141, 110, 99, 0.2) !important; }
+:global(.body--dark .bg-standings-table .bg-amber-1) {
+  background: rgba(255, 193, 7, 0.18) !important;
+  color: #ffe082 !important;
+}
+:global(.body--dark .bg-standings-table .bg-blue-grey-1) {
+  background: rgba(144, 164, 174, 0.18) !important;
+  color: #cfd8dc !important;
+}
+:global(.body--dark .bg-standings-table .bg-brown-1) {
+  background: rgba(141, 110, 99, 0.22) !important;
+  color: #d7ccc8 !important;
 }
 
 .overflow-auto {

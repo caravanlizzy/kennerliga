@@ -84,6 +84,7 @@ import { storeToRefs } from 'pinia';
 import { useRouter } from 'vue-router';
 import { provide } from 'vue';
 import { useQuasar } from 'quasar';
+import { DARK_MODE_STORAGE_KEY } from 'boot/dark-mode';
 
 const drawerState = defineModel();
 
@@ -97,6 +98,11 @@ provide('closeDrawer', () => (drawerState.value = false));
 
 function toggleDarkMode(val: boolean): void {
   $q.dark.set(val);
+  try {
+    localStorage.setItem(DARK_MODE_STORAGE_KEY, String(val));
+  } catch (e) {
+    // localStorage unavailable — ignore
+  }
 }
 
 async function doLogout(): Promise<void> {
