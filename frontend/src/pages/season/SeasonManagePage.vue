@@ -53,52 +53,34 @@
 
     <!-- Content -->
     <div v-else-if="!error && season">
-      <!-- Season Info Section -->
-      <div class="row q-col-gutter-md q-mb-lg">
-        <div class="col-12 col-md-6">
-          <ContentSection
-            title="Season Info"
-            icon="info"
-            color="primary"
-            style="margin-top: 0"
-            :bordered="false"
-          >
-            <div class="row q-gutter-sm items-center">
-              <q-badge align="middle" color="grey-2" text-color="grey-9" class="q-pa-sm text-weight-bold">
-                {{ leagues.length }} leagues
-              </q-badge>
-              <q-badge
-                v-if="seasonStatusLabel"
-                :color="statusColor"
-                class="q-pa-sm text-weight-bold"
-                :label="seasonStatusLabel"
-              />
-            </div>
-          </ContentSection>
+      <!-- Season Info & Members (unified, box-less) -->
+      <div class="q-px-sm q-mb-lg">
+        <div class="row q-gutter-sm items-center q-mb-sm">
+          <q-badge align="middle" color="grey-2" text-color="grey-9" class="q-pa-sm text-weight-bold">
+            {{ leagues.length }} leagues
+          </q-badge>
+          <q-badge
+            v-if="seasonStatusLabel"
+            :color="statusColor"
+            class="q-pa-sm text-weight-bold"
+            :label="seasonStatusLabel"
+          />
+          <q-badge align="middle" color="grey-2" text-color="grey-9" class="q-pa-sm text-weight-bold">
+            {{ participants.length }} members
+          </q-badge>
         </div>
-
-        <div class="col-12 col-md-6">
-          <ContentSection
-            title="Registered Members"
-            icon="people"
-            color="secondary"
-            style="margin-top: 0"
-            :bordered="false"
+        <div v-if="participants.length > 0" class="row q-col-gutter-xs">
+          <q-chip
+            v-for="p in participants"
+            :key="p.id"
+            dense
+            icon="person"
+            class="q-mr-xs q-mb-xs"
           >
-            <div v-if="participants.length > 0" class="row q-col-gutter-xs">
-              <q-chip
-                v-for="p in participants"
-                :key="p.id"
-                dense
-                icon="person"
-                class="q-mr-xs q-mb-xs"
-              >
-                {{ p.profile_name }}
-              </q-chip>
-            </div>
-            <div v-else class="text-caption text-grey-6 italic">No registered members for this season.</div>
-          </ContentSection>
+            {{ p.profile_name }}
+          </q-chip>
         </div>
+        <div v-else class="text-caption text-grey-6 italic">No registered members for this season.</div>
       </div>
 
       <!-- Leagues Grid -->
