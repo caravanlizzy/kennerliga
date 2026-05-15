@@ -67,6 +67,18 @@ const routes: RouteRecordRaw[] = [
     ],
   },
   {
+    path: '/taskboard',
+    component: () => import('layouts/MainLayout.vue'),
+    meta: { requiresAuth: true, requiresAdmin: true },
+    children: [
+      {
+        path: '',
+        name: 'taskboard',
+        component: () => import('pages/TaskBoardPage.vue'),
+      },
+    ],
+  },
+  {
     path: '/',
     component: () => import('layouts/MainLayout.vue'),
     children: [

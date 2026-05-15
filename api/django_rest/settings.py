@@ -55,6 +55,7 @@ MY_APPS = [
     "announcement",
     "result",
     "user",
+    "taskboard",
     "api",
 ]
 

@@ -67,7 +67,7 @@
             icon="task_alt"
             icon-color="green-7"
             label="Task Board"
-            @click="openTaskBoard"
+            forward-name="taskboard"
           />
         </template>
       </q-list>
@@ -101,10 +101,6 @@ provide('closeDrawer', () => (drawerState.value = false));
 
 function toggleDarkMode(val: boolean): void {
   $q.dark.set(val);
-}
-
-function openTaskBoard(): void {
-  window.open('https://task-board-production-6055.up.railway.app/', '_blank');
 }
 
 async function doLogout(): Promise<void> {

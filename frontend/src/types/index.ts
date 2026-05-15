@@ -4,3 +4,4 @@ export * from './league';
 export * from './game';
 export * from './announcement';
 export * from './events';
+export * from './taskboard';
