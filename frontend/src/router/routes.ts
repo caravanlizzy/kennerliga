@@ -69,7 +69,7 @@ const routes: RouteRecordRaw[] = [
   {
     path: '/taskboard',
     component: () => import('layouts/MainLayout.vue'),
-    meta: { requiresAuth: true, requiresAdmin: true },
+    meta: { requiresAuth: true },
     children: [
       {
         path: '',

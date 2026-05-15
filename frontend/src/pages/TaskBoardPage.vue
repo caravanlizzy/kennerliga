@@ -3,7 +3,12 @@
     <div class="row items-center q-mb-lg">
       <div class="text-h4">Task Board</div>
       <q-space />
-      <KennerButton icon="add" color="primary" @click="openCreateDialog">
+      <KennerButton
+        v-if="isAdmin"
+        icon="add"
+        color="primary"
+        @click="openCreateDialog"
+      >
         New Task
       </KennerButton>
     </div>
@@ -48,12 +53,12 @@
                   :key="task.id"
                   flat
                   bordered
-                  class="task-card cursor-pointer"
-                  @click="openEditDialog(task)"
+                  :class="['task-card', { 'cursor-pointer': isAdmin }]"
+                  @click="isAdmin ? openEditDialog(task) : undefined"
                 >
                   <q-card-section class="q-pa-sm">
-                    <div class="row items-center no-wrap">
-                      <div class="text-weight-medium ellipsis col">
+                    <div class="row items-center no-wrap q-gutter-xs">
+                      <div class="text-weight-medium task-title col">
                         {{ task.title }}
                       </div>
                       <q-chip
@@ -98,13 +103,13 @@
               <q-item
                 v-for="task in recentTasks"
                 :key="task.id"
-                clickable
-                @click="openEditDialog(task)"
+                :clickable="isAdmin"
+                @click="isAdmin ? openEditDialog(task) : undefined"
               >
                 <q-item-section avatar>
                   <q-icon :name="statusIcons[task.status]" size="xs" />
                 </q-item-section>
-                <q-item-section>
+                <q-item-section class="recent-task-section">
                   <q-item-label class="ellipsis">{{ task.title }}</q-item-label>
                   <q-item-label caption>{{ task.status }}</q-item-label>
                 </q-item-section>
@@ -229,6 +234,7 @@
 import { onMounted, reactive, ref } from 'vue';
 import { storeToRefs } from 'pinia';
 import { useTaskboardStore } from 'stores/taskboardStore';
+import { useUserStore } from 'stores/userStore';
 import LoadingSpinner from 'components/base/LoadingSpinner.vue';
 import KennerButton from 'components/base/KennerButton.vue';
 import KennerSelect from 'components/base/KennerSelect.vue';
@@ -242,6 +248,7 @@ import {
 
 const taskboardStore = useTaskboardStore();
 const { tasks, loading, tasksByStatus, recentTasks } = storeToRefs(taskboardStore);
+const { isAdmin } = storeToRefs(useUserStore());
 const {
   fetchTasks,
   addTask,
@@ -409,5 +416,22 @@ onMounted(() => {
   overflow: hidden;
   word-break: break-word;
   overflow-wrap: anywhere;
+  min-width: 0;
+}
+
+.task-title {
+  word-break: break-word;
+  overflow-wrap: anywhere;
+  white-space: normal;
+  min-width: 0;
+}
+
+.recent-task-section {
+  min-width: 0;
+}
+
+.kanban-column,
+.kanban-column :deep(.q-card__section) {
+  min-width: 0;
 }
 </style>

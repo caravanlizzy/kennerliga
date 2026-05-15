@@ -23,6 +23,12 @@
         />
         <DrawerItem icon="group" icon-color="teal-7" label="Members" forward-name="users" />
         <DrawerItem icon="gavel" icon-color="primary" label="Rules" forward-name="rules" />
+        <DrawerItem
+          icon="task_alt"
+          icon-color="green-7"
+          label="Task Board"
+          forward-name="taskboard"
+        />
 
         <q-separator class="q-my-sm drawer-separator" />
         <DrawerSubGroup>Appearance</DrawerSubGroup>
@@ -60,16 +66,6 @@
           />
         </template>
 
-        <template v-if="isAdmin">
-          <q-separator class="q-my-sm drawer-separator" />
-          <DrawerSubGroup>Development</DrawerSubGroup>
-          <DrawerItem
-            icon="task_alt"
-            icon-color="green-7"
-            label="Task Board"
-            forward-name="taskboard"
-          />
-        </template>
       </q-list>
     </div>
 
