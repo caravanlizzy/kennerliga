@@ -18,10 +18,17 @@ class Result(models.Model):
     )
     league = models.ForeignKey(League, on_delete=models.CASCADE, related_name="results")
     season = models.ForeignKey(Season, on_delete=models.CASCADE, related_name="results")
+    win_condition = models.ForeignKey(
+        'game.WinCondition',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='results'
+    )
     points = models.IntegerField(blank=True, null=True)
+    position = models.PositiveIntegerField(blank=True, null=True)
     starting_points = models.IntegerField(blank=True, null=True)
     starting_position = models.IntegerField(blank=True, null=True)
-    position = models.PositiveIntegerField(blank=True, null=True)
     notes = models.TextField(blank=True, null=True)
     decisive_tie_breaker = models.ForeignKey(
         TieBreaker,
