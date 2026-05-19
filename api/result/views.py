@@ -4,7 +4,7 @@ from rest_framework.response import Response
 from rest_framework import status, permissions
 from django.db import transaction
 
-from game.models import SelectedGame, ResultConfig, TieBreaker
+from game.models import SelectedGame, ResultConfig, WinCondition
 from league.models import GameStanding, LeagueStatus
 from services.standings_snapshot import rebuild_game_snapshot, rebuild_league_snapshot
 from season.models import Season
@@ -166,19 +166,34 @@ class MatchResultViewSet(ViewSet):
                 status=status.HTTP_404_NOT_FOUND,
             )
 
-        league, season, tbs = (
-            selected_game.league,
-            selected_game.league.season,
-            list(
-                TieBreaker.objects.filter(result_config=result_config).order_by(
-                    "-order"
-                )
-            ),
-        )
-        use_points, base_field = (
-            result_config.has_points,
-            ("points" if result_config.has_points else "position"),
-        )
+        league = selected_game.league
+        season = league.season
+
+        # Per-match (per game) win condition: one selected for the whole result set.
+        win_condition_id = request.data.get("win_condition")
+        win_condition = WinCondition.objects.filter(
+            pk=win_condition_id, result_config=result_config
+        ).first()
+        if not win_condition:
+            return Response(
+                {"detail": "Win condition is required."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        tbs = list(win_condition.tie_breakers.order_by("-order"))
+
+        if win_condition.is_points:
+            use_points = True
+            base_field = "points"
+        elif win_condition.is_option:
+            # Lower option.order wins; ties only between players with the same option.
+            use_points = False
+            base_field = "win_condition_option_order"
+        else:
+            return Response(
+                {"detail": "Unsupported win condition type."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
 
         if len(result_data) != league.members.count():
             return Response(
@@ -193,8 +208,12 @@ class MatchResultViewSet(ViewSet):
                     "selected_game": selected_game.id,
                     "league": league.id,
                     "season": season.id,
+                    "win_condition": win_condition.id,
                 }
             )
+            if win_condition.is_points:
+                # Points WCs cannot have an option; clear if frontend sent one.
+                entry["win_condition_option"] = None
             player_profile_id = entry.get("player_profile")
             if player_profile_id in seen:
                 return Response(
@@ -219,6 +238,22 @@ class MatchResultViewSet(ViewSet):
             serializers.append(s)
 
         rows = [s.validated_data for s in serializers]
+
+        # For OPTION win conditions, ranking is by WinConditionOption.order (lower wins).
+        # Inject a numeric base value into each row so services.* stays generic.
+        if win_condition.is_option:
+            for row in rows:
+                opt = row.get("win_condition_option")
+                row["win_condition_option_order"] = (
+                    opt.order if opt is not None else float("inf")
+                )
+
+        # If a tie breaker was requested, ensure it actually belongs to this win condition.
+        if requested_tb_id is not None and requested_tb_id not in {tb.id for tb in tbs}:
+            return Response(
+                {"detail": "Tie breaker doesn't belong to win condition."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
 
         # Initial tie check
         if requested_tb_id is None:
