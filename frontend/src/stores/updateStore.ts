@@ -2,6 +2,8 @@ import { defineStore } from 'pinia';
 import { ref } from 'vue';
 import { api } from 'boot/axios';
 
+const pollInterval = 20000;
+
 export const useUpdateStore = defineStore('update', () => {
   const lastUpdateCheck = ref(new Date().toISOString());
   const topics = ref<Set<string>>(new Set());
@@ -75,7 +77,7 @@ export const useUpdateStore = defineStore('update', () => {
 
   function startPolling() {
     if (pollTimer) return;
-    pollTimer = window.setInterval(checkUpdates, 5000);
+    pollTimer = window.setInterval(checkUpdates, pollInterval);
   }
 
   function stopPolling() {
