@@ -90,12 +90,12 @@ import { api } from 'boot/axios';
 import KennerButton from 'components/base/KennerButton.vue';
 import KennerTooltip from 'components/base/KennerTooltip.vue';
 import { useResponsive } from 'src/composables/responsive';
-import { useLeagueColors } from 'src/composables/useLeagueColors';
+import { leagueColors } from '../../composables/leagueColors';
 
 import { useLeagueStore } from 'stores/leagueStore';
 
 const { isMobile } = useResponsive();
-const { getLeagueColor } = useLeagueColors();
+const { getLeagueColor } = leagueColors();
 const route = useRoute();
 
 interface League {

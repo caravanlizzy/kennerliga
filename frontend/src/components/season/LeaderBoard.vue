@@ -257,10 +257,10 @@ import { ref, watch } from 'vue';
 import LoadingSpinner from 'components/base/LoadingSpinner.vue';
 import ErrorDisplay from 'components/base/ErrorDisplay.vue';
 import UserAvatar from 'components/ui/UserAvatar.vue';
-import { useLeagueColors } from 'src/composables/useLeagueColors';
+import { leagueColors } from '../../composables/leagueColors';
 
 const props = defineProps<{ year: number }>();
-const {  getHexLeagueColor } = useLeagueColors();
+const {  getHexLeagueColor } = leagueColors();
 
 interface PerLevelCounts {
   first: number;

@@ -6,7 +6,7 @@ export interface LeagueStyle {
   text: string;
 }
 
-export function useLeagueColors() {
+export function leagueColors() {
   const getLeagueColor = (league: number): string => {
     if (league <= 1) return 'amber-8'; // best
     if (league === 2) return 'blue-grey-5';

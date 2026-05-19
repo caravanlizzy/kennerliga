@@ -7,7 +7,7 @@ import {
 } from 'src/services/seasonService';
 import type { TSeasonDto } from 'src/types';
 
-export function useHomeSeasonSelection(isAuthenticated: Ref<boolean>) {
+export function homeSeasonSelection(isAuthenticated: Ref<boolean>) {
   const selectedYear = ref(new Date().getFullYear());
   const availableYears = ref<number[]>([]);
   const loadingSeasonInit = ref(false);

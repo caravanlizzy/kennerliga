@@ -32,7 +32,7 @@ defineOptions({ name: 'AuthenticatedHomeDashboard' });
 import { onMounted } from 'vue';
 import { storeToRefs } from 'pinia';
 import { useUserStore } from 'stores/userStore';
-import { useHomeSeasonSelection } from 'src/composables/useHomeSeasonSelection';
+import { homeSeasonSelection } from '../../composables/homeSeasonSelection';
 import HomeSeasonSection from 'components/home/HomeSeasonSection.vue';
 import HomeLeaderboardSection from 'components/home/HomeLeaderboardSection.vue';
 import HomeLiveActionSection from 'components/home/HomeLiveActionSection.vue';
@@ -49,7 +49,7 @@ const {
   seasonYearOptions,
   seasonMonthOptions,
   initSeasonSelection,
-} = useHomeSeasonSelection(isAuthenticated);
+} = homeSeasonSelection(isAuthenticated);
 
 onMounted(initSeasonSelection);
 </script>

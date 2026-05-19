@@ -135,13 +135,13 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from 'vue';
-import { useLeagueColors } from 'src/composables/useLeagueColors';
+import { leagueColors } from '../../composables/leagueColors';
 import { TLiveEvent, TLiveEventType } from 'src/types';
 import { fetchLiveActionEvents } from 'src/services/seasonService';
 import { useUpdateStore } from 'stores/updateStore';
 
 const updateStore = useUpdateStore();
-const { getLeagueColor } = useLeagueColors();
+const { getLeagueColor } = leagueColors();
 const events = ref<TLiveEvent[]>([]);
 const loading = ref(true);
 const selectedLeagues = ref<Set<number | string>>(new Set());
