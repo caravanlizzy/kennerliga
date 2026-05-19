@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from game.models import ResultConfig, Faction, TieBreaker, WinCondition
+from game.models import ResultConfig, Faction, TieBreaker, WinCondition, WinConditionOption
 from .models import Result
 
 
@@ -17,6 +17,11 @@ class ResultSerializer(serializers.ModelSerializer):
         required=False,
         allow_null=True
     )
+    win_condition_option = serializers.PrimaryKeyRelatedField(
+        queryset=WinConditionOption.objects.all(),
+        required=False,
+        allow_null=True,
+    )
     game_name = serializers.CharField(source="selected_game.game.name", read_only=True)
 
     class Meta:
@@ -32,6 +37,7 @@ class ResultSerializer(serializers.ModelSerializer):
             'starting_position',
             'position',
             'win_condition',
+            'win_condition_option',
             'notes',
             'tie_breaker_value',
             'decisive_tie_breaker',
@@ -58,6 +64,12 @@ class ResultSerializer(serializers.ModelSerializer):
             ret['win_condition'] = {
                 "id": instance.win_condition.id,
                 "name": instance.win_condition.name
+            }
+        if instance.win_condition_option:
+            ret['win_condition_option'] = {
+                "id": instance.win_condition_option.id,
+                "name": instance.win_condition_option.name,
+                "order": instance.win_condition_option.order,
             }
         return ret
 
@@ -103,9 +115,19 @@ class ResultSerializer(serializers.ModelSerializer):
 
         # ✅ Validate win condition
         win_condition = data.get('win_condition')
+        win_condition_option = data.get('win_condition_option')
         if win_condition:
             if win_condition.result_config.game != selected_game.game:
                 raise serializers.ValidationError("Win condition must belong to the selected game.")
+            if win_condition.is_option:
+                if not win_condition_option:
+                    raise serializers.ValidationError("Option is required for this win condition.")
+                if win_condition_option.win_condition_id != win_condition.id:
+                    raise serializers.ValidationError("Option does not belong to selected win condition.")
+            elif win_condition.is_points and win_condition_option is not None:
+                raise serializers.ValidationError("Points win conditions cannot have an option.")
+        elif win_condition_option is not None:
+            raise serializers.ValidationError("Win condition is required when an option is provided.")
 
         return data
 
