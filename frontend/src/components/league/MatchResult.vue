@@ -76,6 +76,24 @@
 
             <!-- Stats -->
             <div class="stats-col-new row items-center justify-end q-gutter-xs">
+              <!-- Win Condition / Option badge -->
+              <q-badge
+                v-if="result.win_condition_option_name || result.win_condition_name"
+                color="deep-purple-5"
+                class="stat-badge"
+              >
+                <q-icon name="flag_circle" size="14px" class="q-mr-xs" />
+                <span class="ellipsis">
+                  {{ result.win_condition_option_name || result.win_condition_name }}
+                </span>
+                <KennerTooltip v-if="result.win_condition_name">
+                  <span class="text-weight-bold">Win condition:</span>
+                  {{ result.win_condition_name }}<template
+                    v-if="result.win_condition_option_name"
+                  > — {{ result.win_condition_option_name }}</template>
+                </KennerTooltip>
+              </q-badge>
+
               <q-badge
                 v-if="result.points != null && selectedGame.has_points !== false"
                 :color="result.position === 1 ? 'amber-7' : 'grey-6'"
@@ -128,6 +146,7 @@ import { computed } from 'vue';
 import { storeToRefs } from 'pinia';
 import { useLeagueStore } from 'stores/leagueStore';
 import { useUserStore } from 'stores/userStore';
+import KennerTooltip from 'components/base/KennerTooltip.vue';
 
 import { TSelectedGameDto, TMatchResultDto } from 'src/types';
 
@@ -174,6 +193,8 @@ const rawResults = computed(() => {
     starting_points: r.starting_points ?? null,
     tie_breaker_value: r.tie_breaker_value ?? null,
     decisive_tie_breaker: r.decisive_tie_breaker?.name ?? null,
+    win_condition_name: r.win_condition?.name ?? null,
+    win_condition_option_name: r.win_condition_option?.name ?? null,
     // The API now returns 'factions' as a list of objects with id, faction_name, level
     factions: (r.factions ?? [])
       .slice()
