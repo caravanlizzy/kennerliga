@@ -131,6 +131,10 @@ export const useLeagueStore = (id: number) => {
             }
           });
         });
+
+        // Keep the user store in sync so navbar indicators (e.g. "my turn"
+        // bubble on the My League button) reflect the latest league state.
+        await useUserStore().setMyCurrentLeagueId();
       } finally {
         loading.value = false;
       }
