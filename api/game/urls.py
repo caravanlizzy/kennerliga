@@ -15,6 +15,8 @@ from game.views import (
     SelectedOptionViewSet,
     FullGameViewSet,
     BanDecisionViewSet,
+    WinConditionViewSet,
+    WinConditionOptionViewSet,
 )
 
 router = DefaultRouter()
@@ -26,6 +28,12 @@ router.register(
 )
 router.register("factions", FactionViewSet, basename="factions")
 router.register("tie-breakers", TieBreakerViewSet, basename="tie-breakers")
+router.register("win-conditions", WinConditionViewSet, basename="win-conditions")
+router.register(
+    "win-condition-options",
+    WinConditionOptionViewSet,
+    basename="win-condition-options",
+)
 router.register("result-configs", ResultConfigViewSet, basename="result-configs")
 router.register(
     "starting-point-systems",

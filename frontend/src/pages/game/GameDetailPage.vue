@@ -166,7 +166,7 @@
                 :hasStartingPlayerOrder="resultConfig.has_starting_player_order"
                 :isAsymmetric="resultConfig.is_asymmetric"
                 :factions="factions"
-                :tieBreakers="tieBreakers"
+                :winConditions="winConditions"
               />
             </q-card-section>
           </q-card>
@@ -199,8 +199,8 @@ const { data: game } = await api.get<TFullGameDto>(`game/games-full/${route.para
 const {
   data: [resultConfig],
 } = await api.get<any[]>(`game/result-configs/?game=${route.params.id}`);
-const { data: tieBreakers } = await api.get<any[]>(
-  `game/tie-breakers/?result_config=${resultConfig.id}`
+const { data: winConditions } = await api.get<any[]>(
+  `game/win-conditions/?result_config=${resultConfig.id}`
 );
 const { data: factions } = await api.get<any[]>(`game/factions/?game=${route.params.id}`);
 const { data: platform } = await api.get<TPlatform>(`game/platforms/${game.platform}/`);

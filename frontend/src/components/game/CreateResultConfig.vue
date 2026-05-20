@@ -112,43 +112,41 @@
 
           <q-separator spaced />
 
-          <!-- Tie Breakers -->
-          <div class="row items-center justify-between q-pl-sm q-pr-sm">
-            <div>
-              <div class="text-body2">Tie-breakers</div>
-              <div class="text-caption text-grey-7">
-                Rules for ties (top to bottom priority)
-              </div>
-            </div>
-            <q-toggle v-model="hasTieBreaker" dense />
-          </div>
-
-          <div v-if="hasTieBreaker" class="q-pl-sm q-pr-sm q-mt-sm">
+          <!-- Win Conditions -->
+          <div class="q-pl-sm q-pr-sm q-mt-sm">
             <div class="row items-center justify-between q-mb-xs">
-              <div class="text-subtitle2">Tie-breakers</div>
+              <div>
+                <div class="text-body2">Win conditions</div>
+                <div class="text-caption text-grey-7">
+                  Each win condition carries its own tie-breakers and (for option-based wins) selectable options.
+                </div>
+              </div>
               <KennerButton
                 flat
                 dense
                 icon="add"
-                label="New tie-breaker"
+                label="New win condition"
                 color="primary"
-                @click="addTieBreaker"
+                @click="addWinCondition"
               />
             </div>
 
             <div
-              v-if="!tieBreakersUi.length"
+              v-if="!winConditionsUi.length"
               class="text-caption text-grey-7 q-mt-xs"
             >
-              No tie-breakers defined yet.
+              No win conditions defined yet.
             </div>
 
             <div v-else class="q-mt-sm">
-              <div
-                v-for="(tb, tbIdx) in tieBreakersUi"
-                :key="tb.id"
-                class="q-mb-sm q-pa-sm bg-white rounded-borders shadow-1 border-light"
+              <q-card
+                v-for="(wc, wcIdx) in winConditionsUi"
+                :key="wc.id"
+                flat
+                bordered
+                class="q-mb-md q-pa-sm rounded-borders bg-white"
               >
+                <!-- WC header -->
                 <div class="row items-center q-col-gutter-sm">
                   <div class="col-auto">
                     <div class="column">
@@ -158,8 +156,8 @@
                         dense
                         size="xs"
                         icon="keyboard_arrow_up"
-                        :disable="tbIdx === 0"
-                        @click="moveTieBreaker(tbIdx, 'up')"
+                        :disable="wcIdx === 0"
+                        @click="moveWinCondition(wcIdx, 'up')"
                       />
                       <KennerButton
                         flat
@@ -167,25 +165,34 @@
                         dense
                         size="xs"
                         icon="keyboard_arrow_down"
-                        :disable="tbIdx === tieBreakersUi.length - 1"
-                        @click="moveTieBreaker(tbIdx, 'down')"
+                        :disable="wcIdx === winConditionsUi.length - 1"
+                        @click="moveWinCondition(wcIdx, 'down')"
                       />
                     </div>
                   </div>
+
                   <div class="col">
                     <KennerInput
-                      v-model="tb.name"
-                      label="Tie-breaker name"
-                      placeholder="e.g. Most coins, Strength..."
+                      v-model="wc.name"
+                      label="Win condition name"
+                      placeholder="e.g. Most VP, Conquered the capital..."
                     />
                   </div>
 
                   <div class="col-auto">
-                    <q-checkbox
+                    <q-btn-toggle
+                      v-model="wc.condition_type"
+                      :options="[
+                        { label: 'Points', value: 'POINTS' },
+                        { label: 'Option', value: 'OPTION' },
+                      ]"
+                      no-caps
                       dense
-                      v-model="tb.lowerWins"
-                      label="Lower wins"
-                      color="primary"
+                      color="grey-3"
+                      text-color="grey-8"
+                      toggle-color="primary"
+                      toggle-text-color="white"
+                      unelevated
                     />
                   </div>
 
@@ -196,17 +203,173 @@
                       dense
                       icon="delete"
                       color="negative"
-                      @click="removeTieBreaker(tb.id)"
+                      @click="removeWinCondition(wc.id)"
                     />
                   </div>
                 </div>
 
-                <div class="text-caption text-grey-7 q-mt-xs q-ml-xl">
-                  {{
-                    tb.lowerWins ? 'Lower numbers win' : 'Higher numbers win'
-                  }}
+                <!-- Options (only for OPTION type) -->
+                <div v-if="wc.condition_type === 'OPTION'" class="q-mt-md q-pl-md">
+                  <div class="row items-center justify-between q-mb-xs">
+                    <div class="text-subtitle2">Options</div>
+                    <KennerButton
+                      flat
+                      dense
+                      icon="add"
+                      label="Add option"
+                      color="primary"
+                      size="sm"
+                      @click="addWinConditionOption(wc)"
+                    />
+                  </div>
+
+                  <div
+                    v-if="!wc.options.length"
+                    class="text-caption text-grey-7 q-mt-xs"
+                  >
+                    No options defined yet.
+                  </div>
+
+                  <div v-else>
+                    <div
+                      v-for="(opt, optIdx) in wc.options"
+                      :key="opt.id"
+                      class="row items-center q-col-gutter-sm q-mb-xs"
+                    >
+                      <div class="col-auto">
+                        <div class="column">
+                          <KennerButton
+                            flat
+                            round
+                            dense
+                            size="xs"
+                            icon="keyboard_arrow_up"
+                            :disable="optIdx === 0"
+                            @click="moveWinConditionOption(wc, optIdx, 'up')"
+                          />
+                          <KennerButton
+                            flat
+                            round
+                            dense
+                            size="xs"
+                            icon="keyboard_arrow_down"
+                            :disable="optIdx === wc.options.length - 1"
+                            @click="moveWinConditionOption(wc, optIdx, 'down')"
+                          />
+                        </div>
+                      </div>
+                      <div class="col">
+                        <KennerInput
+                          v-model="opt.name"
+                          label="Option name"
+                          placeholder="e.g. Built the wonder, Eliminated all rivals..."
+                          dense
+                        />
+                      </div>
+                      <div class="col-auto">
+                        <KennerButton
+                          flat
+                          round
+                          dense
+                          icon="delete"
+                          color="negative"
+                          @click="removeWinConditionOption(wc, opt.id)"
+                        />
+                      </div>
+                    </div>
+                  </div>
                 </div>
-              </div>
+
+                <!-- Tie-breakers nested under WC -->
+                <div class="q-mt-md q-pl-md">
+                  <div class="row items-center justify-between q-mb-xs">
+                    <div>
+                      <div class="text-subtitle2">Tie-breakers</div>
+                      <div class="text-caption text-grey-7">
+                        Applied in order (top is checked first) when this win condition produces a tie.
+                      </div>
+                    </div>
+                    <KennerButton
+                      flat
+                      dense
+                      icon="add"
+                      label="New tie-breaker"
+                      color="primary"
+                      size="sm"
+                      @click="addTieBreaker(wc)"
+                    />
+                  </div>
+
+                  <div
+                    v-if="!wc.tieBreakers.length"
+                    class="text-caption text-grey-7 q-mt-xs"
+                  >
+                    No tie-breakers defined yet.
+                  </div>
+
+                  <div v-else>
+                    <div
+                      v-for="(tb, tbIdx) in wc.tieBreakers"
+                      :key="tb.id"
+                      class="q-mb-sm q-pa-sm bg-grey-1 rounded-borders"
+                    >
+                      <div class="row items-center q-col-gutter-sm">
+                        <div class="col-auto">
+                          <div class="column">
+                            <KennerButton
+                              flat
+                              round
+                              dense
+                              size="xs"
+                              icon="keyboard_arrow_up"
+                              :disable="tbIdx === 0"
+                              @click="moveTieBreaker(wc, tbIdx, 'up')"
+                            />
+                            <KennerButton
+                              flat
+                              round
+                              dense
+                              size="xs"
+                              icon="keyboard_arrow_down"
+                              :disable="tbIdx === wc.tieBreakers.length - 1"
+                              @click="moveTieBreaker(wc, tbIdx, 'down')"
+                            />
+                          </div>
+                        </div>
+                        <div class="col">
+                          <KennerInput
+                            v-model="tb.name"
+                            label="Tie-breaker name"
+                            placeholder="e.g. Most coins, Strength..."
+                            dense
+                          />
+                        </div>
+                        <div class="col-auto">
+                          <q-checkbox
+                            dense
+                            v-model="tb.lowerWins"
+                            label="Lower wins"
+                            color="primary"
+                          />
+                        </div>
+                        <div class="col-auto">
+                          <KennerButton
+                            flat
+                            round
+                            dense
+                            icon="delete"
+                            color="negative"
+                            @click="removeTieBreaker(wc, tb.id)"
+                          />
+                        </div>
+                      </div>
+                      <div class="text-caption text-grey-7 q-mt-xs q-ml-xl">
+                        {{ tb.lowerWins ? 'Lower numbers win' : 'Higher numbers win' }}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </q-card>
             </div>
           </div>
         </div>
@@ -222,7 +385,14 @@ import KennerInput from 'components/base/KennerInput.vue';
 import KennerButton from 'components/base/KennerButton.vue';
 import ListCreator from 'components/lists/ListCreator.vue';
 import { api } from 'boot/axios';
-import { TFaction, TResultConfig, TTieBreaker } from 'src/types';
+import {
+  TFaction,
+  TResultConfig,
+  TTieBreaker,
+  TWinCondition,
+  TWinConditionOption,
+  TWinConditionType,
+} from 'src/types';
 
 const props = defineProps<{
   initialConfig?: TResultConfig;
@@ -238,6 +408,19 @@ type UiTieBreaker = {
   lowerWins: boolean; // checked => lower wins
 };
 
+type UiWinConditionOption = {
+  id: string;
+  name: string;
+};
+
+type UiWinCondition = {
+  id: string;
+  name: string;
+  condition_type: TWinConditionType;
+  options: UiWinConditionOption[];
+  tieBreakers: UiTieBreaker[];
+};
+
 function newRef(): string {
   if (typeof crypto !== 'undefined' && 'randomUUID' in crypto) {
     // @ts-expect-error TS lib may not include randomUUID depending on config
@@ -251,7 +434,6 @@ const hasStartingPlayerOrder = ref(
   props.initialConfig?.hasStartingPlayerOrder ?? true
 );
 const hasPoints = ref(props.initialConfig?.hasPoints ?? true);
-const hasTieBreaker = ref(props.initialConfig?.hasTieBreaker ?? false);
 
 type UiFactionLevel = {
   id: string;
@@ -278,12 +460,18 @@ if (props.initialConfig?.factions && props.initialConfig.factions.length > 0) {
   factionLevels.value = [{ id: newRef(), factions: [] }]; // Start with level 0
 }
 
-const tieBreakersUi = ref<UiTieBreaker[]>(
-  props.initialConfig?.tieBreakers?.map((tb) => ({
+const winConditionsUi = ref<UiWinCondition[]>(
+  (props.initialConfig?.winConditions ?? []).map((wc) => ({
     id: newRef(),
-    name: tb.name,
-    lowerWins: !tb.higher_wins,
-  })) ?? []
+    name: wc.name,
+    condition_type: wc.condition_type,
+    options: (wc.options ?? []).map((o) => ({ id: newRef(), name: o.name })),
+    tieBreakers: (wc.tieBreakers ?? []).map((tb) => ({
+      id: newRef(),
+      name: tb.name,
+      lowerWins: !tb.higher_wins,
+    })),
+  }))
 );
 
 const loadingSystems = ref(true);
@@ -316,24 +504,66 @@ const pointsDescription = computed(() => {
   );
 });
 
-function addTieBreaker(): void {
-  tieBreakersUi.value.push({
+function addWinCondition(): void {
+  winConditionsUi.value.push({
     id: newRef(),
     name: '',
-    lowerWins: false, // default: higher wins
+    condition_type: 'POINTS',
+    options: [],
+    tieBreakers: [],
   });
 }
 
-function moveTieBreaker(index: number, direction: 'up' | 'down') {
-  const newIndex = direction === 'up' ? index - 1 : index + 1;
-  if (newIndex < 0 || newIndex >= tieBreakersUi.value.length) return;
-  const temp = tieBreakersUi.value[index];
-  tieBreakersUi.value[index] = tieBreakersUi.value[newIndex];
-  tieBreakersUi.value[newIndex] = temp;
+function removeWinCondition(id: string): void {
+  winConditionsUi.value = winConditionsUi.value.filter((w) => w.id !== id);
 }
 
-function removeTieBreaker(id: string): void {
-  tieBreakersUi.value = tieBreakersUi.value.filter((t) => t.id !== id);
+function moveWinCondition(index: number, direction: 'up' | 'down') {
+  const newIndex = direction === 'up' ? index - 1 : index + 1;
+  if (newIndex < 0 || newIndex >= winConditionsUi.value.length) return;
+  const temp = winConditionsUi.value[index];
+  winConditionsUi.value[index] = winConditionsUi.value[newIndex];
+  winConditionsUi.value[newIndex] = temp;
+}
+
+function addWinConditionOption(wc: UiWinCondition): void {
+  wc.options.push({ id: newRef(), name: '' });
+}
+
+function removeWinConditionOption(wc: UiWinCondition, id: string): void {
+  wc.options = wc.options.filter((o) => o.id !== id);
+}
+
+function moveWinConditionOption(
+  wc: UiWinCondition,
+  index: number,
+  direction: 'up' | 'down'
+) {
+  const newIndex = direction === 'up' ? index - 1 : index + 1;
+  if (newIndex < 0 || newIndex >= wc.options.length) return;
+  const temp = wc.options[index];
+  wc.options[index] = wc.options[newIndex];
+  wc.options[newIndex] = temp;
+}
+
+function addTieBreaker(wc: UiWinCondition): void {
+  wc.tieBreakers.push({ id: newRef(), name: '', lowerWins: false });
+}
+
+function removeTieBreaker(wc: UiWinCondition, id: string): void {
+  wc.tieBreakers = wc.tieBreakers.filter((t) => t.id !== id);
+}
+
+function moveTieBreaker(
+  wc: UiWinCondition,
+  index: number,
+  direction: 'up' | 'down'
+) {
+  const newIndex = direction === 'up' ? index - 1 : index + 1;
+  if (newIndex < 0 || newIndex >= wc.tieBreakers.length) return;
+  const temp = wc.tieBreakers[index];
+  wc.tieBreakers[index] = wc.tieBreakers[newIndex];
+  wc.tieBreakers[newIndex] = temp;
 }
 
 function addFactionLevel(): void {
@@ -345,13 +575,6 @@ function removeFactionLevel(index: number): void {
     factionLevels.value.splice(index, 1);
   }
 }
-
-const tieBreakers = computed<TTieBreaker[]>(() => {
-  return tieBreakersUi.value.map((tb) => ({
-    name: tb.name,
-    higher_wins: !tb.lowerWins,
-  }));
-});
 
 const factions = computed<TFaction[]>(() => {
   if (!isAsymmetric.value) return [];
@@ -366,14 +589,28 @@ const factions = computed<TFaction[]>(() => {
   return allFactions;
 });
 
+const winConditions = computed<TWinCondition[]>(() => {
+  return winConditionsUi.value.map((wc) => ({
+    name: wc.name,
+    condition_type: wc.condition_type,
+    options:
+      wc.condition_type === 'OPTION'
+        ? wc.options.map<TWinConditionOption>((o) => ({ name: o.name }))
+        : [],
+    tieBreakers: wc.tieBreakers.map<TTieBreaker>((tb) => ({
+      name: tb.name,
+      higher_wins: !tb.lowerWins,
+    })),
+  }));
+});
+
 const resultConfig = computed<TResultConfig>(() => ({
   isAsymmetric: isAsymmetric.value,
   hasPoints: hasPoints.value,
   startingPointSystem: startingPointSystem.value?.id ?? null,
   hasStartingPlayerOrder: hasStartingPlayerOrder.value,
   factions: factions.value,
-  hasTieBreaker: hasTieBreaker.value,
-  tieBreakers: tieBreakers.value,
+  winConditions: winConditions.value,
 }));
 
 watch(

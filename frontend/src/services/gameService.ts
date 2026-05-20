@@ -188,7 +188,7 @@ export async function createResultConfigData(
       },
     });
     await createFactions(gameId, resultConfig);
-    await createTieBreakers(resultConfigData.id, resultConfig);
+    await createWinConditions(resultConfigData.id, resultConfig);
   } catch (e) {
     // errorMessages.value.push('CreateResultConfig');
     console.log('Error creating the result configuration', e);
@@ -218,27 +218,61 @@ export async function createFactions(
   }
 }
 
-export async function createTieBreakers(resultConfigId: number, resultConfig: TResultConfig): Promise<void> {
-  console.log(resultConfigId, resultConfig);
-  if (resultConfig === undefined) return;
-  if (resultConfig.tieBreakers === undefined) return;
-  if (!resultConfig.hasTieBreaker) return;
+export async function createWinConditions(resultConfigId: number, resultConfig: TResultConfig): Promise<void> {
+  if (!resultConfig?.winConditions?.length) return;
 
-  const len = resultConfig.tieBreakers.length;
-  for (const [index, tieBreaker] of resultConfig.tieBreakers.entries()) {
-    console.log(index, tieBreaker);
+  for (const [wcIndex, winCondition] of resultConfig.winConditions.entries()) {
+    let winConditionId: number;
     try {
-      await api('game/tie-breakers/', {
+      const { data: createdWc } = await api('game/win-conditions/', {
         method: 'POST',
         data: {
           result_config: resultConfigId,
-          name: tieBreaker.name,
-          order: (len - index) * 10,
-          higher_wins: tieBreaker.higher_wins,
+          name: winCondition.name,
+          condition_type: winCondition.condition_type,
+          order: wcIndex * 10,
         },
       });
+      winConditionId = createdWc.id;
     } catch (e) {
-      console.log('Error creating tieBreaker', e);
+      console.log('Error creating winCondition', e);
+      continue;
+    }
+
+    if (winCondition.condition_type === 'OPTION' && winCondition.options?.length) {
+      for (const [optIndex, opt] of winCondition.options.entries()) {
+        try {
+          await api('game/win-condition-options/', {
+            method: 'POST',
+            data: {
+              win_condition: winConditionId,
+              name: opt.name,
+              order: optIndex * 10,
+            },
+          });
+        } catch (e) {
+          console.log('Error creating winConditionOption', e);
+        }
+      }
+    }
+
+    if (winCondition.tieBreakers?.length) {
+      const len = winCondition.tieBreakers.length;
+      for (const [index, tieBreaker] of winCondition.tieBreakers.entries()) {
+        try {
+          await api('game/tie-breakers/', {
+            method: 'POST',
+            data: {
+              win_condition: winConditionId,
+              name: tieBreaker.name,
+              order: (len - index) * 10,
+              higher_wins: tieBreaker.higher_wins,
+            },
+          });
+        } catch (e) {
+          console.log('Error creating tieBreaker', e);
+        }
+      }
     }
   }
 }
@@ -348,11 +382,12 @@ export async function updateResultConfigData(
         await api.delete(`game/factions/${f.id}/`);
       }
 
-      const { data: existingTieBreakers } = await api.get<any[]>(
-        `game/tie-breakers/?result_config=${configId}`
+      // Deleting win-conditions cascades to their options and tie-breakers.
+      const { data: existingWinConditions } = await api.get<any[]>(
+        `game/win-conditions/?result_config=${configId}`
       );
-      for (const tb of existingTieBreakers) {
-        await api.delete(`game/tie-breakers/${tb.id}/`);
+      for (const wc of existingWinConditions) {
+        await api.delete(`game/win-conditions/${wc.id}/`);
       }
     } else {
       // Create new if somehow missing
@@ -369,9 +404,9 @@ export async function updateResultConfigData(
       configId = newConfig.id;
     }
 
-    // 4. Create new factions and tie-breakers
+    // 4. Create new factions and win-conditions (with options and tie-breakers)
     await createFactions(gameId, resultConfig);
-    await createTieBreakers(configId, resultConfig);
+    await createWinConditions(configId, resultConfig);
   } catch (e) {
     console.log('Error updating the result configuration', e);
     throw new Error('Error updating the result configuration: \n' + e);
