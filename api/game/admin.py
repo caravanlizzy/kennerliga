@@ -93,8 +93,8 @@ class FactionAdmin(admin.ModelAdmin):
 
 @admin.register(TieBreaker)
 class TieBreakerAdmin(admin.ModelAdmin):
-    list_display = ("name", "result_config", "order")
-    list_filter = ("result_config__game",)
+    list_display = ("name", "win_condition", "order")
+    list_filter = ("win_condition__result_config__game",)
 
 
 class WinConditionInline(admin.TabularInline):
