@@ -440,10 +440,14 @@ onMounted(async () => {
     // Load Result Config
     if (resultConfigsRes.data && resultConfigsRes.data.length > 0) {
       const rc = resultConfigsRes.data[0];
-      const [tieBreakersRes, factionsRes] = await Promise.all([
-        api.get<any[]>(`game/tie-breakers/?result_config=${rc.id}`),
+      const [winConditionsRes, factionsRes] = await Promise.all([
+        api.get<any[]>(`game/win-conditions/?result_config=${rc.id}`),
         api.get<any[]>(`game/factions/?game=${gameId}`)
       ]);
+
+      const sortedWinConditions = [...winConditionsRes.data].sort(
+        (a, b) => (a.order ?? 0) - (b.order ?? 0)
+      );
 
       initialResultConfig.value = {
         isAsymmetric: rc.is_asymmetric,
@@ -451,10 +455,16 @@ onMounted(async () => {
         startingPointSystem: rc.starting_points_system_id || rc.starting_points_system,
         hasStartingPlayerOrder: rc.has_starting_player_order,
         factions: factionsRes.data.map(f => ({ name: f.name, level: f.level })),
-        hasTieBreaker: tieBreakersRes.data.length > 0,
-        tieBreakers: tieBreakersRes.data
-          .sort((a, b) => b.order - a.order)
-          .map(tb => ({ name: tb.name, higher_wins: tb.higher_wins }))
+        winConditions: sortedWinConditions.map(wc => ({
+          name: wc.name,
+          condition_type: wc.condition_type,
+          options: [...(wc.options || [])]
+            .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
+            .map(o => ({ name: o.name })),
+          tieBreakers: [...(wc.tie_breakers || [])]
+            .sort((a, b) => (b.order ?? 0) - (a.order ?? 0))
+            .map(tb => ({ name: tb.name, higher_wins: tb.higher_wins })),
+        })),
       };
     } else {
       // Fallback default
@@ -464,8 +474,7 @@ onMounted(async () => {
         startingPointSystem: null,
         hasStartingPlayerOrder: true,
         factions: [],
-        hasTieBreaker: false,
-        tieBreakers: []
+        winConditions: []
       };
     }
 

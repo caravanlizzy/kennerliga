@@ -9,7 +9,7 @@ from .services import create_selected_game, create_ban_decision
 from . import queries as game_q
 from game.models import Game, GameOption, GameOptionChoice, Faction, TieBreaker, ResultConfig, StartingPointSystem, \
     Platform, SelectedGame, SelectedOption, BanDecision, GameOptionAvailabilityGroup, GameOptionAvailabilityCondition, \
-    WinCondition
+    WinCondition, WinConditionOption
 from league.models import League
 from user.models import PlayerProfile
 
@@ -44,7 +44,16 @@ class TieBreakerSerializer(ModelSerializer):
         fields = '__all__'
 
 
+class WinConditionOptionSerializer(ModelSerializer):
+    class Meta:
+        model = WinConditionOption
+        fields = '__all__'
+
+
 class WinConditionSerializer(ModelSerializer):
+    options = WinConditionOptionSerializer(many=True, read_only=True)
+    tie_breakers = TieBreakerSerializer(many=True, read_only=True)
+
     class Meta:
         model = WinCondition
         fields = '__all__'
