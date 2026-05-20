@@ -206,11 +206,13 @@ export type TMatchResultPayload = {
   starting_points: number | null;
   faction_ids: number[];
   tie_breaker_value: number | null;
+  win_condition_option?: number | null;
 };
 
 export type TMatchResultSubmitPayload = {
   selected_game: number;
   results: TMatchResultPayload[];
+  win_condition: number;
   tiebreaker?: { id: number };
 };
 
@@ -227,6 +229,8 @@ export type TMatchResultDto = {
   starting_points: number | null;
   tie_breaker_value: number | null;
   decisive_tie_breaker: { id: number; name: string } | null;
+  win_condition: { id: number; name: string } | null;
+  win_condition_option: { id: number; name: string; order: number } | null;
   factions: { id: number; name: string; level: number }[];
 };
 

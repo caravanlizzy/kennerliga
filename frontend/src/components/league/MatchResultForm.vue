@@ -37,6 +37,26 @@
         v-if="!isLoading && formData.length"
         @submit.prevent="submitResults"
       >
+        <!-- Win Condition selector -->
+        <q-card
+          v-if="winConditions.length > 0"
+          flat
+          bordered
+          class="q-mb-md q-pa-md wc-card"
+        >
+          <div class="text-subtitle2 text-weight-bold q-mb-sm">
+            <q-icon name="flag_circle" color="primary" class="q-mr-xs" />
+            Win Condition
+          </div>
+          <q-option-group
+            v-model="selectedWinConditionId"
+            :options="winConditions.map((wc) => ({ label: wc.name, value: wc.id }))"
+            color="primary"
+            type="radio"
+            inline
+          />
+        </q-card>
+
         <div class="row q-col-gutter-md q-mb-md">
           <div
             v-for="member in members"
@@ -170,6 +190,28 @@
                     ]"
                   />
 
+                  <!-- Win Condition Option (only for OPTION-type WCs) -->
+                  <div
+                    v-if="winConditionIsOption && selectedWinCondition?.options?.length"
+                    class="q-mt-xs"
+                  >
+                    <div class="text-caption text-grey-7 q-mb-xs">
+                      {{ selectedWinCondition?.name || 'Outcome' }}
+                    </div>
+                    <q-option-group
+                      v-model="getEntry(member.profile).win_condition_option"
+                      :options="
+                        (selectedWinCondition?.options ?? [])
+                          .slice()
+                          .sort((a, b) => a.order - b.order)
+                          .map((o) => ({ label: o.name, value: o.id }))
+                      "
+                      color="primary"
+                      type="radio"
+                      inline
+                    />
+                  </div>
+
                   <!-- Tie-Breaker (Appears only when a tie needs resolving) -->
                   <div
                     v-if="tieBreakerRequired && needsTieBreaker(member.profile)"
@@ -232,7 +274,7 @@ import KennerSelect from 'components/base/KennerSelect.vue';
 import KennerInput from 'components/base/KennerInput.vue';
 import KennerButton from 'components/base/KennerButton.vue';
 import LoadingSpinner from 'components/base/LoadingSpinner.vue';
-import { TLeagueDto, TResultConfig, TTieBreakerDto, TMatchResultPayload, TMatchResultSubmitPayload, TMatchResult } from 'src/types';
+import { TLeagueDto, TResultConfig, TTieBreakerDto, TMatchResultPayload, TMatchResultSubmitPayload, TMatchResult, TWinConditionDto } from 'src/types';
 
 type Faction = { id: number; name: string; level: number };
 
@@ -246,6 +288,7 @@ type FormDataEntry = {
   starting_points: number | null;
   faction_ids: Record<number, number | null>;
   tie_breaker_value: number | null;
+  win_condition_option: number | null;
 };
 
 const emit = defineEmits<{ (e: 'submitted', selectedGameId: number): void }>();
@@ -269,6 +312,17 @@ const resultConfig = ref<TResultConfig | null>(null);
 const factions = ref<Faction[]>([]);
 const formData = ref<FormDataEntry[]>([]);
 const isLoading = ref(false);
+
+const winConditions = ref<TWinConditionDto[]>([]);
+const selectedWinConditionId = ref<number | null>(null);
+const selectedWinCondition = computed<TWinConditionDto | null>(
+  () =>
+    winConditions.value.find((wc) => wc.id === selectedWinConditionId.value) ??
+    null
+);
+const winConditionIsOption = computed(
+  () => selectedWinCondition.value?.condition_type === 'OPTION'
+);
 
 const tieBreakerRequired = ref(false);
 const requiredTieBreaker = ref<TTieBreakerDto | null>(null);
@@ -310,6 +364,7 @@ function getEntry(profileId: number) {
       starting_points: null as number | null,
       faction_ids: {} as Record<number, number | null>,
       tie_breaker_value: null as number | null,
+      win_condition_option: null as number | null,
     };
     formData.value.push(found);
   }
@@ -356,6 +411,38 @@ async function fetchResultConfig() {
   if (!gameId) return;
   const { data } = await api.get(`game/result-configs/?game=${gameId}`);
   resultConfig.value = data?.[0] ?? null;
+}
+
+async function fetchWinConditions() {
+  if (!resultConfig.value?.id) {
+    winConditions.value = [];
+    selectedWinConditionId.value = null;
+    return;
+  }
+  const { data } = await api.get<TWinConditionDto[]>(
+    `game/win-conditions/?result_config=${resultConfig.value.id}`
+  );
+  let wcs = (data ?? []).slice().sort((a, b) => a.order - b.order);
+
+  // Auto-create a default "Win" POINTS WinCondition if none exist (legacy data).
+  if (wcs.length === 0) {
+    try {
+      const { data: created } = await api.post<TWinConditionDto>(
+        'game/win-conditions/',
+        {
+          name: 'Win',
+          condition_type: 'POINTS',
+          order: 0,
+          result_config: resultConfig.value.id,
+        }
+      );
+      wcs = [{ ...created, options: created.options ?? [], tie_breakers: created.tie_breakers ?? [] }];
+    } catch (e) {
+      console.error('Failed to auto-create default WinCondition:', e);
+    }
+  }
+  winConditions.value = wcs;
+  selectedWinConditionId.value = wcs[0]?.id ?? null;
 }
 
 async function fetchFactions() {
@@ -405,6 +492,9 @@ async function fetchExistingResults() {
             tie_breaker_value: existing.tie_breaker_value
               ? Number(existing.tie_breaker_value)
               : null,
+            win_condition_option:
+              (existing.win_condition_option as { id: number } | null)?.id ??
+              null,
           };
         }
         return {
@@ -417,6 +507,7 @@ async function fetchExistingResults() {
           starting_points: null,
           faction_ids: {},
           tie_breaker_value: null,
+          win_condition_option: null,
         };
       });
       return true;
@@ -443,6 +534,7 @@ function initFormData() {
     starting_points: null as number | null,
     faction_ids: {} as Record<number, number | null>,
     tie_breaker_value: null as number | null,
+    win_condition_option: null as number | null,
   }));
   if (resultConfig.value?.has_starting_player_order) {
     preselectStartingPositions();
@@ -461,6 +553,7 @@ watch(
       isLoading.value = true;
       try {
         await Promise.all([fetchResultConfig(), fetchFactions()]);
+        await fetchWinConditions();
         const hasResults = await fetchExistingResults();
         if (!hasResults) {
           initFormData();
@@ -562,6 +655,29 @@ async function submitResults() {
     }
   }
 
+  if (!selectedWinConditionId.value) {
+    $q.notify({
+      type: 'negative',
+      message: 'Please select a win condition.',
+    });
+    return;
+  }
+
+  if (winConditionIsOption.value) {
+    const missingOpt = formData.value.filter(
+      (e) => e.win_condition_option == null
+    );
+    if (missingOpt.length) {
+      $q.notify({
+        type: 'negative',
+        message: `Please pick an outcome for: ${missingOpt
+          .map((e) => idToName(e.player_profile))
+          .join(', ')}`,
+      });
+      return;
+    }
+  }
+
   const results: TMatchResultPayload[] = formData.value.map((entry) => {
     const selectedFactionIds = Object.values(entry.faction_ids || []).filter(
       (id) => id !== null && id !== undefined
@@ -579,6 +695,9 @@ async function submitResults() {
       starting_points: entry.starting_points,
       faction_ids: selectedFactionIds,
       tie_breaker_value: entry.tie_breaker_value ?? null,
+      win_condition_option: winConditionIsOption.value
+        ? entry.win_condition_option
+        : null,
     };
     return res;
   });
@@ -586,6 +705,7 @@ async function submitResults() {
   const payload: TMatchResultSubmitPayload = {
     selected_game: props.selectedGameId,
     results,
+    win_condition: selectedWinConditionId.value,
   };
 
   if (tieBreakerRequired.value && requiredTieBreaker.value?.id) {
@@ -632,5 +752,9 @@ async function submitResults() {
   min-height: 40px;
   font-weight: 500;
   font-size: 15px;
+}
+.wc-card {
+  background: #fafafa;
+  border-radius: 10px;
 }
 </style>
