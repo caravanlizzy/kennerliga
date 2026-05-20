@@ -54035,7 +54035,7 @@
     "model": "game.gameoption",
     "pk": 5,
     "fields": {
-      "name": "Alternative Zoopl\u00e4ne",
+      "name": "Alternative Zoopläne",
       "game": 1,
       "has_choices": false,
       "order": 0,
@@ -54126,7 +54126,7 @@
     "model": "game.gameoption",
     "pk": 15,
     "fields": {
-      "name": "Feuer und Eis - Endwertungspl\u00e4ttchen",
+      "name": "Feuer und Eis - Endwertungsplättchen",
       "game": 5,
       "has_choices": false,
       "order": 0,
@@ -54139,7 +54139,7 @@
     "model": "game.gameoption",
     "pk": 16,
     "fields": {
-      "name": "Feuer und Eis - V\u00f6lker",
+      "name": "Feuer und Eis - Völker",
       "game": 5,
       "has_choices": false,
       "order": 0,
@@ -54152,7 +54152,7 @@
     "model": "game.gameoption",
     "pk": 17,
     "fields": {
-      "name": "Fan-V\u00f6lker",
+      "name": "Fan-Völker",
       "game": 5,
       "has_choices": false,
       "order": 0,
@@ -54295,7 +54295,7 @@
     "model": "game.gameoption",
     "pk": 28,
     "fields": {
-      "name": "Anf\u00e4nger Konzerne",
+      "name": "Anfänger Konzerne",
       "game": 7,
       "has_choices": false,
       "order": 0,
@@ -54308,7 +54308,7 @@
     "model": "game.gameoption",
     "pk": 29,
     "fields": {
-      "name": "Pr\u00e4ludium",
+      "name": "Präludium",
       "game": 7,
       "has_choices": false,
       "order": 0,
@@ -54321,7 +54321,7 @@
     "model": "game.gameoption",
     "pk": 30,
     "fields": {
-      "name": "Regierungsauftr\u00e4ge",
+      "name": "Regierungsaufträge",
       "game": 8,
       "has_choices": false,
       "order": 0,
@@ -54334,7 +54334,7 @@
     "model": "game.gameoption",
     "pk": 31,
     "fields": {
-      "name": "Spielerbogen f\u00fcr erfahrene Spieler",
+      "name": "Spielerbogen für erfahrene Spieler",
       "game": 8,
       "has_choices": false,
       "order": 0,
@@ -54373,7 +54373,7 @@
     "model": "game.gameoption",
     "pk": 75,
     "fields": {
-      "name": "V\u00f6lkertableau",
+      "name": "Völkertableau",
       "game": 26,
       "has_choices": true,
       "order": 0,
@@ -54464,7 +54464,7 @@
     "model": "game.gameoption",
     "pk": 82,
     "fields": {
-      "name": "Variante Schwarze W\u00fcrfel",
+      "name": "Variante Schwarze Würfel",
       "game": 29,
       "has_choices": false,
       "order": 0,
@@ -54555,7 +54555,7 @@
     "model": "game.gameoption",
     "pk": 89,
     "fields": {
-      "name": "Schiffspl\u00e4ttchen Verteilung",
+      "name": "Schiffsplättchen Verteilung",
       "game": 32,
       "has_choices": true,
       "order": 0,
@@ -54763,7 +54763,7 @@
     "model": "game.gameoption",
     "pk": 105,
     "fields": {
-      "name": "Zus\u00e4tzliche Aktionsfelder",
+      "name": "Zusätzliche Aktionsfelder",
       "game": 35,
       "has_choices": false,
       "order": 0,
@@ -54867,7 +54867,7 @@
     "model": "game.gameoptionchoice",
     "pk": 1,
     "fields": {
-      "name": "Anf\u00e4nger",
+      "name": "Anfänger",
       "option": 1,
       "order": 0
     }
@@ -54903,7 +54903,7 @@
     "model": "game.gameoptionchoice",
     "pk": 5,
     "fields": {
-      "name": "Gleicher Zooplan f\u00fcr alle",
+      "name": "Gleicher Zooplan für alle",
       "option": 1,
       "order": 0
     }
@@ -54930,7 +54930,7 @@
     "model": "game.gameoptionchoice",
     "pk": 8,
     "fields": {
-      "name": "Zooplan 2 (Freilauffl\u00e4chen)",
+      "name": "Zooplan 2 (Freilaufflächen)",
       "option": 4,
       "order": 0
     }
@@ -55011,7 +55011,7 @@
     "model": "game.gameoptionchoice",
     "pk": 17,
     "fields": {
-      "name": "Zuf\u00e4llig",
+      "name": "Zufällig",
       "option": 4,
       "order": 0
     }
@@ -55056,7 +55056,7 @@
     "model": "game.gameoptionchoice",
     "pk": 22,
     "fields": {
-      "name": "\u00dcberarbeitetes Grundspiel",
+      "name": "Überarbeitetes Grundspiel",
       "option": 9,
       "order": 0
     }
@@ -55065,7 +55065,7 @@
     "model": "game.gameoptionchoice",
     "pk": 23,
     "fields": {
-      "name": "Zuf\u00e4llig",
+      "name": "Zufällig",
       "option": 9,
       "order": 0
     }
@@ -55074,7 +55074,7 @@
     "model": "game.gameoptionchoice",
     "pk": 24,
     "fields": {
-      "name": "Zuf\u00e4llig",
+      "name": "Zufällig",
       "option": 9,
       "order": 0
     }
@@ -55083,7 +55083,7 @@
     "model": "game.gameoptionchoice",
     "pk": 25,
     "fields": {
-      "name": "Zuf\u00e4llig generiert (von IKM)",
+      "name": "Zufällig generiert (von IKM)",
       "option": 9,
       "order": 0
     }
@@ -55128,7 +55128,7 @@
     "model": "game.gameoptionchoice",
     "pk": 30,
     "fields": {
-      "name": "Nach V\u00f6lkern angepasst",
+      "name": "Nach Völkern angepasst",
       "option": 11,
       "order": 0
     }
@@ -55200,7 +55200,7 @@
     "model": "game.gameoptionchoice",
     "pk": 38,
     "fields": {
-      "name": "Zuf\u00e4llig",
+      "name": "Zufällig",
       "option": 15,
       "order": 0
     }
@@ -55227,7 +55227,7 @@
     "model": "game.gameoptionchoice",
     "pk": 41,
     "fields": {
-      "name": "Zuf\u00e4llig",
+      "name": "Zufällig",
       "option": 16,
       "order": 0
     }
@@ -55254,7 +55254,7 @@
     "model": "game.gameoptionchoice",
     "pk": 44,
     "fields": {
-      "name": "Zuf\u00e4llig",
+      "name": "Zufällig",
       "option": 17,
       "order": 0
     }
@@ -55335,7 +55335,7 @@
     "model": "game.gameoptionchoice",
     "pk": 83,
     "fields": {
-      "name": "Gl\u00fccksgr\u00e4ber-Variante",
+      "name": "Glücksgräber-Variante",
       "option": 73,
       "order": 0
     }
@@ -55380,7 +55380,7 @@
     "model": "game.gameoptionchoice",
     "pk": 88,
     "fields": {
-      "name": "In Spielerreihenfolge ausgew\u00e4hlte V\u00f6lker",
+      "name": "In Spielerreihenfolge ausgewählte Völker",
       "option": 75,
       "order": 0
     }
@@ -55389,7 +55389,7 @@
     "model": "game.gameoptionchoice",
     "pk": 89,
     "fields": {
-      "name": "Zuf\u00e4llige Spielplanauswahl",
+      "name": "Zufällige Spielplanauswahl",
       "option": 75,
       "order": 0
     }
@@ -55398,7 +55398,7 @@
     "model": "game.gameoptionchoice",
     "pk": 90,
     "fields": {
-      "name": "Zuf\u00e4llige Spielplanauswahl",
+      "name": "Zufällige Spielplanauswahl",
       "option": 75,
       "order": 0
     }
@@ -55425,7 +55425,7 @@
     "model": "game.gameoptionchoice",
     "pk": 93,
     "fields": {
-      "name": "Regul\u00e4re Vorausschau",
+      "name": "Reguläre Vorausschau",
       "option": 76,
       "order": 0
     }
@@ -55569,7 +55569,7 @@
     "model": "game.gameoptionchoice",
     "pk": 109,
     "fields": {
-      "name": "2 Zeuspl\u00e4ttchen weniger (1 Statue, 1 Kultst\u00e4tte)",
+      "name": "2 Zeusplättchen weniger (1 Statue, 1 Kultstätte)",
       "option": 88,
       "order": 0
     }
@@ -55578,7 +55578,7 @@
     "model": "game.gameoptionchoice",
     "pk": 110,
     "fields": {
-      "name": "3 Zeuspl\u00e4ttchen weniger (1 Statue, 1 Kultst\u00e4tte, 1 Monster)",
+      "name": "3 Zeusplättchen weniger (1 Statue, 1 Kultstätte, 1 Monster)",
       "option": 88,
       "order": 0
     }
@@ -55587,7 +55587,7 @@
     "model": "game.gameoptionchoice",
     "pk": 111,
     "fields": {
-      "name": "Am k\u00fcrzesten: 4 Zeuspl\u00e4ttchen weniger (1 Statue, 1 Kultst\u00e4tte, 1 Monster, 1 Opfergabe)",
+      "name": "Am kürzesten: 4 Zeusplättchen weniger (1 Statue, 1 Kultstätte, 1 Monster, 1 Opfergabe)",
       "option": 88,
       "order": 0
     }
@@ -55596,7 +55596,7 @@
     "model": "game.gameoptionchoice",
     "pk": 112,
     "fields": {
-      "name": "K\u00fcrzer: 1 Zeuspl\u00e4ttchen weniger (Statue)",
+      "name": "Kürzer: 1 Zeusplättchen weniger (Statue)",
       "option": 88,
       "order": 0
     }
@@ -55605,7 +55605,7 @@
     "model": "game.gameoptionchoice",
     "pk": 113,
     "fields": {
-      "name": "Normal (12 Zeuspl\u00e4ttchen)",
+      "name": "Normal (12 Zeusplättchen)",
       "option": 88,
       "order": 0
     }
@@ -55623,7 +55623,7 @@
     "model": "game.gameoptionchoice",
     "pk": 115,
     "fields": {
-      "name": "Ausw\u00e4hlen",
+      "name": "Auswählen",
       "option": 89,
       "order": 0
     }
@@ -55632,7 +55632,7 @@
     "model": "game.gameoptionchoice",
     "pk": 116,
     "fields": {
-      "name": "F\u00fcr Anf\u00e4nger (wenig Variation und Untiefen)",
+      "name": "Für Anfänger (wenig Variation und Untiefen)",
       "option": 90,
       "order": 0
     }
@@ -55641,7 +55641,7 @@
     "model": "game.gameoptionchoice",
     "pk": 117,
     "fields": {
-      "name": "F\u00fcr Fortgeschrittene (mehr Variation und Untiefen)",
+      "name": "Für Fortgeschrittene (mehr Variation und Untiefen)",
       "option": 90,
       "order": 0
     }
@@ -55821,7 +55821,7 @@
     "model": "game.gameoptionchoice",
     "pk": 137,
     "fields": {
-      "name": "Anf\u00e4nger",
+      "name": "Anfänger",
       "option": 106,
       "order": 0
     }
@@ -68963,7 +68963,7 @@
     "pk": 1,
     "fields": {
       "code": "FIX",
-      "description": "Gleiche Startpunkte f\u00fcr alle"
+      "description": "Gleiche Startpunkte für alle"
     }
   },
   {
@@ -69184,263 +69184,453 @@
     }
   },
   {
-    "model": "game.tiebreaker",
+    "model": "game.wincondition",
     "pk": 1,
     "fields": {
       "result_config": 1,
+      "name": "Punkte",
+      "condition_type": "POINTS",
+      "order": 0
+    }
+  },
+  {
+    "model": "game.wincondition",
+    "pk": 5,
+    "fields": {
+      "result_config": 5,
+      "name": "Punkte",
+      "condition_type": "POINTS",
+      "order": 0
+    }
+  },
+  {
+    "model": "game.wincondition",
+    "pk": 6,
+    "fields": {
+      "result_config": 6,
+      "name": "Punkte",
+      "condition_type": "POINTS",
+      "order": 0
+    }
+  },
+  {
+    "model": "game.wincondition",
+    "pk": 7,
+    "fields": {
+      "result_config": 7,
+      "name": "Punkte",
+      "condition_type": "POINTS",
+      "order": 0
+    }
+  },
+  {
+    "model": "game.wincondition",
+    "pk": 8,
+    "fields": {
+      "result_config": 8,
+      "name": "Punkte",
+      "condition_type": "POINTS",
+      "order": 0
+    }
+  },
+  {
+    "model": "game.wincondition",
+    "pk": 23,
+    "fields": {
+      "result_config": 23,
+      "name": "Punkte",
+      "condition_type": "POINTS",
+      "order": 0
+    }
+  },
+  {
+    "model": "game.wincondition",
+    "pk": 24,
+    "fields": {
+      "result_config": 24,
+      "name": "Punkte",
+      "condition_type": "POINTS",
+      "order": 0
+    }
+  },
+  {
+    "model": "game.wincondition",
+    "pk": 25,
+    "fields": {
+      "result_config": 25,
+      "name": "Punkte",
+      "condition_type": "POINTS",
+      "order": 0
+    }
+  },
+  {
+    "model": "game.wincondition",
+    "pk": 26,
+    "fields": {
+      "result_config": 26,
+      "name": "Punkte",
+      "condition_type": "POINTS",
+      "order": 0
+    }
+  },
+  {
+    "model": "game.wincondition",
+    "pk": 27,
+    "fields": {
+      "result_config": 27,
+      "name": "Punkte",
+      "condition_type": "POINTS",
+      "order": 0
+    }
+  },
+  {
+    "model": "game.wincondition",
+    "pk": 28,
+    "fields": {
+      "result_config": 28,
+      "name": "Punkte",
+      "condition_type": "POINTS",
+      "order": 0
+    }
+  },
+  {
+    "model": "game.wincondition",
+    "pk": 29,
+    "fields": {
+      "result_config": 29,
+      "name": "Punkte",
+      "condition_type": "POINTS",
+      "order": 0
+    }
+  },
+  {
+    "model": "game.wincondition",
+    "pk": 30,
+    "fields": {
+      "result_config": 30,
+      "name": "Punkte",
+      "condition_type": "POINTS",
+      "order": 0
+    }
+  },
+  {
+    "model": "game.wincondition",
+    "pk": 31,
+    "fields": {
+      "result_config": 31,
+      "name": "Punkte",
+      "condition_type": "POINTS",
+      "order": 0
+    }
+  },
+  {
+    "model": "game.wincondition",
+    "pk": 32,
+    "fields": {
+      "result_config": 32,
+      "name": "Punkte",
+      "condition_type": "POINTS",
+      "order": 0
+    }
+  },
+  {
+    "model": "game.wincondition",
+    "pk": 33,
+    "fields": {
+      "result_config": 33,
+      "name": "Punkte",
+      "condition_type": "POINTS",
+      "order": 0
+    }
+  },
+  {
+    "model": "game.wincondition",
+    "pk": 34,
+    "fields": {
+      "result_config": 34,
+      "name": "Punkte",
+      "condition_type": "POINTS",
+      "order": 0
+    }
+  },
+  {
+    "model": "game.wincondition",
+    "pk": 35,
+    "fields": {
+      "result_config": 35,
+      "name": "Punkte",
+      "condition_type": "POINTS",
+      "order": 0
+    }
+  },
+  {
+    "model": "game.wincondition",
+    "pk": 36,
+    "fields": {
+      "result_config": 36,
+      "name": "Punkte",
+      "condition_type": "POINTS",
+      "order": 0
+    }
+  },
+  {
+    "model": "game.tiebreaker",
+    "pk": 1,
+    "fields": {
       "name": "Geld",
       "order": 0,
-      "higher_wins": true
+      "higher_wins": true,
+      "win_condition": 1
     }
   },
   {
     "model": "game.tiebreaker",
     "pk": 2,
     "fields": {
-      "result_config": 1,
       "name": "kartenziehen",
       "order": 10,
-      "higher_wins": true
+      "higher_wins": true,
+      "win_condition": 1
     }
   },
   {
     "model": "game.tiebreaker",
     "pk": 3,
     "fields": {
-      "result_config": 8,
-      "name": "Geb\u00e4ude",
+      "name": "Gebäude",
       "order": 0,
-      "higher_wins": true
+      "higher_wins": true,
+      "win_condition": 8
     }
   },
   {
     "model": "game.tiebreaker",
     "pk": 4,
     "fields": {
-      "result_config": 8,
       "name": "Credits",
       "order": 10,
-      "higher_wins": true
+      "higher_wins": true,
+      "win_condition": 8
     }
   },
   {
     "model": "game.tiebreaker",
     "pk": 5,
     "fields": {
-      "result_config": 24,
       "name": "Gold",
       "order": 10,
-      "higher_wins": true
+      "higher_wins": true,
+      "win_condition": 24
     }
   },
   {
     "model": "game.tiebreaker",
     "pk": 6,
     "fields": {
-      "result_config": 24,
       "name": "wenigste Pets",
       "order": 0,
-      "higher_wins": true
+      "higher_wins": true,
+      "win_condition": 24
     }
   },
   {
     "model": "game.tiebreaker",
     "pk": 7,
     "fields": {
-      "result_config": 25,
       "name": "Weine",
       "order": 10,
-      "higher_wins": true
+      "higher_wins": true,
+      "win_condition": 25
     }
   },
   {
     "model": "game.tiebreaker",
     "pk": 8,
     "fields": {
-      "result_config": 25,
       "name": "Trauben",
       "order": 20,
-      "higher_wins": true
+      "higher_wins": true,
+      "win_condition": 25
     }
   },
   {
     "model": "game.tiebreaker",
     "pk": 9,
     "fields": {
-      "result_config": 25,
       "name": "Lira",
       "order": 0,
-      "higher_wins": true
+      "higher_wins": true,
+      "win_condition": 25
     }
   },
   {
     "model": "game.tiebreaker",
     "pk": 10,
     "fields": {
-      "result_config": 26,
-      "name": "Auftr\u00e4ge",
+      "name": "Aufträge",
       "order": 0,
-      "higher_wins": true
+      "higher_wins": true,
+      "win_condition": 26
     }
   },
   {
     "model": "game.tiebreaker",
     "pk": 11,
     "fields": {
-      "result_config": 26,
       "name": "Ressourcen",
       "order": 10,
-      "higher_wins": true
+      "higher_wins": true,
+      "win_condition": 26
     }
   },
   {
     "model": "game.tiebreaker",
     "pk": 12,
     "fields": {
-      "result_config": 29,
-      "name": "Gunstpl\u00e4ttchen",
+      "name": "Gunstplättchen",
       "order": 10,
-      "higher_wins": true
+      "higher_wins": true,
+      "win_condition": 29
     }
   },
   {
     "model": "game.tiebreaker",
     "pk": 13,
     "fields": {
-      "result_config": 29,
-      "name": "Orakelpl\u00e4ttchen",
+      "name": "Orakelplättchen",
       "order": 5,
-      "higher_wins": true
+      "higher_wins": true,
+      "win_condition": 29
     }
   },
   {
     "model": "game.tiebreaker",
     "pk": 14,
     "fields": {
-      "result_config": 29,
-      "name": "Zur\u00fcckgekehrt zu Zeus nach Runden",
+      "name": "Zurückgekehrt zu Zeus nach Runden",
       "order": 0,
-      "higher_wins": true
+      "higher_wins": true,
+      "win_condition": 29
     }
   },
   {
     "model": "game.tiebreaker",
     "pk": 15,
     "fields": {
-      "result_config": 33,
-      "name": "Siedlungen Gr\u00f6\u00dfe 2",
+      "name": "Siedlungen Größe 2",
       "order": 20,
-      "higher_wins": true
+      "higher_wins": true,
+      "win_condition": 33
     }
   },
   {
     "model": "game.tiebreaker",
     "pk": 16,
     "fields": {
-      "result_config": 33,
-      "name": "Siedlungen  Gr\u00f6\u00dfe 6",
+      "name": "Siedlungen  Größe 6",
       "order": 60,
-      "higher_wins": true
+      "higher_wins": true,
+      "win_condition": 33
     }
   },
   {
     "model": "game.tiebreaker",
     "pk": 17,
     "fields": {
-      "result_config": 33,
-      "name": "Siedlungen  Gr\u00f6\u00dfe 1",
+      "name": "Siedlungen  Größe 1",
       "order": 10,
-      "higher_wins": true
+      "higher_wins": true,
+      "win_condition": 33
     }
   },
   {
     "model": "game.tiebreaker",
     "pk": 18,
     "fields": {
-      "result_config": 33,
-      "name": "Siedlungen  Gr\u00f6\u00dfe 5",
+      "name": "Siedlungen  Größe 5",
       "order": 50,
-      "higher_wins": true
+      "higher_wins": true,
+      "win_condition": 33
     }
   },
   {
     "model": "game.tiebreaker",
     "pk": 19,
     "fields": {
-      "result_config": 33,
-      "name": "Siedlungen  Gr\u00f6\u00dfe 4",
+      "name": "Siedlungen  Größe 4",
       "order": 40,
-      "higher_wins": true
+      "higher_wins": true,
+      "win_condition": 33
     }
   },
   {
     "model": "game.tiebreaker",
     "pk": 20,
     "fields": {
-      "result_config": 33,
       "name": "Siedlungen",
       "order": 0,
-      "higher_wins": true
+      "higher_wins": true,
+      "win_condition": 33
     }
   },
   {
     "model": "game.tiebreaker",
     "pk": 21,
     "fields": {
-      "result_config": 33,
-      "name": "Siedlungen Gr\u00f6\u00dfe 3",
+      "name": "Siedlungen Größe 3",
       "order": 30,
-      "higher_wins": true
+      "higher_wins": true,
+      "win_condition": 33
     }
   },
   {
     "model": "game.tiebreaker",
     "pk": 22,
     "fields": {
-      "result_config": 34,
       "name": "bezwungene Monster",
       "order": 10,
-      "higher_wins": true
+      "higher_wins": true,
+      "win_condition": 34
     }
   },
   {
     "model": "game.tiebreaker",
     "pk": 23,
     "fields": {
-      "result_config": 34,
       "name": "Nuggets",
       "order": 0,
-      "higher_wins": true
+      "higher_wins": true,
+      "win_condition": 34
     }
   },
   {
     "model": "game.tiebreaker",
     "pk": 24,
     "fields": {
-      "result_config": 35,
-      "name": "fr\u00fcher am verschollenen Tempel",
+      "name": "früher am verschollenen Tempel",
       "order": 0,
-      "higher_wins": true
+      "higher_wins": true,
+      "win_condition": 35
     }
   },
   {
     "model": "game.tiebreaker",
     "pk": 25,
     "fields": {
-      "result_config": 35,
-      "name": "Punkte f\u00fcr Forhscungsmarker",
+      "name": "Punkte für Forhscungsmarker",
       "order": 10,
-      "higher_wins": true
+      "higher_wins": true,
+      "win_condition": 35
     }
   },
   {
     "model": "game.tiebreaker",
     "pk": 26,
     "fields": {
-      "result_config": 36,
       "name": "huhu",
       "order": 10,
-      "higher_wins": true
+      "higher_wins": true,
+      "win_condition": 36
     }
   },
   {
@@ -69448,7 +69638,7 @@
     "pk": 1,
     "fields": {
       "game": 1,
-      "name": "Zooplan 2 (Freilauffl\u00e4chen)",
+      "name": "Zooplan 2 (Freilaufflächen)",
       "level": 0
     }
   },
@@ -69556,7 +69746,7 @@
     "pk": 13,
     "fields": {
       "game": 5,
-      "name": "D\u00fcsterlinge",
+      "name": "Düsterlinge",
       "level": 0
     }
   },
@@ -70006,7 +70196,7 @@
     "pk": 63,
     "fields": {
       "game": 26,
-      "name": "W\u00fcstent\u00f6chter",
+      "name": "Wüstentöchter",
       "level": 0
     }
   },
@@ -70024,7 +70214,7 @@
     "pk": 65,
     "fields": {
       "game": 26,
-      "name": "Seeb\u00e4ren",
+      "name": "Seebären",
       "level": 0
     }
   },
@@ -70132,7 +70322,7 @@
     "pk": 77,
     "fields": {
       "game": 29,
-      "name": "M\u00f6ngke Khan",
+      "name": "Möngke Khan",
       "level": 0
     }
   },
@@ -70222,7 +70412,7 @@
     "pk": 87,
     "fields": {
       "game": 30,
-      "name": "Geisterbeschw\u00f6rer",
+      "name": "Geisterbeschwörer",
       "level": 0
     }
   },
@@ -70321,7 +70511,7 @@
     "pk": 98,
     "fields": {
       "game": 32,
-      "name": "Schiffspl\u00e4ttchen 2",
+      "name": "Schiffsplättchen 2",
       "level": 0
     }
   },
@@ -70330,7 +70520,7 @@
     "pk": 99,
     "fields": {
       "game": 32,
-      "name": "Schiffspl\u00e4ttchen 4",
+      "name": "Schiffsplättchen 4",
       "level": 0
     }
   },
@@ -70339,7 +70529,7 @@
     "pk": 100,
     "fields": {
       "game": 32,
-      "name": "Schiffspl\u00e4ttchen 7",
+      "name": "Schiffsplättchen 7",
       "level": 0
     }
   },
@@ -70348,7 +70538,7 @@
     "pk": 101,
     "fields": {
       "game": 32,
-      "name": "Schiffspl\u00e4ttchen 3",
+      "name": "Schiffsplättchen 3",
       "level": 0
     }
   },
@@ -70357,7 +70547,7 @@
     "pk": 102,
     "fields": {
       "game": 32,
-      "name": "Schiffspl\u00e4ttchen 5",
+      "name": "Schiffsplättchen 5",
       "level": 0
     }
   },
@@ -70366,7 +70556,7 @@
     "pk": 103,
     "fields": {
       "game": 32,
-      "name": "Schiffspl\u00e4ttchen 6",
+      "name": "Schiffsplättchen 6",
       "level": 0
     }
   },
@@ -70375,7 +70565,7 @@
     "pk": 104,
     "fields": {
       "game": 32,
-      "name": "Schiffspl\u00e4ttchen 1",
+      "name": "Schiffsplättchen 1",
       "level": 0
     }
   },
@@ -70384,7 +70574,7 @@
     "pk": 105,
     "fields": {
       "game": 32,
-      "name": "Schiffspl\u00e4ttchen 8",
+      "name": "Schiffsplättchen 8",
       "level": 0
     }
   },
@@ -124028,7 +124218,7 @@
     "model": "chat.chat",
     "pk": 155,
     "fields": {
-      "text": "Just checked the standings... Pro Player 3, how's the view from down there? \ud83d\ude09",
+      "text": "Just checked the standings... Pro Player 3, how's the view from down there? 😉",
       "user": 15,
       "datetime": "2026-02-11T22:29:58.452Z",
       "label": ""
@@ -124608,7 +124798,7 @@
     "model": "chat.chat",
     "pk": 213,
     "fields": {
-      "text": "Just checked the standings... Pro Player 4, how's the view from down there? \ud83d\ude09",
+      "text": "Just checked the standings... Pro Player 4, how's the view from down there? 😉",
       "user": 14,
       "datetime": "2026-02-11T22:29:58.825Z",
       "label": ""
@@ -124718,7 +124908,7 @@
     "model": "chat.chat",
     "pk": 224,
     "fields": {
-      "text": "Just checked the standings... Pro Player 3, how's the view from down there? \ud83d\ude09",
+      "text": "Just checked the standings... Pro Player 3, how's the view from down there? 😉",
       "user": 19,
       "datetime": "2026-02-11T22:29:58.905Z",
       "label": ""
@@ -125118,7 +125308,7 @@
     "model": "chat.chat",
     "pk": 264,
     "fields": {
-      "text": "Anyone else think the dice were rigged for Pro Player 8 today? \ud83d\ude02",
+      "text": "Anyone else think the dice were rigged for Pro Player 8 today? 😂",
       "user": 15,
       "datetime": "2026-02-11T22:29:59.185Z",
       "label": ""
@@ -125198,7 +125388,7 @@
     "model": "chat.chat",
     "pk": 272,
     "fields": {
-      "text": "Just checked the standings... Pro Player 1, how's the view from down there? \ud83d\ude09",
+      "text": "Just checked the standings... Pro Player 1, how's the view from down there? 😉",
       "user": 15,
       "datetime": "2026-02-11T22:29:59.232Z",
       "label": ""
@@ -125238,7 +125428,7 @@
     "model": "chat.chat",
     "pk": 276,
     "fields": {
-      "text": "Anyone else think the dice were rigged for Pro Player 8 today? \ud83d\ude02",
+      "text": "Anyone else think the dice were rigged for Pro Player 8 today? 😂",
       "user": 14,
       "datetime": "2026-02-11T22:29:59.257Z",
       "label": ""
@@ -125378,7 +125568,7 @@
     "model": "chat.chat",
     "pk": 290,
     "fields": {
-      "text": "Anyone else think the dice were rigged for Pro Player 7 today? \ud83d\ude02",
+      "text": "Anyone else think the dice were rigged for Pro Player 7 today? 😂",
       "user": 15,
       "datetime": "2026-02-11T22:29:59.349Z",
       "label": ""
@@ -126108,7 +126298,7 @@
     "model": "chat.chat",
     "pk": 363,
     "fields": {
-      "text": "Just checked the standings... Pro Player 6, how's the view from down there? \ud83d\ude09",
+      "text": "Just checked the standings... Pro Player 6, how's the view from down there? 😉",
       "user": 14,
       "datetime": "2026-02-11T22:29:59.853Z",
       "label": ""
@@ -126478,7 +126668,7 @@
     "model": "chat.chat",
     "pk": 400,
     "fields": {
-      "text": "Just checked the standings... Pro Player 8, how's the view from down there? \ud83d\ude09",
+      "text": "Just checked the standings... Pro Player 8, how's the view from down there? 😉",
       "user": 18,
       "datetime": "2026-02-11T22:30:00.119Z",
       "label": ""
@@ -126538,7 +126728,7 @@
     "model": "chat.chat",
     "pk": 406,
     "fields": {
-      "text": "Just checked the standings... Pro Player 7, how's the view from down there? \ud83d\ude09",
+      "text": "Just checked the standings... Pro Player 7, how's the view from down there? 😉",
       "user": 18,
       "datetime": "2026-02-11T22:30:00.158Z",
       "label": ""
@@ -126658,7 +126848,7 @@
     "model": "chat.chat",
     "pk": 418,
     "fields": {
-      "text": "Anyone else think the dice were rigged for Pro Player 3 today? \ud83d\ude02",
+      "text": "Anyone else think the dice were rigged for Pro Player 3 today? 😂",
       "user": 14,
       "datetime": "2026-02-11T22:30:00.241Z",
       "label": ""
@@ -126718,7 +126908,7 @@
     "model": "chat.chat",
     "pk": 424,
     "fields": {
-      "text": "Just checked the standings... Pro Player 1, how's the view from down there? \ud83d\ude09",
+      "text": "Just checked the standings... Pro Player 1, how's the view from down there? 😉",
       "user": 21,
       "datetime": "2026-02-11T22:30:00.280Z",
       "label": ""
@@ -126728,7 +126918,7 @@
     "model": "chat.chat",
     "pk": 425,
     "fields": {
-      "text": "Just checked the standings... Pro Player 2, how's the view from down there? \ud83d\ude09",
+      "text": "Just checked the standings... Pro Player 2, how's the view from down there? 😉",
       "user": 14,
       "datetime": "2026-02-11T22:30:00.286Z",
       "label": ""
@@ -126848,7 +127038,7 @@
     "model": "chat.chat",
     "pk": 437,
     "fields": {
-      "text": "Just checked the standings... Pro Player 8, how's the view from down there? \ud83d\ude09",
+      "text": "Just checked the standings... Pro Player 8, how's the view from down there? 😉",
       "user": 16,
       "datetime": "2026-02-11T22:30:00.369Z",
       "label": ""
@@ -126958,7 +127148,7 @@
     "model": "chat.chat",
     "pk": 448,
     "fields": {
-      "text": "Just checked the standings... Pro Player 8, how's the view from down there? \ud83d\ude09",
+      "text": "Just checked the standings... Pro Player 8, how's the view from down there? 😉",
       "user": 15,
       "datetime": "2026-02-11T22:30:00.441Z",
       "label": ""
@@ -127078,7 +127268,7 @@
     "model": "chat.chat",
     "pk": 460,
     "fields": {
-      "text": "Anyone else think the dice were rigged for Pro Player 6 today? \ud83d\ude02",
+      "text": "Anyone else think the dice were rigged for Pro Player 6 today? 😂",
       "user": 18,
       "datetime": "2026-02-11T22:30:00.518Z",
       "label": ""
@@ -127368,7 +127558,7 @@
     "model": "chat.chat",
     "pk": 489,
     "fields": {
-      "text": "Just checked the standings... Pro Player 7, how's the view from down there? \ud83d\ude09",
+      "text": "Just checked the standings... Pro Player 7, how's the view from down there? 😉",
       "user": 19,
       "datetime": "2026-02-11T22:30:00.735Z",
       "label": ""
@@ -127588,7 +127778,7 @@
     "model": "chat.chat",
     "pk": 511,
     "fields": {
-      "text": "Just checked the standings... Pro Player 4, how's the view from down there? \ud83d\ude09",
+      "text": "Just checked the standings... Pro Player 4, how's the view from down there? 😉",
       "user": 18,
       "datetime": "2026-02-11T22:30:00.901Z",
       "label": ""
@@ -127628,7 +127818,7 @@
     "model": "chat.chat",
     "pk": 515,
     "fields": {
-      "text": "Anyone else think the dice were rigged for Pro Player 8 today? \ud83d\ude02",
+      "text": "Anyone else think the dice were rigged for Pro Player 8 today? 😂",
       "user": 14,
       "datetime": "2026-02-11T22:30:00.937Z",
       "label": ""
@@ -127898,7 +128088,7 @@
     "model": "chat.chat",
     "pk": 542,
     "fields": {
-      "text": "Anyone else think the dice were rigged for Pro Player 7 today? \ud83d\ude02",
+      "text": "Anyone else think the dice were rigged for Pro Player 7 today? 😂",
       "user": 14,
       "datetime": "2026-02-11T22:30:01.140Z",
       "label": ""
@@ -127998,7 +128188,7 @@
     "model": "chat.chat",
     "pk": 552,
     "fields": {
-      "text": "Just checked the standings... Pro Player 3, how's the view from down there? \ud83d\ude09",
+      "text": "Just checked the standings... Pro Player 3, how's the view from down there? 😉",
       "user": 21,
       "datetime": "2026-02-11T22:30:01.212Z",
       "label": ""
@@ -128068,7 +128258,7 @@
     "model": "chat.chat",
     "pk": 559,
     "fields": {
-      "text": "Just checked the standings... Pro Player 8, how's the view from down there? \ud83d\ude09",
+      "text": "Just checked the standings... Pro Player 8, how's the view from down there? 😉",
       "user": 20,
       "datetime": "2026-02-11T22:30:01.262Z",
       "label": ""
@@ -128288,7 +128478,7 @@
     "model": "chat.chat",
     "pk": 581,
     "fields": {
-      "text": "Just checked the standings... Pro Player 6, how's the view from down there? \ud83d\ude09",
+      "text": "Just checked the standings... Pro Player 6, how's the view from down there? 😉",
       "user": 17,
       "datetime": "2026-02-11T22:30:01.405Z",
       "label": ""
@@ -128328,7 +128518,7 @@
     "model": "chat.chat",
     "pk": 585,
     "fields": {
-      "text": "Anyone else think the dice were rigged for Pro Player 6 today? \ud83d\ude02",
+      "text": "Anyone else think the dice were rigged for Pro Player 6 today? 😂",
       "user": 14,
       "datetime": "2026-02-11T22:30:01.430Z",
       "label": ""
@@ -128468,7 +128658,7 @@
     "model": "chat.chat",
     "pk": 599,
     "fields": {
-      "text": "Anyone else think the dice were rigged for Pro Player 3 today? \ud83d\ude02",
+      "text": "Anyone else think the dice were rigged for Pro Player 3 today? 😂",
       "user": 21,
       "datetime": "2026-02-11T22:30:01.533Z",
       "label": ""
