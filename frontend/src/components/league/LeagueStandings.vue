@@ -185,7 +185,6 @@ const fetchStandings = async () => {
 
 onMounted(fetchStandings);
 
-formatNumbers()
 const rows = computed(() => {
   return [...standings.value].sort((a, b) => {
     if (b.league_points !== a.league_points)
