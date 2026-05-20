@@ -52,6 +52,7 @@ export const useUpdateStore = defineStore('update', () => {
 
     if (!pollTimer) {
       startPolling();
+      void checkUpdates();
     }
 
     return () => unsubscribe(topic, callback);
