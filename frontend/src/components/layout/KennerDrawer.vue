@@ -13,8 +13,7 @@
     <!-- Drawer Content -->
     <div class="col scroll q-px-sm">
       <q-list class="q-py-sm">
-        <DrawerSubGroup>General</DrawerSubGroup>
-        <DrawerItem icon="feedback" icon-color="orange-8" label="Feedback" forward-name="feedback" />
+        <DrawerSubGroup>Browse</DrawerSubGroup>
         <DrawerItem
           icon="calendar_month"
           icon-color="blue-8"
@@ -22,13 +21,32 @@
           forward-name="seasons"
         />
         <DrawerItem icon="group" icon-color="teal-7" label="Members" forward-name="users" />
+
+        <q-separator class="q-my-sm drawer-separator" />
+        <DrawerSubGroup>Info</DrawerSubGroup>
         <DrawerItem icon="gavel" icon-color="primary" label="Rules" forward-name="rules" />
+
+        <q-separator class="q-my-sm drawer-separator" />
+        <DrawerSubGroup>Contribute</DrawerSubGroup>
+        <DrawerItem icon="feedback" icon-color="orange-8" label="Feedback" forward-name="feedback" />
         <DrawerItem
           icon="task_alt"
           icon-color="green-7"
           label="Task Board"
           forward-name="taskboard"
         />
+
+        <template v-if="isAdmin">
+          <q-separator class="q-my-sm drawer-separator" />
+          <DrawerSubGroup>Management</DrawerSubGroup>
+          <DrawerItem icon="casino" icon-color="indigo-7" label="Games" forward-name="games" />
+          <DrawerItem
+            icon="forward_to_inbox"
+            icon-color="deep-purple-7"
+            label="Invitations"
+            forward-name="invitations"
+          />
+        </template>
 
         <q-separator class="q-my-sm drawer-separator" />
         <DrawerSubGroup>Appearance</DrawerSubGroup>
@@ -53,18 +71,6 @@
             />
           </q-item-section>
         </q-item>
-
-        <template v-if="isAdmin">
-          <q-separator class="q-my-sm drawer-separator" />
-          <DrawerSubGroup>Management</DrawerSubGroup>
-          <DrawerItem icon="casino" icon-color="indigo-7" label="Games" forward-name="games" />
-          <DrawerItem
-            icon="forward_to_inbox"
-            icon-color="deep-purple-7"
-            label="Invitations"
-            forward-name="invitations"
-          />
-        </template>
 
       </q-list>
     </div>
