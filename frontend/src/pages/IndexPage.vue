@@ -2,7 +2,7 @@
   <q-page class="column col q-pa-none">
     <HomeAnnouncements :is-mobile="isMobile" />
 
-    <div class="q-pa-md q-mx-auto home-page-container">
+    <div class="q-mx-auto home-page-container" :class="[{ 'q-pa-md': !isMobile }, isMobile ? 'col column' : '']">
       <WelcomeSection
         v-if="showWelcome"
         :is-authenticated="isAuthenticated"
@@ -39,6 +39,11 @@ const showWelcome = computed(
 .home-page-container {
   max-width: 1300px;
   width: 100%;
+}
+
+.home-page-container.col {
+  flex: 1 1 auto;
+  min-height: 0;
 }
 
 @media (min-width: 1024px) {

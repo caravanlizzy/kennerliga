@@ -1,5 +1,5 @@
 <template>
-  <div :id="id">
+  <div :id="id" class="welcome-section-root">
     <template v-if="!isAuthenticated">
       <div
         class="column items-center justify-center relative-position q-mb-xl"
@@ -55,9 +55,9 @@
     <template v-else>
       <div
         class="relative-position"
-        :class="isMobile ? 'q-pa-none' : 'q-px-lg q-pt-md q-pb-none q-mb-md'"
+        :class="[isMobile ? 'q-pa-none auth-mobile-wrap' : 'q-px-lg q-pt-md q-pb-none q-mb-md']"
       >
-        <div class="relative-position" style="z-index: 1">
+        <div class="relative-position" :class="isMobile ? 'auth-mobile-inner' : ''" style="z-index: 1">
           <div
             v-if="!isMobile"
             :class="[isMobile ? 'text-h5' : 'text-h4', 'text-weight-bold text-dark tracking-tighter']"
@@ -117,5 +117,26 @@ onUnmounted(() => {
 
 .border-top-subtle {
   border-top: 1px solid rgba(54, 64, 88, 0.08);
+}
+
+.welcome-section-root {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.auth-mobile-wrap {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.auth-mobile-inner {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
 }
 </style>

@@ -1,42 +1,25 @@
 <template>
-  <div class="launcher-container q-pa-md">
-    <div class="staggered-list">
-      <template v-for="tile in tiles" :key="tile.title">
-        <div
-          v-if="tile.visible"
-          v-ripple
-          class="launcher-tile cursor-pointer relative-position"
-          :class="[
-            `theme-${tile.color}`,
-            tile.featured ? 'featured-tile' : ''
-          ]"
-          @click="navigateTo(tile.route)"
-        >
-          <div class="tile-inner row no-wrap items-center">
-            <div class="tile-icon-box flex flex-center">
-              <q-icon
-                :name="tile.icon"
-                size="32px"
-                class="main-icon"
-              />
-              <div class="icon-blob"></div>
-            </div>
-
-            <div class="tile-info q-ml-lg col">
-              <div class="row items-center justify-between">
-                <div>
-                  <div class="text-h6 text-weight-bold title-text">{{ tile.title }}</div>
-                  <div class="text-caption text-grey-7 description-text">{{ tile.description }}</div>
-                </div>
-              </div>
-            </div>
+  <div class="launcher-container">
+    <template v-for="(tile, idx) in visibleTiles" :key="tile.title">
+      <div
+        v-ripple
+        class="launcher-row"
+        :class="{ 'is-featured': tile.featured }"
+        @click="navigateTo(tile.route)"
+      >
+        <div class="row no-wrap items-center q-px-md q-py-md">
+          <div class="row-icon-box flex flex-center">
+            <q-icon :name="tile.icon" size="36px" class="row-icon" />
           </div>
 
-          <!-- Decorative element -->
-          <div class="decorative-circle"></div>
+          <div class="col q-ml-md">
+            <div class="row-title">{{ tile.title }}</div>
+            <div class="row-description">{{ tile.description }}</div>
+          </div>
         </div>
-      </template>
-    </div>
+        <q-separator v-if="idx < visibleTiles.length - 1" class="row-divider" />
+      </div>
+    </template>
   </div>
 </template>
 
@@ -53,7 +36,6 @@ const tiles = computed(() => [
     title: 'My League',
     description: 'Pick, post and see standings',
     icon: 'ads_click',
-    color: 'secondary',
     route: { name: 'my-league' },
     visible: !!userStore.user?.myCurrentLeagueId,
     featured: true,
@@ -62,7 +44,6 @@ const tiles = computed(() => [
     title: 'Seasons',
     description: 'Browse past and current seasons',
     icon: 'military_tech',
-    color: 'blue',
     route: { name: 'mobile-seasons' },
     visible: true,
     featured: false,
@@ -71,7 +52,6 @@ const tiles = computed(() => [
     title: 'Leaderboard',
     description: 'Check who is currently on top',
     icon: 'stars',
-    color: 'orange',
     route: { name: 'mobile-leaderboard' },
     visible: true,
     featured: false,
@@ -80,7 +60,6 @@ const tiles = computed(() => [
     title: 'Live',
     description: 'Get info about what is going on in the leagues',
     icon: 'bolt',
-    color: 'deep-purple',
     route: { name: 'mobile-live' },
     visible: true,
     featured: false,
@@ -89,12 +68,13 @@ const tiles = computed(() => [
     title: 'Chat',
     description: 'Connect with other league members',
     icon: 'chat',
-    color: 'teal',
     route: { name: 'mobile-chat' },
     visible: true,
     featured: false,
   },
 ]);
+
+const visibleTiles = computed(() => tiles.value.filter(t => t.visible));
 
 function navigateTo(route: Record<string, unknown>) {
   router.push(route as any);
@@ -103,138 +83,74 @@ function navigateTo(route: Record<string, unknown>) {
 
 <style scoped lang="scss">
 .launcher-container {
-  max-width: 600px;
-  margin: 0 auto;
-}
-
-.tracking-tighter {
-  letter-spacing: -1.5px;
-}
-
-.staggered-list {
+  width: 100%;
+  background: white;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  min-height: 100%;
+  flex: 1 1 auto;
 }
 
-.launcher-tile {
-  background: white;
-  border-radius: 28px;
-  padding: 16px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
-  border: 1px solid rgba(0, 0, 0, 0.04);
-  transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
-  overflow: hidden;
+.launcher-row {
+  position: relative;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  flex: 1 1 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+
+  > .row {
+    flex: 1 1 auto;
+  }
 
   &:hover {
-    transform: translateX(8px);
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
-    border-color: rgba(0, 0, 0, 0.08);
-
-    .icon-blob {
-      transform: scale(1.2) rotate(15deg);
-    }
+    background-color: rgba(0, 0, 0, 0.03);
   }
 
   &:active {
-    transform: scale(0.98) translateX(4px);
+    background-color: rgba(0, 0, 0, 0.05);
+  }
+
+  &.is-featured {
+    background-color: rgba(0, 0, 0, 0.015);
+
+    .row-title {
+      font-size: 1.3rem;
+    }
+
+    .row-icon {
+      color: var(--q-primary);
+    }
   }
 }
 
-.tile-inner {
-  position: relative;
-  z-index: 2;
+.row-icon-box {
+  width: 48px;
+  height: 48px;
+  flex-shrink: 0;
 }
 
-.tile-icon-box {
-  width: 64px;
-  height: 64px;
-  position: relative;
-
-  .main-icon {
-    color: var(--theme-color);
-    z-index: 2;
-  }
-
-  .icon-blob {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    background: var(--theme-bg);
-    border-radius: 22px;
-    z-index: 1;
-    transition: all 0.5s ease;
-  }
+.row-icon {
+  color: #607d8b;
 }
 
-.title-text {
+.row-title {
+  font-size: 1.2rem;
+  font-weight: 600;
   color: #1a1a1a;
-  letter-spacing: -0.5px;
-  margin-bottom: 2px;
+  letter-spacing: -0.2px;
+  line-height: 1.25;
 }
 
-.description-text {
-  font-size: 0.8rem;
-  line-height: 1.2;
+.row-description {
+  font-size: 0.9rem;
+  color: #78909c;
+  line-height: 1.3;
+  margin-top: 4px;
 }
 
-.decorative-circle {
-  position: absolute;
-  top: -20px;
-  right: -20px;
-  width: 80px;
-  height: 80px;
-  background: var(--theme-bg);
-  border-radius: 50%;
-  opacity: 0.3;
-  z-index: 1;
-}
-
-/* Featured Tile Styles */
-.featured-tile {
-  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
-  padding: 24px;
-  border: 2px solid var(--theme-bg);
-
-  .tile-icon-box {
-    width: 72px;
-    height: 72px;
-  }
-
-  .title-text {
-    font-size: 1.4rem;
-  }
-}
-
-/* Theme color definitions */
-.theme-secondary {
-  --theme-color: #26c6da;
-  --theme-bg: #e0f7fa;
-}
-.theme-blue {
-  --theme-color: #2196f3;
-  --theme-bg: #e3f2fd;
-}
-.theme-orange {
-  --theme-color: #ff9800;
-  --theme-bg: #fff3e0;
-}
-.theme-deep-purple {
-  --theme-color: #673ab7;
-  --theme-bg: #ede7f6;
-}
-.theme-teal {
-  --theme-color: #009688;
-  --theme-bg: #e0f2f1;
-}
-
-@media (min-width: 600px) {
-  .staggered-list {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-  }
-  .featured-tile {
-    grid-column: span 2;
-  }
+.row-divider {
+  background-color: rgba(0, 0, 0, 0.06);
 }
 </style>

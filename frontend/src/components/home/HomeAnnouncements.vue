@@ -3,7 +3,7 @@
     <AnnouncementDisplay class="col-12 q-px-md" />
   </div>
 
-  <div v-else class="q-mb-md">
+  <div v-else>
     <AnnouncementDisplay />
   </div>
 </template>
