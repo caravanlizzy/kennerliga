@@ -59,6 +59,9 @@ def finalize_results(
         rebuild_game_snapshot(selected_game, win_mode="fractional")
         rebuild_league_snapshot(league, win_mode="fractional")
 
+        from league.services import touch_league
+        touch_league(league)
+
         # Mark league as DONE when all SelectedGames in this league have results uploaded
         member_count = league.members.count()
         # Get all SelectedGames that belong to this league, excluding successfully banned ones

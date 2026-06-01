@@ -234,6 +234,12 @@ def set_league_active_player(league: League, participant) -> None:
     league.save(update_fields=["active_player", "updated_at"])
 
 
+def touch_league(league: League) -> None:
+    from django.utils import timezone
+    league.updated_at = timezone.now()
+    league.save(update_fields=["updated_at"])
+
+
 def rotate_active_player(
     league: League, reverse_order: bool = False, members=None
 ) -> Optional[SeasonParticipant]:
@@ -249,8 +255,10 @@ def rotate_active_player(
         i = ordered_players.index(current)
         next_player = ordered_players[(i + 1) % len(ordered_players)]
 
+    from django.utils import timezone
     league.active_player = next_player
-    league.save(update_fields=["active_player"])
+    league.updated_at = timezone.now()
+    league.save(update_fields=["active_player", "updated_at"])
     return next_player
 
 
@@ -258,9 +266,11 @@ def rotate_active_player(
 def advance_turn(league: League):
     if league.status == LeagueStatus.PICKING:
         if q.all_players_have_picked(league):
+            from django.utils import timezone
             league.status = LeagueStatus.BANNING
             league.active_player = q.get_members_ordered(league).first()
-            league.save(update_fields=["status", "active_player"])
+            league.updated_at = timezone.now()
+            league.save(update_fields=["status", "active_player", "updated_at"])
         else:
             if q.is_two_player_league(league):
                 if q.both_players_exactly_one_pick(league):
@@ -269,9 +279,11 @@ def advance_turn(league: League):
 
     elif league.status == LeagueStatus.REPICKING:
         if q.all_repickers_have_repicked(league):
+            from django.utils import timezone
             league.status = LeagueStatus.PLAYING
             league.active_player = None
-            league.save(update_fields=["status", "active_player"])
+            league.updated_at = timezone.now()
+            league.save(update_fields=["status", "active_player", "updated_at"])
         else:
             players_to_repick = q.get_players_to_repick(league)
             # rotate_active_player expects a queryset (uses order_by),
@@ -282,15 +294,18 @@ def advance_turn(league: League):
     elif league.status == LeagueStatus.BANNING:
         if q.all_players_have_banned(league):
             players_to_repick = q.get_players_to_repick(league)
+            from django.utils import timezone
             if players_to_repick:
                 league.status = LeagueStatus.REPICKING
-                league.save(update_fields=["status"])
+                league.updated_at = timezone.now()
+                league.save(update_fields=["status", "updated_at"])
                 qs = league.members.filter(id__in=[m.id for m in players_to_repick])
                 rotate_active_player(league, members=qs)
             else:
                 league.status = LeagueStatus.PLAYING
                 league.active_player = None
-                league.save(update_fields=["status", "active_player"])
+                league.updated_at = timezone.now()
+                league.save(update_fields=["status", "active_player", "updated_at"])
         else:
             rotate_active_player(league)
 
@@ -300,10 +315,14 @@ def advance_turn(league: League):
 def select_game(league: League, player, game):
     if league.active_player != player:
         raise ValueError("It's not this player's turn to select a game.")
-    return SelectedGame.objects.create(league=league, player=player, game=game)
+    selected = SelectedGame.objects.create(league=league, player=player, game=game)
+    touch_league(league)
+    return selected
 
 
 def ban_game(league: League, player, game):
     if league.active_player != player:
         raise ValueError("It's not this player's turn to ban a game.")
-    return BanDecision.objects.create(league=league, player=player, game=game)
+    ban = BanDecision.objects.create(league=league, player=player, game=game)
+    touch_league(league)
+    return ban
