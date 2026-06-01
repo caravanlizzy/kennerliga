@@ -228,8 +228,10 @@ def get_full_standings_data(league: League) -> Dict:
 
 
 def set_league_active_player(league: League, participant) -> None:
+    from django.utils import timezone
     league.active_player = participant
-    league.save(update_fields=["active_player"])
+    league.updated_at = timezone.now()
+    league.save(update_fields=["active_player", "updated_at"])
 
 
 def rotate_active_player(
