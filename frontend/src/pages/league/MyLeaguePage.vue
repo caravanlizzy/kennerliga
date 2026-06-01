@@ -25,6 +25,7 @@
 
       <LeagueStandingsSection />
       <GameSelectionSection />
+      <BanGameSection />
       <ResultsSection />
       <ReportResultsSection />
       <PlayersSection />
@@ -39,6 +40,7 @@ import ActionBar from 'components/ui/ActionBar.vue';
 import LoadingSpinner from 'components/base/LoadingSpinner.vue';
 import LeagueStandingsSection from 'components/league/sections/LeagueStandingsSection.vue';
 import GameSelectionSection from 'components/league/sections/GameSelectionSection.vue';
+import BanGameSection from 'components/league/sections/BanGameSection.vue';
 import ResultsSection from 'components/league/sections/ResultsSection.vue';
 import ReportResultsSection from 'components/league/sections/ReportResultsSection.vue';
 import PlayersSection from 'components/league/sections/PlayersSection.vue';
