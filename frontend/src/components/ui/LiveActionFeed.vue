@@ -67,9 +67,9 @@
                     </q-badge>
 
                     <q-badge
-                      :style="{ backgroundColor: getColorHex(event.type) }"
-                      class="text-weight-bold"
-                      style="font-size: 0.65rem"
+                      outline
+                      :style="{ color: getColorHex(event.type), borderColor: getColorHex(event.type) }"
+                      class="text-weight-bold event-badge"
                     >
                       {{ getEventDisplayType(event.type) }}
                     </q-badge>
@@ -276,6 +276,15 @@ function getColorHex(type: TLiveEventType) {
   :global(.body--dark) &::-webkit-scrollbar-thumb {
     background: rgba(255, 255, 255, 0.15);
   }
+}
+
+.event-badge {
+  font-size: 0.65rem;
+  letter-spacing: 0.06em;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: transparent !important;
+  border-width: 1px;
 }
 
 .event-card {
