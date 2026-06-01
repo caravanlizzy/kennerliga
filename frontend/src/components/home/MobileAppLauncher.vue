@@ -4,7 +4,6 @@
       <div
         v-ripple
         class="launcher-row"
-        :class="{ 'is-featured': tile.featured }"
         @click="navigateTo(tile.route)"
       >
         <div class="row no-wrap items-center q-px-md q-py-md">
@@ -38,7 +37,6 @@ const tiles = computed(() => [
     icon: 'ads_click',
     route: { name: 'my-league' },
     visible: !!userStore.user?.myCurrentLeagueId,
-    featured: true,
   },
   {
     title: 'Seasons',
@@ -46,7 +44,6 @@ const tiles = computed(() => [
     icon: 'military_tech',
     route: { name: 'mobile-seasons' },
     visible: true,
-    featured: false,
   },
   {
     title: 'Leaderboard',
@@ -54,7 +51,6 @@ const tiles = computed(() => [
     icon: 'stars',
     route: { name: 'mobile-leaderboard' },
     visible: true,
-    featured: false,
   },
   {
     title: 'Live',
@@ -62,7 +58,6 @@ const tiles = computed(() => [
     icon: 'bolt',
     route: { name: 'mobile-live' },
     visible: true,
-    featured: false,
   },
   {
     title: 'Chat',
@@ -70,7 +65,6 @@ const tiles = computed(() => [
     icon: 'chat',
     route: { name: 'mobile-chat' },
     visible: true,
-    featured: false,
   },
 ]);
 
@@ -84,7 +78,7 @@ function navigateTo(route: Record<string, unknown>) {
 <style scoped lang="scss">
 .launcher-container {
   width: 100%;
-  background: white;
+  background: #faf8f5;
   display: flex;
   flex-direction: column;
   min-height: 100%;
@@ -110,18 +104,6 @@ function navigateTo(route: Record<string, unknown>) {
 
   &:active {
     background-color: rgba(0, 0, 0, 0.05);
-  }
-
-  &.is-featured {
-    background-color: rgba(0, 0, 0, 0.015);
-
-    .row-title {
-      font-size: 1.3rem;
-    }
-
-    .row-icon {
-      color: var(--q-primary);
-    }
   }
 }
 
