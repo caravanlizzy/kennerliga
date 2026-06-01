@@ -34,7 +34,7 @@
         <KennerButton
           flat
           dense
-          color="secondary"
+          color="primary"
           icon="visibility"
           :label="isMobile ? undefined : 'View'"
           :to="{ name: 'season-overview', params: { id: props.row.id } }"
@@ -44,7 +44,7 @@
           v-if="isAdmin"
           flat
           dense
-          color="primary"
+          color="secondary"
           icon="settings"
           :label="isMobile ? undefined : 'Manage'"
           :to="{ name: 'season-manage', params: { id: props.row.id } }"
