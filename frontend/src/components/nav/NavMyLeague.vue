@@ -3,7 +3,7 @@
     <KennerButton
       v-if="isAuthenticated && user?.myCurrentLeagueId"
       :to="{ name: 'my-league' }"
-      unelevated
+      flat
       color="primary"
       shape="squircle"
       class="league-btn text-weight-bold"
@@ -12,8 +12,8 @@
       no-caps
     >
       <div class="row items-center no-wrap">
-        <q-icon name="ads_click" :color="isMeActivePlayer ? 'warning' : 'secondary'" :class="{ 'q-mr-xs': !isMobile }" />
-        <span v-if="!isMobile" class="text-grey-1">My League</span>
+        <q-icon name="ads_click" :color="isMeActivePlayer ? 'warning' : 'primary'" :class="{ 'q-mr-xs': !isMobile }" />
+        <span v-if="!isMobile" class="text-primary">My League</span>
       </div>
       <q-badge v-if="isMeActivePlayer" floating rounded class="notification-dot" color="warning" />
     </KennerButton>
