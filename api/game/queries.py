@@ -48,7 +48,7 @@ def get_selected_game_ids_for_league_including_related(league: League) -> set[in
     return get_game_ids_including_related(selected_game_ids)
 
 
-def get_max_selected_game_ids_for_profile_in_season_including_related(
+def get_max_selected_game_ids_for_profile_in_year_including_related(
     profile,
     season,
     excluded_selected_game_id: Optional[int] = None,
@@ -56,7 +56,7 @@ def get_max_selected_game_ids_for_profile_in_season_including_related(
     selected_games = (
         SelectedGame.objects.filter(
             profile=profile,
-            league__season=season,
+            league__season__year=season.year,
         )
         .select_related("game")
         .prefetch_related("game__related_games")

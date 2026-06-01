@@ -36,7 +36,7 @@ from result.models import Result
 from .queries import (
     get_all_games,
     get_selected_game_ids_for_league_including_related,
-    get_max_selected_game_ids_for_profile_in_season_including_related,
+    get_max_selected_game_ids_for_profile_in_year_including_related,
 )
 
 
@@ -70,7 +70,7 @@ class GameViewSet(ModelViewSet):
                         league
                     )
                     max_selected = (
-                        get_max_selected_game_ids_for_profile_in_season_including_related(
+                        get_max_selected_game_ids_for_profile_in_year_including_related(
                             self.request.user.profile,
                             league.season,
                         )

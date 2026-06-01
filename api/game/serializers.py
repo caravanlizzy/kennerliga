@@ -223,7 +223,7 @@ class SelectedGameSerializer(serializers.ModelSerializer):
     def _validate_season_selection_limit(self, game, league, profile):
         excluded_selected_game_id = self.instance.id if self.instance else None
 
-        max_selected_game_ids = game_q.get_max_selected_game_ids_for_profile_in_season_including_related(
+        max_selected_game_ids = game_q.get_max_selected_game_ids_for_profile_in_year_including_related(
             profile=profile,
             season=league.season,
             excluded_selected_game_id=excluded_selected_game_id,
