@@ -74,16 +74,16 @@ const light = 45
 
 const avatarStyle = computed(() => {
   const baseHue = hue.value;
-  const bgColor = `hsla(${baseHue}, ${sat}%, ${light}%, 0.85)`;
-  const borderColor = `hsla(${baseHue}, ${sat}%, ${Math.max(light - 10, 20)}%, 0.2)`;
-  const textColor = '#ffffff';
+  const bgColor = 'transparent';
+  const borderColor = `hsla(${baseHue}, ${sat}%, ${light}%, 0.45)`;
+  const textColor = `hsla(${baseHue}, ${sat}%, ${Math.max(light - 5, 25)}%, 1)`;
 
   return {
     '--avatar-bg-color': bgColor,
     '--avatar-border-color': borderColor,
     '--avatar-text-color': textColor,
     backgroundColor: bgColor,
-    boxShadow: `0 2px 8px hsla(${baseHue}, ${sat}%, 20%, 0.1)`
+    boxShadow: 'none'
   } as Record<string, string>
 })
 
@@ -114,7 +114,7 @@ const shapeClass = computed(() => {
   justify-content: center;
   flex-shrink: 0;
   cursor: pointer;
-  border: 1px solid var(--avatar-border-color);
+  border: none;
   color: var(--avatar-text-color);
   transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
@@ -124,8 +124,8 @@ const shapeClass = computed(() => {
 }
 
 .user-avatar:hover {
+  background-color: rgba(0, 0, 0, 0.06) !important;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08) !important;
-  border-color: rgba(0, 0, 0, 0.1);
 }
 
 .avatar-inner {
