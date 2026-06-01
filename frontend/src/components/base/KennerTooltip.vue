@@ -1,18 +1,16 @@
 <template>
   <q-tooltip
-    class="kenner-tooltip bg-white text-dark rounded-borders shadow-2 q-px-md q-py-sm text-caption"
-    :delay="400"
-    :hide-delay="100"
+    class="kenner-tooltip"
+    :delay="300"
+    :hide-delay="0"
     anchor="top middle"
     self="bottom middle"
-    transition-show="jump-up"
+    transition-show="fade"
     transition-hide="fade"
-    :offset="[10, 10]"
+    :offset="[0, 6]"
     :style="tooltipStyle"
   >
-    <div class="column items-center justify-center">
-      <slot />
-    </div>
+    <slot />
   </q-tooltip>
 </template>
 
@@ -26,17 +24,32 @@ const props = defineProps<{
 const tooltipStyle = computed(() => {
   if (!props.color) return {}
   return {
-    border: `2px solid ${props.color}`,
+    borderColor: props.color,
   }
 })
 </script>
 
-<style scoped lang="scss">
+<style lang="scss">
 .kenner-tooltip {
-  border: 1px solid rgba(0, 0, 0, 0.05);
+  background: #ffffff !important;
+  color: #1f2329 !important;
+  font-size: 12.5px;
   font-weight: 500;
-  backdrop-filter: blur(4px);
-  background: rgba(255, 255, 255, 0.95) !important;
+  letter-spacing: 0.01em;
+  line-height: 1.4;
+  padding: 6px 10px !important;
+  border-radius: 6px !important;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+  white-space: nowrap;
+  max-width: 280px;
+}
+
+body.body--dark .kenner-tooltip {
+  background: #2a2f36 !important;
+  color: #f5f5f5 !important;
+  border-color: rgba(255, 255, 255, 0.14);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
 }
 </style>
 
