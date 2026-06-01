@@ -128,14 +128,12 @@
           <!-- Player -->
           <td class="text-left relative-position q-py-md">
             <div class="row items-center q-gutter-x-md">
-              <UserAvatar
-                :display-username="row.profile_name"
-                :navigation-name="row.username"
-                size="32px"
-              />
               <div class="column">
                 <div class="row items-center q-gutter-x-sm">
-                  <span class="text-subtitle2 text-weight-bold leaderboard-player-name">{{ row.profile_name }}</span>
+                  <span
+                    class="text-subtitle2 text-weight-bold leaderboard-player-name cursor-pointer username-link"
+                    @click="$router.push({ name: 'user-detail', params: { username: row.username } })"
+                  >{{ row.profile_name }}</span>
                   <q-icon
                     v-if="index === 0"
                     name="stars"
@@ -256,7 +254,6 @@ import { api } from 'boot/axios';
 import { ref, watch } from 'vue';
 import LoadingSpinner from 'components/base/LoadingSpinner.vue';
 import ErrorDisplay from 'components/base/ErrorDisplay.vue';
-import UserAvatar from 'components/ui/UserAvatar.vue';
 import { leagueColors } from '../../composables/leagueColors';
 
 const props = defineProps<{ year: number }>();
@@ -355,6 +352,8 @@ watch(
 
 .leaderboard-header-text { color: var(--leaderboard-header-text, #616161); } /* text-grey-8 */
 .leaderboard-player-name { color: var(--leaderboard-player-text, #212121); } /* text-grey-9 */
+.username-link { transition: color 0.2s ease; }
+.username-link:hover { color: var(--q-primary); text-decoration: underline; }
 .leaderboard-rank-text { color: var(--leaderboard-rank-text, #757575); } /* text-grey-7 */
 .leaderboard-count-text { color: var(--leaderboard-count-text, #212121); } /* text-grey-9 */
 .leaderboard-count-text-subtle { color: var(--leaderboard-count-text-subtle, #424242); } /* text-grey-8 */

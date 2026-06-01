@@ -57,20 +57,24 @@
             <div class="row items-center no-wrap">
               <template v-if="props.row.username">
                 <div class="row items-center no-wrap q-gutter-x-sm">
-                  <UserAvatar
-                    :display-username="props.row.username"
-                    size="28px"
-                  >
-                    <KennerTooltip v-if="isMobile && props.row.username">
+                  <div v-if="isMobile">
+                    <span
+                      class="text-weight-bold cursor-pointer username-link"
+                      @click="$router.push({ name: 'user-detail', params: { username: props.row.username } })"
+                    >
                       {{ props.row.username }}
-                    </KennerTooltip>
-                  </UserAvatar>
-                  <div v-if="!isMobile" class="column">
-                    <span class="text-subtitle2 text-weight-bold line-height-1">
+                    </span>
+                    <KennerTooltip>{{ props.row.username }}</KennerTooltip>
+                  </div>
+                  <div v-else class="column">
+                    <span
+                      class="text-subtitle2 text-weight-bold line-height-1 cursor-pointer username-link"
+                      @click="$router.push({ name: 'user-detail', params: { username: props.row.username } })"
+                    >
                       {{ props.row.username }}
                     </span>
                     <span
-                      v-if="!isMobile && props.row.profile_name && props.row.profile_name !== props.row.username"
+                      v-if="props.row.profile_name && props.row.profile_name !== props.row.username"
                       class="text-caption text-grey-6"
                       style="font-size: 0.7rem; line-height: 1"
                     >
@@ -248,6 +252,13 @@
 .border-orange-2 {
   border: 1px solid #ffcc80;
 }
+.username-link {
+  transition: color 0.2s ease;
+}
+.username-link:hover {
+  color: var(--q-primary);
+  text-decoration: underline;
+}
 </style>
 
 <script setup lang="ts">
@@ -256,7 +267,6 @@ import { api } from 'boot/axios';
 import LoadingSpinner from 'components/base/LoadingSpinner.vue';
 import type { QTableColumn } from 'quasar';
 import { useResponsive } from 'src/composables/responsive';
-import UserAvatar from 'components/ui/UserAvatar.vue';
 import KennerTooltip from 'components/base/KennerTooltip.vue';
 import KennerButton from 'components/base/KennerButton.vue';
 
