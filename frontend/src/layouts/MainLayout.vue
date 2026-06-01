@@ -25,10 +25,8 @@
       <div class="column full-height kenner-drawer-container">
         <div class="q-pa-lg q-mb-sm row items-center border-bottom-subtle bg-chat-header">
           <div class="row items-center">
-            <q-icon name="chat" color="teal" size="32px" class="q-mr-sm" />
-            <span class="text-h5 text-weight-bolder tracking-tighter" style="letter-spacing: -1px;">
-              <span class="text-teal">Kenner</span><span class="text-grey-9 chat-title-suffix">Chat</span>
-            </span>
+            <q-icon name="chat" color="grey-8" size="28px" class="q-mr-sm" />
+            <span class="text-h6 text-weight-medium text-grey-9">Chat</span>
           </div>
           <q-space />
           <q-btn flat round dense icon="close" color="grey-7" class="hover-scale" @click="toggleChat">

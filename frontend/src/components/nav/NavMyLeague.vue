@@ -12,8 +12,8 @@
       no-caps
     >
       <div class="row items-center no-wrap">
-        <q-icon name="ads_click" color="secondary" :class="{ 'q-mr-xs': !isMobile }" />
-        <span v-if="!isMobile">My League</span>
+        <q-icon name="ads_click" :color="isMeActivePlayer ? 'warning' : 'secondary'" :class="{ 'q-mr-xs': !isMobile }" />
+        <span v-if="!isMobile" class="text-grey-1">My League</span>
       </div>
       <q-badge v-if="isMeActivePlayer" floating rounded class="notification-dot" color="warning" />
     </KennerButton>

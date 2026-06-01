@@ -2,7 +2,7 @@
   <div v-if="!isMobile" class="row items-center no-wrap">
     <KennerButton
       unelevated
-      color="teal"
+      color="grey-8"
       flat
       shape="squircle"
       class="chat-btn"
@@ -42,11 +42,11 @@ const unreadCount = computed(() => 0);
   transition: all 0.3s ease;
 
   &.is-active {
-    background: rgba($teal, 0.1) !important;
+    background: rgba(0, 0, 0, 0.06) !important;
   }
 
   &:hover {
-    background: rgba($teal, 0.05) !important;
+    background: rgba(0, 0, 0, 0.03) !important;
   }
 }
 
