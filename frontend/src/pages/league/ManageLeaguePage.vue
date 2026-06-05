@@ -53,7 +53,19 @@
             >
               {{ season?.name }}
             </q-chip>
+            <KennerSelect
+              v-if="isAdmin"
+              emit-value
+              map-options
+              :model-value="league?.status"
+              :options="statusOptions"
+              :loading="updatingStatus"
+              label="Status"
+              style="min-width: 160px"
+              @update:model-value="onStatusChange"
+            />
             <q-chip
+              v-else
               square
               :color="season?.status === 'RUNNING' ? 'positive' : 'grey-7'"
               text-color="white"
@@ -151,6 +163,7 @@ import { fetchSeason } from 'src/services/seasonService';
 import ContentSection from 'components/base/ContentSection.vue';
 import KennerTooltip from 'components/base/KennerTooltip.vue';
 import KennerButton from 'components/base/KennerButton.vue';
+import KennerSelect from 'components/base/KennerSelect.vue';
 import ErrorDisplay from 'components/base/ErrorDisplay.vue';
 import LoadingSpinner from 'components/base/LoadingSpinner.vue';
 import MemberGameCard from 'components/league/manager/MemberGameCard.vue';
@@ -158,11 +171,23 @@ import EmptyMembersState from 'components/league/manager/EmptyMembersState.vue';
 import LeagueStandings from 'components/league/LeagueStandings.vue';
 import ManagerFormsDialog, { TActiveForm } from 'components/league/manager/ManagerFormsDialog.vue';
 import { useDialog } from 'src/composables/dialog';
+import { storeToRefs } from 'pinia';
+import { useUserStore } from 'src/stores/userStore';
 import type { TSeasonDto, TLeagueDto, TSelectedGameDto, TMatchResult, TSeasonParticipantDto } from 'src/types';
 
 const route = useRoute();
 const $q = useQuasar();
 const { setDialog } = useDialog();
+const { isAdmin } = storeToRefs(useUserStore());
+
+const statusOptions = [
+  { label: 'Picking', value: 'PICKING' },
+  { label: 'Banning', value: 'BANNING' },
+  { label: 'Repicking', value: 'REPICKING' },
+  { label: 'Playing', value: 'PLAYING' },
+  { label: 'Done', value: 'DONE' },
+];
+const updatingStatus = ref(false);
 
 const league = ref<TLeagueDto | null>(null);
 const season = ref<TSeasonDto | null>(null);
@@ -197,6 +222,23 @@ async function load() {
     error.value = e?.message || 'Failed to load league/season data.';
   } finally {
     loading.value = false;
+  }
+}
+
+async function onStatusChange(newStatus: string) {
+  if (!league.value || !newStatus || newStatus === league.value.status) return;
+  updatingStatus.value = true;
+  try {
+    const { data } = await api.post(
+      `league/leagues/${league.value.id}/set-status/`,
+      { status: newStatus }
+    );
+    league.value.status = data.status;
+    $q.notify({ type: 'positive', message: `Status set to ${data.status}` });
+  } catch (e) {
+    $q.notify({ type: 'negative', message: 'Failed to set league status' });
+  } finally {
+    updatingStatus.value = false;
   }
 }
 

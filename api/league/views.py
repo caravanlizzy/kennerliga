@@ -11,6 +11,7 @@ from league.models import (
     League,
     LeagueStanding,
     GameStanding,
+    LeagueStatus,
     LeagueTieResolution,
     LeagueTieResolutionEntry,
     TieResolutionReason,
@@ -47,7 +48,7 @@ class LeagueViewSet(ModelViewSet):
         return super().get_serializer_class()
 
     def get_permissions(self):
-        if self.action in ["rebuild_standings", "resolve_tie"]:
+        if self.action in ["rebuild_standings", "resolve_tie", "set_status"]:
             return [IsAdminUser()]
         return super().get_permissions()
 
@@ -301,6 +302,33 @@ class LeagueViewSet(ModelViewSet):
 
         return Response(
             {"participant_id": season_participant.id}, status=status.HTTP_200_OK
+        )
+
+    @action(detail=True, methods=["post"], url_path="set-status")
+    def set_status(self, request, pk=None):
+        """
+        Set the league status. Admin-only.
+        Expects { "status": "<one of LeagueStatus choices>" } in the request data.
+        """
+        league = self.get_object()
+        new_status = request.data.get("status")
+
+        valid_values = [choice for choice, _ in LeagueStatus.choices]
+        if new_status not in valid_values:
+            return Response(
+                {
+                    "detail": "Invalid status.",
+                    "valid_values": valid_values,
+                },
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        league.status = new_status
+        league.save(update_fields=["status", "updated_at"])
+
+        return Response(
+            {"id": league.id, "status": league.status},
+            status=status.HTTP_200_OK,
         )
 
 
