@@ -57,19 +57,24 @@
     <template v-else>
       <div
         class="relative-position"
-        :class="[isMobile ? 'q-pa-none auth-mobile-wrap' : 'q-px-lg q-pt-md q-pb-none q-mb-md']"
+        :class="[isMobile ? 'q-pa-none auth-mobile-wrap' : 'q-pa-none q-mb-md']"
       >
         <div class="relative-position" :class="isMobile ? 'auth-mobile-inner' : ''" style="z-index: 1">
-          <div
-            v-if="!isMobile"
-            :class="[isMobile ? 'text-h5' : 'text-h4', 'text-weight-bold text-dark tracking-tighter']"
-            style="letter-spacing: -1px;"
+          <q-card
+            flat
+            bordered
+            class="combined-card q-pa-lg"
+            :class="isMobile ? 'combined-card--mobile' : 'q-mt-xl'"
           >
-            Welcome back!
-          </div>
-          <MobileAppLauncher v-if="isMobile" />
-
-          <ReleaseNotesSection :class="isMobile ? 'q-px-md' : ''" />
+            <div :class="isMobile ? '' : 'row q-col-gutter-lg items-start'">
+              <div :class="isMobile ? '' : 'col-12 col-md-6'">
+                <PurposeSection />
+              </div>
+              <div :class="isMobile ? 'q-mt-md combined-divider-mobile q-pt-md' : 'col-12 col-md-6 combined-divider-desktop'">
+                <ReleaseNotesSection />
+              </div>
+            </div>
+          </q-card>
         </div>
       </div>
     </template>
@@ -77,8 +82,8 @@
 </template>
 
 <script setup lang="ts">
-import MobileAppLauncher from 'components/home/MobileAppLauncher.vue';
 import ReleaseNotesSection from 'components/home/ReleaseNotesSection.vue';
+import PurposeSection from 'components/home/PurposeSection.vue';
 import KennerButton from 'components/base/KennerButton.vue';
 import { useResponsive } from 'src/composables/responsive';
 import { onMounted, onUnmounted } from 'vue';
@@ -143,5 +148,40 @@ onUnmounted(() => {
   flex-direction: column;
   flex: 1 1 auto;
   min-height: 0;
+}
+
+.combined-card {
+  border-radius: 9px;
+  background: white;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+}
+
+.combined-card--mobile {
+  margin: 0;
+  border-left: none;
+  border-right: none;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.combined-divider-mobile {
+  border-top: 1px solid rgba(54, 64, 88, 0.08);
+}
+
+.combined-divider-desktop {
+  position: relative;
+}
+
+@media (min-width: 1024px) {
+  .combined-divider-desktop::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 1px;
+    background: rgba(54, 64, 88, 0.08);
+  }
 }
 </style>
