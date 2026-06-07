@@ -9,11 +9,40 @@
       style="height: 44px; min-width: 44px;"
     >
       <div class="row items-center no-wrap brand-wrap">
-        <q-icon
-          name="img:icons/favicon.svg"
+        <svg
           class="brand-k-icon"
           :class="{ 'brand-k-icon--mobile': isMobile }"
-        />
+          viewBox="0 0 1024 1024"
+          xmlns="http://www.w3.org/2000/svg"
+          aria-hidden="true"
+          focusable="false"
+        >
+          <defs>
+            <linearGradient id="brandKGradient" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stop-color="#ff7a59" />
+              <stop offset="100%" stop-color="#ec4899" />
+            </linearGradient>
+          </defs>
+          <path
+            d="M512 0L955.5 256V768L512 1024L68.5 768V256L512 0Z"
+            fill="url(#brandKGradient)"
+          />
+          <path
+            d="M380 320V704"
+            stroke="#ffffff"
+            stroke-width="80"
+            stroke-linecap="round"
+            fill="none"
+          />
+          <path
+            d="M680 320L440 512L680 704"
+            stroke="#ffffff"
+            stroke-width="80"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            fill="none"
+          />
+        </svg>
         <span
           v-if="!isMobile"
           class="text-h5 text-weight-bold tracking-tight brand-text"
@@ -44,6 +73,7 @@ const { isMobile } = useResponsive();
 }
 
 .brand-k-icon {
+  display: inline-block;
   font-size: 2rem;
   height: 2rem;
   width: 2rem;
