@@ -64,9 +64,9 @@
             flat
             bordered
             class="combined-card q-pa-lg"
-            :class="[isMobile ? 'combined-card--mobile' : 'q-mt-md', { 'combined-card--collapsed': !expanded }]"
+            :class="[isMobile ? 'combined-card--mobile' : 'q-mt-md', { 'combined-card--collapsed': !expanded && !isMobile }]"
           >
-            <div class="combined-card__content" :class="{ 'combined-card__content--collapsed': !expanded }">
+            <div class="combined-card__content" :class="{ 'combined-card__content--collapsed': !expanded && !isMobile }">
               <div :class="isMobile ? '' : 'row q-col-gutter-lg items-start'">
                 <div :class="isMobile ? '' : 'col-12 col-md-6'">
                   <PurposeSection />
@@ -75,9 +75,9 @@
                   <ReleaseNotesSection />
                 </div>
               </div>
-              <div v-if="!expanded" class="combined-card__fade" />
+              <div v-if="!expanded && !isMobile" class="combined-card__fade" />
             </div>
-            <div class="row justify-center q-mt-sm">
+            <div v-if="!isMobile" class="row justify-center q-mt-sm">
               <q-btn
                 flat
                 dense
