@@ -2,7 +2,7 @@
   <ContentSection
     id="leaderboard"
     icon="stars"
-    title="Leaderboard"
+    title="Hall of Fame"
     class="col-12"
     color="secondary"
   >

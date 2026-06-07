@@ -12,20 +12,20 @@
     <div class="q-px-lg q-py-md row items-center justify-between border-bottom-subtle">
       <div class="row items-center q-gutter-x-sm">
         <q-icon name="analytics" color="primary" size="20px" />
-        <span class="text-subtitle2 text-weight-bold leaderboard-header-text">Annual Championship</span>
+        <span class="text-subtitle2 text-weight-bold leaderboard-header-text">Annual Leaderboard</span>
       </div>
       <q-btn-toggle
         v-model="showAllLeagues"
         toggle-color="primary"
-        color="toggle-bg"
-        text-color="primary"
+        text-color="grey-7"
         unelevated
         dense
-        rounded
-        class="border-primary-1 full-width-mobile"
+        no-caps
+        spread
+        class="league-toggle"
         :options="[
-          { label: 'Highest League', value: false },
-          { label: 'All Leagues', value: true }
+          { label: 'Highest', value: false },
+          { label: 'All', value: true }
         ]"
       />
     </div>
@@ -375,14 +375,29 @@ watch(
   }
 }
 
-.full-width-mobile {
+.league-toggle {
+  flex: 0 0 auto;
+  width: 200px;
+  background: rgba(0, 0, 0, 0.04);
+  border-radius: 999px;
+  padding: 2px;
+
+  :deep(.q-btn) {
+    flex: 1 1 0;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 600;
+    min-height: 28px;
+    padding: 2px 10px;
+  }
+
+  :deep(.q-btn__content) {
+    white-space: nowrap;
+  }
+
   @media (max-width: 480px) {
     width: 100%;
     margin-top: 12px;
-
-    :deep(.q-btn) {
-      flex: 1;
-    }
   }
 }
 
