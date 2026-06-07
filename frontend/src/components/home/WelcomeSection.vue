@@ -64,15 +64,30 @@
             flat
             bordered
             class="combined-card q-pa-lg"
-            :class="isMobile ? 'combined-card--mobile' : 'q-mt-md'"
+            :class="[isMobile ? 'combined-card--mobile' : 'q-mt-md', { 'combined-card--collapsed': !expanded }]"
           >
-            <div :class="isMobile ? '' : 'row q-col-gutter-lg items-start'">
-              <div :class="isMobile ? '' : 'col-12 col-md-6'">
-                <PurposeSection />
+            <div class="combined-card__content" :class="{ 'combined-card__content--collapsed': !expanded }">
+              <div :class="isMobile ? '' : 'row q-col-gutter-lg items-start'">
+                <div :class="isMobile ? '' : 'col-12 col-md-6'">
+                  <PurposeSection />
+                </div>
+                <div :class="isMobile ? 'q-mt-md combined-divider-mobile q-pt-md' : 'col-12 col-md-6 combined-divider-desktop'">
+                  <ReleaseNotesSection />
+                </div>
               </div>
-              <div :class="isMobile ? 'q-mt-md combined-divider-mobile q-pt-md' : 'col-12 col-md-6 combined-divider-desktop'">
-                <ReleaseNotesSection />
-              </div>
+              <div v-if="!expanded" class="combined-card__fade" />
+            </div>
+            <div class="row justify-center q-mt-sm">
+              <q-btn
+                flat
+                dense
+                no-caps
+                size="sm"
+                color="primary"
+                :icon-right="expanded ? 'expand_less' : 'expand_more'"
+                :label="expanded ? 'Show less' : 'Show more'"
+                @click="expanded = !expanded"
+              />
             </div>
           </q-card>
         </div>
@@ -86,7 +101,7 @@ import ReleaseNotesSection from 'components/home/ReleaseNotesSection.vue';
 import PurposeSection from 'components/home/PurposeSection.vue';
 import KennerButton from 'components/base/KennerButton.vue';
 import { useResponsive } from 'src/composables/responsive';
-import { onMounted, onUnmounted } from 'vue';
+import { onMounted, onUnmounted, ref } from 'vue';
 
 withDefaults(
   defineProps<{
@@ -99,6 +114,7 @@ withDefaults(
 );
 
 const { isMobile } = useResponsive();
+const expanded = ref(false);
 
 onMounted(() => {
   // Navigation registration removed
@@ -155,6 +171,29 @@ onUnmounted(() => {
   background: white;
   border: 1px solid rgba(0, 0, 0, 0.08);
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+}
+
+.combined-card__content {
+  position: relative;
+}
+
+.combined-card__content--collapsed {
+  max-height: 160px;
+  overflow: hidden;
+}
+
+.combined-card__fade {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 60px;
+  pointer-events: none;
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 0) 0%, white 100%);
+}
+
+body.body--dark .combined-card__fade {
+  background: linear-gradient(to bottom, rgba(30, 30, 30, 0) 0%, #1e1e1e 100%);
 }
 
 .combined-card--mobile {
