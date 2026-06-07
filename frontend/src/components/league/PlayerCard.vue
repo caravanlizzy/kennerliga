@@ -311,9 +311,9 @@ function formatBannerNames(names: string[]) {
   text-decoration-thickness: 1.5px;
 }
 
-:global(.body--dark) .member-section {
-  background: #1e1e1e;
-  border-color: rgba(255, 255, 255, 0.08);
+body.body--dark .member-section {
+  background: #1e1e1e !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
 
   &:hover {
@@ -321,28 +321,28 @@ function formatBannerNames(names: string[]) {
   }
 }
 
-:global(.body--dark) .member-header {
+body.body--dark .member-header {
   background: linear-gradient(to right, rgba(144, 202, 249, 0.05), transparent);
   border-bottom-color: rgba(255, 255, 255, 0.06);
 }
 
-:global(.body--dark) .player-name {
+body.body--dark .player-name {
   color: #ececec;
 }
 
-:global(.body--dark) .game-item-container {
+body.body--dark .game-item-container {
   border-bottom-color: rgba(255, 255, 255, 0.05);
 }
 
-:global(.body--dark) .game-name {
+body.body--dark .game-name {
   color: #ececec;
 }
 
-:global(.body--dark) .platform-label {
+body.body--dark .platform-label {
   color: #9aa4ad;
 }
 
-:global(.body--dark) .ban-action-item {
+body.body--dark .ban-action-item {
   background: rgba(144, 164, 174, 0.08);
   border-top-color: rgba(255, 255, 255, 0.04);
   border-bottom-color: rgba(255, 255, 255, 0.04);
@@ -355,11 +355,11 @@ function formatBannerNames(names: string[]) {
   }
 }
 
-:global(.body--dark) .banned-by-label {
+body.body--dark .banned-by-label {
   color: #8a96a3;
 }
 
-:global(.body--dark) .game-details {
+body.body--dark .game-details {
   border-top-color: rgba(255, 255, 255, 0.08);
   background: rgba(255, 255, 255, 0.02);
 }

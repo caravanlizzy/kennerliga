@@ -102,6 +102,11 @@ defineProps<{
     font-weight: 700;
   }
 
+  body.body--dark &.q-field--float .q-field__label {
+    background: #1e1e1e !important;
+    color: var(--q-primary) !important;
+  }
+
   &.q-field--error {
     border-color: var(--q-negative) !important;
     background: rgba(255, 0, 0, 0.03);
