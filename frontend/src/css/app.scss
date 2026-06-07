@@ -83,7 +83,9 @@
 }
 
 .main-container {
-  background: #f5f7fa; // Light greyish background for better contrast with white cards
+  // Warmer, softer background: gentle cream-to-warm-beige gradient
+  background: linear-gradient(180deg, #fbf7f2 0%, #f3ece2 100%);
+  background-attachment: fixed;
   min-height: 100vh;
 }
 

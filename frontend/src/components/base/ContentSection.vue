@@ -7,9 +7,9 @@
     <div
       class="section-watermark absolute-top-right q-ma-md"
       :class="`text-${color}`"
-      style="opacity: 0.04; pointer-events: none; transform: rotate(-15deg)"
+      style="opacity: 0.03; pointer-events: none; transform: rotate(-15deg)"
     >
-      <q-icon :name="icon" size="140px" />
+      <q-icon :name="icon" size="120px" />
     </div>
 
 
@@ -99,27 +99,40 @@
 
   <style scoped lang="scss">
 .content-section-container {
-  transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
   position: relative;
   background: white;
-  border-radius: 9px;
-  border: 1px solid rgba(0, 0, 0, 0.08);
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+  border-radius: 10px;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.05);
   overflow: hidden;
 
-  &.indicator-primary { border-top: 4px solid var(--q-primary); --separator-color: var(--q-primary); }
-  &.indicator-secondary { border-top: 4px solid var(--q-secondary); --separator-color: var(--q-secondary); }
-  &.indicator-accent { border-top: 4px solid var(--q-accent); --separator-color: var(--q-accent); }
-  &.indicator-dark { border-top: 4px solid var(--q-dark); --separator-color: var(--q-dark); }
-  &.indicator-info { border-top: 4px solid var(--q-info); --separator-color: var(--q-info); }
-  &.indicator-warning { border-top: 4px solid var(--q-warning); --separator-color: var(--q-warning); }
-  &.indicator-negative { border-top: 4px solid var(--q-negative); --separator-color: var(--q-negative); }
-  &.indicator-positive { border-top: 4px solid var(--q-positive); --separator-color: var(--q-positive); }
+  // Subtle accent top stripe (thinner / softer than the original)
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: var(--accent-color);
+    opacity: 0.55;
+    pointer-events: none;
+    z-index: 2;
+  }
+
+  &.indicator-primary { --separator-color: var(--q-primary); --accent-color: var(--q-primary); }
+  &.indicator-secondary { --separator-color: var(--q-secondary); --accent-color: var(--q-secondary); }
+  &.indicator-accent { --separator-color: var(--q-accent); --accent-color: var(--q-accent); }
+  &.indicator-dark { --separator-color: var(--q-dark); --accent-color: var(--q-dark); }
+  &.indicator-info { --separator-color: var(--q-info); --accent-color: var(--q-info); }
+  &.indicator-warning { --separator-color: var(--q-warning); --accent-color: var(--q-warning); }
+  &.indicator-negative { --separator-color: var(--q-negative); --accent-color: var(--q-negative); }
+  &.indicator-positive { --separator-color: var(--q-positive); --accent-color: var(--q-positive); }
 }
 
   .section-header {
-    padding: 0 0 12px 0;
-    border-bottom: 1px solid color-mix(in srgb, var(--separator-color, black) 12%, transparent);
+    padding: 0 0 10px 0;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
 
     :deep(.q-item) {
       padding: 0;
@@ -133,12 +146,6 @@
 
   .section-watermark {
     z-index: 0;
-    transition: all 0.3s ease;
     pointer-events: none;
-  }
-
-  .content-section-container:hover .section-watermark {
-    opacity: 0.08 !important;
-    transform: rotate(-10deg) scale(1.1) !important;
   }
   </style>
