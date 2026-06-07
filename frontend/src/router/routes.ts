@@ -67,6 +67,18 @@ const routes: RouteRecordRaw[] = [
     ],
   },
   {
+    path: '/release-notes',
+    component: () => import('layouts/MainLayout.vue'),
+    meta: { requiresAuth: true, requiresAdmin: true },
+    children: [
+      {
+        path: '',
+        name: 'release-notes',
+        component: () => import('pages/ReleaseNoteManagementPage.vue'),
+      },
+    ],
+  },
+  {
     path: '/taskboard',
     component: () => import('layouts/MainLayout.vue'),
     meta: { requiresAuth: true },

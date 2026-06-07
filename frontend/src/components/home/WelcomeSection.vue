@@ -49,6 +49,8 @@
               An account is required to view league details and participate.
             </span>
           </div>
+
+          <ReleaseNotesSection :class="isMobile ? 'q-px-md' : 'q-px-lg'" />
         </div>
       </div>
     </template>
@@ -66,6 +68,8 @@
             Welcome back!
           </div>
           <MobileAppLauncher v-if="isMobile" />
+
+          <ReleaseNotesSection :class="isMobile ? 'q-px-md' : ''" />
         </div>
       </div>
     </template>
@@ -74,6 +78,7 @@
 
 <script setup lang="ts">
 import MobileAppLauncher from 'components/home/MobileAppLauncher.vue';
+import ReleaseNotesSection from 'components/home/ReleaseNotesSection.vue';
 import KennerButton from 'components/base/KennerButton.vue';
 import { useResponsive } from 'src/composables/responsive';
 import { onMounted, onUnmounted } from 'vue';

@@ -53,6 +53,7 @@ MY_APPS = [
     "league",
     "season",
     "announcement",
+    "release_note",
     "result",
     "user",
     "taskboard",

@@ -3,5 +3,6 @@ export * from './user';
 export * from './league';
 export * from './game';
 export * from './announcement';
+export * from './releaseNote';
 export * from './events';
 export * from './taskboard';
