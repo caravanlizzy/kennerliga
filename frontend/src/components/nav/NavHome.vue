@@ -17,7 +17,7 @@
         <span
           v-if="!isMobile"
           class="text-h5 text-weight-bold tracking-tight brand-text"
-        ><span class="text-primary">enner</span><span class="text-accent">Liga</span></span>
+        ><span class="brand-text__word">enner</span><span class="brand-text__word">Liga</span></span>
       </div>
     </KennerButton>
 
@@ -32,15 +32,22 @@ const { isMobile } = useResponsive();
 </script>
 
 <style scoped lang="scss">
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@600;700;800&display=swap');
+
 .brand-wrap {
   line-height: 1;
+  text-transform: none;
+}
+
+:deep(.q-btn__content) {
+  text-transform: none;
 }
 
 .brand-k-icon {
-  font-size: 1.6rem;
-  height: 1.6rem;
-  width: 1.6rem;
-  margin-right: -2px;
+  font-size: 2rem;
+  height: 2rem;
+  width: 2rem;
+  margin-right: -1px;
   position: relative;
   top: 1px;
 }
@@ -50,7 +57,18 @@ const { isMobile } = useResponsive();
 }
 
 .brand-text {
-  letter-spacing: -0.5px;
+  font-family: 'Outfit', 'Segoe UI', system-ui, sans-serif;
+  font-weight: 600;
+  letter-spacing: 0.01em;
   line-height: 1;
+  font-size: 1.5rem;
+}
+
+.brand-text__word {
+  color: #1a2233;
+}
+
+:global(.body--dark) .brand-text__word {
+  color: #f1f5f9;
 }
 </style>
