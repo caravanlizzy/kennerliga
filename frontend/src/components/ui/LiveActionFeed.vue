@@ -13,15 +13,16 @@
       <!-- League Filters -->
       <div
         v-if="availableLeagues.length > 1"
-        class="row q-gutter-xs q-mb-md q-px-xs"
+        class="row q-gutter-xs q-mb-md q-px-xs league-filter-row"
       >
         <q-chip
           clickable
+          dense
           :outline="!isAllSelected"
           :color="isAllSelected ? 'primary' : 'grey-7'"
           text-color="white"
           size="sm"
-          class="text-weight-bold"
+          class="text-weight-bold league-filter-chip"
           @click="toggleAllLeagues"
         >
           All
@@ -30,11 +31,12 @@
           v-for="lvl in availableLeagues"
           :key="lvl"
           clickable
+          dense
           :outline="!selectedLeagues.has(lvl)"
           :color="selectedLeagues.has(lvl) ? 'primary' : 'grey-7'"
           text-color="white"
           size="sm"
-          class="text-weight-bold"
+          class="text-weight-bold league-filter-chip"
           @click="toggleLeagueFilter(lvl)"
         >
           L{{ lvl }}
@@ -44,37 +46,33 @@
       <div
         v-for="event in filteredEvents"
         :key="event.id"
-        class="event-item q-mb-md"
+        class="event-item q-mb-sm"
       >
         <q-card
           flat
-          bordered
-          class="event-card"
+          :class="['event-card', `event-card--${event.type.toLowerCase()}`]"
+          :style="{ '--event-color': getColorHex(event.type) }"
         >
-          <q-card-section class="q-pa-sm">
+          <q-card-section class="q-pa-sm q-pl-md">
             <div class="row items-center no-wrap">
               <div class="col">
                 <div
-                  class="text-caption text-grey-7 flex justify-between items-center"
+                  class="text-caption flex justify-between items-center event-meta"
                 >
-                  <span class="row items-center q-gutter-x-sm">
+                  <span class="row items-center q-gutter-x-xs">
                     <q-badge
                       :color="getLeagueColor(Number(event.leagueLevel))"
-                      class="text-weight-bold"
-                      style="font-size: 0.65rem"
+                      class="text-weight-bold league-badge"
                     >
                       L{{ event.leagueLevel }}
                     </q-badge>
 
-                    <q-badge
-                      outline
-                      :style="{ color: getColorHex(event.type), borderColor: getColorHex(event.type) }"
-                      class="text-weight-bold event-badge"
-                    >
+                    <span class="event-type-pill">
+                      <q-icon :name="getEventIcon(event.type)" size="12px" class="q-mr-xs" />
                       {{ getEventDisplayType(event.type) }}
-                    </q-badge>
+                    </span>
                   </span>
-                  <span style="font-size: 0.7rem; opacity: 0.8">{{
+                  <span class="event-time">{{
                     formatTime(event.timestamp)
                   }}</span>
                 </div>
@@ -100,13 +98,13 @@
                       <table class="results-table full-width">
                         <tbody>
                           <tr v-for="(res, idx) in event.data.results" :key="idx">
-                            <td class="text-weight-bold text-grey-7 q-pr-sm" style="width: 20px;">
+                            <td class="results-table__pos q-pr-sm" style="width: 20px;">
                               {{ res.position || idx + 1 }}.
                             </td>
-                            <td class="playerName text-weight-medium">
+                            <td class="playerName results-table__name">
                               {{ res.playerName }}
                             </td>
-                            <td class="text-right text-grey-6 text-caption italic" v-if="res.points">
+                            <td class="text-right results-table__points text-caption" v-if="res.points">
                               {{ res.points }} VP
                             </td>
                           </tr>
@@ -245,9 +243,26 @@ function getColorHex(type: TLiveEventType) {
       return '#9e9e9e';
   }
 }
+
+function getEventIcon(type: TLiveEventType) {
+  switch (type) {
+    case 'PICK':
+      return 'check_circle';
+    case 'BAN':
+      return 'block';
+    case 'GAME_FINISHED':
+      return 'emoji_events';
+    case 'LEAGUE_FINISHED':
+      return 'workspace_premium';
+    case 'SEASON_FINISHED':
+      return 'military_tech';
+    default:
+      return 'bolt';
+  }
+}
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .live-action-feed {
   max-height: 500px;
   overflow-y: auto;
@@ -278,79 +293,121 @@ function getColorHex(type: TLiveEventType) {
   }
 }
 
-.event-badge {
+.league-badge {
   font-size: 0.65rem;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.04em;
   padding: 2px 6px;
-  border-radius: 4px;
-  background: transparent !important;
-  border-width: 1px;
+  border-radius: 6px;
+}
+
+.event-type-pill {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  padding: 2px 8px;
+  border-radius: 999px;
+  color: var(--event-color);
+  background: color-mix(in srgb, var(--event-color) 12%, transparent);
+  text-transform: uppercase;
+}
+
+.event-meta {
+  color: #64748b;
+}
+
+:global(.body--dark) .event-meta {
+  color: #94a3b8;
+}
+
+.event-time {
+  font-size: 0.7rem;
+  font-variant-numeric: tabular-nums;
+  opacity: 0.85;
 }
 
 .event-card {
   position: relative;
-  transition: all 0.2s ease-in-out;
-  background: white;
-  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(8px);
+  border-radius: 14px;
   overflow: hidden;
-  border: 1px solid rgba(0, 0, 0, 0.06);
+  border: 1px solid rgba(54, 64, 88, 0.08);
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
 }
 
 :global(.body--dark) .event-card {
-  background: #1d1d1d;
-  border-color: rgba(255, 255, 255, 0.1);
-}
-
-.event-card:hover {
-  border-color: rgba(0, 0, 0, 0.15);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-}
-
-:global(.body--dark) .event-card:hover {
-  border-color: rgba(255, 255, 255, 0.2);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  background: rgba(30, 34, 45, 0.6);
+  border-color: rgba(255, 255, 255, 0.08);
+  box-shadow: none;
 }
 
 .event-content {
   font-size: 0.9rem;
-  line-height: 1.4;
-  color: #2c3e50;
+  line-height: 1.45;
+  color: #1f2937;
 }
 
 :global(.body--dark) .event-content {
-  color: #ececec;
+  color: #e5e7eb;
 }
 
 .results-container {
-  padding-left: 8px;
-  margin-left: 4px;
-  background: rgba(75, 178, 106, 0.03);
-  border-radius: 0 4px 4px 0;
+  padding: 4px 8px;
+  margin-top: 6px;
+  background: transparent;
+  border-left: 1px solid rgba(0, 0, 0, 0.06);
+  border-radius: 0;
 }
 
 :global(.body--dark) .results-container {
-  background: rgba(75, 178, 106, 0.1);
+  border-left-color: rgba(255, 255, 255, 0.08);
+}
+
+.league-filter-chip {
+  border-radius: 8px;
 }
 
 .results-table {
   border-collapse: collapse;
-  font-size: 0.8rem;
-  margin-top: 4px;
+  font-size: 0.75rem;
+  margin-top: 2px;
 }
 
 .results-table tr {
-  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  border-bottom: 1px dashed rgba(0, 0, 0, 0.04);
 }
 
 :global(.body--dark) .results-table tr {
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  border-bottom: 1px dashed rgba(255, 255, 255, 0.04);
 }
 .results-table tr:last-child {
   border-bottom: none;
 }
 .results-table td {
-  padding: 4px 0;
+  padding: 3px 0;
   vertical-align: middle;
+}
+.results-table__pos {
+  color: #94a3b8;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+.results-table__name {
+  color: #475569;
+  font-weight: 400;
+}
+.results-table__points {
+  color: #94a3b8;
+  font-variant-numeric: tabular-nums;
+}
+:global(.body--dark) .results-table__pos,
+:global(.body--dark) .results-table__points {
+  color: #64748b;
+}
+:global(.body--dark) .results-table__name {
+  color: #cbd5e1;
 }
 .results-table .playerName {
   max-width: 140px;
