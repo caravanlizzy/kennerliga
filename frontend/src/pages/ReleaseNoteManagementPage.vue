@@ -5,52 +5,8 @@
     <LoadingSpinner v-if="loading" />
 
     <template v-else>
-      <!-- Current Release Notes -->
+      <!-- New Release Note Form (on top) -->
       <q-card flat bordered class="q-mb-lg">
-        <q-card-section>
-          <div class="text-h6 q-mb-md">Current Release Notes</div>
-
-          <div v-if="releaseNotes.length === 0" class="text-center text-grey q-pa-lg">
-            No release notes yet
-          </div>
-
-          <div v-else class="q-gutter-md">
-            <q-card
-              v-for="note in releaseNotes"
-              :key="note.id"
-              flat
-              bordered
-            >
-              <q-card-section>
-                <div class="row items-center no-wrap">
-                  <div class="col">
-                    <div class="text-subtitle1 text-weight-bold">
-                      {{ note.title }}
-                    </div>
-                    <div class="text-caption text-grey-7">
-                      {{ note.created_at }}
-                    </div>
-                  </div>
-                  <KennerButton
-                    flat
-                    round
-                    dense
-                    icon="delete"
-                    color="negative"
-                    @click="requestDelete(note.id)"
-                  />
-                </div>
-                <div class="q-mt-sm release-note-text">
-                  {{ note.text }}
-                </div>
-              </q-card-section>
-            </q-card>
-          </div>
-        </q-card-section>
-      </q-card>
-
-      <!-- New Release Note Form -->
-      <q-card flat bordered>
         <q-card-section>
           <div class="text-h6 q-mb-md">Add New Release Note</div>
 
@@ -61,11 +17,13 @@
               :rules="[(val) => !!val || 'Title is required']"
             />
 
-            <KennerInput
+            <q-input
               v-model="newNote.text"
               label="Text"
               type="textarea"
+              outlined
               autogrow
+              :input-style="{ minHeight: '120px' }"
               :rules="[(val) => !!val || 'Text is required']"
             />
 
@@ -75,6 +33,46 @@
               </KennerButton>
             </div>
           </q-form>
+        </q-card-section>
+      </q-card>
+
+      <!-- Current Release Notes (preview as table) -->
+      <q-card flat bordered>
+        <q-card-section>
+          <div class="text-h6 q-mb-md">Current Release Notes</div>
+
+          <div v-if="releaseNotes.length === 0" class="text-center text-grey q-pa-lg">
+            No release notes yet
+          </div>
+
+          <q-table
+            v-else
+            :rows="releaseNotes"
+            :columns="columns"
+            row-key="id"
+            flat
+            dense
+            hide-bottom
+            :pagination="{ rowsPerPage: 0 }"
+          >
+            <template #body-cell-text="props">
+              <q-td :props="props">
+                <div class="release-note-text">{{ props.row.text }}</div>
+              </q-td>
+            </template>
+            <template #body-cell-actions="props">
+              <q-td :props="props" auto-width>
+                <KennerButton
+                  flat
+                  round
+                  dense
+                  icon="delete"
+                  color="negative"
+                  @click="requestDelete(props.row.id)"
+                />
+              </q-td>
+            </template>
+          </q-table>
         </q-card-section>
       </q-card>
     </template>
@@ -122,6 +120,20 @@ const newNote = reactive<ReleaseNoteCreate>({
   title: '',
   text: '',
 });
+
+function formatDate(value: string): string {
+  if (!value) return '';
+  const d = new Date(value);
+  if (Number.isNaN(d.getTime())) return value;
+  return d.toLocaleDateString();
+}
+
+const columns = [
+  { name: 'title', label: 'Title', field: 'title', align: 'left' as const, classes: 'text-weight-bold', style: 'min-width: 140px' },
+  { name: 'created_at', label: 'Date', field: 'created_at', align: 'left' as const, format: (v: string) => formatDate(v), style: 'width: 110px' },
+  { name: 'text', label: 'Text', field: 'text', align: 'left' as const },
+  { name: 'actions', label: '', field: 'id', align: 'right' as const },
+];
 
 // dialog state
 const deleteDialogOpen = ref(false);
