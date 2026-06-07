@@ -64,7 +64,7 @@
             flat
             bordered
             class="combined-card q-pa-lg"
-            :class="isMobile ? 'combined-card--mobile' : 'q-mt-xl'"
+            :class="isMobile ? 'combined-card--mobile' : 'q-mt-md'"
           >
             <div :class="isMobile ? '' : 'row q-col-gutter-lg items-start'">
               <div :class="isMobile ? '' : 'col-12 col-md-6'">

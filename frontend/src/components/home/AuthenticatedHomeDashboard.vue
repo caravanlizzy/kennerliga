@@ -1,6 +1,6 @@
 <template>
   <div class="column col q-pt-none">
-    <div class="row q-col-gutter-xl">
+    <div class="row q-col-gutter-md">
       <!-- Left Column: Primary Info -->
       <div class="col-12 col-md-8">
         <HomeSeasonSection
@@ -15,7 +15,7 @@
         <HomeLeaderboardSection
           v-model:year="selectedYear"
           :years="availableYears"
-          class="q-mt-xl"
+          class="q-mt-md"
         />
       </div>
 
