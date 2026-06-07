@@ -1,12 +1,23 @@
 <template>
-  <q-page class="q-pa-md">
-    <div class="row items-center q-mb-lg">
-      <div class="text-h4">Task Board</div>
-      <q-space />
+  <q-page class="q-pa-md q-gutter-y-lg page-container">
+    <!-- Page Header -->
+    <div class="page-header row items-center justify-between no-wrap q-gutter-x-md">
+      <div class="row items-center q-gutter-x-md no-wrap">
+        <div class="header-icon-wrap">
+          <q-icon name="view_kanban" size="28px" class="text-white" />
+        </div>
+        <div class="column">
+          <div class="text-h5 text-weight-bolder page-title">Task Board</div>
+          <div class="text-caption page-subtitle">
+            Plan, track, and manage tasks across the team.
+          </div>
+        </div>
+      </div>
       <KennerButton
         v-if="isAdmin"
         icon="add"
         color="primary"
+        class="new-task-btn"
         @click="openCreateDialog"
       >
         New Task
@@ -26,33 +37,34 @@
           >
             <q-card
               flat
-              bordered
-              :class="['kanban-column', statusColumnClasses[status]]"
+              :class="['kanban-column glass-card', statusColumnClasses[status], `kanban-column--${statusKey(status)}`]"
             >
-              <q-card-section class="q-pb-sm">
-                <div class="row items-center q-gutter-sm">
-                  <q-icon :name="statusIcons[status]" size="sm" />
-                  <div class="text-subtitle1 text-weight-bold">{{ status }}</div>
+              <q-card-section class="kanban-column__header q-py-sm q-px-md">
+                <div class="row items-center q-gutter-x-sm no-wrap">
+                  <q-icon :name="statusIcons[status]" size="18px" class="kanban-column__icon" />
+                  <div class="text-subtitle2 text-weight-bold kanban-column__title">{{ status }}</div>
                   <q-space />
-                  <q-badge color="dark" :label="tasksByStatus[status].length" />
+                  <q-chip
+                    dense
+                    :label="tasksByStatus[status].length"
+                    class="count-chip"
+                  />
                 </div>
               </q-card-section>
 
-              <q-separator />
-
-              <q-card-section class="q-gutter-sm column">
+              <q-card-section class="q-gutter-y-sm column q-pa-md">
                 <div
                   v-if="tasksByStatus[status].length === 0"
-                  class="text-grey text-center q-py-md"
+                  class="empty-column column items-center q-py-md text-caption"
                 >
-                  No tasks
+                  <q-icon name="inbox" size="28px" class="opacity-30 q-mb-xs" />
+                  <span>No tasks</span>
                 </div>
 
                 <q-card
                   v-for="task in tasksByStatus[status]"
                   :key="task.id"
                   flat
-                  bordered
                   :class="['task-card', { 'cursor-pointer': isAdmin }]"
                   @click="isAdmin ? openEditDialog(task) : undefined"
                 >
@@ -70,7 +82,7 @@
                     </div>
                     <div
                       v-if="task.description"
-                      class="text-caption text-grey-7 q-mt-xs ellipsis-2-lines"
+                      class="text-caption task-description q-mt-xs ellipsis-2-lines"
                     >
                       {{ task.description }}
                     </div>
@@ -84,33 +96,36 @@
 
       <!-- Recent Tasks Sidebar -->
       <div class="col-12 col-md-3">
-        <q-card flat bordered>
-          <q-card-section>
-            <div class="text-subtitle1 text-weight-bold q-mb-sm">
-              <q-icon name="history" size="sm" class="q-mr-xs" />
-              Recent Tasks
+        <q-card flat class="glass-card recent-card">
+          <q-card-section class="recent-card__header q-py-sm q-px-md">
+            <div class="row items-center q-gutter-x-sm">
+              <q-icon name="history" size="18px" color="primary" />
+              <div class="text-subtitle2 text-weight-bold recent-card__title">Recent Tasks</div>
             </div>
-            <q-separator class="q-mb-sm" />
+          </q-card-section>
 
+          <q-card-section class="q-pa-sm">
             <div
               v-if="recentTasks.length === 0"
-              class="text-grey text-center q-py-md"
+              class="empty-column column items-center q-py-md text-caption"
             >
-              No tasks yet
+              <q-icon name="inbox" size="28px" class="opacity-30 q-mb-xs" />
+              <span>No tasks yet</span>
             </div>
 
-            <q-list v-else dense>
+            <q-list v-else dense separator class="recent-list">
               <q-item
                 v-for="task in recentTasks"
                 :key="task.id"
                 :clickable="isAdmin"
+                class="recent-item"
                 @click="isAdmin ? openEditDialog(task) : undefined"
               >
                 <q-item-section avatar>
-                  <q-icon :name="statusIcons[task.status]" size="xs" />
+                  <q-icon :name="statusIcons[task.status]" size="18px" />
                 </q-item-section>
                 <q-item-section class="recent-task-section">
-                  <q-item-label class="ellipsis">{{ task.title }}</q-item-label>
+                  <q-item-label class="ellipsis text-weight-medium">{{ task.title }}</q-item-label>
                   <q-item-label caption>{{ task.status }}</q-item-label>
                 </q-item-section>
                 <q-item-section side>
@@ -266,6 +281,10 @@ const statuses: TaskStatus[] = [
   TaskStatus.DECLINED,
 ];
 
+function statusKey(status: TaskStatus): string {
+  return String(status).toLowerCase().replace(/\s+/g, '-');
+}
+
 const priorityOptions = [
   { label: 'High', value: TaskPriority.HIGH },
   { label: 'Medium', value: TaskPriority.MEDIUM },
@@ -357,17 +376,145 @@ onMounted(() => {
 </script>
 
 <style lang="scss" scoped>
+.page-container {
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+/* ---------- Page header ---------- */
+.page-header {
+  padding: 8px 4px 0;
+}
+
+.header-icon-wrap {
+  width: 52px;
+  height: 52px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, var(--q-primary) 0%, #6366f1 100%);
+  box-shadow: 0 6px 18px rgba(99, 102, 241, 0.25);
+  flex-shrink: 0;
+}
+
+.page-title {
+  color: var(--tb-title, #1a1a1a);
+  line-height: 1.2;
+}
+
+.page-subtitle {
+  color: var(--tb-subtle-text, #6b7280);
+}
+
+.new-task-btn {
+  border-radius: 10px;
+  flex-shrink: 0;
+}
+
+/* ---------- Glass cards ---------- */
+.glass-card {
+  background: var(--tb-bg, rgba(255, 255, 255, 0.6));
+  backdrop-filter: blur(8px);
+  border: 1px solid var(--tb-border, rgba(54, 64, 88, 0.08));
+  border-radius: 16px;
+  overflow: hidden;
+}
+
 .kanban-column {
-  min-height: 200px;
+  min-height: 220px;
+  display: flex;
+  flex-direction: column;
+  position: relative;
 }
 
+.kanban-column::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--column-accent, var(--q-primary));
+  opacity: 0.85;
+}
+
+.kanban-column--todo { --column-accent: #6366f1; }
+.kanban-column--in-progress { --column-accent: #f59e0b; }
+.kanban-column--done { --column-accent: #10b981; }
+.kanban-column--declined { --column-accent: #ef4444; }
+
+.kanban-column__header {
+  background: var(--tb-header-bg, rgba(248, 249, 250, 0.5));
+  border-bottom: 1px solid var(--tb-border, rgba(54, 64, 88, 0.08));
+}
+
+.kanban-column__title {
+  color: var(--tb-header-text, #374151);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-size: 0.78rem;
+}
+
+.kanban-column__icon {
+  color: var(--column-accent, var(--q-primary));
+}
+
+.count-chip {
+  font-weight: 700;
+  font-size: 11px;
+  background: var(--column-accent, var(--q-primary)) !important;
+  color: #fff !important;
+  min-height: 20px;
+  padding: 0 8px;
+}
+
+.empty-column {
+  color: var(--tb-subtle-text, #9ca3af);
+}
+
+/* ---------- Task cards ---------- */
 .task-card {
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  background: var(--tb-task-bg, #ffffff);
+  border: 1px solid var(--tb-task-border, rgba(54, 64, 88, 0.08));
+  border-radius: 10px;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
 }
 
-.task-card:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+.task-card.cursor-pointer:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+  border-color: var(--column-accent, rgba(99, 102, 241, 0.4));
+}
+
+.task-title {
+  color: var(--tb-title, #1f2937);
+}
+
+.task-description {
+  color: var(--tb-subtle-text, #6b7280);
+}
+
+/* ---------- Recent sidebar ---------- */
+.recent-card__header {
+  background: var(--tb-header-bg, rgba(248, 249, 250, 0.5));
+  border-bottom: 1px solid var(--tb-border, rgba(54, 64, 88, 0.08));
+}
+
+.recent-card__title {
+  color: var(--tb-header-text, #374151);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-size: 0.78rem;
+}
+
+.recent-list :deep(.q-item) {
+  border-radius: 8px;
+  transition: background-color 0.15s ease;
+}
+
+.recent-list :deep(.q-item:hover) {
+  background-color: var(--tb-row-hover, rgba(99, 102, 241, 0.06));
 }
 
 .description-field {
@@ -433,5 +580,36 @@ onMounted(() => {
 .kanban-column,
 .kanban-column :deep(.q-card__section) {
   min-width: 0;
+}
+
+/* ---------- Dark mode ---------- */
+:global(.body--dark) {
+  .glass-card {
+    --tb-bg: rgba(30, 30, 30, 0.8);
+    --tb-border: rgba(255, 255, 255, 0.1);
+    --tb-header-bg: rgba(40, 40, 40, 0.5);
+    --tb-header-text: #ececec;
+    --tb-subtle-text: #9ca3af;
+    --tb-title: #ececec;
+    --tb-task-bg: #262626;
+    --tb-task-border: rgba(255, 255, 255, 0.08);
+    --tb-row-hover: rgba(255, 255, 255, 0.05);
+  }
+
+  .page-title { color: #ececec; }
+  .page-subtitle { color: #9ca3af; }
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 600px) {
+  .header-icon-wrap {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+  }
+
+  .new-task-btn {
+    width: auto;
+  }
 }
 </style>
