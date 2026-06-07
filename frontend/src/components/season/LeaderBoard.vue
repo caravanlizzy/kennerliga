@@ -12,7 +12,7 @@
     <div class="q-px-lg q-py-md row items-center justify-between border-bottom-subtle">
       <div class="row items-center q-gutter-x-sm">
         <q-icon name="analytics" color="primary" size="20px" />
-        <span class="text-subtitle2 text-weight-bold leaderboard-header-text">Annual Leaderboard</span>
+        <span class="text-subtitle2 text-weight-bold leaderboard-header-text">Leaderboard</span>
       </div>
       <q-btn-toggle
         v-model="showAllLeagues"
