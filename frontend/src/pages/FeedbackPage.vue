@@ -1,69 +1,36 @@
 <template>
   <div class="q-pa-md q-gutter-y-lg page-container">
-    <!-- Feedback Display for Admins -->
-    <div v-if="isAdmin" class="feedback-list">
-      <div class="row items-center q-mb-md">
-        <q-icon name="analytics" color="primary" size="sm" class="q-mr-sm" />
-        <div class="text-h6 text-weight-bold">Manage User Feedback</div>
+    <!-- Page Header -->
+    <div class="page-header">
+      <div class="row items-center q-gutter-x-md no-wrap">
+        <div class="header-icon-wrap">
+          <q-icon name="forum" size="28px" class="text-white" />
+        </div>
+        <div class="column">
+          <div class="text-h5 text-weight-bolder page-title">Feedback</div>
+          <div class="text-caption page-subtitle">
+            Share ideas, report issues, or tell us what you love.
+          </div>
+        </div>
       </div>
-
-      <q-table
-        :rows="feedbacks"
-        :columns="columns"
-        row-key="id"
-        flat
-        bordered
-        :loading="loadingFeedback"
-        :pagination="pagination"
-        class="feedback-table shadow-1"
-        no-data-label="No feedback yet."
-      >
-        <template v-slot:body-cell-username="props">
-          <q-td :props="props">
-            <div class="row items-center no-wrap">
-              <q-avatar size="24px" color="primary" text-color="white" class="q-mr-sm">
-                {{ (props.row.username || 'A')[0].toUpperCase() }}
-              </q-avatar>
-              <div class="text-weight-medium">{{ props.row.username || 'Anonymous' }}</div>
-            </div>
-          </q-td>
-        </template>
-
-        <template v-slot:body-cell-datetime="props">
-          <q-td :props="props" class="text-grey-7">
-            {{ formatDate(props.row.datetime) }}
-          </q-td>
-        </template>
-
-        <template v-slot:body-cell-message="props">
-          <q-td :props="props" class="message-cell">
-            <div class="message-text truncate-2-lines">
-              {{ props.row.message }}
-            </div>
-            <q-tooltip anchor="top middle" self="bottom middle" :offset="[0, 8]" class="bg-dark text-white shadow-2">
-              <div class="q-pa-xs max-width-300 whitespace-pre-line">
-                {{ props.row.message }}
-              </div>
-            </q-tooltip>
-          </q-td>
-        </template>
-      </q-table>
     </div>
 
     <!-- Feedback Submission Form -->
-    <div class="feedback-form-container q-mt-xl">
-      <q-card flat bordered class="feedback-card shadow-1">
-        <q-card-section class="bg-grey-1 q-py-md">
-          <div class="row items-center">
-            <q-icon name="feedback" color="orange-8" size="sm" class="q-mr-sm" />
-            <div class="text-h6 text-weight-bold">Submit Feedback</div>
+    <div class="feedback-form-container">
+      <q-card flat class="feedback-card">
+        <q-card-section class="feedback-card-header">
+          <div class="row items-center q-gutter-x-sm">
+            <q-icon name="edit_note" color="primary" size="22px" />
+            <div class="text-subtitle1 text-weight-bold feedback-header-text">
+              Submit Feedback
+            </div>
           </div>
-          <div class="text-caption text-grey-7">
+          <div class="text-caption feedback-subtle-text q-mt-xs">
             We value your thoughts! Let us know how we can improve.
           </div>
         </q-card-section>
 
-        <q-separator />
+        <q-separator class="feedback-separator" />
 
         <q-card-section class="q-pa-lg">
           <q-form @submit="onSubmit" class="q-gutter-md">
@@ -74,23 +41,110 @@
               type="textarea"
               autogrow
               rows="4"
-              filled
+              outlined
+              counter
+              maxlength="2000"
               class="feedback-input"
               :rules="[(val) => !!val || 'Feedback is required']"
             />
 
-            <div class="row justify-end">
+            <div class="row items-center justify-between q-gutter-sm submit-row">
+              <div class="row items-center text-caption feedback-subtle-text q-gutter-x-xs">
+                <q-icon name="lock" size="14px" />
+                <span>Your feedback is sent privately to the admins.</span>
+              </div>
               <KennerButton
                 label="Send Feedback"
                 type="submit"
                 color="primary"
                 icon-right="send"
-                class="q-px-lg"
+                class="q-px-lg send-btn"
                 :loading="submitting"
+                :disable="!feedback.trim()"
               />
             </div>
           </q-form>
         </q-card-section>
+      </q-card>
+    </div>
+
+    <!-- Feedback Display for Admins -->
+    <div v-if="isAdmin" class="feedback-list">
+      <div class="row items-center justify-between q-mb-md admin-header">
+        <div class="row items-center q-gutter-x-sm">
+          <q-icon name="admin_panel_settings" color="primary" size="22px" />
+          <div class="text-subtitle1 text-weight-bold feedback-header-text">
+            Manage User Feedback
+          </div>
+        </div>
+        <q-chip
+          v-if="!loadingFeedback && feedbacks.length > 0"
+          dense
+          color="primary"
+          text-color="white"
+          class="count-chip"
+        >
+          {{ feedbacks.length }} {{ feedbacks.length === 1 ? 'entry' : 'entries' }}
+        </q-chip>
+      </div>
+
+      <q-card flat class="feedback-card">
+        <q-table
+          :rows="feedbacks"
+          :columns="columns"
+          row-key="id"
+          flat
+          :loading="loadingFeedback"
+          :pagination="pagination"
+          class="feedback-table"
+          no-data-label="No feedback yet."
+        >
+          <template v-slot:body-cell-username="props">
+            <q-td :props="props">
+              <div class="row items-center no-wrap">
+                <q-avatar size="28px" color="primary" text-color="white" class="q-mr-sm user-avatar">
+                  {{ (props.row.username || 'A')[0].toUpperCase() }}
+                </q-avatar>
+                <div class="text-weight-medium">{{ props.row.username || 'Anonymous' }}</div>
+              </div>
+            </q-td>
+          </template>
+
+          <template v-slot:body-cell-datetime="props">
+            <q-td :props="props" class="feedback-subtle-text">
+              <div class="row items-center q-gutter-x-xs no-wrap">
+                <q-icon name="schedule" size="14px" />
+                <span>{{ formatDate(props.row.datetime) }}</span>
+              </div>
+            </q-td>
+          </template>
+
+          <template v-slot:body-cell-message="props">
+            <q-td :props="props" class="message-cell">
+              <div class="message-text truncate-2-lines">
+                {{ props.row.message }}
+              </div>
+              <q-tooltip
+                anchor="top middle"
+                self="bottom middle"
+                :offset="[0, 8]"
+                class="bg-dark text-white shadow-2"
+              >
+                <div class="q-pa-xs max-width-300 whitespace-pre-line">
+                  {{ props.row.message }}
+                </div>
+              </q-tooltip>
+            </q-td>
+          </template>
+
+          <template v-slot:no-data>
+            <div class="full-width column items-center q-pa-xl feedback-subtle-text">
+              <q-icon name="inbox" size="48px" class="q-mb-sm opacity-20" />
+              <div class="text-subtitle1 text-weight-bold">No Feedback Yet</div>
+              <div class="text-caption">User feedback will appear here once submitted.</div>
+            </div>
+          </template>
+        </q-table>
       </q-card>
     </div>
   </div>
@@ -119,21 +173,21 @@ const columns = [
   {
     name: 'username',
     label: 'User',
-    align: 'left',
+    align: 'left' as const,
     field: 'username',
     sortable: true,
   },
   {
     name: 'datetime',
     label: 'Date',
-    align: 'left',
+    align: 'left' as const,
     field: 'datetime',
     sortable: true,
   },
   {
     name: 'message',
     label: 'Feedback Message',
-    align: 'left',
+    align: 'left' as const,
     field: 'message',
     style: 'max-width: 500px',
   },
@@ -205,22 +259,123 @@ onMounted(() => {
   margin: 0 auto;
 }
 
-.feedback-table {
-  background: white;
-  border-radius: 12px;
-  overflow: hidden;
+/* ---------- Page header ---------- */
+.page-header {
+  padding: 8px 4px 0;
+}
 
-  :deep(.q-table__card) {
+.header-icon-wrap {
+  width: 52px;
+  height: 52px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, var(--q-primary) 0%, #6366f1 100%);
+  box-shadow: 0 6px 18px rgba(99, 102, 241, 0.25);
+  flex-shrink: 0;
+}
+
+.page-title {
+  color: var(--feedback-title, #1a1a1a);
+  line-height: 1.2;
+}
+
+.page-subtitle {
+  color: var(--feedback-subtle-text, #6b7280);
+}
+
+/* ---------- Cards (glass) ---------- */
+.feedback-card {
+  background: var(--feedback-bg, rgba(255, 255, 255, 0.6));
+  backdrop-filter: blur(8px);
+  border: 1px solid var(--feedback-border, rgba(54, 64, 88, 0.08));
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.feedback-card-header {
+  padding: 16px 20px;
+  background: var(--feedback-header-bg, rgba(248, 249, 250, 0.5));
+}
+
+.feedback-separator {
+  background: var(--feedback-border, rgba(54, 64, 88, 0.08));
+}
+
+.feedback-header-text {
+  color: var(--feedback-header-text, #374151);
+}
+
+.feedback-subtle-text {
+  color: var(--feedback-subtle-text, #6b7280);
+}
+
+/* ---------- Form ---------- */
+.feedback-input {
+  :deep(.q-field__control) {
+    border-radius: 12px;
+    transition: all 0.2s ease;
+  }
+
+  :deep(.q-field__native),
+  :deep(.q-field__label) {
+    font-size: 0.95rem;
+  }
+}
+
+.submit-row {
+  flex-wrap: wrap;
+}
+
+.send-btn {
+  border-radius: 10px;
+}
+
+/* ---------- Admin section ---------- */
+.admin-header {
+  padding: 0 4px;
+}
+
+.count-chip {
+  font-weight: 600;
+  font-size: 11px;
+}
+
+.user-avatar {
+  font-weight: 700;
+  font-size: 12px;
+}
+
+.feedback-table {
+  background: transparent;
+
+  :deep(.q-table__card),
+  :deep(.q-table__container) {
     box-shadow: none;
+    background: transparent;
   }
 
   :deep(thead tr th) {
     font-weight: 700;
     text-transform: uppercase;
-    font-size: 0.75rem;
-    letter-spacing: 0.05em;
-    color: #607d8b;
-    background: #f8f9fa;
+    font-size: 0.7rem;
+    letter-spacing: 0.06em;
+    color: var(--feedback-subtle-text, #607d8b);
+    background: var(--feedback-header-bg, rgba(248, 249, 250, 0.5));
+    border-bottom: 1.5px solid var(--feedback-border, rgba(54, 64, 88, 0.12));
+  }
+
+  :deep(tbody tr) {
+    transition: background-color 0.15s ease;
+  }
+
+  :deep(tbody tr:hover) {
+    background-color: var(--feedback-row-hover, rgba(248, 250, 252, 1)) !important;
+  }
+
+  :deep(tbody td) {
+    border-bottom: 1px solid var(--feedback-row-border, rgba(0, 0, 0, 0.04));
   }
 }
 
@@ -231,6 +386,7 @@ onMounted(() => {
 .message-text {
   max-width: 450px;
   line-height: 1.5;
+  color: var(--feedback-text, #212121);
 }
 
 .truncate-2-lines {
@@ -241,48 +397,6 @@ onMounted(() => {
   text-overflow: ellipsis;
 }
 
-.feedback-card {
-  border-radius: 16px;
-  overflow: hidden;
-  max-width: 800px;
-  margin: 0 auto;
-}
-
-.feedback-input {
-  :deep(.q-field__control) {
-    border-radius: 12px;
-    background: rgba(0, 0, 0, 0.03);
-    transition: all 0.3s ease;
-
-    &:before {
-      display: none;
-    }
-
-    &:hover {
-      background: rgba(0, 0, 0, 0.05);
-    }
-  }
-
-  &.q-field--focused {
-    :deep(.q-field__control) {
-      background: white;
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
-      border: 1px solid rgba(0, 0, 0, 0.1);
-    }
-  }
-
-  :deep(.q-field__native) {
-    padding-top: 24px;
-    font-size: 1rem;
-    line-height: 1.5;
-  }
-
-  :deep(.q-field__label) {
-    top: 16px;
-    font-weight: 500;
-  }
-}
-
 .max-width-300 {
   max-width: 300px;
 }
@@ -291,9 +405,42 @@ onMounted(() => {
   white-space: pre-line;
 }
 
+/* ---------- Dark mode ---------- */
+:global(.body--dark) {
+  .feedback-card {
+    --feedback-bg: rgba(30, 30, 30, 0.8);
+    --feedback-border: rgba(255, 255, 255, 0.1);
+    --feedback-header-bg: rgba(40, 40, 40, 0.5);
+    --feedback-header-text: #ececec;
+    --feedback-subtle-text: #9e9e9e;
+    --feedback-text: #ececec;
+    --feedback-row-hover: #262626;
+    --feedback-row-border: rgba(255, 255, 255, 0.05);
+  }
+
+  .page-title {
+    color: #ececec;
+  }
+
+  .page-subtitle {
+    color: #9e9e9e;
+  }
+}
+
+/* ---------- Responsive ---------- */
 @media (max-width: 600px) {
   .message-text {
     max-width: 200px;
+  }
+
+  .submit-row .send-btn {
+    width: 100%;
+  }
+
+  .header-icon-wrap {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
   }
 }
 </style>
