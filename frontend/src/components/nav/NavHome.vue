@@ -9,7 +9,7 @@
       style="height: 44px; min-width: 44px;"
     >
       <div class="row items-center no-wrap">
-        <q-icon size="md" name="img:icons/favicon.svg" class="q-mr-sm" />
+        <q-icon size="md" name="img:icons/favicon.svg" :class="{ 'q-mr-sm': !isMobile }" />
         <span v-if="!isMobile" class="text-h5 text-weight-bold tracking-tight" style="letter-spacing: -0.5px;"><span class="text-primary">Kenner</span><span class="text-accent">Liga</span></span>
       </div>
     </KennerButton>
