@@ -272,7 +272,6 @@ onMounted(() => {
   align-items: center;
   justify-content: center;
   background: linear-gradient(135deg, var(--q-primary) 0%, #6366f1 100%);
-  box-shadow: 0 6px 18px rgba(99, 102, 241, 0.25);
   flex-shrink: 0;
 }
 

@@ -357,7 +357,6 @@ watch(
   border-radius: 8px;
   background: linear-gradient(135deg, var(--q-primary) 0%, var(--q-accent) 100%);
   color: #fff;
-  box-shadow: 0 2px 8px rgba(54, 64, 88, 0.15);
 }
 
 :global(.body--dark) .leaderboard-header {
