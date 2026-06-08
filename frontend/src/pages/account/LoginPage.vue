@@ -13,10 +13,10 @@
     >
       <q-form @submit="doLogin" @keyup.enter="doLogin" class="q-gutter-y-lg">
         <div class="column items-center q-mb-lg">
-          <q-icon name="img:icons/favicon.svg" size="64px" class="q-mb-md" />
-          <div class="text-h4 text-weight-bolder text-dark tracking-tighter">Login</div>
+          <BrandLogo class="q-mb-md" icon-size="64px" word-size="2rem" />
+          <div class="text-h4 text-weight-bolder text-dark tracking-tighter q-mt-md">Login</div>
           <div class="text-subtitle2 text-grey-6 q-mt-xs text-center">
-            Welcome back to <span class="text-primary">Kenner</span><span class="text-accent">Liga</span>
+            Welcome back
           </div>
         </div>
 
@@ -55,6 +55,7 @@
 <script setup lang="ts">
 import KennerInput from 'components/base/KennerInput.vue';
 import KennerButton from 'components/base/KennerButton.vue';
+import BrandLogo from 'components/base/BrandLogo.vue';
 import { useUserStore } from 'stores/userStore';
 import { useResponsive } from 'src/composables/responsive';
 import { ref } from 'vue';
