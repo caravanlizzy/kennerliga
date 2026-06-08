@@ -29,12 +29,12 @@
       <!-- Icon Section -->
       <div class="champion-icon-wrapper flex flex-center">
         <div class="crown-overlay">
-          <q-icon name="workspace_premium" size="22px" color="amber-8" />
+          <q-icon name="military_tech" size="20px" color="grey-7" />
         </div>
       </div>
 
       <!-- Text Content Section -->
-      <div class="champion-info-section column justify-center q-ml-sm">
+      <div class="champion-info-section column justify-center">
         <div class="name-row row no-wrap items-baseline">
           <span class="champion-name">{{ champion.username }}</span>
         </div>
@@ -45,9 +45,6 @@
         <q-icon name="chevron_right" size="16px" color="grey-5" />
       </div>
     </div>
-
-    <!-- Shine Effect -->
-    <div class="shine-effect"></div>
   </div>
 </template>
 
@@ -131,38 +128,32 @@ onMounted(loadCurrentChampion);
 .champion-card-container {
   position: relative;
   cursor: pointer;
-  background: white;
-  border-radius: 12px;
+  background: transparent;
+  border: none;
+  border-radius: 8px;
   padding: 4px 8px;
   margin: 0 4px;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: background-color 0.2s ease;
   overflow: hidden;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
   user-select: none;
 
   &:hover {
-    box-shadow: 0 4px 15px rgba(255, 193, 7, 0.15);
-    background: #fffdf5;
-
-    .shine-effect {
-      left: 100%;
-      transition: left 0.8s ease-in-out;
-    }
+    background: rgba(0, 0, 0, 0.03);
 
     .action-arrow {
       color: var(--q-primary) !important;
     }
-  }
 
-  &:active {
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    .champion-name {
+      color: var(--q-primary);
+    }
   }
 
   &.is-mobile {
     padding: 2px 8px;
     margin: 0 2px;
-    border-radius: 20px;
-    background: rgba(255, 193, 7, 0.05);
+    border-radius: 8px;
+    background: transparent;
   }
 }
 
@@ -178,19 +169,28 @@ onMounted(loadCurrentChampion);
   height: 38px;
 }
 
+.champion-info-section {
+  margin-left: 8px;
+}
+
+.is-mobile {
+  .champion-icon-wrapper {
+    width: 24px;
+    height: 24px;
+    padding: 0;
+  }
+
+  .champion-info-section {
+    margin-left: 2px;
+  }
+}
+
 .crown-overlay {
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
   z-index: 2;
-  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1));
-  animation: crown-float 2s ease-in-out infinite;
-}
-
-@keyframes crown-float {
-  0%, 100% { transform: translate(-50%, -50%) scale(1) rotate(10deg); }
-  50% { transform: translate(-50%, -60%) scale(1.1) rotate(15deg); }
 }
 
 
@@ -200,7 +200,7 @@ onMounted(loadCurrentChampion);
 
 .champion-name {
   font-size: 0.95rem;
-  font-weight: 800;
+  font-weight: 600;
   color: var(--q-dark);
   line-height: 1.2;
   white-space: nowrap;
@@ -213,36 +213,19 @@ onMounted(loadCurrentChampion);
 }
 
 :global(.body--dark) .champion-card-container {
-  background: #1e1e1e;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+  background: transparent;
+  border: none;
 
   &:hover {
-    background: #2a2620;
-    box-shadow: 0 4px 15px rgba(255, 193, 7, 0.2);
+    background: rgba(255, 255, 255, 0.04);
   }
 
   &.is-mobile {
-    background: rgba(255, 193, 7, 0.08);
+    background: transparent;
   }
 
   .champion-name {
-    color: #ffe082;
+    color: #f5f5f5;
   }
-}
-
-.shine-effect {
-  position: absolute;
-  top: 0;
-  left: -200%;
-  width: 200%;
-  height: 100%;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(255, 255, 255, 0.4),
-    transparent
-  );
-  transform: skewX(-20deg);
-  z-index: 0;
 }
 </style>

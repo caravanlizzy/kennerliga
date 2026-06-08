@@ -15,23 +15,23 @@
       <q-list class="q-py-sm">
         <DrawerSubGroup>Browse</DrawerSubGroup>
         <DrawerItem
-          icon="calendar_month"
-          icon-color="blue-8"
+          icon="event"
+          icon-color="primary"
           label="Seasons"
           forward-name="seasons"
         />
-        <DrawerItem icon="group" icon-color="teal-7" label="Members" forward-name="users" />
+        <DrawerItem icon="people_alt" icon-color="primary" label="Members" forward-name="users" />
 
         <q-separator class="q-my-sm drawer-separator" />
         <DrawerSubGroup>Info</DrawerSubGroup>
-        <DrawerItem icon="gavel" icon-color="primary" label="Rules" forward-name="rules" />
+        <DrawerItem icon="menu_book" icon-color="primary" label="Rules" forward-name="rules" />
 
         <q-separator class="q-my-sm drawer-separator" />
         <DrawerSubGroup>Contribute</DrawerSubGroup>
-        <DrawerItem icon="feedback" icon-color="orange-8" label="Feedback" forward-name="feedback" />
+        <DrawerItem icon="rate_review" icon-color="primary" label="Feedback" forward-name="feedback" />
         <DrawerItem
-          icon="task_alt"
-          icon-color="green-7"
+          icon="checklist"
+          icon-color="primary"
           label="Task Board"
           forward-name="taskboard"
         />
@@ -39,10 +39,10 @@
         <template v-if="isAdmin">
           <q-separator class="q-my-sm drawer-separator" />
           <DrawerSubGroup>Management</DrawerSubGroup>
-          <DrawerItem icon="casino" icon-color="indigo-7" label="Games" forward-name="games" />
+          <DrawerItem icon="sports_esports" icon-color="primary" label="Games" forward-name="games" />
           <DrawerItem
-            icon="forward_to_inbox"
-            icon-color="deep-purple-7"
+            icon="mark_email_unread"
+            icon-color="primary"
             label="Invitations"
             forward-name="invitations"
           />
@@ -77,7 +77,7 @@
 
     <div class="q-pa-md q-pb-xl">
       <q-separator class="q-mb-md drawer-separator" />
-      <DrawerItem icon="logout" icon-color="red-7" label="Logout" class="logout-item" @click="doLogout" />
+      <DrawerItem icon="exit_to_app" icon-color="red-7" label="Logout" class="logout-item" @click="doLogout" />
     </div>
   </div>
 </template>
