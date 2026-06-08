@@ -15,6 +15,7 @@ export function homeSeasonSelection(isAuthenticated: Ref<boolean>) {
   const seasonsForYear = ref<TSeasonDto[]>([]);
   const selectedSeasonYear = ref<number | null>(null);
   const selectedSeasonMonth = ref<number | null>(null);
+  const currentSeasonId = ref<number | null>(null);
 
   const seasonYearOptions = computed(() =>
     [...availableYears.value]
@@ -68,10 +69,11 @@ export function homeSeasonSelection(isAuthenticated: Ref<boolean>) {
     loadingSeasonInit.value = true;
     try {
       // 1. Fetch current season ID first to get started as soon as possible
-      const currentSeasonId = await fetchCurrentSeasonId();
+      const fetchedCurrentSeasonId = await fetchCurrentSeasonId();
+      currentSeasonId.value = fetchedCurrentSeasonId;
 
-      if (currentSeasonId) {
-        const season = await fetchSeason(currentSeasonId);
+      if (fetchedCurrentSeasonId) {
+        const season = await fetchSeason(fetchedCurrentSeasonId);
         if (season) {
           selectedYear.value = season.year;
 
@@ -117,6 +119,7 @@ export function homeSeasonSelection(isAuthenticated: Ref<boolean>) {
     selectedSeasonYear,
     selectedSeasonMonth,
     selectedSeasonId,
+    currentSeasonId,
 
     seasonYearOptions,
     seasonMonthOptions,

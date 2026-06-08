@@ -4,67 +4,58 @@
     <LoadingSpinner v-if="loadingLeagues" text="Loading standings..." />
 
     <!-- Leagues + matrices -->
-    <div v-else-if="!seasonId && !loadingLeagues" class="column items-center q-pa-xl text-grey-6">
-      <q-icon name="info_outline" size="48px" class="q-mb-md" />
-      <div class="text-h6">No season selected</div>
-      <div>Please select year and month that contain a league.</div>
+    <div v-else-if="!seasonId && !loadingLeagues" class="empty-state column items-center q-pa-xl">
+      <div class="empty-state__icon-wrap q-mb-md">
+        <q-icon name="info_outline" size="32px" />
+      </div>
+      <div class="text-h6 text-weight-bold">No season selected</div>
+      <div class="text-caption text-grey-6">Please select year and month that contain a league.</div>
     </div>
 
-    <div v-else-if="leagues.length === 0 && seasonId" class="column items-center q-pa-xl text-grey-6 bg-empty-state rounded-borders-12 border-subtle">
-       <q-icon name="upcoming" size="48px" class="q-mb-md opacity-20" />
-       <div class="text-h6 text-weight-bold">No leagues found</div>
-       <div class="text-caption q-mb-lg">This season hasn't been set up with any leagues yet.</div>
-       <KennerButton
-         v-if="!isOverviewPage"
-         outline
-         color="primary"
-         icon="visibility"
-         label="Season Overview"
-         :to="{ name: 'season-overview', params: { id: seasonId } }"
-       />
+    <div v-else-if="leagues.length === 0 && seasonId" class="empty-state column items-center q-pa-xl">
+      <div class="empty-state__icon-wrap q-mb-md">
+        <q-icon name="upcoming" size="32px" />
+      </div>
+      <div class="text-h6 text-weight-bold">No leagues found</div>
+      <div class="text-caption text-grey-6 q-mb-lg">This season hasn't been set up with any leagues yet.</div>
+      <KennerButton
+        v-if="!isOverviewPage"
+        outline
+        color="primary"
+        icon="visibility"
+        label="Season Overview"
+        :to="{ name: 'season-overview', params: { id: seasonId } }"
+      />
     </div>
 
     <div v-else class="column q-gutter-y-md">
-      <div v-if="seasonId && !isOverviewPage" class="row justify-end q-px-sm">
-        <KennerButton
-          outline
-          color="primary"
-          icon="visibility"
-          label="Season Overview"
-          :to="{ name: 'season-overview', params: { id: seasonId } }"
-        />
-      </div>
-
-      <div class="column q-gutter-y-xl">
-        <div v-for="league in leagues" :key="league.id" class="league-wrapper">
-          <div class="row items-center q-mb-md q-px-sm">
-            <div
-              class="league-badge q-mr-md"
-              :class="`bg-${getLeagueColor(league.level)}`"
-            >
-              {{ league.level }}
+      <div class="column q-gutter-y-lg">
+        <div
+          v-for="league in leagues"
+          :key="league.id"
+          class="league-card"
+          :class="`league-card--l${league.level}`"
+        >
+          <div class="league-card__header row items-center">
+            <div class="league-badge" :class="`league-badge--l${league.level}`">
+              L{{ league.level }}
             </div>
-            <div class="column">
-              <div
-                class="text-h6 text-weight-bold line-height-1"
-                :class="`text-${getLeagueColor(league.level)}`"
-              >
+            <div class="column q-ml-md">
+              <div class="league-card__title">
                 League {{ league.level }}
               </div>
-              <div class="text-caption text-grey-6 uppercase letter-spacing-1">
+              <div class="league-card__subtitle">
                 {{ mode === 'results' ? 'Division Overview' : 'Division Standings' }}
               </div>
             </div>
-
-
             <q-space />
-            <KennerButton flat round icon="info" :color="getLeagueColor(league.level)" size="sm">
+            <KennerButton flat round dense icon="info" :color="getLeagueColor(league.level)" size="sm">
               <KennerTooltip>
                 {{ mode === 'results' ? 'Detailed match results' : 'Current standings' }} for League {{ league.level }}
               </KennerTooltip>
             </KennerButton>
           </div>
-          <div class="results-container">
+          <div class="league-card__body">
             <LeagueMatchResults
               v-if="mode === 'results'"
               :leagueId="league.id"
@@ -163,69 +154,117 @@ watch(() => props.seasonId, (id) => {
 </script>
 
 <style scoped lang="scss">
-.border-subtle {
-  border: 1px solid rgba(54, 64, 88, 0.08);
-}
-
-.bg-empty-state {
-  background: white;
-}
-
-:global(.body--dark) .bg-empty-state {
-  background: #1e1e1e;
-}
-
-:global(.body--dark) .border-subtle {
-  border-color: rgba(255, 255, 255, 0.08);
-}
-
-.opacity-20 {
-  opacity: 0.2;
-}
-
 .season-standings {
   max-width: 1200px;
   margin: 0 auto;
 }
 
-.border-orange-2 {
-  border: 1px solid #ffcc80;
+/* ---------- Empty states ---------- */
+.empty-state {
+  background: rgba(255, 255, 255, 0.72);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(54, 64, 88, 0.08);
+  border-radius: 16px;
+  box-shadow: 0 4px 16px rgba(54, 64, 88, 0.04);
+  color: #5b6478;
+  text-align: center;
 }
 
-.league-badge {
+.empty-state__icon-wrap {
+  width: 56px;
+  height: 56px;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   color: white;
+  background: linear-gradient(135deg, var(--q-primary), var(--q-accent));
+}
+
+:global(.body--dark) .empty-state {
+  background: rgba(30, 30, 30, 0.72);
+  border-color: rgba(255, 255, 255, 0.08);
+  color: #c8cdd6;
+}
+
+/* ---------- League card ---------- */
+.league-card {
+  background: rgba(255, 255, 255, 0.72);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(54, 64, 88, 0.08);
+  border-radius: 16px;
+  box-shadow: 0 4px 16px rgba(54, 64, 88, 0.05);
+  overflow: hidden;
+  transition: box-shadow 0.25s ease, transform 0.25s ease;
+}
+
+.league-card:hover {
+  box-shadow: 0 8px 24px rgba(54, 64, 88, 0.08);
+}
+
+.league-card__header {
+  padding: 14px 18px;
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.06), rgba(236, 72, 153, 0.04));
+  border-bottom: 1px solid rgba(54, 64, 88, 0.06);
+}
+
+.league-card__title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  line-height: 1.1;
+  color: #1f2533;
+  letter-spacing: -0.01em;
+}
+
+.league-card__subtitle {
+  margin-top: 2px;
+  font-size: 0.72rem;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: #8a94a6;
+  font-weight: 600;
+}
+
+.league-card__body {
+  padding: 4px 6px 8px;
+}
+
+:global(.body--dark) .league-card {
+  background: rgba(30, 30, 30, 0.72);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+:global(.body--dark) .league-card__header {
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.12), rgba(236, 72, 153, 0.08));
+  border-bottom-color: rgba(255, 255, 255, 0.06);
+}
+
+:global(.body--dark) .league-card__title { color: #eef0f4; }
+:global(.body--dark) .league-card__subtitle { color: #9aa3b2; }
+
+/* ---------- League badge (medal tones) ---------- */
+.league-badge {
   width: 42px;
   height: 42px;
   border-radius: 14px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-weight: 900;
-  font-size: 1.3rem;
-  transition: all 0.3s ease;
+  font-weight: 800;
+  font-size: 1.05rem;
+  letter-spacing: -0.02em;
+  color: white;
+  background: linear-gradient(135deg, #94a3b8, #64748b);
+  flex-shrink: 0;
 }
 
-.shadow-amber-8 { box-shadow: 0 4px 12px rgba(255, 143, 0, 0.3); }
-.shadow-blue-grey-5 { box-shadow: 0 4px 12px rgba(96, 125, 139, 0.3); }
-.shadow-brown-6 { box-shadow: 0 4px 12px rgba(121, 85, 72, 0.3); }
-.shadow-red-6 { box-shadow: 0 4px 12px rgba(244, 67, 54, 0.3); }
-.shadow-deep-purple-6 { box-shadow: 0 4px 12px rgba(103, 58, 183, 0.3); }
-.shadow-indigo-6 { box-shadow: 0 4px 12px rgba(63, 81, 181, 0.3); }
-.shadow-grey-7 { box-shadow: 0 4px 12px rgba(158, 158, 158, 0.3); }
-
-.line-height-1 {
-  line-height: 1;
+.league-badge--l1 {
+  background: linear-gradient(135deg, #fbbf24, #f59e0b);
 }
-
-.letter-spacing-1 {
-  letter-spacing: 1px;
+.league-badge--l2 {
+  background: linear-gradient(135deg, #cbd5e1, #94a3b8);
 }
-
-.uppercase {
-  text-transform: uppercase;
-}
-
-.results-container {
-  /* removed white background and border to let cards breathe */
+.league-badge--l3 {
+  background: linear-gradient(135deg, #fdba74, #c2825a);
 }
 </style>

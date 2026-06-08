@@ -7,6 +7,7 @@
           v-model:selectedSeasonYear="selectedSeasonYear"
           v-model:selectedSeasonMonth="selectedSeasonMonth"
           :selected-season-id="selectedSeasonId"
+          :current-season-id="currentSeasonId"
           :season-year-options="seasonYearOptions"
           :season-month-options="seasonMonthOptions"
           :loading="loadingSeasonInit"
@@ -46,6 +47,7 @@ const {
   selectedSeasonYear,
   selectedSeasonMonth,
   selectedSeasonId,
+  currentSeasonId,
   seasonYearOptions,
   seasonMonthOptions,
   initSeasonSelection,
