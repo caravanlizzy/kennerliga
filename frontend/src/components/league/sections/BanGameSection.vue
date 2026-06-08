@@ -198,19 +198,32 @@ watch(
 }
 
 .ban-candidate-card {
-  border-radius: 10px;
-  transition: all 0.2s ease;
-  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 12px;
+  transition: border-color 0.2s ease, background 0.2s ease,
+    transform 0.2s ease, box-shadow 0.2s ease;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  background: #ffffff;
 
   &:hover {
     border-color: var(--q-negative);
     background: rgba(193, 0, 21, 0.04);
     transform: translateY(-1px);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    box-shadow: 0 4px 16px rgba(15, 23, 42, 0.08);
 
     .ban-candidate-icon {
       transform: scale(1.1);
     }
+  }
+}
+
+.body--dark .ban-candidate-card {
+  background: #1e222a;
+  border-color: rgba(255, 255, 255, 0.08);
+
+  &:hover {
+    border-color: var(--q-negative);
+    background: rgba(193, 0, 21, 0.12);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
   }
 }
 
