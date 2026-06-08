@@ -1,5 +1,5 @@
 <template>
-  <q-page class="q-pa-none bg-grey-1">
+  <q-page class="q-pa-none user-detail-page">
     <!-- User Profile Hero Section -->
     <div v-if="user" class="profile-hero bg-primary text-white q-pa-lg relative-position overflow-hidden">
       <div class="hero-content row items-center q-col-gutter-lg relative-position z-index-1">
@@ -57,8 +57,8 @@
         <!-- Left Column: User Summary & Actions -->
         <div class="col-12 col-md-4">
           <!-- Selection Limit Status (Moved from sidebar to prominent position) -->
-          <q-card flat bordered class="rounded-borders overflow-hidden q-mb-lg bg-white">
-            <q-card-section class="bg-grey-2 text-weight-bold text-uppercase letter-spacing-1 text-grey-8 row items-center justify-between">
+          <q-card flat bordered class="rounded-borders overflow-hidden q-mb-lg surface-card">
+            <q-card-section class="surface-card-header text-weight-bold text-uppercase letter-spacing-1 row items-center justify-between">
               <div>Selections {{ new Date().getFullYear() }}</div>
               <q-icon name="info_outline" size="xs">
                 <q-tooltip>Maximum {{ maxGameLimit }} selections per game per year</q-tooltip>
@@ -87,20 +87,20 @@
           </q-card>
 
           <!-- Overall Performance Summary -->
-          <q-card flat bordered class="rounded-borders overflow-hidden bg-white">
-            <q-card-section class="bg-grey-2 text-weight-bold text-uppercase letter-spacing-1 text-grey-8">
+          <q-card flat bordered class="rounded-borders overflow-hidden surface-card">
+            <q-card-section class="surface-card-header text-weight-bold text-uppercase letter-spacing-1">
               Overall Performance
             </q-card-section>
             <q-card-section class="q-pa-md">
               <div class="row q-col-gutter-sm q-mb-lg">
                 <div class="col-6">
-                  <div class="column items-center q-pa-md bg-grey-1 rounded-borders border-grey-2 bordered">
+                  <div class="column items-center q-pa-md stat-tile rounded-borders bordered">
                     <div class="text-h5 text-weight-bolder text-positive">{{ (overallStats.wins / (overallStats.total_games || 1) * 100).toFixed(0) }}%</div>
-                    <div class="text-caption text-grey-6 uppercase text-weight-bold">Win Rate</div>
+                    <div class="text-caption text-muted uppercase text-weight-bold">Win Rate</div>
                   </div>
                 </div>
                 <div class="col-6">
-                  <div class="column items-center q-pa-md bg-grey-1 rounded-borders border-grey-2 bordered">
+                  <div class="column items-center q-pa-md stat-tile rounded-borders bordered">
                     <div class="text-h5 text-weight-bolder text-primary">#{{ (overallStats.avg_pos || 0).toFixed(1) }}</div>
                     <div class="text-caption text-grey-6 uppercase text-weight-bold">Avg Pos</div>
                   </div>
@@ -109,14 +109,13 @@
 
               <div class="column q-gutter-y-md">
                 <div v-for="pos in [1, 2, 3, 4]" :key="pos" class="distribution-row row items-center q-col-gutter-sm">
-                  <div class="col-2 text-weight-bold text-grey-7">{{ pos }}{{ getOrdinal(pos) }}</div>
+                  <div class="col-2 text-weight-bold text-muted">{{ pos }}{{ getOrdinal(pos) }}</div>
                   <div class="col">
                     <q-linear-progress
                       :value="(overallStats.positions[pos] || 0) / (overallStats.total_games || 1)"
                       size="12px"
                       :color="getPosColor(pos)"
-                      track-color="grey-3"
-                      class="rounded-borders"
+                      class="rounded-borders distribution-progress"
                     />
                   </div>
                   <div class="col-3 text-right">
@@ -135,7 +134,7 @@
           <q-tabs
             v-model="tab"
             dense
-            class="text-grey-7 bg-white rounded-borders bordered q-mb-lg"
+            class="text-muted surface-card rounded-borders bordered q-mb-lg"
             active-color="primary"
             indicator-color="primary"
             align="justify"
@@ -152,7 +151,7 @@
               <div v-if="topGames.length > 0" class="q-mb-xl">
                 <div class="row items-center q-mb-md">
                   <q-icon name="emoji_events" color="amber-8" size="24px" class="q-mr-sm" />
-                  <div class="text-h5 text-weight-bolder text-dark tracking-tighter">Top Performing Games</div>
+                  <div class="text-h5 text-weight-bolder text-heading tracking-tighter">Top Performing Games</div>
                 </div>
                 <div class="row q-col-gutter-md">
                   <div v-for="(game, idx) in topGames" :key="'top-'+game.name" class="col-12 col-sm-4">
@@ -161,7 +160,7 @@
                         #{{ idx + 1 }}
                       </div>
                       <q-card-section class="q-pt-xl q-pb-md text-center">
-                        <div class="text-subtitle1 text-weight-bolder text-dark ellipsis q-mb-sm">{{ game.name }}</div>
+                        <div class="text-subtitle1 text-weight-bolder text-heading ellipsis q-mb-sm">{{ game.name }}</div>
                         <div class="row justify-center q-gutter-x-md">
                           <div class="column">
                             <div class="text-h5 text-weight-bolder text-positive">{{ game.winRate.toFixed(0) }}%</div>
@@ -185,7 +184,7 @@
                 <div class="row items-center justify-between q-mb-md">
                   <div class="row items-center">
                     <q-icon name="list" color="indigo-7" size="24px" class="q-mr-sm" />
-                    <div class="text-h5 text-weight-bolder text-dark tracking-tighter">All Games Library</div>
+                    <div class="text-h5 text-weight-bolder text-heading tracking-tighter">All Games Library</div>
                   </div>
                   <div style="min-width: 200px">
                     <q-input
@@ -194,7 +193,7 @@
                       dense
                       rounded
                       placeholder="Search games..."
-                      class="bg-white"
+                      class="surface-card"
                     >
                       <template #append>
                         <q-icon name="search" size="xs" />
@@ -203,38 +202,41 @@
                   </div>
                 </div>
 
-                <div v-if="filteredGameStats.length === 0" class="text-center q-pa-xl text-grey-5 bg-white rounded-borders border-dashed border-grey-4">
+                <div v-if="filteredGameStats.length === 0" class="text-center q-pa-xl text-muted surface-card rounded-borders border-dashed empty-state">
                   <q-icon name="sports_esports" size="48px" class="q-mb-sm opacity-20" />
                   <div class="text-h6 text-weight-light">No games found</div>
                 </div>
 
                 <div v-else class="row q-col-gutter-md">
-                  <div v-for="game in filteredGameStats" :key="game.name" class="col-12 col-sm-6">
+                  <div v-for="game in filteredGameStats" :key="game.name" class="col-12 col-sm-6 col-md-4">
                     <q-card flat bordered class="game-stat-card hover-lift transition-all">
-                      <q-card-section>
-                        <div class="text-subtitle1 text-weight-bold text-dark ellipsis q-mb-sm">{{ game.name }}</div>
-                        <div class="row items-center justify-between">
-                          <div class="column">
-                            <div class="text-h6 text-weight-bolder text-positive">{{ game.winRate.toFixed(0) }}%</div>
-                            <div class="text-caption text-grey-6 uppercase letter-spacing-1" style="font-size: 0.6rem">Win Rate</div>
+                      <q-card-section class="q-pa-md">
+                        <div class="game-card-title text-body1 text-weight-bold text-heading ellipsis q-mb-sm">
+                          {{ game.name }}
+                        </div>
+                        <div class="row items-stretch no-wrap game-card-metrics q-mb-sm">
+                          <div class="col column items-center justify-center q-py-xs">
+                            <div class="text-h6 text-weight-bolder text-positive q-mb-none">{{ game.winRate.toFixed(0) }}%</div>
+                            <div class="text-caption text-muted uppercase metric-label">Win</div>
                           </div>
-                          <div class="column items-end">
-                            <div class="text-h6 text-weight-bolder text-primary">#{{ game.avgPos.toFixed(1) }}</div>
-                            <div class="text-caption text-grey-6 uppercase letter-spacing-1" style="font-size: 0.6rem">Avg Pos</div>
+                          <div class="metric-divider" />
+                          <div class="col column items-center justify-center q-py-xs">
+                            <div class="text-h6 text-weight-bolder text-primary q-mb-none">#{{ game.avgPos.toFixed(1) }}</div>
+                            <div class="text-caption text-muted uppercase metric-label">Avg</div>
                           </div>
                         </div>
-                        <div class="q-mt-md">
-                          <div class="text-caption text-grey-6 q-mb-xs text-weight-bold uppercase" style="font-size: 0.6rem">Recent Results</div>
-                          <div class="row q-gutter-xs">
-                            <q-badge
-                              v-for="(p, idx) in game.positions.slice(-5).reverse()"
-                              :key="idx"
-                              :color="getPosBadgeColor(p)"
-                              class="text-weight-bold result-badge"
-                            >
-                              {{ p }}
-                            </q-badge>
-                          </div>
+                        <div class="recent-results-label text-caption text-muted">
+                          Last 5
+                        </div>
+                        <div class="row items-center q-gutter-xs recent-results">
+                          <q-badge
+                            v-for="(p, idx) in game.positions.slice(-5).reverse()"
+                            :key="idx"
+                            :color="getPosBadgeColor(p)"
+                            class="text-weight-bold result-badge"
+                          >
+                            {{ p }}
+                          </q-badge>
                         </div>
                       </q-card-section>
                     </q-card>
@@ -247,9 +249,9 @@
             <q-tab-panel name="seasons" class="q-pa-none">
               <div class="row items-center q-mb-md">
                 <q-icon name="history" color="teal-7" size="24px" class="q-mr-sm" />
-                <div class="text-h5 text-weight-bolder text-dark tracking-tighter">Season Participation</div>
+                <div class="text-h5 text-weight-bolder text-heading tracking-tighter">Season Participation</div>
               </div>
-              <q-card flat bordered class="rounded-borders overflow-hidden bg-white">
+              <q-card flat bordered class="rounded-borders overflow-hidden surface-card">
                 <q-list separator>
                   <q-item
                     v-for="sp in userSeasonList"
@@ -260,7 +262,7 @@
                     class="q-py-md"
                   >
                     <q-item-section avatar>
-                      <q-avatar color="grey-2" text-color="primary" icon="emoji_events" />
+                      <q-avatar class="season-avatar" text-color="primary" icon="emoji_events" />
                     </q-item-section>
                     <q-item-section>
                       <q-item-label class="text-h6 text-weight-bold">{{ sp.season_details?.name || `Season ${sp.season}` }}</q-item-label>
@@ -432,8 +434,91 @@ onMounted(load);
 </script>
 
 <style scoped lang="scss">
+/* ---- Theme tokens (light defaults) ---- */
+.user-detail-page {
+  --page-bg: #f7f8fa;
+  --surface-bg: #ffffff;
+  --surface-header-bg: #f1f3f5;
+  --surface-header-text: rgba(15, 23, 42, 0.65);
+  --surface-border: rgba(15, 23, 42, 0.08);
+  --surface-border-strong: rgba(15, 23, 42, 0.14);
+  --surface-shadow: 0 1px 2px rgba(15, 23, 42, 0.04),
+    0 4px 16px rgba(15, 23, 42, 0.04);
+  --surface-shadow-hover: 0 1px 2px rgba(15, 23, 42, 0.05),
+    0 8px 24px rgba(15, 23, 42, 0.06);
+  --stat-tile-bg: rgba(15, 23, 42, 0.025);
+  --text-heading: #1f2933;
+  --text-muted: rgba(15, 23, 42, 0.6);
+  --divider: rgba(15, 23, 42, 0.06);
+  --progress-track: rgba(15, 23, 42, 0.08);
+
+  background: var(--page-bg);
+  min-height: 100%;
+}
+
+:global(.body--dark) .user-detail-page {
+  --page-bg: #181b21;
+  --surface-bg: #1e222a;
+  --surface-header-bg: #242933;
+  --surface-header-text: rgba(255, 255, 255, 0.7);
+  --surface-border: rgba(255, 255, 255, 0.08);
+  --surface-border-strong: rgba(255, 255, 255, 0.14);
+  --surface-shadow: 0 1px 2px rgba(0, 0, 0, 0.4),
+    0 4px 16px rgba(0, 0, 0, 0.25);
+  --surface-shadow-hover: 0 1px 2px rgba(0, 0, 0, 0.45),
+    0 8px 24px rgba(0, 0, 0, 0.35);
+  --stat-tile-bg: rgba(255, 255, 255, 0.04);
+  --text-heading: #e6e8ee;
+  --text-muted: rgba(255, 255, 255, 0.6);
+  --divider: rgba(255, 255, 255, 0.08);
+  --progress-track: rgba(255, 255, 255, 0.12);
+}
+
+/* ---- Shared surface utilities ---- */
+.surface-card {
+  background: var(--surface-bg) !important;
+  border-color: var(--surface-border) !important;
+  border-radius: 14px;
+  box-shadow: var(--surface-shadow);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+
+  &:hover {
+    border-color: var(--surface-border-strong) !important;
+    box-shadow: var(--surface-shadow-hover);
+  }
+}
+
+.surface-card-header {
+  background: var(--surface-header-bg);
+  color: var(--surface-header-text);
+  border-bottom: 1px solid var(--divider);
+}
+
+.stat-tile {
+  background: var(--stat-tile-bg);
+  border-color: var(--surface-border) !important;
+  transition: background 0.2s ease, border-color 0.2s ease;
+
+  &:hover {
+    background: var(--surface-border);
+    border-color: var(--surface-border-strong) !important;
+  }
+}
+
+.text-heading { color: var(--text-heading) !important; }
+.text-muted { color: var(--text-muted) !important; }
+
+.empty-state {
+  border: 1px dashed var(--surface-border-strong);
+}
+
+.season-avatar {
+  background: var(--stat-tile-bg);
+}
+
+/* ---- Theme-aware overrides for existing styles ---- */
 .border-top {
-  border-top: 1px solid rgba(0,0,0,0.05);
+  border-top: 1px solid var(--divider);
 }
 
 .profile-hero {
@@ -474,7 +559,7 @@ onMounted(load);
 .separator-vertical-dark {
   width: 1px;
   height: 30px;
-  background: rgba(0,0,0,0.05);
+  background: var(--divider);
 }
 
 .max-width-container {
@@ -497,20 +582,29 @@ onMounted(load);
 
 .distribution-row {
   transition: background 0.2s ease;
+  border-radius: 6px;
+  padding: 2px 4px;
   &:hover {
-    background: rgba(0,0,0,0.02);
+    background: var(--divider);
   }
 }
 
 .bordered {
-  border: 1px solid rgba(0,0,0,0.05);
+  border: 1px solid var(--surface-border);
 }
 
 .top-game-card {
   border-radius: 16px;
-  background: white;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.05);
-  border: 1px solid rgba(0,0,0,0.03);
+  background: var(--surface-bg);
+  box-shadow: var(--surface-shadow);
+  border: 1px solid var(--surface-border);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease,
+    transform 0.2s ease;
+
+  &:hover {
+    border-color: var(--surface-border-strong);
+    box-shadow: var(--surface-shadow-hover);
+  }
 
   &.rank-1 { border-top: 4px solid #ffc107; }
   &.rank-2 { border-top: 4px solid #b0bec5; }
@@ -535,22 +629,83 @@ onMounted(load);
 }
 
 .game-stat-card {
-  border-radius: 12px;
-  &:hover {
-    border-color: var(--q-primary);
+  position: relative;
+  border-radius: 14px;
+  background: var(--surface-bg) !important;
+  border-color: var(--surface-border) !important;
+  overflow: hidden;
+  transition: border-color 0.2s ease, background 0.2s ease,
+    box-shadow 0.2s ease, transform 0.2s ease;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--q-primary), var(--q-positive));
+    opacity: 0;
+    transition: opacity 0.25s ease;
   }
+
+  &:hover {
+    border-color: var(--surface-border-strong) !important;
+
+    &::before {
+      opacity: 1;
+    }
+  }
+}
+
+.game-card-title {
+  letter-spacing: -0.01em;
+  line-height: 1.25;
+}
+
+.game-card-metrics {
+  border-radius: 10px;
+  background: var(--stat-tile-bg);
+  border: 1px solid var(--surface-border);
+}
+
+.metric-divider {
+  width: 1px;
+  align-self: stretch;
+  background: var(--divider);
+  margin: 6px 0;
+}
+
+.metric-label {
+  font-size: 0.6rem;
+  letter-spacing: 0.08em;
+  margin-top: 2px;
+}
+
+.recent-results {
+  min-height: 20px;
+}
+
+.recent-results-label {
+  font-size: 0.65rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+  opacity: 0.75;
 }
 
 .result-badge {
   border-radius: 4px;
   padding: 2px 6px;
+  min-width: 22px;
+  justify-content: center;
 }
 
 .hover-lift {
   transition: transform 0.2s ease, box-shadow 0.2s ease;
   &:hover {
     transform: translateY(-4px);
-    box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+    box-shadow: var(--surface-shadow-hover);
   }
 }
 
