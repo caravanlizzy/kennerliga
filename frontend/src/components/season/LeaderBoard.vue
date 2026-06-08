@@ -9,10 +9,12 @@
     class="leaderboard-container"
   >
     <!-- View Toggle -->
-    <div class="q-px-lg q-py-md row items-center justify-between border-bottom-subtle">
+    <div class="leaderboard-header q-px-lg q-py-md row items-center justify-between">
       <div class="row items-center q-gutter-x-sm">
-        <q-icon name="analytics" color="primary" size="20px" />
-        <span class="text-subtitle2 text-weight-bold leaderboard-header-text">Leaderboard</span>
+        <div class="leaderboard-header__icon">
+          <q-icon name="analytics" size="18px" />
+        </div>
+        <span class="text-subtitle2 text-weight-bolder leaderboard-header-text">Leaderboard</span>
       </div>
       <q-btn-toggle
         v-model="showAllLeagues"
@@ -34,8 +36,7 @@
     <q-markup-table flat dense separator="none" class="leaderboard-table bg-transparent">
       <thead>
       <tr class="text-uppercase text-grey-6 text-caption text-weight-bold header-row">
-        <th class="q-pa-none" style="width: 4px"></th>
-        <th class="text-left q-pl-lg" style="width: 40px">#</th>
+        <th class="text-left q-pl-lg" style="width: 56px">#</th>
         <th class="text-left player-column">Player</th>
 
         <template v-if="!showAllLeagues">
@@ -96,7 +97,7 @@
       >
         <!-- League level separator (e.g. L1 to L2) -->
         <tr v-if="index > 0 && bestLeague(row) !== bestLeague(standings.standings[index-1])" class="league-separator-row">
-          <td :colspan="showAllLeagues ? 3 + standings.levels.length : 7" class="q-pa-none">
+          <td :colspan="showAllLeagues ? 2 + standings.levels.length : 6" class="q-pa-none">
             <div class="league-separator-divider"></div>
           </td>
         </tr>
@@ -108,21 +109,29 @@
           }"
         >
 
-          <!-- League Level Indicator Strip -->
-          <td class="q-pa-none relative-position" style="width: 4px; padding: 0 !important;">
-            <div
-              v-if="bestLeague(row)"
-              class="league-strip"
-              :style="{ backgroundColor: getHexLeagueColor(bestLeague(row)!) }"
-            >
-              <q-tooltip anchor="center right" self="center left">
-                League {{ bestLeague(row) }}
-              </q-tooltip>
+          <!-- Rank (with subtle league level dot) -->
+          <td class="text-left q-pl-lg leaderboard-rank-text">
+            <div class="row items-center no-wrap q-gutter-x-sm">
+              <div
+                class="rank-badge"
+                :class="{
+                  'rank-badge--gold': index === 0,
+                  'rank-badge--silver': index === 1,
+                  'rank-badge--bronze': index === 2,
+                }"
+              >
+                {{ index + 1 }}
+              </div>
+              <div
+                v-if="bestLeague(row)"
+                class="league-dot"
+                :style="{ backgroundColor: getHexLeagueColor(bestLeague(row)!) }"
+              >
+                <q-tooltip anchor="center right" self="center left">
+                  League {{ bestLeague(row) }}
+                </q-tooltip>
+              </div>
             </div>
-          </td>
-          <!-- Rank -->
-          <td class="text-left q-pl-lg text-weight-bold leaderboard-rank-text">
-            {{ index + 1 }}
           </td>
 
           <!-- Player -->
@@ -234,7 +243,7 @@
       <div class="row items-center q-gutter-x-xs">
         <q-icon name="info" size="14px" />
         <span>
-          <strong>Legend:</strong> The colored strip on the left indicates the highest league level a player has participated in.
+          <strong>Legend:</strong> The colored dot next to the rank indicates the highest league level a player has participated in.
           Higher league participation results in a higher leaderboard position.
         </span>
       </div>
@@ -326,10 +335,75 @@ watch(
 <style scoped lang="scss">
 .leaderboard-container, .leaderboard-empty {
   overflow: auto;
-  background: var(--leaderboard-bg, rgba(255, 255, 255, 0.4));
-  backdrop-filter: blur(8px);
+  background: var(--leaderboard-bg, rgba(255, 255, 255, 0.65));
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   border: 1px solid var(--leaderboard-border, rgba(54, 64, 88, 0.08));
-  border-radius: 12px;
+  border-radius: 16px;
+  box-shadow: 0 4px 24px rgba(54, 64, 88, 0.04);
+}
+
+.leaderboard-header {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.5) 0%, rgba(255, 255, 255, 0.2) 100%);
+  border-bottom: 1px solid var(--leaderboard-border, rgba(54, 64, 88, 0.08));
+}
+
+.leaderboard-header__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, var(--q-primary) 0%, var(--q-accent) 100%);
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(54, 64, 88, 0.15);
+}
+
+:global(.body--dark) .leaderboard-header {
+  background: linear-gradient(135deg, rgba(40, 40, 40, 0.6) 0%, rgba(30, 30, 30, 0.3) 100%);
+}
+
+:global(.body--dark) .rank-badge {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--leaderboard-rank-text, #bdbdbd);
+}
+
+:global(.body--dark) .league-toggle {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+.rank-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 28px;
+  height: 28px;
+  padding: 0 8px;
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: 13px;
+  color: var(--leaderboard-rank-text, #757575);
+  background: rgba(54, 64, 88, 0.06);
+}
+
+.rank-badge--gold {
+  background: linear-gradient(135deg, #ffd54f 0%, #ffb300 100%);
+  color: #5d4037;
+  box-shadow: 0 2px 8px rgba(255, 179, 0, 0.35);
+}
+
+.rank-badge--silver {
+  background: linear-gradient(135deg, #eceff1 0%, #b0bec5 100%);
+  color: #37474f;
+  box-shadow: 0 2px 8px rgba(176, 190, 197, 0.4);
+}
+
+.rank-badge--bronze {
+  background: linear-gradient(135deg, #d7a17a 0%, #a1683a 100%);
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(161, 104, 58, 0.35);
 }
 
 :global(.body--dark) {
@@ -378,9 +452,10 @@ watch(
 .league-toggle {
   flex: 0 0 auto;
   width: 200px;
-  background: rgba(0, 0, 0, 0.04);
+  background: rgba(54, 64, 88, 0.06);
   border-radius: 999px;
-  padding: 2px;
+  padding: 3px;
+  border: 1px solid rgba(54, 64, 88, 0.06);
 
   :deep(.q-btn) {
     flex: 1 1 0;
@@ -389,6 +464,11 @@ watch(
     font-weight: 600;
     min-height: 28px;
     padding: 2px 10px;
+    transition: all 0.2s ease;
+  }
+
+  :deep(.q-btn--active) {
+    box-shadow: 0 2px 8px rgba(54, 64, 88, 0.15);
   }
 
   :deep(.q-btn__content) {
@@ -402,37 +482,42 @@ watch(
 }
 
 .header-row {
-  background: var(--leaderboard-header-bg, rgba(248, 249, 250, 0.5));
-  border-bottom: 1.5px solid var(--leaderboard-border, rgba(54, 64, 88, 0.12));
+  background: var(--leaderboard-header-bg, rgba(248, 249, 250, 0.4));
+  border-bottom: 1.5px solid var(--leaderboard-border, rgba(54, 64, 88, 0.1));
   height: 48px;
+  letter-spacing: 0.5px;
 }
 
 .leaderboard-row {
   position: relative;
-  transition: all 0.2s ease;
+  transition: background-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
   border-bottom: 1px solid var(--leaderboard-row-border, rgba(0, 0, 0, 0.04));
-  background: var(--leaderboard-row-bg, white);
+  background: var(--leaderboard-row-bg, transparent);
 
   &:hover {
-    background-color: var(--leaderboard-row-hover, rgba(248, 250, 252, 1)) !important;
+    background-color: var(--leaderboard-row-hover, rgba(255, 255, 255, 0.85)) !important;
     z-index: 1;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
+    box-shadow: 0 4px 16px rgba(54, 64, 88, 0.06);
   }
 }
 
-.league-strip {
-  position: absolute;
-  left: 0;
-  top: 0;
-  bottom: 0;
-  width: 4px;
-  z-index: 2;
+.league-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex: 0 0 auto;
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.6), 0 1px 2px rgba(0, 0, 0, 0.08);
+  cursor: help;
+}
+
+:global(.body--dark) .league-dot {
+  box-shadow: 0 0 0 2px rgba(30, 30, 30, 0.6), 0 1px 2px rgba(0, 0, 0, 0.3);
 }
 
 
 .top-rank-bg {
-  /* Using a very subtle amber overlay for the first rank, compatible with league backgrounds */
-  background-image: linear-gradient(rgba(255, 215, 0, 0.05), rgba(255, 215, 0, 0.05)) !important;
+  /* Subtle gold tint with left accent for the leader */
+  background-image: linear-gradient(90deg, rgba(255, 193, 7, 0.08) 0%, rgba(255, 193, 7, 0) 60%) !important;
 }
 
 .league-indicator {
