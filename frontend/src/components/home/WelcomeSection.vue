@@ -16,10 +16,11 @@
         <div class="full-width relative-position" style="z-index: 1">
           <!-- Hero Section -->
           <div class="column items-center text-center" :class="isMobile ? 'q-mb-lg' : 'q-mb-xl'">
-            <q-icon name="img:icons/favicon.svg" :size="isMobile ? '80px' : '120px'" class="q-mb-lg" />
-            <h1 :class="[isMobile ? 'text-h4' : 'text-h2', 'text-weight-bold q-my-none tracking-tighter']" style="letter-spacing: -2px; text-shadow: 0 2px 4px rgba(0,0,0,0.05)">
-              <span class="text-primary">Kenner</span><span class="text-accent">Liga</span>
-            </h1>
+            <BrandLogo
+              class="q-my-none"
+              :icon-size="isMobile ? '80px' : '120px'"
+              :word-size="isMobile ? '2.125rem' : '3.75rem'"
+            />
             <p :class="[isMobile ? 'text-subtitle1' : 'text-h5', 'text-grey-8 q-mt-md q-mb-xl']">
               A private space for our boardgame league. We manage everything from season registration and auto league assignment to game picking, banning, and results. Stay connected via community chat and keep an eye on past season stats and overviews.
             </p>
@@ -100,6 +101,7 @@
 import ReleaseNotesSection from 'components/home/ReleaseNotesSection.vue';
 import PurposeSection from 'components/home/PurposeSection.vue';
 import KennerButton from 'components/base/KennerButton.vue';
+import BrandLogo from 'components/base/BrandLogo.vue';
 import { useResponsive } from 'src/composables/responsive';
 import { onMounted, onUnmounted, ref } from 'vue';
 
@@ -144,6 +146,7 @@ onUnmounted(() => {
 .border-top-subtle {
   border-top: 1px solid rgba(54, 64, 88, 0.08);
 }
+
 
 .welcome-section-root {
   display: flex;
