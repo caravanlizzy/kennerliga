@@ -7,9 +7,9 @@
     color="primary"
   >
     <template #title>
-      <div class="row items-center no-wrap season-title-block">
+      <div class="row items-center no-wrap q-gutter-x-sm season-title-block">
         <span class="text-h5 text-weight-bold tracking-tight text-primary">Seasons</span>
-        <div v-if="isLiveSeason" class="live-pill q-ml-sm">
+        <div v-if="isLiveSeason" class="live-pill">
           <span class="live-dot" />
           Running
         </div>
@@ -19,27 +19,25 @@
     <template #header-extra>
       <div
         v-if="!loading"
-        class="row no-wrap items-center q-gutter-x-sm q-ml-md season-header-extra"
+        class="row items-center justify-end no-wrap q-gutter-x-sm q-ml-md col season-header-extra"
       >
-        <div style="width: 110px">
+        <div style="min-width: 110px">
           <KennerSelect
             :model-value="selectedSeasonYear"
             :options="seasonYearOptions"
             label="Year"
             emit-value
             map-options
-            dense
             @update:model-value="$emit('update:selectedSeasonYear', $event)"
           />
         </div>
-        <div style="width: 110px">
+        <div style="min-width: 110px">
           <KennerSelect
             :model-value="selectedSeasonMonth"
             :options="seasonMonthOptions"
             label="Month"
             emit-value
             map-options
-            dense
             @update:model-value="$emit('update:selectedSeasonMonth', $event)"
           />
         </div>
@@ -51,7 +49,7 @@
           :label="isMobile ? '' : 'Overview'"
           :round="isMobile"
           :to="{ name: 'season-overview', params: { id: selectedSeasonId } }"
-          class="overview-btn q-ml-auto"
+          class="overview-btn q-ml-md"
         >
           <KennerTooltip v-if="isMobile">Season Overview</KennerTooltip>
         </KennerButton>
@@ -113,7 +111,7 @@ const isLiveSeason = computed(
 
 .season-header-extra {
   min-height: 40px;
-  flex: 1 1 auto;
+  gap: 8px;
 
   :deep(.q-field) {
     align-self: center;
@@ -124,6 +122,7 @@ const isLiveSeason = computed(
     height: 40px;
   }
 }
+
 
 .live-pill {
   display: inline-flex;
