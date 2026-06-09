@@ -7,6 +7,11 @@ import userRoutes from 'src/router/userRoutes';
 import 'vue-router';
 import seasonRoutes from 'src/router/seasonRoutes';
 import leagueRoutes from 'src/router/leagueRoutes';
+import ResponsivePage from 'src/components/layout/ResponsivePage.vue';
+
+const LiveMobile = () => import('src/pages/mobile/LiveActionMobilePage.vue');
+const ChatMobile = () => import('src/pages/mobile/ChatMobilePage.vue');
+const LeaderboardMobile = () => import('src/pages/mobile/LeaderboardMobilePage.vue');
 
 // To ensure it is treated as a module, add at least one `export` statement
 export {};
@@ -111,24 +116,29 @@ const routes: RouteRecordRaw[] = [
         meta: { icon: 'gavel', label: 'Rules' }
       },
       {
-        path: 'm/seasons',
-        name: 'mobile-seasons',
-        component: () => import('src/pages/mobile/SeasonsMobilePage.vue'),
+        path: 'live',
+        name: 'live',
+        component: ResponsivePage,
+        props: { desktop: LiveMobile, mobile: LiveMobile },
+        meta: { icon: 'bolt', label: 'Live', requiresAuth: true },
       },
       {
-        path: 'm/live',
-        name: 'mobile-live',
-        component: () => import('src/pages/mobile/LiveActionMobilePage.vue'),
+        path: 'chat',
+        name: 'chat',
+        component: ResponsivePage,
+        props: { desktop: ChatMobile, mobile: ChatMobile },
+        meta: { icon: 'chat', label: 'Chat', requiresAuth: true },
       },
       {
-        path: 'm/chat',
-        name: 'mobile-chat',
-        component: () => import('src/pages/mobile/ChatMobilePage.vue'),
+        path: 'leaderboard',
+        name: 'leaderboard',
+        component: ResponsivePage,
+        props: { desktop: LeaderboardMobile, mobile: LeaderboardMobile },
+        meta: { icon: 'stars', label: 'Leaderboard', requiresAuth: true },
       },
       {
-        path: 'm/leaderboard',
-        name: 'mobile-leaderboard',
-        component: () => import('src/pages/mobile/LeaderboardMobilePage.vue'),
+        path: 'm/:rest(.*)*',
+        redirect: (to) => '/' + ((to.params.rest as string[]) ?? []).join('/'),
       },
       {
         path: 'dev',

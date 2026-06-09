@@ -1,9 +1,15 @@
+import ResponsivePage from 'src/components/layout/ResponsivePage.vue';
+
+const SeasonsDesktop = () => import('pages/season/SeasonListPage.vue');
+const SeasonsMobile = () => import('src/pages/mobile/SeasonsMobilePage.vue');
+
 export default {
   path: 'seasons/', meta: { requiresAuth: true }, children: [
     {
       path: '',
       name: 'seasons',
-      component: () => import('pages/season/SeasonListPage.vue'),
+      component: ResponsivePage,
+      props: { desktop: SeasonsDesktop, mobile: SeasonsMobile },
       meta: { icon: 'military_tech', label: 'Seasons' },
     },
     {

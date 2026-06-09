@@ -32,33 +32,27 @@ const { isMobile } = useResponsive();
 const { isAuthenticated } = storeToRefs(useUserStore());
 
 const activeTab = computed(() => {
-  const name = route.name as string;
-  if (name === 'home') return 'welcome';
-  if (name === 'mobile-seasons' || name === 'seasons') return 'seasons';
-  if (name === 'mobile-live' || name === 'live') return 'live';
-  if (name === 'mobile-chat' || name === 'chat') return 'chat';
-  if (name === 'mobile-leaderboard' || name === 'leaderboard') return 'leaderboard';
-  return null;
+  switch (route.name) {
+    case 'home': return 'welcome';
+    case 'seasons': return 'seasons';
+    case 'live': return 'live';
+    case 'chat': return 'chat';
+    case 'leaderboard': return 'leaderboard';
+    default: return null;
+  }
 });
 
+const tabToRoute = {
+  welcome: 'home',
+  seasons: 'seasons',
+  live: 'live',
+  chat: 'chat',
+  leaderboard: 'leaderboard',
+} as const;
+
 function handleTabChange(value: string) {
-  switch (value) {
-    case 'welcome':
-      router.push({ name: 'home' });
-      break;
-    case 'seasons':
-      router.push({ name: 'mobile-seasons' });
-      break;
-    case 'live':
-      router.push({ name: 'mobile-live' });
-      break;
-    case 'chat':
-      router.push({ name: 'mobile-chat' });
-      break;
-    case 'leaderboard':
-      router.push({ name: 'mobile-leaderboard' });
-      break;
-  }
+  const name = tabToRoute[value as keyof typeof tabToRoute];
+  if (name) router.push({ name });
 }
 </script>
 
