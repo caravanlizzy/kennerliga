@@ -3,18 +3,19 @@
     :to="forwardName ? { name: forwardName } : undefined"
     @click="handleClick"
     clickable
-    class="drawer-item q-mx-sm q-my-xs squircle-shape"
+    dense
+    class="drawer-item q-mx-sm squircle-shape"
     active-class="drawer-item--active"
   >
     <q-item-section avatar class="drawer-item__icon-section">
       <q-icon
         :name="icon"
-        size="22px"
+        size="20px"
         :color="active ? (iconColor || 'primary') : (iconColor || 'grey-7')"
       />
     </q-item-section>
     <q-item-section class="drawer-item__text-section">
-      <q-item-label class="text-subtitle2 text-weight-medium">
+      <q-item-label class="drawer-item__label text-weight-medium">
         {{ label }}
       </q-item-label>
     </q-item-section>
@@ -44,12 +45,14 @@ function handleClick() {
 
 <style scoped lang="scss">
 .drawer-item {
-  min-height: 44px;
-  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  min-height: 32px;
+  padding: 2px 12px;
+  margin: 1px 0;
+  transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
   color: #555;
 
   &.squircle-shape {
-    border-radius: 12px !important;
+    border-radius: 8px !important;
   }
 
   &:hover {
@@ -88,5 +91,10 @@ function handleClick() {
 
 .drawer-item__text-section {
   padding-left: 8px;
+}
+
+.drawer-item__label {
+  font-size: 0.9375rem;
+  line-height: 1.2;
 }
 </style>
