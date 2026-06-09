@@ -529,7 +529,72 @@ class LiveEventViewSet(ViewSet):
                 }
             )
 
-        # 3. GAME_FINISHED events
+        # 3. LEAGUE_RUNNING events (picking/banning done; games actually played)
+        # Emitted once a league has moved past the pick/ban phase.
+        running_statuses = {"PLAYING", "DONE"}
+        # Group picks per league
+        picks_by_league: Dict[int, list] = defaultdict(list)
+        for pick in picks:
+            picks_by_league[pick.league_id].append(pick)
+        # Group bans per league
+        bans_by_league: Dict[int, list] = defaultdict(list)
+        for ban in bans:
+            bans_by_league[ban.league_id].append(ban)
+
+        for league in leagues:
+            if league.status not in running_statuses:
+                continue
+            league_picks = picks_by_league.get(league.id, [])
+            if not league_picks:
+                continue
+            # A game is successfully banned only if the number of BanDecisions
+            # targeting it reaches the league's min_bans threshold
+            # (2 for leagues with > 2 members, else 1). Picks with fewer bans
+            # are still being played.
+            member_count = league.member_count or 0
+            min_bans = 2 if member_count > 2 else 1
+            ban_counts_by_sg: Dict[int, int] = defaultdict(int)
+            for b in bans_by_league.get(league.id, []):
+                if b.selected_game_id is not None:
+                    ban_counts_by_sg[b.selected_game_id] += 1
+            banned_sg_ids = {
+                sg_id
+                for sg_id, c in ban_counts_by_sg.items()
+                if c >= min_bans
+            }
+            playing_picks = [p for p in league_picks if p.id not in banned_sg_ids]
+            if not playing_picks:
+                continue
+
+            league_bans = bans_by_league.get(league.id, [])
+            if league_bans:
+                event_time = max(b.created_at for b in league_bans)
+            else:
+                event_time = max(p.created_at for p in league_picks)
+
+            games_payload = [
+                {
+                    "playerName": p.profile.profile_name,
+                    "gameName": p.game.name,
+                }
+                for p in playing_picks
+            ]
+
+            events.append(
+                {
+                    "id": f"league-running-{league.id}",
+                    "type": "LEAGUE_RUNNING",
+                    "timestamp": event_time,
+                    "leagueLevel": league.level,
+                    "leagueId": league.id,
+                    "data": {
+                        "leagueLevel": league.level,
+                        "games": games_payload,
+                    },
+                }
+            )
+
+        # 4. GAME_FINISHED events
         # Get all results for these leagues
         results = Result.objects.filter(league__in=leagues).select_related(
             "player_profile", "selected_game__game", "league"

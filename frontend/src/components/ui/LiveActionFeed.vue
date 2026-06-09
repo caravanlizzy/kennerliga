@@ -112,6 +112,24 @@
                       </table>
                     </div>
                   </span>
+                  <span v-else-if="event.type === 'LEAGUE_RUNNING'">
+                    League {{ event.data.leagueLevel || event.leagueLevel }} is on! Games being played:
+                    <div v-if="event.data.games && event.data.games.length" class="q-mt-sm results-container">
+                      <table class="results-table full-width">
+                        <tbody>
+                          <tr v-for="(g, idx) in event.data.games" :key="idx">
+                            <td class="results-table__pos q-pr-sm" style="width: 20px;">
+                              {{ idx + 1 }}.
+                            </td>
+                            <td class="playerName results-table__name">
+                              <strong>{{ g.gameName }}</strong>
+                              <span class="text-grey-6"> &mdash; {{ g.playerName }}</span>
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </span>
                   <span v-else-if="event.type === 'LEAGUE_FINISHED'">
                     League {{ event.data.leagueLevel || event.leagueLevel }} finishes! Winner:
                     <strong>{{ event.data.winners?.join(', ') }}</strong>
@@ -207,6 +225,8 @@ function getEventDisplayType(type: TLiveEventType) {
       return 'PICK';
     case 'BAN':
       return 'BAN';
+    case 'LEAGUE_RUNNING':
+      return 'RUNNING';
     case 'GAME_FINISHED':
       return 'WIN';
     case 'LEAGUE_FINISHED':
@@ -233,6 +253,8 @@ function getColorHex(type: TLiveEventType) {
       return '#37474f'; // primary (from quasar.variables.scss)
     case 'BAN':
       return '#d63a38'; // negative
+    case 'LEAGUE_RUNNING':
+      return '#1976d2'; // info / blue
     case 'GAME_FINISHED':
       return '#4bb26a'; // positive
     case 'LEAGUE_FINISHED':
@@ -250,6 +272,8 @@ function getEventIcon(type: TLiveEventType) {
       return 'check_circle';
     case 'BAN':
       return 'block';
+    case 'LEAGUE_RUNNING':
+      return 'sports_esports';
     case 'GAME_FINISHED':
       return 'emoji_events';
     case 'LEAGUE_FINISHED':
