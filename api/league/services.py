@@ -213,10 +213,16 @@ def build_full_standings_payload(
     }
 
 
-def _selected_games_qs(league_filter):
-    """SelectedGame queryset with the lean ResultConfig prefetch."""
+def _selected_games_qs(league_filter, season_ids):
+    """SelectedGame queryset with the lean ResultConfig prefetch.
+
+    Ordered by the picker's ``SeasonParticipant.rank`` for the relevant
+    season(s). ``season_ids`` constrains the ``season_participants`` join so
+    we don't pull rank rows from unrelated seasons.
+    """
     return (
         SelectedGame.objects.filter(**league_filter)
+        .filter(profile__season_participants__season_id__in=season_ids)
         .annotate(ban_count=Count("bandecision"))
         .select_related("game__platform", "profile")
         .prefetch_related(
@@ -225,7 +231,7 @@ def _selected_games_qs(league_filter):
                 queryset=ResultConfig.objects.only("id", "has_points", "game_id"),
             )
         )
-        .order_by("id")
+        .order_by("profile__season_participants__rank", "id")
     )
 
 
@@ -240,7 +246,8 @@ def get_full_standings_data(league: League) -> Dict:
     required_bans = get_ban_amount_for_success(len(members_list))
 
     selected_games = list(
-        _selected_games_qs({"league_id": league.id}).filter(ban_count__lt=required_bans)
+        _selected_games_qs({"league_id": league.id}, [league.season_id])
+        .filter(ban_count__lt=required_bans)
     )
     league_standing_list = list(
         LeagueStanding.objects.filter(league_id=league.id).select_related(
@@ -280,10 +287,11 @@ def build_full_standings_for_season(leagues: List[League]) -> List[Dict]:
         return []
 
     league_ids = [l.id for l in leagues]
+    season_ids = list({l.season_id for l in leagues})
 
     # ---- one bulk query per dataset, grouped by league_id in Python --------
     selected_games_by_league: Dict[int, List] = {lid: [] for lid in league_ids}
-    for sg in _selected_games_qs({"league_id__in": league_ids}):
+    for sg in _selected_games_qs({"league_id__in": league_ids}, season_ids):
         selected_games_by_league.setdefault(sg.league_id, []).append(sg)
 
     members_by_league: Dict[int, List] = {lid: [] for lid in league_ids}
