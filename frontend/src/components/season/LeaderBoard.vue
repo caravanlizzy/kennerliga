@@ -8,30 +8,6 @@
     v-else-if="standings && standings.standings.length > 0"
     class="leaderboard-container"
   >
-    <!-- View Toggle -->
-    <div class="leaderboard-header q-px-lg q-py-md row items-center justify-between">
-      <div class="row items-center q-gutter-x-sm">
-        <div class="leaderboard-header__icon">
-          <q-icon name="analytics" size="18px" />
-        </div>
-        <span class="text-subtitle2 text-weight-bolder leaderboard-header-text">Leaderboard</span>
-      </div>
-      <q-btn-toggle
-        v-model="showAllLeagues"
-        toggle-color="primary"
-        text-color="grey-7"
-        unelevated
-        dense
-        no-caps
-        spread
-        class="league-toggle"
-        :options="[
-          { label: 'Highest', value: false },
-          { label: 'All', value: true }
-        ]"
-      />
-    </div>
-
     <!-- Table -->
     <q-markup-table flat dense separator="none" class="leaderboard-table bg-transparent">
       <thead>
@@ -289,7 +265,7 @@ interface LeaderBoardResponse {
 const standings = ref<LeaderBoardResponse | null>(null);
 const loading = ref(false);
 const error = ref(false);
-const showAllLeagues = ref(false);
+const showAllLeagues = defineModel<boolean>('showAllLeagues', { default: false });
 
 async function fetchStandings(): Promise<void> {
   loading.value = true;
