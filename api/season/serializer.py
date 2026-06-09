@@ -2,9 +2,9 @@ from rest_framework import serializers
 from rest_framework.fields import SerializerMethodField, BooleanField, CharField
 from rest_framework.serializers import ModelSerializer
 
-from game.models import SelectedGame, BanDecision
 from game.serializers import SelectedGameSerializer
 from season.models import Season, SeasonParticipant
+from season.participant_prefetch import get_league_standings_order
 from user.models import PlayerProfile
 
 
@@ -121,71 +121,91 @@ class SeasonParticipantSerializer(ModelSerializer):
             "league",
         ]
 
-    def get_league(self, obj):
-        # Find the league this participant is in for this season
-        league = obj.leagues_member.filter(season=obj.season).first()
-        if not league:
-            return None
-        return {"id": league.id, "level": league.level}
+    # ---- context / prefetch helpers ----------------------------------------
+    def _league(self):
+        """League this participant is being rendered in (from context)."""
+        return self.context.get("league")
 
-    def get_league_position(self, obj):
-        from league.models import LeagueStanding
+    @staticmethod
+    def _profile_selected_games(obj, league):
+        """
+        Return SelectedGames for ``obj.profile`` in ``league`` using the
+        ``profile.sg_in_league`` prefetched attribute when available.
+        Falls back to a filtered query only if the prefetch is missing.
+        """
+        prefetched = getattr(obj.profile, "sg_in_league", None)
+        if prefetched is not None:
+            return prefetched
+        # Fallback (no prefetch attached) - kept for safety, not for hot paths.
+        from game.models import SelectedGame
 
-        # Find the league this participant is in for this season
-        league = obj.leagues_member.filter(season=obj.season).first()
-        if not league:
-            return None
-
-        # Get all standings for this league, ordered by the same rules as the standings view
-        standings = list(
-            LeagueStanding.objects.filter(league=league)
-            .order_by(
-                "-league_points",
-                "-wins",
-                "-tie_break_priority",
-                "player_profile__profile_name",
-            )
-            .values_list("player_profile_id", flat=True)
-        )
-
-        try:
-            # Rank is index + 1
-            return standings.index(obj.profile_id) + 1
-        except ValueError:
-            return None
-
-    def get_my_banned_game(self, obj):
-        league = self.context.get("league")
-        if not league:
-            return None
-
-        ban_decision = (
-            BanDecision.objects.filter(league=league, player_banning=obj.profile)
-            .select_related("selected_game")
-            .first()
-        )
-
-        if not ban_decision or not ban_decision.selected_game:
-            return None
-
-        return SelectedGameSerializer(
-            ban_decision.selected_game, context=self.context
-        ).data
-
-    # ---- public getters -----------------------------------------------------
-    def get_selected_games(self, obj):
-        league = self.context.get("league")
-        if not league:
-            return []
-
-        qs = (
+        return list(
             SelectedGame.objects.filter(profile=obj.profile, league=league)
             .select_related("game")
             .order_by("id")
         )
 
-        return SelectedGameSerializer(qs, many=True, context=self.context).data
+    @staticmethod
+    def _profile_bans(obj, league):
+        """Same idea for BanDecisions made by this profile in the league."""
+        prefetched = getattr(obj.profile, "bans_in_league", None)
+        if prefetched is not None:
+            return prefetched
+        from game.models import BanDecision
+
+        return list(
+            BanDecision.objects.filter(
+                league=league, player_banning=obj.profile
+            ).select_related("selected_game__game")
+        )
+
+    # ---- field getters -----------------------------------------------------
+    def get_league(self, obj):
+        league = self._league()
+        if not league:
+            return None
+        return {"id": league.id, "level": league.level}
+
+    def get_league_position(self, obj):
+        league = self._league()
+        if not league:
+            return None
+        standings_order = get_league_standings_order(league)
+        try:
+            return standings_order.index(obj.profile_id) + 1
+        except ValueError:
+            return None
+
+    def get_my_banned_game(self, obj):
+        league = self._league()
+        if not league:
+            return None
+
+        bans = self._profile_bans(obj, league)
+        selected_game = next(
+            (b.selected_game for b in bans if b.selected_game_id), None
+        )
+        if not selected_game:
+            return None
+
+        return SelectedGameSerializer(selected_game, context=self.context).data
+
+    def get_selected_games(self, obj):
+        league = self._league()
+        if not league:
+            return []
+        return SelectedGameSerializer(
+            self._profile_selected_games(obj, league),
+            many=True,
+            context=self.context,
+        ).data
 
     def get_is_active_player(self, obj):
-        league = self.context.get("league")
-        return bool(league and obj == league.active_player)
+        league = self._league()
+        if not league:
+            return False
+        # Prefer cached active_player_id (attached by attach_league_lookups)
+        active_id = getattr(league, "_active_player_id", None)
+        if active_id is None:
+            active_id = league.active_player_id
+        return obj.id == active_id

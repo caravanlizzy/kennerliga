@@ -1,8 +1,6 @@
-from django.db.models import Exists, OuterRef
 from rest_framework.fields import SerializerMethodField
 from rest_framework import serializers
 
-from game.models import BanDecision
 from league.models import League, GameStanding, LeagueStanding
 from season.models import SeasonParticipant
 
@@ -38,12 +36,14 @@ class LeagueSerializer(serializers.ModelSerializer):
         return is_league_finished(obj)
 
     def get_members(self, obj):
-        # We want to include selected_games for the season list page's icons
-        # Use SeasonParticipantSerializer and pass the league in context
+        # We want to include selected_games for the season list page's icons.
+        # Use the prefetch helper to avoid N+1 queries inside the participant
+        # serializer (selected games, bans, standings, active player, ...).
         from season.serializer import SeasonParticipantSerializer
+        from season.participant_prefetch import prefetched_members
 
         return SeasonParticipantSerializer(
-            obj.members.all(), many=True, context={"league": obj}
+            prefetched_members(obj), many=True, context={"league": obj}
         ).data
 
     def validate(self, attrs):
@@ -168,23 +168,16 @@ class LeagueDetailSerializer(serializers.ModelSerializer):
         fields = ["id", "status", "season", "level", "active_player", "members"]
 
     def get_members(self, league):
-        # Render members with your existing participant serializer
+        # Render members with the participant serializer, using the central
+        # prefetch helper so all per-row data (selected games, bans, standings,
+        # active player) is resolved without N+1 queries.
         from season.serializer import SeasonParticipantSerializer
+        from season.participant_prefetch import prefetched_members
 
-        members_qs = (
-            league.members.select_related("profile__user")
-            .annotate(
-                has_banned=Exists(
-                    BanDecision.objects.filter(
-                        league=league,
-                        player_banning_id=OuterRef("profile_id"),
-                    )
-                )
-            )
-            .order_by("rank")
-        )
         serializer = SeasonParticipantSerializer(
-            members_qs, many=True, context={"league": league}
+            prefetched_members(league),
+            many=True,
+            context={"league": league},
         )
         data = serializer.data
 
