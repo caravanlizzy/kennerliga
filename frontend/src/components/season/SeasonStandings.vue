@@ -111,31 +111,35 @@ const isOverviewPage = computed(() => route.name === 'season-overview');
 async function loadLeaguesForSeason(seasonId: number) {
   loadingLeagues.value = true;
   try {
+    if (props.mode === 'standings') {
+      // Batched: single request returns all leagues + their full standings.
+      const { data } = await api.get(`season/seasons/${seasonId}/full-standings/`);
+      const leaguesPayload: any[] = data?.leagues ?? [];
+      leagues.value = leaguesPayload.map(l => ({
+        id: l.id,
+        name: l.name,
+        level: l.level,
+      }));
+      const standingsMap: Record<number, any> = {};
+      leaguesPayload.forEach(l => {
+        standingsMap[l.id] = l;
+      });
+      allStandingsData.value = standingsMap;
+      return;
+    }
+
     const { data: leaguesData } = await api.get<League[]>('league/leagues', {
       params: { season: seasonId },
     });
     leagues.value = leaguesData;
 
-    if (leaguesData.length > 0) {
-      if (props.mode === 'standings') {
-        // Fetch all full-standings in parallel
-        const standingsPromises = leaguesData.map(l =>
-          api.get(`league/leagues/${l.id}/full-standings/`).then(res => ({ id: l.id, data: res.data }))
-        );
-        const results = await Promise.all(standingsPromises);
-        const standingsMap: Record<number, any> = {};
-        results.forEach(r => {
-          standingsMap[r.id] = r.data;
-        });
-        allStandingsData.value = standingsMap;
-      } else if (props.mode === 'results') {
-        // In results mode, initialize all league stores in parallel
-        const storePromises = leaguesData.map(l => {
-          const store = useLeagueStore(l.id)();
-          return store.init();
-        });
-        await Promise.all(storePromises);
-      }
+    if (leaguesData.length > 0 && props.mode === 'results') {
+      // In results mode, initialize all league stores in parallel
+      const storePromises = leaguesData.map(l => {
+        const store = useLeagueStore(l.id)();
+        return store.init();
+      });
+      await Promise.all(storePromises);
     }
   } catch (e) {
     console.error('Error loading season standings:', e);

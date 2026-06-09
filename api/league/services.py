@@ -1,7 +1,7 @@
-from typing import Optional, List, Dict
+from typing import Optional, List, Dict, Iterable
 from django.db import transaction
-from django.db.models import Count
-from game.models import SelectedGame, BanDecision
+from django.db.models import Count, Prefetch
+from game.models import SelectedGame, BanDecision, ResultConfig
 from league.models import (
     League,
     LeagueStatus,
@@ -14,67 +14,57 @@ from league import queries as q
 from api.constants import get_ban_amount_for_success
 
 
-def get_full_standings_data(league: League) -> Dict:
-    required_bans = get_ban_amount_for_success(league.members.count())
+def _serialize_selected_game(sg) -> Dict:
+    configs = list(sg.game.resultconfig_set.all())
+    return {
+        "id": sg.id,
+        "game_name": sg.game.name,
+        "game_short_name": sg.game.short_name,
+        "platform_name": sg.game.platform.name,
+        "has_points": configs[0].has_points if configs else True,
+        "selected_by_id": sg.profile.id if sg.profile else None,
+        "selected_by_name": sg.profile.profile_name if sg.profile else None,
+    }
 
-    # 1. Get all selected games for this league (column headers)
-    selected_games = (
-        SelectedGame.objects.filter(league_id=league.id)
-        .annotate(ban_count=Count("bandecision"))
-        .filter(ban_count__lt=required_bans)
-        .select_related("game__platform", "profile")
-        .prefetch_related("game__resultconfig_set")
-        .order_by("id")
-    )
 
-    selected_game_list = []
-    for sg in selected_games:
-        configs = list(sg.game.resultconfig_set.all())
-        selected_game_list.append(
-            {
-                "id": sg.id,
-                "game_name": sg.game.name,
-                "game_short_name": sg.game.short_name,
-                "platform_name": sg.game.platform.name,
-                "has_points": configs[0].has_points if configs else True,
-                "selected_by_id": sg.profile.id if sg.profile else None,
-                "selected_by_name": sg.profile.profile_name if sg.profile else None,
-            }
-        )
+def _gs_row(gs) -> Dict:
+    return {
+        "points": str(gs.points),
+        "league_points": str(gs.league_points),
+        "rank": gs.rank,
+        "decisive_tie_breaker_name": gs.decisive_tie_breaker.name
+        if gs.decisive_tie_breaker
+        else None,
+        "tie_breaker_value": gs.tie_breaker_value,
+    }
+
+
+def build_full_standings_payload(
+    league: League,
+    selected_games: List,
+    league_standing_list: List,
+    game_standings: Iterable,
+    members: Iterable,
+    tie_resolutions: Iterable,
+) -> Dict:
+    """Build the full-standings payload for one league from pre-loaded data.
+
+    All inputs are expected to already be filtered to this league. This keeps
+    the function reusable between the per-league endpoint and the batched
+    season-wide endpoint, where data is bulk-loaded once and grouped by
+    league_id.
+    """
+    selected_game_list = [_serialize_selected_game(sg) for sg in selected_games]
     selected_game_ids = [sg.id for sg in selected_games]
 
-    # 2. Get league standings (for row ordering & totals)
-    league_standings = LeagueStanding.objects.filter(
-        league_id=league.id
-    ).select_related("player_profile__user")
-    league_standing_list = list(league_standings)
     league_standing_dict = {ls.player_profile_id: ls for ls in league_standing_list}
 
-    # 3. Get all game standings for this league
-    game_standings = GameStanding.objects.filter(league_id=league.id).select_related(
-        "decisive_tie_breaker"
-    )
-
     # Build a lookup: {player_profile_id: {selected_game_id: {...}}}
-    game_data_by_player = {}
+    game_data_by_player: Dict[int, Dict[int, Dict]] = {}
     for gs in game_standings:
-        pid = gs.player_profile_id
-        if pid not in game_data_by_player:
-            game_data_by_player[pid] = {}
-        game_data_by_player[pid][gs.selected_game_id] = {
-            "points": str(gs.points),
-            "league_points": str(gs.league_points),
-            "rank": gs.rank,
-            "decisive_tie_breaker_name": gs.decisive_tie_breaker.name
-            if gs.decisive_tie_breaker
-            else None,
-            "tie_breaker_value": gs.tie_breaker_value,
-        }
-
-    # 4. Get all members of the league to ensure everyone is listed even if they have no standings yet
-    members = league.members.select_related("profile__user").order_by(
-        "rank", "profile__profile_name"
-    )
+        game_data_by_player.setdefault(gs.player_profile_id, {})[
+            gs.selected_game_id
+        ] = _gs_row(gs)
 
     # 5. Build the response rows
     standings_list = []
@@ -120,13 +110,13 @@ def get_full_standings_data(league: League) -> Dict:
         )
 
     # 6. Build tie groups information (unresolved and resolved)
-    # Unresolved groups from current snapshot
-    unresolved_qs = LeagueStanding.objects.filter(
-        league_id=league.id, unresolved_tie_group__isnull=False
-    ).select_related("player_profile__user")
+    # Unresolved groups from current snapshot - reuse already-loaded
+    # ``league_standing_list`` instead of re-querying LeagueStanding.
     unresolved_map: Dict[str, Dict] = {}
-    for ls in unresolved_qs:
+    for ls in league_standing_list:
         key = ls.unresolved_tie_group
+        if not key:
+            continue
         if key not in unresolved_map:
             unresolved_map[key] = {
                 "group_key": key,
@@ -151,12 +141,8 @@ def get_full_standings_data(league: League) -> Dict:
         )
 
     # Resolutions (may include groups already resolved and thus not present as unresolved anymore)
-    # 7. Get tie resolutions
-    resolutions = LeagueTieResolution.objects.filter(
-        league_id=league.id
-    ).prefetch_related("entries__player_profile__user")
     resolution_map: Dict[str, Dict] = {}
-    for res in resolutions:
+    for res in tie_resolutions:
         # Members ordered by order_index for display
         ordered_entries = sorted(res.entries.all(), key=lambda e: e.order_index)
         members = [
@@ -225,6 +211,142 @@ def get_full_standings_data(league: League) -> Dict:
         "season_id": league.season_id,
         "tie_groups": tie_groups,
     }
+
+
+def _selected_games_qs(league_filter):
+    """SelectedGame queryset with the lean ResultConfig prefetch."""
+    return (
+        SelectedGame.objects.filter(**league_filter)
+        .annotate(ban_count=Count("bandecision"))
+        .select_related("game__platform", "profile")
+        .prefetch_related(
+            Prefetch(
+                "game__resultconfig_set",
+                queryset=ResultConfig.objects.only("id", "has_points", "game_id"),
+            )
+        )
+        .order_by("id")
+    )
+
+
+def get_full_standings_data(league: League) -> Dict:
+    """Per-league entry point. Loads the five datasets and delegates the
+    payload construction to ``build_full_standings_payload``."""
+    members_list = list(
+        league.members.select_related("profile__user").order_by(
+            "rank", "profile__profile_name"
+        )
+    )
+    required_bans = get_ban_amount_for_success(len(members_list))
+
+    selected_games = list(
+        _selected_games_qs({"league_id": league.id}).filter(ban_count__lt=required_bans)
+    )
+    league_standing_list = list(
+        LeagueStanding.objects.filter(league_id=league.id).select_related(
+            "player_profile__user"
+        )
+    )
+    game_standings = list(
+        GameStanding.objects.filter(league_id=league.id).select_related(
+            "decisive_tie_breaker"
+        )
+    )
+    tie_resolutions = list(
+        LeagueTieResolution.objects.filter(league_id=league.id).prefetch_related(
+            "entries__player_profile__user"
+        )
+    )
+
+    return build_full_standings_payload(
+        league=league,
+        selected_games=selected_games,
+        league_standing_list=league_standing_list,
+        game_standings=game_standings,
+        members=members_list,
+        tie_resolutions=tie_resolutions,
+    )
+
+
+def build_full_standings_for_season(leagues: List[League]) -> List[Dict]:
+    """Bulk-load every dataset once for all leagues in the season and build
+    the per-league full-standings payload in Python.
+
+    This is the constant-query backend for ``GET /seasons/{id}/full-standings/``
+    used by the season-standings page on the frontend, replacing the previous
+    ``1 + N`` HTTP round-trips and ``O(N)`` SQL fan-out.
+    """
+    if not leagues:
+        return []
+
+    league_ids = [l.id for l in leagues]
+
+    # ---- one bulk query per dataset, grouped by league_id in Python --------
+    selected_games_by_league: Dict[int, List] = {lid: [] for lid in league_ids}
+    for sg in _selected_games_qs({"league_id__in": league_ids}):
+        selected_games_by_league.setdefault(sg.league_id, []).append(sg)
+
+    members_by_league: Dict[int, List] = {lid: [] for lid in league_ids}
+    members_qs = (
+        SeasonParticipant.objects.filter(leagues_member__in=league_ids)
+        .select_related("profile__user")
+        .prefetch_related("leagues_member")
+    )
+    for m in members_qs:
+        # A participant can belong to multiple leagues (theoretically), so
+        # bucket them by every league in ``league_ids`` they're a member of.
+        for lg in m.leagues_member.all():
+            if lg.id in members_by_league:
+                members_by_league[lg.id].append(m)
+    # Stable per-league ordering: rank, then profile_name
+    for lid, lst in members_by_league.items():
+        lst.sort(
+            key=lambda m: (
+                m.rank if m.rank is not None else 10**9,
+                (m.profile.profile_name or ""),
+            )
+        )
+
+    league_standings_by_league: Dict[int, List] = {lid: [] for lid in league_ids}
+    for ls in LeagueStanding.objects.filter(league_id__in=league_ids).select_related(
+        "player_profile__user"
+    ):
+        league_standings_by_league.setdefault(ls.league_id, []).append(ls)
+
+    game_standings_by_league: Dict[int, List] = {lid: [] for lid in league_ids}
+    for gs in GameStanding.objects.filter(league_id__in=league_ids).select_related(
+        "decisive_tie_breaker"
+    ):
+        game_standings_by_league.setdefault(gs.league_id, []).append(gs)
+
+    tie_resolutions_by_league: Dict[int, List] = {lid: [] for lid in league_ids}
+    for tr in LeagueTieResolution.objects.filter(
+        league_id__in=league_ids
+    ).prefetch_related("entries__player_profile__user"):
+        tie_resolutions_by_league.setdefault(tr.league_id, []).append(tr)
+
+    # ---- per-league payload (filter selected_games by ban threshold) -------
+    payloads: List[Dict] = []
+    for league in leagues:
+        members_for_league = members_by_league.get(league.id, [])
+        required_bans = get_ban_amount_for_success(len(members_for_league))
+        sgs = [
+            sg
+            for sg in selected_games_by_league.get(league.id, [])
+            if sg.ban_count < required_bans
+        ]
+        payload = build_full_standings_payload(
+            league=league,
+            selected_games=sgs,
+            league_standing_list=league_standings_by_league.get(league.id, []),
+            game_standings=game_standings_by_league.get(league.id, []),
+            members=members_for_league,
+            tie_resolutions=tie_resolutions_by_league.get(league.id, []),
+        )
+        payload.update({"id": league.id, "level": league.level, "name": str(league)})
+        payloads.append(payload)
+
+    return payloads
 
 
 def set_league_active_player(league: League, participant) -> None:

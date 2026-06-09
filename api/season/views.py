@@ -24,6 +24,7 @@ from season.queries import (
 )
 from season.models import Season, SeasonParticipant
 from season.scoreboard_payload import build_season_scoreboards
+from league.services import build_full_standings_for_season
 from season.serializer import (
     SeasonSerializer,
     SeasonParticipantSerializer,
@@ -80,9 +81,42 @@ class SeasonViewSet(ModelViewSet):
             "registration_status",
             "league_winners",
             "seasons_with_leagues",
+            "full_standings",
         ]:
             return [IsAuthenticated()]
         return [IsAdminUser()]
+
+    @action(detail=True, methods=["get"], url_path="full-standings")
+    def full_standings(self, request, pk=None):
+        """
+        GET /seasons/{id}/full-standings/
+
+        Batched endpoint that returns full-standings payloads for every league
+        in the season in a single response. Replaces the previous frontend
+        pattern of issuing 1 + N HTTP calls (one for the league list and one
+        per league for its full standings) and keeps the SQL count constant
+        regardless of league count.
+        """
+        season = get_object_or_404(
+            Season.objects.only("id", "year", "month", "status"), pk=pk
+        )
+        leagues = list(
+            League.objects.filter(season_id=season.id)
+            .select_related("season")
+            .order_by("level", "id")
+        )
+        payloads = build_full_standings_for_season(leagues)
+        return Response(
+            {
+                "season": {
+                    "id": season.id,
+                    "name": season.name,
+                    "status": season.status,
+                },
+                "leagues": payloads,
+            },
+            status=status.HTTP_200_OK,
+        )
 
     @action(detail=False, methods=["get"], url_path="seasons-with-leagues")
     def seasons_with_leagues(self, request):

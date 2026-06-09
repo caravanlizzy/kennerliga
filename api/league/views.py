@@ -38,6 +38,28 @@ class LeagueViewSet(ModelViewSet):
     def get_queryset(self):
         if self.action == "full_standings":
             return League.objects.all()
+        if self.action == "list":
+            # LeagueListSerializer renders members through
+            # SeasonParticipantMiniSerializer, which only needs the
+            # SeasonParticipant rows themselves (id + profile.profile_name +
+            # profile.user.username). Skip the heavy ``members__profile*``
+            # chain prefetch and use a lean one tailored to the mini
+            # serializer to keep the list endpoint cheap.
+            from django.db.models import Prefetch
+            from season.models import SeasonParticipant
+
+            return (
+                League.objects.all()
+                .prefetch_related(
+                    Prefetch(
+                        "members",
+                        queryset=SeasonParticipant.objects.select_related(
+                            "profile__user"
+                        ),
+                    )
+                )
+                .order_by("season__year", "season__month", "level")
+            )
         return super().get_queryset()
 
     def get_serializer_class(self):
