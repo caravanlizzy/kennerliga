@@ -3,9 +3,6 @@
     <!-- Drawer Header -->
     <div class="q-pa-lg q-mb-sm row items-center border-bottom-subtle bg-drawer-header">
       <q-icon name="img:icons/favicon.svg" size="36px" class="q-mr-sm" />
-      <span class="text-h5 text-weight-bolder tracking-tighter" style="letter-spacing: -1px;">
-        <span class="text-primary">Kenner</span><span class="text-accent">Liga</span>
-      </span>
       <q-space />
       <q-btn flat round dense icon="close" color="grey-7" class="hover-scale" @click="drawerState = false" />
     </div>
