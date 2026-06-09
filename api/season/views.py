@@ -567,10 +567,20 @@ class LiveEventViewSet(ViewSet):
                 continue
 
             league_bans = bans_by_league.get(league.id, [])
-            if league_bans:
-                event_time = max(b.created_at for b in league_bans)
-            else:
-                event_time = max(p.created_at for p in league_picks)
+            # Ensure the LEAGUE_RUNNING event always appears strictly after
+            # every PICK and BAN of that league on the timeline. We therefore
+            # take the latest timestamp across both picks and bans, using
+            # `updated_at` as well as `created_at` so that picks which were
+            # re-saved (e.g. repicks replacing a banned game on the same row)
+            # are also taken into account.
+            candidate_times = []
+            for p in league_picks:
+                candidate_times.append(p.created_at)
+                if getattr(p, "updated_at", None):
+                    candidate_times.append(p.updated_at)
+            for b in league_bans:
+                candidate_times.append(b.created_at)
+            event_time = max(candidate_times)
 
             games_payload = [
                 {
@@ -753,7 +763,23 @@ class LiveEventViewSet(ViewSet):
             )
 
         # Sort
-        events.sort(key=lambda x: x["timestamp"], reverse=True)
+        # Secondary key: when timestamps tie, ensure LEAGUE_RUNNING summaries
+        # come AFTER the PICK/BAN events that led to them (and BEFORE later
+        # events such as GAME_FINISHED). With reverse=True (newest first), a
+        # higher secondary value appears earlier in the rendered list, so
+        # LEAGUE_RUNNING gets a higher rank than PICK/BAN on ties.
+        type_order = {
+            "PICK": 0,
+            "BAN": 0,
+            "LEAGUE_RUNNING": 1,
+            "GAME_FINISHED": 2,
+            "LEAGUE_FINISHED": 3,
+            "SEASON_FINISHED": 4,
+        }
+        events.sort(
+            key=lambda x: (x["timestamp"], type_order.get(x["type"], 0)),
+            reverse=True,
+        )
         limit = request.query_params.get("limit")
         if limit:
             try:
