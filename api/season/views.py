@@ -1,8 +1,8 @@
 # Create your views here.
 from collections import defaultdict
-from typing import List, Dict
+from typing import Dict
 
-from django.db.models import Prefetch, Q
+from django.db.models import Count, Prefetch, Q
 from django.http import HttpResponseNotFound
 from rest_framework import status
 from rest_framework.decorators import action
@@ -23,6 +23,7 @@ from season.queries import (
     get_running_season,
 )
 from season.models import Season, SeasonParticipant
+from season.scoreboard_payload import build_season_scoreboards
 from season.serializer import (
     SeasonSerializer,
     SeasonParticipantSerializer,
@@ -218,119 +219,6 @@ class SeasonViewSet(ModelViewSet):
         )
 
 
-def build_league_scoreboard_payload(league: League) -> dict:
-    """
-    Compose a grid-friendly scoreboard payload for a single league.
-
-    Shape:
-    {
-      "league": {"id": ..., "name": ...},
-      "columns": ["Game", "Alice", "Bob", ...],
-      "rows": [
-        {"type":"game","selected_game_id":12,"game":"Catan","cells":[{"player_id":..,"profile_name":"Alice","value":83,"display":"83 pts"}, ...]},
-        {"type":"league_totals","label":"League Points","cells":[...]}
-      ]
-    }
-    """
-    # Establish player order once (rank, then id)
-    members_qs = (
-        league.members.select_related("profile__user")
-        .order_by("rank", "id")
-        .values("profile", "profile__profile_name")
-    )
-    members = list(members_qs)
-    player_order: List[int] = [m["profile"] for m in members]
-    player_names: Dict[int, str] = {
-        m["profile"]: m["profile__profile_name"] for m in members
-    }
-
-    # All per-game standings for this league
-    gs_qs = (
-        GameStanding.objects.filter(league=league.id)
-        .select_related("player_profile", "selected_game__game")
-        .order_by("selected_game_id", "rank")
-    )
-
-    # Group rows by selected_game
-    by_game: Dict[int, list] = defaultdict(list)
-    game_meta: Dict[int, dict] = {}
-    for row in gs_qs:
-        by_game[row.selected_game_id].append(row)
-        if row.selected_game_id not in game_meta:
-            game_meta[row.selected_game_id] = {
-                "game_name": getattr(
-                    row.selected_game.game, "name", str(row.selected_game.game)
-                )
-            }
-
-    # Columns: "Game" + players
-    columns = ["Game"] + [
-        player_names.get(pid, f"Player {pid}") for pid in player_order
-    ]
-
-    # Build game rows
-    rows: List[dict] = []
-    for selected_game_id, standings in by_game.items():
-        points_by_player = {
-            s.player_profile: getattr(s, "ingame_points", None) for s in standings
-        }
-
-        cells = []
-        for pid in player_order:
-            val = points_by_player.get(pid)
-            cells.append(
-                {
-                    "player_id": pid,
-                    "profile_name": player_names.get(pid, f"Player {pid}"),
-                    "value": val,
-                    "display": (f"{val} pts" if val is not None else "—"),
-                }
-            )
-
-        rows.append(
-            {
-                "type": "game",
-                "selected_game_id": selected_game_id,
-                "game": game_meta[selected_game_id]["game_name"],
-                "cells": cells,
-            }
-        )
-
-    # Final league totals row
-    ls_qs = LeagueStanding.objects.filter(league=league.id).select_related(
-        "player_profile"
-    )
-    league_points_by_player = {
-        ls.player_profile: getattr(ls, "league_points", 0) for ls in ls_qs
-    }
-
-    total_cells = []
-    for pid in player_order:
-        val = league_points_by_player.get(pid, 0)
-        total_cells.append(
-            {
-                "player_id": pid,
-                "profile_name": player_names.get(pid, f"Player {pid}"),
-                "value": val,
-                "display": f"{val} pts",
-            }
-        )
-
-    rows.append(
-        {
-            "type": "league_totals",
-            "label": "League Points",
-            "cells": total_cells,
-        }
-    )
-
-    return {
-        "league": {"id": league.id, "name": league.level},
-        "columns": columns,
-        "rows": rows,
-    }
-
-
 class SeasonScoreboardViewSet(ViewSet):
     """
     GET /season-scoreboards/{season_id}/scoreboards/
@@ -344,16 +232,17 @@ class SeasonScoreboardViewSet(ViewSet):
             Season.objects.only("id", "year", "month", "status"), pk=pk
         )
 
-        # Fetch leagues for this season (Level 1 = highest)
-        leagues = (
+        # Fetch leagues for this season (Level 1 = highest). Members are
+        # prefetched once and reused by the scoreboard payload builder, which
+        # also bulk-loads GameStanding/LeagueStanding for the whole season.
+        leagues = list(
             League.objects.filter(season_id=season.id)
             .select_related("season")
             .prefetch_related(
                 Prefetch(
                     "members",
                     queryset=(
-                        League._meta.get_field("members")
-                        .remote_field.model.objects.select_related("profile__user")
+                        SeasonParticipant.objects.select_related("profile__user")
                         .order_by("rank", "id")
                     ),
                 )
@@ -361,7 +250,7 @@ class SeasonScoreboardViewSet(ViewSet):
             .order_by("level", "id")
         )
 
-        payloads = [build_league_scoreboard_payload(league) for league in leagues]
+        payloads = build_season_scoreboards(leagues)
 
         return Response(
             {
@@ -557,7 +446,12 @@ class LiveEventViewSet(ViewSet):
                 return Response([])
             season_id = season.id
 
-        leagues = League.objects.filter(season_id=season_id)
+        # Annotate member_count once instead of running .count() per league.
+        leagues = list(
+            League.objects.filter(season_id=season_id).annotate(
+                member_count=Count("members")
+            )
+        )
         events = []
 
         # 1. PICK events
@@ -611,9 +505,20 @@ class LiveEventViewSet(ViewSet):
         for r in results:
             results_by_game[r.selected_game_id].append(r)
 
-        # We need member counts for each league to determine if a game is finished.
-        # Let's count members per league.
-        league_member_counts = {l.id: l.members.count() for l in leagues}
+        # Member counts come from the annotation above (single query).
+        league_member_counts = {l.id: l.member_count for l in leagues}
+
+        # Bulk-load all LeagueStanding rows for the season once and group
+        # by league_id in Python; replaces per-league queries below.
+        standings_by_league: Dict[int, list] = defaultdict(list)
+        for ls in (
+            LeagueStanding.objects.filter(
+                league_id__in=[l.id for l in leagues]
+            )
+            .select_related("player_profile")
+            .order_by("-league_points", "-wins")
+        ):
+            standings_by_league[ls.league_id].append(ls)
 
         for sg_id, res_list in results_by_game.items():
             if not res_list:
@@ -700,11 +605,9 @@ class LiveEventViewSet(ViewSet):
             if not league.is_finished:
                 continue
 
-            standings = LeagueStanding.objects.filter(league=league).order_by(
-                "-league_points", "-wins"
-            )
-            if standings.exists():
-                top_standing = standings.first()
+            standings = standings_by_league.get(league.id, [])
+            if standings:
+                top_standing = standings[0]
                 # Get all players tied for first place
                 winners = [
                     s.player_profile.profile_name
@@ -729,17 +632,13 @@ class LiveEventViewSet(ViewSet):
         # 5. SEASON_FINISHED events
         season = Season.objects.filter(id=season_id).first()
         if season and season.status == Season.SeasonStatus.DONE:
-            # Find winner of Level 1 league
-            l1 = leagues.filter(level=1).first()
+            # Find winner of Level 1 league (reuse the bulk standings load)
+            l1 = next((l for l in leagues if l.level == 1), None)
             winner_name = "Unknown"
             if l1:
-                top_standing = (
-                    LeagueStanding.objects.filter(league=l1)
-                    .order_by("-league_points", "-wins")
-                    .first()
-                )
-                if top_standing:
-                    winner_name = top_standing.player_profile.profile_name
+                l1_standings = standings_by_league.get(l1.id, [])
+                if l1_standings:
+                    winner_name = l1_standings[0].player_profile.profile_name
 
             events.append(
                 {
