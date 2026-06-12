@@ -1,7 +1,7 @@
 <template>
   <div>
     <div v-if="loading" class="flex flex-center q-pa-md">
-      <q-spinner color="primary" size="2em" />
+      <q-spinner-puff color="primary" size="2em" />
     </div>
     <div
       v-else-if="events.length === 0"

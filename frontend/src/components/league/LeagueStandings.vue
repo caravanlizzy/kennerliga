@@ -54,7 +54,7 @@
       No standings available.
     </div>
     <div v-else-if="loading" class="q-pa-md flex flex-center">
-      <q-spinner-dots color="primary" size="40px" />
+      <q-spinner-puff color="primary" size="40px" />
     </div>
 
     <!-- Tie Groups Info (Shown at bottom for resolved groups or standalone) -->

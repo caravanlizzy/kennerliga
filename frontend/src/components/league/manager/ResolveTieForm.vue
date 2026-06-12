@@ -1,7 +1,7 @@
 <template>
   <div class="q-pa-md">
     <div v-if="loadingReasons" class="flex flex-center q-pa-md">
-      <q-spinner size="30px" color="primary" />
+      <q-spinner-puff size="30px" color="primary" />
     </div>
     <q-form v-else @submit="submit">
       <div class="text-subtitle2 q-mb-sm">Players in Tie Group (Order determines rank)</div>

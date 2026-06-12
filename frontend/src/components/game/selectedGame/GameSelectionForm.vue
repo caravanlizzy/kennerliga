@@ -1,7 +1,7 @@
 <template>
   <q-card flat class="q-pa-sm modern-details-card">
     <q-inner-loading v-if="isLoading" :showing="isLoading" class="rounded-borders">
-      <q-spinner-grid size="4em" color="primary" />
+      <q-spinner-puff size="4em" color="primary" />
     </q-inner-loading>
 
     <template v-else>
