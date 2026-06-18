@@ -6,7 +6,7 @@
         <KennerButton round dense flat icon="add" @click="addItem"/>
       </template>
     </KennerInput>
-    <div v-for="(item, index) of listItems" :key="item.id">
+    <div v-for="(item, index) of listItems" :key="item.itemId">
       <div v-if="item.isEditable">
         <KennerInput bottom-slots hide-bottom-space label="editieren" color="primary" class="text-white"
                  v-model="item.name">
@@ -41,7 +41,7 @@
           <!--          <kenner-counter :content="index" />-->
         </div>
         <div class="column justify-center item-start">{{ item.name }}</div>
-        <KennerButton icon="delete" @click="removeItem(item)" color="accent" flat dense/>
+        <KennerButton icon="delete" @click.stop="removeItem(item)" color="accent" flat dense/>
       </div>
     </div>
   </div>
