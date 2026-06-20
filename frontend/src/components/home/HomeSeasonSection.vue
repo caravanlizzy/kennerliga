@@ -18,7 +18,6 @@
 
     <template #header-extra>
       <div
-        v-if="!loading"
         class="row items-center justify-end no-wrap q-gutter-x-sm q-ml-md col season-header-extra"
       >
         <div style="min-width: 110px">
@@ -28,6 +27,7 @@
             label="Year"
             emit-value
             map-options
+            :disable="loading"
             @update:model-value="$emit('update:selectedSeasonYear', $event)"
           />
         </div>
@@ -38,11 +38,12 @@
             label="Month"
             emit-value
             map-options
+            :disable="loading"
             @update:model-value="$emit('update:selectedSeasonMonth', $event)"
           />
         </div>
         <KennerButton
-          v-if="selectedSeasonId"
+          v-if="selectedSeasonId && !loading"
           outline
           color="primary"
           icon="visibility"
