@@ -203,13 +203,36 @@
         <div class="text-caption">The standings will appear here once the season starts.</div>
       </div>
 
-      <!-- Unresolved Tie Info (Shown here only if leagueId is provided and we have unresolved groups) -->
-      <div v-if="leagueId && standings?.tie_groups?.some(g => g.unresolved)" class="q-mb-md q-px-sm">
-        <div class="row items-center q-gutter-x-sm bg-orange-1 q-pa-sm rounded-borders border-orange-2">
-          <q-icon name="warning" color="orange-9" size="16px" />
-          <div class="text-caption text-orange-9 text-weight-bold">unresolved</div>
-          <div class="text-caption text-grey-8">
-            {{ standings.tie_groups.filter(g => g.unresolved).map(g => g.members.map(m => m.profile_name).join(' vs ')).join(' | ') }}
+      <!-- Unresolved Tie Info (only when the league is fully played) -->
+      <div
+        v-if="leagueId && standings?.all_games_finished && standings?.tie_groups?.some(g => g.unresolved)"
+        class="q-mt-md q-mb-md"
+      >
+        <div class="unresolved-card">
+          <div class="unresolved-card__header">
+            <q-icon name="emoji_events" size="18px" class="unresolved-card__icon" />
+            <div class="unresolved-card__title">Unresolved tie</div>
+            <q-badge class="unresolved-card__badge" rounded>
+              {{ standings.tie_groups.filter(g => g.unresolved).length }}
+            </q-badge>
+          </div>
+          <div class="unresolved-card__body">
+            <div
+              v-for="grp in standings.tie_groups.filter(g => g.unresolved)"
+              :key="grp.group_key"
+              class="unresolved-card__group"
+            >
+              <template v-for="(m, idx) in grp.members" :key="m.player_profile_id">
+                <span class="unresolved-card__player">{{ m.profile_name }}</span>
+                <span
+                  v-if="idx < grp.members.length - 1"
+                  class="unresolved-card__vs"
+                >vs</span>
+              </template>
+            </div>
+          </div>
+          <div class="unresolved-card__hint">
+            Awaiting tie-break decision.
           </div>
         </div>
       </div>
@@ -248,10 +271,122 @@
   </div>
 </template>
 
-<style scoped>
+<style scoped lang="scss">
 .border-orange-2 {
   border: 1px solid #ffcc80;
 }
+
+.unresolved-card {
+  position: relative;
+  border-radius: 12px;
+  padding: 14px 16px;
+  background: linear-gradient(135deg, #fff7ed 0%, #fff1de 100%);
+  border: 1px solid #fcd9a8;
+  box-shadow: 0 2px 6px rgba(180, 100, 0, 0.08);
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    background: linear-gradient(180deg, #f59e0b, #d97706);
+  }
+
+  &__header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+  }
+
+  &__icon {
+    color: #d97706;
+  }
+
+  &__title {
+    font-size: 0.85rem;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+    text-transform: uppercase;
+    color: #92400e;
+  }
+
+  &__badge {
+    background: #d97706;
+    color: #fff;
+    font-size: 0.65rem;
+    font-weight: 700;
+    padding: 2px 8px;
+  }
+
+  &__body {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 12px;
+  }
+
+  &__group {
+    display: inline-flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 6px;
+    padding: 6px 10px;
+    background: rgba(255, 255, 255, 0.75);
+    border: 1px solid rgba(217, 119, 6, 0.25);
+    border-radius: 999px;
+  }
+
+  &__player {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #7c2d12;
+  }
+
+  &__vs {
+    font-size: 0.65rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #b45309;
+    opacity: 0.75;
+  }
+
+  &__hint {
+    margin-top: 8px;
+    font-size: 0.7rem;
+    color: #92400e;
+    opacity: 0.8;
+    font-style: italic;
+  }
+}
+
+:global(.body--dark) .unresolved-card {
+  background: linear-gradient(135deg, rgba(120, 53, 15, 0.45) 0%, rgba(180, 83, 9, 0.35) 100%);
+  border-color: rgba(252, 211, 77, 0.35);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
+
+  .unresolved-card__title,
+  .unresolved-card__hint {
+    color: #fde68a;
+  }
+  .unresolved-card__icon {
+    color: #fbbf24;
+  }
+  .unresolved-card__group {
+    background: rgba(0, 0, 0, 0.25);
+    border-color: rgba(251, 191, 36, 0.35);
+  }
+  .unresolved-card__player {
+    color: #fde68a;
+  }
+  .unresolved-card__vs {
+    color: #fbbf24;
+  }
+}
+
 .username-link {
   transition: color 0.2s ease;
 }
@@ -333,6 +468,7 @@ interface StandingsData {
   standings: Standing[];
   season_id?: number;
   tie_groups?: TieGroup[];
+  all_games_finished?: boolean;
 }
 
 const standings = ref<StandingsData | null>(props.prefetchedData || null);

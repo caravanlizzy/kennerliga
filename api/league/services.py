@@ -205,11 +205,23 @@ def build_full_standings_payload(
 
     tie_groups.sort(key=_tg_sort_key)
 
+    # Determine whether all games in the league are finished:
+    # every (member, selected_game) pair must have a GameStanding row.
+    expected_pairs = len(standings_list) * len(selected_game_ids)
+    actual_pairs = sum(
+        1
+        for row in standings_list
+        for sg_id in selected_game_ids
+        if row["games"].get(str(sg_id), {}).get("points") is not None
+    )
+    all_games_finished = expected_pairs > 0 and actual_pairs == expected_pairs
+
     return {
         "selected_games": selected_game_list,
         "standings": standings_list,
         "season_id": league.season_id,
         "tie_groups": tie_groups,
+        "all_games_finished": all_games_finished,
     }
 
 
