@@ -1,26 +1,26 @@
 <template>
   <div v-if="releaseNotes.length > 0" class="release-notes-block">
-    <div class="row items-center q-mb-sm">
-      <q-icon name="campaign" size="28px" color="primary" class="q-mr-sm" />
-      <div class="text-h6 text-weight-bold">What's new</div>
+    <div class="row items-center q-mb-xs">
+      <q-icon name="campaign" size="16px" color="grey-6" class="q-mr-xs" />
+      <div class="text-caption text-weight-medium text-grey-7 text-uppercase release-notes-block__title">What's new</div>
     </div>
 
-    <div class="q-gutter-sm">
+    <div class="q-gutter-xs">
       <div
         v-for="note in releaseNotes"
         :key="note.id"
         class="release-note-item"
       >
-        <div class="row items-center no-wrap q-mb-xs">
-          <q-icon name="new_releases" class="text-accent q-mr-sm" />
-          <div class="text-subtitle2 text-weight-bold col">
+        <div class="row items-center no-wrap">
+          <q-icon name="new_releases" size="14px" class="text-grey-6 q-mr-xs" />
+          <div class="text-caption text-weight-medium text-grey-8 col ellipsis">
             {{ note.title }}
           </div>
           <div class="text-caption text-grey-6">
             {{ formatDate(note.created_at) }}
           </div>
         </div>
-        <div class="text-body2 text-grey-9 release-note-text">
+        <div class="text-caption text-grey-7 release-note-text">
           {{ note.text }}
         </div>
       </div>
@@ -45,14 +45,14 @@ function formatDate(value: string): string {
 </script>
 
 <style scoped>
-.release-notes-card {
-  border-radius: 12px;
-  background: white;
+.release-notes-block__title {
+  letter-spacing: 0.06em;
 }
 
 .release-note-item + .release-note-item {
-  border-top: 1px solid rgba(54, 64, 88, 0.08);
-  padding-top: 8px;
+  border-top: 1px solid rgba(54, 64, 88, 0.05);
+  padding-top: 4px;
+  margin-top: 4px;
 }
 
 .release-note-text {

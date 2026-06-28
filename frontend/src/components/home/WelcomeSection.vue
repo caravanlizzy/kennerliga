@@ -63,9 +63,8 @@
         <div class="relative-position" :class="isMobile ? 'auth-mobile-inner' : ''" style="z-index: 1">
           <q-card
             flat
-            bordered
-            class="combined-card q-pa-lg"
-            :class="[isMobile ? 'combined-card--mobile' : 'q-mt-md', { 'combined-card--collapsed': !expanded && !isMobile }]"
+            class="combined-card q-pa-sm"
+            :class="[isMobile ? 'combined-card--mobile' : 'q-mt-sm', { 'combined-card--collapsed': !expanded && !isMobile }]"
           >
             <div class="combined-card__content" :class="{ 'combined-card__content--collapsed': !expanded && !isMobile }">
               <div :class="isMobile ? '' : 'row q-col-gutter-lg items-start'">
@@ -170,10 +169,11 @@ onUnmounted(() => {
 }
 
 .combined-card {
-  border-radius: 9px;
-  background: white;
-  border: 1px solid rgba(0, 0, 0, 0.08);
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+  border-radius: 8px;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  opacity: 0.85;
 }
 
 .combined-card__content {
@@ -181,7 +181,7 @@ onUnmounted(() => {
 }
 
 .combined-card__content--collapsed {
-  max-height: 160px;
+  max-height: 90px;
   overflow: hidden;
 }
 
