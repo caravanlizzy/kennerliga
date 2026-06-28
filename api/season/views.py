@@ -434,6 +434,122 @@ class SeasonParticipantViewSet(ModelViewSet):
         # Default behaviour: return only registered participants
         return response
 
+    @action(detail=False, methods=["get"], url_path="projected-leagues")
+    def projected_leagues(self, request):
+        """
+        GET /season-participants/projected-leagues/?season=<id>
+
+        For an upcoming/open season, project how the currently-registered
+        participants would be distributed across leagues for that season,
+        applying the same promotion/relegation logic used when ranks are
+        finalized (see ``season.services.apply_promotion``).
+
+        Participants with a finalized result from the previous season are
+        placed into their projected league. Newcomers (no previous-season
+        result available) are returned in a ``shuffle_pool`` since their
+        final league depends on the random shuffle performed at season
+        start.
+
+        Response:
+        {
+          "season": {"id", "name", "status"},
+          "leagues": [{"level": 1, "size": 4, "members": [
+              {"profile": .., "profile_name": .., "username": ..,
+               "prev_league": .., "prev_position": ..}
+          ]}, ...],
+          "shuffle_pool": [
+              {"profile": .., "profile_name": .., "username": ..}
+          ]
+        }
+        """
+        from season.services import (
+            _players_per_league,
+            apply_promotion,
+            get_previous_result,
+        )
+
+        season_id = request.query_params.get("season")
+        season = None
+        if season_id:
+            try:
+                season = Season.objects.get(pk=season_id)
+            except Season.DoesNotExist:
+                season = None
+        if not season:
+            season = get_open_season()
+        if not season:
+            season = get_running_season()
+        if not season:
+            return Response(
+                {"season": None, "leagues": [], "shuffle_pool": []}, status=200
+            )
+
+        participants = list(
+            SeasonParticipant.objects.filter(season=season).select_related(
+                "profile", "profile__user"
+            )
+        )
+        total = len(participants)
+        sizes = _players_per_league(total) if total else []
+
+        prev_rows = []
+        newcomers = []
+        for sp in participants:
+            info = get_previous_result(sp.profile)
+            base = {
+                "profile": sp.profile_id,
+                "profile_name": sp.profile.profile_name,
+                "username": getattr(
+                    getattr(sp.profile, "user", None), "username", None
+                ),
+            }
+            if info and info.get("position") is not None:
+                prev_rows.append(
+                    {
+                        **base,
+                        "league": info["league"],
+                        "position": info["position"],
+                        "is_last": info["is_last"],
+                    }
+                )
+            else:
+                newcomers.append(base)
+
+        ordered = apply_promotion(prev_rows, sizes if sizes else None)
+
+        # Distribute ordered prev participants into leagues by capacity.
+        leagues_payload = []
+        idx = 0
+        for level, size in enumerate(sizes, start=1):
+            chunk = ordered[idx : idx + size]
+            idx += size
+            members = [
+                {
+                    "profile": r["profile"],
+                    "profile_name": r["profile_name"],
+                    "username": r["username"],
+                    "prev_league": r.get("league"),
+                    "prev_position": r.get("position"),
+                }
+                for r in chunk
+            ]
+            leagues_payload.append(
+                {"level": level, "size": size, "members": members}
+            )
+
+        return Response(
+            {
+                "season": {
+                    "id": season.id,
+                    "name": season.name,
+                    "status": season.status,
+                },
+                "leagues": leagues_payload,
+                "shuffle_pool": newcomers,
+            },
+            status=200,
+        )
+
     @action(detail=False, methods=["get"], url_path="current")
     def current(self, request):
         """

@@ -103,6 +103,43 @@ export async function fetchSeasonParticipants(
   return arr;
 }
 
+export type TProjectedLeagueMember = {
+  profile: number;
+  profile_name: string;
+  username: string | null;
+  prev_league?: number | null;
+  prev_position?: number | null;
+};
+
+export type TProjectedLeague = {
+  level: number;
+  size: number;
+  members: TProjectedLeagueMember[];
+};
+
+export type TProjectedLeaguesResponse = {
+  season: { id: number; name: string; status: string } | null;
+  leagues: TProjectedLeague[];
+  shuffle_pool: TProjectedLeagueMember[];
+};
+
+export async function fetchProjectedLeagues(
+  seasonId?: number
+): Promise<TProjectedLeaguesResponse> {
+  try {
+    const qs = seasonId ? `?season=${seasonId}` : '';
+    const { data } = await api.get(`/season/season-participants/projected-leagues/${qs}`);
+    return {
+      season: data?.season ?? null,
+      leagues: Array.isArray(data?.leagues) ? data.leagues : [],
+      shuffle_pool: Array.isArray(data?.shuffle_pool) ? data.shuffle_pool : [],
+    };
+  } catch (error) {
+    console.error('Failed to fetch projected leagues:', error);
+    return { season: null, leagues: [], shuffle_pool: [] };
+  }
+}
+
 export async function fetchLeaguesBySeason(seasonId: number): Promise<TLeagueDto[]> {
   try {
     const { data } = await api(`/league/leagues/?season=${seasonId}`);

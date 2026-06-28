@@ -100,10 +100,75 @@
               />
             </div>
             <template v-else-if="participantsLoaded">
-              <div v-if="activeParticipants.length" class="row q-gutter-xs">
-                <div v-for="(p, index) in activeParticipants" :key="p.id || index" class="col-auto">
-                  <div class="participant-chip" :class="{ 'participant-chip--mobile': isMobile }">
-                    {{ p.profile_name || 'Anonymous' }}
+              <div v-if="activeParticipants.length">
+                <!-- Grouped by projected league -->
+                <div
+                  v-for="group in projectedLeagueGroups"
+                  :key="`L-${group.level}`"
+                  :class="isMobile ? 'q-mb-sm' : 'q-mb-md'"
+                >
+                  <div class="row items-center q-gutter-x-xs q-mb-xs">
+                    <div
+                      class="text-caption text-weight-bolder text-grey-7 uppercase tracking-widest"
+                      :style="isMobile ? 'font-size: 0.55rem' : 'font-size: 0.6rem'"
+                    >
+                      League {{ group.level }}
+                    </div>
+                    <q-badge
+                      color="grey-5"
+                      :label="`${group.members.length}/${group.size}`"
+                      rounded
+                      class="text-weight-bold"
+                      :style="isMobile ? 'font-size: 9px; padding: 1px 4px' : 'font-size: 10px; padding: 2px 6px'"
+                    />
+                  </div>
+                  <div class="row q-gutter-xs">
+                    <div v-for="(p, index) in group.members" :key="p.profile || index" class="col-auto">
+                      <div class="participant-chip" :class="{ 'participant-chip--mobile': isMobile }">
+                        {{ p.profile_name || 'Anonymous' }}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Shuffle pool -->
+                <div v-if="shufflePool.length" :class="isMobile ? 'q-mt-sm' : 'q-mt-md'">
+                  <div class="row items-center q-gutter-x-xs q-mb-xs">
+                    <div
+                      class="text-caption text-weight-bolder text-grey-7 uppercase tracking-widest"
+                      :style="isMobile ? 'font-size: 0.55rem' : 'font-size: 0.6rem'"
+                    >
+                      Shuffle pool
+                    </div>
+                    <q-badge
+                      color="warning"
+                      :label="shufflePool.length"
+                      rounded
+                      class="text-weight-bold"
+                      :style="isMobile ? 'font-size: 9px; padding: 1px 4px' : 'font-size: 10px; padding: 2px 6px'"
+                    />
+                    <q-icon name="shuffle" size="12px" class="text-grey-6" />
+                  </div>
+                  <div class="row q-gutter-xs">
+                    <div v-for="(p, index) in shufflePool" :key="p.profile || index" class="col-auto">
+                      <div
+                        class="participant-chip participant-chip--shuffle"
+                        :class="{ 'participant-chip--mobile': isMobile }"
+                      >
+                        {{ p.profile_name || 'Anonymous' }}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Fallback: signed-up users not yet in projection (e.g. just registered) -->
+                <div v-if="unprojectedParticipants.length" :class="isMobile ? 'q-mt-sm' : 'q-mt-md'">
+                  <div class="row q-gutter-xs">
+                    <div v-for="(p, index) in unprojectedParticipants" :key="p.id || index" class="col-auto">
+                      <div class="participant-chip" :class="{ 'participant-chip--mobile': isMobile }">
+                        {{ p.profile_name || 'Anonymous' }}
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -181,7 +246,12 @@ import {
   fetchRegistrationStatus,
   fetchOpenSeasonParticipants,
   fetchSeasonParticipants,
+  fetchProjectedLeagues,
   registerForSeason,
+} from 'src/services/seasonService';
+import type {
+  TProjectedLeague,
+  TProjectedLeagueMember,
 } from 'src/services/seasonService';
 import type { TAnnouncementDto, TSeasonParticipantDto } from 'src/types';
 
@@ -204,6 +274,8 @@ const openSeasonId = ref<number | null>(null);
 const participants = ref<TSeasonParticipantDto[] | null>(null);
 const participantsLoading = ref(false);
 const participantsLoaded = ref(false);
+const projectedLeagues = ref<TProjectedLeague[]>([]);
+const shufflePool = ref<TProjectedLeagueMember[]>([]);
 
 const activeParticipants = computed(() => {
   return (participants.value || []).filter((p) => !p.is_prev_unregistered);
@@ -211,6 +283,26 @@ const activeParticipants = computed(() => {
 
 const missingParticipants = computed(() => {
   return (participants.value || []).filter((p) => p.is_prev_unregistered);
+});
+
+const projectedLeagueGroups = computed<TProjectedLeague[]>(() => {
+  return (projectedLeagues.value || []).filter((g) => g.members && g.members.length > 0);
+});
+
+// Profile ids that appear anywhere in the projection (leagues or shuffle pool)
+const projectedProfileIds = computed<Set<number>>(() => {
+  const ids = new Set<number>();
+  for (const g of projectedLeagues.value || []) {
+    for (const m of g.members || []) ids.add(m.profile);
+  }
+  for (const m of shufflePool.value || []) ids.add(m.profile);
+  return ids;
+});
+
+// Signed-up participants not yet reflected by the projection (kept as a flat fallback)
+const unprojectedParticipants = computed(() => {
+  const known = projectedProfileIds.value;
+  return activeParticipants.value.filter((p) => !known.has(p.profile));
 });
 
 async function loadParticipants() {
@@ -224,11 +316,24 @@ async function loadParticipants() {
     } else {
       participants.value = await fetchOpenSeasonParticipants(true);
     }
+    await loadProjectedLeagues();
   } catch {
     participants.value = [];
   } finally {
     participantsLoading.value = false;
     participantsLoaded.value = true;
+  }
+}
+
+async function loadProjectedLeagues() {
+  try {
+    const seasonId = announcement.season_id || openSeasonId.value || undefined;
+    const proj = await fetchProjectedLeagues(seasonId);
+    projectedLeagues.value = proj.leagues;
+    shufflePool.value = proj.shuffle_pool;
+  } catch {
+    projectedLeagues.value = [];
+    shufflePool.value = [];
   }
 }
 
@@ -333,6 +438,13 @@ onMounted(async () => {
   color: #777;
   border: 1px dashed rgba(0, 0, 0, 0.15);
   font-weight: 500;
+  box-shadow: none;
+}
+
+.participant-chip--shuffle {
+  background: rgba(255, 193, 7, 0.08);
+  color: #8a6d00;
+  border: 1px dashed rgba(255, 193, 7, 0.55);
   box-shadow: none;
 }
 
