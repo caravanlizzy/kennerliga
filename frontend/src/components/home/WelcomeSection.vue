@@ -40,6 +40,14 @@
                 to="/rules"
                 :size="isMobile ? 'md' : 'lg'"
               />
+              <KennerButton
+                color="secondary"
+                outline
+                label="About"
+                icon="info"
+                to="/about"
+                :size="isMobile ? 'md' : 'lg'"
+              />
             </div>
           </div>
 
@@ -51,45 +59,6 @@
             </span>
           </div>
 
-          <ReleaseNotesSection :class="isMobile ? 'q-px-md' : 'q-px-lg'" />
-        </div>
-      </div>
-    </template>
-    <template v-else>
-      <div
-        class="relative-position"
-        :class="[isMobile ? 'q-pa-none auth-mobile-wrap' : 'q-pa-none q-mb-md']"
-      >
-        <div class="relative-position" :class="isMobile ? 'auth-mobile-inner' : ''" style="z-index: 1">
-          <q-card
-            flat
-            class="combined-card q-pa-sm"
-            :class="[isMobile ? 'combined-card--mobile' : 'q-mt-sm', { 'combined-card--collapsed': !expanded && !isMobile }]"
-          >
-            <div class="combined-card__content" :class="{ 'combined-card__content--collapsed': !expanded && !isMobile }">
-              <div :class="isMobile ? '' : 'row q-col-gutter-lg items-start'">
-                <div :class="isMobile ? '' : 'col-12 col-md-6'">
-                  <PurposeSection />
-                </div>
-                <div :class="isMobile ? 'q-mt-md combined-divider-mobile q-pt-md' : 'col-12 col-md-6 combined-divider-desktop'">
-                  <ReleaseNotesSection />
-                </div>
-              </div>
-              <div v-if="!expanded && !isMobile" class="combined-card__fade" />
-            </div>
-            <div v-if="!isMobile" class="row justify-center q-mt-sm">
-              <q-btn
-                flat
-                dense
-                no-caps
-                size="sm"
-                color="primary"
-                :icon-right="expanded ? 'expand_less' : 'expand_more'"
-                :label="expanded ? 'Show less' : 'Show more'"
-                @click="expanded = !expanded"
-              />
-            </div>
-          </q-card>
         </div>
       </div>
     </template>
@@ -97,12 +66,10 @@
 </template>
 
 <script setup lang="ts">
-import ReleaseNotesSection from 'components/home/ReleaseNotesSection.vue';
-import PurposeSection from 'components/home/PurposeSection.vue';
 import KennerButton from 'components/base/KennerButton.vue';
 import BrandLogo from 'components/base/BrandLogo.vue';
 import { useResponsive } from 'src/composables/responsive';
-import { onMounted, onUnmounted, ref } from 'vue';
+import { onMounted, onUnmounted } from 'vue';
 
 withDefaults(
   defineProps<{
@@ -115,7 +82,6 @@ withDefaults(
 );
 
 const { isMobile } = useResponsive();
-const expanded = ref(false);
 
 onMounted(() => {
   // Navigation registration removed

@@ -116,6 +116,12 @@ const routes: RouteRecordRaw[] = [
         meta: { icon: 'gavel', label: 'Rules' }
       },
       {
+        path: 'about',
+        name: 'about',
+        component: () => import('pages/AboutPage.vue'),
+        meta: { icon: 'info', label: 'About' }
+      },
+      {
         path: 'live',
         name: 'live',
         component: ResponsivePage,
