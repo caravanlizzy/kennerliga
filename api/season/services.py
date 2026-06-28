@@ -97,7 +97,10 @@ def rank_participants(
         p for p in profiles if p not in prev_participants_profiles
     ]
 
-    ordered_prev_profiles = order_previous(prev_participants_profiles)
+    new_league_sizes = _players_per_league(len(profiles))
+    ordered_prev_profiles = order_previous(
+        prev_participants_profiles, new_league_sizes
+    )
 
     shuffle(new_participants_profiles)
 
@@ -180,7 +183,10 @@ def get_previous_result(profile: PlayerProfile) -> Optional[dict]:
     }
 
 
-def order_previous(participants: List[PlayerProfile]) -> List[PlayerProfile]:
+def order_previous(
+    participants: List[PlayerProfile],
+    new_league_sizes: Optional[List[int]] = None,
+) -> List[PlayerProfile]:
     data = []
     for p in participants:
         info = get_previous_result(p)
@@ -194,20 +200,174 @@ def order_previous(participants: List[PlayerProfile]) -> List[PlayerProfile]:
                 }
             )
 
-    sorted_list = sorted(data, key=lambda x: (x["league"], x["position"]))
-    promoted = apply_promotion(sorted_list)
+    promoted = apply_promotion(data, new_league_sizes)
     return [row["profile"] for row in promoted]
 
 
-def apply_promotion(participants: List[dict]) -> List[dict]:
-    # Apply simple promotion/relegation rule
-    participants_copy = participants.copy()
-    for i, current in enumerate(participants_copy[1:], start=1):
-        prev = participants_copy[i - 1]
-        if (
-            prev["is_last"]
-            and current["league"] - 1 == prev["league"]
-            and current["position"] == 1
-        ):
-            participants_copy[i], participants_copy[i - 1] = prev, current
-    return participants_copy
+def _target_league(row: dict, num_new_leagues: Optional[int] = None) -> int:
+    """Determine the new league level a previous-season player aims for.
+
+    The previous league index is first clamped to the new structure size so
+    that — when the new season has fewer leagues than the previous one
+    (e.g. due to non-registration of whole leagues) — the pyramid is
+    compressed proportionally. Promotion/relegation offsets are then
+    applied on top of the clamped value.
+
+    - Winner (position 1) of a non-top league is guaranteed a promotion.
+    - Last position in a league forces a relegation.
+    - Otherwise, stay in (the clamped) league.
+    """
+    league = row["league"]
+    if num_new_leagues is None or num_new_leagues <= 0:
+        clamped = league
+        cap = league + 1
+    else:
+        clamped = min(league, num_new_leagues)
+        cap = num_new_leagues
+    if row["position"] == 1 and league > 1:
+        return max(1, clamped - 1)
+    if row["is_last"]:
+        return min(cap, clamped + 1)
+    return clamped
+
+
+def _sort_key(row: dict, num_new_leagues: Optional[int] = None):
+    return (_target_league(row, num_new_leagues), row["league"], row["position"])
+
+
+def apply_promotion(
+    participants: List[dict],
+    new_league_sizes: Optional[List[int]] = None,
+) -> List[dict]:
+    """Order previous-season registered players for the next season,
+    enforcing two rules:
+
+    1. A player who won their league (position 1, league > 1) is guaranteed
+       to be promoted: they must end up in a strictly higher league than
+       before. If capacity in the target league is full, the lowest-ranked
+       non-guaranteed player of that league is relegated to make room
+       (e.g. the 3rd of the higher league).
+    2. A player who finished last in their league is guaranteed to be
+       relegated: they must end up in a strictly lower league than before.
+       If that means another player has to be promoted from below to fill
+       the gap, that promotion happens.
+    """
+    if not participants:
+        return []
+
+    num_new = len(new_league_sizes) if new_league_sizes else 0
+
+    def _key(row: dict):
+        return _sort_key(row, num_new if num_new > 0 else None)
+
+    # Sort by (target_league, prev_league, prev_position) as the baseline.
+    ordered = sorted(participants, key=_key)
+
+    # Without explicit league sizes, fall back to the baseline order.
+    if not new_league_sizes:
+        return ordered
+
+    # Assign rows to new leagues by capacity. Only the prefix of new
+    # leagues that this group of previous players occupies is relevant.
+    league_assignment: List[List[dict]] = []
+    idx = 0
+    for size in new_league_sizes:
+        if idx >= len(ordered):
+            break
+        chunk = ordered[idx : idx + size]
+        league_assignment.append(chunk)
+        idx += size
+        if idx >= len(ordered):
+            break
+
+    def _is_guaranteed_promotion(row: dict) -> bool:
+        return row["position"] == 1 and row["league"] > 1
+
+    def _is_guaranteed_relegation(row: dict) -> bool:
+        return row["is_last"]
+
+    # Iteratively fix violations until stable. Each pass either resolves a
+    # violation by swapping a guaranteed-move player with a non-guaranteed
+    # one in the adjacent league, or stops.
+    changed = True
+    safety = 0
+    while changed and safety < 100:
+        changed = False
+        safety += 1
+
+        # Rule 1: every guaranteed-promotion player must be in a new league
+        # strictly above their (clamped) previous league.
+        for new_level_idx, league in enumerate(league_assignment):
+            new_level = new_level_idx + 1
+            for row in list(league):
+                prev_clamped = (
+                    min(row["league"], num_new) if num_new > 0 else row["league"]
+                )
+                if (
+                    _is_guaranteed_promotion(row)
+                    and new_level >= prev_clamped
+                    and new_level_idx > 0
+                ):
+                    # Find a non-guaranteed swap candidate in the league above
+                    # (lowest-ranked one) to relegate.
+                    above = league_assignment[new_level_idx - 1]
+                    candidates = [
+                        r
+                        for r in above
+                        if not _is_guaranteed_promotion(r)
+                        and not _is_guaranteed_relegation(r)
+                    ]
+                    if not candidates:
+                        continue
+                    victim = max(candidates, key=_key)
+                    above.remove(victim)
+                    above.append(row)
+                    league.remove(row)
+                    league.append(victim)
+                    above.sort(key=_key)
+                    league.sort(key=_key)
+                    changed = True
+                    break
+            if changed:
+                break
+        if changed:
+            continue
+
+        # Rule 2: every guaranteed-relegation player must be in a new league
+        # strictly below their (clamped) previous league.
+        for new_level_idx, league in enumerate(league_assignment):
+            new_level = new_level_idx + 1
+            for row in list(league):
+                prev_clamped = (
+                    min(row["league"], num_new) if num_new > 0 else row["league"]
+                )
+                if (
+                    _is_guaranteed_relegation(row)
+                    and new_level <= prev_clamped
+                    and new_level_idx + 1 < len(league_assignment)
+                ):
+                    below = league_assignment[new_level_idx + 1]
+                    candidates = [
+                        r
+                        for r in below
+                        if not _is_guaranteed_promotion(r)
+                        and not _is_guaranteed_relegation(r)
+                    ]
+                    if not candidates:
+                        continue
+                    victim = min(candidates, key=_key)
+                    below.remove(victim)
+                    below.append(row)
+                    league.remove(row)
+                    league.append(victim)
+                    below.sort(key=_key)
+                    league.sort(key=_key)
+                    changed = True
+                    break
+            if changed:
+                break
+
+    result: List[dict] = []
+    for league in league_assignment:
+        result.extend(league)
+    return result

@@ -10,6 +10,7 @@ from season.services import (
     close_season,
     rank_participants,
     open_registration,
+    apply_promotion,
 )
 from league.models import League, LeagueStanding
 from season_manager import start_new_season
@@ -226,3 +227,103 @@ class RankParticipantsTest(TestCase):
         # New players should be at the end
         self.assertIn(ranked_profiles[8], [self.new_p1, self.new_p2])
         self.assertIn(ranked_profiles[9], [self.new_p1, self.new_p2])
+
+
+def _row(name, league, position, is_last=False):
+    return {
+        "profile": name,
+        "league": league,
+        "position": position,
+        "is_last": is_last,
+    }
+
+
+class ApplyPromotionRulesTest(TestCase):
+    """Pure logic tests for apply_promotion covering the
+    promotion-guaranteed and last-forces-relegation rules.
+    """
+
+    def test_classic_swap_when_full_league_sizes_match(self):
+        # 8 players, sizes [4, 4]. Last of L1 swaps with winner of L2.
+        rows = [
+            _row("A", 1, 1),
+            _row("B", 1, 2),
+            _row("C", 1, 3),
+            _row("D", 1, 4, is_last=True),
+            _row("E", 2, 1),
+            _row("F", 2, 2),
+            _row("G", 2, 3),
+            _row("H", 2, 4, is_last=True),
+        ]
+        result = [r["profile"] for r in apply_promotion(rows, [4, 4])]
+        self.assertEqual(result, ["A", "B", "C", "E", "D", "F", "G", "H"])
+
+    def test_third_of_higher_league_relegated_to_keep_promotion(self):
+        # New L1 shrinks to 3, L2 to 2. Winner of L2 must still be promoted
+        # even though L1 is "full" without him; the 3rd of L1 is relegated.
+        # Last of L1 (D) did not register.
+        rows = [
+            _row("A", 1, 1),
+            _row("B", 1, 2),
+            _row("C", 1, 3),
+            _row("E", 2, 1),
+            _row("F", 2, 2, is_last=True),
+        ]
+        result = [r["profile"] for r in apply_promotion(rows, [3, 2])]
+        # A, B keep L1; E promoted into L1; C relegated to L2; F stays last.
+        self.assertEqual(result[:3], ["A", "B", "E"])
+        self.assertEqual(set(result[3:]), {"C", "F"})
+        # F was last in L2 -> should land in the bottom-most spot.
+        self.assertEqual(result[-1], "F")
+
+    def test_last_forces_relegation_pulling_extra_promotion_from_below(self):
+        # Two L1 players did not register (A, B). D was last of L1 and
+        # must still be relegated; F and G get promoted from L2 to fill L1.
+        rows = [
+            _row("C", 1, 3),
+            _row("D", 1, 4, is_last=True),
+            _row("E", 2, 1),
+            _row("F", 2, 2),
+            _row("G", 2, 3),
+            _row("H", 2, 4, is_last=True),
+        ]
+        result = [r["profile"] for r in apply_promotion(rows, [4, 2])]
+        # New L1 = [C, E, F, G]; D forced down to L2 with H.
+        self.assertEqual(result[:4], ["C", "E", "F", "G"])
+        self.assertEqual(set(result[4:]), {"D", "H"})
+
+    def test_collapsed_pyramid_promotion_outranks_relegation(self):
+        # Previous 5 leagues x 4 players. All of L2, L3, L4 skip
+        # registration. L1 and L5 register fully -> 8 players, new
+        # structure [4, 4]. The winner of L5 (Q) must be promoted into
+        # new L1, and the last of L1 (D) must be relegated to new L2.
+        rows = [
+            _row("A", 1, 1),
+            _row("B", 1, 2),
+            _row("C", 1, 3),
+            _row("D", 1, 4, is_last=True),
+            _row("Q", 5, 1),
+            _row("R", 5, 2),
+            _row("S", 5, 3),
+            _row("T", 5, 4, is_last=True),
+        ]
+        result = [r["profile"] for r in apply_promotion(rows, [4, 4])]
+        self.assertEqual(set(result[:4]), {"A", "B", "C", "Q"})
+        self.assertEqual(set(result[4:]), {"D", "R", "S", "T"})
+        # Q (promoted winner) must end up above D (relegated last).
+        self.assertLess(result.index("Q"), result.index("D"))
+
+    def test_no_violation_when_winner_already_in_higher_league(self):
+        # Standard case with new players: previous registered players
+        # already line up correctly, no swap needed.
+        rows = [
+            _row("A", 1, 1),
+            _row("B", 1, 2),
+            _row("C", 1, 3),
+            _row("D", 1, 4, is_last=True),
+            _row("E", 2, 1),
+            _row("F", 2, 2),
+        ]
+        result = [r["profile"] for r in apply_promotion(rows, [4, 4])]
+        # E promoted above D (the last), D relegated.
+        self.assertEqual(result, ["A", "B", "C", "E", "D", "F"])
