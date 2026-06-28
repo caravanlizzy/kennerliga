@@ -22,6 +22,7 @@
         <q-separator class="q-my-sm drawer-separator" />
         <DrawerSubGroup>Info</DrawerSubGroup>
         <DrawerItem icon="menu_book" icon-color="primary" label="Rules" forward-name="rules" />
+        <DrawerItem icon="info" icon-color="primary" label="About" forward-name="about" />
 
         <q-separator class="q-my-sm drawer-separator" />
         <DrawerSubGroup>Contribute</DrawerSubGroup>
