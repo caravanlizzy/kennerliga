@@ -41,7 +41,7 @@
 
     <q-page-container class="col column main-container">
       <div
-        class="q-mx-auto full-width"
+        class="q-mx-auto"
         style="max-width: 1300px; width: 100%; "
       >
         <AnnouncementDisplay v-if="isMobile && isAuthenticated" no-margins />

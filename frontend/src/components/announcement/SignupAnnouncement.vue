@@ -161,11 +161,11 @@
                   Provisional Leagues
                 </div>
                 <!-- Grouped by projected league -->
+                <div class="league-grid" :class="{ 'league-grid--mobile': isMobile }">
                 <div
                   v-for="group in projectedLeagueGroups"
                   :key="`L-${group.level}`"
                   class="league-box"
-                  :class="isMobile ? 'q-mb-sm' : 'q-mb-md'"
                 >
                   <div class="league-box__label row items-center q-gutter-x-xs">
                     <div
@@ -189,6 +189,7 @@
                       </div>
                     </div>
                   </div>
+                </div>
                 </div>
 
                 <!-- Shuffle pool -->
@@ -569,12 +570,24 @@ onMounted(async () => {
   border-top-color: var(--q-accent) !important;
 }
 
+.league-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.league-grid--mobile {
+  grid-template-columns: 1fr;
+  gap: 8px;
+}
+
 .league-box {
   position: relative;
   border: 1px solid rgba(0, 0, 0, 0.12);
   border-radius: 10px;
-  padding: 14px 10px 10px 10px;
-  margin-top: 8px;
+  padding: 12px 8px 8px 8px;
+  min-width: 0;
 }
 
 .league-box__label {
