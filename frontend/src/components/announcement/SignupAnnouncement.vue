@@ -152,18 +152,27 @@
             </div>
             <template v-else-if="participantsLoaded">
               <div v-if="activeParticipants.length">
+                <!-- Preliminary leagues notice -->
+                <div
+                  v-if="projectedLeagueGroups.length"
+                  class="text-caption text-grey-6 italic q-mb-sm"
+                  :style="isMobile ? 'font-size: 0.65rem' : 'font-size: 0.7rem'"
+                >
+                  Provisional Leagues
+                </div>
                 <!-- Grouped by projected league -->
                 <div
                   v-for="group in projectedLeagueGroups"
                   :key="`L-${group.level}`"
+                  class="league-box"
                   :class="isMobile ? 'q-mb-sm' : 'q-mb-md'"
                 >
-                  <div class="row items-center q-gutter-x-xs q-mb-xs">
+                  <div class="league-box__label row items-center q-gutter-x-xs">
                     <div
                       class="text-caption text-weight-bolder text-grey-7 uppercase tracking-widest"
                       :style="isMobile ? 'font-size: 0.55rem' : 'font-size: 0.6rem'"
                     >
-                      League {{ group.level }}
+                      L{{ group.level }}
                     </div>
                     <q-badge
                       color="grey-5"
@@ -558,5 +567,22 @@ onMounted(async () => {
 .announcement-card--minimized {
   border-top-width: 4px;
   border-top-color: var(--q-accent) !important;
+}
+
+.league-box {
+  position: relative;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  border-radius: 10px;
+  padding: 14px 10px 10px 10px;
+  margin-top: 8px;
+}
+
+.league-box__label {
+  position: absolute;
+  top: -8px;
+  left: 10px;
+  background: white;
+  padding: 0 6px;
+  line-height: 1;
 }
 </style>
