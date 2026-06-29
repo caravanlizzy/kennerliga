@@ -41,9 +41,10 @@
 
     <q-page-container class="col column main-container">
       <div
-        class="q-mx-auto"
+        class="q-mx-auto full-width"
         style="max-width: 1300px; width: 100%; "
       >
+        <AnnouncementDisplay v-if="isMobile && isAuthenticated" no-margins />
         <router-view v-slot="{ Component }">
           <component :is="Component" />
         </router-view>
@@ -61,6 +62,7 @@ import NavBar from 'components/layout/NavBar.vue';
 import { ref, Ref, onMounted } from 'vue';
 import KennerDrawer from 'components/layout/KennerDrawer.vue';
 import ConfirmDialog from 'components/ui/ConfirmDialog.vue';
+import AnnouncementDisplay from 'components/ui/AnnouncementDisplay.vue';
 import KennerChat from 'components/chat/KennerChat.vue';
 import { useUserStore } from 'stores/userStore';
 import { useUiStore } from 'stores/uiStore';

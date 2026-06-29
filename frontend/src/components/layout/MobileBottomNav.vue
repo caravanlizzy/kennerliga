@@ -10,7 +10,6 @@
       no-caps
       @update:model-value="handleTabChange"
     >
-      <q-tab name="welcome" icon="home" label="Home" />
       <q-tab name="seasons" icon="military_tech" label="Seasons" />
       <q-tab name="live" icon="bolt" label="Live" />
       <q-tab name="chat" icon="chat" label="Chat" />
@@ -33,7 +32,6 @@ const { isAuthenticated } = storeToRefs(useUserStore());
 
 const activeTab = computed(() => {
   switch (route.name) {
-    case 'home': return 'welcome';
     case 'season-standings': return 'seasons';
     case 'live': return 'live';
     case 'chat': return 'chat';
@@ -43,7 +41,6 @@ const activeTab = computed(() => {
 });
 
 const tabToRoute = {
-  welcome: 'home',
   seasons: 'season-standings',
   live: 'live',
   chat: 'chat',

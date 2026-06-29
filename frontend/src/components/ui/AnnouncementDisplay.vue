@@ -1,11 +1,11 @@
 <template>
-  <div v-if="isVisible" :class="isMobile ? 'q-mb-sm' : 'q-mt-md q-mb-md'">
+  <div v-if="isVisible" :class="noMargins ? '' : (isMobile ? 'q-mb-sm' : 'q-mt-md q-mb-md')">
     <transition-group
       appear
       enter-active-class="animated fadeInDown"
       leave-active-class="animated fadeOutUp"
     >
-      <div v-for="a in visibleAnnouncements" :key="a.id" class="q-mb-sm">
+      <div v-for="a in visibleAnnouncements" :key="a.id" :class="noMargins ? '' : 'q-mb-sm'">
         <!-- Special Handling for Registration -->
         <SignupAnnouncement
           v-if="a.type === 'REGISTER'"
@@ -75,6 +75,10 @@ import { useQuasar } from 'quasar';
 
 const $q = useQuasar();
 const { isMobile } = useResponsive();
+
+defineProps<{
+  noMargins?: boolean;
+}>();
 
 const shouldRemoveBorders = computed(() => {
   return $q.screen.lt.sm;

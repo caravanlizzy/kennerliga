@@ -1,6 +1,6 @@
 <template>
   <q-page class="column col q-pa-none">
-    <HomeAnnouncements :is-mobile="isMobile" />
+    <HomeAnnouncements v-if="!isMobile" :is-mobile="isMobile" />
 
     <div class="q-mx-auto home-page-container" :class="[{ 'q-pa-md': !isMobile }, isMobile ? 'col column' : '']">
       <WelcomeSection

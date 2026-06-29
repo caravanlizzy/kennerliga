@@ -2,14 +2,65 @@
   <q-card
     flat
     class="announcement-card overflow-hidden announcement-card--signup"
-    :class="{ 'no-border-radius': shouldRemoveBorders }"
+    :class="{ 'no-border-radius': shouldRemoveBorders, 'announcement-card--minimized': isMinimized }"
   >
+    <!-- Minimized View -->
     <q-card-section
+      v-if="isMinimized"
+      class="q-py-sm row items-center no-wrap signup-minimized"
+      @click="toggleMinimized"
+    >
+      <q-icon name="how_to_reg" size="20px" color="accent" class="q-mr-sm" />
+      <div class="text-subtitle2 text-weight-bolder text-primary col ellipsis">
+        {{ announcement.title }}
+      </div>
+      <div
+        v-if="isSignedUpForOpenSeason"
+        class="row items-center q-gutter-x-xs text-positive text-weight-bold text-caption q-mr-sm"
+      >
+        <q-icon name="check_circle" size="14px" />
+        <span>Signed up</span>
+      </div>
+      <div
+        v-else
+        class="row items-center q-gutter-x-xs text-negative text-weight-bold text-caption q-mr-sm"
+      >
+        <q-icon name="radio_button_unchecked" size="14px" />
+        <span>Not signed up</span>
+      </div>
+      <q-btn
+        flat
+        dense
+        round
+        icon="expand_more"
+        size="sm"
+        color="grey-7"
+        @click.stop="toggleMinimized"
+      >
+        <q-tooltip>Expand</q-tooltip>
+      </q-btn>
+    </q-card-section>
+
+    <q-card-section
+      v-else
       :class="[
         isMobile ? 'q-py-md' : 'q-py-lg',
         'relative-position row items-center no-wrap signup-content',
       ]"
     >
+      <!-- Minimize Button -->
+      <q-btn
+        flat
+        dense
+        round
+        icon="expand_less"
+        size="sm"
+        color="grey-7"
+        class="absolute minimize-btn content-layer"
+        @click="toggleMinimized"
+      >
+        <q-tooltip>Minimize</q-tooltip>
+      </q-btn>
       <!-- Background Ornament -->
       <div class="signup-ornament absolute-right overflow-hidden">
         <q-icon name="campaign" size="180px" color="accent" />
@@ -275,6 +326,29 @@ const participants = ref<TSeasonParticipantDto[] | null>(null);
 const participantsLoading = ref(false);
 const participantsLoaded = ref(false);
 const projectedLeagues = ref<TProjectedLeague[]>([]);
+
+const minimizedStorageKey = computed(() => {
+  const sid = announcement.season_id || openSeasonId.value;
+  return sid ? `signup-announcement-minimized:${sid}` : null;
+});
+
+const isMinimized = ref(false);
+
+function toggleMinimized() {
+  isMinimized.value = !isMinimized.value;
+  const key = minimizedStorageKey.value;
+  if (key) {
+    try {
+      if (isMinimized.value) {
+        localStorage.setItem(key, '1');
+      } else {
+        localStorage.removeItem(key);
+      }
+    } catch {
+      // ignore localStorage errors
+    }
+  }
+}
 const shufflePool = ref<TProjectedLeagueMember[]>([]);
 
 const activeParticipants = computed(() => {
@@ -355,6 +429,15 @@ onMounted(async () => {
   openSeasonId.value = status.season_id;
   if (isAuthenticated.value) {
     isSignedUpForOpenSeason.value = status.registered;
+  }
+  // Restore minimized state from localStorage for the current season
+  const key = minimizedStorageKey.value;
+  if (key) {
+    try {
+      isMinimized.value = localStorage.getItem(key) === '1';
+    } catch {
+      // ignore
+    }
   }
   await loadParticipants();
 });
@@ -460,5 +543,20 @@ onMounted(async () => {
 
 .tracking-widest {
   letter-spacing: 0.1em;
+}
+
+.minimize-btn {
+  top: 4px;
+  right: 4px;
+  z-index: 2;
+}
+
+.signup-minimized {
+  cursor: pointer;
+}
+
+.announcement-card--minimized {
+  border-top-width: 4px;
+  border-top-color: var(--q-accent) !important;
 }
 </style>
