@@ -7,6 +7,12 @@ export default {
       meta: { icon: 'military_tech', label: 'Seasons' },
     },
     {
+      path: 'standings',
+      name: 'season-standings',
+      component: () => import('pages/mobile/SeasonsMobilePage.vue'),
+      meta: { icon: 'military_tech', label: 'Standings' },
+    },
+    {
       path: 'create',
       name: 'season-create',
       component: () => import('pages/season/SeasonCreatePage.vue'),

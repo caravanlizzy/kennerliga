@@ -34,7 +34,7 @@ const { isAuthenticated } = storeToRefs(useUserStore());
 const activeTab = computed(() => {
   switch (route.name) {
     case 'home': return 'welcome';
-    case 'seasons': return 'seasons';
+    case 'season-standings': return 'seasons';
     case 'live': return 'live';
     case 'chat': return 'chat';
     case 'leaderboard': return 'leaderboard';
@@ -44,7 +44,7 @@ const activeTab = computed(() => {
 
 const tabToRoute = {
   welcome: 'home',
-  seasons: 'seasons',
+  seasons: 'season-standings',
   live: 'live',
   chat: 'chat',
   leaderboard: 'leaderboard',
