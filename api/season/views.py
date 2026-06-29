@@ -465,7 +465,7 @@ class SeasonParticipantViewSet(ModelViewSet):
         from season.services import (
             _players_per_league,
             apply_promotion,
-            get_previous_result,
+            get_projection_result,
         )
 
         season_id = request.query_params.get("season")
@@ -495,7 +495,7 @@ class SeasonParticipantViewSet(ModelViewSet):
         prev_rows = []
         newcomers = []
         for sp in participants:
-            info = get_previous_result(sp.profile)
+            info = get_projection_result(sp.profile)
             base = {
                 "profile": sp.profile_id,
                 "profile_name": sp.profile.profile_name,

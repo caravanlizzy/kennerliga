@@ -155,8 +155,12 @@ def get_previous_result(profile: PlayerProfile) -> Optional[dict]:
     if not prev_season or prev_season != last_season:
         return None
 
+    return _result_for_season(profile, prev_season)
+
+
+def _result_for_season(profile: PlayerProfile, season: Season) -> Optional[dict]:
     try:
-        league = League.objects.get(season=prev_season, members__profile=profile)
+        league = League.objects.get(season=season, members__profile=profile)
     except League.DoesNotExist:
         return None
 
@@ -181,6 +185,26 @@ def get_previous_result(profile: PlayerProfile) -> Optional[dict]:
         "position": rank,
         "is_last": (rank == len(standings) and len(standings) > 1),
     }
+
+
+def get_projection_result(profile: PlayerProfile) -> Optional[dict]:
+    """Return a 'previous result' for projection purposes.
+
+    Used by the sign-up preview to project the next season's leagues even
+    when the previous season has not been finalized yet. Prefers the
+    currently RUNNING season's live standings; falls back to the most
+    recent DONE season otherwise. Returns ``None`` if the player has no
+    relevant standing in either.
+    """
+    from season.queries import get_running_season
+
+    running = get_running_season()
+    if running is not None:
+        result = _result_for_season(profile, running)
+        if result is not None:
+            return result
+    # Fall back to the finalized previous season.
+    return get_previous_result(profile)
 
 
 def order_previous(
