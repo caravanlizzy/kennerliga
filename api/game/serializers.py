@@ -431,7 +431,7 @@ class FullGameSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Game
-        fields = ["id", "name", "short_name", "platform", "selectable", "options"]
+        fields = ["id", "name", "short_name", "platform", "selectable", "min_players", "max_players", "options"]
 
     @transaction.atomic
     def create(self, validated_data):
