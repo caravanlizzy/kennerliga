@@ -487,6 +487,8 @@ class FullGameSerializer(serializers.ModelSerializer):
         instance.short_name = validated_data.get("short_name", instance.short_name)
         instance.platform = validated_data.get("platform", instance.platform)
         instance.selectable = validated_data.get("selectable", instance.selectable)
+        instance.min_players = validated_data.get("min_players", instance.min_players)
+        instance.max_players = validated_data.get("max_players", instance.max_players)
         instance.save()
 
         if options_data is None:
