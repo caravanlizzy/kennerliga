@@ -12,6 +12,7 @@
     <GameSelectionView
       :leagueId="leagueId"
       :profileId="myProfileId"
+      :memberCount="memberCount"
       @selection-updated="(updated: TGameSelection) => (gameSelection = updated)"
       @selectionValid="(valid: boolean) => (selectionValid = valid)"
       @set-submitter="(s: TSubmitter) => (submitter = s)"
@@ -21,7 +22,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from 'vue';
+import { computed, ref, watch } from 'vue';
 import { storeToRefs } from 'pinia';
 import ContentSection from 'components/base/ContentSection.vue';
 import GameSelectionView from 'components/game/selectedGame/GameSelectionView.vue';
@@ -39,9 +40,11 @@ const isOwnedStatus = (status: unknown): status is TOwnedStatus =>
   OWNED_STATUSES.includes(status as TOwnedStatus);
 
 const myLeagueStore = useMyLeagueStore();
-const { isMePickingGame, leagueStatus, myProfileId, leagueId } =
+const { isMePickingGame, leagueStatus, myProfileId, leagueId, members } =
   storeToRefs(myLeagueStore);
 const { updateLeagueData } = myLeagueStore;
+
+const memberCount = computed(() => (members.value ?? []).length);
 
 const { setActions, setLeadText, setSubject, reset } = useActionBar();
 

@@ -41,6 +41,26 @@
                   <q-badge color="primary" outline class="q-ml-xs" style="font-size: 10px; padding: 2px 4px;">{{ availableGames.length }}</q-badge>
                 </div>
               </div>
+
+              <q-btn
+                dense
+                unelevated
+                no-caps
+                color="primary"
+                :icon="isRandomizing ? 'casino' : 'shuffle'"
+                :label="isRandomizing ? 'Rolling…' : 'Pick a random game for me'"
+                :disable="isRandomizing || randomizableGames.length === 0"
+                class="random-btn"
+                :class="{ 'random-btn--rolling': isRandomizing }"
+                @click="randomizeGame"
+              >
+                <q-tooltip v-if="memberCount">
+                  Chooses a random game that fits {{ memberCount }} player{{ memberCount === 1 ? '' : 's' }}.
+                </q-tooltip>
+                <q-tooltip v-else>
+                  Chooses a random game from the currently available list.
+                </q-tooltip>
+              </q-btn>
             </div>
 
             <div class="game-grid custom-scrollbar">
@@ -82,18 +102,20 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, provide, watch } from 'vue';
+import { computed, onMounted, provide, ref, watch } from 'vue';
 import { useGameSelection } from 'src/composables/gameSelection';
 import GameFilter from 'components/game/selectedGame/GameFilter.vue';
 import PlatformMultiSelect from 'components/game/selectedGame/PlatformMultiSelect.vue';
 import NoGamesFound from 'components/game/selectedGame/NoGamesFound.vue';
 import GameSelectionCard from 'components/game/selectedGame/GameSelectionCard.vue';
 import GameSelectionForm from 'components/game/selectedGame/GameSelectionForm.vue';
+import type { TGameDto } from 'src/types';
 
 const props = defineProps<{
   leagueId: number;
   profileId: number;
   manageOnly?: boolean;
+  memberCount?: number;
   onSuccess?: () => void;
   onError?: () => void;
 }>();
@@ -143,6 +165,68 @@ async function onSubmit() {
   } catch (e) {
     console.error(e);
     props.onError?.();
+  }
+}
+
+// ---- randomize game ----
+const isRandomizing = ref(false);
+
+// Games that match current league member count (falls back to all available
+// games when member count is unknown or game min/max are missing).
+const randomizableGames = computed<TGameDto[]>(() => {
+  const games = availableGames.value ?? [];
+  const count = props.memberCount ?? 0;
+  if (!count) return games;
+  const matching = games.filter((g) => {
+    const min = typeof g.min_players === 'number' ? g.min_players : undefined;
+    const max = typeof g.max_players === 'number' ? g.max_players : undefined;
+    if (min === undefined && max === undefined) return true;
+    if (min !== undefined && count < min) return false;
+    if (max !== undefined && count > max) return false;
+    return true;
+  });
+  return matching.length > 0 ? matching : games;
+});
+
+function pickRandom<T>(items: T[]): T | undefined {
+  if (items.length === 0) return undefined;
+  return items[Math.floor(Math.random() * items.length)];
+}
+
+async function randomizeGame() {
+  const pool = randomizableGames.value;
+  if (pool.length === 0 || isRandomizing.value) return;
+
+  isRandomizing.value = true;
+  try {
+    const finalPick = pickRandom(pool)!;
+
+    // Animate: quickly cycle through candidates, easing out at the end.
+    const steps = Math.min(12, Math.max(6, pool.length));
+    let delay = 60;
+    let lastId = -1;
+
+    for (let i = 0; i < steps; i++) {
+      // ensure a visible change between steps when possible
+      let candidate = pickRandom(pool)!;
+      if (pool.length > 1) {
+        let guard = 0;
+        while (candidate.id === lastId && guard++ < 5) {
+          candidate = pickRandom(pool)!;
+        }
+      }
+      lastId = candidate.id;
+      // fire and forget — initGameInformation may fetch full game details,
+      // but for the spinning animation we only need the visual selection to move.
+      void initGameInformation(candidate);
+      await new Promise((r) => setTimeout(r, delay));
+      delay = Math.min(260, Math.round(delay * 1.18));
+    }
+
+    // Land on the final pick and wait for details to load.
+    await initGameInformation(finalPick);
+  } finally {
+    isRandomizing.value = false;
   }
 }
 </script>
@@ -204,6 +288,45 @@ async function onSubmit() {
   max-height: 500px;
   overflow-y: auto;
   padding: 12px;
+}
+
+.random-btn {
+  border-radius: 999px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  padding: 4px 12px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+
+  &:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 16px rgba(var(--q-primary), 0.25);
+  }
+
+  :deep(.q-icon) {
+    transition: transform 0.3s ease;
+  }
+
+  &--rolling {
+    :deep(.q-icon) {
+      animation: dice-roll 0.6s linear infinite;
+    }
+  }
+}
+
+@keyframes dice-roll {
+  0%   { transform: rotate(0deg)   scale(1);   }
+  50%  { transform: rotate(180deg) scale(1.15); }
+  100% { transform: rotate(360deg) scale(1);   }
+}
+
+.game-grid :deep(.game-card.selected) {
+  animation: pick-pop 0.35s ease;
+}
+
+@keyframes pick-pop {
+  0%   { transform: scale(1);    }
+  60%  { transform: scale(1.06); }
+  100% { transform: scale(1);    }
 }
 
 .custom-scrollbar {
