@@ -784,8 +784,8 @@ const onSubmit = async () => {
       short_name: shortName.value.trim() !== '' ? shortName.value.trim() : name.value,
       platform: platform.value,
       selectable: selectable.value,
-      min_players: minPlayers.value,
-      max_players: maxPlayers.value,
+      min_players: Number(minPlayers.value),
+      max_players: Number(maxPlayers.value),
       options: gameOptions.value.map((opt) => ({
         id: opt.id,
         ref: opt.ref,
