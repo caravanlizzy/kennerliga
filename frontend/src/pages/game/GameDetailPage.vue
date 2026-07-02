@@ -42,7 +42,7 @@
               <q-separator vertical inset class="q-mx-xs" />
               <q-chip dense square color="white" text-color="grey-8" class="shadow-1">
                 <q-icon name="groups" color="accent" class="q-mr-xs" />
-                Players: {{ game.min_players ?? 2 }} - {{ game.max_players ?? 4 }}
+                Players: {{ game.min_players }} - {{ game.max_players }}
               </q-chip>
             </div>
 
