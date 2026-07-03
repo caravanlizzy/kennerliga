@@ -57,17 +57,18 @@
       </div>
     </template>
     <!--
-      Stale-while-revalidate: as soon as we have a `selectedSeasonId` (even if
-      the parent still reports `loading`), keep rendering SeasonStandings so
-      cached data stays visible during background refreshes. Only when we have
-      nothing to show yet do we fall back to the loading spinner.
+      Stale-while-revalidate: as soon as we have a `selectedSeasonId`, keep
+      rendering SeasonStandings — even if the store is currently `refreshing`
+      in the background — so cached data stays visible during navigation.
+      Only when we truly have nothing to show yet (first load, no cache) do we
+      fall back to the loading spinner.
     -->
     <SeasonStandings
-      v-if="selectedSeasonId || !loading"
+      v-if="selectedSeasonId"
       :seasonId="selectedSeasonId"
       class="col-12"
     />
-    <div v-else class="flex flex-center q-pa-xl">
+    <div v-else-if="loading" class="flex flex-center q-pa-xl">
       <LoadingSpinner text="Loading seasons..." />
     </div>
   </ContentSection>
@@ -94,6 +95,10 @@ const props = defineProps<{
   seasonYearOptions: SelectOption[];
   seasonMonthOptions: SelectOption[];
   loading: boolean;
+  // Non-blocking background refresh indicator. The section keeps rendering
+  // cached data while this is true; consumers may optionally surface a subtle
+  // hint in the header if they wish.
+  refreshing?: boolean;
 }>();
 
 defineEmits<{

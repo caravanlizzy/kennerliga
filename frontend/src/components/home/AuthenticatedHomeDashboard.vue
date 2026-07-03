@@ -10,7 +10,8 @@
           :current-season-id="currentSeasonId"
           :season-year-options="seasonYearOptions"
           :season-month-options="seasonMonthOptions"
-          :loading="loadingSeasonInit"
+          :loading="loading"
+          :refreshing="refreshing"
         />
 
         <HomeLeaderboardSection
@@ -30,28 +31,46 @@
 
 <script setup lang="ts">
 defineOptions({ name: 'AuthenticatedHomeDashboard' });
-import { onMounted } from 'vue';
+import { onMounted, watch } from 'vue';
 import { storeToRefs } from 'pinia';
 import { useUserStore } from 'stores/userStore';
-import { homeSeasonSelection } from '../../composables/homeSeasonSelection';
+import { useHomeSeasonStore } from 'stores/homeSeasonStore';
 import HomeSeasonSection from 'components/home/HomeSeasonSection.vue';
 import HomeLeaderboardSection from 'components/home/HomeLeaderboardSection.vue';
 import HomeLiveActionSection from 'components/home/HomeLiveActionSection.vue';
 
 const { isAuthenticated } = storeToRefs(useUserStore());
 
+// Season selection state now lives in a Pinia store, so it persists across
+// navigation. Re-mounting this component reuses the cached data and only
+// triggers a non-blocking background refresh — no more spinner on every visit.
+const homeSeasonStore = useHomeSeasonStore();
 const {
   selectedYear,
   availableYears,
-  loadingSeasonInit,
+  loading,
+  refreshing,
   selectedSeasonYear,
   selectedSeasonMonth,
   selectedSeasonId,
   currentSeasonId,
   seasonYearOptions,
   seasonMonthOptions,
-  initSeasonSelection,
-} = homeSeasonSelection(isAuthenticated);
+} = storeToRefs(homeSeasonStore);
 
-onMounted(initSeasonSelection);
+function ensureInitialized() {
+  if (isAuthenticated.value) {
+    // `init` is stale-while-revalidate: blocking on first call, background
+    // refresh on subsequent ones.
+    void homeSeasonStore.init();
+  }
+}
+
+onMounted(ensureInitialized);
+
+// If the user logs in after mount, initialize; if they log out, drop the cache.
+watch(isAuthenticated, (isAuth, wasAuth) => {
+  if (isAuth && !wasAuth) ensureInitialized();
+  else if (!isAuth && wasAuth) homeSeasonStore.reset();
+});
 </script>
