@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import { ref, Ref } from 'vue';
+import { ref, Ref, watch } from 'vue';
 import { api } from 'boot/axios';
 import { fetchMyCurrentLeagueInfo } from 'src/services/leagueService';
 import { TUserDto } from 'src/types';
@@ -55,10 +55,15 @@ export const useUserStore = defineStore(
     function loadDataFromLocalStorage(): void {
       const data = localStorage.getItem('userStore');
       if (data) {
-        const parsedData = JSON.parse(data);
-        user.value = parsedData.user;
-        isAuthenticated.value = parsedData.isAuthenticated;
-        isAdmin.value = parsedData.user?.admin ?? false;
+        try {
+          const parsedData = JSON.parse(data);
+          user.value = parsedData.user;
+          isAuthenticated.value = parsedData.isAuthenticated;
+          isAdmin.value = parsedData.user?.admin ?? false;
+          storeToken();
+        } catch (e) {
+          console.error('Failed to parse userStore from localStorage', e);
+        }
       }
     }
 
@@ -102,18 +107,22 @@ export const useUserStore = defineStore(
       }
     }
 
+    watch(
+      () => [user.value, isAuthenticated.value],
+      () => {
+        localStorage.setItem(
+          'userStore',
+          JSON.stringify({
+            user: user.value,
+            isAuthenticated: isAuthenticated.value,
+          })
+        );
+      },
+      { deep: true }
+    );
+
+    loadDataFromLocalStorage();
+
     return { user, listUsers, isAuthenticated, isAdmin, isMe, login, logout, loadDataFromLocalStorage, setMyCurrentLeagueId };
-  },
-  {
-    persist: {
-      enabled: true,
-      strategies: [
-        {
-          key: 'userStore',
-          storage: localStorage,
-          paths: ['user', 'isAuthenticated'],
-        },
-      ],
-    },
   }
 );
