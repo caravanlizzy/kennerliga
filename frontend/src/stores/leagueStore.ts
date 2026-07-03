@@ -1,6 +1,6 @@
 // stores/leagueStore.ts
 import { defineStore } from 'pinia';
-import { computed, ref, shallowRef, onUnmounted } from 'vue';
+import { computed, ref, shallowRef } from 'vue';
 import { fetchLeagueDetails } from 'src/services/leagueService';
 import { useUserStore } from 'stores/userStore';
 import { api } from 'boot/axios';

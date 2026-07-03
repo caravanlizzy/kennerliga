@@ -239,7 +239,7 @@ import { api } from 'boot/axios';
 import { ref, watch } from 'vue';
 import LoadingSpinner from 'components/base/LoadingSpinner.vue';
 import ErrorDisplay from 'components/base/ErrorDisplay.vue';
-import { leagueColors } from '../../composables/leagueColors';
+import { leagueColors } from 'src/composables/leagueColors';
 
 const props = defineProps<{ year: number }>();
 const {  getHexLeagueColor } = leagueColors();

@@ -81,7 +81,7 @@ import { api } from 'boot/axios';
 import KennerButton from 'components/base/KennerButton.vue';
 import KennerTooltip from 'components/base/KennerTooltip.vue';
 import { useResponsive } from 'src/composables/responsive';
-import { leagueColors } from '../../composables/leagueColors';
+import { leagueColors } from 'src/composables/leagueColors';
 
 import { useLeagueStore } from 'stores/leagueStore';
 
