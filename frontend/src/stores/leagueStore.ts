@@ -111,12 +111,25 @@ export const useLeagueStore = (id: number) => {
 
 
     const initialized = ref(false);
+    // Background refresh indicator (does not block UI, unlike `loading`).
+    const refreshing = ref(false);
     let initPromise: Promise<void> | null = null;
+    let refreshPromise: Promise<void> | null = null;
 
-    async function updateLeagueData() {
+    /**
+     * Fetch league details from the backend and merge them into the store.
+     *
+     * By default this sets the blocking `loading` flag so the UI can show a
+     * spinner while there is nothing to display yet. When called as a
+     * background refresh (`{ background: true }`) it uses the non-blocking
+     * `refreshing` flag instead, so cached store data stays visible while the
+     * fresh data is being fetched (stale-while-revalidate).
+     */
+    async function updateLeagueData(options: { background?: boolean } = {}) {
       if (leagueId.value == null) return;
-      // await new Promise(resolve => setTimeout(resolve, 1000));
-      loading.value = true;
+      const background = options.background === true;
+      const flag = background ? refreshing : loading;
+      flag.value = true;
       try {
         const data = await fetchLeagueDetails(leagueId.value);
         leagueData.value = data;
@@ -136,7 +149,7 @@ export const useLeagueStore = (id: number) => {
         // bubble on the My League button) reflect the latest league state.
         await useUserStore().setMyCurrentLeagueId();
       } finally {
-        loading.value = false;
+        flag.value = false;
       }
     }
 
@@ -187,23 +200,56 @@ export const useLeagueStore = (id: number) => {
       return matchResultsBySelectedGame.value[selectedGameId]?.length > 0;
     }
 
+    /**
+     * Stale-while-revalidate initialization.
+     *
+     * - First ever call for this league: fetch synchronously with the blocking
+     *   `loading` flag, so consumers can `await init()` and then render.
+     * - Subsequent calls (store already has data): return immediately using the
+     *   cached data from the store, and kick off a non-blocking background
+     *   refresh so any changes propagate reactively without a visible loading
+     *   state. This is the key to minimizing perceived loading times when
+     *   navigating back to a league page.
+     */
     async function init() {
-      if (initialized.value) return;
+      // If we already have cached league data in the store, use it immediately
+      // and refresh in the background.
+      if (initialized.value && leagueData.value) {
+        void refreshInBackground();
+        return;
+      }
+      // In-flight initial fetch — reuse the same promise for concurrent callers.
       if (initPromise) return initPromise;
-      loading.value = true;
+
       initPromise = (async () => {
         try {
           await updateLeagueData();
           // getMatchResults is now redundant for initial load as data is prefetched
-          // await getMatchResults();
           initialized.value = true;
         } finally {
-          loading.value = false;
           initPromise = null;
         }
       })();
 
       return initPromise;
+    }
+
+    /**
+     * Non-blocking refresh used by `init()` when cached data is already
+     * available. Ensures at most one background refresh is in flight at a time.
+     */
+    function refreshInBackground(): Promise<void> {
+      if (refreshPromise) return refreshPromise;
+      refreshPromise = (async () => {
+        try {
+          await updateLeagueData({ background: true });
+        } catch {
+          // Silently ignore — the stale cached data is still shown to the user.
+        } finally {
+          refreshPromise = null;
+        }
+      })();
+      return refreshPromise;
     }
 
     const activePlayer = computed(() =>
@@ -235,6 +281,7 @@ export const useLeagueStore = (id: number) => {
     return {
       // state
       loading,
+      refreshing,
       leagueId,
       leagueData,
       members,
@@ -261,6 +308,7 @@ export const useLeagueStore = (id: number) => {
       // actions
       init,
       updateLeagueData,
+      refreshInBackground,
       refreshResultsForGame,
       hasSelectedGameResult,
       refresh,
