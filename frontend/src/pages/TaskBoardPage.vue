@@ -246,7 +246,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, reactive, ref } from 'vue';
+import { onMounted } from 'vue';
 import { storeToRefs } from 'pinia';
 import { useTaskboardStore } from 'stores/taskboardStore';
 import { useUserStore } from 'stores/userStore';
@@ -254,6 +254,7 @@ import LoadingSpinner from 'components/base/LoadingSpinner.vue';
 import KennerButton from 'components/base/KennerButton.vue';
 import KennerSelect from 'components/base/KennerSelect.vue';
 import KennerInput from 'components/base/KennerInput.vue';
+import { useCrudDialogs } from 'src/composables/crudDialogs';
 import {
   TaskPriority,
   TaskStatus,
@@ -305,70 +306,39 @@ const defaultForm: TaskCreate = {
   status: TaskStatus.TODO,
 };
 
-const form = reactive<TaskCreate>({ ...defaultForm });
-const editingTaskId = ref<number | null>(null);
-const formDialogOpen = ref(false);
-
-const deleteDialogOpen = ref(false);
-const pendingDeleteId = ref<number | null>(null);
-
-function resetForm(): void {
-  form.title = defaultForm.title;
-  form.description = defaultForm.description;
-  form.priority = defaultForm.priority;
-  form.status = defaultForm.status;
-  editingTaskId.value = null;
-}
-
-function openCreateDialog(): void {
-  resetForm();
-  formDialogOpen.value = true;
-}
-
-function openEditDialog(task: TTaskDto): void {
-  editingTaskId.value = task.id;
-  form.title = task.title;
-  form.description = task.description ?? '';
-  form.priority = task.priority;
-  form.status = task.status;
-  formDialogOpen.value = true;
-}
-
-async function submitTask(): Promise<void> {
-  if (!form.title.trim()) return;
-
-  const payload: TaskCreate = {
-    title: form.title.trim(),
-    description: form.description ?? '',
-    priority: form.priority,
-    status: form.status,
-  };
-
-  if (editingTaskId.value === null) {
-    await addTask(payload);
-  } else {
-    await editTask(editingTaskId.value, payload);
-  }
-  formDialogOpen.value = false;
-  resetForm();
-}
-
-function requestDelete(): void {
-  if (editingTaskId.value !== null) {
-    pendingDeleteId.value = editingTaskId.value;
-    deleteDialogOpen.value = true;
-  }
-}
-
-async function confirmDelete(): Promise<void> {
-  if (pendingDeleteId.value != null) {
-    await removeTask(pendingDeleteId.value);
-  }
-  pendingDeleteId.value = null;
-  deleteDialogOpen.value = false;
-  formDialogOpen.value = false;
-  resetForm();
-}
+const {
+  form,
+  editingId: editingTaskId,
+  formDialogOpen,
+  deleteDialogOpen,
+  openCreateDialog,
+  openEditDialog,
+  submit: submitTask,
+  requestDelete,
+  confirmDelete,
+} = useCrudDialogs<TTaskDto, TaskCreate>({
+  defaultForm,
+  toForm: (task) => ({
+    title: task.title,
+    description: task.description ?? '',
+    priority: task.priority,
+    status: task.status,
+  }),
+  validate: (f) => !!f.title.trim(),
+  create: (f) => addTask({
+    title: f.title.trim(),
+    description: f.description ?? '',
+    priority: f.priority,
+    status: f.status,
+  }),
+  update: (id, f) => editTask(id, {
+    title: f.title.trim(),
+    description: f.description ?? '',
+    priority: f.priority,
+    status: f.status,
+  }),
+  remove: (id) => removeTask(id),
+});
 
 onMounted(() => {
   fetchTasks();

@@ -71,7 +71,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch, computed } from 'vue';
+import { watch, computed } from 'vue';
 import { useRoute } from 'vue-router';
 import LeagueMatchResults from 'components/league/LeagueMatchResults.vue';
 import LeagueStandings from 'components/league/LeagueStandings.vue';
@@ -82,6 +82,7 @@ import KennerButton from 'components/base/KennerButton.vue';
 import KennerTooltip from 'components/base/KennerTooltip.vue';
 import { useResponsive } from 'src/composables/responsive';
 import { leagueColors } from 'src/composables/leagueColors';
+import { useCachedResource } from 'src/composables/cachedResource';
 
 import { useLeagueStore } from 'stores/leagueStore';
 
@@ -95,6 +96,11 @@ interface League {
   level: number;
 }
 
+interface SeasonPayload {
+  leagues: League[];
+  standingsMap: Record<number, any>;
+}
+
 const props = withDefaults(defineProps<{
   seasonId?: number | null;
   mode?: 'standings' | 'results' | 'standings-simple';
@@ -102,73 +108,57 @@ const props = withDefaults(defineProps<{
   mode: 'standings'
 });
 
-const leagues = ref<League[]>([]);
-const allStandingsData = ref<Record<number, any>>({});
-// Blocking loading flag — only true until we have the first payload for the
-// currently selected season.
-const loadingLeagues = ref(false);
-// Non-blocking refresh indicator for background refetches
-// (stale-while-revalidate). Cached leagues/standings stay visible while a
-// fresh fetch is in flight, so the UI does not flash empty.
-const refreshingLeagues = ref(false);
-// Id of the season whose data is currently cached in `leagues`/`allStandingsData`.
-const loadedSeasonId = ref<number | null>(null);
-
 const isOverviewPage = computed(() => route.name === 'season-overview');
 
-async function loadLeaguesForSeason(seasonId: number) {
-  // Stale-while-revalidate: if we already have data for THIS season cached,
-  // keep it on screen and refresh in the background. When switching seasons
-  // (or on the very first load) we must show the blocking spinner because the
-  // cached data belongs to a different season.
-  const isBackground = loadedSeasonId.value === seasonId;
-  const flag = isBackground ? refreshingLeagues : loadingLeagues;
-  flag.value = true;
-  try {
-    if (props.mode === 'standings') {
-      // Batched: single request returns all leagues + their full standings.
-      const { data } = await api.get(`season/seasons/${seasonId}/full-standings/`);
-      const leaguesPayload: any[] = data?.leagues ?? [];
-      leagues.value = leaguesPayload.map(l => ({
-        id: l.id,
-        name: l.name,
-        level: l.level,
-      }));
-      const standingsMap: Record<number, any> = {};
-      leaguesPayload.forEach(l => {
-        standingsMap[l.id] = l;
-      });
-      allStandingsData.value = standingsMap;
-      loadedSeasonId.value = seasonId;
-      return;
-    }
-
-    const { data: leaguesData } = await api.get<League[]>('league/leagues', {
-      params: { season: seasonId },
+// Stale-while-revalidate loader: cached data for the current season stays on
+// screen while a fresh request is in flight, so the UI never flashes the
+// blocking spinner on subsequent visits.
+const {
+  data: payload,
+  loading: loadingLeagues,
+  refreshing: refreshingLeagues,
+  load: loadLeaguesForSeason,
+  reset: resetLeagues,
+} = useCachedResource<number, SeasonPayload>(async (seasonId) => {
+  if (props.mode === 'standings') {
+    // Batched: single request returns all leagues + their full standings.
+    const { data } = await api.get(`season/seasons/${seasonId}/full-standings/`);
+    const leaguesPayload: any[] = data?.leagues ?? [];
+    const leaguesOut: League[] = leaguesPayload.map(l => ({
+      id: l.id,
+      name: l.name,
+      level: l.level,
+    }));
+    const standingsMap: Record<number, any> = {};
+    leaguesPayload.forEach(l => {
+      standingsMap[l.id] = l;
     });
-    leagues.value = leaguesData;
-
-    if (leaguesData.length > 0 && props.mode === 'results') {
-      // In results mode, initialize all league stores in parallel
-      const storePromises = leaguesData.map(l => {
-        const store = useLeagueStore(l.id)();
-        return store.init();
-      });
-      await Promise.all(storePromises);
-    }
-    loadedSeasonId.value = seasonId;
-  } catch (e) {
-    console.error('Error loading season standings:', e);
-  } finally {
-    flag.value = false;
+    return { leagues: leaguesOut, standingsMap };
   }
-}
+
+  const { data: leaguesData } = await api.get<League[]>('league/leagues', {
+    params: { season: seasonId },
+  });
+
+  if (leaguesData.length > 0 && props.mode === 'results') {
+    // In results mode, initialize all league stores in parallel
+    const storePromises = leaguesData.map(l => {
+      const store = useLeagueStore(l.id)();
+      return store.init();
+    });
+    await Promise.all(storePromises);
+  }
+  return { leagues: leaguesData, standingsMap: {} };
+});
+
+const leagues = computed<League[]>(() => payload.value?.leagues ?? []);
+const allStandingsData = computed<Record<number, any>>(
+  () => payload.value?.standingsMap ?? {}
+);
 
 watch(() => props.seasonId, (id) => {
   if (!id) {
-    leagues.value = [];
-    allStandingsData.value = {};
-    loadedSeasonId.value = null;
+    resetLeagues();
     return;
   }
   loadLeaguesForSeason(id);

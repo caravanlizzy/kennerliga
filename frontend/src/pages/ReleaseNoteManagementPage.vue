@@ -104,22 +104,25 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, ref } from 'vue';
+import { reactive } from 'vue';
 import { storeToRefs } from 'pinia';
 import { useReleaseNoteStore } from 'stores/releaseNoteStore';
 import LoadingSpinner from 'components/base/LoadingSpinner.vue';
 import KennerButton from 'components/base/KennerButton.vue';
 import KennerInput from 'components/base/KennerInput.vue';
+import { useDeleteConfirm } from 'src/composables/crudDialogs';
 import type { ReleaseNoteCreate } from 'src/types';
 
 const releaseNoteStore = useReleaseNoteStore();
 const { releaseNotes, loading } = storeToRefs(releaseNoteStore);
 const { addReleaseNote, removeReleaseNote } = releaseNoteStore;
 
-const newNote = reactive<ReleaseNoteCreate>({
+const defaultNote: ReleaseNoteCreate = {
   title: '',
   text: '',
-});
+};
+
+const newNote = reactive<ReleaseNoteCreate>({ ...defaultNote });
 
 function formatDate(value: string): string {
   if (!value) return '';
@@ -135,13 +138,8 @@ const columns = [
   { name: 'actions', label: '', field: 'id', align: 'right' as const },
 ];
 
-// dialog state
-const deleteDialogOpen = ref(false);
-const pendingDeleteId = ref<number | null>(null);
-
 function resetForm() {
-  newNote.title = '';
-  newNote.text = '';
+  Object.assign(newNote, defaultNote);
 }
 
 async function submitReleaseNote() {
@@ -149,18 +147,9 @@ async function submitReleaseNote() {
   resetForm();
 }
 
-function requestDelete(id: number) {
-  pendingDeleteId.value = id;
-  deleteDialogOpen.value = true;
-}
-
-async function confirmDelete() {
-  if (pendingDeleteId.value != null) {
-    await removeReleaseNote(pendingDeleteId.value);
-  }
-  pendingDeleteId.value = null;
-  deleteDialogOpen.value = false;
-}
+const { deleteDialogOpen, requestDelete, confirmDelete } = useDeleteConfirm(
+  (id) => removeReleaseNote(id)
+);
 </script>
 
 <style scoped>

@@ -136,13 +136,14 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, ref } from 'vue';
+import { reactive } from 'vue';
 import { storeToRefs } from 'pinia';
 import { useAnnouncementStore } from 'stores/announcementStore';
 import LoadingSpinner from 'components/base/LoadingSpinner.vue';
 import KennerButton from 'components/base/KennerButton.vue';
 import KennerSelect from 'components/base/KennerSelect.vue';
 import KennerInput from 'components/base/KennerInput.vue';
+import { useDeleteConfirm } from 'src/composables/crudDialogs';
 import { AnnouncementType, type AnnouncementCreate } from 'src/types';
 
 const announcementStore = useAnnouncementStore();
@@ -157,24 +158,18 @@ const announcementTypes = [
   { label: 'Neutral', value: AnnouncementType.NEUTRAL },
 ];
 
-const newAnnouncement = reactive<AnnouncementCreate>({
+const defaultAnnouncement: AnnouncementCreate = {
   type: AnnouncementType.INFO,
   title: '',
   content: '',
   visible_from: '',
   visible_until: '',
-});
+};
 
-// dialog state
-const deleteDialogOpen = ref(false);
-const pendingDeleteId = ref<number | null>(null);
+const newAnnouncement = reactive<AnnouncementCreate>({ ...defaultAnnouncement });
 
 function resetForm() {
-  newAnnouncement.type = AnnouncementType.INFO;
-  newAnnouncement.title = '';
-  newAnnouncement.content = '';
-  newAnnouncement.visible_from = '';
-  newAnnouncement.visible_until = '';
+  Object.assign(newAnnouncement, defaultAnnouncement);
 }
 
 async function submitAnnouncement() {
@@ -182,16 +177,7 @@ async function submitAnnouncement() {
   resetForm();
 }
 
-function requestDelete(id: number) {
-  pendingDeleteId.value = id;
-  deleteDialogOpen.value = true;
-}
-
-async function confirmDelete() {
-  if (pendingDeleteId.value != null) {
-    await removeAnnouncement(pendingDeleteId.value);
-  }
-  pendingDeleteId.value = null;
-  deleteDialogOpen.value = false;
-}
+const { deleteDialogOpen, requestDelete, confirmDelete } = useDeleteConfirm(
+  (id) => removeAnnouncement(id)
+);
 </script>
