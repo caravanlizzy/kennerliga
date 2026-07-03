@@ -264,13 +264,24 @@ interface LeaderBoardResponse {
 
 const standings = ref<LeaderBoardResponse | null>(null);
 const loading = ref(false);
+// Background refresh indicator (does not blank the UI, unlike `loading`).
+const refreshing = ref(false);
 const error = ref(false);
 const showAllLeagues = defineModel<boolean>('showAllLeagues', { default: false });
 
+/**
+ * Stale-while-revalidate fetch.
+ *
+ * When we already have cached standings displayed we keep them visible and
+ * flip the non-blocking `refreshing` flag instead of clearing the data and
+ * showing a loading spinner. Only the very first fetch (or a fetch after an
+ * error) uses the blocking `loading` flag.
+ */
 async function fetchStandings(): Promise<void> {
-  loading.value = true;
+  const hasCachedData = standings.value !== null;
+  const flag = hasCachedData ? refreshing : loading;
+  flag.value = true;
   error.value = false;
-  standings.value = null;
 
   try {
     const { data } = await api.get<LeaderBoardResponse>(
@@ -281,7 +292,7 @@ async function fetchStandings(): Promise<void> {
     console.error('Error loading yearly standings:', e);
     error.value = true;
   } finally {
-    loading.value = false;
+    flag.value = false;
   }
 }
 

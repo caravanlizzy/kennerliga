@@ -104,12 +104,26 @@ const props = withDefaults(defineProps<{
 
 const leagues = ref<League[]>([]);
 const allStandingsData = ref<Record<number, any>>({});
+// Blocking loading flag — only true until we have the first payload for the
+// currently selected season.
 const loadingLeagues = ref(false);
+// Non-blocking refresh indicator for background refetches
+// (stale-while-revalidate). Cached leagues/standings stay visible while a
+// fresh fetch is in flight, so the UI does not flash empty.
+const refreshingLeagues = ref(false);
+// Id of the season whose data is currently cached in `leagues`/`allStandingsData`.
+const loadedSeasonId = ref<number | null>(null);
 
 const isOverviewPage = computed(() => route.name === 'season-overview');
 
 async function loadLeaguesForSeason(seasonId: number) {
-  loadingLeagues.value = true;
+  // Stale-while-revalidate: if we already have data for THIS season cached,
+  // keep it on screen and refresh in the background. When switching seasons
+  // (or on the very first load) we must show the blocking spinner because the
+  // cached data belongs to a different season.
+  const isBackground = loadedSeasonId.value === seasonId;
+  const flag = isBackground ? refreshingLeagues : loadingLeagues;
+  flag.value = true;
   try {
     if (props.mode === 'standings') {
       // Batched: single request returns all leagues + their full standings.
@@ -141,16 +155,19 @@ async function loadLeaguesForSeason(seasonId: number) {
       });
       await Promise.all(storePromises);
     }
+    loadedSeasonId.value = seasonId;
   } catch (e) {
     console.error('Error loading season standings:', e);
   } finally {
-    loadingLeagues.value = false;
+    flag.value = false;
   }
 }
 
 watch(() => props.seasonId, (id) => {
   if (!id) {
     leagues.value = [];
+    allStandingsData.value = {};
+    loadedSeasonId.value = null;
     return;
   }
   loadLeaguesForSeason(id);

@@ -56,8 +56,14 @@
         </KennerButton>
       </div>
     </template>
+    <!--
+      Stale-while-revalidate: as soon as we have a `selectedSeasonId` (even if
+      the parent still reports `loading`), keep rendering SeasonStandings so
+      cached data stays visible during background refreshes. Only when we have
+      nothing to show yet do we fall back to the loading spinner.
+    -->
     <SeasonStandings
-      v-if="!loading"
+      v-if="selectedSeasonId || !loading"
       :seasonId="selectedSeasonId"
       class="col-12"
     />

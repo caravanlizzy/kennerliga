@@ -159,7 +159,13 @@ import { useUpdateStore } from 'stores/updateStore';
 const updateStore = useUpdateStore();
 const { getLeagueColor } = leagueColors();
 const events = ref<TLiveEvent[]>([]);
+// Blocking loading flag — only true until we have the first payload.
 const loading = ref(true);
+// Non-blocking refresh indicator used for background refetches
+// (stale-while-revalidate). The cached `events` stay on screen while a new
+// fetch is in flight, so the feed does not flash empty.
+const refreshing = ref(false);
+const initialized = ref(false);
 const selectedLeagues = ref<Set<number | string>>(new Set());
 let unsubscribe: (() => void) | null = null;
 
@@ -198,12 +204,19 @@ function toggleAllLeagues() {
 }
 
 async function fetchEvents() {
+  // Stale-while-revalidate: only use the blocking `loading` flag on the very
+  // first fetch. Subsequent refreshes (initial fetch already succeeded) flip
+  // the non-blocking `refreshing` flag so cached events stay visible.
+  const isBackground = initialized.value;
+  const flag = isBackground ? refreshing : loading;
+  flag.value = true;
   try {
     events.value = await fetchLiveActionEvents();
+    initialized.value = true;
   } catch (error) {
     console.error('Error fetching live events:', error);
   } finally {
-    loading.value = false;
+    flag.value = false;
   }
 }
 
