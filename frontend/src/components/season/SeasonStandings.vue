@@ -139,6 +139,7 @@ async function loadLeaguesForSeason(seasonId: number) {
         standingsMap[l.id] = l;
       });
       allStandingsData.value = standingsMap;
+      loadedSeasonId.value = seasonId;
       return;
     }
 
