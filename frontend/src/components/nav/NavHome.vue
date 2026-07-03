@@ -1,7 +1,7 @@
 <template>
   <div class="row items-center no-wrap">
     <KennerButton
-      :to="{ name: 'home' }"
+      :to="{ name: isMobile ? 'season-standings' : 'home' }"
       unelevated
       flat
       color="dark"
