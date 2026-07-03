@@ -15,6 +15,8 @@ from game.models import (
     SelectedGame,
     SelectedOption,
     BanDecision,
+    WinCondition,
+    WinConditionOption,
 )
 from game.serializers import (
     GameSerializer,
@@ -29,6 +31,8 @@ from game.serializers import (
     SelectedOptionSerializer,
     FullGameSerializer,
     BanDecisionSerializer,
+    WinConditionSerializer,
+    WinConditionOptionSerializer,
 )
 
 from league.models import League
@@ -108,7 +112,21 @@ class FactionViewSet(ModelViewSet):
 class TieBreakerViewSet(ModelViewSet):
     queryset = TieBreaker.objects.all()
     serializer_class = TieBreakerSerializer
+    filterset_fields = ["win_condition"]
+    permission_classes = [IsAuthenticated]
+
+
+class WinConditionViewSet(ModelViewSet):
+    queryset = WinCondition.objects.all().prefetch_related("options", "tie_breakers")
+    serializer_class = WinConditionSerializer
     filterset_fields = ["result_config"]
+    permission_classes = [IsAuthenticated]
+
+
+class WinConditionOptionViewSet(ModelViewSet):
+    queryset = WinConditionOption.objects.all()
+    serializer_class = WinConditionOptionSerializer
+    filterset_fields = ["win_condition"]
     permission_classes = [IsAuthenticated]
 
 

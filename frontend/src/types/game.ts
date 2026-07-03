@@ -147,6 +147,19 @@ export type TTieBreaker = {
   higher_wins: boolean;
 };
 
+export type TWinConditionType = 'POINTS' | 'OPTION';
+
+export type TWinConditionOption = {
+  name: string;
+};
+
+export type TWinCondition = {
+  name: string;
+  condition_type: TWinConditionType;
+  options: TWinConditionOption[];
+  tieBreakers: TTieBreaker[];
+};
+
 export type TResultConfig = {
   id?: number;
   game?: number;
@@ -155,14 +168,32 @@ export type TResultConfig = {
   startingPointSystem: number | null;
   hasStartingPlayerOrder: boolean;
   factions?: TFaction[];
-  tieBreakers?: TTieBreaker[];
-  hasTieBreaker?: boolean;
+  winConditions?: TWinCondition[];
 };
 
 export type TTieBreakerDto = {
   id: number;
   name: string;
   order: number;
+  higher_wins: boolean;
+  win_condition: number;
+};
+
+export type TWinConditionOptionDto = {
+  id: number;
+  name: string;
+  order: number;
+  win_condition: number;
+};
+
+export type TWinConditionDto = {
+  id: number;
+  name: string;
+  condition_type: TWinConditionType;
+  order: number;
+  result_config: number;
+  options: TWinConditionOptionDto[];
+  tie_breakers: TTieBreakerDto[];
 };
 
 export type TMatchResultPayload = {
@@ -175,11 +206,13 @@ export type TMatchResultPayload = {
   starting_points: number | null;
   faction_ids: number[];
   tie_breaker_value: number | null;
+  win_condition_option?: number | null;
 };
 
 export type TMatchResultSubmitPayload = {
   selected_game: number;
   results: TMatchResultPayload[];
+  win_condition: number;
   tiebreaker?: { id: number };
 };
 
@@ -196,6 +229,8 @@ export type TMatchResultDto = {
   starting_points: number | null;
   tie_breaker_value: number | null;
   decisive_tie_breaker: { id: number; name: string } | null;
+  win_condition: { id: number; name: string } | null;
+  win_condition_option: { id: number; name: string; order: number } | null;
   factions: { id: number; name: string; level: number }[];
 };
 

@@ -6,20 +6,9 @@ from nested_admin.nested import (
 )
 
 # Register your models here.
-from game.models import (
-    Game,
-    GameOption,
-    GameOptionChoice,
-    StartingPointSystem,
-    Faction,
-    TieBreaker,
-    ResultConfig,
-    SelectedGame,
-    BanDecision,
-    SelectedOption,
-    GameOptionAvailabilityCondition,
-    GameOptionAvailabilityGroup,
-)
+from game.models import Game, GameOption, GameOptionChoice, StartingPointSystem, Faction, TieBreaker, \
+    ResultConfig, SelectedGame, BanDecision, SelectedOption, GameOptionAvailabilityCondition, \
+    GameOptionAvailabilityGroup, WinCondition
 from services.standings_snapshot import rebuild_game_snapshot, rebuild_league_snapshot
 
 
@@ -104,8 +93,13 @@ class FactionAdmin(admin.ModelAdmin):
 
 @admin.register(TieBreaker)
 class TieBreakerAdmin(admin.ModelAdmin):
-    list_display = ("name", "result_config", "order")
-    list_filter = ("result_config__game",)
+    list_display = ("name", "win_condition", "order")
+    list_filter = ("win_condition__result_config__game",)
+
+
+class WinConditionInline(admin.TabularInline):
+    model = WinCondition
+    extra = 0
 
 
 @admin.register(ResultConfig)
@@ -118,6 +112,7 @@ class ResultConfigAdmin(admin.ModelAdmin):
         "has_points",
     )
     list_filter = ("game",)
+    inlines = [WinConditionInline]
 
 
 from django.urls import path

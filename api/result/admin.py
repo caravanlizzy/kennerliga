@@ -6,14 +6,15 @@ from game.models import Faction
 @admin.register(Result)
 class ResultAdmin(admin.ModelAdmin):
     list_display = (
-        "player_profile",
-        "get_selected_game",
-        "get_factions",
-        "league",
-        "season",
-        "points",
-        "starting_position",
-        "tie_breaker_resolved",
+        'player_profile',
+        'get_selected_game',
+        'get_factions',
+        'win_condition',
+        'league',
+        'season',
+        'points',
+        'starting_position',
+        'tie_breaker_resolved'
     )
 
     list_filter = ("league", "season", "tie_breaker_resolved")
@@ -28,11 +29,12 @@ class ResultAdmin(admin.ModelAdmin):
 
     # Optimizes Foreign Key lookups in the list view (prevents N+1 queries)
     list_select_related = (
-        "player_profile",
-        "league",
-        "season",
-        "selected_game",
-        "selected_game__game",
+        'player_profile',
+        'league',
+        'season',
+        'selected_game',
+        'selected_game__game',
+        'win_condition'
     )
 
     def get_queryset(self, request):

@@ -257,8 +257,61 @@ class ResultConfig(models.Model):
         return f"ResultConfig for {self.game}"
 
 
+class WinCondition(models.Model):
+    class WinConditionType(models.TextChoices):
+        POINTS = "POINTS", "Points"
+        OPTION = "OPTION", "Option"
+
+    result_config = models.ForeignKey(
+        ResultConfig,
+        on_delete=models.CASCADE,
+        related_name="win_conditions",
+    )
+    name = models.CharField(max_length=255)
+    condition_type = models.CharField(
+        max_length=20,
+        choices=WinConditionType.choices,
+        default=WinConditionType.OPTION,
+    )
+    order = models.PositiveIntegerField(default=0)
+
+    @property
+    def is_points(self):
+        return self.condition_type == self.WinConditionType.POINTS
+
+    @property
+    def is_option(self):
+        return self.condition_type == self.WinConditionType.OPTION
+
+    def __str__(self):
+        return f"{self.name} ({self.result_config.game.name})"
+
+    class Meta:
+        ordering = ["order", "name"]
+
+
+class WinConditionOption(models.Model):
+    win_condition = models.ForeignKey(
+        WinCondition,
+        on_delete=models.CASCADE,
+        related_name="options",
+    )
+    name = models.CharField(max_length=255)
+    order = models.PositiveIntegerField(default=0)
+
+    def __str__(self):
+        return f"{self.name} ({self.win_condition.name})"
+
+    class Meta:
+        ordering = ["order", "name"]
+
+
 class TieBreaker(models.Model):
-    result_config = models.ForeignKey(ResultConfig, on_delete=models.CASCADE)
+    win_condition = models.ForeignKey(
+        WinCondition,
+        on_delete=models.CASCADE,
+        related_name="tie_breakers",
+    )
     name = models.CharField(max_length=255)
     order = models.PositiveIntegerField(help_text="Higher order is more important.")
     higher_wins = models.BooleanField(
@@ -270,7 +323,7 @@ class TieBreaker(models.Model):
         ordering = ["-order"]
 
     def __str__(self):
-        return str(self.name)
+        return f"{self.name} ({self.win_condition.name})"
 
 
 class Faction(models.Model):
