@@ -37,6 +37,15 @@ export default route(async function(/* { store, ssrContext } */) {
     const uiStore = useUiStore();
     uiStore.clearSections();
 
+    const isMobile =
+      !process.env.SERVER &&
+      typeof window !== 'undefined' &&
+      window.matchMedia('(max-width: 599px)').matches;
+
+    if (to.name === 'home' && isMobile) {
+      return next({ name: 'season-standings' });
+    }
+
     if (!to.meta.requiresAuth) return next();
     const userStore = useUserStore();
     const { user } = userStore;
