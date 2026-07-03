@@ -10,7 +10,8 @@ import leagueRoutes from 'src/router/leagueRoutes';
 import ResponsivePage from 'src/components/layout/ResponsivePage.vue';
 
 const LiveMobile = () => import('src/pages/mobile/LiveActionMobilePage.vue');
-const ChatMobile = () => import('src/pages/mobile/ChatMobilePage.vue');
+// Chat feature temporarily disabled
+// const ChatMobile = () => import('src/pages/mobile/ChatMobilePage.vue');
 const LeaderboardMobile = () => import('src/pages/mobile/LeaderboardMobilePage.vue');
 
 // To ensure it is treated as a module, add at least one `export` statement
@@ -128,13 +129,14 @@ const routes: RouteRecordRaw[] = [
         props: { desktop: LiveMobile, mobile: LiveMobile },
         meta: { icon: 'bolt', label: 'Live', requiresAuth: true },
       },
-      {
-        path: 'chat',
-        name: 'chat',
-        component: ResponsivePage,
-        props: { desktop: ChatMobile, mobile: ChatMobile },
-        meta: { icon: 'chat', label: 'Chat', requiresAuth: true },
-      },
+      // Chat feature temporarily disabled
+      // {
+      //   path: 'chat',
+      //   name: 'chat',
+      //   component: ResponsivePage,
+      //   props: { desktop: ChatMobile, mobile: ChatMobile },
+      //   meta: { icon: 'chat', label: 'Chat', requiresAuth: true },
+      // },
       {
         path: 'leaderboard',
         name: 'leaderboard',

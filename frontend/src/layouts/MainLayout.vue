@@ -14,8 +14,9 @@
       <KennerDrawer v-model="drawerState" />
     </q-drawer>
 
+    <!-- Chat feature temporarily disabled -->
     <q-drawer
-      v-if="isAuthenticated"
+      v-if="false && isAuthenticated"
       side="left"
       v-model="chatDrawerOpen"
       :width="350"

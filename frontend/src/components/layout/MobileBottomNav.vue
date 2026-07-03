@@ -12,7 +12,8 @@
     >
       <q-tab name="seasons" icon="military_tech" label="Seasons" />
       <q-tab name="live" icon="bolt" label="Live" />
-      <q-tab name="chat" icon="chat" label="Chat" />
+      <!-- Chat feature temporarily disabled -->
+      <!-- <q-tab name="chat" icon="chat" label="Chat" /> -->
       <q-tab name="leaderboard" icon="stars" label="Rank" />
     </q-tabs>
   </q-footer>

@@ -27,7 +27,7 @@
           <CurrentChampion />
         </div>
 
-        <NavChat v-if="isAuthenticated" />
+        <!-- Chat feature temporarily disabled --><NavChat v-if="false && isAuthenticated" />
 
         <NavMyLeague v-if="user && user.myCurrentLeagueId" />
 
