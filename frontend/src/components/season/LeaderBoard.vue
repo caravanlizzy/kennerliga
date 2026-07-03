@@ -240,6 +240,7 @@ import { ref, watch } from 'vue';
 import LoadingSpinner from 'components/base/LoadingSpinner.vue';
 import ErrorDisplay from 'components/base/ErrorDisplay.vue';
 import { leagueColors } from 'src/composables/leagueColors';
+import { useCachedResource } from 'src/composables/cachedResource';
 
 const props = defineProps<{ year: number }>();
 const {  getHexLeagueColor } = leagueColors();
@@ -262,38 +263,35 @@ interface LeaderBoardResponse {
   standings: PlayerYearStanding[];
 }
 
-const standings = ref<LeaderBoardResponse | null>(null);
-const loading = ref(false);
-// Background refresh indicator (does not blank the UI, unlike `loading`).
-const refreshing = ref(false);
 const error = ref(false);
 const showAllLeagues = defineModel<boolean>('showAllLeagues', { default: false });
 
-/**
- * Stale-while-revalidate fetch.
- *
- * When we already have cached standings displayed we keep them visible and
- * flip the non-blocking `refreshing` flag instead of clearing the data and
- * showing a loading spinner. Only the very first fetch (or a fetch after an
- * error) uses the blocking `loading` flag.
- */
-async function fetchStandings(): Promise<void> {
-  const hasCachedData = standings.value !== null;
-  const flag = hasCachedData ? refreshing : loading;
-  flag.value = true;
-  error.value = false;
+// Stale-while-revalidate cache with a module-level `cacheKey`, so the
+// leaderboard survives component unmount/remount (Hall of Fame section on
+// the home page). The key is per-year, so switching years is instant on
+// the second visit.
+const {
+  data: standings,
+  loading,
+  load: loadStandings,
+} = useCachedResource<number, LeaderBoardResponse>(
+  async (year) => {
+    error.value = false;
+    try {
+      const { data } = await api.get<LeaderBoardResponse>(
+        `leaderboard/?year=${year}`
+      );
+      return data;
+    } catch (e) {
+      error.value = true;
+      throw e;
+    }
+  },
+  { cacheKey: 'leaderboard' }
+);
 
-  try {
-    const { data } = await api.get<LeaderBoardResponse>(
-      `leaderboard/?year=${props.year}`
-    );
-    standings.value = data;
-  } catch (e) {
-    console.error('Error loading yearly standings:', e);
-    error.value = true;
-  } finally {
-    flag.value = false;
-  }
+function fetchStandings(): void {
+  void loadStandings(props.year);
 }
 
 function bestLeague(row: PlayerYearStanding): number | null {

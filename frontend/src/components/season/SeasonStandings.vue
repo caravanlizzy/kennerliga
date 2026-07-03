@@ -120,6 +120,9 @@ const {
   load: loadLeaguesForSeason,
   reset: resetLeagues,
 } = useCachedResource<number, SeasonPayload>(async (seasonId) => {
+  // Note: `cacheKey` below persists the SWR state across component
+  // unmount/remount so navigating back to a season keeps the standings
+  // cached instead of showing the blocking spinner.
   if (props.mode === 'standings') {
     // Batched: single request returns all leagues + their full standings.
     const { data } = await api.get(`season/seasons/${seasonId}/full-standings/`);
@@ -149,20 +152,25 @@ const {
     await Promise.all(storePromises);
   }
   return { leagues: leaguesData, standingsMap: {} };
-});
+}, { cacheKey: `season-standings:${props.mode}` });
 
 const leagues = computed<League[]>(() => payload.value?.leagues ?? []);
 const allStandingsData = computed<Record<number, any>>(
   () => payload.value?.standingsMap ?? {}
 );
 
+// The cache is module-level (see `cacheKey` above), so we deliberately do
+// NOT call `resetLeagues()` when `seasonId` is falsy — that would wipe the
+// cache for every other mount of this component. When a valid id becomes
+// available we just load it; the previous key's data stays around until it
+// is naturally overwritten.
 watch(() => props.seasonId, (id) => {
-  if (!id) {
-    resetLeagues();
-    return;
-  }
+  if (!id) return;
   loadLeaguesForSeason(id);
 }, { immediate: true });
+
+// Silence unused-var warning; kept in the destructure for API symmetry.
+void resetLeagues;
 </script>
 
 <style scoped lang="scss">

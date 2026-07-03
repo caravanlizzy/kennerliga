@@ -155,17 +155,25 @@ import { leagueColors } from 'src/composables/leagueColors';
 import { TLiveEvent, TLiveEventType } from 'src/types';
 import { fetchLiveActionEvents } from 'src/services/seasonService';
 import { useUpdateStore } from 'stores/updateStore';
+import { useCachedResource } from 'src/composables/cachedResource';
 
 const updateStore = useUpdateStore();
 const { getLeagueColor } = leagueColors();
-const events = ref<TLiveEvent[]>([]);
-// Blocking loading flag — only true until we have the first payload.
-const loading = ref(true);
-// Non-blocking refresh indicator used for background refetches
-// (stale-while-revalidate). The cached `events` stay on screen while a new
-// fetch is in flight, so the feed does not flash empty.
-const refreshing = ref(false);
-const initialized = ref(false);
+
+// Stale-while-revalidate cache with a module-level `cacheKey`, so events
+// survive component unmount/remount (e.g. navigating away and back). Without
+// this, the local refs would be recreated on each mount and the feed would
+// flash the blocking spinner every time.
+const {
+  data: eventsData,
+  loading,
+  load: loadEvents,
+} = useCachedResource<'live', TLiveEvent[]>(
+  () => fetchLiveActionEvents(),
+  { cacheKey: 'live-action-feed' }
+);
+const events = computed<TLiveEvent[]>(() => eventsData.value ?? []);
+
 const selectedLeagues = ref<Set<number | string>>(new Set());
 let unsubscribe: (() => void) | null = null;
 
@@ -203,21 +211,11 @@ function toggleAllLeagues() {
   selectedLeagues.value.clear();
 }
 
-async function fetchEvents() {
-  // Stale-while-revalidate: only use the blocking `loading` flag on the very
-  // first fetch. Subsequent refreshes (initial fetch already succeeded) flip
-  // the non-blocking `refreshing` flag so cached events stay visible.
-  const isBackground = initialized.value;
-  const flag = isBackground ? refreshing : loading;
-  flag.value = true;
-  try {
-    events.value = await fetchLiveActionEvents();
-    initialized.value = true;
-  } catch (error) {
-    console.error('Error fetching live events:', error);
-  } finally {
-    flag.value = false;
-  }
+function fetchEvents() {
+  // SWR is handled by `useCachedResource`: the blocking `loading` flag is
+  // only true until the first payload; subsequent calls run in the
+  // background so cached events stay on screen.
+  void loadEvents('live');
 }
 
 function formatTime(timestamp: string) {
