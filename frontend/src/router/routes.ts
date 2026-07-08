@@ -50,17 +50,6 @@ const routes: RouteRecordRaw[] = [
     ],
   },
   {
-    path: '/feedback',
-    component: () => import('layouts/MainLayout.vue'),
-    children: [
-      {
-        path: '',
-        name: 'feedback',
-        component: () => import('pages/FeedbackPage.vue'),
-      },
-    ],
-  },
-  {
     path: '/announcements',
     component: () => import('layouts/MainLayout.vue'),
     meta: { requiresAuth: true, requiresAdmin: true },
@@ -69,6 +58,19 @@ const routes: RouteRecordRaw[] = [
         path: '',
         name: 'announcements',
         component: () => import('pages/AnnouncementManagementPage.vue'),
+        meta: { label: 'Announcements', icon: 'campaign' },
+      },
+    ],
+  },
+  {
+    path: '/feedback',
+    component: () => import('layouts/MainLayout.vue'),
+    children: [
+      {
+        path: '',
+        name: 'feedback',
+        component: () => import('pages/FeedbackPage.vue'),
+        meta: { label: 'Feedback', icon: 'forum' },
       },
     ],
   },
@@ -81,6 +83,7 @@ const routes: RouteRecordRaw[] = [
         path: '',
         name: 'release-notes',
         component: () => import('pages/ReleaseNoteManagementPage.vue'),
+        meta: { label: 'Release Notes', icon: 'history' },
       },
     ],
   },
@@ -93,6 +96,7 @@ const routes: RouteRecordRaw[] = [
         path: '',
         name: 'taskboard',
         component: () => import('pages/TaskBoardPage.vue'),
+        meta: { label: 'Task Board', icon: 'view_kanban' },
       },
     ],
   },

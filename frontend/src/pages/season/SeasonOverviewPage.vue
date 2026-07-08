@@ -3,16 +3,6 @@
     <!-- Header Area -->
     <div class="row items-center justify-between q-mb-lg">
       <div class="row items-center q-gutter-x-md">
-        <KennerButton
-          flat
-          icon="arrow_back"
-          shape="squircle"
-          color="grey-7"
-          size="md"
-          @click="router.back()"
-        >
-          <KennerTooltip>Back to seasons</KennerTooltip>
-        </KennerButton>
         <div class="column">
           <div class="row items-center q-gutter-x-xs">
             <q-icon name="military_tech" size="sm" color="primary" />

@@ -3,9 +3,6 @@
     <!-- Page Header -->
     <div class="page-header row items-center justify-between no-wrap q-gutter-x-md">
       <div class="row items-center q-gutter-x-md no-wrap">
-        <div class="header-icon-wrap">
-          <q-icon name="view_kanban" size="28px" class="text-white" />
-        </div>
         <div class="column">
           <div class="text-h5 text-weight-bolder page-title">Task Board</div>
           <div class="text-caption page-subtitle">
@@ -41,7 +38,6 @@
             >
               <q-card-section class="kanban-column__header q-py-sm q-px-md">
                 <div class="row items-center q-gutter-x-sm no-wrap">
-                  <q-icon :name="statusIcons[status]" size="18px" class="kanban-column__icon" />
                   <div class="text-subtitle2 text-weight-bold kanban-column__title">{{ status }}</div>
                   <q-space />
                   <q-chip
@@ -99,7 +95,6 @@
         <q-card flat class="glass-card recent-card">
           <q-card-section class="recent-card__header q-py-sm q-px-md">
             <div class="row items-center q-gutter-x-sm">
-              <q-icon name="history" size="18px" color="primary" />
               <div class="text-subtitle2 text-weight-bold recent-card__title">Recent Tasks</div>
             </div>
           </q-card-section>
@@ -121,9 +116,6 @@
                 class="recent-item"
                 @click="isAdmin ? openEditDialog(task) : undefined"
               >
-                <q-item-section avatar>
-                  <q-icon :name="statusIcons[task.status]" size="18px" />
-                </q-item-section>
                 <q-item-section class="recent-task-section">
                   <q-item-label class="ellipsis text-weight-medium">{{ task.title }}</q-item-label>
                   <q-item-label caption>{{ task.status }}</q-item-label>

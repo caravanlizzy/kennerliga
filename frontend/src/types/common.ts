@@ -20,7 +20,7 @@ export type TMessageDto = {
   sender: string;
   label?: string;
 };
-
+ 
 export type TFeedbackDto = {
   id: number;
   message: string;
@@ -28,3 +28,4 @@ export type TFeedbackDto = {
   user?: number;
   username?: string;
 };
+

@@ -3,9 +3,6 @@
     <!-- Page Header -->
     <div class="page-header">
       <div class="row items-center q-gutter-x-md no-wrap">
-        <div class="header-icon-wrap">
-          <q-icon name="forum" size="28px" class="text-white" />
-        </div>
         <div class="column">
           <div class="text-h5 text-weight-bolder page-title">Feedback</div>
           <div class="text-caption page-subtitle">
@@ -20,7 +17,6 @@
       <q-card flat class="feedback-card">
         <q-card-section class="feedback-card-header">
           <div class="row items-center q-gutter-x-sm">
-            <q-icon name="edit_note" color="primary" size="22px" />
             <div class="text-subtitle1 text-weight-bold feedback-header-text">
               Submit Feedback
             </div>
@@ -72,7 +68,6 @@
     <div v-if="isAdmin" class="feedback-list">
       <div class="row items-center justify-between q-mb-md admin-header">
         <div class="row items-center q-gutter-x-sm">
-          <q-icon name="admin_panel_settings" color="primary" size="22px" />
           <div class="text-subtitle1 text-weight-bold feedback-header-text">
             Manage User Feedback
           </div>

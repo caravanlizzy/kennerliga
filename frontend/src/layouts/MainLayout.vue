@@ -46,6 +46,7 @@
         style="max-width: 1300px; width: 100%; "
       >
         <AnnouncementDisplay v-if="isMobile && isAuthenticated" no-margins />
+        <BreadcrumbsNavigation />
         <router-view v-slot="{ Component }">
           <component :is="Component" />
         </router-view>
@@ -59,6 +60,7 @@
 
 <script setup lang="ts">
 import MobileBottomNav from 'components/layout/MobileBottomNav.vue';
+import BreadcrumbsNavigation from 'components/layout/BreadcrumbsNavigation.vue';
 import NavBar from 'components/layout/NavBar.vue';
 import { ref, Ref, onMounted } from 'vue';
 import KennerDrawer from 'components/layout/KennerDrawer.vue';

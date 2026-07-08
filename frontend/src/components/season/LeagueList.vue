@@ -42,7 +42,7 @@
 
     <!-- Members -->
     <div class="q-px-md q-pt-sm q-pb-md">
-      <div class="text-caption text-grey-6 q-mb-xs text-weight-medium">Members</div>
+      <div class="text-caption text-grey-6 q-mb-xs text-weight-medium">Users</div>
       <div v-if="league.members?.length" class="row q-col-gutter-xs">
         <q-chip
           v-for="m in league.members"
@@ -56,7 +56,7 @@
           {{ m.profile_name }}
         </q-chip>
       </div>
-      <div v-else class="text-caption text-grey-5 italic">No members assigned</div>
+      <div v-else class="text-caption text-grey-5 italic">No users assigned</div>
     </div>
   </q-card>
 </template>

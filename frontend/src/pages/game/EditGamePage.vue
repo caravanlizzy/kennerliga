@@ -5,7 +5,6 @@
         <q-card flat bordered class="q-pa-lg shadow-2">
           <div class="row items-center justify-between q-mb-lg">
             <div class="row items-center q-gutter-x-sm">
-              <KennerButton flat round icon="arrow_back" @click="router.back()" />
               <q-icon name="edit" size="md" color="primary" />
               <h1 class="text-h4 q-my-none text-weight-bold">Edit Game</h1>
             </div>

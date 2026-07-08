@@ -17,22 +17,17 @@
           label="Seasons"
           forward-name="seasons"
         />
-        <DrawerItem icon="people_alt" icon-color="primary" label="Members" forward-name="users" />
+        <DrawerItem icon="people_alt" icon-color="primary" label="Users" forward-name="users" />
 
         <q-separator class="q-my-sm drawer-separator" />
         <DrawerSubGroup>Info</DrawerSubGroup>
         <DrawerItem icon="menu_book" icon-color="primary" label="Rules" forward-name="rules" />
         <DrawerItem icon="info" icon-color="primary" label="About" forward-name="about" />
-
+ 
         <q-separator class="q-my-sm drawer-separator" />
         <DrawerSubGroup>Contribute</DrawerSubGroup>
-        <DrawerItem icon="rate_review" icon-color="primary" label="Feedback" forward-name="feedback" />
-        <DrawerItem
-          icon="checklist"
-          icon-color="primary"
-          label="Task Board"
-          forward-name="taskboard"
-        />
+        <DrawerItem icon="forum" icon-color="primary" label="Feedback" forward-name="feedback" />
+        <DrawerItem icon="view_kanban" icon-color="primary" label="Task Board" forward-name="taskboard" />
 
         <template v-if="isAdmin">
           <q-separator class="q-my-sm drawer-separator" />

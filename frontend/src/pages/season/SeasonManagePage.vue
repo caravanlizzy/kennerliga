@@ -3,16 +3,6 @@
     <!-- Header Area -->
     <div class="row items-center justify-between q-mb-md">
       <div class="row items-center q-gutter-x-sm">
-        <KennerButton
-          flat
-          icon="arrow_back"
-          round
-          color="grey-7"
-          size="md"
-          @click="router.back()"
-        >
-          <KennerTooltip>Back</KennerTooltip>
-        </KennerButton>
         <q-icon name="military_tech" size="md" color="primary" />
         <div class="text-h4 text-weight-bolder text-dark tracking-tighter">
           {{ isAdmin ? 'Manage Season' : 'Season Details' }} {{ season?.name || '…' }}
@@ -60,7 +50,7 @@
             <q-icon name="groups" size="20px" />
           </div>
           <div class="col">
-            <div class="text-subtitle1 text-weight-bolder season-summary__title">Members</div>
+            <div class="text-subtitle1 text-weight-bolder season-summary__title">Users</div>
             <div class="text-caption text-grey-6">Overview for this season</div>
           </div>
           <div class="row items-center q-gutter-x-xs">
@@ -70,7 +60,7 @@
             </div>
             <div class="stat-pill">
               <q-icon name="person" size="14px" class="q-mr-xs" />
-              <span>{{ participants.length }} members</span>
+              <span>{{ participants.length }} users</span>
             </div>
             <div
               v-if="seasonStatusLabel"
@@ -95,7 +85,7 @@
               <span>{{ p.profile_name }}</span>
             </div>
           </div>
-          <div v-else class="text-caption text-grey-6 italic">No registered members for this season.</div>
+          <div v-else class="text-caption text-grey-6 italic">No registered users for this season.</div>
         </div>
       </div>
 

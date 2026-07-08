@@ -3,16 +3,6 @@
     <!-- Header Area -->
     <div class="row items-center justify-between q-mb-md">
       <div class="row items-center q-gutter-x-sm">
-        <KennerButton
-          flat
-          icon="arrow_back"
-          round
-          color="grey-7"
-          size="md"
-          @click="$router.back()"
-        >
-          <KennerTooltip>Back</KennerTooltip>
-        </KennerButton>
         <q-icon name="settings" size="md" color="primary" />
         <div class="text-h4 text-weight-bolder text-dark tracking-tighter">
           Manage League
@@ -110,14 +100,14 @@
     <ErrorDisplay v-else-if="error" :error="error" class="q-mb-md" />
 
     <!-- Empty state -->
-    <EmptyMembersState
+    <EmptyUsersState
       v-else-if="!loading && (!league?.members || league.members.length === 0)"
     />
 
     <!-- Members Grid -->
     <ContentSection
       v-else-if="!loading && league"
-      title="League Members"
+      title="League Users"
       icon="people"
       color="secondary"
       :bordered="false"
@@ -167,7 +157,7 @@ import KennerSelect from 'components/base/KennerSelect.vue';
 import ErrorDisplay from 'components/base/ErrorDisplay.vue';
 import LoadingSpinner from 'components/base/LoadingSpinner.vue';
 import MemberGameCard from 'components/league/manager/MemberGameCard.vue';
-import EmptyMembersState from 'components/league/manager/EmptyMembersState.vue';
+import EmptyUsersState from 'components/league/manager/EmptyUsersState.vue';
 import LeagueStandings from 'components/league/LeagueStandings.vue';
 import ManagerFormsDialog, { TActiveForm } from 'components/league/manager/ManagerFormsDialog.vue';
 import { useDialog } from 'src/composables/dialog';

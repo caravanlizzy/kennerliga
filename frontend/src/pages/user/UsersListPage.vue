@@ -2,7 +2,7 @@
   <KennerTable
     :create-button="createButton"
     flat
-    title="Members"
+    title="Users"
     @row-click="onRowClick"
     :rows="users"
     :columns="columns"

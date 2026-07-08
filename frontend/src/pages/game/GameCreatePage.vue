@@ -4,7 +4,6 @@
       <div class="col-12 col-md-10 col-lg-8">
         <q-card flat bordered class="q-pa-lg shadow-2">
           <div class="row items-center q-mb-lg q-gutter-x-sm">
-            <KennerButton flat round icon="arrow_back" @click="$router.back()" />
             <q-icon
               name="add_circle"
               size="md"
