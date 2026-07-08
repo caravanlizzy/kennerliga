@@ -29,12 +29,13 @@
 
 <script setup lang="ts">
 import { computed } from 'vue';
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import { useResponsive } from 'src/composables/responsive';
 import KennerButton from 'components/base/KennerButton.vue';
 import KennerTooltip from 'components/base/KennerTooltip.vue';
 
 const route = useRoute();
+const router = useRouter();
 const { isMobile } = useResponsive();
 
 const show = computed(() => {
@@ -85,7 +86,15 @@ const crumbs = computed(() => {
     }
   });
 
-  return result;
+  // Filter out crumbs that don't have a view (component)
+  // We do this by resolving the path and checking if any of the matched records have a component
+  // (excluding the root layout)
+  return result.filter(crumb => {
+    const resolved = router.resolve(crumb.path);
+    return resolved.matched.some(m => 
+      m.path !== '/' && m.components && Object.keys(m.components).length > 0
+    );
+  });
 });
 </script>
 
