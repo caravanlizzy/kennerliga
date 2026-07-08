@@ -12,14 +12,14 @@
         hide-pagination
         :pagination="{ rowsPerPage: 0 }"
         :row-class="rowClass"
-        class="bg-standings-table rounded-borders text-caption"
+        class="rounded-borders text-caption"
       >
         <template #no-data>
           <!-- This slot will not be used because of v-if above, but good practice -->
           <div class="hidden"></div>
         </template>
         <template #header="props">
-          <q-tr :props="props" class="header-row">
+          <q-tr :props="props">
             <q-th
               v-for="col in props.cols"
               :key="col.name"
@@ -57,7 +57,7 @@
         </template>
 
         <template #body-cell-profile_name="props">
-          <q-td :props="props" class="text-left profile-cell">
+          <q-td :props="props" class="text-left q-py-sm q-px-md">
             <div class="row items-center no-wrap">
               <template v-if="props.row.username">
                 <div class="row items-center no-wrap q-gutter-x-sm">
@@ -72,7 +72,7 @@
                   </div>
                   <div v-else class="column">
                     <span
-                      class="text-subtitle2 text-weight-bold line-height-1 cursor-pointer username-link"
+                      class="text-subtitle2 text-weight-bold cursor-pointer username-link"
                       @click="$router.push({ name: 'user-detail', params: { username: props.row.username } })"
                     >
                       {{ props.row.username }}
@@ -201,7 +201,7 @@
       <LoadingSpinner v-else-if="loading" text="Loading standings..." />
 
       <!-- Empty state -->
-      <div v-else-if="standings && standings.standings.length === 0 && standings.selected_games.length === 0" class="column items-center q-pa-xl text-grey-6 bg-standings-table rounded-borders">
+      <div v-else-if="standings && standings.standings.length === 0 && standings.selected_games.length === 0" class="column items-center q-pa-xl text-grey-6 bg-grey-1 rounded-borders">
         <q-icon name="upcoming" size="40px" class="q-mb-sm opacity-50" />
         <div class="text-subtitle2">No participants yet</div>
         <div class="text-caption">The standings will appear here once the season starts.</div>
@@ -212,33 +212,36 @@
         v-if="leagueId && standings?.all_games_finished && standings?.tie_groups?.some(g => g.unresolved)"
         class="q-mt-md q-mb-md"
       >
-        <div class="unresolved-card">
-          <div class="unresolved-card__header">
-            <q-icon name="emoji_events" size="18px" class="unresolved-card__icon" />
-            <div class="unresolved-card__title">Unresolved tie</div>
-            <q-badge class="unresolved-card__badge" rounded>
+        <q-card flat bordered class="bg-orange-1 text-orange-9 q-pa-md rounded-borders relative-position overflow-hidden" style="border-color: #fcd9a8;">
+          <div class="absolute-left bg-orange-8" style="width: 4px;"></div>
+          <div class="row items-center q-gutter-x-sm q-mb-sm">
+            <q-icon name="emoji_events" size="18px" color="orange-8" />
+            <div class="text-subtitle2 text-weight-bold text-uppercase" style="letter-spacing: 0.3px;">Unresolved tie</div>
+            <q-badge color="orange-8" rounded>
               {{ standings.tie_groups.filter(g => g.unresolved).length }}
             </q-badge>
           </div>
-          <div class="unresolved-card__body">
-            <div
+          <div class="row wrap q-gutter-sm">
+            <q-chip
               v-for="grp in standings.tie_groups.filter(g => g.unresolved)"
               :key="grp.group_key"
-              class="unresolved-card__group"
+              color="orange-2"
+              text-color="orange-10"
+              class="q-ma-none"
             >
               <template v-for="(m, idx) in grp.members" :key="m.player_profile_id">
-                <span class="unresolved-card__player">{{ m.profile_name }}</span>
+                <span class="text-weight-bold">{{ m.profile_name }}</span>
                 <span
                   v-if="idx < grp.members.length - 1"
-                  class="unresolved-card__vs"
+                  class="q-mx-xs text-weight-light opacity-70"
                 >vs</span>
               </template>
-            </div>
+            </q-chip>
           </div>
-          <div class="unresolved-card__hint">
+          <div class="text-orange-9 q-mt-sm text-italic opacity-80" style="font-size: 0.7rem;">
             Awaiting tie-break decision.
           </div>
-        </div>
+        </q-card>
       </div>
 
       <!-- Footer Actions -->
@@ -275,130 +278,6 @@
   </div>
 </template>
 
-<style scoped lang="scss">
-.border-orange-2 {
-  border: 1px solid #ffcc80;
-}
-
-.unresolved-card {
-  position: relative;
-  border-radius: 12px;
-  padding: 14px 16px;
-  background: linear-gradient(135deg, #fff7ed 0%, #fff1de 100%);
-  border: 1px solid #fcd9a8;
-  box-shadow: 0 2px 6px rgba(180, 100, 0, 0.08);
-  overflow: hidden;
-
-  &::before {
-    content: '';
-    position: absolute;
-    left: 0;
-    top: 0;
-    bottom: 0;
-    width: 4px;
-    background: linear-gradient(180deg, #f59e0b, #d97706);
-  }
-
-  &__header {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin-bottom: 8px;
-  }
-
-  &__icon {
-    color: #d97706;
-  }
-
-  &__title {
-    font-size: 0.85rem;
-    font-weight: 700;
-    letter-spacing: 0.3px;
-    text-transform: uppercase;
-    color: #92400e;
-  }
-
-  &__badge {
-    background: #d97706;
-    color: #fff;
-    font-size: 0.65rem;
-    font-weight: 700;
-    padding: 2px 8px;
-  }
-
-  &__body {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px 12px;
-  }
-
-  &__group {
-    display: inline-flex;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 6px;
-    padding: 6px 10px;
-    background: rgba(255, 255, 255, 0.75);
-    border: 1px solid rgba(217, 119, 6, 0.25);
-    border-radius: 999px;
-  }
-
-  &__player {
-    font-size: 0.8rem;
-    font-weight: 600;
-    color: #7c2d12;
-  }
-
-  &__vs {
-    font-size: 0.65rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    color: #b45309;
-    opacity: 0.75;
-  }
-
-  &__hint {
-    margin-top: 8px;
-    font-size: 0.7rem;
-    color: #92400e;
-    opacity: 0.8;
-    font-style: italic;
-  }
-}
-
-:global(.body--dark) .unresolved-card {
-  background: linear-gradient(135deg, rgba(120, 53, 15, 0.45) 0%, rgba(180, 83, 9, 0.35) 100%);
-  border-color: rgba(252, 211, 77, 0.35);
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
-
-  .unresolved-card__title,
-  .unresolved-card__hint {
-    color: #fde68a;
-  }
-  .unresolved-card__icon {
-    color: #fbbf24;
-  }
-  .unresolved-card__group {
-    background: rgba(0, 0, 0, 0.25);
-    border-color: rgba(251, 191, 36, 0.35);
-  }
-  .unresolved-card__player {
-    color: #fde68a;
-  }
-  .unresolved-card__vs {
-    color: #fbbf24;
-  }
-}
-
-.username-link {
-  transition: color 0.2s ease;
-}
-.username-link:hover {
-  color: var(--q-primary);
-  text-decoration: underline;
-}
-</style>
 
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue';
@@ -582,7 +461,7 @@ const rowClass = (row: any, index: number) => {
   // Let's check if there are any games.
   const hasGames = standings.value?.selected_games && standings.value.selected_games.length > 0;
   if (!hasGames) return '';
-  return index === 0 ? 'league-leader-row' : '';
+  return index === 0 ? 'bg-orange-1' : '';
 };
 
 const formatNumber = (value: string | number): string => {
@@ -631,93 +510,11 @@ function getRankBgClass(rank: number | undefined) {
 
 <style scoped lang="scss">
 
-.header-row {
-  background-color: var(--standings-header-bg, #f8f9fa);
-  border-bottom: 2px solid rgba(0, 0, 0, 0.05);
+.username-link {
+  transition: color 0.2s ease;
 }
-
-.profile-cell {
-  padding: 8px 12px;
-}
-
-.leader-crown {
-  animation: float 2s ease-in-out infinite;
-}
-
-@keyframes float {
-  0% { transform: translateY(0px); }
-  50% { transform: translateY(-2px); }
-  100% { transform: translateY(0px); }
-}
-
-.league-leader-row {
-  background-color: var(--standings-leader-bg, #fffaf0) !important; /* very light orange */
-}
-
-.bg-standings-table {
-  background: white !important;
-  color: #2c3e50;
-}
-
-:global(.body--dark .bg-standings-table) {
-  background: #1d1d1d !important;
-  color: #ececec;
-  --standings-header-bg: #262626;
-  --standings-leader-bg: #2d281e;
-}
-
-:global(.body--dark .bg-standings-table .header-row),
-:global(.body--dark .bg-standings-table thead tr) {
-  background-color: #262626 !important;
-  border-bottom-color: rgba(255, 255, 255, 0.08) !important;
-}
-
-:global(.body--dark .bg-standings-table thead tr th) {
-  color: #cccccc !important;
-}
-
-:global(.body--dark .bg-standings-table tbody tr td) {
-  color: #ececec !important;
-  border-color: rgba(255, 255, 255, 0.05) !important;
-}
-
-:global(.body--dark .bg-standings-table .league-leader-row td) {
-  background-color: #2d281e !important;
-}
-
-.line-height-1 {
-  line-height: 1.1;
-}
-
-/* Ensure the background doesn't override the hover effect of q-table if any */
-:global(.q-table tbody tr:hover td.bg-amber-1),
-:global(.q-table tbody tr:hover td.bg-blue-grey-1),
-:global(.q-table tbody tr:hover td.bg-brown-1),
-:global(.q-table tbody tr.bg-orange-1:hover) {
-  filter: brightness(0.97);
-}
-
-:global(.body--dark .q-table tbody tr:hover td.bg-amber-1),
-:global(.body--dark .q-table tbody tr:hover td.bg-blue-grey-1),
-:global(.body--dark .q-table tbody tr:hover td.bg-brown-1) {
-  filter: brightness(1.2);
-}
-
-:global(.body--dark .bg-standings-table .bg-amber-1) {
-  background: rgba(255, 193, 7, 0.18) !important;
-  color: #ffe082 !important;
-}
-:global(.body--dark .bg-standings-table .bg-blue-grey-1) {
-  background: rgba(144, 164, 174, 0.18) !important;
-  color: #cfd8dc !important;
-}
-:global(.body--dark .bg-standings-table .bg-brown-1) {
-  background: rgba(141, 110, 99, 0.22) !important;
-  color: #d7ccc8 !important;
-}
-
-.overflow-auto {
-  scrollbar-width: thin;
-  scrollbar-color: #e0e0e0 transparent;
+.username-link:hover {
+  color: var(--q-primary);
+  text-decoration: underline;
 }
 </style>
