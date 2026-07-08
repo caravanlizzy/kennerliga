@@ -12,7 +12,6 @@
       </div>
       <div class="col">
         <div class="text-subtitle1 text-weight-bolder league-card__title">League {{ league.level }}</div>
-        <div class="text-caption text-grey-6">ID: {{ league.id }}</div>
       </div>
       <div class="col-auto column items-end q-gutter-y-xs">
         <div class="member-pill">
@@ -74,7 +73,10 @@ const router = useRouter();
 const { isAdmin } = storeToRefs(useUserStore());
 
 function goToLeague(league: TLeagueDto) {
-  router.push({ name: 'league-manager', params: { id: league.id } });
+  router.push({
+    name: 'league-manager',
+    params: { id: league.season, leagueId: league.id },
+  });
 }
 </script>
 

@@ -5,7 +5,7 @@
       <div class="row items-center q-gutter-x-sm">
         <q-icon name="settings" size="md" color="primary" />
         <div class="text-h4 text-weight-bolder text-dark tracking-tighter">
-          Manage League
+          Manage League {{ league?.level ? `L${league.level}` : '' }}
         </div>
       </div>
       <div class="row items-center q-gutter-x-sm">
@@ -192,7 +192,7 @@ async function load() {
   loading.value = true;
   error.value = null;
   try {
-    const leagueId = Number(route.params.id);
+    const leagueId = Number(route.params.leagueId);
     league.value = await fetchLeagueDetails(leagueId);
     if (!league.value) throw new Error('Failed to load league data.');
     season.value = await fetchSeason(league.value.season);

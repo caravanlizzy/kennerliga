@@ -27,7 +27,7 @@ export default {
       meta: { label: 'Manage Season', icon: 'settings' },
       children: [
         {
-          path: '',
+          path: 'league/:leagueId/manage',
           name: 'league-manager',
           component: () => import('pages/league/ManageLeaguePage.vue'),
           meta: { requiresAdmin: true, label: 'Manage League', icon: 'settings' },

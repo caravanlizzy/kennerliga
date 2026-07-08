@@ -107,7 +107,7 @@ const profileOptions = computed(() =>
   availableMembers.value.map((p) => {
     const idNum = Number(p.id);
     return {
-      label: p.profile_name ?? p.username ?? `#${idNum}`,
+      label: p.profile_name ?? p.username,
       value: idNum,
     };
   })

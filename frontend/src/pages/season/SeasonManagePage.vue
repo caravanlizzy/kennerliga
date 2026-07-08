@@ -1,7 +1,7 @@
 <template>
   <q-page class="q-pa-md">
     <!-- Header Area -->
-    <div class="row items-center justify-between q-mb-md">
+    <div v-if="route.name !== 'league-manager'" class="row items-center justify-between q-mb-md">
       <div class="row items-center q-gutter-x-sm">
         <q-icon name="military_tech" size="md" color="primary" />
         <div class="text-h4 text-weight-bolder text-dark tracking-tighter">
@@ -43,72 +43,76 @@
 
     <!-- Content -->
     <div v-else-if="!error && season">
-      <!-- Season Info & Members -->
-      <div class="season-summary q-mb-lg">
-        <div class="season-summary__header row items-center no-wrap q-gutter-x-sm q-px-md q-py-md">
-          <div class="season-summary__icon">
-            <q-icon name="groups" size="20px" />
-          </div>
-          <div class="col">
-            <div class="text-subtitle1 text-weight-bolder season-summary__title">Users</div>
-            <div class="text-caption text-grey-6">Overview for this season</div>
-          </div>
-          <div class="row items-center q-gutter-x-xs">
-            <div class="stat-pill">
-              <q-icon name="emoji_events" size="14px" class="q-mr-xs" />
-              <span>{{ leagues.length }} leagues</span>
+      <router-view v-if="route.name === 'league-manager'" />
+
+      <template v-else>
+        <!-- Season Info & Members -->
+        <div class="season-summary q-mb-lg">
+          <div class="season-summary__header row items-center no-wrap q-gutter-x-sm q-px-md q-py-md">
+            <div class="season-summary__icon">
+              <q-icon name="groups" size="20px" />
             </div>
-            <div class="stat-pill">
-              <q-icon name="person" size="14px" class="q-mr-xs" />
-              <span>{{ participants.length }} users</span>
+            <div class="col">
+              <div class="text-subtitle1 text-weight-bolder season-summary__title">Participants</div>
+              <div class="text-caption text-grey-6">Overview for this season</div>
             </div>
+            <div class="row items-center q-gutter-x-xs">
+              <div class="stat-pill">
+                <q-icon name="emoji_events" size="14px" class="q-mr-xs" />
+                <span>{{ leagues.length }} leagues</span>
+              </div>
+              <div class="stat-pill">
+                <q-icon name="person" size="14px" class="q-mr-xs" />
+                <span>{{ participants.length }} participants</span>
+              </div>
+              <div
+                v-if="seasonStatusLabel"
+                class="status-pill"
+                :class="`status-pill--${statusColor}`"
+              >
+                {{ seasonStatusLabel }}
+              </div>
+            </div>
+          </div>
+
+          <div class="season-summary__divider" />
+
+          <div class="q-px-md q-pt-sm q-pb-md">
+            <div v-if="participants.length > 0" class="row q-col-gutter-xs">
+              <div
+                v-for="p in participants"
+                :key="p.id"
+                class="member-chip q-mr-xs q-mb-xs"
+              >
+                <q-icon name="person" size="14px" class="q-mr-xs" />
+                <span>{{ p.profile_name }}</span>
+              </div>
+            </div>
+            <div v-else class="text-caption text-grey-6 italic">No registered users for this season.</div>
+          </div>
+        </div>
+
+        <!-- Leagues Grid -->
+        <ContentSection
+          title="Leagues"
+          icon="groups"
+          color="accent"
+          :bordered="false"
+        >
+          <div v-if="leagues.length === 0" class="text-grey-7 q-pa-md bg-grey-1 rounded-borders text-center">
+            No leagues found for this season.
+          </div>
+          <div v-else class="row q-col-gutter-lg">
             <div
-              v-if="seasonStatusLabel"
-              class="status-pill"
-              :class="`status-pill--${statusColor}`"
+              v-for="league in leagues"
+              :key="league.id"
+              class="col-12 col-sm-6 col-md-4"
             >
-              {{ seasonStatusLabel }}
+              <LeagueList :league="league"/>
             </div>
           </div>
-        </div>
-
-        <div class="season-summary__divider" />
-
-        <div class="q-px-md q-pt-sm q-pb-md">
-          <div v-if="participants.length > 0" class="row q-col-gutter-xs">
-            <div
-              v-for="p in participants"
-              :key="p.id"
-              class="member-chip q-mr-xs q-mb-xs"
-            >
-              <q-icon name="person" size="14px" class="q-mr-xs" />
-              <span>{{ p.profile_name }}</span>
-            </div>
-          </div>
-          <div v-else class="text-caption text-grey-6 italic">No registered users for this season.</div>
-        </div>
-      </div>
-
-      <!-- Leagues Grid -->
-      <ContentSection
-        title="Leagues"
-        icon="groups"
-        color="accent"
-        :bordered="false"
-      >
-        <div v-if="leagues.length === 0" class="text-grey-7 q-pa-md bg-grey-1 rounded-borders text-center">
-          No leagues found for this season.
-        </div>
-        <div v-else class="row q-col-gutter-lg">
-          <div
-            v-for="league in leagues"
-            :key="league.id"
-            class="col-12 col-sm-6 col-md-4"
-          >
-            <LeagueList :league="league"/>
-          </div>
-        </div>
-      </ContentSection>
+        </ContentSection>
+      </template>
     </div>
   </q-page>
 </template>
