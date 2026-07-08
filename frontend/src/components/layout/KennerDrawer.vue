@@ -41,30 +41,6 @@
           />
         </template>
 
-        <q-separator class="q-my-sm drawer-separator" />
-        <DrawerSubGroup>Appearance</DrawerSubGroup>
-        <q-item class="drawer-item q-mx-sm q-my-xs squircle-shape">
-          <q-item-section avatar class="drawer-item__icon-section">
-            <q-icon
-              :name="$q.dark.isActive ? 'dark_mode' : 'light_mode'"
-              size="22px"
-              :color="$q.dark.isActive ? 'amber' : 'grey-7'"
-            />
-          </q-item-section>
-          <q-item-section class="drawer-item__text-section">
-            <q-item-label class="text-subtitle2 text-weight-medium">
-              Dark Mode
-            </q-item-label>
-          </q-item-section>
-          <q-item-section side>
-            <q-toggle
-              :model-value="$q.dark.isActive"
-              @update:model-value="toggleDarkMode"
-              color="primary"
-            />
-          </q-item-section>
-        </q-item>
-
       </q-list>
     </div>
 
@@ -83,7 +59,6 @@ import { storeToRefs } from 'pinia';
 import { useRouter } from 'vue-router';
 import { provide } from 'vue';
 import { useQuasar } from 'quasar';
-import { DARK_MODE_STORAGE_KEY } from 'boot/dark-mode';
 
 const drawerState = defineModel();
 
@@ -94,15 +69,6 @@ const router = useRouter();
 const $q = useQuasar();
 
 provide('closeDrawer', () => (drawerState.value = false));
-
-function toggleDarkMode(val: boolean): void {
-  $q.dark.set(val);
-  try {
-    localStorage.setItem(DARK_MODE_STORAGE_KEY, String(val));
-  } catch (e) {
-    // localStorage unavailable — ignore
-  }
-}
 
 async function doLogout(): Promise<void> {
   await logout();
@@ -115,17 +81,7 @@ async function doLogout(): Promise<void> {
 .kenner-drawer-container {
 }
 
-.body--dark .kenner-drawer-container {
-}
-
-.body--dark .border-bottom-subtle {
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
-}
-
 .bg-drawer-header {
-}
-
-.body--dark .bg-drawer-header {
 }
 
 .glass-effect {

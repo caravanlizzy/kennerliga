@@ -51,8 +51,7 @@
             class="q-py-md q-px-sm column justify-center"
           >
             <div
-              class="flex justify-between items-center q-mb-xs"
-              :class="$q.dark.isActive ? 'text-grey-5' : 'text-grey-7'"
+              class="flex justify-between items-center q-mb-xs text-grey-7"
               style="font-size: 0.65rem;"
             >
               <span class="row items-center q-gutter-x-xs">
@@ -83,9 +82,8 @@
               }}</span>
             </div>
             <div
-              class="q-mt-xs"
+              class="q-mt-xs text-grey-9"
               style="font-size: 0.9rem; line-height: 1.45;"
-              :class="$q.dark.isActive ? 'text-grey-3' : 'text-grey-9'"
             >
               <span v-if="event.type === 'PICK'">
                 <strong class="text-primary">{{ event.data.playerName }}</strong> picks
@@ -104,10 +102,10 @@
               <span v-else-if="event.type === 'GAME_FINISHED'">
                 <strong class="text-primary">{{ event.data.winner }}</strong> wins
                 <strong class="text-primary">{{ event.data.gameName }}</strong>
-                <div v-if="event.data.results" class="q-mt-sm q-pa-xs" :style="{ borderLeft: `1px solid ${$q.dark.isActive ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.06)'}` }">
+                <div v-if="event.data.results" class="q-mt-sm q-pa-xs" :style="{ borderLeft: `1px solid rgba(0,0,0,0.06)` }">
                   <table class="full-width" style="border-collapse: collapse; font-size: 0.75rem;">
                     <tbody>
-                      <tr v-for="(res, idx) in event.data.results" :key="idx" :style="{ borderBottom: idx === event.data.results.length - 1 ? 'none' : `1px dashed ${$q.dark.isActive ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.04)'}` }">
+                      <tr v-for="(res, idx) in event.data.results" :key="idx" :style="{ borderBottom: idx === event.data.results.length - 1 ? 'none' : `1px dashed rgba(0,0,0,0.04)` }">
                         <td class="q-pr-sm text-grey-6" style="width: 20px; font-weight: 500;">
                           {{ res.position || idx + 1 }}.
                         </td>
@@ -124,10 +122,10 @@
               </span>
               <span v-else-if="event.type === 'LEAGUE_RUNNING'">
                 League {{ event.data.leagueLevel || event.leagueLevel }} is on! Games:
-                <div v-if="event.data.games && event.data.games.length" class="q-mt-sm q-pa-xs" :style="{ borderLeft: `1px solid ${$q.dark.isActive ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.06)'}` }">
+                <div v-if="event.data.games && event.data.games.length" class="q-mt-sm q-pa-xs" :style="{ borderLeft: `1px solid rgba(0,0,0,0.06)` }">
                   <table class="full-width" style="border-collapse: collapse; font-size: 0.75rem;">
                     <tbody>
-                      <tr v-for="(g, idx) in event.data.games" :key="idx" :style="{ borderBottom: idx === event.data.games.length - 1 ? 'none' : `1px dashed ${$q.dark.isActive ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.04)'}` }">
+                      <tr v-for="(g, idx) in event.data.games" :key="idx" :style="{ borderBottom: idx === event.data.games.length - 1 ? 'none' : `1px dashed rgba(0,0,0,0.04)` }">
                         <td class="q-pr-sm text-grey-6" style="width: 20px;">
                           {{ idx + 1 }}.
                         </td>

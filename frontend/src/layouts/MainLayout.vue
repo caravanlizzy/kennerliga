@@ -92,21 +92,7 @@ function toggleDrawer(): void {
 .main-container {
 }
 
-.body--dark .main-container {
-}
-
 .bg-chat-header {
-}
-
-.body--dark .bg-chat-header {
-}
-
-.body--dark .chat-title-suffix {
-  color: #ccc !important;
-}
-
-.body--dark .border-bottom-subtle {
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
 }
 
 .border-bottom {

@@ -206,29 +206,6 @@
   }
 }
 
-:global(.body--dark) .unresolved-card {
-  background: linear-gradient(135deg, rgba(120, 53, 15, 0.45) 0%, rgba(180, 83, 9, 0.35) 100%);
-  border-color: rgba(252, 211, 77, 0.35);
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
-
-  .unresolved-card__title,
-  .unresolved-card__hint {
-    color: #fde68a;
-  }
-  .unresolved-card__icon {
-    color: #fbbf24;
-  }
-  .unresolved-card__group {
-    background: rgba(0, 0, 0, 0.25);
-    border-color: rgba(251, 191, 36, 0.35);
-  }
-  .unresolved-card__player {
-    color: #fde68a;
-  }
-  .unresolved-card__vs {
-    color: #fbbf24;
-  }
-}
 </style>
 
 <script setup lang="ts">

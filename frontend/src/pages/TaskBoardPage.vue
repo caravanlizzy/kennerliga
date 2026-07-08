@@ -512,11 +512,6 @@ onMounted(() => {
   padding: 7px 9px;
 }
 
-.body--dark .description-field__textarea {
-  border-color: rgba(255, 255, 255, 0.28);
-  color: #fff;
-}
-
 .ellipsis-2-lines {
   display: -webkit-box;
   -webkit-line-clamp: 2;
@@ -541,24 +536,6 @@ onMounted(() => {
 .kanban-column,
 .kanban-column :deep(.q-card__section) {
   min-width: 0;
-}
-
-/* ---------- Dark mode ---------- */
-:global(.body--dark) {
-  .glass-card {
-    --tb-bg: rgba(30, 30, 30, 0.8);
-    --tb-border: rgba(255, 255, 255, 0.1);
-    --tb-header-bg: rgba(40, 40, 40, 0.5);
-    --tb-header-text: #ececec;
-    --tb-subtle-text: #9ca3af;
-    --tb-title: #ececec;
-    --tb-task-bg: #262626;
-    --tb-task-border: rgba(255, 255, 255, 0.08);
-    --tb-row-hover: rgba(255, 255, 255, 0.05);
-  }
-
-  .page-title { color: #ececec; }
-  .page-subtitle { color: #9ca3af; }
 }
 
 /* ---------- Responsive ---------- */

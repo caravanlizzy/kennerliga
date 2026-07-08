@@ -1,6 +1,5 @@
 <template>
   <q-input
-    :dark="$q.dark.isActive"
     color="primary"
     v-model="modelValue"
     :label="label"
@@ -18,15 +17,10 @@
 </template>
 
 <script setup lang="ts">
-import { useQuasar } from 'quasar';
-
-const $q = useQuasar();
-
 withDefaults(defineProps<{
   rules?: any[],
   label?: string,
-  dark?: boolean,
-}>(), { dark: false });
+}>(), {});
 
 const modelValue = defineModel();
 
@@ -45,28 +39,6 @@ const modelValue = defineModel();
 
   &:hover {
     background: rgba(0, 0, 0, 0.06);
-  }
-
-  :global(.body--dark) & {
-    background: rgba(255, 255, 255, 0.05);
-
-    &:hover {
-      background: rgba(255, 255, 255, 0.1);
-    }
-
-    &.q-field--focused {
-      background: #2a2a2a;
-      border-color: rgba(255, 255, 255, 0.2);
-    }
-
-    .q-field__native, .q-field__prefix, .q-field__suffix, .q-field__input {
-      color: white;
-    }
-
-    &.q-field--float .q-field__label {
-      background: #1e1e1e;
-      color: var(--q-primary);
-    }
   }
 
   &.q-field--focused {

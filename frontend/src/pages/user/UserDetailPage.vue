@@ -459,23 +459,6 @@ onMounted(load);
   min-height: 100%;
 }
 
-:global(.body--dark) .user-detail-page {
-  --page-bg: #181b21;
-  --surface-bg: #1e222a;
-  --surface-header-bg: #242933;
-  --surface-header-text: rgba(255, 255, 255, 0.7);
-  --surface-border: rgba(255, 255, 255, 0.08);
-  --surface-border-strong: rgba(255, 255, 255, 0.14);
-  --surface-shadow: 0 1px 2px rgba(0, 0, 0, 0.4),
-    0 4px 16px rgba(0, 0, 0, 0.25);
-  --surface-shadow-hover: 0 1px 2px rgba(0, 0, 0, 0.45),
-    0 8px 24px rgba(0, 0, 0, 0.35);
-  --stat-tile-bg: rgba(255, 255, 255, 0.04);
-  --text-heading: #e6e8ee;
-  --text-muted: rgba(255, 255, 255, 0.6);
-  --divider: rgba(255, 255, 255, 0.08);
-  --progress-track: rgba(255, 255, 255, 0.12);
-}
 
 /* ---- Shared surface utilities ---- */
 .surface-card {

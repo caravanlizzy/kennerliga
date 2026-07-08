@@ -278,32 +278,4 @@ onMounted(load);
   }
 }
 
-:global(.body--dark) .season-summary {
-  background: rgba(30, 30, 30, 0.8);
-  border-color: rgba(255, 255, 255, 0.08);
-}
-
-:global(.body--dark) .season-summary__header {
-  background: linear-gradient(135deg, rgba(40, 40, 40, 0.6) 0%, rgba(30, 30, 30, 0.3) 100%);
-}
-
-:global(.body--dark) .season-summary__title {
-  color: #ececec;
-}
-
-:global(.body--dark) .stat-pill {
-  background: rgba(255, 255, 255, 0.08);
-  color: #cbd5e1;
-}
-
-:global(.body--dark) .member-chip {
-  background: rgba(255, 255, 255, 0.06);
-  border-color: rgba(255, 255, 255, 0.08);
-  color: #e2e8f0;
-
-  &:hover {
-    background: rgba(255, 255, 255, 0.12);
-    border-color: rgba(255, 255, 255, 0.16);
-  }
-}
 </style>

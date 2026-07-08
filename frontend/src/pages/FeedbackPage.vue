@@ -399,27 +399,6 @@ onMounted(() => {
   white-space: pre-line;
 }
 
-/* ---------- Dark mode ---------- */
-:global(.body--dark) {
-  .feedback-card {
-    --feedback-bg: rgba(30, 30, 30, 0.8);
-    --feedback-border: rgba(255, 255, 255, 0.1);
-    --feedback-header-bg: rgba(40, 40, 40, 0.5);
-    --feedback-header-text: #ececec;
-    --feedback-subtle-text: #9e9e9e;
-    --feedback-text: #ececec;
-    --feedback-row-hover: #262626;
-    --feedback-row-border: rgba(255, 255, 255, 0.05);
-  }
-
-  .page-title {
-    color: #ececec;
-  }
-
-  .page-subtitle {
-    color: #9e9e9e;
-  }
-}
 
 /* ---------- Responsive ---------- */
 @media (max-width: 600px) {

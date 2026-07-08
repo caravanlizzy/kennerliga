@@ -143,39 +143,4 @@ const pagination = ref({
   border-radius: 999px;
 }
 
-:global(.body--dark) .kenner-table {
-  background: rgba(30, 30, 30, 0.8);
-  border-color: rgba(255, 255, 255, 0.08);
-}
-
-:global(.body--dark) .kenner-table__title {
-  color: #ececec;
-}
-
-:global(.body--dark) :deep(.q-table__top) {
-  background: linear-gradient(135deg, rgba(40, 40, 40, 0.6) 0%, rgba(30, 30, 30, 0.3) 100%);
-  border-bottom-color: rgba(255, 255, 255, 0.06);
-}
-
-:global(.body--dark) :deep(.kenner-table__header-row th) {
-  color: #94a3b8;
-  border-bottom-color: rgba(255, 255, 255, 0.08);
-}
-
-:global(.body--dark) :deep(.kenner-table__body) {
-  color: #cbd5e1;
-}
-
-:global(.body--dark) :deep(.q-table tbody td) {
-  border-bottom-color: rgba(255, 255, 255, 0.05);
-}
-
-:global(.body--dark) :deep(.q-table tbody tr:hover) {
-  background: rgba(255, 255, 255, 0.04);
-}
-
-:global(.body--dark) :deep(.q-table__bottom) {
-  border-top-color: rgba(255, 255, 255, 0.06);
-  color: #94a3b8;
-}
 </style>

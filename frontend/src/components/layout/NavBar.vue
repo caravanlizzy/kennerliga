@@ -61,10 +61,6 @@ const { isMobile } = useResponsive();
   justify-content: space-between;
 }
 
-.body--dark .navbar {
-  color: white !important;
-}
-
 .flex-spacer {
   flex: 1;
 }
@@ -81,9 +77,6 @@ const { isMobile } = useResponsive();
 }
 
 .glass-effect {
-}
-
-.body--dark .glass-effect {
 }
 
 .border-subtle {

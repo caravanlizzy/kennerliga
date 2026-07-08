@@ -212,20 +212,4 @@ onMounted(loadCurrentChampion);
   transition: all 0.2s ease;
 }
 
-:global(.body--dark) .champion-card-container {
-  background: transparent;
-  border: none;
-
-  &:hover {
-    background: rgba(255, 255, 255, 0.04);
-  }
-
-  &.is-mobile {
-    background: transparent;
-  }
-
-  .champion-name {
-    color: #f5f5f5;
-  }
-}
 </style>

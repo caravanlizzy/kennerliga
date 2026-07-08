@@ -112,10 +112,6 @@ const crumbs = computed(() => {
   min-width: 200px;
 }
 
-:global(.body--dark) .breadcrumbs-content {
-  background: rgba(30, 30, 30, 0.4);
-  border-color: rgba(255, 255, 255, 0.08);
-}
 
 :deep(.q-breadcrumbs__el) {
   white-space: nowrap;

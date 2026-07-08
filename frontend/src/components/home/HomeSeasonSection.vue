@@ -166,9 +166,4 @@ const isLiveSeason = computed(
   100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
 }
 
-:global(.body--dark) .live-pill {
-  color: #6ee7b7;
-  background: rgba(16, 185, 129, 0.18);
-  border-color: rgba(16, 185, 129, 0.4);
-}
 </style>

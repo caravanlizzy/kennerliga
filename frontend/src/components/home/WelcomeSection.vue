@@ -161,9 +161,6 @@ onUnmounted(() => {
   background: linear-gradient(to bottom, rgba(255, 255, 255, 0) 0%, white 100%);
 }
 
-body.body--dark .combined-card__fade {
-  background: linear-gradient(to bottom, rgba(30, 30, 30, 0) 0%, #1e1e1e 100%);
-}
 
 .combined-card--mobile {
   margin: 0;

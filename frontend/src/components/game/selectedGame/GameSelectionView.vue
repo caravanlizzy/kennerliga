@@ -339,17 +339,9 @@ async function randomizeGame() {
   &::-webkit-scrollbar-thumb {
     background: rgba(0, 0, 0, 0.1);
     border-radius: 10px;
-
-    :global(.body--dark) & {
-      background: rgba(255, 255, 255, 0.1) !important;
-    }
   }
   &::-webkit-scrollbar-thumb:hover {
     background: rgba(0, 0, 0, 0.2);
-
-    :global(.body--dark) & {
-      background: rgba(255, 255, 255, 0.2) !important;
-    }
   }
 }
 </style>

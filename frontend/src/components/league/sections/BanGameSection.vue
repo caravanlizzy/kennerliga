@@ -216,16 +216,6 @@ watch(
   }
 }
 
-.body--dark .ban-candidate-card {
-  background: #1e222a;
-  border-color: rgba(255, 255, 255, 0.08);
-
-  &:hover {
-    border-color: var(--q-negative);
-    background: rgba(193, 0, 21, 0.12);
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
-  }
-}
 
 .ban-candidate-icon {
   transition: transform 0.2s ease;

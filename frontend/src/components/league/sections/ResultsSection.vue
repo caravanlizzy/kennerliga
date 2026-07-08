@@ -89,32 +89,4 @@ watchEffect(() => {
   }
 }
 
-:global(.body--dark) .league-section {
-  :deep(.content-section-container) {
-    background: #1e222a;
-    border-color: rgba(255, 255, 255, 0.08);
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.4),
-      0 4px 16px rgba(0, 0, 0, 0.25);
-
-    &:hover {
-      border-color: rgba(255, 255, 255, 0.14);
-      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.45),
-        0 8px 24px rgba(0, 0, 0, 0.35);
-    }
-  }
-
-  :deep(.section-header) {
-    border-bottom-color: rgba(255, 255, 255, 0.08);
-  }
-}
-
-:global(.body--dark) .result-card {
-  background: rgba(255, 255, 255, 0.03);
-  border-color: rgba(255, 255, 255, 0.08);
-
-  &:hover {
-    background: rgba(255, 255, 255, 0.05);
-    border-color: rgba(255, 255, 255, 0.14);
-  }
-}
 </style>

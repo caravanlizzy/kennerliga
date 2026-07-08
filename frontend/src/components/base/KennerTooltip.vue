@@ -45,11 +45,5 @@ const tooltipStyle = computed(() => {
   max-width: 280px;
 }
 
-body.body--dark .kenner-tooltip {
-  background: #2a2f36 !important;
-  color: #f5f5f5 !important;
-  border-color: rgba(255, 255, 255, 0.14);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
-}
 </style>
 

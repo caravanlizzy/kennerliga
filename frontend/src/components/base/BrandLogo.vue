@@ -95,7 +95,4 @@ void props;
   color: #1a2233;
 }
 
-:global(.body--dark) .brand-text__word {
-  color: #f1f5f9;
-}
 </style>
