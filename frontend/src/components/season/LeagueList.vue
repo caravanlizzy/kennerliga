@@ -6,7 +6,7 @@
     @click="isAdmin ? goToLeague(league) : undefined"
   >
     <!-- Header -->
-    <div class="league-card__header q-px-md q-py-md row items-center no-wrap q-gutter-x-md">
+    <div class="q-px-md q-py-md row items-center no-wrap q-gutter-x-md">
       <div class="league-avatar" :class="`league-avatar--lvl${league.level}`">
         <span>L{{ league.level }}</span>
       </div>
@@ -102,10 +102,6 @@ function goToLeague(league: TLeagueDto) {
 
 .league-card--complete {
   border-color: rgba(33, 186, 69, 0.25);
-}
-
-.league-card__header {
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.6) 0%, rgba(255, 255, 255, 0.2) 100%);
 }
 
 .league-card__title {

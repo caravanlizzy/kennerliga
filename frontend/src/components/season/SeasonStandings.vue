@@ -36,7 +36,7 @@
           class="league-card"
           :class="`league-card--l${league.level}`"
         >
-          <div class="league-card__header row items-center">
+          <div class="q-pa-md row items-center">
             <div class="league-badge" :class="`league-badge--l${league.level}`">
               L{{ league.level }}
             </div>
@@ -222,12 +222,6 @@ void resetLeagues;
   box-shadow: 0 8px 24px rgba(54, 64, 88, 0.08);
 }
 
-.league-card__header {
-  padding: 14px 18px;
-  background: linear-gradient(135deg, rgba(99, 102, 241, 0.06), rgba(236, 72, 153, 0.04));
-  border-bottom: 1px solid rgba(54, 64, 88, 0.06);
-}
-
 .league-card__title {
   font-size: 1.05rem;
   font-weight: 700;
@@ -254,10 +248,6 @@ void resetLeagues;
   border-color: rgba(255, 255, 255, 0.08);
 }
 
-:global(.body--dark) .league-card__header {
-  background: linear-gradient(135deg, rgba(99, 102, 241, 0.12), rgba(236, 72, 153, 0.08));
-  border-bottom-color: rgba(255, 255, 255, 0.06);
-}
 
 :global(.body--dark) .league-card__title { color: #eef0f4; }
 :global(.body--dark) .league-card__subtitle { color: #9aa3b2; }
