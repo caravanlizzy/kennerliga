@@ -49,7 +49,7 @@
           <template v-for="level in standings.levels" :key="level">
             <th class="text-center level-group-header" :style="{ borderLeft: '1.5px solid rgba(54, 64, 88, 0.12)' }">
               <div class="column items-center">
-                <span class="text-caption text-weight-bolder text-primary q-mb-xs">L{{ level }}</span>
+                <LeagueLevel badge :level="level" class="q-mb-xs" />
                 <div class="row justify-center items-center no-wrap">
                   <q-icon name="emoji_events" class="text-amber-8" size="14px" />
                   <div class="pos-sep"></div>
@@ -241,6 +241,7 @@ import LoadingSpinner from 'components/base/LoadingSpinner.vue';
 import ErrorDisplay from 'components/base/ErrorDisplay.vue';
 import { leagueColors } from 'src/composables/leagueColors';
 import { useCachedResource } from 'src/composables/cachedResource';
+import LeagueLevel from 'components/season/LeagueLevel.vue';
 
 const props = defineProps<{ year: number }>();
 const {  getHexLeagueColor } = leagueColors();

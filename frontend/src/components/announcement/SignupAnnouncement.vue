@@ -168,12 +168,11 @@
                   class="league-box"
                 >
                   <div class="league-box__label row items-center q-gutter-x-xs">
-                    <div
-                      class="text-caption text-weight-bolder text-grey-7 uppercase tracking-widest"
+                    <LeagueLevel
+                      badge
+                      :level="group.level"
                       :style="isMobile ? 'font-size: 0.55rem' : 'font-size: 0.6rem'"
-                    >
-                      L{{ group.level }}
-                    </div>
+                    />
                     <q-badge
                       color="grey-5"
                       :label="`${group.members.length}/${group.size}`"
@@ -302,6 +301,7 @@ import { useUserStore } from 'stores/userStore';
 import { useResponsive } from 'src/composables/responsive';
 import KennerButton from 'components/base/KennerButton.vue';
 import KennerTooltip from 'components/base/KennerTooltip.vue';
+import LeagueLevel from 'components/season/LeagueLevel.vue';
 import { useQuasar } from 'quasar';
 import {
   fetchRegistrationStatus,

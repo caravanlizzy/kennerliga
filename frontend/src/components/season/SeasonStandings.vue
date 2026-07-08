@@ -36,33 +36,14 @@
           class="league-card"
           :class="`league-card--l${league.level}`"
         >
-          <div class="q-pa-md row items-center">
-            <div class="league-badge" :class="`league-badge--l${league.level}`">
-              L{{ league.level }}
-            </div>
-            <div class="column q-ml-md">
-              <div class="league-card__title">
-                League {{ league.level }}
-              </div>
-              <div class="league-card__subtitle">
-                {{ mode === 'results' ? 'Division Overview' : 'Division Standings' }}
-              </div>
-            </div>
-            <q-space />
-            <KennerButton flat round dense icon="info" :color="getLeagueColor(league.level)" size="sm">
-              <KennerTooltip>
-                {{ mode === 'results' ? 'Detailed match results' : 'Current standings' }} for League {{ league.level }}
-              </KennerTooltip>
-            </KennerButton>
-          </div>
-          <div class="league-card__body">
+          <div class="q-pa-xs">
             <LeagueMatchResults
               v-if="mode === 'results'"
               :leagueId="league.id"
               :show-standings="isOverviewPage"
             />
             <LeagueStandings v-else-if="mode === 'standings-simple'" :leagueId="league.id" />
-            <LeagueStandingsMatrix v-else :leagueId="league.id" :prefetchedData="allStandingsData[league.id]" />
+            <LeagueStandingsMatrix v-else :leagueId="league.id" :prefetchedData="allStandingsData[league.id]" :level="league.level" />
           </div>
         </div>
       </div>
@@ -83,6 +64,7 @@ import KennerTooltip from 'components/base/KennerTooltip.vue';
 import { useResponsive } from 'src/composables/responsive';
 import { leagueColors } from 'src/composables/leagueColors';
 import { useCachedResource } from 'src/composables/cachedResource';
+import LeagueLevel from 'components/season/LeagueLevel.vue';
 
 import { useLeagueStore } from 'stores/leagueStore';
 
@@ -252,29 +234,9 @@ void resetLeagues;
 :global(.body--dark) .league-card__title { color: #eef0f4; }
 :global(.body--dark) .league-card__subtitle { color: #9aa3b2; }
 
-/* ---------- League badge (medal tones) ---------- */
+/* ---------- League badge ---------- */
 .league-badge {
-  width: 42px;
-  height: 42px;
-  border-radius: 14px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 800;
-  font-size: 1.05rem;
-  letter-spacing: -0.02em;
-  color: white;
-  background: linear-gradient(135deg, #94a3b8, #64748b);
   flex-shrink: 0;
-}
-
-.league-badge--l1 {
-  background: linear-gradient(135deg, #fbbf24, #f59e0b);
-}
-.league-badge--l2 {
-  background: linear-gradient(135deg, #cbd5e1, #94a3b8);
-}
-.league-badge--l3 {
-  background: linear-gradient(135deg, #fdba74, #c2825a);
+  border-radius: 14px !important;
 }
 </style>

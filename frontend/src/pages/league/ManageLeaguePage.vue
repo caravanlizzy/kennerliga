@@ -4,8 +4,9 @@
     <div class="row items-center justify-between q-mb-md">
       <div class="row items-center q-gutter-x-sm">
         <q-icon name="settings" size="md" color="primary" />
-        <div class="text-h4 text-weight-bolder text-dark tracking-tighter">
-          Manage League {{ league?.level ? `L${league.level}` : '' }}
+        <div class="text-h4 text-weight-bolder text-dark tracking-tighter row items-center no-wrap">
+          Manage League
+          <LeagueLevel v-if="league" :level="league.level" class="q-ml-sm" size="40px" font-size="18px" />
         </div>
       </div>
       <div class="row items-center q-gutter-x-sm">
@@ -63,15 +64,7 @@
             >
               {{ league?.status }}
             </q-chip>
-            <q-chip
-              square
-              color="secondary"
-              text-color="white"
-              class="text-weight-bold"
-              icon="military_tech"
-            >
-              Level {{ league?.level }}
-            </q-chip>
+            <LeagueLevel v-if="league" badge :level="league.level" class="q-pa-sm" />
           </div>
         </ContentSection>
       </div>
@@ -160,6 +153,7 @@ import MemberGameCard from 'components/league/manager/MemberGameCard.vue';
 import EmptyUsersState from 'components/league/manager/EmptyUsersState.vue';
 import LeagueStandings from 'components/league/LeagueStandings.vue';
 import ManagerFormsDialog, { TActiveForm } from 'components/league/manager/ManagerFormsDialog.vue';
+import LeagueLevel from 'components/season/LeagueLevel.vue';
 import { useDialog } from 'src/composables/dialog';
 import { storeToRefs } from 'pinia';
 import { useUserStore } from 'src/stores/userStore';

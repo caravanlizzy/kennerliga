@@ -56,9 +56,11 @@
             :key="`${item.username}-${item.level}`"
             class="next__item q-pa-sm q-gutter-sm"
           >
-            <span class="next__badge bg-grey-3 text-weight-bolder">
-              L{{ item.level }}
-            </span>
+            <LeagueLevel
+              badge
+              :level="item.level"
+              class="next__badge"
+            />
             <div class="column">
               <span class="next__name text-capitalize text-weight-bold">{{ item.username }}</span>
               <span v-if="item.profile_name && item.profile_name !== item.username" class="text-caption text-grey-6" style="font-size: 0.7rem">
@@ -75,6 +77,7 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue';
 import { api } from 'boot/axios';
+import LeagueLevel from 'components/season/LeagueLevel.vue';
 
 type LeagueWinnerApiResponse = {
   season: { id: number; name: string; status: string };
@@ -265,13 +268,6 @@ const restOfLeagues = computed(() => {
 
 .next__badge {
   flex: 0 0 auto;
-  min-width: 42px;
-  height: 26px;
-  display: inline-grid;
-  place-items: center;
-  border-radius: 999px;
-  letter-spacing: 0.3px;
-  font-size: 12px;
 }
 
 /* Give positions 4 and 5 a bit more highlight */

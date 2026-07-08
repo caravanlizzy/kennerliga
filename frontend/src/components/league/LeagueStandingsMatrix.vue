@@ -47,6 +47,10 @@
                   <span class="text-grey-5">by </span>{{ (col as any).selectedByName }}
                 </div>
               </div>
+              <div v-else-if="col.name === 'profile_name'" class="row items-center">
+                <LeagueLevel :level="level" v-if="level" />
+                <span v-else>{{ col.label }}</span>
+              </div>
               <span v-else>{{ col.label }}</span>
             </q-th>
           </q-tr>
@@ -238,35 +242,35 @@
       </div>
 
       <!-- Footer Actions -->
-      <div v-if="standings && standings.season_id" class="row justify-end q-mt-md">
-        <KennerButton
-          flat
-          color="primary"
-          icon="visibility"
-          label="View Season Overview"
-          size="sm"
-          :to="{ name: 'season-overview', params: { id: standings.season_id } }"
-        />
-      </div>
+<!--      <div v-if="standings && standings.season_id" class="row justify-end q-mt-md">-->
+<!--        <KennerButton-->
+<!--          flat-->
+<!--          color="primary"-->
+<!--          icon="visibility"-->
+<!--          label="View Season Overview"-->
+<!--          size="sm"-->
+<!--          :to="{ name: 'season-overview', params: { id: standings.season_id } }"-->
+<!--        />-->
+<!--      </div>-->
 
-      <!-- Error state -->
-      <div
-        v-else-if="error"
-        class="column items-center q-pa-md bg-standings-table rounded-borders"
-      >
-        <q-icon name="error_outline" size="24px" color="negative" />
-        <span class="q-mt-xs text-negative text-caption">
-          Error loading standings
-        </span>
-        <KennerButton
-          outline
-          color="dark"
-          label="Retry"
-          size="sm"
-          class="q-mt-sm"
-          @click="fetchStandings"
-        />
-      </div>
+<!--      &lt;!&ndash; Error state &ndash;&gt;-->
+<!--      <div-->
+<!--        v-else-if="error"-->
+<!--        class="column items-center q-pa-md bg-standings-table rounded-borders"-->
+<!--      >-->
+<!--        <q-icon name="error_outline" size="24px" color="negative" />-->
+<!--        <span class="q-mt-xs text-negative text-caption">-->
+<!--          Error loading standings-->
+<!--        </span>-->
+<!--        <KennerButton-->
+<!--          outline-->
+<!--          color="dark"-->
+<!--          label="Retry"-->
+<!--          size="sm"-->
+<!--          class="q-mt-sm"-->
+<!--          @click="fetchStandings"-->
+<!--        />-->
+<!--      </div>-->
     </div>
   </div>
 </template>
@@ -403,11 +407,12 @@ import LoadingSpinner from 'components/base/LoadingSpinner.vue';
 import type { QTableColumn } from 'quasar';
 import { useResponsive } from 'src/composables/responsive';
 import KennerTooltip from 'components/base/KennerTooltip.vue';
-import KennerButton from 'components/base/KennerButton.vue';
+import LeagueLevel from 'components/season/LeagueLevel.vue';
 
 const props = defineProps<{
   leagueId: number;
   prefetchedData?: StandingsData | null;
+  level?: number | string;
 }>();
 
 const { isMobile } = useResponsive();

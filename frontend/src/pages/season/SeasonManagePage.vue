@@ -119,7 +119,7 @@
 
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue';
-import { useRoute, useRouter } from 'vue-router';
+import { useRoute } from 'vue-router';
 import { fetchLeaguesBySeason, fetchSeason, fetchSeasonParticipants } from 'src/services/seasonService';
 import LeagueList from 'components/season/LeagueList.vue';
 import KennerButton from 'components/base/KennerButton.vue';
@@ -132,7 +132,6 @@ import { useUserStore } from 'stores/userStore';
 import { storeToRefs } from 'pinia';
 
 const route = useRoute();
-const router = useRouter();
 const { isAdmin } = storeToRefs(useUserStore());
 const seasonId = Number(route.params.id);
 

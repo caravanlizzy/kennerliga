@@ -266,7 +266,9 @@
                     </q-item-section>
                     <q-item-section>
                       <q-item-label class="text-h6 text-weight-bold">{{ sp.season_details?.name || `Season ${sp.season}` }}</q-item-label>
-                      <q-item-label caption v-if="sp.league">League {{ sp.league.level }}</q-item-label>
+                      <div v-if="sp.league" class="q-mt-xs">
+                        <LeagueLevel badge :level="sp.league.level" />
+                      </div>
                     </q-item-section>
                     <q-item-section side>
                       <div class="row items-center q-gutter-x-md">
@@ -319,6 +321,7 @@ import { api } from 'boot/axios';
 import UserAvatar from 'components/ui/UserAvatar.vue';
 import KennerButton from 'components/base/KennerButton.vue';
 import LoadingSpinner from 'components/base/LoadingSpinner.vue';
+import LeagueLevel from 'components/season/LeagueLevel.vue';
 import { TUserDto, TSeasonParticipantDto, TSeasonDto } from 'src/types';
 
 const route = useRoute();
