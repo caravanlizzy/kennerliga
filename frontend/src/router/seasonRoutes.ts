@@ -1,5 +1,7 @@
 export default {
-  path: 'seasons/', meta: { requiresAuth: true, label: 'Seasons', icon: 'event' }, children: [
+  path: 'seasons/',
+  meta: { requiresAuth: true, label: 'Seasons', icon: 'event' },
+  children: [
     {
       path: '',
       name: 'seasons',
@@ -16,19 +18,27 @@ export default {
       path: 'create',
       name: 'season-create',
       component: () => import('pages/season/SeasonCreatePage.vue'),
-      meta: { requiresAdmin: true, label: 'Create Season', icon: 'add_circle' }
+      meta: { requiresAdmin: true, label: 'Create Season', icon: 'add_circle' },
     },
     {
       path: ':id/manage',
       name: 'season-manage',
       component: () => import('pages/season/SeasonManagePage.vue'),
-      meta: { label: 'Manage Season', icon: 'settings' }
+      meta: { label: 'Manage Season', icon: 'settings' },
+      children: [
+        {
+          path: '',
+          name: 'league-manager',
+          component: () => import('pages/league/ManageLeaguePage.vue'),
+          meta: { requiresAdmin: true, label: 'Manage League', icon: 'settings' },
+        },
+      ],
     },
     {
       path: ':id/overview',
       name: 'season-overview',
       component: () => import('pages/season/SeasonOverviewPage.vue'),
-      meta: { label: 'Season Overview', icon: 'visibility' }
-    }
-  ]
+      meta: { label: 'Season Overview', icon: 'visibility' },
+    },
+  ],
 };

@@ -6,7 +6,6 @@ import userRoutes from 'src/router/userRoutes';
 // project's tsconfig.json "files"
 import 'vue-router';
 import seasonRoutes from 'src/router/seasonRoutes';
-import leagueRoutes from 'src/router/leagueRoutes';
 import ResponsivePage from 'src/components/layout/ResponsivePage.vue';
 
 const LiveMobile = () => import('src/pages/mobile/LiveActionMobilePage.vue');
@@ -113,7 +112,12 @@ const routes: RouteRecordRaw[] = [
       userRoutes,
       gameRoutes,
       seasonRoutes,
-      leagueRoutes,
+      {
+        path: 'my',
+        name: 'my-league',
+        component: () => import('pages/league/MyLeaguePage.vue'),
+        meta: { label: 'My League', icon: 'military_tech' }
+      },
       {
         path: 'rules',
         name: 'rules',

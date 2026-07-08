@@ -40,7 +40,7 @@ const { isMobile } = useResponsive();
 
 const show = computed(() => {
   if (!route.name) return true;
-  
+
   const alwaysExclude = ['home', 'login', 'register'];
   if (alwaysExclude.includes(route.name as string)) return false;
 
@@ -53,7 +53,7 @@ const show = computed(() => {
 
 const crumbs = computed(() => {
   const result: { label: string; icon?: string; path: string }[] = [];
-  
+
   // We skip the first matched record if it's just the root/layout
   // and we only include those with meta labels
   route.matched.forEach((record) => {
@@ -62,7 +62,7 @@ const crumbs = computed(() => {
       if (result.length > 0 && result[result.length - 1].label === record.meta.label) {
         return;
       }
-      
+
       // Handle dynamic segments in path if any (though route.path might be better)
       let path = record.path;
       if (path.includes(':')) {
@@ -85,16 +85,7 @@ const crumbs = computed(() => {
       });
     }
   });
-
-  // Filter out crumbs that don't have a view (component)
-  // We do this by resolving the path and checking if any of the matched records have a component
-  // (excluding the root layout)
-  return result.filter(crumb => {
-    const resolved = router.resolve(crumb.path);
-    return resolved.matched.some(m => 
-      m.path !== '/' && m.components && Object.keys(m.components).length > 0
-    );
-  });
+  return result;
 });
 </script>
 
