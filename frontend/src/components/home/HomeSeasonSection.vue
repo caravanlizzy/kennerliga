@@ -7,18 +7,22 @@
     color="primary"
   >
     <template #title>
-      <div class="row items-center no-wrap q-gutter-x-sm season-title-block">
-        <span class="text-h5 text-weight-bold tracking-tight text-primary">Seasons</span>
-        <div v-if="isLiveSeason" class="live-pill">
-          <span class="live-dot" />
+      <div class="row items-center no-wrap q-gutter-x-sm">
+        <span class="text-h5 text-weight-bold text-primary">Seasons</span>
+        <q-badge
+          v-if="isLiveSeason"
+          rounded
+          color="positive"
+          class="q-px-sm q-py-xs text-weight-bolder text-uppercase"
+        >
           Running
-        </div>
+        </q-badge>
       </div>
     </template>
 
     <template #header-extra>
       <div
-        class="row items-center justify-end no-wrap q-gutter-x-sm q-ml-md col season-header-extra"
+        class="row items-center justify-end no-wrap q-gutter-x-sm q-ml-md col"
       >
         <div style="min-width: 110px">
           <KennerSelect
@@ -50,7 +54,7 @@
           :label="isMobile ? '' : 'Overview'"
           :round="isMobile"
           :to="{ name: 'season-overview', params: { id: selectedSeasonId } }"
-          class="overview-btn q-ml-md"
+          class="q-ml-md"
         >
           <KennerTooltip v-if="isMobile">Season Overview</KennerTooltip>
         </KennerButton>
@@ -115,55 +119,3 @@ const isLiveSeason = computed(
     props.currentSeasonId === props.selectedSeasonId
 );
 </script>
-
-<style scoped lang="scss">
-.season-title-block {
-  min-height: 40px;
-}
-
-.season-header-extra {
-  min-height: 40px;
-  gap: 8px;
-
-  :deep(.q-field) {
-    align-self: center;
-  }
-
-  .overview-btn {
-    align-self: center;
-    height: 40px;
-  }
-}
-
-
-.live-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 3px 10px;
-  border-radius: 999px;
-  font-size: 0.7rem;
-  font-weight: 700;
-  letter-spacing: 0.6px;
-  text-transform: uppercase;
-  color: #047857;
-  background: rgba(16, 185, 129, 0.12);
-  border: 1px solid rgba(16, 185, 129, 0.3);
-}
-
-.live-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: #10b981;
-  box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.6);
-  animation: live-pulse 1.6s ease-out infinite;
-}
-
-@keyframes live-pulse {
-  0%   { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.55); }
-  70%  { box-shadow: 0 0 0 8px rgba(16, 185, 129, 0); }
-  100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
-}
-
-</style>
