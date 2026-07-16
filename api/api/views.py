@@ -73,8 +73,9 @@ from django.utils import timezone
 from datetime import timedelta
 from chat.models import Chat
 from league.models import League
-from game.models import SelectedGame
+from game.models import SelectedGame, BanDecision
 from result.models import Result
+from season.models import Season
 
 
 class NeedsUpdateView(APIView):
@@ -90,7 +91,10 @@ class NeedsUpdateView(APIView):
         since_dt = None
         if since:
             try:
-                since_dt = timezone.datetime.fromisoformat(since.replace("Z", "+00:00"))
+                # Handle Z and also space that might come from + being URL-decoded
+                since_dt = timezone.datetime.fromisoformat(
+                    since.replace("Z", "+00:00").replace(" ", "+")
+                )
             except (ValueError, TypeError):
                 pass
 
@@ -106,12 +110,19 @@ class NeedsUpdateView(APIView):
         # For simplicity, we check if ANY league relevant to the current user (if any) or ANY league at all changed.
         # But usually we'd want to be more specific.
         # For a "needs-update" generic endpoint, we can just return /league/ if any relevant model changed.
-        if League.objects.filter(updated_at__gt=since_dt).exists():
+        if (
+            League.objects.filter(updated_at__gt=since_dt).exists()
+            or SelectedGame.objects.filter(updated_at__gt=since_dt).exists()
+            or Result.objects.filter(updated_at__gt=since_dt).exists()
+            or BanDecision.objects.filter(created_at__gt=since_dt).exists()
+        ):
             updates.append("/league/")
-        elif SelectedGame.objects.filter(updated_at__gt=since_dt).exists():
-            updates.append("/league/")
-        elif Result.objects.filter(updated_at__gt=since_dt).exists():
-            updates.append("/league/")
+            updates.append("/season/")
+
+        # Check for season-specific updates (that aren't already covered by league updates)
+        if Season.objects.filter(updated_at__gt=since_dt).exists():
+            if "/season/" not in updates:
+                updates.append("/season/")
 
         return Response({"updates": updates}, status=status.HTTP_200_OK)
 
