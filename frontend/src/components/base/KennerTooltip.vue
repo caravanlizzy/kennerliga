@@ -41,8 +41,9 @@ const tooltipStyle = computed(() => {
   border-radius: 6px !important;
   border: 1px solid rgba(0, 0, 0, 0.12);
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
-  white-space: nowrap;
-  max-width: 280px;
+  white-space: normal;
+  max-width: 320px;
+  overflow-wrap: break-word;
 }
 
 </style>
