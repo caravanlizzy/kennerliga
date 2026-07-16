@@ -269,4 +269,16 @@ export const useHomeSeasonStore = defineStore('homeSeason', () => {
     refreshInBackground,
     reset,
   };
+}, {
+  persist: {
+    paths: [
+      'selectedYear',
+      'selectedSeasonYear',
+      'selectedSeasonMonth',
+      'availableYears',
+      'seasonsByYear',
+      'currentSeasonId',
+      'initialized'
+    ]
+  }
 });
