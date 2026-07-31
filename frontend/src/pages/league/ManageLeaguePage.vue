@@ -1,5 +1,5 @@
 <template>
-  <q-page class="q-pa-md">
+  <q-page class="q-py-md">
     <!-- Header Area -->
     <div class="row items-center justify-between q-mb-md">
       <div class="row items-center q-gutter-x-sm">

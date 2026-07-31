@@ -1,41 +1,55 @@
 <template>
-  <div v-if="show" class="breadcrumbs-wrapper">
-    <div class="breadcrumbs-container q-px-md">
-      <div class="breadcrumbs-content row items-center q-gutter-x-sm no-wrap">
-        <KennerButton
-          flat
-          icon="arrow_back"
-          shape="circle"
-          color="grey-7"
-          size="sm"
-          @click="$router.back()"
-        >
-          <KennerTooltip>Back</KennerTooltip>
-        </KennerButton>
-        <q-breadcrumbs gutter="sm" class="text-grey-7 text-weight-medium overflow-hidden">
-          <q-breadcrumbs-el icon="home" to="/" />
-          <q-breadcrumbs-el
-            v-for="crumb in crumbs"
-            :key="crumb.path"
-            :label="crumb.label"
-            :icon="crumb.icon"
-            :to="crumb.path"
-          />
-        </q-breadcrumbs>
+  <div v-if="show" class="kenner-title-bar-wrapper">
+    <div class="kenner-title-bar-container">
+      <div class="kenner-title-bar-content row items-center no-wrap">
+        <!-- Left Section: Breadcrumbs -->
+        <div class="row items-center no-wrap q-gutter-x-sm left-section">
+          <slot name="left">
+            <KennerButton
+              flat
+              icon="arrow_back"
+              shape="circle"
+              color="grey-7"
+              size="sm"
+              @click="$router.back()"
+            >
+              <KennerTooltip>Back</KennerTooltip>
+            </KennerButton>
+            <q-breadcrumbs gutter="sm" class="text-grey-7 text-weight-medium overflow-hidden">
+              <q-breadcrumbs-el icon="home" to="/" />
+              <q-breadcrumbs-el
+                v-for="crumb in crumbs"
+                :key="crumb.path"
+                :label="crumb.label"
+                :icon="crumb.icon"
+                :to="crumb.path"
+              />
+            </q-breadcrumbs>
+          </slot>
+        </div>
+
+        <q-space />
+
+        <!-- Right Section: Actions/Other Content -->
+        <div class="row items-center no-wrap q-gutter-x-sm right-section">
+          <slot name="right" />
+        </div>
       </div>
+
+      <!-- Bottom Section (optional) -->
+      <slot name="bottom" />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { computed } from 'vue';
-import { useRoute, useRouter } from 'vue-router';
+import { useRoute } from 'vue-router';
 import { useResponsive } from 'src/composables/responsive';
 import KennerButton from 'components/base/KennerButton.vue';
 import KennerTooltip from 'components/base/KennerTooltip.vue';
 
 const route = useRoute();
-const router = useRouter();
 const { isMobile } = useResponsive();
 
 const show = computed(() => {
@@ -54,24 +68,17 @@ const show = computed(() => {
 const crumbs = computed(() => {
   const result: { label: string; icon?: string; path: string }[] = [];
 
-  // We skip the first matched record if it's just the root/layout
-  // and we only include those with meta labels
   route.matched.forEach((record) => {
     if (record.meta && record.meta.label && record.path !== '/') {
-      // Avoid duplicate labels if parent and child have same label
       if (result.length > 0 && result[result.length - 1].label === record.meta.label) {
         return;
       }
 
-      // Handle dynamic segments in path if any (though route.path might be better)
       let path = record.path;
       if (path.includes(':')) {
-         // If it's the current route, use the actual path
          if (record.name === route.name) {
              path = route.path;
          } else {
-             // Try to resolve params for parent routes if possible
-             // This is simplified; usually you'd need more logic here
              Object.entries(route.params).forEach(([key, value]) => {
                path = path.replace(`:${key}`, Array.isArray(value) ? value[0] : value);
              });
@@ -90,34 +97,39 @@ const crumbs = computed(() => {
 </script>
 
 <style scoped lang="scss">
-.breadcrumbs-wrapper {
+.kenner-title-bar-wrapper {
   padding-top: 12px;
   margin-bottom: 8px;
 }
 
-.breadcrumbs-container {
+.kenner-title-bar-container {
   max-width: 1300px;
   width: 100%;
   margin: 0 auto;
 }
 
-.breadcrumbs-content {
-  background: rgba(255, 255, 255, 0.4);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border: 1px solid rgba(0, 0, 0, 0.05);
+.kenner-title-bar-content {
+  background: rgba(0, 0, 0, 0.04);
   border-radius: 12px;
-  padding: 6px 12px;
-  display: inline-flex;
-  min-width: 200px;
+  padding: 4px 12px;
+  display: flex;
+  min-height: 44px;
 }
 
-
-:deep(.q-breadcrumbs__el) {
+::deep(.q-breadcrumbs__el) {
   white-space: nowrap;
 }
 
-:deep(.q-breadcrumbs__el-icon) {
+::deep(.q-breadcrumbs__el-icon) {
   font-size: 18px;
+}
+
+.left-section {
+  flex-shrink: 1;
+  min-width: 0;
+}
+
+.right-section {
+  flex-shrink: 0;
 }
 </style>

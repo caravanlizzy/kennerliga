@@ -42,11 +42,18 @@
 
     <q-page-container class="col column main-container">
       <div
-        class="q-mx-auto"
+        class="q-mx-auto q-px-md"
         style="max-width: 1300px; width: 100%; "
       >
         <AnnouncementDisplay v-if="isMobile && isAuthenticated" no-margins />
-        <BreadcrumbsNavigation />
+        <KennerTitleBar>
+          <template #right v-if="isAuthenticated">
+            <ActionBarRight />
+          </template>
+          <template #bottom v-if="isAuthenticated">
+            <ActionBarBottom />
+          </template>
+        </KennerTitleBar>
         <router-view v-slot="{ Component }">
           <component :is="Component" />
         </router-view>
@@ -60,7 +67,9 @@
 
 <script setup lang="ts">
 import MobileBottomNav from 'components/layout/MobileBottomNav.vue';
-import BreadcrumbsNavigation from 'components/layout/BreadcrumbsNavigation.vue';
+import KennerTitleBar from 'components/layout/KennerTitleBar.vue';
+import ActionBarRight from 'components/ui/ActionBarRight.vue';
+import ActionBarBottom from 'components/ui/ActionBarBottom.vue';
 import NavBar from 'components/layout/NavBar.vue';
 import { ref, Ref, onMounted } from 'vue';
 import KennerDrawer from 'components/layout/KennerDrawer.vue';

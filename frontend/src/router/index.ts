@@ -9,6 +9,7 @@ import {
 import routes from './routes';
 import { useUserStore } from 'stores/userStore';
 import { useUiStore } from 'stores/uiStore';
+import { useActionBar } from 'src/composables/actionBar';
 
 /*
  * If not building with SSR mode, you can
@@ -36,6 +37,9 @@ export default route(async function(/* { store, ssrContext } */) {
   Router.beforeEach(function(to, from, next) {
     const uiStore = useUiStore();
     uiStore.clearSections();
+
+    const { reset } = useActionBar();
+    reset();
 
     const isMobile =
       !process.env.SERVER &&

@@ -1,6 +1,6 @@
 <template>
   <q-page>
-    <div v-if="loading || !user" class="q-pa-md">
+    <div v-if="loading || !user" class="q-py-md">
       <LoadingSpinner text="Loading league data...">
         <template #skeleton>
           <q-skeleton type="rect" height="28px" class="q-mb-sm" />
@@ -20,9 +20,7 @@
       </LoadingSpinner>
     </div>
 
-    <div v-else class="q-pa-md relative-position league-page">
-      <ActionBar class="q-mb-md" />
-
+    <div v-else class="q-py-md relative-position league-page">
       <LeagueStandingsSection />
       <GameSelectionSection />
       <BanGameSection />
@@ -36,7 +34,6 @@
 <script setup lang="ts">
 import { onMounted, onUnmounted } from 'vue';
 import { storeToRefs } from 'pinia';
-import ActionBar from 'components/ui/ActionBar.vue';
 import LoadingSpinner from 'components/base/LoadingSpinner.vue';
 import LeagueStandingsSection from 'components/league/sections/LeagueStandingsSection.vue';
 import GameSelectionSection from 'components/league/sections/GameSelectionSection.vue';

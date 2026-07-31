@@ -1,5 +1,5 @@
 <template>
-  <q-page class="q-pa-md q-gutter-y-lg page-container">
+  <q-page class="q-py-md q-gutter-y-lg page-container">
     <!-- Page Header -->
     <div class="page-header row items-center justify-between no-wrap q-gutter-x-md">
       <div class="row items-center q-gutter-x-md no-wrap">

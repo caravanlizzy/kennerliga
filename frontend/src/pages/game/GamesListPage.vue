@@ -23,7 +23,7 @@
     </template>
   </KennerTable>
 
-  <div v-else class="q-pa-md">
+  <div v-else class="q-py-md">
     <q-banner v-if="error" rounded dense class="q-mb-sm">
       <template #avatar><q-icon name="warning" color="negative" /></template>
       {{ error }}

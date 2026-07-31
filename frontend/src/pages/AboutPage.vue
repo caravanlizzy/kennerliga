@@ -1,5 +1,5 @@
 <template>
-  <q-page class="q-pa-md flex justify-center">
+  <q-page class="q-py-md flex justify-center">
     <div style="max-width: 1000px; width: 100%">
       <div class="text-h4 text-weight-bold q-mb-lg text-primary row items-center">
         <q-icon name="info" class="q-mr-md" />
