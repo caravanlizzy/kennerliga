@@ -446,7 +446,7 @@ class SeasonParticipantViewSet(ModelViewSet):
 
         Participants with a finalized result from the previous season are
         placed into their projected league. Newcomers (no previous-season
-        result available) are returned in a ``shuffle_pool`` since their
+        result available) are returned in a ``registration_pool`` since their
         final league depends on the random shuffle performed at season
         start.
 
@@ -457,7 +457,7 @@ class SeasonParticipantViewSet(ModelViewSet):
               {"profile": .., "profile_name": .., "username": ..,
                "prev_league": .., "prev_position": ..}
           ]}, ...],
-          "shuffle_pool": [
+          "registration_pool": [
               {"profile": .., "profile_name": .., "username": ..}
           ]
         }
@@ -481,7 +481,7 @@ class SeasonParticipantViewSet(ModelViewSet):
             season = get_running_season()
         if not season:
             return Response(
-                {"season": None, "leagues": [], "shuffle_pool": []}, status=200
+                {"season": None, "leagues": [], "registration_pool": []}, status=200
             )
 
         participants = list(
@@ -545,7 +545,7 @@ class SeasonParticipantViewSet(ModelViewSet):
                     "status": season.status,
                 },
                 "leagues": leagues_payload,
-                "shuffle_pool": newcomers,
+                "registration_pool": newcomers,
             },
             status=200,
         )

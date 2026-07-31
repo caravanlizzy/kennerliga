@@ -120,7 +120,7 @@ export type TProjectedLeague = {
 export type TProjectedLeaguesResponse = {
   season: { id: number; name: string; status: string } | null;
   leagues: TProjectedLeague[];
-  shuffle_pool: TProjectedLeagueMember[];
+  registration_pool: TProjectedLeagueMember[];
 };
 
 export async function fetchProjectedLeagues(
@@ -132,11 +132,11 @@ export async function fetchProjectedLeagues(
     return {
       season: data?.season ?? null,
       leagues: Array.isArray(data?.leagues) ? data.leagues : [],
-      shuffle_pool: Array.isArray(data?.shuffle_pool) ? data.shuffle_pool : [],
+      registration_pool: Array.isArray(data?.registration_pool) ? data.registration_pool : [],
     };
   } catch (error) {
     console.error('Failed to fetch projected leagues:', error);
-    return { season: null, leagues: [], shuffle_pool: [] };
+    return { season: null, leagues: [], registration_pool: [] };
   }
 }
 
