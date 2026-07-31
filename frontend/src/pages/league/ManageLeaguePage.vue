@@ -9,19 +9,6 @@
           <LeagueLevel v-if="league" :level="league.level" class="q-ml-sm" size="40px" font-size="18px" />
         </div>
       </div>
-      <div class="row items-center q-gutter-x-sm">
-        <KennerButton
-          v-if="!loading && league"
-          flat
-          icon="refresh"
-          round
-          color="primary"
-          size="md"
-          @click="load"
-        >
-          <KennerTooltip>Refresh</KennerTooltip>
-        </KennerButton>
-      </div>
     </div>
 
     <!-- Info Section -->

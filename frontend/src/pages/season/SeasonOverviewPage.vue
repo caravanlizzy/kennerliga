@@ -21,17 +21,6 @@
         >
           {{ seasonStatusLabel }}
         </div>
-        <KennerButton
-          v-if="!loading && season"
-          flat
-          icon="refresh"
-          shape="squircle"
-          color="primary"
-          size="md"
-          @click="load"
-        >
-          <KennerTooltip>Refresh</KennerTooltip>
-        </KennerButton>
       </div>
     </div>
 

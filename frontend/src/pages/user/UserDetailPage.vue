@@ -32,16 +32,6 @@
             </div>
           </div>
         </div>
-        <div class="absolute-top-right q-pa-md z-index-2">
-          <KennerButton
-            flat
-            round
-            icon="refresh"
-            color="white"
-            @click="reload"
-            :loading="loading"
-          />
-        </div>
       </div>
       <!-- Decorative background elements -->
       <div class="hero-bg-overlay absolute-full" />
@@ -399,9 +389,6 @@ async function load() {
   }
 }
 
-function reload() {
-  load();
-}
 
 const filteredGameStats = computed(() => {
   if (!gameSearch.value) return gameStats.value;

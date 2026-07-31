@@ -31,17 +31,6 @@
         >
           <KennerTooltip>Start Season Manually</KennerTooltip>
         </KennerButton>
-        <KennerButton
-          v-if="!loading && season"
-          flat
-          icon="refresh"
-          round
-          color="primary"
-          size="md"
-          @click="load"
-        >
-          <KennerTooltip>Refresh</KennerTooltip>
-        </KennerButton>
       </div>
     </div>
 
