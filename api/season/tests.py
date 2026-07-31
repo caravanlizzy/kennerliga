@@ -41,8 +41,8 @@ class SeasonManagerTest(TestCase):
         self.assertEqual(open_season.status, Season.SeasonStatus.RUNNING)
 
     def test_start_new_season_no_open_season(self):
-        with self.assertRaisesRegex(ValueError, "No open season found to start"):
-            start_new_season()
+        # Should now return early without error (graceful exit for auto-script)
+        start_new_season()
 
 
 class SeasonLogicTests(TestCase):

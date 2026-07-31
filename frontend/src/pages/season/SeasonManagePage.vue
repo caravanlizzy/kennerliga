@@ -20,6 +20,18 @@
           <KennerTooltip>View Public Overview</KennerTooltip>
         </KennerButton>
         <KennerButton
+          v-if="isAdmin && season?.status === 'OPEN'"
+          flat
+          icon="play_arrow"
+          round
+          color="positive"
+          size="md"
+          :loading="starting"
+          @click="onStartSeason"
+        >
+          <KennerTooltip>Start Season Manually</KennerTooltip>
+        </KennerButton>
+        <KennerButton
           v-if="!loading && season"
           flat
           icon="refresh"
@@ -120,7 +132,7 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue';
 import { useRoute } from 'vue-router';
-import { fetchLeaguesBySeason, fetchSeason, fetchSeasonParticipants } from 'src/services/seasonService';
+import { fetchLeaguesBySeason, fetchSeason, fetchSeasonParticipants, startSeason } from 'src/services/seasonService';
 import LeagueList from 'components/season/LeagueList.vue';
 import KennerButton from 'components/base/KennerButton.vue';
 import KennerTooltip from 'components/base/KennerTooltip.vue';
@@ -130,15 +142,18 @@ import LoadingSpinner from 'components/base/LoadingSpinner.vue';
 import { TSeasonDto, TLeagueDto, TSeasonParticipantDto } from 'src/types';
 import { useUserStore } from 'stores/userStore';
 import { storeToRefs } from 'pinia';
+import { useDialog } from 'src/composables/dialog';
 
 const route = useRoute();
 const { isAdmin } = storeToRefs(useUserStore());
+const { setDialog } = useDialog();
 const seasonId = Number(route.params.id);
 
 const leagues = ref<TLeagueDto[]>([]);
 const season = ref<TSeasonDto | null>(null);
 const participants = ref<TSeasonParticipantDto[]>([]);
 const loading = ref(true);
+const starting = ref(false);
 const error = ref<string | null>(null);
 
 const statusColor = computed(() => {
@@ -175,6 +190,29 @@ async function load() {
   } finally {
     loading.value = false;
   }
+}
+
+async function onStartSeason() {
+  if (!season.value) return;
+
+  setDialog(
+    'Confirm Manual Start',
+    `Are you sure you want to start ${season.value.name} manually? This will close the currently running season if any.`,
+    'warning',
+    async () => {
+      try {
+        starting.value = true;
+        await startSeason(seasonId);
+        await load();
+      } catch (e: any) {
+        error.value = e?.response?.data?.detail || e?.message || 'Failed to start season.';
+      } finally {
+        starting.value = false;
+      }
+    },
+    undefined,
+    'Start Season'
+  );
 }
 
 onMounted(load);

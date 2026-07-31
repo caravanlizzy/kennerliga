@@ -53,12 +53,13 @@ def get_leagues(season: Season) -> QuerySet:
     return season.league_set.all()
 
 
-def get_registered_participants() -> List[SeasonParticipant]:
+def get_registered_participants(season=None) -> List[SeasonParticipant]:
     """
-    Returns all participants registered in the current open season.
-    If no season is open, returns an empty list.
+    Returns all participants registered in the given or current open season.
+    If no season is provided and no season is open, returns an empty list.
     """
-    season = get_open_season()
+    if not season:
+        season = get_open_season()
     if season:
         participants = SeasonParticipant.objects.filter(season=season)
         return list(participants)

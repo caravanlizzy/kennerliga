@@ -64,6 +64,10 @@ export async function fetchSeason(seasonId: number): Promise<TSeasonDto | undefi
   }
 }
 
+export async function startSeason(seasonId: number): Promise<void> {
+  await api.post(`/season/seasons/${seasonId}/start-season/`);
+}
+
 export async function fetchCurrentSeasonId(): Promise<number | null> {
   try {
     const { data } = await api.get('/season/current/');

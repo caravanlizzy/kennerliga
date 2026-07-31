@@ -252,6 +252,25 @@ class SeasonViewSet(ModelViewSet):
             status=status.HTTP_200_OK,
         )
 
+    @action(detail=True, methods=["post"], url_path="start-season")
+    def start_season(self, request, pk=None):
+        season = self.get_object()
+        if season.status != Season.SeasonStatus.OPEN:
+            return Response(
+                {"detail": "Only OPEN seasons can be started manually."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        from season_manager import start_new_season
+
+        try:
+            start_new_season(season)
+            return Response(
+                {"detail": "Season started successfully."}, status=status.HTTP_200_OK
+            )
+        except Exception as e:
+            return Response({"detail": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
 
 class SeasonScoreboardViewSet(ViewSet):
     """

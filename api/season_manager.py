@@ -1,3 +1,4 @@
+import logging
 from django.db import transaction
 from season.queries import (
     get_registered_participants,
@@ -14,18 +15,20 @@ from season.services import (
 from announcement.services import delete_registration_announcements
 
 
-def start_new_season():
+def start_new_season(new_season=None):
     running_season = get_running_season()
-    new_season = get_open_season()
+    if new_season is None:
+        new_season = get_open_season()
 
     if not new_season:
-        raise ValueError("No open season found to start")
+        logging.info("No open season found to start. Skipping.")
+        return
 
     with transaction.atomic():
         delete_registration_announcements()
         close_season(running_season)
 
-        participants = list(get_registered_participants())
+        participants = list(get_registered_participants(new_season))
         ranked = rank_participants(new_season, participants)
 
         create_leagues(new_season, ranked)
