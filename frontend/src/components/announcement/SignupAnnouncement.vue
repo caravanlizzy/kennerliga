@@ -10,7 +10,7 @@
       class="q-py-sm row items-center no-wrap signup-minimized"
       @click="toggleMinimized"
     >
-      <q-icon name="how_to_reg" size="20px" color="accent" class="q-mr-sm" />
+      <q-icon name="person_add" size="20px" color="accent" class="q-mr-sm" />
       <div class="text-subtitle2 text-weight-bolder text-primary col ellipsis">
         {{ announcement.title }}
       </div>
@@ -74,7 +74,7 @@
                 :class="[isMobile ? 'icon-wrapper--mobile' : '']"
               >
                 <q-icon
-                  name="how_to_reg"
+                  name="person_add"
                   :size="isMobile ? '32px' : '40px'"
                   color="white"
                 />
@@ -191,28 +191,28 @@
                 </div>
                 </div>
 
-                <!-- Registration pool -->
-                <div v-if="registrationPool.length" :class="isMobile ? 'q-mt-sm' : 'q-mt-md'">
+                <!-- Newcomers -->
+                <div v-if="newcomers.length" :class="isMobile ? 'q-mt-sm' : 'q-mt-md'">
                   <div class="row items-center q-gutter-x-xs q-mb-xs">
                     <div
                       class="text-caption text-weight-bolder text-grey-7 uppercase tracking-widest"
                       :style="isMobile ? 'font-size: 0.55rem' : 'font-size: 0.6rem'"
                     >
-                      Registration pool
+                      Newcomers
                     </div>
                     <q-badge
                       color="warning"
-                      :label="registrationPool.length"
+                      :label="newcomers.length"
                       rounded
                       class="text-weight-bold"
                       :style="isMobile ? 'font-size: 9px; padding: 1px 4px' : 'font-size: 10px; padding: 2px 6px'"
                     />
-                    <q-icon name="how_to_reg" size="12px" class="text-grey-6" />
+                    <q-icon name="person_add" size="12px" class="text-grey-6" />
                   </div>
                   <div class="row q-gutter-xs">
-                    <div v-for="(p, index) in registrationPool" :key="p.profile || index" class="col-auto">
+                    <div v-for="(p, index) in newcomers" :key="p.profile || index" class="col-auto">
                       <div
-                        class="participant-chip participant-chip--registration"
+                        class="participant-chip participant-chip--newcomer"
                         :class="{ 'participant-chip--mobile': isMobile }"
                       >
                         {{ p.profile_name || 'Anonymous' }}
@@ -359,7 +359,7 @@ function toggleMinimized() {
     }
   }
 }
-const registrationPool = ref<TProjectedLeagueMember[]>([]);
+const newcomers = ref<TProjectedLeagueMember[]>([]);
 
 const activeParticipants = computed(() => {
   return (participants.value || []).filter((p) => !p.is_prev_unregistered);
@@ -373,13 +373,13 @@ const projectedLeagueGroups = computed<TProjectedLeague[]>(() => {
   return (projectedLeagues.value || []).filter((g) => g.members && g.members.length > 0);
 });
 
-// Profile ids that appear anywhere in the projection (leagues or registration pool)
+// Profile ids that appear anywhere in the projection (leagues or newcomers pool)
 const projectedProfileIds = computed<Set<number>>(() => {
   const ids = new Set<number>();
   for (const g of projectedLeagues.value || []) {
     for (const m of g.members || []) ids.add(m.profile);
   }
-  for (const m of registrationPool.value || []) ids.add(m.profile);
+  for (const m of newcomers.value || []) ids.add(m.profile);
   return ids;
 });
 
@@ -414,10 +414,10 @@ async function loadProjectedLeagues() {
     const seasonId = announcement.season_id || openSeasonId.value || undefined;
     const proj = await fetchProjectedLeagues(seasonId);
     projectedLeagues.value = proj.leagues;
-    registrationPool.value = proj.registration_pool;
+    newcomers.value = proj.newcomers;
   } catch {
     projectedLeagues.value = [];
-    registrationPool.value = [];
+    newcomers.value = [];
   }
 }
 
@@ -534,7 +534,7 @@ onMounted(async () => {
   box-shadow: none;
 }
 
-.participant-chip--registration {
+.participant-chip--newcomer {
   background: rgba(255, 193, 7, 0.08);
   color: #8a6d00;
   border: 1px dashed rgba(255, 193, 7, 0.55);
