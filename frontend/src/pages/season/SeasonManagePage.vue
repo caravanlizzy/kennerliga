@@ -10,7 +10,8 @@
       </div>
       <div class="row items-center q-gutter-x-sm">
         <KennerButton
-          flat
+          outline
+          no-caps
           icon="visibility"
           round
           color="secondary"
@@ -21,7 +22,8 @@
         </KennerButton>
         <KennerButton
           v-if="isAdmin && season?.status === 'OPEN'"
-          flat
+          outline
+          no-caps
           icon="play_arrow"
           round
           color="positive"

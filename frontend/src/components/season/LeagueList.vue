@@ -21,8 +21,8 @@
         </q-badge>
         <KennerButton
           v-if="isAdmin"
-          flat
           dense
+          outline
           no-caps
           color="primary"
           icon="settings"

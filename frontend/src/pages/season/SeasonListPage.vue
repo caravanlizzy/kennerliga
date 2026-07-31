@@ -32,8 +32,9 @@
     <template v-slot:body-cell-actions="props">
       <q-td :props="props" class="q-gutter-x-sm">
         <KennerButton
-          flat
           dense
+          outline
+          no-caps
           color="primary"
           icon="visibility"
           :label="isMobile ? undefined : 'View'"
@@ -42,8 +43,9 @@
         />
         <KennerButton
           v-if="isAdmin"
-          flat
           dense
+          outline
+          no-caps
           color="secondary"
           icon="settings"
           :label="isMobile ? undefined : 'Manage'"

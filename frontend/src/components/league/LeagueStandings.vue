@@ -12,12 +12,13 @@
           <q-badge class="unresolved-card__badge" rounded>
             {{ tieGroups.filter(g => g.unresolved).length }}
           </q-badge>
-          <q-btn
+          <KennerButton
             v-if="adminMode"
             label="Resolve"
             size="xs"
             color="primary"
-            unelevated
+            outline
+            no-caps
             class="q-ml-auto"
             @click="emit('resolve-tie', tieGroups.find(g => g.unresolved))"
           />
@@ -93,12 +94,13 @@
               <div class="text-caption" style="font-size: 0.7rem">
                 {{ group.members.map(m => m.profile_name).join(' vs ') }}
               </div>
-              <q-btn
+              <KennerButton
                 v-if="adminMode && group.unresolved"
                 label="Resolve"
                 size="xs"
                 color="primary"
-                flat
+                outline
+                no-caps
                 dense
                 class="q-ml-auto"
                 @click="emit('resolve-tie', group)"
@@ -217,6 +219,7 @@ import { useUserStore } from 'stores/userStore';
 import { api } from 'boot/axios';
 import { formatNumbers } from 'src/helpers';
 import { useResponsive } from 'src/composables/responsive';
+import KennerButton from 'components/base/KennerButton.vue';
 
 const props = defineProps<{
   leagueId?: number;

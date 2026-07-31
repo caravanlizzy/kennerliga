@@ -77,7 +77,8 @@
           <div class="row q-gutter-xs">
             <KennerButton
               v-if="(member.selected_games?.length || 0) < maxGames"
-              flat
+              outline
+              no-caps
               color="primary"
               icon="add_circle"
               label="Add Game"
@@ -87,7 +88,8 @@
             />
             <KennerButton
               v-if="!member.my_banned_game && !member.has_banned"
-              flat
+              outline
+              no-caps
               color="red-7"
               icon="block"
               label="Ban Game"
@@ -101,7 +103,8 @@
                 ['PICKING', 'REPICKING', 'BANNING'].includes(league.status) &&
                 season?.status === 'RUNNING'
               "
-              flat
+              outline
+              no-caps
               color="secondary"
               icon="person_outline"
               label="Set Active"
@@ -176,7 +179,7 @@
               <div class="col-auto">
                 <div class="row items-center q-gutter-xs">
                   <KennerButton
-                    flat
+                    outline
                     dense
                     round
                     color="red-5"

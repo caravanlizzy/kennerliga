@@ -50,6 +50,7 @@
           v-if="createButton"
           color="primary"
           icon="add"
+          outline
           :label="createButton.label"
           :to="{ name: createButton.forwardName }"
         />

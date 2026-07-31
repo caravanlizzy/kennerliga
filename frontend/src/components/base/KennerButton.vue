@@ -1,7 +1,7 @@
 <template>
   <q-btn
     unelevated
-    filled
+    no-caps
     :rounded="shape === 'rounded' || !shape"
     :round="shape === 'circle'"
     :dense="isMobile"
