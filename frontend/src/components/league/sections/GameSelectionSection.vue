@@ -64,7 +64,12 @@ async function submitGameSelection() {
 }
 
 function manageActionBar() {
-  if (!isOwnedStatus(leagueStatus.value)) return;
+  if (!isOwnedStatus(leagueStatus.value) || !isMePickingGame.value) {
+    if (isOwnedStatus(leagueStatus.value) && !isMePickingGame.value) {
+      reset();
+    }
+    return;
+  }
 
   setActions([
     {
@@ -80,7 +85,12 @@ function manageActionBar() {
 
 // Re-render the action bar only when the inputs it actually depends on change.
 watch(
-  [leagueStatus, selectionValid, () => gameSelection.value?.game?.name],
+  [
+    leagueStatus,
+    isMePickingGame,
+    selectionValid,
+    () => gameSelection.value?.game?.name,
+  ],
   manageActionBar,
   { immediate: true }
 );

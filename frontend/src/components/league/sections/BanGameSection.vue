@@ -140,7 +140,10 @@ function renderCandidateList(candidates: TBanCandidate[]) {
 
 function manageActionBar() {
   if (!isOwnedStatus(leagueStatus.value)) return;
-  if (!isMeBanningGame.value) return;
+  if (!isMeBanningGame.value) {
+    reset();
+    return;
+  }
 
   const candidates = buildCandidates();
 

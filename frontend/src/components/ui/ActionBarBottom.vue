@@ -27,34 +27,11 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import { useActionBar } from 'src/composables/actionBar';
-import { useUserStore } from 'stores/userStore';
-import { useLeagueStore } from 'stores/leagueStore';
-import { storeToRefs } from 'pinia';
-import { useRoute } from 'vue-router';
 
 const { leadText, subject, hint } = useActionBar();
-const { user } = storeToRefs(useUserStore());
-const route = useRoute();
-
-const myLeagueStore = computed(() => {
-  if (!user.value?.myCurrentLeagueId) return null;
-  return useLeagueStore(user.value.myCurrentLeagueId)();
-});
-
-const isMeActivePlayer = computed(() => myLeagueStore.value?.isMeActivePlayer);
-
-const showLeagueInfo = computed(() => {
-  const excluded = [
-    'about', 'rules', 'feedback', 'announcements', 'release-notes', 'taskboard',
-    'users', 'user-detail', 'invite-user', 'invitations'
-  ];
-  return !excluded.includes(route.name as string);
-});
 
 const hasContent = computed(() => {
-  const hasCustomContent = leadText.value || subject.value || hint.value;
-  const hasLeagueTurnInfo = showLeagueInfo.value && isMeActivePlayer.value;
-  return hasCustomContent || hasLeagueTurnInfo;
+  return !!(leadText.value || subject.value || hint.value);
 });
 </script>
 

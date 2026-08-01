@@ -1,10 +1,16 @@
 <template>
   <div v-if="show" class="kenner-title-bar-wrapper">
     <div class="kenner-title-bar-container">
-      <div class="kenner-title-bar-content row items-center no-wrap">
+      <div
+        class="kenner-title-bar-content items-center"
+        :class="isMobile ? 'column q-py-sm q-gutter-y-sm' : 'row no-wrap'"
+      >
         <!-- Left Section: Breadcrumbs -->
-        <div class="row items-center no-wrap q-gutter-x-sm left-section">
-          <slot name="left">
+        <slot name="left">
+          <div
+            class="row items-center no-wrap q-gutter-x-sm left-section"
+            :class="{ 'full-width justify-center': isMobile }"
+          >
             <KennerButton
               flat
               icon="arrow_back"
@@ -25,15 +31,13 @@
                 :to="crumb.path"
               />
             </q-breadcrumbs>
-          </slot>
-        </div>
+          </div>
+        </slot>
 
-        <q-space />
+        <q-space v-if="!isMobile" />
 
         <!-- Right Section: Actions/Other Content -->
-        <div class="row items-center no-wrap q-gutter-x-sm right-section">
-          <slot name="right" />
-        </div>
+        <slot name="right" />
       </div>
 
       <!-- Bottom Section (optional) -->
@@ -129,7 +133,4 @@ const crumbs = computed(() => {
   min-width: 0;
 }
 
-.right-section {
-  flex-shrink: 0;
-}
 </style>
