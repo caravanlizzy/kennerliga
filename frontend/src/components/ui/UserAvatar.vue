@@ -145,6 +145,6 @@ const shapeClass = computed(() => {
 
 /* squircle magic: proportional border radius */
 .squircle-shape {
-  border-radius: 28% !important;
+  border-radius: var(--kenner-card-radius, 0px) !important;
 }
 </style>

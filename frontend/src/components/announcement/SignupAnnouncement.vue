@@ -455,17 +455,15 @@ onMounted(async () => {
 
 <style scoped>
 .announcement-card {
-  border-radius: 16px;
-  transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+  border-radius: 12px;
   background: white;
   border: 1px solid rgba(0, 0, 0, 0.08);
   width: 100%;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
 }
 
 .announcement-card--signup {
   border-top: 4px solid var(--q-accent);
-  background: linear-gradient(135deg, rgba($accent, 0.03) 0%, white 100%);
+  background: white;
   position: relative;
 }
 
@@ -491,23 +489,15 @@ onMounted(async () => {
 .icon-wrapper {
   width: 64px;
   height: 64px;
-  border-radius: 20px;
+  border-radius: 16px;
   flex-shrink: 0;
   background: var(--q-accent);
-  box-shadow: 0 8px 16px rgba($accent, 0.25);
-  animation: pulse-shadow 3s infinite;
-}
-
-@keyframes pulse-shadow {
-  0% { box-shadow: 0 8px 16px rgba($accent, 0.25); }
-  50% { box-shadow: 0 8px 24px rgba($accent, 0.4); }
-  100% { box-shadow: 0 8px 16px rgba($accent, 0.25); }
 }
 
 .icon-wrapper--mobile {
   width: 52px;
   height: 52px;
-  border-radius: 16px;
+  border-radius: 12px;
   margin-right: 16px !important;
 }
 
@@ -519,11 +509,10 @@ onMounted(async () => {
   font-size: 12px;
   background: rgba(248, 249, 250, 0.7);
   padding: 4px 12px;
-  border-radius: 8px;
+  border-radius: 6px;
   color: #2c3e50;
   font-weight: 600;
   border: 1px solid rgba($accent, 0.1);
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
 }
 
 .participant-chip--missing {
@@ -548,7 +537,7 @@ onMounted(async () => {
 .participant-chip--mobile {
   font-size: 10px;
   padding: 2px 8px;
-  border-radius: 6px;
+  border-radius: 4px;
 }
 
 .tracking-widest {
@@ -585,7 +574,7 @@ onMounted(async () => {
 .league-box {
   position: relative;
   border: 1px solid rgba(0, 0, 0, 0.12);
-  border-radius: 10px;
+  border-radius: 8px;
   padding: 12px 8px 8px 8px;
   min-width: 0;
 }

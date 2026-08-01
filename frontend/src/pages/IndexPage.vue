@@ -37,7 +37,7 @@ const showWelcome = computed(
 
 <style scoped>
 .home-page-container {
-  max-width: 1300px;
+  max-width: var(--kenner-max-width);
   width: 100%;
 }
 

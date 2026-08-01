@@ -11,7 +11,6 @@
         <span class="text-h5 text-weight-bold text-primary">Seasons</span>
         <q-badge
           v-if="isLiveSeason"
-          rounded
           color="positive"
           class="q-px-sm q-py-xs text-weight-bolder text-uppercase"
         >

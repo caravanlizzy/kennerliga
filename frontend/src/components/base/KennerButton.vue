@@ -2,11 +2,11 @@
   <q-btn
     unelevated
     no-caps
-    :rounded="shape === 'rounded' || !shape"
+    :rounded="shape === 'rounded'"
     :round="shape === 'circle'"
     :dense="isMobile"
     class="q-mx-xs"
-    :class="{ 'squircle-shape': shape === 'squircle' }"
+    :class="{ 'squircle-shape': shape === 'squircle', 'square-shape': shape === 'square' || !shape }"
     :color="color"
     :icon="icon"
     size="md"
@@ -23,13 +23,16 @@ import { TKennerButton } from 'src/types';
 
 withDefaults(defineProps<TKennerButton>(), {
   color: 'dark',
-  shape: 'rounded',
+  shape: 'squircle',
 });
 const { isMobile } = useResponsive();
 </script>
 
 <style scoped>
 .squircle-shape {
-  border-radius: 12px !important;
+  border-radius: var(--kenner-card-radius, 0px) !important;
+}
+.square-shape {
+  border-radius: 0px !important;
 }
 </style>

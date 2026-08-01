@@ -40,7 +40,6 @@ const tooltipStyle = computed(() => {
   padding: 6px 10px !important;
   border-radius: 6px !important;
   border: 1px solid rgba(0, 0, 0, 0.12);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
   white-space: normal;
   max-width: 320px;
   overflow-wrap: break-word;

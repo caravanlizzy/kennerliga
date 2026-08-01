@@ -339,7 +339,7 @@ onMounted(() => {
 
 <style lang="scss" scoped>
 .page-container {
-  max-width: 1400px;
+  max-width: var(--kenner-max-width);
   margin: 0 auto;
 }
 

@@ -27,25 +27,5 @@ const isOpened = ref(true);
 <style scoped lang="scss">
 .league-section {
   margin-bottom: 20px;
-
-  :deep(.content-section-container) {
-    background: #ffffff;
-    border: 1px solid rgba(15, 23, 42, 0.08);
-    border-radius: 14px;
-    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04),
-      0 4px 16px rgba(15, 23, 42, 0.04);
-    transition: border-color 0.2s ease, box-shadow 0.2s ease;
-
-    &:hover {
-      border-color: rgba(15, 23, 42, 0.12);
-      box-shadow: 0 1px 2px rgba(15, 23, 42, 0.05),
-        0 8px 24px rgba(15, 23, 42, 0.06);
-    }
-  }
-
-  :deep(.section-header) {
-    border-bottom-color: rgba(15, 23, 42, 0.06);
-  }
 }
-
 </style>

@@ -1,4 +1,16 @@
 // app global css in SCSS form
+:root {
+  --kenner-card-radius: 16px;
+  --kenner-card-shadow: none;
+  --kenner-card-shadow-hover: none;
+  --kenner-border-color: rgba(0, 0, 0, 0.08);
+  --kenner-bg-glass: rgba(255, 255, 255, 0.98);
+  --kenner-max-width: 1440px;
+  --kenner-max-width-text: 1100px;
+  --kenner-bg-page: #f8fafc;
+  --kenner-bg-page-accent: #f1f5f9;
+}
+
 * {
   box-sizing: border-box;
 }
@@ -63,6 +75,10 @@
   border-width: 1px;
 }
 
+.rounded-borders {
+  border-radius: var(--kenner-card-radius, 16px) !important;
+}
+
 .rounded-borders-12 {
   border-radius: 12px !important;
   overflow: hidden;
@@ -73,19 +89,38 @@
   overflow: hidden;
 }
 
+// Global Rounded but Flat
+.q-card, .q-dialog__inner > div, .q-menu, .q-banner, .q-item, .q-chip, .q-badge, .q-field--outlined .q-field__control {
+  border-radius: var(--kenner-card-radius, 16px) !important;
+  box-shadow: none !important;
+}
+
+.q-btn--rectangle {
+  border-radius: 8px !important;
+}
+
 // Glass Effect & Layout
 .glass-effect {
-  background: rgba(255, 255, 255, 0.8) !important;
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.03);
+  background: var(--kenner-bg-glass, rgba(255, 255, 255, 0.98)) !important;
+  border-bottom: 1px solid var(--kenner-border-color);
+  // Add a very subtle blur to help distinction without breaking flatness
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.glass-effect-top {
+  background: var(--kenner-bg-glass, rgba(255, 255, 255, 0.98)) !important;
+  border-top: 1px solid var(--kenner-border-color);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
 }
 
 .main-container {
-  // Warmer, softer background: gentle cream-to-warm-beige gradient
-  background: linear-gradient(180deg, #fbf7f2 0%, #f3ece2 100%);
-  background-attachment: fixed;
+  // Distinct background with a subtle gradient and radial depth
+  background: var(--kenner-bg-page);
+  background-image:
+    radial-gradient(at 0% 0%, rgba(77, 73, 73, 0.03) 0px, transparent 50%),
+    radial-gradient(at 100% 0%, rgba(148, 163, 184, 0.05) 0px, transparent 50%);
   min-height: 100vh;
 }
 

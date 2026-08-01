@@ -4,7 +4,7 @@
     <div class="q-pa-lg q-mb-sm row items-center border-bottom-subtle bg-drawer-header">
       <q-icon name="img:icons/favicon.svg" size="36px" class="q-mr-sm" />
       <q-space />
-      <q-btn flat round dense icon="close" color="grey-7" class="hover-scale" @click="drawerState = false" />
+      <q-btn flat round dense icon="close" color="grey-7" @click="drawerState = false" />
     </div>
 
     <!-- Drawer Content -->
@@ -85,8 +85,8 @@ async function doLogout(): Promise<void> {
 }
 
 .glass-effect {
-  backdrop-filter: blur(20px) saturate(180%);
-  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border-left: 1px solid rgba(0, 0, 0, 0.05);
+  border-bottom: none !important;
 }
 
 .border-bottom-subtle {
@@ -104,13 +104,6 @@ async function doLogout(): Promise<void> {
   &:hover {
     background: rgba(255, 0, 0, 0.06);
     color: #d32f2f !important;
-  }
-}
-
-.hover-scale {
-  transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  &:hover {
-    transform: scale(1.1);
   }
 }
 

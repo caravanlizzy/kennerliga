@@ -82,23 +82,22 @@ watch(
   position: relative;
   display: inline-flex;
   align-items: stretch;
-  background: rgba(0, 0, 0, 0.04);
-  border-radius: 999px;
-  padding: 3px;
+  background: rgba(0, 0, 0, 0.08);
+  border-radius: 8px;
+  padding: 2px;
   user-select: none;
   line-height: 1;
 
   &__thumb {
     position: absolute;
-    top: 3px;
-    bottom: 3px;
+    top: 2px;
+    bottom: 2px;
     left: 0;
-    border-radius: 999px;
+    border-radius: 6px;
     background: var(--q-primary);
-    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.18);
-    transition: transform 260ms cubic-bezier(0.4, 0, 0.2, 1),
-                width 260ms cubic-bezier(0.4, 0, 0.2, 1),
-                opacity 200ms ease;
+    transition: transform 180ms cubic-bezier(0.4, 0, 0.2, 1),
+                width 180ms cubic-bezier(0.4, 0, 0.2, 1),
+                opacity 150ms ease;
     z-index: 0;
     will-change: transform, width;
   }
@@ -111,7 +110,7 @@ watch(
     background: transparent;
     cursor: pointer;
     padding: 6px 14px;
-    border-radius: 999px;
+    border-radius: 6px;
     font-size: 12px;
     font-weight: 600;
     letter-spacing: 0.2px;

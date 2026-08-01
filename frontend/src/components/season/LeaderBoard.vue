@@ -223,7 +223,7 @@
   </div>
 
   <!-- No data -->
-  <div v-else class="column items-center q-pa-xl text-grey-6 leaderboard-empty overflow-auto rounded-borders shadow-2">
+  <div v-else class="column items-center q-pa-xl text-grey-6 leaderboard-empty overflow-auto">
     <q-icon name="stars" size="48px" class="q-mb-sm opacity-20" />
     <div class="text-subtitle1 text-weight-bold">No Leaderboard Data</div>
     <div class="text-caption">Leaderboard statistics will appear here after the seasons conclude.</div>
@@ -318,7 +318,7 @@ watch(
 .league-dot {
   width: 18px;
   height: 18px;
-  border-radius: 50%;
+  border-radius: 4px;
   flex-shrink: 0;
   display: flex;
   align-items: center;

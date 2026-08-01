@@ -201,17 +201,16 @@ watch(
 }
 
 .ban-candidate-card {
-  border-radius: 12px;
-  transition: border-color 0.2s ease, background 0.2s ease,
-    transform 0.2s ease, box-shadow 0.2s ease;
-  border: 1px solid rgba(15, 23, 42, 0.08);
-  background: #ffffff;
+  border-radius: var(--kenner-card-radius, 16px);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 1px solid var(--kenner-border-color);
+  background: white;
 
   &:hover {
     border-color: var(--q-negative);
     background: rgba(193, 0, 21, 0.04);
-    transform: translateY(-1px);
-    box-shadow: 0 4px 16px rgba(15, 23, 42, 0.08);
+    transform: translateY(-2px);
+    box-shadow: var(--kenner-card-shadow-hover);
 
     .ban-candidate-icon {
       transform: scale(1.1);

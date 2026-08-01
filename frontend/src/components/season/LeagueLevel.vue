@@ -6,6 +6,7 @@
     :color="getLeagueColor(Number(level))"
     text-color="white"
     class="text-weight-bold"
+    square
     v-bind="$attrs"
   >
     L{{ level }}

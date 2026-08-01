@@ -205,15 +205,10 @@ function formatBannerNames(names: string[]) {
 
 .member-section {
   background: white;
-  border-radius: 16px;
+  border-radius: var(--kenner-card-radius, 0px);
   overflow: hidden;
-  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-  border: 1px solid rgba(0, 0, 0, 0.06);
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
-
-  &:hover {
-    box-shadow: 0 12px 30px -5px rgba(0, 0, 0, 0.04), 0 8px 10px -6px rgba(0, 0, 0, 0.04);
-  }
+  border: 1px solid var(--kenner-border-color);
+  box-shadow: var(--kenner-card-shadow);
 }
 
 .member-header {
@@ -250,7 +245,7 @@ function formatBannerNames(names: string[]) {
 .game-icon-bg {
   width: 36px;
   height: 36px;
-  border-radius: 10px;
+  border-radius: 8px;
   background: rgba(var(--q-primary), 0.08);
   display: flex;
   align-items: center;
@@ -299,7 +294,6 @@ function formatBannerNames(names: string[]) {
   border-top: 1px dashed rgba(0, 0, 0, 0.06);
   background: rgba(0, 0, 0, 0.01);
   margin: 0 10px;
-  border-radius: 0 0 8px 8px;
 }
 
 .opacity-50 {

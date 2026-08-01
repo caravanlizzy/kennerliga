@@ -107,17 +107,18 @@ const crumbs = computed(() => {
 }
 
 .kenner-title-bar-container {
-  max-width: 1300px;
+  max-width: var(--kenner-max-width);
   width: 100%;
   margin: 0 auto;
 }
 
 .kenner-title-bar-content {
-  background: rgba(0, 0, 0, 0.04);
-  border-radius: 12px;
-  padding: 4px 12px;
+  background: var(--kenner-bg-glass, rgba(255, 255, 255, 0.95));
+  border: 1px solid var(--kenner-border-color);
+  border-radius: var(--kenner-card-radius, 0px);
+  padding: 6px 16px;
   display: flex;
-  min-height: 44px;
+  min-height: 48px;
 }
 
 ::deep(.q-breadcrumbs__el) {

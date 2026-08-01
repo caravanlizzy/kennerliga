@@ -9,7 +9,7 @@
         <div class="unresolved-card__header">
           <q-icon name="emoji_events" size="18px" class="unresolved-card__icon" />
           <div class="unresolved-card__title">Unresolved tie</div>
-          <q-badge class="unresolved-card__badge" rounded>
+          <q-badge class="unresolved-card__badge">
             {{ tieGroups.filter(g => g.unresolved).length }}
           </q-badge>
           <KennerButton
@@ -125,9 +125,8 @@
   position: relative;
   border-radius: 12px;
   padding: 14px 16px;
-  background: linear-gradient(135deg, #fff7ed 0%, #fff1de 100%);
+  background: #fff7ed;
   border: 1px solid #fcd9a8;
-  box-shadow: 0 2px 6px rgba(180, 100, 0, 0.08);
   overflow: hidden;
 
   &::before {
@@ -174,15 +173,15 @@
   }
 
   &__group {
-    display: inline-flex;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 6px;
-    padding: 6px 10px;
-    background: rgba(255, 255, 255, 0.75);
-    border: 1px solid rgba(217, 119, 6, 0.25);
-    border-radius: 999px;
-  }
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 6px 10px;
+  background: rgba(255, 255, 255, 0.75);
+  border: 1px solid rgba(217, 119, 6, 0.25);
+  border-radius: 6px;
+}
 
   &__player {
     font-size: 0.8rem;

@@ -3,7 +3,7 @@ export type TKennerButton = {
   icon?: string;
   color?: string;
   forwardName?: string;
-  shape?: 'rounded' | 'squircle' | 'circle';
+  shape?: 'rounded' | 'squircle' | 'circle' | 'square';
 };
 
 export type TItem = {

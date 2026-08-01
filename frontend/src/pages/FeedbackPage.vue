@@ -250,7 +250,7 @@ onMounted(() => {
 
 <style scoped lang="scss">
 .page-container {
-  max-width: 1000px;
+  max-width: var(--kenner-max-width-text);
   margin: 0 auto;
 }
 

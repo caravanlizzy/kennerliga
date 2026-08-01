@@ -108,13 +108,11 @@ const textColors = {
 
 <style scoped>
 .announcement-card {
-  border-radius: 16px;
-  transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+  border-radius: 12px;
   background: white;
   border: 1px solid rgba(0, 0, 0, 0.08);
   border-top-width: 4px;
   width: 100%;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
 }
 
 .announcement-card--info {
@@ -152,7 +150,7 @@ const textColors = {
 .icon-wrapper--mobile {
   width: 40px;
   height: 40px;
-  border-radius: 12px;
+  border-radius: 10px;
   margin-right: 12px !important;
 }
 
@@ -168,11 +166,10 @@ const textColors = {
   font-size: 12px;
   background: rgba(248, 249, 250, 0.7);
   padding: 4px 12px;
-  border-radius: 8px;
+  border-radius: 6px;
   color: #2c3e50;
   font-weight: 600;
   border: 1px solid rgba(0, 0, 0, 0.05);
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
 }
 
 .tracking-widest {

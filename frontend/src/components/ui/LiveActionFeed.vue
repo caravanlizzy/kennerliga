@@ -23,7 +23,7 @@
           text-color="white"
           size="sm"
           class="text-weight-bold"
-          style="border-radius: 8px"
+          style="border-radius: 4px"
           @click="toggleAllLeagues"
         >
           All
@@ -38,7 +38,7 @@
           text-color="white"
           size="sm"
           class="text-weight-bold"
-          style="border-radius: 8px"
+          style="border-radius: 4px"
           @click="toggleLeagueFilter(lvl)"
         >
           L{{ lvl }}
@@ -58,18 +58,18 @@
                 <q-badge
                   :color="getLeagueColor(Number(event.leagueLevel))"
                   class="text-weight-bold"
-                  style="font-size: 0.65rem; border-radius: 6px; padding: 2px 6px;"
+                  style="font-size: 0.65rem; border-radius: 4px; padding: 2px 6px;"
                 >
                   L{{ event.leagueLevel }}
                 </q-badge>
 
                 <q-badge
-                  rounded
                   :style="{
                     color: getColorHex(event.type),
                     backgroundColor: `color-mix(in srgb, ${getColorHex(event.type)} 12%, transparent)`,
                     fontSize: '0.65rem',
-                    letterSpacing: '0.08em'
+                    letterSpacing: '0.08em',
+                    borderRadius: '4px'
                   }"
                   class="text-bold q-px-sm q-py-xs text-uppercase"
                 >

@@ -23,15 +23,15 @@
         d="M380 320V704"
         stroke="#ffffff"
         stroke-width="80"
-        stroke-linecap="round"
+        stroke-linecap="butt"
         fill="none"
       />
       <path
         d="M680 320L440 512L680 704"
         stroke="#ffffff"
         stroke-width="80"
-        stroke-linecap="round"
-        stroke-linejoin="round"
+        stroke-linecap="butt"
+        stroke-linejoin="miter"
         fill="none"
       />
     </svg>

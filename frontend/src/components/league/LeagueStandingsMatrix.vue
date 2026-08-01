@@ -12,7 +12,7 @@
         hide-pagination
         :pagination="{ rowsPerPage: 0 }"
         :row-class="rowClass"
-        class="rounded-borders text-caption"
+        class="text-caption"
       >
         <template #no-data>
           <!-- This slot will not be used because of v-if above, but good practice -->
@@ -201,7 +201,7 @@
       <LoadingSpinner v-else-if="loading" text="Loading standings..." />
 
       <!-- Empty state -->
-      <div v-else-if="standings && standings.standings.length === 0 && standings.selected_games.length === 0" class="column items-center q-pa-xl text-grey-6 bg-grey-1 rounded-borders">
+      <div v-else-if="standings && standings.standings.length === 0 && standings.selected_games.length === 0" class="column items-center q-pa-xl text-grey-6 bg-grey-1">
         <q-icon name="upcoming" size="40px" class="q-mb-sm opacity-50" />
         <div class="text-subtitle2">No participants yet</div>
         <div class="text-caption">The standings will appear here once the season starts.</div>
@@ -212,12 +212,12 @@
         v-if="leagueId && standings?.all_games_finished && standings?.tie_groups?.some(g => g.unresolved)"
         class="q-mt-md q-mb-md"
       >
-        <q-card flat bordered class="bg-orange-1 text-orange-9 q-pa-md rounded-borders relative-position overflow-hidden" style="border-color: #fcd9a8;">
+        <q-card flat bordered class="bg-orange-1 text-orange-9 q-pa-md relative-position overflow-hidden" style="border-color: #fcd9a8;">
           <div class="absolute-left bg-orange-8" style="width: 4px;"></div>
           <div class="row items-center q-gutter-x-sm q-mb-sm">
             <q-icon name="emoji_events" size="18px" color="orange-8" />
             <div class="text-subtitle2 text-weight-bold text-uppercase" style="letter-spacing: 0.3px;">Unresolved tie</div>
-            <q-badge color="orange-8" rounded>
+            <q-badge color="orange-8">
               {{ standings.tie_groups.filter(g => g.unresolved).length }}
             </q-badge>
           </div>

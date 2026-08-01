@@ -1,6 +1,6 @@
 <template>
   <q-page class="q-py-md flex justify-center">
-    <div style="max-width: 1000px; width: 100%">
+    <div style="max-width: var(--kenner-max-width-text); width: 100%">
       <div class="text-h4 text-weight-bold q-mb-lg text-primary row items-center">
         <q-icon name="gavel" class="q-mr-md" />
         Tournament Rules

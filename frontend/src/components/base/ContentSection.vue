@@ -101,21 +101,20 @@
 .content-section-container {
   position: relative;
   background: white;
-  border-radius: 10px;
-  border: 1px solid rgba(0, 0, 0, 0.1);
-  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.05);
+  border-radius: var(--kenner-card-radius, 0px);
+  border: 1px solid var(--kenner-border-color);
+  box-shadow: var(--kenner-card-shadow);
   overflow: hidden;
 
-  // Subtle accent top stripe (thinner / softer than the original)
+  // Sharp accent top stripe
   &::before {
     content: '';
     position: absolute;
     top: 0;
     left: 0;
     right: 0;
-    height: 2px;
+    height: 3px;
     background: var(--accent-color);
-    opacity: 0.55;
     pointer-events: none;
     z-index: 2;
   }

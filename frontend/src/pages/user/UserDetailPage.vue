@@ -451,13 +451,11 @@ onMounted(load);
 .surface-card {
   background: var(--surface-bg) !important;
   border-color: var(--surface-border) !important;
-  border-radius: 14px;
-  box-shadow: var(--surface-shadow);
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  border-radius: 12px;
+  transition: border-color 0.2s ease;
 
   &:hover {
     border-color: var(--surface-border-strong) !important;
-    box-shadow: var(--surface-shadow-hover);
   }
 }
 
@@ -512,12 +510,7 @@ onMounted(load);
 }
 
 .avatar-container {
-  border-radius: 20px;
-  transform: rotate(-3deg);
-  transition: transform 0.3s ease;
-  &:hover {
-    transform: rotate(0deg) scale(1.05);
-  }
+  border-radius: 12px;
 }
 
 .text-white-80 { color: rgba(255,255,255,0.8); }
@@ -536,7 +529,7 @@ onMounted(load);
 }
 
 .max-width-container {
-  max-width: 1200px;
+  max-width: var(--kenner-max-width);
 }
 
 .mx-auto {
@@ -555,7 +548,7 @@ onMounted(load);
 
 .distribution-row {
   transition: background 0.2s ease;
-  border-radius: 6px;
+  border-radius: 4px;
   padding: 2px 4px;
   &:hover {
     background: var(--divider);
@@ -567,24 +560,16 @@ onMounted(load);
 }
 
 .top-game-card {
-  border-radius: 16px;
+  border-radius: 12px;
   background: var(--surface-bg);
-  box-shadow: var(--surface-shadow);
   border: 1px solid var(--surface-border);
-  transition: border-color 0.2s ease, box-shadow 0.2s ease,
-    transform 0.2s ease;
-
-  &:hover {
-    border-color: var(--surface-border-strong);
-    box-shadow: var(--surface-shadow-hover);
-  }
 
   &.rank-1 { border-top: 4px solid #ffc107; }
   &.rank-2 { border-top: 4px solid #b0bec5; }
   &.rank-3 { border-top: 4px solid #ff9800; }
 
   .rank-badge {
-    border-bottom-right-radius: 12px;
+    border-bottom-right-radius: 8px;
     font-size: 0.9rem;
   }
   &.rank-1 .rank-badge { background: #ffc107; color: #000; }
@@ -603,12 +588,10 @@ onMounted(load);
 
 .game-stat-card {
   position: relative;
-  border-radius: 14px;
+  border-radius: 12px;
   background: var(--surface-bg) !important;
   border-color: var(--surface-border) !important;
   overflow: hidden;
-  transition: border-color 0.2s ease, background 0.2s ease,
-    box-shadow 0.2s ease, transform 0.2s ease;
 
   &::before {
     content: '';
@@ -619,7 +602,6 @@ onMounted(load);
     height: 3px;
     background: linear-gradient(90deg, var(--q-primary), var(--q-positive));
     opacity: 0;
-    transition: opacity 0.25s ease;
   }
 
   &:hover {
@@ -637,7 +619,7 @@ onMounted(load);
 }
 
 .game-card-metrics {
-  border-radius: 10px;
+  border-radius: 8px;
   background: var(--stat-tile-bg);
   border: 1px solid var(--surface-border);
 }
@@ -675,10 +657,8 @@ onMounted(load);
 }
 
 .hover-lift {
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
   &:hover {
-    transform: translateY(-4px);
-    box-shadow: var(--surface-shadow-hover);
+    transform: translateY(-2px);
   }
 }
 

@@ -1,5 +1,5 @@
 <template>
-  <q-footer v-if="isMobile && isAuthenticated" bordered class="bg-white text-dark mobile-bottom-nav">
+  <q-footer v-if="isMobile && isAuthenticated" class="glass-effect-top text-dark mobile-bottom-nav">
     <q-tabs
       :model-value="activeTab"
       class="full-width"
@@ -57,8 +57,6 @@ function handleTabChange(value: string) {
 <style lang="scss" scoped>
 .mobile-bottom-nav {
   height: 60px;
-  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
-  border-top: 1px solid rgba(0, 0, 0, 0.05) !important;
 
   :deep(.q-tab) {
     min-height: 60px;

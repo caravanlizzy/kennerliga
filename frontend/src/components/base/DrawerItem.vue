@@ -53,7 +53,7 @@ function handleClick() {
   color: #555;
 
   &.squircle-shape {
-    border-radius: 8px !important;
+    border-radius: var(--kenner-card-radius, 0px) !important;
   }
 
   &:hover {
@@ -62,12 +62,11 @@ function handleClick() {
 
     .q-icon {
       color: var(--q-primary);
-      transform: scale(1.05);
     }
   }
 
   &--active {
-    background: linear-gradient(90deg, rgba(var(--q-primary), 0.1) 0%, rgba(var(--q-primary), 0.02) 100%);
+    background: rgba(var(--q-primary), 0.08);
     color: var(--q-primary);
     font-weight: 600;
 
@@ -79,7 +78,6 @@ function handleClick() {
       height: 70%;
       width: 4px;
       background: var(--q-primary);
-      border-radius: 0 4px 4px 0;
     }
   }
 }

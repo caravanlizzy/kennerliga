@@ -1,7 +1,7 @@
 
 <template>
   <div
-    class="rounded-borders q-mt-xs side-accent-border"
+    class="q-mt-xs side-accent-border"
     :style="{
       borderLeft: `3px solid ${resolveColor(props.color)}`,
       borderTop: `1px solid ${resolveColor(props.color)}`,

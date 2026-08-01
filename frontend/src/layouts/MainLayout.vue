@@ -43,7 +43,7 @@
     <q-page-container class="col column main-container">
       <div
         class="q-mx-auto q-px-md"
-        style="max-width: 1300px; width: 100%; "
+        style="max-width: var(--kenner-max-width); width: 100%; "
       >
         <AnnouncementDisplay v-if="isMobile && isAuthenticated" no-margins />
         <KennerTitleBar>
@@ -105,18 +105,16 @@ function toggleDrawer(): void {
 }
 
 .border-bottom {
-  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  border-bottom: 1px solid var(--kenner-border-color);
 }
 .border-bottom-subtle {
-  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.03);
 }
 .chat-drawer {
-  border-right: 1px solid rgba(0, 0, 0, 0.08) !important;
-  box-shadow: 10px 0 30px rgba(0, 0, 0, 0.05);
+  border-right: 1px solid var(--kenner-border-color) !important;
 }
 .kenner-drawer {
-  border-left: 1px solid rgba(0, 0, 0, 0.08) !important;
-  box-shadow: -10px 0 30px rgba(0, 0, 0, 0.05);
+  border-left: 1px solid var(--kenner-border-color) !important;
 }
 
 // Removed unused styles: .chat-mini-toggle, .vertical-text
