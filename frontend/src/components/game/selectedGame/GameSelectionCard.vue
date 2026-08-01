@@ -52,6 +52,11 @@
   height: 100px;
   overflow: hidden;
 
+  @media (max-width: 600px) {
+    height: 80px;
+    border-radius: 12px;
+  }
+
   &:hover {
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
     border-color: var(--q-primary);
@@ -80,6 +85,10 @@
   font-weight: 600 !important;
   line-height: 1.15;
   width: 100%;
+
+  @media (max-width: 600px) {
+    font-size: 0.7rem;
+  }
 }
 
 .transition-all {
@@ -95,6 +104,16 @@
   justify-content: center;
   background: #e9ecef;
   transition: all 0.3s ease;
+
+  @media (max-width: 600px) {
+    width: 24px;
+    height: 24px;
+    border-radius: 8px;
+    
+    .q-icon {
+      font-size: 16px !important;
+    }
+  }
 }
 
 .bg-primary-soft {

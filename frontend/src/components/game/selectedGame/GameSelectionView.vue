@@ -1,30 +1,55 @@
 <template>
   <div class="game-selection-container">
-    <div class="row q-col-gutter-lg">
+    <div class="row" :class="isMobile ? 'q-col-gutter-y-md' : 'q-col-gutter-lg'">
       <!-- LEFT SIDE: Filter & Grid -->
       <div class="col-12" :class="{ 'col-md-7': gameSelection.game.id > 0 }">
         <!-- 1. FIND & FILTER & AVAILABLE GAMES SECTION -->
-        <div class="selection-browser-card">
+        <div class="selection-browser-card" :class="{ 'no-shadow no-border': isMobile }">
           <!-- Find & Filter -->
           <div class="section-container filter-section q-pa-sm q-px-md">
-            <div class="row items-center q-gutter-x-sm q-mb-sm">
-              <div class="section-icon-box small">
-                <q-icon name="search" size="16px" color="primary" />
+            <div
+              class="row items-center justify-between no-wrap"
+              :class="{ 'cursor-pointer': isMobile }"
+              @click="isMobile && (showFilters = !showFilters)"
+            >
+              <div class="row items-center q-gutter-x-sm" :class="{ 'q-mb-sm': !isMobile }">
+                <div class="section-icon-box small">
+                  <q-icon :name="isMobile ? 'filter_list' : 'search'" size="16px" color="primary" />
+                </div>
+                <div class="text-caption text-weight-bold text-primary text-uppercase letter-spacing-1 relative-position">
+                  {{ isMobile ? 'Filter' : 'Find & Filter' }}
+                  <q-badge
+                    v-if="isMobile && hasActiveFilters"
+                    color="primary"
+                    rounded
+                    class="q-ml-xs"
+                    style="width: 8px; height: 8px; min-height: 8px; padding: 0;"
+                  />
+                </div>
               </div>
-              <div class="text-caption text-weight-bold text-primary text-uppercase letter-spacing-1">Find & Filter</div>
+              <q-icon
+                v-if="isMobile"
+                :name="showFilters ? 'expand_less' : 'expand_more'"
+                color="grey-6"
+                size="20px"
+              />
             </div>
 
-            <div class="row q-col-gutter-sm items-center">
-              <div class="col-12 col-sm-4">
-                <GameFilter v-model="filter" />
+            <q-slide-transition>
+              <div v-show="!isMobile || showFilters">
+                <div class="row q-col-gutter-sm items-center q-pt-xs">
+                  <div class="col-12 col-sm-4">
+                    <GameFilter v-model="filter" />
+                  </div>
+                  <div class="col-12 col-sm-8">
+                    <PlatformMultiSelect
+                      :isPlatformSelected="isPlatformSelected"
+                      :togglePlatform="togglePlatform"
+                    />
+                  </div>
+                </div>
               </div>
-              <div class="col-12 col-sm-8">
-                <PlatformMultiSelect
-                  :isPlatformSelected="isPlatformSelected"
-                  :togglePlatform="togglePlatform"
-                />
-              </div>
-            </div>
+            </q-slide-transition>
           </div>
 
           <q-separator />
@@ -37,7 +62,7 @@
                   <q-icon name="grid_view" size="16px" color="primary" />
                 </div>
                 <div class="text-caption text-weight-bold text-primary text-uppercase letter-spacing-1">
-                  Available Games
+                  {{ isMobile ? 'Games' : 'Available Games' }}
                   <q-badge color="primary" outline class="q-ml-xs" style="font-size: 10px; padding: 2px 4px;">{{ availableGames.length }}</q-badge>
                 </div>
               </div>
@@ -48,10 +73,10 @@
                 no-caps
                 color="primary"
                 :icon="isRandomizing ? 'casino' : 'shuffle'"
-                :label="isRandomizing ? 'Rolling…' : 'Pick a random game for me'"
+                :label="isMobile ? '' : (isRandomizing ? 'Rolling…' : 'Pick a random game for me')"
                 :disable="isRandomizing || randomizableGames.length === 0"
                 class="random-btn"
-                :class="{ 'random-btn--rolling': isRandomizing }"
+                :class="{ 'random-btn--rolling': isRandomizing, 'q-px-sm': isMobile }"
                 @click="randomizeGame"
               >
                 <q-tooltip v-if="memberCount">
@@ -104,6 +129,7 @@
 <script setup lang="ts">
 import { computed, onMounted, provide, ref, watch } from 'vue';
 import { useGameSelection } from 'src/composables/gameSelection';
+import { useResponsive } from 'src/composables/responsive';
 import GameFilter from 'components/game/selectedGame/GameFilter.vue';
 import PlatformMultiSelect from 'components/game/selectedGame/PlatformMultiSelect.vue';
 import NoGamesFound from 'components/game/selectedGame/NoGamesFound.vue';
@@ -144,12 +170,32 @@ const {
   submitGame,
 } = useGameSelection(props.leagueId, props.profileId, props.manageOnly);
 
+const { isMobile } = useResponsive();
+const showFilters = ref(false);
+
+const hasActiveFilters = computed(() => {
+  return (filter.value && filter.value.length > 0) ||
+    (platforms.value && platforms.value.some(p => isPlatformSelected(p.id)));
+});
+
 provide('platforms', platforms);
 
 // init: load games/platforms and, in edit mode, pre-fill selection
 onMounted(async () => {
   await loadPlatformsAndGames();
   emit('set-submitter', onSubmit);
+});
+
+watch(() => gameSelection.game.id, (newId) => {
+  if (newId > 0 && isMobile.value) {
+    // Scroll to form after a short delay for DOM update
+    setTimeout(() => {
+      const formElement = document.querySelector('.sticky-form');
+      if (formElement) {
+        formElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }, 100);
+  }
 });
 
 watch(gameSelection, (newVal) => {
@@ -242,6 +288,13 @@ async function randomizeGame() {
   border: 1px solid rgba(0, 0, 0, 0.08);
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
   overflow: hidden;
+
+  &.no-shadow {
+    box-shadow: none;
+  }
+  &.no-border {
+    border: none;
+  }
 }
 
 
@@ -288,6 +341,13 @@ async function randomizeGame() {
   max-height: 500px;
   overflow-y: auto;
   padding: 12px;
+
+  @media (max-width: 600px) {
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    gap: 8px;
+    padding: 8px;
+    max-height: none;
+  }
 }
 
 .random-btn {

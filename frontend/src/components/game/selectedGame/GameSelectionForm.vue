@@ -20,21 +20,24 @@
         </div>
 
         <!-- Title and Button Row -->
-        <div class="row items-center justify-between no-wrap q-gutter-x-lg">
-          <div class="text-h6 text-weight-bolder text-dark line-height-1">
+        <div class="row items-center justify-between no-wrap" :class="isMobile ? 'q-gutter-x-sm' : 'q-gutter-x-lg'">
+          <div
+            class="text-weight-bolder text-dark line-height-1"
+            :class="isMobile ? 'text-subtitle1' : 'text-h6'"
+          >
             {{ gameInformation.game.name }}
           </div>
 
           <div class="flex-shrink-0">
             <KennerButton
-              size="md"
+              :size="isMobile ? 'sm' : 'md'"
               color="primary"
               icon="save"
               :disable="!isValid"
               @click="onSubmit"
               class="shadow-4 save-btn"
             >
-              Confirm Selection
+              {{ isMobile ? 'Confirm' : 'Confirm Selection' }}
             </KennerButton>
           </div>
         </div>
@@ -159,6 +162,7 @@
 <script setup lang="ts">
 import KennerSelect from 'components/base/KennerSelect.vue';
 import KennerButton from 'components/base/KennerButton.vue';
+import { useResponsive } from 'src/composables/responsive';
 import { getPlatformColor, getPlatformName } from 'src/composables/gameSelection';
 import {
   TPlatform,
@@ -169,6 +173,7 @@ import {
 import { computed, inject } from 'vue';
 
 const platforms = inject<TPlatform[]>('platforms', []);
+const { isMobile } = useResponsive();
 
 const props = withDefaults(
   defineProps<{
