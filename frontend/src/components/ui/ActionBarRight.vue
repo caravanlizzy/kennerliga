@@ -1,13 +1,13 @@
 <template>
   <div
     v-if="hasRightContent"
-    class="row items-center no-wrap q-gutter-x-sm right-section"
+    class="row items-center no-wrap right-section"
     :class="{ 'full-width justify-between': isMobile }"
   >
     <!-- League Info Group (Status & Active Player) -->
     <div
       v-if="showLeagueInfo && (statusNoun || activePlayer)"
-      class="row items-center no-wrap q-gutter-x-sm"
+      class="row items-center no-wrap league-info-group"
     >
       <!-- Status Chip -->
       <q-badge
@@ -31,7 +31,7 @@
         outline
         :color="isMeActivePlayer ? 'positive' : 'grey-7'"
         :text-color="isMeActivePlayer ? 'positive' : 'grey-8'"
-        class="text-weight-bold q-ma-none"
+        class="text-weight-bold"
         style="border-radius: 6px; font-size: 0.8rem;"
       >
         <q-icon :name="isMeActivePlayer ? 'bolt' : 'schedule'" size="16px" class="q-mr-xs" />
@@ -48,7 +48,7 @@
     <!-- Action Buttons Group -->
     <div
       v-if="actions.length && isMeActivePlayer"
-      class="row items-center no-wrap q-gutter-x-xs"
+      class="row items-center no-wrap action-buttons-group"
     >
       <KennerButton
         v-for="a in actions"
@@ -114,5 +114,18 @@ async function handleAction(action: any) {
 <style scoped lang="scss">
 .right-section {
   flex-shrink: 0;
+  gap: 12px;
+}
+
+.league-info-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.action-buttons-group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
 </style>

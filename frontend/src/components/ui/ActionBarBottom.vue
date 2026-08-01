@@ -4,7 +4,7 @@
     class="action-content q-pa-md q-mt-sm"
   >
     <div class="text-section">
-      <div v-if="leadText" class="text-caption text-grey-6 text-uppercase letter-spacing-1 q-mb-xs">
+      <div v-if="leadText" class="text-caption text-grey-6 text-uppercase letter-spacing-1">
         <component :is="leadText" />
       </div>
       <div
@@ -16,7 +16,7 @@
       </div>
       <div
         v-if="hint"
-        class="text-caption text-grey-7 q-mt-xs"
+        class="text-caption text-grey-7"
       >
         <component :is="hint" />
       </div>
@@ -44,6 +44,9 @@ const hasContent = computed(() => {
 .text-section {
   flex: 1;
   min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
 }
 
 .letter-spacing-1 {
