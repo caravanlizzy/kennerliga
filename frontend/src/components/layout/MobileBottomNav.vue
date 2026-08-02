@@ -56,20 +56,21 @@ function handleTabChange(value: string) {
 
 <style lang="scss" scoped>
 .mobile-bottom-nav {
-  height: 60px;
+  height: 50px;
+  background: #f8fafc !important;
 
   :deep(.q-tab) {
-    min-height: 60px;
+    min-height: 50px;
     padding: 0;
 
     .q-tab__icon {
-      font-size: 22px;
+      font-size: 20px;
     }
 
     .q-tab__label {
-      font-size: 10px;
+      font-size: 9px;
       font-weight: 600;
-      margin-top: 2px;
+      margin-top: 1px;
     }
 
     &.q-tab--active {

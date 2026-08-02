@@ -1,6 +1,6 @@
 <template>
-  <q-layout class="column" view="hHh LpR lFf">
-    <q-header class="col-auto no-shadow bg-transparent">
+  <q-layout view="hHh LpR fFf">
+    <q-header class="no-shadow bg-transparent">
       <NavBar :onToggle="toggleDrawer" />
     </q-header>
 
@@ -40,7 +40,7 @@
 
     <!-- Removed fixed chat toggle -->
 
-    <q-page-container class="col column main-container">
+    <q-page-container class="main-container">
       <div
         class="q-mx-auto q-px-md"
         style="max-width: var(--kenner-max-width); width: 100%; "

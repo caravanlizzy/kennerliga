@@ -3,7 +3,6 @@
     <q-toolbar
       class="navbar text-dark q-py-sm relative-position"
       :class="isMobile ? 'q-px-sm' : 'q-px-md'"
-      style="border-bottom: none;"
     >
       <div class="row no-wrap items-center flex-shrink-0">
         <NavHome />
@@ -59,6 +58,24 @@ const { isMobile } = useResponsive();
   display: flex;
   align-items: center;
   justify-content: space-between;
+
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(
+      90deg,
+      rgba($primary, 0) 0%,
+      rgba($kenner-red, 0.3) 25%,
+      rgba($kenner-red, 0.8) 50%,
+      rgba($kenner-red, 0.3) 75%,
+      rgba($primary, 0) 100%
+    );
+    z-index: 10;
+  }
 }
 
 .flex-spacer {

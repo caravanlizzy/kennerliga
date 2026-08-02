@@ -59,7 +59,7 @@
         size="sm"
         @click="handleAction(a)"
       >
-        <span v-if="!isMobile">{{ a.name }}</span>
+        <span v-if="!isMobile || !a.icon">{{ a.name }}</span>
       </KennerButton>
     </div>
   </div>
