@@ -18,7 +18,7 @@
           flat
           class="announcement-card overflow-hidden"
           :class="[
-            { 'no-border-radius': shouldRemoveBorders },
+            { 'no-border-radius-mobile': shouldRemoveBorders },
             `announcement-card--${a.type.toLowerCase()}`
           ]"
         >
@@ -135,7 +135,7 @@ const textColors = {
   border-top-color: #424242 !important; /* text-grey-9 */
 }
 
-.announcement-card:hover:not(.no-border-radius) {
+.announcement-card:hover:not(.no-border-radius-mobile) {
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
 }
 

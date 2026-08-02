@@ -2,7 +2,7 @@
   <q-card
     flat
     class="announcement-card overflow-hidden announcement-card--signup"
-    :class="{ 'no-border-radius': shouldRemoveBorders, 'announcement-card--minimized': isMinimized }"
+    :class="{ 'no-border-radius-mobile': shouldRemoveBorders, 'announcement-card--minimized': isMinimized }"
   >
     <!-- Minimized View -->
     <q-card-section
@@ -325,7 +325,7 @@ const { announcement } = props;
 const $q = useQuasar();
 const { isMobile } = useResponsive();
 
-const shouldRemoveBorders = ref($q.screen.lt.sm);
+const shouldRemoveBorders = computed(() => $q.screen.lt.sm);
 
 const userStore = useUserStore();
 const { isAuthenticated } = storeToRefs(userStore);
@@ -478,11 +478,7 @@ onMounted(async () => {
   z-index: 1;
 }
 
-.no-border-radius {
-  border-radius: 0 !important;
-}
-
-.announcement-card:hover:not(.no-border-radius) {
+.announcement-card:hover:not(.no-border-radius-mobile) {
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
 }
 

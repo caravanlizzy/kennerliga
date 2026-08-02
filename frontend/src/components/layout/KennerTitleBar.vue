@@ -3,7 +3,7 @@
     <div class="kenner-title-bar-container">
       <div
         class="kenner-title-bar-content items-center"
-        :class="isMobile ? 'column q-py-sm q-gutter-y-sm' : 'row no-wrap'"
+        :class="isMobile ? 'column q-py-sm q-gutter-y-sm no-border-radius-mobile' : 'row no-wrap'"
       >
         <!-- Left Section: Breadcrumbs -->
         <slot name="left">

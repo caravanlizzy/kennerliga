@@ -1,5 +1,5 @@
 <template>
-  <div :class="isMobile ? 'q-pa-sm' : 'q-pa-md'" class="column season-standings">
+  <div class="q-pa-md column season-standings">
     <!-- State primary -->
     <LoadingSpinner v-if="loadingLeagues" text="Loading standings..." />
 

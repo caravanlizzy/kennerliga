@@ -1,8 +1,11 @@
 <template>
   <div
     :id="sectionId"
-    class="q-mt-xl content-section-container relative-position q-pa-lg"
-    :class="`indicator-${color}`"
+    class="q-mt-xl content-section-container relative-position"
+    :class="[
+      `indicator-${color}`,
+      isMobile ? 'q-pa-md no-border-radius-mobile' : 'q-pa-lg'
+    ]"
   >
     <div
       class="section-watermark absolute-top-right q-ma-md"
@@ -58,8 +61,10 @@
   <script setup lang="ts">
   import { computed, onMounted, onUnmounted } from 'vue';
   import { useUiStore } from 'src/stores/uiStore';
+  import { useResponsive } from 'src/composables/responsive';
 
   const uiStore = useUiStore();
+  const { isMobile } = useResponsive();
 
   const isOpened = defineModel<boolean>('isOpened', { default: true });
 

@@ -42,7 +42,8 @@
 
     <q-page-container class="main-container">
       <div
-        class="q-mx-auto q-px-md"
+        class="q-mx-auto"
+        :class="isMobile ? 'q-px-none' : 'q-px-md'"
         style="max-width: var(--kenner-max-width); width: 100%; "
       >
         <AnnouncementDisplay v-if="isMobile && isAuthenticated" no-margins />

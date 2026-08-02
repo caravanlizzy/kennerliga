@@ -1,8 +1,7 @@
 <template>
   <div class="column full-width glass-effect">
     <q-toolbar
-      class="navbar text-dark q-py-sm relative-position"
-      :class="isMobile ? 'q-px-sm' : 'q-px-md'"
+      class="navbar text-dark q-py-sm relative-position q-px-md"
     >
       <div class="row no-wrap items-center flex-shrink-0">
         <NavHome />
