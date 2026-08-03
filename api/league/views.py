@@ -1,8 +1,8 @@
 from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
-from rest_framework.response import Response
 from rest_framework.viewsets import ReadOnlyModelViewSet, ModelViewSet
+from api.permissions import IsAdminOrReadOnly
 
 from game.models import SelectedGame
 from league.models import (
@@ -33,7 +33,7 @@ class LeagueViewSet(ModelViewSet):
     )
     serializer_class = LeagueSerializer
     filterset_fields = ["season", "members__profile"]
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAdminOrReadOnly]
 
     def get_queryset(self):
         if self.action == "full_standings":

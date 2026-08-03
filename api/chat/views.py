@@ -1,6 +1,6 @@
 from django.utils.dateparse import parse_datetime
 from rest_framework.exceptions import ValidationError
-from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.viewsets import ModelViewSet
 
 from chat.models import Chat
@@ -9,9 +9,9 @@ from chat.serializer import ChatSerializer
 
 class ChatViewSet(ModelViewSet):
     def get_permissions(self):
-        if self.action == "create":
+        if self.action in ["list", "retrieve", "create"]:
             return [IsAuthenticated()]
-        return [AllowAny()]
+        return [IsAdminUser()]
 
     def get_queryset(self):
         limit = self.request.query_params.get("limit", None)

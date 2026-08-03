@@ -35,12 +35,9 @@ from user.models import PlayerProfile
 
 
 class SeasonRegistrationView(APIView):
+    permission_classes = [IsAuthenticated]
+
     def post(self, request, *args, **kwargs):
-        if not self.request.user:
-            return Response(
-                {"detail": "Authentication credentials were not provided."},
-                status=status.HTTP_401_UNAUTHORIZED,
-            )
         try:
             player_profile = PlayerProfile.objects.get(user=self.request.user)
         except PlayerProfile.DoesNotExist:
@@ -82,6 +79,9 @@ class SeasonViewSet(ModelViewSet):
             "league_winners",
             "seasons_with_leagues",
             "full_standings",
+            "scoreboards",
+            "projected_leagues",
+            "current",
         ]:
             return [IsAuthenticated()]
         return [IsAdminUser()]

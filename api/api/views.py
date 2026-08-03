@@ -5,12 +5,14 @@ from league.models import LeagueStanding, LeagueStatus
 from user.models import PlatformPlayer
 
 from collections import defaultdict
+from rest_framework.permissions import AllowAny
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 
 
 class LoginApiView(APIView):
+    permission_classes = [AllowAny]
     @staticmethod
     def post(request, *args, **kwargs):
         username = request.data.get("username")

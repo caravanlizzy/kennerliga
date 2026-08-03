@@ -11,6 +11,7 @@ from rest_framework.exceptions import NotFound
 from rest_framework.permissions import IsAuthenticated, IsAdminUser, AllowAny
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet, ViewSet
+from api.permissions import IsAdminOrReadOnly
 
 from chat.service import create_chat_announcement
 from league.models import League, LeagueStanding
@@ -346,7 +347,7 @@ class UserRegistrationViewSet(ViewSet):
 class PlayerProfileViewSet(ModelViewSet):
     queryset = PlayerProfile.objects.all()
     serializer_class = PlayerProfileSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAdminOrReadOnly]
 
     def get_queryset(self):
         queryset = PlayerProfile.objects.all()
@@ -367,10 +368,14 @@ class PlayerProfileViewSet(ModelViewSet):
 
 
 class FeedbackViewSet(ModelViewSet):
-    permission_classes = [IsAuthenticated]
     queryset = Feedback.objects.all()
     serializer_class = FeedbackSerializer
     http_method_names = ["get", "post", "head", "options"]
+
+    def get_permissions(self):
+        if self.action == "create":
+            return [IsAuthenticated()]
+        return [IsAdminUser()]
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)

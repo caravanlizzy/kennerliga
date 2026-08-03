@@ -56,10 +56,10 @@ class ResultViewSet(ModelViewSet):
 
     def get_permissions(self):
         if self.action == "create":
-            permission_classes = [IsAdminOrMemberInCurrentLeague]
-        else:
-            permission_classes = []
-        return [permission() for permission in permission_classes]
+            return [IsAdminOrMemberInCurrentLeague()]
+        if self.action in ["list", "retrieve"]:
+            return [permissions.IsAuthenticated()]
+        return [permissions.IsAdminUser()]
 
 
 class MatchResultViewSet(ViewSet):
@@ -95,10 +95,10 @@ class MatchResultViewSet(ViewSet):
 
     def get_permissions(self):
         if self.action == "create":
-            permission_classes = [IsAdminOrMemberInCurrentLeague]
-        else:
-            permission_classes = []
-        return [permission() for permission in permission_classes]
+            return [IsAdminOrMemberInCurrentLeague()]
+        if self.action == "destroy":
+            return [permissions.IsAdminUser()]
+        return [permissions.IsAuthenticated()]
 
     def _fnum(self, x, default=None):
         try:

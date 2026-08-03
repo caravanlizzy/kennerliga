@@ -2,6 +2,7 @@ from django.db.models import Count, IntegerField, OuterRef, Subquery
 from django.db.models.functions import Coalesce, Lower
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.viewsets import ModelViewSet
+from api.permissions import IsAdminOrReadOnly
 
 from game.models import (
     Game,
@@ -43,7 +44,7 @@ from .queries import (
 class GameViewSet(ModelViewSet):
     queryset = Game.objects.all().order_by(Lower("name"))
     serializer_class = GameSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAdminOrReadOnly]
 
     def get_queryset(self):
         queryset = get_all_games()
@@ -89,46 +90,47 @@ class GameOptionViewSet(ModelViewSet):
     queryset = GameOption.objects.all()
     serializer_class = GameOptionSerializer
     filterset_fields = ["game"]
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAdminOrReadOnly]
 
 
 class GameOptionChoiceViewSet(ModelViewSet):
     queryset = GameOptionChoice.objects.all()
     serializer_class = GameOptionChoiceSerializer
     filterset_fields = ["option"]
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAdminOrReadOnly]
 
 
 class FactionViewSet(ModelViewSet):
     queryset = Faction.objects.all()
     serializer_class = FactionSerializer
     filterset_fields = ["game"]
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAdminOrReadOnly]
+
 
 class TieBreakerViewSet(ModelViewSet):
     queryset = TieBreaker.objects.all()
     serializer_class = TieBreakerSerializer
     filterset_fields = ["result_config"]
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAdminOrReadOnly]
 
 
 class ResultConfigViewSet(ModelViewSet):
     queryset = ResultConfig.objects.all()
     serializer_class = ResultConfigSerializer
     filterset_fields = ["game"]
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAdminOrReadOnly]
 
 
 class StartingPointSystemViewSet(ModelViewSet):
     queryset = StartingPointSystem.objects.all()
     serializer_class = StartingPointSystemSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAdminOrReadOnly]
 
 
 class PlatformViewSet(ModelViewSet):
     queryset = Platform.objects.all()
     serializer_class = PlatformSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAdminOrReadOnly]
 
 
 # Subqueries to count members/results without cross-join inflation that
@@ -195,7 +197,7 @@ class FullGameViewSet(ModelViewSet):
         )
     )
     serializer_class = FullGameSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAdminOrReadOnly]
 
     def get_queryset(self):
         queryset = super().get_queryset()
