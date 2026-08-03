@@ -2,7 +2,6 @@
   <q-card
     @click="initGameInformation(game)"
     flat
-    bordered
     clickable
     v-ripple="{ color: 'primary' }"
     class="game-card modern-card cursor-pointer relative-position"
@@ -88,8 +87,6 @@
 
     .icon-circle {
       background: rgba($kenner-red, 0.15);
-      border: 1px solid rgba($kenner-red, 0.2);
-      box-shadow: 0 0 15px rgba($kenner-red, 0.2);
     }
   }
 }
