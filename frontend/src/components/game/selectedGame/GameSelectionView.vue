@@ -2,7 +2,7 @@
   <div class="game-selection-container">
     <div class="row" :class="isMobile ? 'q-col-gutter-y-md' : 'q-col-gutter-lg'">
       <!-- LEFT SIDE: Filter & Grid -->
-      <div class="col-12" :class="{ 'col-md-7': gameSelection.game.id > 0 }">
+      <div class="col-12 col-md-7">
         <!-- 1. FIND & FILTER & AVAILABLE GAMES SECTION -->
         <div class="selection-browser-card" :class="{ 'no-shadow no-border': isMobile }">
           <!-- Find & Filter -->
@@ -88,7 +88,7 @@
               </q-btn>
             </div>
 
-            <div class="game-grid custom-scrollbar">
+            <div class="game-grid custom-scrollbar" ref="gridRef">
               <NoGamesFound v-if="availableGames.length === 0" />
               <GameSelectionCard
                 v-for="game in availableGames"
@@ -103,15 +103,8 @@
       </div>
 
       <!-- RIGHT SIDE: SELECTION FORM -->
-      <div v-if="gameSelection.game.id > 0" class="col-12 col-md-5">
-        <div class="section-container form-section sticky-form">
-          <div class="row items-center q-gutter-x-sm q-mb-md">
-            <div class="section-icon-box accent">
-              <q-icon name="check_circle" size="20px" color="white" />
-            </div>
-            <div class="text-subtitle1 text-weight-bold text-primary">Complete Selection</div>
-          </div>
-
+      <div class="col-12 col-md-5">
+        <div v-if="gameSelection.game.id > 0" class="form-section sticky-form">
           <GameSelectionForm
             :game-information="gameInformation"
             :game-selection="gameSelection"
@@ -119,7 +112,37 @@
             :is-valid="isValid"
             :on-submit="onSubmit"
             :visible-options="visibleOptions"
-          />
+          >
+            <template #header>
+              <div class="row items-center q-gutter-x-sm">
+                <div
+                  class="section-icon-box"
+                  :class="isValid ? 'selected-bg' : 'incomplete-bg'"
+                >
+                  <q-icon :name="isValid ? 'check_circle' : 'edit_note'" size="20px" :color="isValid ? 'white' : 'grey-7'" />
+                </div>
+                <div
+                  class="text-subtitle1 text-weight-bold transition-all ellipsis"
+                  :class="isValid ? 'text-selected' : 'text-grey-7'"
+                >
+                  {{ isValid ? 'Ready to Confirm' : 'Complete Selection' }}
+                </div>
+              </div>
+            </template>
+          </GameSelectionForm>
+        </div>
+
+        <!-- Placeholder when no game is selected -->
+        <div v-else-if="!isMobile" class="placeholder-section flex flex-center">
+          <div class="text-center q-pa-xl">
+            <div class="placeholder-icon-container q-mb-lg">
+              <q-icon name="ads_click" size="64px" color="grey-3" />
+            </div>
+            <div class="text-h6 text-grey-4 text-weight-bold tracking-tight">Select a Game</div>
+            <div class="text-caption text-grey-5 q-mt-sm">
+              Pick a game from the list<br>to configure your selection
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -172,6 +195,7 @@ const {
 
 const { isMobile } = useResponsive();
 const showFilters = ref(false);
+const gridRef = ref<HTMLElement | null>(null);
 
 const hasActiveFilters = computed(() => {
   return (filter.value && filter.value.length > 0) ||
@@ -187,14 +211,24 @@ onMounted(async () => {
 });
 
 watch(() => gameSelection.game.id, (newId) => {
-  if (newId > 0 && isMobile.value) {
-    // Scroll to form after a short delay for DOM update
+  if (newId > 0) {
+    // 1. Scroll the card into view (especially useful for the scrollable grid on desktop)
     setTimeout(() => {
-      const formElement = document.querySelector('.sticky-form');
-      if (formElement) {
-        formElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      const cardElement = gridRef.value?.querySelector('.game-card.selected');
+      if (cardElement) {
+        cardElement.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
       }
-    }, 100);
+    }, 50);
+
+    // 2. Scroll to form on mobile
+    if (isMobile.value) {
+      setTimeout(() => {
+        const formElement = document.querySelector('.sticky-form');
+        if (formElement) {
+          formElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }, 150);
+    }
   }
 });
 
@@ -246,30 +280,6 @@ async function randomizeGame() {
   isRandomizing.value = true;
   try {
     const finalPick = pickRandom(pool)!;
-
-    // Animate: quickly cycle through candidates, easing out at the end.
-    const steps = Math.min(12, Math.max(6, pool.length));
-    let delay = 60;
-    let lastId = -1;
-
-    for (let i = 0; i < steps; i++) {
-      // ensure a visible change between steps when possible
-      let candidate = pickRandom(pool)!;
-      if (pool.length > 1) {
-        let guard = 0;
-        while (candidate.id === lastId && guard++ < 5) {
-          candidate = pickRandom(pool)!;
-        }
-      }
-      lastId = candidate.id;
-      // fire and forget — initGameInformation may fetch full game details,
-      // but for the spinning animation we only need the visual selection to move.
-      void initGameInformation(candidate);
-      await new Promise((r) => setTimeout(r, delay));
-      delay = Math.min(260, Math.round(delay * 1.18));
-    }
-
-    // Land on the final pick and wait for details to load.
     await initGameInformation(finalPick);
   } finally {
     isRandomizing.value = false;
@@ -280,13 +290,14 @@ async function randomizeGame() {
 <style scoped lang="scss">
 .game-selection-container {
   padding: 8px 0;
+  // min-width removed - now handled by ManagerFormsDialog
 }
 
 .selection-browser-card {
-  border-radius: 16px;
+  border-radius: 24px;
   background: white;
-  border: 1px solid rgba(0, 0, 0, 0.08);
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03);
   overflow: hidden;
 
   &.no-shadow {
@@ -297,29 +308,53 @@ async function randomizeGame() {
   }
 }
 
+.filter-section {
+  background: linear-gradient(to bottom, #ffffff, #fcfcfc);
+}
 
 .grid-section {
-  background: #f1f3f5;
+  background: #f8fafc;
+  border-top: 1px solid rgba(0, 0, 0, 0.05);
 }
 
 .section-icon-box {
   width: 36px;
   height: 36px;
-  border-radius: 10px;
-  background: rgba(var(--q-primary), 0.1);
+  border-radius: 12px;
+  background: white;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
   display: flex;
   align-items: center;
   justify-content: center;
+  transition: all 0.3s ease;
 
   &.small {
     width: 28px;
     height: 28px;
     border-radius: 8px;
+    box-shadow: none;
   }
 
-  &.accent {
-    background: var(--q-primary);
+  &.selected-bg {
+    background: linear-gradient(135deg, $kenner-red 0%, darken($kenner-red, 10%) 100%);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 4px 12px rgba($kenner-red, 0.15);
   }
+
+  &.incomplete-bg {
+    background: #f8fafc;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.02);
+  }
+}
+
+.transition-all {
+  transition: all 0.3s ease;
+}
+
+.text-selected {
+  color: $kenner-red;
 }
 
 .letter-spacing-1 {
@@ -331,16 +366,40 @@ async function randomizeGame() {
   @media (min-width: 1024px) {
     position: sticky;
     top: 24px;
+    height: fit-content;
   }
+}
+
+.placeholder-section {
+  border: 2px dashed rgba(0, 0, 0, 0.05);
+  border-radius: 24px;
+  height: 100%;
+  min-height: 400px;
+  background: rgba(0, 0, 0, 0.01);
+}
+
+.placeholder-icon-container {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  background: white;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
+  border: 1px solid rgba(0, 0, 0, 0.02);
 }
 
 .game-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
   gap: 12px;
-  max-height: 500px;
+  max-height: 520px;
   overflow-y: auto;
-  padding: 12px;
+  padding: 16px;
+  box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.03);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.5);
 
   @media (max-width: 600px) {
     grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
@@ -358,7 +417,7 @@ async function randomizeGame() {
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 
   &:hover:not(:disabled) {
-    transform: translateY(-1px);
+    // transform: translateY(-1px);
     box-shadow: 0 6px 16px rgba(var(--q-primary), 0.25);
   }
 
@@ -381,6 +440,7 @@ async function randomizeGame() {
 
 .game-grid :deep(.game-card.selected) {
   animation: pick-pop 0.35s ease;
+  border-color: $kenner-red !important;
 }
 
 @keyframes pick-pop {

@@ -6,7 +6,9 @@
     clickable
     v-ripple="{ color: 'primary' }"
     class="game-card modern-card cursor-pointer relative-position"
-    :class="{ selected: game.id === gameSelection.game.id }"
+    :class="{
+      selected: game.id === gameSelection.game.id
+    }"
     role="button"
     tabindex="0"
     @keyup.enter.space="initGameInformation(game)"
@@ -23,11 +25,13 @@
 
     <q-card-section class="q-pa-xs column items-center justify-center text-center full-height">
       <div class="icon-container q-mb-xs">
-        <div class="icon-circle" :class="{ 'bg-primary-soft': game.id === gameSelection.game.id }">
+        <div class="icon-circle" :class="{
+          'bg-selected-soft': game.id === gameSelection.game.id
+        }">
           <q-icon
             name="sports_esports"
             size="20px"
-            :class="game.id === gameSelection.game.id ? 'text-primary' : 'text-grey-6'"
+            :class="(game.id === gameSelection.game.id) ? 'text-selected' : 'text-grey-6'"
             class="transition-all"
           />
         </div>
@@ -47,8 +51,9 @@
 .modern-card {
   border-radius: 16px;
   background: white;
-  border: 1px solid rgba(0, 0, 0, 0.08);
-  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  border: 2px solid transparent;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.08);
+  transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
   height: 100px;
   overflow: hidden;
 
@@ -58,33 +63,52 @@
   }
 
   &:hover {
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-    border-color: var(--q-primary);
-    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.06);
+    border-color: rgba($kenner-red, 0.4);
+    // transform: translateY(-2px); // Removed to prevent horizontal/vertical jump
 
     .icon-circle {
-      background: rgba(var(--q-primary), 0.08);
+      background: rgba($kenner-red, 0.05);
     }
     .icon-container .q-icon {
-      color: var(--q-primary) !important;
+      color: $kenner-red !important;
+      transform: scale(1.1);
     }
   }
 
   &.selected {
-    border: 2px solid var(--q-primary);
-    box-shadow: 0 8px 20px rgba(var(--q-primary), 0.1);
+    border: 2px solid $kenner-red;
+    box-shadow:
+      0 12px 28px rgba($kenner-red, 0.2),
+      inset 0 0 20px rgba($kenner-red, 0.1);
+    background:
+      radial-gradient(circle at center, rgba($kenner-red, 0.06) 0%, transparent 70%),
+      repeating-conic-gradient(from 0deg, transparent 0deg 20deg, rgba($kenner-red, 0.02) 20deg 40deg),
+      white;
 
     .icon-circle {
-      background: rgba(var(--q-primary), 0.12);
+      background: rgba($kenner-red, 0.15);
+      border: 1px solid rgba($kenner-red, 0.2);
+      box-shadow: 0 0 15px rgba($kenner-red, 0.2);
     }
   }
 }
 
+.text-selected {
+  color: $kenner-red !important;
+}
+
+.bg-selected-soft {
+  background: rgba($kenner-red, 0.15) !important;
+}
+
 .game-name {
-  font-size: 0.8rem;
-  font-weight: 600 !important;
-  line-height: 1.15;
+  font-size: 0.85rem;
+  font-weight: 700 !important;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
   width: 100%;
+  color: #2d3748;
 
   @media (max-width: 600px) {
     font-size: 0.7rem;
@@ -116,9 +140,6 @@
   }
 }
 
-.bg-primary-soft {
-  background: rgba(var(--q-primary), 0.1) !important;
-}
 </style>
 <script setup lang="ts">
 import { getPlatformColor, getPlatformName } from 'src/composables/gameSelection';

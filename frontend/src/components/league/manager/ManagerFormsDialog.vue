@@ -4,7 +4,7 @@
     @update:model-value="$emit('close')"
     persistent
   >
-    <div v-if="activeForm" style="min-width: 320px; max-width: 90vw">
+    <div v-if="activeForm" class="manager-dialog-container">
       <!-- Edit Game -->
       <FormLayout v-if="activeForm.type === 'edit'" @onClose="$emit('close')">
         <template #head>
@@ -102,3 +102,29 @@ defineProps<{
 
 defineEmits(['close', 'success']);
 </script>
+
+<style scoped lang="scss">
+.manager-dialog-container {
+  width: 100%;
+  background: #f8fafc;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.1);
+
+  // Stability for different screen sizes
+  @media (min-width: 0px) {
+    width: 95vw;
+    max-width: 95vw;
+  }
+
+  @media (min-width: 600px) {
+    width: 600px;
+    max-width: 90vw;
+  }
+
+  @media (min-width: 1024px) {
+    width: 1100px;
+    max-width: 90vw;
+  }
+}
+</style>

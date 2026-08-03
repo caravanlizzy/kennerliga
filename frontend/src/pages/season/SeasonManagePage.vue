@@ -51,7 +51,7 @@
       <template v-else>
         <!-- Season Info & Members -->
         <div class="season-summary q-mb-lg">
-          <div class="season-summary__header row items-center no-wrap q-gutter-x-sm q-px-md q-py-md">
+          <div class="season-summary__header row items-center q-gutter-sm q-px-md q-py-md">
             <div class="season-summary__icon">
               <q-icon name="groups" size="20px" />
             </div>

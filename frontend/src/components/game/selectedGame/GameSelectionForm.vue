@@ -1,118 +1,125 @@
 <template>
-  <q-card flat class="q-pa-sm modern-details-card">
+  <q-card flat class="modern-details-card">
     <q-inner-loading v-if="isLoading" :showing="isLoading" class="rounded-borders">
       <q-spinner-puff size="4em" color="primary" />
     </q-inner-loading>
 
     <template v-else>
+      <!-- Optional External Header Slot -->
+      <div v-if="$slots.header" class="q-pa-md border-bottom-subtle">
+        <slot name="header" />
+      </div>
+
       <!-- Header -->
-      <div class="column q-mb-md q-pa-md">
-        <!-- Platform info -->
-        <div class="row items-center q-gutter-x-sm q-mb-xs">
-          <q-badge
-            rounded
-            :color="getPlatformColor(getPlatformName(platforms, gameInformation.game.platform)).color"
-            style="width: 10px; height: 10px; padding: 0"
-          />
-          <span class="text-overline text-grey-7 font-weight-700 letter-spacing-1">
-            {{ getPlatformName(platforms, gameInformation.game.platform).split('.')[0] }}
-          </span>
+      <div class="q-pa-md">
+        <div class="column q-mb-md">
+          <!-- Platform info -->
+          <div class="row items-center q-gutter-x-sm q-mb-xs">
+            <q-badge
+              rounded
+              :color="getPlatformColor(getPlatformName(platforms, gameInformation.game.platform)).color"
+              style="width: 10px; height: 10px; padding: 0"
+            />
+            <span class="text-overline text-grey-7 font-weight-700 letter-spacing-1">
+              {{ getPlatformName(platforms, gameInformation.game.platform).split('.')[0] }}
+            </span>
+          </div>
+
+          <!-- Title and Button Row -->
+          <div class="row items-center justify-between no-wrap" :class="isMobile ? 'q-gutter-x-sm' : 'q-gutter-x-lg'">
+            <div
+              class="text-weight-bolder text-dark line-height-1 ellipsis"
+              :class="isMobile ? 'text-subtitle1' : 'text-h6'"
+            >
+              {{ gameInformation.game.name }}
+            </div>
+
+            <div class="flex-shrink-0">
+              <KennerButton
+                :size="isMobile ? 'sm' : 'md'"
+                :color="isValid ? 'primary' : 'grey-4'"
+                icon="check_circle"
+                :disable="!isValid"
+                @click="onSubmit"
+                class="shadow-premium save-btn"
+              >
+                {{ isMobile ? 'Confirm' : 'Confirm Selection' }}
+              </KennerButton>
+            </div>
+          </div>
         </div>
 
-        <!-- Title and Button Row -->
-        <div class="row items-center justify-between no-wrap" :class="isMobile ? 'q-gutter-x-sm' : 'q-gutter-x-lg'">
+        <q-separator class="q-mb-md opacity-10" />
+
+        <!-- No settings (use conditional visibility) -->
+        <div v-if="!visibleOptionsSafe.length" class="text-center q-pa-md bg-blue-grey-1 rounded-borders border-subtle">
+          <q-icon name="info" size="xs" color="grey-5" class="q-mb-xs" />
+          <div class="text-caption text-grey-7 font-weight-500">
+            No additional settings for this game.
+          </div>
+        </div>
+
+        <!-- Settings -->
+        <template v-else>
+          <div class="row items-center q-gutter-x-sm q-mb-md">
+            <q-icon name="settings" size="18px" class="text-selected" />
+            <div class="text-subtitle2 text-weight-bold text-uppercase letter-spacing-1 text-selected">Game Settings</div>
+          </div>
+
+          <!-- Choices -->
           <div
-            class="text-weight-bolder text-dark line-height-1"
-            :class="isMobile ? 'text-subtitle1' : 'text-h6'"
+            v-if="visibleOptionsSafe.some((o) => o.has_choices)"
+            class="q-mb-md"
           >
-            {{ gameInformation.game.name }}
-          </div>
-
-          <div class="flex-shrink-0">
-            <KennerButton
-              :size="isMobile ? 'sm' : 'md'"
-              color="primary"
-              icon="save"
-              :disable="!isValid"
-              @click="onSubmit"
-              class="shadow-4 save-btn"
-            >
-              {{ isMobile ? 'Confirm' : 'Confirm Selection' }}
-            </KennerButton>
-          </div>
-        </div>
-      </div>
-
-      <q-separator class="q-mb-md opacity-10" />
-
-      <!-- No settings (use conditional visibility) -->
-      <div v-if="!visibleOptionsSafe.length" class="text-center q-pa-md bg-blue-grey-1 rounded-borders border-subtle">
-        <q-icon name="info" size="xs" color="grey-5" class="q-mb-xs" />
-        <div class="text-caption text-grey-7 font-weight-500">
-          No additional settings for this game.
-        </div>
-      </div>
-
-      <!-- Settings -->
-      <template v-else>
-        <div class="row items-center q-gutter-x-sm q-mb-md">
-          <q-icon name="settings" size="18px" color="primary" />
-          <div class="text-subtitle2 text-weight-bold text-uppercase letter-spacing-1 text-primary">Game Settings</div>
-        </div>
-
-        <!-- Choices -->
-        <div
-          v-if="visibleOptionsSafe.some((o) => o.has_choices)"
-          class="q-mb-md"
-        >
-          <div class="row q-col-gutter-md">
-            <div
-              v-for="option in visibleOptionsSafe.filter((o) => o.has_choices)"
-              :key="option.id"
-              class="col-12 col-sm-6"
-            >
-              <KennerSelect
-                :options="option.choices || null"
-                :label="option.name"
-                option-label="name"
-                v-model="findSelectedOption(option.id).choice"
-                :rules="[(val) => !!val || `${option.name} is required`]"
-                class="full-width"
-              />
+            <div class="row q-col-gutter-md">
+              <div
+                v-for="option in visibleOptionsSafe.filter((o) => o.has_choices)"
+                :key="option.id"
+                class="col-12 col-sm-6"
+              >
+                <KennerSelect
+                  :options="option.choices || null"
+                  :label="option.name"
+                  option-label="name"
+                  v-model="findSelectedOption(option.id).choice"
+                  :rules="[(val) => !!val || `${option.name} is required`]"
+                  class="full-width"
+                />
+              </div>
             </div>
           </div>
-        </div>
 
-        <!-- Toggles -->
-        <div v-if="visibleOptionsSafe.some((o) => !o.has_choices)" class="bg-blue-grey-1 q-pa-md rounded-borders border-subtle">
-          <div class="text-caption text-weight-bold text-grey-7 text-uppercase q-mb-sm letter-spacing-1">Toggles</div>
-          <div class="row q-col-gutter-sm">
-            <div
-              v-for="option in visibleOptionsSafe.filter((o) => !o.has_choices)"
-              :key="option.id"
-              class="col-auto"
-            >
-              <q-toggle
-                v-model="findSelectedOption(option.id).value"
-                :label="option.name"
-                dense
-                color="primary"
-                class="font-weight-600"
-              />
+          <!-- Toggles -->
+          <div v-if="visibleOptionsSafe.some((o) => !o.has_choices)" class="bg-blue-grey-1 q-pa-md rounded-borders border-subtle">
+            <div class="text-caption text-weight-bold text-grey-7 text-uppercase q-mb-sm letter-spacing-1">Toggles</div>
+            <div class="row q-col-gutter-sm">
+              <div
+                v-for="option in visibleOptionsSafe.filter((o) => !o.has_choices)"
+                :key="option.id"
+                class="col-auto"
+              >
+                <q-toggle
+                  v-model="findSelectedOption(option.id).value"
+                  :label="option.name"
+                  dense
+                  color="primary"
+                  class="font-weight-600"
+                />
+              </div>
             </div>
           </div>
-        </div>
-      </template>
+        </template>
+      </div>
     </template>
   </q-card>
 </template>
 
 <style lang="scss" scoped>
 .modern-details-card {
-  border-radius: 16px;
+  border-radius: 24px;
   background: white;
-  border: 1px solid rgba(0, 0, 0, 0.08);
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03);
   position: relative;
   overflow: hidden;
 }
@@ -126,16 +133,26 @@
 }
 
 .save-btn {
-  transition: all 0.3s ease;
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   &:not(.q-btn--disabled) {
-    animation: pulse-btn 2s infinite;
+    animation: pulse-btn 2.5s infinite;
+    background: linear-gradient(135deg, $kenner-red 0%, darken($kenner-red, 10%) 100%) !important;
+    color: white !important;
   }
 }
 
+.shadow-premium {
+  box-shadow: 0 4px 14px 0 rgba($kenner-red, 0.39);
+}
+
 @keyframes pulse-btn {
-  0% { box-shadow: 0 0 0 0 rgba(54, 64, 88, 0.4); }
-  70% { box-shadow: 0 0 0 10px rgba(54, 64, 88, 0); }
-  100% { box-shadow: 0 0 0 0 rgba(54, 64, 88, 0); }
+  0% { box-shadow: 0 0 0 0 rgba($kenner-red, 0.5); }
+  70% { box-shadow: 0 0 0 12px rgba($kenner-red, 0); }
+  100% { box-shadow: 0 0 0 0 rgba($kenner-red, 0); }
+}
+
+.text-selected {
+  color: $kenner-red;
 }
 
 .font-weight-500 {
@@ -156,6 +173,10 @@
 
 .border-subtle {
   border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.border-bottom-subtle {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
 }
 </style>
 

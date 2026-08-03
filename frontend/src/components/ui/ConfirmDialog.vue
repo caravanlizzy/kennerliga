@@ -1,6 +1,6 @@
 <template>
   <q-dialog v-model="showDialog">
-    <q-card class="q-pa-sm">
+    <q-card class="q-pa-sm confirm-card">
       <!-- Header with color -->
       <q-card-section
         class="text-h6 text-white"
@@ -64,3 +64,12 @@ async function handleCancel() {
   }
 }
 </script>
+
+<style scoped lang="scss">
+.confirm-card {
+  min-width: 360px;
+  max-width: 95vw;
+  border-radius: 16px;
+  overflow: hidden;
+}
+</style>
