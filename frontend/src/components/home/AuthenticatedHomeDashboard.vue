@@ -12,6 +12,7 @@
           :season-month-options="seasonMonthOptions"
           :loading="loading"
           :refreshing="refreshing"
+          @select-current-season="homeSeasonStore.selectCurrentSeason"
         />
 
         <HomeLeaderboardSection

@@ -30,6 +30,17 @@
             :disable="loading && !selectedSeasonId"
           />
         </div>
+        <q-btn
+          v-if="currentSeasonId && selectedSeasonId !== currentSeasonId"
+          flat
+          round
+          dense
+          icon="today"
+          color="positive"
+          @click="homeSeasonStore.selectCurrentSeason"
+        >
+          <q-tooltip>Current Season</q-tooltip>
+        </q-btn>
         <q-icon name="military_tech" size="sm" color="primary" />
       </div>
     </div>
@@ -59,6 +70,7 @@ const {
   seasonYearOptions,
   seasonMonthOptions,
   selectedSeasonId,
+  currentSeasonId,
 } = storeToRefs(homeSeasonStore);
 
 onMounted(() => {

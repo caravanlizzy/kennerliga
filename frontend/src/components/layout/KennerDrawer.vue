@@ -32,6 +32,14 @@
         <template v-if="isAdmin">
           <q-separator class="q-my-sm drawer-separator" />
           <DrawerSubGroup>Management</DrawerSubGroup>
+          <DrawerItem
+            v-if="currentSeasonId"
+            icon="settings_applications"
+            icon-color="primary"
+            label="Current Season"
+            :forward-params="{ id: currentSeasonId }"
+            forward-name="season-manage"
+          />
           <DrawerItem icon="sports_esports" icon-color="primary" label="Games" forward-name="games" />
           <DrawerItem
             icon="mark_email_unread"
@@ -55,20 +63,31 @@
 import DrawerItem from 'components/base/DrawerItem.vue';
 import DrawerSubGroup from 'components/base/DrawerSubGroup.vue';
 import { useUserStore } from 'stores/userStore';
+import { useHomeSeasonStore } from 'stores/homeSeasonStore';
 import { storeToRefs } from 'pinia';
 import { useRouter } from 'vue-router';
-import { provide } from 'vue';
+import { provide, watch } from 'vue';
 import { useQuasar } from 'quasar';
 
 const drawerState = defineModel();
 
 const { logout } = useUserStore();
-const { isAdmin } = storeToRefs(useUserStore());
+const userStore = useUserStore();
+const { isAdmin } = storeToRefs(userStore);
+
+const homeSeasonStore = useHomeSeasonStore();
+const { currentSeasonId } = storeToRefs(homeSeasonStore);
 
 const router = useRouter();
 const $q = useQuasar();
 
 provide('closeDrawer', () => (drawerState.value = false));
+
+watch(isAdmin, (val) => {
+  if (val) {
+    void homeSeasonStore.init();
+  }
+}, { immediate: true });
 
 async function doLogout(): Promise<void> {
   await logout();

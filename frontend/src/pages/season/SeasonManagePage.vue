@@ -56,7 +56,7 @@
               <q-icon name="groups" size="20px" />
             </div>
             <div class="col">
-              <div class="text-subtitle1 text-weight-bolder season-summary__title">Participants</div>
+              <div class="text-subtitle1 text-weight-bolder season-summary__title">Players</div>
               <div class="text-caption text-grey-6">Overview for this season</div>
             </div>
             <div class="row items-center q-gutter-x-xs">
@@ -66,7 +66,7 @@
               </div>
               <div class="stat-pill">
                 <q-icon name="person" size="14px" class="q-mr-xs" />
-                <span>{{ participants.length }} participants</span>
+                <span>{{ participants.length }} players</span>
               </div>
               <div
                 v-if="seasonStatusLabel"
@@ -80,19 +80,46 @@
 
           <div class="season-summary__divider" />
 
-          <div class="q-px-md q-pt-sm q-pb-md">
-            <div v-if="participants.length > 0" class="row q-col-gutter-xs">
-              <div
-                v-for="p in participants"
-                :key="p.id"
-                class="member-chip q-mr-xs q-mb-xs"
-              >
-                <q-icon name="person" size="14px" class="q-mr-xs" />
-                <span>{{ p.profile_name }}</span>
+          <q-expansion-item
+            label="Show participants"
+            header-class="text-grey-7"
+            dense
+            expand-icon-class="text-grey-7"
+          >
+            <div class="q-px-md q-pt-sm q-pb-md">
+              <div v-if="participants.length > 0">
+                <div
+                  v-for="group in participantsByLeague"
+                  :key="group.league?.id || 'unassigned'"
+                  class="q-mb-md"
+                >
+                  <div class="row items-center q-gutter-x-sm q-mb-xs">
+                    <template v-if="group.league">
+                      <LeagueLevel :level="group.league.level" size="20px" font-size="10px" />
+                      <span class="text-caption text-weight-bold">League {{ group.league.level }}</span>
+                    </template>
+                    <template v-else>
+                      <q-icon name="help_outline" size="16px" color="grey-6" />
+                      <span class="text-caption text-weight-bold text-grey-6">Unassigned</span>
+                    </template>
+                    <div class="text-caption text-grey-6">({{ group.members.length }})</div>
+                  </div>
+                  <div v-if="group.members.length > 0" class="column q-gutter-y-xs q-pl-md q-mt-xs">
+                    <div
+                      v-for="p in group.members"
+                      :key="p.id"
+                      class="row items-center q-gutter-x-sm"
+                    >
+                      <div class="player-dot" />
+                      <span class="text-caption text-grey-8">{{ p.profile_name }}</span>
+                    </div>
+                  </div>
+                  <div v-else class="text-caption text-grey-5 italic q-ml-md">No players</div>
+                </div>
               </div>
+              <div v-else class="text-caption text-grey-6 italic">No registered players for this season.</div>
             </div>
-            <div v-else class="text-caption text-grey-6 italic">No registered users for this season.</div>
-          </div>
+          </q-expansion-item>
         </div>
 
         <!-- Leagues Grid -->
@@ -125,6 +152,7 @@ import { computed, onMounted, ref } from 'vue';
 import { useRoute } from 'vue-router';
 import { fetchLeaguesBySeason, fetchSeason, fetchSeasonParticipants, startSeason } from 'src/services/seasonService';
 import LeagueList from 'components/season/LeagueList.vue';
+import LeagueLevel from 'components/season/LeagueLevel.vue';
 import KennerButton from 'components/base/KennerButton.vue';
 import KennerTooltip from 'components/base/KennerTooltip.vue';
 import ContentSection from 'components/base/ContentSection.vue';
@@ -146,6 +174,31 @@ const participants = ref<TSeasonParticipantDto[]>([]);
 const loading = ref(true);
 const starting = ref(false);
 const error = ref<string | null>(null);
+
+const participantsByLeague = computed(() => {
+  const groups: { league: TLeagueDto | null; members: TSeasonParticipantDto[] }[] = [];
+
+  const sortedLeagues = [...leagues.value].sort((a, b) => {
+    const levelA = typeof a.level === 'string' ? parseInt(a.level) : a.level;
+    const levelB = typeof b.level === 'string' ? parseInt(b.level) : b.level;
+    return levelA - levelB;
+  });
+
+  const assignedParticipantIds = new Set<number>();
+
+  sortedLeagues.forEach((l) => {
+    const members = l.members || [];
+    members.forEach((m) => assignedParticipantIds.add(m.id));
+    groups.push({ league: l, members });
+  });
+
+  const unassigned = participants.value.filter((p) => !assignedParticipantIds.has(p.id));
+  if (unassigned.length > 0) {
+    groups.push({ league: null, members: unassigned });
+  }
+
+  return groups;
+});
 
 const statusColor = computed(() => {
   if (isSeasonCompleted.value) return 'grey-7';
@@ -288,23 +341,12 @@ onMounted(load);
   border-color: rgba(54, 64, 88, 0.12);
 }
 
-.member-chip {
-  display: inline-flex;
-  align-items: center;
-  padding: 5px 12px;
-  border-radius: 999px;
-  background: rgba(54, 64, 88, 0.05);
-  border: 1px solid rgba(54, 64, 88, 0.06);
-  color: #334155;
-  font-size: 13px;
-  font-weight: 500;
-  transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
-
-  &:hover {
-    background: rgba(54, 64, 88, 0.1);
-    border-color: rgba(54, 64, 88, 0.12);
-    transform: translateY(-1px);
-  }
+.player-dot {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--q-primary);
+  opacity: 0.6;
 }
 
 </style>

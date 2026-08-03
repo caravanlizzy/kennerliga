@@ -246,6 +246,22 @@ export const useHomeSeasonStore = defineStore('homeSeason', () => {
     refreshPromise = null;
   }
 
+  async function selectCurrentSeason(): Promise<void> {
+    if (currentSeasonId.value == null) {
+      // If not yet fetched, try to fetch it
+      const fetched = await fetchCurrentSeasonId();
+      currentSeasonId.value = fetched;
+    }
+
+    if (currentSeasonId.value != null) {
+      const season = await fetchSeason(currentSeasonId.value);
+      if (season) {
+        selectedSeasonYear.value = season.year;
+        selectedSeasonMonth.value = season.month;
+      }
+    }
+  }
+
   return {
     // state
     selectedYear,
@@ -268,6 +284,7 @@ export const useHomeSeasonStore = defineStore('homeSeason', () => {
     init,
     refreshInBackground,
     reset,
+    selectCurrentSeason,
   };
 }, {
   persist: {

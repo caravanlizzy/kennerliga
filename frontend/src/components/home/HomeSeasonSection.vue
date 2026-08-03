@@ -46,6 +46,18 @@
           />
         </div>
         <KennerButton
+          v-if="currentSeasonId && !isLiveSeason && !loading"
+          outline
+          color="positive"
+          icon="today"
+          :label="isMobile ? '' : 'Current'"
+          :round="isMobile"
+          class="q-ml-md"
+          @click="$emit('selectCurrentSeason')"
+        >
+          <KennerTooltip>Jump to current season</KennerTooltip>
+        </KennerButton>
+        <KennerButton
           v-if="selectedSeasonId && !loading"
           outline
           color="primary"
@@ -107,6 +119,7 @@ const props = defineProps<{
 defineEmits<{
   (e: 'update:selectedSeasonYear', value: number | null): void;
   (e: 'update:selectedSeasonMonth', value: number | null): void;
+  (e: 'selectCurrentSeason'): void;
 }>();
 
 const { isMobile } = useResponsive();

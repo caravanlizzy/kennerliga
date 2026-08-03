@@ -1,6 +1,6 @@
 <template>
   <q-item
-    :to="forwardName ? { name: forwardName } : undefined"
+    :to="forwardName ? { name: forwardName, params: forwardParams } : undefined"
     @click="handleClick"
     clickable
     dense
@@ -31,6 +31,7 @@ type TKennerItem = {
   iconColor?: string;
   label: string;
   forwardName?: string;
+  forwardParams?: Record<string, any>;
   active?: boolean;
 }
 defineProps<TKennerItem>();
