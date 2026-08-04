@@ -4,9 +4,9 @@
     title="Game Selection"
     color="primary"
     icon="ads_click"
+    v-bind="$attrs"
     v-model:is-opened="isOpened"
     expandable
-    bordered
     class="league-section"
   >
     <GameSelectionView
@@ -113,7 +113,4 @@ watch(
 </script>
 
 <style scoped lang="scss">
-.league-section {
-  margin-bottom: 20px;
-}
 </style>

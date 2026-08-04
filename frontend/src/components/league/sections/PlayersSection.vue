@@ -3,9 +3,9 @@
     title="Games - Picks and Bans"
     color="secondary"
     icon="groups"
+    v-bind="$attrs"
     v-model:is-opened="isOpened"
     expandable
-    bordered
     class="league-section"
   >
     <PlayerCard :all-members="members" />
@@ -25,7 +25,4 @@ const isOpened = ref(true);
 </script>
 
 <style scoped lang="scss">
-.league-section {
-  margin-bottom: 20px;
-}
 </style>

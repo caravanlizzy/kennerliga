@@ -4,9 +4,9 @@
     title="Results"
     color="warning"
     icon="emoji_events"
+    v-bind="$attrs"
     v-model:is-opened="isOpened"
     expandable
-    bordered
     class="league-section"
   >
     <div
@@ -54,10 +54,6 @@ watchEffect(() => {
 </script>
 
 <style scoped lang="scss">
-.league-section {
-  margin-bottom: 20px;
-}
-
 .result-card {
   border-radius: var(--kenner-card-radius, 16px);
   border: 1px solid var(--kenner-border-color);

@@ -1,10 +1,11 @@
 <template>
   <div
     :id="sectionId"
-    class="q-mt-xl content-section-container relative-position"
+    class="content-section-container relative-position"
     :class="[
       `indicator-${color}`,
-      isMobile ? 'q-pa-md no-border-radius-mobile' : 'q-pa-lg'
+      isMobile ? 'q-pa-md no-border-radius-mobile' : 'q-pa-lg',
+      { 'q-mt-xl': !noMargin, 'content-section--flat': flat }
     ]"
   >
     <div
@@ -76,11 +77,15 @@
       icon?: string;
       titleEnd?: boolean;
       expandable?: boolean;
+      flat?: boolean;
+      noMargin?: boolean;
     }>(),
     {
       titleEnd: false,
       expandable: false,
-      icon: 'article'
+      icon: 'article',
+      flat: false,
+      noMargin: false
     }
   );
 
@@ -110,6 +115,30 @@
   border: 1px solid var(--kenner-border-color);
   box-shadow: var(--kenner-card-shadow);
   overflow: hidden;
+
+  &.content-section--flat {
+    border: none !important;
+    box-shadow: none !important;
+    background: transparent !important;
+    border-radius: 0 !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    padding-top: 20px !important;
+    padding-bottom: 20px !important;
+
+    @media (max-width: 599px) {
+      padding-top: 16px !important;
+      padding-bottom: 16px !important;
+    }
+
+    &::before {
+      display: none;
+    }
+
+    .section-header {
+      padding-top: 0;
+    }
+  }
 
   // Sharp accent top stripe
   &::before {

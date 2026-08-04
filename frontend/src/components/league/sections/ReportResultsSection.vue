@@ -4,9 +4,9 @@
     title="Report Results"
     color="accent"
     icon="publish"
+    v-bind="$attrs"
     v-model:is-opened="isOpened"
     expandable
-    bordered
     class="league-section"
   >
     <MatchResultTabs />
@@ -39,7 +39,4 @@ watch(
 </script>
 
 <style scoped lang="scss">
-.league-section {
-  margin-bottom: 20px;
-}
 </style>

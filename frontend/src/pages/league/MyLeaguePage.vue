@@ -21,18 +21,76 @@
     </div>
 
     <div v-else class="q-py-md relative-position league-page">
-      <LeagueStandingsSection />
-      <GameSelectionSection />
-      <BanGameSection />
-      <ResultsSection />
-      <ReportResultsSection />
-      <PlayersSection />
+      <div class="row q-col-gutter-lg">
+        <!-- Sticky Sidebar Navigation -->
+        <div class="col-12 col-md-3 gt-sm">
+          <div class="sticky-column">
+            <div class="text-h6 text-weight-bold q-mb-md q-px-md text-dark">
+              My League
+            </div>
+            <q-list padding class="navigation-list">
+              <q-item
+                v-for="section in navSections"
+                :key="section.id"
+                clickable
+                v-ripple
+                :active="activeSection === section.id"
+                @click="scrollTo(section.id)"
+                class="nav-item q-mb-sm"
+                active-class="nav-item--active"
+              >
+                <q-item-section avatar>
+                  <q-icon 
+                    :name="section.icon" 
+                    :color="activeSection === section.id ? section.color : 'grey-7'"
+                    size="22px"
+                  />
+                </q-item-section>
+                <q-item-section>
+                  <q-item-label 
+                    class="text-weight-medium"
+                    :class="activeSection === section.id ? `text-${section.color}` : 'text-grey-7'"
+                  >
+                    {{ section.title }}
+                  </q-item-label>
+                </q-item-section>
+              </q-item>
+            </q-list>
+          </div>
+        </div>
+
+        <!-- Unified Content Area -->
+        <div class="col-12 col-md-9">
+          <BanGameSection />
+          <div class="unified-content-container">
+            <LeagueStandingsSection flat no-margin />
+            <div class="section-divider" />
+            
+            <GameSelectionSection flat no-margin />
+            
+            <div 
+              v-if="leagueStatus === 'PLAYING' || leagueStatus === 'DONE'" 
+              class="section-divider" 
+            />
+            <ResultsSection flat no-margin />
+            
+            <div 
+              v-if="leagueStatus === 'PLAYING'" 
+              class="section-divider" 
+            />
+            <ReportResultsSection flat no-margin />
+            
+            <div class="section-divider" />
+            <PlayersSection flat no-margin />
+          </div>
+        </div>
+      </div>
     </div>
   </q-page>
 </template>
 
 <script setup lang="ts">
-import { onMounted, onUnmounted } from 'vue';
+import { onMounted, onUnmounted, ref, watch } from 'vue';
 import { storeToRefs } from 'pinia';
 import LoadingSpinner from 'components/base/LoadingSpinner.vue';
 import LeagueStandingsSection from 'components/league/sections/LeagueStandingsSection.vue';
@@ -44,13 +102,58 @@ import PlayersSection from 'components/league/sections/PlayersSection.vue';
 import { useUserStore } from 'stores/userStore';
 import { useUpdateStore } from 'stores/updateStore';
 import { useMyLeagueStore } from 'src/composables/myLeague';
+import { useUiStore } from 'src/stores/uiStore';
+import { scroll } from 'quasar';
+const { getScrollTarget, setVerticalScrollPosition } = scroll;
+
+import { useResponsive } from 'src/composables/responsive';
 
 const { user } = storeToRefs(useUserStore());
 const myLeagueStore = useMyLeagueStore();
-const { loading } = storeToRefs(myLeagueStore);
+const { loading, leagueStatus } = storeToRefs(myLeagueStore);
+const uiStore = useUiStore();
+const { navSections } = storeToRefs(uiStore);
+const { isMobile } = useResponsive();
 
 const updateStore = useUpdateStore();
 let unsubscribe: () => void;
+
+const activeSection = ref('');
+
+function scrollTo(id: string) {
+  const el = document.getElementById(id);
+  if (el) {
+    const target = getScrollTarget(el);
+    const offset = el.offsetTop - 20;
+    setVerticalScrollPosition(target, offset, 300);
+    activeSection.value = id;
+  }
+}
+
+const observer = ref<IntersectionObserver | null>(null);
+
+watch(navSections, (newSections) => {
+  if (observer.value) {
+    observer.value.disconnect();
+  }
+
+  observer.value = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      if (entry.isIntersecting) {
+        activeSection.value = entry.target.id;
+      }
+    });
+  }, { threshold: 0.2, rootMargin: '-100px 0px -50% 0px' });
+
+  newSections.forEach((section) => {
+    const el = document.getElementById(section.id);
+    if (el) observer.value?.observe(el);
+  });
+
+  if (!activeSection.value && newSections.length > 0) {
+    activeSection.value = newSections[0].id;
+  }
+}, { deep: true, immediate: true });
 
 onMounted(async () => {
   await myLeagueStore.init();
@@ -64,11 +167,77 @@ onUnmounted(() => {
   if (unsubscribe) {
     unsubscribe();
   }
+  if (observer.value) {
+    observer.value.disconnect();
+  }
 });
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .league-page {
   /* Layout container for league sections. */
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.sticky-column {
+  position: sticky;
+  top: 100px;
+}
+
+.navigation-list {
+  background: rgba(255, 255, 255, 0.5);
+  border-radius: var(--kenner-card-radius);
+  border: 1px solid var(--kenner-border-color);
+  padding: 8px;
+}
+
+.nav-item {
+  border-radius: 12px;
+  transition: all 0.3s ease;
+  color: var(--q-grey-7);
+
+  &:hover {
+    background: rgba(0, 0, 0, 0.03);
+  }
+
+  &--active {
+    background: white;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    font-weight: 700;
+  }
+}
+
+.unified-content-container {
+  background: white;
+  border-radius: var(--kenner-card-radius);
+  border: 1px solid var(--kenner-border-color);
+  box-shadow: var(--kenner-card-shadow);
+  overflow: hidden;
+  padding: 0 24px 24px 24px;
+
+  @media (max-width: 599px) {
+    padding: 0 16px 16px 16px;
+    border-radius: 12px;
+  }
+
+  & > .section-divider:first-child,
+  & > .section-divider:last-child {
+    display: none;
+  }
+
+  & > .section-divider + .section-divider {
+    display: none;
+  }
+}
+
+.section-divider {
+  height: 1px;
+  background: rgba(0, 0, 0, 0.05);
+  margin: 0 -24px;
+
+  @media (max-width: 599px) {
+    margin: 0 -16px;
+  }
 }
 </style>

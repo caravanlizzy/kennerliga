@@ -3,7 +3,7 @@
     title="League Standings"
     color="info"
     icon="leaderboard"
-    bordered
+    v-bind="$attrs"
     expandable
     v-model:is-opened="isOpened"
     class="league-section"
@@ -29,7 +29,4 @@ watchEffect(() => {
 </script>
 
 <style scoped lang="scss">
-.league-section {
-  margin-bottom: 20px;
-}
 </style>
