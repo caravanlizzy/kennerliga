@@ -149,6 +149,7 @@ const columns = computed<QTableProps['columns']>(() => ([
   {
     name: 'actions',
     label: 'Actions',
+    field: 'id',
     align: 'right',
     headerStyle: 'white-space: nowrap',
   },
