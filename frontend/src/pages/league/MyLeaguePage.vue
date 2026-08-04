@@ -214,11 +214,26 @@ onUnmounted(() => {
   border: 1px solid var(--kenner-border-color);
   box-shadow: var(--kenner-card-shadow);
   overflow: hidden;
-  padding: 0 24px 24px 24px;
+  padding: 0 24px;
 
   @media (max-width: 599px) {
-    padding: 0 16px 16px 16px;
+    padding: 0 16px;
     border-radius: 12px;
+  }
+
+  /* Make sure the first and last section feel integrated */
+  & > :first-child :deep(.content-section-container) {
+    padding-top: 24px !important;
+    @media (max-width: 599px) {
+      padding-top: 20px !important;
+    }
+  }
+
+  & > :last-child :deep(.content-section-container) {
+    padding-bottom: 32px !important;
+    @media (max-width: 599px) {
+      padding-bottom: 24px !important;
+    }
   }
 
   & > .section-divider:first-child,
@@ -235,6 +250,7 @@ onUnmounted(() => {
   height: 1px;
   background: rgba(0, 0, 0, 0.05);
   margin: 0 -24px;
+  opacity: 0.6;
 
   @media (max-width: 599px) {
     margin: 0 -16px;

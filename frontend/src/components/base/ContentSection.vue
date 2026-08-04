@@ -117,19 +117,19 @@
   overflow: hidden;
 
   &.content-section--flat {
-    border: none !important;
-    box-shadow: none !important;
-    background: transparent !important;
-    border-radius: 0 !important;
-    padding-left: 0 !important;
-    padding-right: 0 !important;
-    padding-top: 20px !important;
-    padding-bottom: 20px !important;
-
-    @media (max-width: 599px) {
-      padding-top: 16px !important;
-      padding-bottom: 16px !important;
-    }
+      border: none !important;
+      box-shadow: none !important;
+      background: transparent !important;
+      border-radius: 0 !important;
+      padding-left: 0 !important;
+      padding-right: 0 !important;
+      padding-top: 32px !important;
+      padding-bottom: 32px !important;
+  
+      @media (max-width: 599px) {
+        padding-top: 24px !important;
+        padding-bottom: 24px !important;
+      }
 
     &::before {
       display: none;

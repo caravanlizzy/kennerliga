@@ -2,14 +2,17 @@
   <div v-if="show" class="kenner-title-bar-wrapper">
     <div class="kenner-title-bar-container">
       <div
-        class="kenner-title-bar-content items-center"
-        :class="isMobile ? 'column q-py-sm q-gutter-y-sm no-border-radius-mobile' : 'row no-wrap'"
+        class="kenner-title-bar-content"
+        :class="[
+          isMobile ? 'column items-start q-py-md q-gutter-y-sm' : 'row no-wrap items-center',
+          { 'no-border-radius-mobile': isMobile }
+        ]"
       >
-        <!-- Left Section: Breadcrumbs -->
+        <!-- Left Section: Breadcrumbs and Title -->
         <slot name="left">
           <div
             class="row items-center no-wrap q-gutter-x-sm left-section"
-            :class="{ 'full-width justify-center': isMobile }"
+            :class="{ 'full-width': isMobile }"
           >
             <KennerButton
               flat
@@ -21,16 +24,29 @@
             >
               <KennerTooltip>Back</KennerTooltip>
             </KennerButton>
-            <q-breadcrumbs gutter="sm" class="text-grey-7 text-weight-medium overflow-hidden">
-              <q-breadcrumbs-el icon="home" to="/" />
-              <q-breadcrumbs-el
-                v-for="crumb in crumbs"
-                :key="crumb.path"
-                :label="crumb.label"
-                :icon="crumb.icon"
-                :to="crumb.path"
-              />
-            </q-breadcrumbs>
+            
+            <div class="column justify-center q-ml-xs">
+              <div 
+                v-if="pageTitle" 
+                class="text-weight-bolder text-dark line-height-1"
+                :class="isMobile ? 'text-subtitle1' : 'text-h6'"
+              >
+                {{ pageTitle }}
+              </div>
+              <q-breadcrumbs 
+                gutter="xs" 
+                class="text-grey-6 text-weight-medium overflow-hidden breadcrumbs-small"
+              >
+                <q-breadcrumbs-el icon="home" to="/" />
+                <q-breadcrumbs-el
+                  v-for="crumb in crumbs"
+                  :key="crumb.path"
+                  :label="crumb.label"
+                  :icon="crumb.icon"
+                  :to="crumb.path"
+                />
+              </q-breadcrumbs>
+            </div>
           </div>
         </slot>
 
@@ -69,6 +85,8 @@ const show = computed(() => {
   return true;
 });
 
+const pageTitle = computed(() => route.meta.label as string | undefined);
+
 const crumbs = computed(() => {
   const result: { label: string; icon?: string; path: string }[] = [];
 
@@ -103,7 +121,12 @@ const crumbs = computed(() => {
 <style scoped lang="scss">
 .kenner-title-bar-wrapper {
   padding-top: 12px;
-  margin-bottom: 8px;
+  margin-bottom: 12px;
+  
+  @media (max-width: 599px) {
+    padding-top: 0;
+    margin-bottom: 4px;
+  }
 }
 
 .kenner-title-bar-container {
@@ -113,12 +136,30 @@ const crumbs = computed(() => {
 }
 
 .kenner-title-bar-content {
-  background: var(--kenner-bg-glass, rgba(255, 255, 255, 0.95));
+  background: white;
   border: 1px solid var(--kenner-border-color);
-  border-radius: var(--kenner-card-radius, 0px);
-  padding: 6px 16px;
+  border-radius: var(--kenner-card-radius, 16px);
+  padding: 8px 16px;
   display: flex;
-  min-height: 48px;
+  min-height: 56px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
+  
+  @media (max-width: 599px) {
+    min-height: 52px;
+    border-left: none;
+    border-right: none;
+    border-top: none;
+    background: white;
+    box-shadow: none;
+  }
+}
+
+.line-height-1 {
+  line-height: 1.2;
+}
+
+.breadcrumbs-small {
+  font-size: 11px;
 }
 
 ::deep(.q-breadcrumbs__el) {
@@ -126,7 +167,7 @@ const crumbs = computed(() => {
 }
 
 ::deep(.q-breadcrumbs__el-icon) {
-  font-size: 18px;
+  font-size: 14px;
 }
 
 .left-section {
