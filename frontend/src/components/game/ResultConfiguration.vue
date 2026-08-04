@@ -1,115 +1,128 @@
 <template>
-  <div class="q-pa-lg">
-    <div class="text-h5 text-weight-bold text-dark q-mb-lg row items-center">
-      <q-icon name="analytics" color="primary" class="q-mr-sm" />
-      Result Configuration
-    </div>
+  <div>
+    <q-list separator padding>
+      <q-item>
+        <q-item-section>
+          <q-item-label class="text-weight-bold text-subtitle1">Points Scoring</q-item-label>
+          <q-item-label caption>Is victory point tracking enabled?</q-item-label>
+        </q-item-section>
+        <q-item-section side>
+          <q-badge :color="hasPoints ? 'positive' : 'grey-7'" class="q-px-sm">
+            <YesNoItem :yes="hasPoints" />
+          </q-badge>
+        </q-item-section>
+      </q-item>
 
-    <div class="column q-gutter-y-md">
-      <div class="row items-center justify-between bg-grey-1 q-pa-md rounded-borders shadow-1">
-        <div>
-          <div class="text-subtitle1 text-weight-bold">Points Scoring</div>
-          <div class="text-caption text-grey-7">Is victory point tracking enabled?</div>
-        </div>
-        <YesNoItem :yes="hasPoints" />
-      </div>
-
-      <div class="row items-center justify-between bg-grey-1 q-pa-md rounded-borders shadow-1">
-        <div>
-          <div class="text-subtitle1 text-weight-bold">Starting Point System</div>
-          <div class="text-caption text-grey-7">{{ startingPointSystemDescription }}</div>
-        </div>
-        <div class="text-right">
-          <q-badge color="primary" label-class="text-weight-bold" class="q-px-sm q-py-xs">
+      <q-item>
+        <q-item-section>
+          <q-item-label class="text-weight-bold text-subtitle1">Starting Point System</q-item-label>
+          <q-item-label caption>{{ startingPointSystemDescription }}</q-item-label>
+        </q-item-section>
+        <q-item-section side>
+          <q-badge color="primary" class="q-px-sm">
             {{ startingPointSystemCode }}
           </q-badge>
-        </div>
-      </div>
+        </q-item-section>
+      </q-item>
 
-      <div class="row items-center justify-between bg-grey-1 q-pa-md rounded-borders shadow-1">
-        <div>
-          <div class="text-subtitle1 text-weight-bold">Starting Order</div>
-          <div class="text-caption text-grey-7">Does the game track player turn order?</div>
-        </div>
-        <YesNoItem :yes="hasStartingPlayerOrder" />
-      </div>
+      <q-item>
+        <q-item-section>
+          <q-item-label class="text-weight-bold text-subtitle1">Starting Order</q-item-label>
+          <q-item-label caption>Does the game track player turn order?</q-item-label>
+        </q-item-section>
+        <q-item-section side>
+          <q-badge :color="hasStartingPlayerOrder ? 'positive' : 'grey-7'" class="q-px-sm">
+            <YesNoItem :yes="hasStartingPlayerOrder" />
+          </q-badge>
+        </q-item-section>
+      </q-item>
 
-      <div class="row items-center justify-between bg-grey-1 q-pa-md rounded-borders shadow-1">
-        <div>
-          <div class="text-subtitle1 text-weight-bold">Asymmetric Play</div>
-          <div class="text-caption text-grey-7">Are there unique factions or powers?</div>
-        </div>
-        <YesNoItem :yes="isAsymmetric" />
-      </div>
+      <q-item>
+        <q-item-section>
+          <q-item-label class="text-weight-bold text-subtitle1">Asymmetric Play</q-item-label>
+          <q-item-label caption>Are there unique factions or powers?</q-item-label>
+        </q-item-section>
+        <q-item-section side>
+          <q-badge :color="isAsymmetric ? 'secondary' : 'grey-7'" class="q-px-sm">
+            <YesNoItem :yes="isAsymmetric" />
+          </q-badge>
+        </q-item-section>
+      </q-item>
 
-      <div v-if="isAsymmetric" class="q-pa-md bg-white border-light rounded-borders">
-        <div class="text-subtitle2 text-grey-8 q-mb-sm border-bottom q-pb-xs">Factions</div>
-        <div class="row q-col-gutter-sm">
+      <div v-if="isAsymmetric" class="q-mx-md q-my-sm q-pa-md bg-grey-1 rounded-borders border-light">
+        <div class="text-caption text-weight-bold text-grey-9 q-mb-sm uppercase-label" style="font-size: 0.65rem">Factions</div>
+        <div class="row q-col-gutter-md">
           <div v-for="faction in sortedFactions" :key="faction.id" class="col-auto">
-            <q-chip dense outline color="primary" icon="groups">{{ faction.name }}</q-chip>
+            <div class="row items-center q-gutter-x-xs">
+              <q-icon name="groups" color="primary" size="xs" />
+              <div class="text-body2 text-grey-9 text-weight-medium">{{ faction.name }}</div>
+            </div>
           </div>
         </div>
       </div>
 
-      <div class="q-pa-md bg-grey-1 rounded-borders shadow-1">
-        <div class="row items-center justify-between q-mb-sm">
-          <div class="text-subtitle1 text-weight-bold">Win Conditions</div>
-          <q-icon name="emoji_events" color="grey-6" />
+      <div class="q-mt-lg">
+        <div class="q-px-md q-pb-md text-weight-bold text-subtitle1 row items-center uppercase-label text-grey-9">
+          Win Conditions
+          <q-icon name="emoji_events" color="warning" class="q-ml-sm" />
         </div>
+
         <div v-if="sortedWinConditions.length">
-          <div
-            v-for="(wc, wcIndex) in sortedWinConditions"
-            :key="wc.id"
-            class="q-mb-md q-pa-sm bg-white rounded-borders shadow-1"
-          >
-            <div class="row items-center q-mb-xs">
-              <q-avatar size="24px" color="primary" text-color="white" class="q-mr-sm text-caption">
-                {{ wcIndex + 1 }}
-              </q-avatar>
-              <div class="text-body2 text-weight-bold">{{ wc.name }}</div>
-              <q-chip
-                dense
-                outline
-                size="sm"
-                class="q-ml-sm"
-                :color="wc.condition_type === 'POINTS' ? 'primary' : 'secondary'"
-              >
-                {{ wc.condition_type === 'POINTS' ? 'Points' : 'Option' }}
-              </q-chip>
-            </div>
-
-            <div v-if="wc.condition_type === 'OPTION' && wc.options?.length" class="q-mt-sm q-pl-md">
-              <div class="text-caption text-grey-7 q-mb-xs">Options</div>
-              <div class="row q-col-gutter-xs">
-                <div v-for="opt in [...wc.options].sort((a, b) => (a.order ?? 0) - (b.order ?? 0))" :key="opt.id" class="col-auto">
-                  <q-chip dense outline color="secondary" size="sm">{{ opt.name }}</q-chip>
-                </div>
-              </div>
-            </div>
-
-            <div v-if="wc.tie_breakers?.length" class="q-mt-sm q-pl-md">
-              <div class="text-caption text-grey-7 q-mb-xs">Tie-breakers</div>
-              <div
-                v-for="(tb, tbIndex) in [...wc.tie_breakers].sort((a, b) => (b.order ?? 0) - (a.order ?? 0))"
-                :key="tb.id"
-                class="row items-center q-mb-xs"
-              >
-                <q-avatar size="18px" color="secondary" text-color="white" class="q-mr-sm text-caption">
-                  {{ tbIndex + 1 }}
+          <q-list separator class="bg-white">
+            <q-item
+              v-for="(wc, wcIndex) in sortedWinConditions"
+              :key="wc.id"
+              class="q-py-md"
+            >
+              <q-item-section avatar>
+                <q-avatar size="24px" color="primary" text-color="white">
+                  {{ wcIndex + 1 }}
                 </q-avatar>
-                <div class="text-caption">
-                  {{ tb.name }}
-                  <span class="text-grey-6">({{ tb.higher_wins ? 'higher wins' : 'lower wins' }})</span>
+              </q-item-section>
+              <q-item-section>
+                <q-item-label class="text-weight-bold text-body1 text-grey-9">{{ wc.name }}</q-item-label>
+                <q-item-label v-if="wc.condition_type === 'OPTION' && wc.options?.length" caption>
+                  <div class="row q-col-gutter-md q-mt-xs">
+                    <div v-for="opt in [...wc.options].sort((a, b) => (a.order ?? 0) - (b.order ?? 0))" :key="opt.id" class="col-auto">
+                      <div class="row items-center q-gutter-x-xs">
+                        <q-icon name="radio_button_checked" color="secondary" size="xs" />
+                        <div class="text-body2 text-grey-9">{{ opt.name }}</div>
+                      </div>
+                    </div>
+                  </div>
+                </q-item-label>
+
+                <div v-if="wc.tie_breakers?.length" class="q-mt-sm">
+                  <div class="text-caption text-weight-bold text-grey-9 q-mb-xs uppercase-label" style="font-size: 0.65rem">Tie-breakers</div>
+                  <div
+                    v-for="tb in [...wc.tie_breakers].sort((a, b) => (b.order ?? 0) - (a.order ?? 0))"
+                    :key="tb.id"
+                    class="row items-center q-mb-xs"
+                  >
+                    <q-icon name="subdirectory_arrow_right" color="grey-6" size="xs" class="q-mr-xs" />
+                    <div class="text-caption">
+                      <span class="text-weight-medium text-grey-9">{{ tb.name }}</span>
+                      <span class="text-grey-6 q-ml-xs">({{ tb.higher_wins ? 'higher wins' : 'lower wins' }})</span>
+                    </div>
+                  </div>
                 </div>
-              </div>
-            </div>
-          </div>
+              </q-item-section>
+              <q-item-section side>
+                <q-badge
+                  outline
+                  :color="wc.condition_type === 'POINTS' ? 'primary' : 'secondary'"
+                >
+                  {{ wc.condition_type === 'POINTS' ? 'Points' : 'Option' }}
+                </q-badge>
+              </q-item-section>
+            </q-item>
+          </q-list>
         </div>
-        <div v-else class="text-caption text-grey-6 italic">
+        <div v-else class="q-px-md q-pb-md text-caption text-grey-6 italic">
           No win conditions defined.
         </div>
       </div>
-    </div>
+    </q-list>
   </div>
 </template>
 
@@ -144,3 +157,13 @@ const sortedFactions = computed(() => {
   return [...props.factions].sort((a, b) => (a.level ?? 0) - (b.level ?? 0));
 });
 </script>
+
+<style scoped>
+.border-light {
+  border: 1px solid #e0e0e0;
+}
+.uppercase-label {
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+</style>

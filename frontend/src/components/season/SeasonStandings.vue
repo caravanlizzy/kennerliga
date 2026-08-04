@@ -60,16 +60,10 @@ import LeagueStandingsMatrix from 'components/league/LeagueStandingsMatrix.vue';
 import LoadingSpinner from 'components/base/LoadingSpinner.vue';
 import { api } from 'boot/axios';
 import KennerButton from 'components/base/KennerButton.vue';
-import KennerTooltip from 'components/base/KennerTooltip.vue';
-import { useResponsive } from 'src/composables/responsive';
-import { leagueColors } from 'src/composables/leagueColors';
 import { useCachedResource } from 'src/composables/cachedResource';
-import LeagueLevel from 'components/season/LeagueLevel.vue';
 
 import { useLeagueStore } from 'stores/leagueStore';
 
-const { isMobile } = useResponsive();
-const { getLeagueColor } = leagueColors();
 const route = useRoute();
 
 interface League {
@@ -98,7 +92,6 @@ const isOverviewPage = computed(() => route.name === 'season-overview');
 const {
   data: payload,
   loading: loadingLeagues,
-  refreshing: refreshingLeagues,
   load: loadLeaguesForSeason,
   reset: resetLeagues,
 } = useCachedResource<number, SeasonPayload>(async (seasonId) => {

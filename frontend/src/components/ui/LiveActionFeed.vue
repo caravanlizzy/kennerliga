@@ -158,7 +158,6 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from 'vue';
 import { leagueColors } from 'src/composables/leagueColors';
-import { useResponsive } from 'src/composables/responsive';
 import { TLiveEvent, TLiveEventType } from 'src/types';
 import { fetchLiveActionEvents } from 'src/services/seasonService';
 import { useUpdateStore } from 'stores/updateStore';
@@ -166,7 +165,6 @@ import { useCachedResource } from 'src/composables/cachedResource';
 
 const updateStore = useUpdateStore();
 const { getLeagueColor } = leagueColors();
-const { isMobile } = useResponsive();
 
 // Stale-while-revalidate cache with a module-level `cacheKey`, so events
 // survive component unmount/remount (e.g. navigating away and back). Without

@@ -78,10 +78,8 @@
 
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue';
-import { useRoute, useRouter } from 'vue-router';
+import { useRoute } from 'vue-router';
 import { fetchLeaguesBySeason, fetchSeason, fetchSeasonParticipants } from 'src/services/seasonService';
-import KennerButton from 'components/base/KennerButton.vue';
-import KennerTooltip from 'components/base/KennerTooltip.vue';
 import ContentSection from 'components/base/ContentSection.vue';
 import ErrorDisplay from 'components/base/ErrorDisplay.vue';
 import LoadingSpinner from 'components/base/LoadingSpinner.vue';
@@ -90,7 +88,6 @@ import SeasonWinners from 'components/season/SeasonWinners.vue';
 import { TSeasonDto, TLeagueDto, TSeasonParticipantDto } from 'src/types';
 
 const route = useRoute();
-const router = useRouter();
 const seasonId = Number(route.params.id);
 
 const leagues = ref<TLeagueDto[]>([]);

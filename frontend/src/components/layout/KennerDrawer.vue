@@ -67,7 +67,6 @@ import { useHomeSeasonStore } from 'stores/homeSeasonStore';
 import { storeToRefs } from 'pinia';
 import { useRouter } from 'vue-router';
 import { provide, watch } from 'vue';
-import { useQuasar } from 'quasar';
 
 const drawerState = defineModel();
 
@@ -79,7 +78,6 @@ const homeSeasonStore = useHomeSeasonStore();
 const { currentSeasonId } = storeToRefs(homeSeasonStore);
 
 const router = useRouter();
-const $q = useQuasar();
 
 provide('closeDrawer', () => (drawerState.value = false));
 

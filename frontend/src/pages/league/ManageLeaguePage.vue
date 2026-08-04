@@ -131,8 +131,6 @@ import { api } from 'boot/axios';
 import { fetchLeagueDetails } from 'src/services/leagueService';
 import { fetchSeason } from 'src/services/seasonService';
 import ContentSection from 'components/base/ContentSection.vue';
-import KennerTooltip from 'components/base/KennerTooltip.vue';
-import KennerButton from 'components/base/KennerButton.vue';
 import KennerSelect from 'components/base/KennerSelect.vue';
 import ErrorDisplay from 'components/base/ErrorDisplay.vue';
 import LoadingSpinner from 'components/base/LoadingSpinner.vue';

@@ -3,9 +3,9 @@
     <LoadingSpinner v-if="isLoading" />
 
     <div v-else class="row justify-center">
-      <div class="col-12 col-md-10 col-lg-8">
-        <!-- Header -->
-        <q-card flat bordered class="q-mb-lg shadow-2 overflow-hidden">
+      <div class="col-12 col-md-10 col-lg-9">
+        <q-card flat bordered class="shadow-2 overflow-hidden">
+          <!-- Header -->
           <q-card-section class="bg-primary text-white q-pa-lg">
             <div class="row items-center justify-between">
               <div>
@@ -25,7 +25,7 @@
             </div>
           </q-card-section>
 
-          <q-card-section class="q-pa-md bg-grey-1 row items-center justify-between">
+          <q-card-section class="q-pa-md bg-grey-1 row items-center justify-between border-bottom">
             <div class="row items-center q-gutter-sm">
               <q-chip dense square color="white" text-color="grey-8" class="shadow-1">
                 <q-icon name="tune" color="primary" class="q-mr-xs" />
@@ -57,108 +57,104 @@
               </div>
             </div>
           </q-card-section>
-        </q-card>
 
-        <!-- Options Section -->
-        <div class="q-mb-xl">
-          <div class="row items-center q-mb-md q-gutter-x-sm">
-            <q-icon name="tune" size="md" color="grey-8" />
-            <h2 class="text-h4 q-my-none text-weight-medium">Game Options</h2>
-          </div>
+          <q-card-section class="q-pa-lg">
+            <!-- Options Section -->
+            <div class="row items-center q-mb-md q-gutter-x-sm">
+              <q-icon name="tune" size="md" color="grey-8" />
+              <h2 class="text-h4 q-my-none text-weight-medium">Game Options</h2>
+            </div>
 
-          <q-banner v-if="!hasOptions" rounded class="bg-blue-1 text-primary q-mb-lg shadow-1">
-            <template #avatar>
-              <q-icon name="info" />
-            </template>
-            No custom options configured for this game.
-          </q-banner>
+            <q-banner v-if="!hasOptions" rounded class="bg-blue-1 text-primary q-mb-lg shadow-1">
+              <template #avatar>
+                <q-icon name="info" />
+              </template>
+              No custom options configured for this game.
+            </q-banner>
 
-          <div v-else class="row q-col-gutter-lg">
-            <!-- Yes/No Options -->
-            <div v-if="yesNoOptions.length" class="col-12">
-              <q-card flat bordered class="shadow-1">
-                <q-card-section class="bg-grey-2 q-py-sm">
-                  <div class="text-subtitle1 text-weight-bold text-grey-8">Binary Toggles</div>
-                </q-card-section>
-                <q-card-section class="q-pa-none">
-                  <q-list separator>
-                    <q-item v-for="option in yesNoOptions" :key="option.id" class="q-py-md">
-                      <q-item-section avatar>
-                        <q-icon name="check_circle" color="positive" size="sm" />
-                      </q-item-section>
-                      <q-item-section>
-                        <q-item-label class="text-weight-medium text-body1">{{ option.name }}</q-item-label>
-                        <q-item-label v-if="hasAvailability(option)" caption>
-                          <div class="row items-center q-gutter-x-xs text-warning">
-                            <q-icon name="rule" />
-                            <span>Has availability rules</span>
-                          </div>
-                        </q-item-label>
-                      </q-item-section>
-                      <q-item-section side v-if="hasAvailability(option)">
-                        <q-expansion-item
-                          dense
-                          flat
-                          label="View rules"
-                          header-class="text-caption text-grey-7"
-                        >
-                          <div class="q-pa-sm bg-grey-1 rounded-borders q-mt-xs">
-                            <div v-for="(grp, idx) in option.availability_groups" :key="grp.id" class="q-mb-xs">
-                              <div class="text-grey-6 text-caption text-uppercase">Group #{{ idx+1 }}</div>
-                              <div v-for="cond in grp.conditions" :key="cond.id" class="text-caption">
+            <div v-else>
+              <!-- Yes/No Options -->
+              <div v-if="yesNoOptions.length" class="q-mb-lg">
+                <div class="text-subtitle1 text-weight-bold text-grey-9 q-mb-sm uppercase-label">Binary Toggles</div>
+                <div class="row q-col-gutter-md">
+                  <div v-for="option in yesNoOptions" :key="option.id" class="col-12 col-sm-6 col-md-4">
+                    <div class="option-item q-pa-md rounded-borders bg-white border-light full-height">
+                      <div class="row items-center no-wrap">
+                        <q-icon name="check_circle" color="positive" size="sm" class="q-mr-sm" />
+                        <div class="text-weight-medium text-body1 text-grey-9 ellipsis">{{ option.name }}</div>
+                      </div>
+                      <div v-if="hasAvailability(option)" class="q-mt-xs">
+                        <div class="row items-center q-gutter-x-xs text-orange-9 cursor-pointer" @click="toggleRules(option.id)">
+                          <q-icon name="rule" size="xs" />
+                          <span class="text-caption text-weight-medium">Has rules</span>
+                          <q-icon :name="expandedRules[option.id] ? 'expand_less' : 'expand_more'" size="xs" />
+                        </div>
+                        <q-slide-transition>
+                          <div v-if="expandedRules[option.id]" class="q-pa-sm bg-grey-1 rounded-borders q-mt-xs shadow-1 border-light">
+                            <div v-for="grp in option.availability_groups" :key="grp.id" class="q-mb-xs">
+                              <div v-for="cond in grp.conditions" :key="cond.id" class="text-caption text-grey-9">
                                 • {{ formatCondition(cond) }}
                               </div>
                             </div>
                           </div>
-                        </q-expansion-item>
-                      </q-item-section>
-                    </q-item>
-                  </q-list>
-                </q-card-section>
-              </q-card>
-            </div>
-
-            <!-- Choice Options -->
-            <div v-for="option in choiceOptions" :key="option.id" class="col-12 col-md-6">
-              <q-card flat bordered class="full-height shadow-1">
-                <q-card-section class="bg-grey-2 q-py-sm row items-center justify-between">
-                  <div class="text-subtitle1 text-weight-bold text-grey-8">{{ option.name }}</div>
-                  <q-chip dense color="primary" text-color="white">{{ option.choices?.length ?? 0 }} items</q-chip>
-                </q-card-section>
-                <q-card-section>
-                  <div class="row q-col-gutter-sm">
-                    <div v-for="choice in option.choices" :key="choice.id" class="col-auto">
-                      <q-chip outline color="secondary" icon="radio_button_checked" size="sm">{{ choice.name }}</q-chip>
-                    </div>
-                  </div>
-
-                  <div v-if="hasAvailability(option)" class="q-mt-lg">
-                    <q-separator class="q-mb-sm" />
-                    <div class="text-caption text-weight-bold text-warning row items-center q-gutter-x-xs q-mb-xs">
-                      <q-icon name="rule" />
-                      <span>AVAILABILITY RULES</span>
-                    </div>
-                    <div v-for="grp in option.availability_groups" :key="grp.id" class="bg-orange-1 q-pa-sm rounded-borders q-mb-xs">
-                       <div v-for="cond in grp.conditions" :key="cond.id" class="text-caption text-grey-9">
-                        {{ formatCondition(cond) }}
+                        </q-slide-transition>
                       </div>
                     </div>
                   </div>
-                </q-card-section>
-              </q-card>
+                </div>
+              </div>
+
+              <!-- Choice Options -->
+              <div v-if="choiceOptions.length">
+                <div class="text-subtitle1 text-weight-bold text-grey-9 q-mb-sm uppercase-label">Configurable Lists</div>
+                <div class="row q-col-gutter-md">
+                  <div v-for="option in choiceOptions" :key="option.id" class="col-12 col-md-6">
+                    <div class="option-item q-pa-md rounded-borders bg-white border-light full-height">
+                      <div class="row items-center q-mb-md">
+                        <div class="text-weight-bold text-grey-9">{{ option.name }}</div>
+                        <q-badge color="grey-7" class="q-ml-sm" size="xs" transparent>{{ option.choices?.length ?? 0 }}</q-badge>
+                      </div>
+                      <div class="column q-gutter-y-sm">
+                        <div v-for="choice in option.choices" :key="choice.id" class="row items-center q-gutter-x-sm">
+                          <q-icon name="radio_button_checked" color="secondary" size="xs" />
+                          <div class="text-body2 text-grey-9">{{ choice.name }}</div>
+                        </div>
+                      </div>
+
+                      <div v-if="hasAvailability(option)" class="q-mt-md">
+                        <q-separator class="q-my-sm opacity-50" />
+                        <div class="text-caption text-weight-bold text-orange-9 row items-center q-gutter-x-xs cursor-pointer" @click="toggleRules(option.id)">
+                          <q-icon name="rule" size="xs" />
+                          <span>RULES</span>
+                          <q-icon :name="expandedRules[option.id] ? 'expand_less' : 'expand_more'" size="xs" />
+                        </div>
+                        <q-slide-transition>
+                          <div v-if="expandedRules[option.id]" class="q-mt-xs">
+                            <div v-for="grp in option.availability_groups" :key="grp.id">
+                              <div v-for="cond in grp.conditions" :key="cond.id" class="text-caption text-grey-8">
+                                • {{ formatCondition(cond) }}
+                              </div>
+                            </div>
+                          </div>
+                        </q-slide-transition>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
+          </q-card-section>
 
-        <!-- Result Configuration Section -->
-        <div class="q-mb-xl">
-          <div class="row items-center q-mb-md q-gutter-x-sm">
-            <q-icon name="emoji_events" size="md" color="grey-8" />
-            <h2 class="text-h4 q-my-none text-weight-medium">Result & Scoring</h2>
-          </div>
+          <q-separator />
 
-          <q-card flat bordered class="shadow-2 overflow-hidden">
-            <q-card-section class="q-pa-none">
+          <!-- Result Configuration Section -->
+          <q-card-section class="q-pa-lg">
+            <div class="row items-center q-mb-md q-gutter-x-sm">
+              <q-icon name="emoji_events" size="md" color="grey-8" />
+              <h2 class="text-h4 q-my-none text-weight-medium">Result & Scoring</h2>
+            </div>
+
+            <div class="border-light rounded-borders overflow-hidden bg-grey-1">
               <ResultConfiguration
                 :hasPoints="resultConfig.has_points"
                 :startingPointSystemCode="resultConfig.starting_points_system_code"
@@ -168,9 +164,9 @@
                 :factions="factions"
                 :winConditions="winConditions"
               />
-            </q-card-section>
-          </q-card>
-        </div>
+            </div>
+          </q-card-section>
+        </q-card>
       </div>
     </div>
   </q-page>
@@ -179,6 +175,24 @@
 <style scoped>
 .border-negative {
   border: 1px solid currentColor;
+}
+.border-light {
+  border: 1px solid #e0e0e0;
+}
+.border-bottom {
+  border-bottom: 1px solid #e0e0e0;
+}
+.uppercase-label {
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-size: 0.75rem;
+}
+.option-item {
+  transition: all 0.2s ease;
+}
+.option-item:hover {
+  border-color: var(--q-primary);
+  background-color: #fafafa;
 }
 </style>
 
@@ -194,6 +208,11 @@ import { computed, ref } from 'vue';
 const route = useRoute();
 const router = useRouter();
 const isLoading = ref(true);
+const expandedRules = ref<Record<number, boolean>>({});
+
+function toggleRules(id: number) {
+  expandedRules.value[id] = !expandedRules.value[id];
+}
 
 const { data: game } = await api.get<TFullGameDto>(`game/games-full/${route.params.id}/?manage_only=true`);
 const {

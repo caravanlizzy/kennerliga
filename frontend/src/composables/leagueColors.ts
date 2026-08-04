@@ -1,4 +1,3 @@
-import { computed } from 'vue';
 
 export interface LeagueStyle {
   color: string;

@@ -5,7 +5,7 @@
       :style="thumbStyle"
     />
     <button
-      v-for="(opt, i) in options"
+      v-for="opt in options"
       :key="String(opt.value)"
       ref="btnRefs"
       type="button"
@@ -13,7 +13,7 @@
       :aria-selected="isActive(opt.value)"
       class="smooth-switch__option"
       :class="{ 'is-active': isActive(opt.value) }"
-      @click="select(opt.value, i)"
+      @click="select(opt.value)"
     >
       <q-icon v-if="opt.icon" :name="opt.icon" size="14px" class="q-mr-xs" />
       {{ opt.label }}
@@ -44,7 +44,7 @@ function isActive(v: T) {
   return model.value === v;
 }
 
-function select(v: T, _i: number) {
+function select(v: T) {
   model.value = v;
 }
 

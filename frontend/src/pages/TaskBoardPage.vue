@@ -264,7 +264,6 @@ const {
   removeTask,
   priorityChipClasses,
   statusColumnClasses,
-  statusIcons,
 } = taskboardStore;
 
 const statuses: TaskStatus[] = [

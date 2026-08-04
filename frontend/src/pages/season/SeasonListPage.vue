@@ -134,7 +134,7 @@ const columns = computed<QTableProps['columns']>(() => ([
     sortable: true,
     field: (s: SeasonExtra) => displayName(s),
     // render icon + name
-    format: (val: string, row: SeasonExtra) => val, // keep value for filtering/sorting if KennerTable uses it
+    format: (val: string) => val, // keep value for filtering/sorting if KennerTable uses it
     headerStyle: 'white-space: nowrap',
     style: 'white-space: nowrap; max-width: 0',
   },
