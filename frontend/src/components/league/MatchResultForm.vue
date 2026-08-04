@@ -77,7 +77,7 @@
                 <div class="column q-gutter-sm">
                   <!-- Points (for points-based games) -->
                   <KennerInput
-                    v-if="resultConfig?.has_points"
+                    v-if="winConditionIsPoints"
                     v-model.number="getEntry(member.profile).points"
                     type="number"
                     inputmode="numeric"
@@ -87,7 +87,7 @@
                   />
 
                   <!-- Position (for non-points games) -->
-                  <div v-else>
+                  <div v-else-if="!winConditionIsOption && !winConditionIsPoints">
                     <div class="text-caption text-grey-7 q-mb-xs">
                       Final Position
                     </div>
@@ -322,6 +322,9 @@ const selectedWinCondition = computed<TWinConditionDto | null>(
 );
 const winConditionIsOption = computed(
   () => selectedWinCondition.value?.condition_type === 'OPTION'
+);
+const winConditionIsPoints = computed(
+  () => selectedWinCondition.value?.condition_type === 'POINTS'
 );
 
 const tieBreakerRequired = ref(false);
@@ -686,8 +689,8 @@ async function submitResults() {
     const res: TMatchResultPayload = {
       player_profile: entry.player_profile,
       selected_game: entry.selected_game,
-      points: resultConfig.value?.has_points ? entry.points : null,
-      position: !resultConfig.value?.has_points ? entry.position : null,
+      points: winConditionIsPoints.value ? entry.points : null,
+      position: (!winConditionIsPoints.value && !winConditionIsOption.value) ? entry.position : null,
       notes: entry.notes || null,
       starting_position: resultConfig.value?.has_starting_player_order
         ? entry.starting_position

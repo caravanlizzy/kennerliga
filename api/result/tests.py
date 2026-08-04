@@ -7,6 +7,7 @@ from game.models import (
     Game,
     SelectedGame,
     ResultConfig,
+    WinCondition,
     TieBreaker,
     StartingPointSystem,
 )
@@ -45,6 +46,12 @@ class ResultAPITests(TestCase):
         self.config = ResultConfig.objects.create(
             game=self.game, has_points=True, starting_points_system=self.sps
         )
+        self.win_condition = WinCondition.objects.create(
+            result_config=self.config,
+            name="Punkte",
+            condition_type=WinCondition.WinConditionType.POINTS,
+            order=0,
+        )
         self.selected_game = SelectedGame.objects.create(
             game=self.game, league=self.league, profile=self.profile
         )
@@ -60,6 +67,7 @@ class ResultAPITests(TestCase):
 
         data = {
             "selected_game": self.selected_game.id,
+            "win_condition": self.win_condition.id,
             "results": [
                 {
                     "player_profile": self.profile.id,
@@ -86,10 +94,11 @@ class ResultAPITests(TestCase):
         )
         self.league.members.add(participant2)
 
-        tb = TieBreaker.objects.create(result_config=self.config, name="TB1", order=1)
+        tb = TieBreaker.objects.create(win_condition=self.win_condition, name="TB1", order=1)
 
         data = {
             "selected_game": self.selected_game.id,
+            "win_condition": self.win_condition.id,
             "results": [
                 {
                     "player_profile": self.profile.id,
@@ -131,6 +140,7 @@ class ResultAPITests(TestCase):
 
         data = {
             "selected_game": self.selected_game.id,
+            "win_condition": self.win_condition.id,
             "results": [
                 {
                     "player_profile": self.profile.id,
@@ -142,7 +152,7 @@ class ResultAPITests(TestCase):
         }
         # Submission with equal points and NO tie-breakers defined for this game in setUp
         # Actually, let's make sure no tie-breakers exist so it stays a tie.
-        TieBreaker.objects.filter(result_config=self.config).delete()
+        TieBreaker.objects.filter(win_condition=self.win_condition).delete()
 
         response = self.client.post("/api/result/match-results/", data, format="json")
         # Since there are no tie-breakers, it should finalize immediately with a tie

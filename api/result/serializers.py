@@ -108,14 +108,16 @@ class ResultSerializer(serializers.ModelSerializer):
         elif "starting_position" not in data:
             raise serializers.ValidationError("Starting position is required.")
 
-        # ✅ Validate points requirement
-        if result_config.has_points:
-            if "points" not in data:
-                raise serializers.ValidationError("Points are required for this game.")
-
         # ✅ Validate win condition
         win_condition = data.get('win_condition')
         win_condition_option = data.get('win_condition_option')
+
+        # ✅ Validate points requirement
+        is_points_wc = win_condition and win_condition.is_points
+        if is_points_wc or (not win_condition and result_config.has_points):
+            if data.get("points") is None:
+                raise serializers.ValidationError("Points are required.")
+
         if win_condition:
             if win_condition.result_config.game != selected_game.game:
                 raise serializers.ValidationError("Win condition must belong to the selected game.")

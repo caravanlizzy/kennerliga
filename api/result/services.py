@@ -49,6 +49,7 @@ def finalize_results(
         saved = []
         for s in serializers:
             row_data = s.validated_data
+            row_data.pop("win_condition_option_order", None)
             pid = row_data["player_profile"].id
             row_data["position"] = pid_to_rank[pid]
             row_data["tie_breaker_resolved"] = True
