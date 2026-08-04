@@ -22,7 +22,7 @@ import { useMyLeagueStore } from 'src/composables/myLeague';
 import { useActionBar } from 'src/composables/actionBar';
 
 const { leagueStatus } = storeToRefs(useMyLeagueStore());
-const { setHint, reset } = useActionBar();
+const { reset } = useActionBar();
 
 const isOpened = ref(false);
 
@@ -32,7 +32,6 @@ watch(
     isOpened.value = status === 'PLAYING';
     if (status === 'PLAYING') {
       reset();
-      setHint('Games that are finished can be reported below.');
     }
   },
   { immediate: true }
