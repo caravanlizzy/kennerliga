@@ -8,7 +8,7 @@ from nested_admin.nested import (
 # Register your models here.
 from game.models import Game, GameOption, GameOptionChoice, StartingPointSystem, Faction, TieBreaker, \
     ResultConfig, SelectedGame, BanDecision, SelectedOption, GameOptionAvailabilityCondition, \
-    GameOptionAvailabilityGroup, WinCondition
+    GameOptionAvailabilityGroup, WinCondition, WinConditionOption
 from services.standings_snapshot import rebuild_game_snapshot, rebuild_league_snapshot
 
 
@@ -89,6 +89,7 @@ class FactionAdmin(admin.ModelAdmin):
     list_display = ("name", "game", "level")
     list_filter = ("game", "level")
     search_fields = ("name",)
+    ordering = ("game", "level", "name")
 
 
 @admin.register(TieBreaker)
@@ -97,13 +98,32 @@ class TieBreakerAdmin(admin.ModelAdmin):
     list_filter = ("win_condition__result_config__game",)
 
 
-class WinConditionInline(admin.TabularInline):
-    model = WinCondition
+class WinConditionOptionInline(NestedTabularInline):
+    model = WinConditionOption
     extra = 0
 
 
+class TieBreakerInline(NestedTabularInline):
+    model = TieBreaker
+    extra = 0
+
+
+class WinConditionInline(NestedTabularInline):
+    model = WinCondition
+    extra = 0
+    inlines = [WinConditionOptionInline, TieBreakerInline]
+
+
+@admin.register(WinCondition)
+class WinConditionAdmin(NestedModelAdmin):
+    list_display = ("name", "result_config", "condition_type", "order")
+    list_filter = ("condition_type", "result_config__game")
+    search_fields = ("name", "result_config__game__name")
+    inlines = [WinConditionOptionInline, TieBreakerInline]
+
+
 @admin.register(ResultConfig)
-class ResultConfigAdmin(admin.ModelAdmin):
+class ResultConfigAdmin(NestedModelAdmin):
     list_display = (
         "game",
         "is_asymmetric",
@@ -112,6 +132,7 @@ class ResultConfigAdmin(admin.ModelAdmin):
         "has_points",
     )
     list_filter = ("game",)
+    list_select_related = ("game", "starting_points_system")
     inlines = [WinConditionInline]
 
 
@@ -177,6 +198,7 @@ class SelectedGameAdmin(admin.ModelAdmin):
 class BanDecisionAdmin(admin.ModelAdmin):
     list_display = ("player_banning", "league", "selected_game", "created_at")
     list_filter = ("league", "player_banning")
+    list_select_related = ("player_banning", "league", "selected_game")
     date_hierarchy = "created_at"
 
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
@@ -205,3 +227,5 @@ class BanDecisionAdmin(admin.ModelAdmin):
 class SelectedOptionAdmin(admin.ModelAdmin):
     list_display = ("selected_game", "game_option", "choice", "value")
     list_filter = ("selected_game__game", "game_option")
+    list_select_related = ("selected_game", "game_option", "choice")
+    search_fields = ("selected_game__profile__profile_name", "game_option__name")
