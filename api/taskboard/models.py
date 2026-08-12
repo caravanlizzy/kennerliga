@@ -2,12 +2,21 @@ from django.db import models
 
 
 class Task(models.Model):
+    """
+    Model representing a task on the internal task board.
+    """
     class Priority(models.TextChoices):
+        """
+        Choices for task priority.
+        """
         LOW = "Low"
         MEDIUM = "Medium"
         HIGH = "High"
 
     class Status(models.TextChoices):
+        """
+        Choices for task status.
+        """
         TODO = "To Do"
         IN_PROGRESS = "In Progress"
         DONE = "Done"

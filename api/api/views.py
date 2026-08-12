@@ -12,6 +12,10 @@ from rest_framework import status
 
 
 class LoginApiView(APIView):
+    """
+    API view for user login.
+    Authenticates the user and returns user information along with a token.
+    """
     permission_classes = [AllowAny]
     @staticmethod
     def post(request, *args, **kwargs):
@@ -45,6 +49,10 @@ class LoginApiView(APIView):
 
 
 class LogoutApiView(APIView):
+    """
+    API view for user logout.
+    Deletes the authentication token for the current user.
+    """
     @staticmethod
     def post(request, *args, **kwargs):
         # Check if the user is authenticated
@@ -328,14 +336,23 @@ class LeaderboardViewSet(APIView):
 
 
 def create_token(user):
+    """
+    Creates a new authentication token for the given user.
+    """
     return Token.objects.create(user=user)
 
 
 def has_token(user):
+    """
+    Checks if the given user has an existing authentication token.
+    """
     return Token.objects.filter(user=user).exists()
 
 
 def get_token(user):
+    """
+    Retrieves the existing token for a user, or creates a new one if it doesn't exist.
+    """
     if has_token(user):
         token = Token.objects.get(user=user)
     else:
@@ -344,6 +361,9 @@ def get_token(user):
 
 
 def get_user_information(user):
+    """
+    Returns a dictionary containing basic user information and their token.
+    """
     token = get_token(user)
     user = {
         "username": user.username,
@@ -356,6 +376,9 @@ def get_user_information(user):
 
 
 def get_platform_players(user):
+    """
+    Retrieves all platform-specific player names associated with the user.
+    """
     player_profile = user.profile
     platform_players = PlatformPlayer.objects.filter(player_profile=player_profile)
     platform_player_dict = {pp.platform.name: pp.name for pp in platform_players}

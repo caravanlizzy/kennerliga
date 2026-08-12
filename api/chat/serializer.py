@@ -5,6 +5,10 @@ from chat.models import Chat
 
 
 class ChatSerializer(serializers.ModelSerializer):
+    """
+    Serializer for the Chat model.
+    Handles user assignment and text escaping on creation.
+    """
     sender = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
@@ -14,10 +18,16 @@ class ChatSerializer(serializers.ModelSerializer):
 
     @staticmethod
     def get_sender(obj):
+        """
+        Returns the username of the message sender.
+        """
         # Assuming that the 'user' field in the Chat model is a ForeignKey to a User model
         return obj.user.username if obj.user else None
 
     def validate_text(self, value):
+        """
+        Ensures that the chat message text is not empty.
+        """
         if not value or value.strip() == "":
             raise serializers.ValidationError("Message text cannot be empty.")
         return value

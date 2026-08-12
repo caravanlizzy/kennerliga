@@ -35,6 +35,9 @@ from user.models import PlayerProfile
 
 
 class SeasonRegistrationView(APIView):
+    """
+    API view for registering the current user for the open season.
+    """
     permission_classes = [IsAuthenticated]
 
     def post(self, request, *args, **kwargs):
@@ -53,6 +56,10 @@ class SeasonRegistrationView(APIView):
 
 
 class SeasonViewSet(ModelViewSet):
+    """
+    API viewset for viewing and managing seasons.
+    Includes custom actions for starting seasons, viewing winners, and registration status.
+    """
     queryset = Season.objects.all().order_by("-year", "-month")
     serializer_class = SeasonSerializer
     filterset_fields = ["year", "month", "status"]
@@ -274,10 +281,8 @@ class SeasonViewSet(ModelViewSet):
 
 class SeasonScoreboardViewSet(ViewSet):
     """
-    GET /season-scoreboards/{season_id}/scoreboards/
-    Returns scoreboards for every league in the season.
+    API viewset for retrieving scoreboards for all leagues in a specific season.
     """
-
     @action(detail=True, methods=["get"], url_path="scoreboards")
     def scoreboards(self, request, pk=None):
         # Load fields needed for 'name' property (year, month) to avoid extra queries
@@ -320,11 +325,8 @@ class SeasonScoreboardViewSet(ViewSet):
 
 class CurrentSeasonView(APIView):
     """
-    GET /season/current/
-    Returns the Season for the current year and month.
-    Example: { "id": 5, "name": "2025_S10", "status": "RUNNING" }
+    API view for retrieving the current active or upcoming season.
     """
-
     def get(self, request):
         season = get_running_season()
         if not season:
@@ -349,10 +351,9 @@ class CurrentSeasonView(APIView):
 
 class SeasonParticipantViewSet(ModelViewSet):
     """
-    list:   GET  /season-participants/?season=<id>&profile=<id>
-    create: POST /season-participants/  {season, profile, rank?}
+    API viewset for managing participants in a season.
+    Supports listing participants, projecting league distributions, and retrieving current participants.
     """
-
     queryset = SeasonParticipant.objects.select_related("season", "profile").prefetch_related(
         "leagues_member"
     )
@@ -602,6 +603,9 @@ class SeasonParticipantViewSet(ModelViewSet):
 
 
 class LiveEventViewSet(ViewSet):
+    """
+    API viewset for retrieving a live timeline of events (picks, bans, finishes) in a season.
+    """
     permission_classes = [IsAuthenticated]
 
     def list(self, request):

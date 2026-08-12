@@ -6,12 +6,16 @@ from api.constants import get_game_picks_per_player
 
 
 def get_members_ordered(league: League):
-    """Return league members ordered by rank."""
+    """
+    Returns the league members ordered by their season rank.
+    """
     return league.members.all().select_related("profile").order_by("rank")
 
 
 def all_players_have_picked(league: League) -> bool:
-    """Check if all league members have selected a game."""
+    """
+    Checks if all players in the league have selected the expected number of games.
+    """
     members = league.members.all()
     member_count = members.count()
     expected_count = get_game_picks_per_player(member_count)
@@ -31,7 +35,9 @@ def all_players_have_picked(league: League) -> bool:
 
 
 def all_players_have_banned(league: League) -> bool:
-    """Check if all league members have submitted at least one ban."""
+    """
+    Checks if all players in the league have submitted at least one ban decision.
+    """
     members = league.members.all()
     expected_ban_count = 1
 
@@ -50,7 +56,9 @@ def all_players_have_banned(league: League) -> bool:
 
 
 def get_players_to_repick(league: League) -> List:
-    """Return members who must repick because at least one of their games was banned."""
+    """
+    Identifies league members who need to pick another game because one of their initial picks was banned.
+    """
     member_count = league.members.count()
     min_bans = 2 if member_count > 2 else 1
 
@@ -86,8 +94,10 @@ def get_players_to_repick(league: League) -> List:
 
 
 def all_repickers_have_repicked(league: League) -> bool:
+    """
+    Checks if all players identified for repicking have completed their additional selections.
+    """
     expected_count = get_game_picks_per_player(league.members.count()) + 1
-    """Check if all players who must repick have done so."""
     for player in get_players_to_repick(league):
         # For 2-player leagues, players should have 3 games if they had to repick
         # For other leagues, they should have more than 1 game
@@ -100,15 +110,25 @@ def all_repickers_have_repicked(league: League) -> bool:
 
 
 def is_two_player_league(league: League) -> bool:
+    """
+    Returns True if the league has exactly two members.
+    """
     return league.members.count() == 2
 
 
 def both_players_exactly_one_pick(league: League) -> bool:
+    """
+    Returns True if exactly two games have been selected in total for the league.
+    Used in two-player league logic.
+    """
     return SelectedGame.objects.filter(league=league).count() == 2
 
 
 def is_league_finished(league: League) -> bool:
-    """Check if all expected games in the league have been played and have results."""
+    """
+    Checks if all non-banned game selections in the league have recorded results.
+    """
+    # Check if all expected games in the league have been played and have results.
     member_count = league.members.count()
     if member_count == 0:
         return False

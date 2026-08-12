@@ -69,10 +69,16 @@ def get_registered_participants(season=None) -> List[SeasonParticipant]:
 
 
 def register(profile):
+    """
+    Registers a player profile for the current open season.
+    """
     open_season = get_open_season()
     new_participant = SeasonParticipant(season=open_season, profile=profile)
     new_participant.save()
 
 
 def is_profile_registered(profile, season):
+    """
+    Checks if a player profile is registered for a specific season.
+    """
     return SeasonParticipant.objects.filter(season=season, profile=profile).exists()

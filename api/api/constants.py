@@ -22,6 +22,9 @@ DEFAULT_LEAGUE_POINTS = {
 
 
 def get_league_points(player_count: int) -> dict[int, Decimal]:
+    """
+    Returns the league points distribution based on the number of players.
+    """
     return LEAGUE_POINTS_DISTRIBUTION.get(player_count, DEFAULT_LEAGUE_POINTS)
 
 
@@ -29,6 +32,9 @@ def get_league_points(player_count: int) -> dict[int, Decimal]:
 # 2 players: 2 per player
 # 3+ player: 1 per player
 def get_game_picks_per_player(player_count: int) -> int:
+    """
+    Returns the number of game picks each player should make, based on league size.
+    """
     if player_count == 2:
         return 2
     return 1
@@ -36,6 +42,9 @@ def get_game_picks_per_player(player_count: int) -> int:
 
 # Amount of BanDecisions required for a successful ban
 def get_ban_amount_for_success(player_count: int) -> int:
+    """
+    Returns the number of bans required for a game to be successfully banned.
+    """
     if player_count == 2:
         return 1
     return 2

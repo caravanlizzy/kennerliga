@@ -8,6 +8,9 @@ from user.models import PlayerProfile
 
 
 class LeagueStatus(models.TextChoices):
+    """
+    Choices for the current status of a league.
+    """
     PICKING = "PICKING"
     BANNING = "BANNING"
     REPICKING = "REPICKING"
@@ -17,6 +20,9 @@ class LeagueStatus(models.TextChoices):
 
 # Create your models here.
 class League(models.Model):
+    """
+    Model representing a league within a season, consisting of several members and levels.
+    """
     season = models.ForeignKey(
         Season,
         on_delete=models.CASCADE,
@@ -47,6 +53,9 @@ class League(models.Model):
 
 
 class LeagueStanding(models.Model):
+    """
+    Model representing a player's overall standing and points within a league.
+    """
     league = models.ForeignKey(
         League, on_delete=models.CASCADE, related_name="standings"
     )
@@ -78,6 +87,9 @@ class LeagueStanding(models.Model):
 
 
 class TieResolutionReason(models.TextChoices):
+    """
+    Choices for the reason a tie was resolved in a particular way.
+    """
     WINNER_PERCENTAGE = "WINNER_PERCENTAGE", "Percentage by winner"
     CANT_STOP = "CANT_STOP", "Cant Stop"
 
@@ -133,6 +145,9 @@ class LeagueTieResolutionEntry(models.Model):
 
 
 class GameStanding(models.Model):
+    """
+    Model representing a player's standing and points for a specific game within a league.
+    """
     league = models.ForeignKey(
         League, on_delete=models.CASCADE, related_name="game_standings"
     )

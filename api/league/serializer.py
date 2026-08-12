@@ -6,6 +6,9 @@ from season.models import SeasonParticipant
 
 
 class LeagueSerializer(serializers.ModelSerializer):
+    """
+    Serializer for the League model, handling members and completion status.
+    """
     # write: accept SP ids
     member_ids = serializers.PrimaryKeyRelatedField(
         queryset=SeasonParticipant.objects.all(),
@@ -75,6 +78,9 @@ class LeagueSerializer(serializers.ModelSerializer):
 
 
 class LeagueListSerializer(serializers.ModelSerializer):
+    """
+    Lightweight serializer for listing leagues with minimal member information.
+    """
     is_completed = SerializerMethodField()
     members = SerializerMethodField()
 
@@ -102,6 +108,9 @@ class LeagueListSerializer(serializers.ModelSerializer):
 
 
 class LeagueStandingSerializer(serializers.ModelSerializer):
+    """
+    Serializer for the LeagueStanding model, including player profile information.
+    """
     profile_name = serializers.CharField(
         source="player_profile.profile_name", read_only=True
     )
@@ -125,6 +134,9 @@ class LeagueStandingSerializer(serializers.ModelSerializer):
 
 
 class GameStandingSerializer(serializers.ModelSerializer):
+    """
+    Serializer for the GameStanding model, including player profile and tie-breaker details.
+    """
     profile_name = serializers.CharField(
         source="player_profile.profile_name", read_only=True
     )
@@ -155,12 +167,18 @@ class GameStandingSerializer(serializers.ModelSerializer):
 
 
 class LeagueMinimalSerializer(serializers.ModelSerializer):
+    """
+    Minimal serializer for the League model.
+    """
     class Meta:
         model = League
         fields = ["id", "season", "level", "status", "active_player"]
 
 
 class LeagueDetailSerializer(serializers.ModelSerializer):
+    """
+    Detailed serializer for the League model, including enriched member data and rankings.
+    """
     members = serializers.SerializerMethodField()
 
     class Meta:

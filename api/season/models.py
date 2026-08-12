@@ -9,7 +9,13 @@ from user.models import PlayerProfile  # Assuming this is your participant model
 
 # Create your models here.
 class Season(models.Model):
+    """
+    Model representing a competitive season, defined by a year and month.
+    """
     class SeasonStatus(models.TextChoices):
+        """
+        Choices for the current status of a season.
+        """
         NEXT = "NEXT"
         OPEN = "OPEN"
         RUNNING = "RUNNING"
@@ -56,6 +62,9 @@ class Season(models.Model):
 
 
 class SeasonParticipant(models.Model):
+    """
+    Model representing a player's participation in a specific season, including their initial rank.
+    """
     season = models.ForeignKey(
         Season, on_delete=models.CASCADE, related_name="participants"
     )

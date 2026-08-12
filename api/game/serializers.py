@@ -15,42 +15,63 @@ from user.models import PlayerProfile
 
 
 class GameSerializer(ModelSerializer):
+    """
+    Serializer for the Game model.
+    """
     class Meta:
         model = Game
         fields = "__all__"
 
 
 class GameOptionSerializer(ModelSerializer):
+    """
+    Serializer for the GameOption model.
+    """
     class Meta:
         model = GameOption
         fields = "__all__"
 
 
 class GameOptionChoiceSerializer(ModelSerializer):
+    """
+    Serializer for the GameOptionChoice model.
+    """
     class Meta:
         model = GameOptionChoice
         fields = "__all__"
 
 
 class FactionSerializer(ModelSerializer):
+    """
+    Serializer for the Faction model.
+    """
     class Meta:
         model = Faction
         fields = "__all__"
 
 
 class TieBreakerSerializer(ModelSerializer):
+    """
+    Serializer for the TieBreaker model.
+    """
     class Meta:
         model = TieBreaker
         fields = '__all__'
 
 
 class WinConditionOptionSerializer(ModelSerializer):
+    """
+    Serializer for the WinConditionOption model.
+    """
     class Meta:
         model = WinConditionOption
         fields = '__all__'
 
 
 class WinConditionSerializer(ModelSerializer):
+    """
+    Serializer for the WinCondition model, including its options and tie-breakers.
+    """
     options = WinConditionOptionSerializer(many=True, read_only=True)
     tie_breakers = TieBreakerSerializer(many=True, read_only=True)
 
@@ -60,6 +81,9 @@ class WinConditionSerializer(ModelSerializer):
 
 
 class ResultConfigSerializer(ModelSerializer):
+    """
+    Serializer for the ResultConfig model, including win conditions and starting point system info.
+    """
     starting_points_system_code = serializers.SerializerMethodField(read_only=True)
     starting_points_system_description = serializers.SerializerMethodField(
         read_only=True
@@ -85,18 +109,28 @@ class ResultConfigSerializer(ModelSerializer):
 
 
 class StartingPointSystemSerializer(ModelSerializer):
+    """
+    Serializer for the StartingPointSystem model.
+    """
     class Meta:
         model = StartingPointSystem
         fields = "__all__"
 
 
 class PlatformSerializer(ModelSerializer):
+    """
+    Serializer for the Platform model.
+    """
     class Meta:
         model = Platform
         fields = "__all__"
 
 
 class SelectedOptionSerializer(serializers.ModelSerializer):
+    """
+    Serializer for the SelectedOption model.
+    Includes validation to ensure choices belong to the correct options.
+    """
     game_option = GameOptionSerializer(read_only=True)
     choice = GameOptionChoiceSerializer(read_only=True)
 
@@ -136,6 +170,10 @@ class SelectedOptionSerializer(serializers.ModelSerializer):
 
 
 class SelectedGameSerializer(serializers.ModelSerializer):
+    """
+    Serializer for the SelectedGame model.
+    Handles complex validation for league player counts and season selection limits.
+    """
     # game_name is read only
     game_name = serializers.SerializerMethodField()
     platform_name = serializers.SerializerMethodField()
@@ -431,6 +469,10 @@ class FullGameOptionSerializer(serializers.ModelSerializer):
 
 
 class FullGameSerializer(serializers.ModelSerializer):
+    """
+    Comprehensive serializer for the Game model, including all its options, choices, and rules.
+    Used for full game configuration and editing.
+    """
     options = FullGameOptionSerializer(many=True)
 
     class Meta:
@@ -636,6 +678,10 @@ class FullGameSerializer(serializers.ModelSerializer):
 
 
 class BanDecisionSerializer(serializers.ModelSerializer):
+    """
+    Serializer for the BanDecision model.
+    Handles the logic for recording a player's game ban.
+    """
     player_banning = serializers.PrimaryKeyRelatedField(
         queryset=PlayerProfile.objects.all()
     )

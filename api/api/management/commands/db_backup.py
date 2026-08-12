@@ -6,6 +6,10 @@ from django.conf import settings
 
 
 class Command(BaseCommand):
+    """
+    Management command to create a database backup.
+    Supports both MySQL (using mysqldump) and SQLite (using file copy).
+    """
     help = "Create a MySQL backup using .env credentials"
 
     def handle(self, *args, **options):

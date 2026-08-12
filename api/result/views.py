@@ -15,6 +15,9 @@ from .services import finalize_results, get_game_standings_data, get_tie_groups
 
 
 class IsAdminOrMemberInCurrentLeague(permissions.BasePermission):
+    """
+    Custom permission to allow only admins or league members in a running season to perform actions.
+    """
     def has_permission(self, request, view):
         if not request.user or not request.user.is_authenticated:
             return False
@@ -50,11 +53,17 @@ class IsAdminOrMemberInCurrentLeague(permissions.BasePermission):
 
 
 class ResultViewSet(ModelViewSet):
+    """
+    API viewset for viewing and creating individual results.
+    """
     queryset = Result.objects.all()
     serializer_class = ResultSerializer
     filterset_fields = ["selected_game", "player_profile"]
 
     def get_permissions(self):
+        """
+        Determines the permissions for the current action.
+        """
         if self.action == "create":
             return [IsAdminOrMemberInCurrentLeague()]
         if self.action in ["list", "retrieve"]:
@@ -101,12 +110,18 @@ class MatchResultViewSet(ViewSet):
         return [permissions.IsAuthenticated()]
 
     def _fnum(self, x, default=None):
+        """
+        Safely converts a value to float, returning a default if conversion fails.
+        """
         try:
             return float(x)
         except (TypeError, ValueError):
             return default
 
     def _get_tie_groups(self, rows, base_field, use_points, tbs, level):
+        """
+        Delegates tie detection to the service layer.
+        """
         return get_tie_groups(rows, base_field, use_points, tbs, level)
 
     def _finalize_results(
@@ -121,6 +136,9 @@ class MatchResultViewSet(ViewSet):
         decisive_tb=None,
         needing_pids=None,
     ):
+        """
+        Finalizes and saves the result set, and returns the serialized results and standings.
+        """
         saved = finalize_results(
             serializers,
             rows,

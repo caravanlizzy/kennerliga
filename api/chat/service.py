@@ -3,6 +3,10 @@ from user.models import User
 
 
 def create_chat_announcement(text):
+    """
+    Creates a chat message labeled with the given text, sent by user 'haligh' or the first superuser.
+    Used for automated system announcements in the chat.
+    """
     try:
         haligh = User.objects.get(username="haligh")
     except User.DoesNotExist:

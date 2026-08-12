@@ -15,6 +15,9 @@ from api.constants import get_ban_amount_for_success
 
 
 def _serialize_selected_game(sg) -> Dict:
+    """
+    Serializes a SelectedGame object into a dictionary for API payloads.
+    """
     configs = list(sg.game.resultconfig_set.all())
     return {
         "id": sg.id,
@@ -28,6 +31,9 @@ def _serialize_selected_game(sg) -> Dict:
 
 
 def _gs_row(gs) -> Dict:
+    """
+    Serializes a GameStanding object into a dictionary row for API payloads.
+    """
     return {
         "points": str(gs.points),
         "league_points": str(gs.league_points),
@@ -370,6 +376,9 @@ def build_full_standings_for_season(leagues: List[League]) -> List[Dict]:
 
 
 def set_league_active_player(league: League, participant) -> None:
+    """
+    Sets the active player for a league and updates the league's timestamp.
+    """
     from django.utils import timezone
     league.active_player = participant
     league.updated_at = timezone.now()
@@ -377,6 +386,9 @@ def set_league_active_player(league: League, participant) -> None:
 
 
 def touch_league(league: League) -> None:
+    """
+    Updates the updated_at timestamp for a league.
+    """
     from django.utils import timezone
     league.updated_at = timezone.now()
     league.save(update_fields=["updated_at"])
@@ -385,6 +397,10 @@ def touch_league(league: League) -> None:
 def rotate_active_player(
     league: League, reverse_order: bool = False, members=None
 ) -> Optional[SeasonParticipant]:
+    """
+    Rotates the active player in a league to the next player in order.
+    Supports reverse ordering and a custom subset of members.
+    """
     players = members if members is not None else league.members.all()
     ordered_players = list(players.order_by("-rank" if reverse_order else "rank"))
     if not ordered_players:
@@ -406,6 +422,10 @@ def rotate_active_player(
 
 @transaction.atomic
 def advance_turn(league: League):
+    """
+    Advances the league's turn based on its current status (PICKING, BANNING, REPICKING).
+    Handles transitions between these statuses and updates the active player.
+    """
     if league.status == LeagueStatus.PICKING:
         if q.all_players_have_picked(league):
             from django.utils import timezone
@@ -455,6 +475,9 @@ def advance_turn(league: League):
 
 
 def select_game(league: League, player, game):
+    """
+    Records a game selection for a player in a league, ensuring it is their turn.
+    """
     if league.active_player != player:
         raise ValueError("It's not this player's turn to select a game.")
     selected = SelectedGame.objects.create(league=league, player=player, game=game)
@@ -463,6 +486,9 @@ def select_game(league: League, player, game):
 
 
 def ban_game(league: League, player, game):
+    """
+    Records a game ban for a player in a league, ensuring it is their turn.
+    """
     if league.active_player != player:
         raise ValueError("It's not this player's turn to ban a game.")
     ban = BanDecision.objects.create(league=league, player=player, game=game)

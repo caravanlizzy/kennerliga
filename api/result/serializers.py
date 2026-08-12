@@ -4,6 +4,11 @@ from .models import Result
 
 
 class ResultSerializer(serializers.ModelSerializer):
+    """
+    Serializer for the Result model.
+    Handles complex validation based on the game's ResultConfig, including factions,
+    starting points, and win conditions.
+    """
     faction_ids = serializers.ListField(
         child=serializers.IntegerField(), required=False, write_only=True
     )
@@ -46,11 +51,17 @@ class ResultSerializer(serializers.ModelSerializer):
         ]
 
     def get_factions(self, obj):
+        """
+        Returns a list of factions associated with the result.
+        """
         return [
             {"id": f.id, "name": f.name, "level": f.level} for f in obj.factions.all()
         ]
 
     def get_player_profile_name(self, obj):
+        """
+        Returns the name of the player profile associated with the result.
+        """
         return obj.player_profile.profile_name
 
     def to_representation(self, instance):

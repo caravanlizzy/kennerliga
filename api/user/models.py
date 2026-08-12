@@ -10,6 +10,9 @@ from dateutil.relativedelta import relativedelta
 
 
 class User(AbstractUser):
+    """
+    Custom User model for authentication, using username as the primary identifier.
+    """
     # remove inherited first_name/last_name
     first_name = None
     last_name = None
@@ -37,6 +40,9 @@ class User(AbstractUser):
 
 
 class Platform(models.Model):
+    """
+    Model representing a gaming platform (e.g., BoardGameArena, Steam).
+    """
     name = models.CharField(max_length=255, unique=True)
 
     def __str__(self):
@@ -49,6 +55,9 @@ class Platform(models.Model):
 
 
 class PlayerProfile(models.Model):
+    """
+    Model representing a player's profile, linked to a User and multiple platforms.
+    """
     profile_name = models.CharField(max_length=100)
     user = models.OneToOneField(
         User, on_delete=models.SET_NULL, null=True, blank=True, related_name="profile"
@@ -60,6 +69,9 @@ class PlayerProfile(models.Model):
 
 
 class PlatformPlayer(models.Model):
+    """
+    Intermediary model linking a PlayerProfile to a specific Platform with a platform-specific name.
+    """
     player_profile = models.ForeignKey(
         PlayerProfile, on_delete=models.CASCADE, related_name="platform_links"
     )
@@ -81,6 +93,9 @@ class PlatformPlayer(models.Model):
 
 
 class UserInviteLink(models.Model):
+    """
+    Model representing a unique invite link used for user registration and profile linking.
+    """
     key = models.CharField(max_length=32, unique=True, db_index=True)
     label = models.CharField(
         max_length=300,
@@ -118,6 +133,9 @@ class UserInviteLink(models.Model):
 
 
 class Feedback(models.Model):
+    """
+    Model for storing user feedback messages.
+    """
     message = models.TextField()
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     datetime = models.DateTimeField(auto_now_add=True)

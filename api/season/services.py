@@ -9,6 +9,9 @@ from user.models import PlayerProfile
 
 
 def close_season(season: Season):
+    """
+    Marks the given season as DONE.
+    """
     if not season:
         logging.warning("No running season to close")
         return
@@ -17,6 +20,9 @@ def close_season(season: Season):
 
 
 def start_open_season(season: Season):
+    """
+    Changes the status of an OPEN season to RUNNING.
+    """
     if not season:
         logging.warning("No open season found")
         return
@@ -29,6 +35,9 @@ def start_open_season(season: Season):
 
 
 def create_next_season(current_season: Season) -> Season:
+    """
+    Creates a new season for the month following the given current season.
+    """
     if not current_season:
         raise ValueError("No running season found")
     new_month, new_year = _next_month_year(current_season.month, current_season.year)
@@ -38,6 +47,9 @@ def create_next_season(current_season: Season) -> Season:
 
 
 def open_registration(season: Season):
+    """
+    Changes the status of a season to OPEN, allowing players to register.
+    """
     if not season:
         raise ValueError("No current season")
     season.status = Season.SeasonStatus.OPEN
@@ -45,6 +57,9 @@ def open_registration(season: Season):
 
 
 def create_leagues(season: Season, participants: List) -> List[League]:
+    """
+    Distributes participants into leagues for the given season and sets the first active player for each.
+    """
     players_per_league = _players_per_league(len(participants))
     leagues = [
         League.objects.create(season=season, level=i + 1)
@@ -68,10 +83,17 @@ def create_leagues(season: Season, participants: List) -> List[League]:
 
 
 def _next_month_year(month: int, year: int):
+    """
+    Helper to calculate the next month and year.
+    """
     return (1, year + 1) if month == 12 else (month + 1, year)
 
 
 def _players_per_league(count: int) -> List[int]:
+    """
+    Calculates the number of players per league based on the total participant count.
+    Aiming for 4 players per league, with fallback to 3 or 2.
+    """
     league_count, rest = divmod(count, 4)
     players = [4] * league_count
     if rest == 1:
@@ -144,6 +166,9 @@ def get_previous_participants_list(participants) -> List:
 
 
 def get_previous_result(profile: PlayerProfile) -> Optional[dict]:
+    """
+    Retrieves the performance result (league and position) of a profile in the most recent DONE season.
+    """
     prev_season = get_previous_season()
     last_season = (
         Season.objects.filter(
@@ -159,6 +184,9 @@ def get_previous_result(profile: PlayerProfile) -> Optional[dict]:
 
 
 def _result_for_season(profile: PlayerProfile, season: Season) -> Optional[dict]:
+    """
+    Calculates the league level, rank, and 'last position' status for a profile in a specific season.
+    """
     try:
         league = League.objects.get(season=season, members__profile=profile)
     except League.DoesNotExist:
@@ -211,6 +239,9 @@ def order_previous(
     participants: List[PlayerProfile],
     new_league_sizes: Optional[List[int]] = None,
 ) -> List[PlayerProfile]:
+    """
+    Orders a list of previous participants for the new season's ranking, applying promotion rules.
+    """
     data = []
     for p in participants:
         info = get_previous_result(p)

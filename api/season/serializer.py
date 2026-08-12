@@ -9,6 +9,9 @@ from user.models import PlayerProfile
 
 
 class TLiveEventSerializer(serializers.Serializer):
+    """
+    Serializer for representing live events in a season's timeline.
+    """
     id = serializers.CharField()
     type = serializers.CharField()
     timestamp = serializers.DateTimeField()
@@ -18,6 +21,9 @@ class TLiveEventSerializer(serializers.Serializer):
 
 
 class SeasonSerializer(ModelSerializer):
+    """
+    Serializer for the Season model, including derived properties like start time and completion status.
+    """
     name = serializers.SerializerMethodField(read_only=True)
     season_start_time = serializers.SerializerMethodField(read_only=True)
     time_to_start = serializers.SerializerMethodField(read_only=True)
@@ -58,6 +64,9 @@ class SeasonSerializer(ModelSerializer):
 
 
 class SeasonWithLeaguesSerializer(SeasonSerializer):
+    """
+    Serializer for the Season model, including all its associated leagues.
+    """
     leagues = SerializerMethodField()
 
     def get_leagues(self, obj):
@@ -67,6 +76,9 @@ class SeasonWithLeaguesSerializer(SeasonSerializer):
 
 
 class SeasonParticipantMiniSerializer(ModelSerializer):
+    """
+    Lightweight serializer for SeasonParticipant, containing only basic identity info.
+    """
     profile_name = CharField(source="profile.profile_name", read_only=True)
     username = SerializerMethodField()
 
@@ -81,6 +93,10 @@ class SeasonParticipantMiniSerializer(ModelSerializer):
 
 
 class SeasonParticipantSerializer(ModelSerializer):
+    """
+    Serializer for the SeasonParticipant model.
+    Enriches participant data with selected games, bans, league info, and rankings.
+    """
     username = CharField(source="profile.user.username", read_only=True)
     profile_name = CharField(source="profile.profile_name", read_only=True)
     season_details = SeasonSerializer(source="season", read_only=True)

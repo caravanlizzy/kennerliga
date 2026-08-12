@@ -39,10 +39,17 @@ from game.models import SelectedGame
 
 # Create your views here.
 class UserViewSet(ModelViewSet):
+    """
+    API viewset for viewing and managing users.
+    Includes custom actions for retrieving user-specific leagues, seasons, results, and statistics.
+    """
     queryset = User.objects.all().order_by(Lower("username"))
     serializer_class = UserSerializer
 
     def get_permissions(self):
+        """
+        Determines the permissions for the current action.
+        """
         if self.action in [
             "list",
             "retrieve",
@@ -57,6 +64,9 @@ class UserViewSet(ModelViewSet):
         return [permission() for permission in permission_classes]
 
     def get_object(self):
+        """
+        Retrieves a user object by ID or username.
+        """
         lookup = self.kwargs["pk"]  # Django REST by default uses pk
         qs = self.get_queryset()
         # Try ID first, then username
@@ -243,10 +253,16 @@ class UserViewSet(ModelViewSet):
 
 
 class MeViewSet(ViewSet):
+    """
+    API viewset for the current authenticated user's context.
+    """
     permission_classes = [IsAuthenticated]
 
     @action(detail=False, methods=["get"], url_path="current-league")
     def current_league(self, request):
+        """
+        Returns the current running league for the authenticated user.
+        """
         from league.serializer import LeagueMinimalSerializer
 
         profile = request.user.profile
@@ -279,19 +295,18 @@ class MeViewSet(ViewSet):
 
     @action(detail=False, methods=["get"], url_path="results")
     def results(self, request):
+        """
+        Returns all game results for the authenticated user.
+        """
         results = Result.objects.filter(player_profile=request.user.profile)
         return Response(ResultSerializer(results, many=True).data)
 
 
 class UserInviteLinkViewSet(ModelViewSet):
     """
-    Admin-only:
-      - GET    /invite-links/        list (includes invite_url)
-      - POST   /invite-links/        create
-      - GET    /invite-links/{id}/   retrieve
-      - DELETE /invite-links/{id}/   destroy
+    API viewset for managing user invite links.
+    Restricted to admin users.
     """
-
     queryset = UserInviteLink.objects.select_related("created_by").all()
     serializer_class = UserInviteLinkSerializer
     permission_classes = [IsAdminUser]
@@ -303,11 +318,8 @@ class UserInviteLinkViewSet(ModelViewSet):
 
 class UserRegistrationViewSet(ViewSet):
     """
-    Public:
-      - POST /register/                 -> create user (consumes invite)
-      - GET  /register/validate/?key=.. -> check invite validity
+    API viewset for public user registration using an invite link.
     """
-
     permission_classes = [AllowAny]
 
     def create(self, request):
@@ -356,11 +368,17 @@ class UserRegistrationViewSet(ViewSet):
 
 
 class PlayerProfileViewSet(ModelViewSet):
+    """
+    API viewset for viewing and managing player profiles.
+    """
     queryset = PlayerProfile.objects.all()
     serializer_class = PlayerProfileSerializer
     permission_classes = [IsAdminOrReadOnly]
 
     def get_queryset(self):
+        """
+        Filters player profiles, optionally by whether they have an associated user.
+        """
         queryset = PlayerProfile.objects.all()
 
         # Check for user__isnull query parameter
@@ -379,6 +397,9 @@ class PlayerProfileViewSet(ModelViewSet):
 
 
 class FeedbackViewSet(ModelViewSet):
+    """
+    API viewset for submitting and viewing user feedback.
+    """
     queryset = Feedback.objects.all()
     serializer_class = FeedbackSerializer
     http_method_names = ["get", "post", "head", "options"]

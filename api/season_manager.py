@@ -16,6 +16,11 @@ from announcement.services import delete_registration_announcements
 
 
 def start_new_season(new_season=None):
+    """
+    Orchestrates the transition to a new season.
+    This includes closing the currently running season, ranking participants for the new season,
+    creating leagues, and setting up the subsequent next season.
+    """
     running_season = get_running_season()
     if new_season is None:
         new_season = get_open_season()

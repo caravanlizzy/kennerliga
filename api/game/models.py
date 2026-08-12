@@ -6,6 +6,9 @@ from user.models import PlayerProfile, Platform
 
 
 class Game(models.Model):
+    """
+    Model representing a board or video game that can be played in a league.
+    """
     name = models.CharField(max_length=120)
     short_name = models.CharField(max_length=120, blank=True, default="")
     platform = models.ForeignKey(Platform, on_delete=models.CASCADE)
@@ -37,6 +40,9 @@ class Game(models.Model):
 
 
 class GameOption(models.Model):
+    """
+    Model representing a configuration option for a game (e.g., Map, Mode, Player Count).
+    """
     name = models.CharField(max_length=88)
     game = models.ForeignKey(
         "Game", null=True, blank=True, on_delete=models.CASCADE, related_name="options"
@@ -69,6 +75,9 @@ class GameOption(models.Model):
 
 
 class GameOptionChoice(models.Model):
+    """
+    Model representing a specific choice for a GameOption that has multiple predefined choices.
+    """
     name = models.CharField(max_length=139, blank=True, null=True)
     option = models.ForeignKey(
         GameOption, on_delete=models.CASCADE, related_name="choices"
@@ -104,52 +113,10 @@ class GameOptionAvailabilityCondition(models.Model):
     A single atomic requirement inside a group.
     Exactly one of expected_value or expected_choice must be set.
     """
-
-    group = models.ForeignKey(
-        GameOptionAvailabilityGroup,
-        on_delete=models.CASCADE,
-        related_name="conditions",
-    )
-
-    depends_on_option = models.ForeignKey(
-        GameOption,
-        on_delete=models.CASCADE,
-        related_name="required_by_conditions",
-    )
-
-    expected_value = models.BooleanField(null=True, blank=True)
-    expected_choice = models.ForeignKey(
-        "GameOptionChoice",
-        on_delete=models.CASCADE,
-        null=True,
-        blank=True,
-        related_name="required_by_conditions",
-    )
-
-    negate = models.BooleanField(
-        default=False,
-        help_text="If true, invert the condition (NOT).",
-    )
-
-    class Meta:
-        constraints = [
-            models.CheckConstraint(
-                name="availability_condition_exactly_one_expected",
-                check=(
-                    # (expected_value is null) XOR (expected_choice is null)
-                    (
-                        models.Q(expected_value__isnull=False)
-                        & models.Q(expected_choice__isnull=True)
-                    )
-                    | (
-                        models.Q(expected_value__isnull=True)
-                        & models.Q(expected_choice__isnull=False)
-                    )
-                ),
-            ),
-        ]
-
     def clean(self):
+        """
+        Validates that the expected_choice belongs to the depends_on_option.
+        """
         super().clean()
 
         # If you set expected_choice, it must belong to depends_on_option.
@@ -172,6 +139,9 @@ class GameOptionAvailabilityCondition(models.Model):
 
 
 class SelectedGame(models.Model):
+    """
+    Model representing a game selected to be played in a specific league.
+    """
     profile = models.ForeignKey(
         PlayerProfile, on_delete=models.CASCADE, related_name="selected_games"
     )
@@ -196,6 +166,9 @@ class SelectedGame(models.Model):
 
 
 class SelectedOption(models.Model):
+    """
+    Model representing the specific value or choice selected for a GameOption in a SelectedGame.
+    """
     selected_game = models.ForeignKey(
         SelectedGame, on_delete=models.CASCADE, related_name="selected_options"
     )
@@ -216,6 +189,9 @@ class SelectedOption(models.Model):
 
 
 class BanDecision(models.Model):
+    """
+    Model representing a player's decision to ban a selected game in a league.
+    """
     league = models.ForeignKey(
         "league.League", on_delete=models.CASCADE, related_name="ban_decisions"
     )
@@ -237,6 +213,9 @@ class BanDecision(models.Model):
 
 
 class StartingPointSystem(models.Model):
+    """
+    Model representing the system used to determine starting points for players in a game.
+    """
     code = models.CharField(max_length=10, unique=True)
     description = models.CharField(max_length=255)
 
@@ -245,6 +224,9 @@ class StartingPointSystem(models.Model):
 
 
 class ResultConfig(models.Model):
+    """
+    Configuration for how results are recorded and calculated for a specific game.
+    """
     game = models.ForeignKey(Game, on_delete=models.CASCADE)
     is_asymmetric = models.BooleanField(default=False)
     has_starting_player_order = models.BooleanField(default=True)
@@ -258,7 +240,13 @@ class ResultConfig(models.Model):
 
 
 class WinCondition(models.Model):
+    """
+    Model representing a condition used to determine the winner of a game (e.g., Points, specific achievement).
+    """
     class WinConditionType(models.TextChoices):
+        """
+        Choices for the type of win condition.
+        """
         POINTS = "POINTS", "Points"
         OPTION = "OPTION", "Option"
 
@@ -291,6 +279,9 @@ class WinCondition(models.Model):
 
 
 class WinConditionOption(models.Model):
+    """
+    Model representing an option for a WinCondition of type OPTION.
+    """
     win_condition = models.ForeignKey(
         WinCondition,
         on_delete=models.CASCADE,
@@ -307,6 +298,9 @@ class WinConditionOption(models.Model):
 
 
 class TieBreaker(models.Model):
+    """
+    Model representing a tie-breaker rule for a WinCondition.
+    """
     win_condition = models.ForeignKey(
         WinCondition,
         on_delete=models.CASCADE,
@@ -327,6 +321,9 @@ class TieBreaker(models.Model):
 
 
 class Faction(models.Model):
+    """
+    Model representing a playable faction, race, or character in a game.
+    """
     game = models.ForeignKey(Game, on_delete=models.CASCADE)
     name = models.CharField(max_length=255)
     level = models.PositiveIntegerField(

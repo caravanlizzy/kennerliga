@@ -27,6 +27,10 @@ from league.services import get_full_standings_data
 
 
 class LeagueViewSet(ModelViewSet):
+    """
+    API viewset for viewing and managing leagues.
+    Provides custom actions for standings, game-standings, and admin operations like rebuilding snapshots.
+    """
     queryset = (
         League.objects.all()
         .prefetch_related("members__profile", "members__profile__user")
@@ -37,6 +41,9 @@ class LeagueViewSet(ModelViewSet):
     permission_classes = [IsAdminOrReadOnly]
 
     def get_queryset(self):
+        """
+        Customizes the queryset based on the action, optimizing for list views.
+        """
         if self.action == "full_standings":
             return League.objects.all()
         if self.action == "list":
@@ -64,17 +71,26 @@ class LeagueViewSet(ModelViewSet):
         return super().get_queryset()
 
     def get_serializer_class(self):
+        """
+        Returns the appropriate serializer class for the current action.
+        """
         if self.action == "list":
             return LeagueListSerializer
         return super().get_serializer_class()
 
     def get_permissions(self):
+        """
+        Ensures admin-only actions are protected.
+        """
         if self.action in ["rebuild_standings", "resolve_tie", "set_status"]:
             return [IsAdminUser()]
         return super().get_permissions()
 
     @action(detail=True, methods=["get"], url_path="standings")
     def standings(self, request, pk=None):
+        """
+        Returns the overall standings for the league.
+        """
         qs = (
             LeagueStanding.objects.filter(league=pk)
             .select_related("player_profile")
@@ -91,6 +107,9 @@ class LeagueViewSet(ModelViewSet):
 
     @action(detail=True, methods=["get"], url_path="game-standings")
     def game_standings(self, request, pk=None):
+        """
+        Returns the standings for a specific selected game within the league.
+        """
         sg_id = request.query_params.get("selected_game")
         if not sg_id:
             return Response(
@@ -109,6 +128,9 @@ class LeagueViewSet(ModelViewSet):
 
     @action(detail=True, methods=["get"], url_path="full-standings")
     def full_standings(self, request, pk=None):
+        """
+        Returns a comprehensive matrix of results and standings for all games and players in the league.
+        """
         league = self.get_object()
         data = get_full_standings_data(league)
         return Response(data, status=status.HTTP_200_OK)

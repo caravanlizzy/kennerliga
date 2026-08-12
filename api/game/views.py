@@ -46,11 +46,18 @@ from .queries import (
 
 
 class GameViewSet(ModelViewSet):
+    """
+    API viewset for viewing and editing games.
+    Supports filtering based on league member count and preventing duplicate game selections.
+    """
     queryset = Game.objects.all().order_by(Lower("name"))
     serializer_class = GameSerializer
     permission_classes = [IsAdminOrReadOnly]
 
     def get_queryset(self):
+        """
+        Filters the games based on league constraints and availability.
+        """
         queryset = get_all_games()
         league_id = self.request.query_params.get("league")
         manage_only = (
@@ -91,6 +98,9 @@ class GameViewSet(ModelViewSet):
 
 
 class GameOptionViewSet(ModelViewSet):
+    """
+    API viewset for viewing and editing game options.
+    """
     queryset = GameOption.objects.all()
     serializer_class = GameOptionSerializer
     filterset_fields = ["game"]
@@ -98,6 +108,9 @@ class GameOptionViewSet(ModelViewSet):
 
 
 class GameOptionChoiceViewSet(ModelViewSet):
+    """
+    API viewset for viewing and editing game option choices.
+    """
     queryset = GameOptionChoice.objects.all()
     serializer_class = GameOptionChoiceSerializer
     filterset_fields = ["option"]
@@ -105,6 +118,9 @@ class GameOptionChoiceViewSet(ModelViewSet):
 
 
 class FactionViewSet(ModelViewSet):
+    """
+    API viewset for viewing and editing game factions.
+    """
     queryset = Faction.objects.all()
     serializer_class = FactionSerializer
     filterset_fields = ["game"]
@@ -112,6 +128,9 @@ class FactionViewSet(ModelViewSet):
 
 
 class TieBreakerViewSet(ModelViewSet):
+    """
+    API viewset for viewing and editing tie-breakers.
+    """
     queryset = TieBreaker.objects.all()
     serializer_class = TieBreakerSerializer
     filterset_fields = ["win_condition"]
@@ -119,6 +138,9 @@ class TieBreakerViewSet(ModelViewSet):
 
 
 class WinConditionViewSet(ModelViewSet):
+    """
+    API viewset for viewing and editing win conditions.
+    """
     queryset = WinCondition.objects.all().prefetch_related("options", "tie_breakers")
     serializer_class = WinConditionSerializer
     filterset_fields = ["result_config"]
@@ -126,6 +148,9 @@ class WinConditionViewSet(ModelViewSet):
 
 
 class WinConditionOptionViewSet(ModelViewSet):
+    """
+    API viewset for viewing and editing win condition options.
+    """
     queryset = WinConditionOption.objects.all()
     serializer_class = WinConditionOptionSerializer
     filterset_fields = ["win_condition"]
@@ -133,6 +158,9 @@ class WinConditionOptionViewSet(ModelViewSet):
 
 
 class ResultConfigViewSet(ModelViewSet):
+    """
+    API viewset for viewing and editing game result configurations.
+    """
     queryset = ResultConfig.objects.all()
     serializer_class = ResultConfigSerializer
     filterset_fields = ["game"]
@@ -140,12 +168,18 @@ class ResultConfigViewSet(ModelViewSet):
 
 
 class StartingPointSystemViewSet(ModelViewSet):
+    """
+    API viewset for viewing starting point systems.
+    """
     queryset = StartingPointSystem.objects.all()
     serializer_class = StartingPointSystemSerializer
     permission_classes = [IsAdminOrReadOnly]
 
 
 class PlatformViewSet(ModelViewSet):
+    """
+    API viewset for viewing and editing gaming platforms.
+    """
     queryset = Platform.objects.all()
     serializer_class = PlatformSerializer
     permission_classes = [IsAdminOrReadOnly]
@@ -173,6 +207,9 @@ _LEAGUE_MEMBER_COUNT_SQ = Subquery(
 
 
 class SelectedGameViewSet(ModelViewSet):
+    """
+    API viewset for viewing and managing games selected for a league.
+    """
     queryset = (
         SelectedGame.objects.all()
         .select_related("game", "game__platform", "league", "profile")
@@ -192,6 +229,9 @@ class SelectedGameViewSet(ModelViewSet):
 
 
 class BanDecisionViewSet(ModelViewSet):
+    """
+    API viewset for recording and viewing game ban decisions.
+    """
     queryset = BanDecision.objects.all()
     serializer_class = BanDecisionSerializer
     filterset_fields = ["league"]
@@ -199,12 +239,18 @@ class BanDecisionViewSet(ModelViewSet):
 
 
 class SelectedOptionViewSet(ModelViewSet):
+    """
+    API viewset for managing options selected for a particular game in a league.
+    """
     queryset = SelectedOption.objects.all()
     serializer_class = SelectedOptionSerializer
     permission_classes = [IsAuthenticated]
 
 
 class FullGameViewSet(ModelViewSet):
+    """
+    API viewset for viewing games with all their related options, choices, and availability rules.
+    """
     queryset = (
         Game.objects.all()
         .select_related("platform")
@@ -218,6 +264,9 @@ class FullGameViewSet(ModelViewSet):
     permission_classes = [IsAdminOrReadOnly]
 
     def get_queryset(self):
+        """
+        Optionally filters for selectable games unless manage_only is specified by an admin.
+        """
         queryset = super().get_queryset()
         manage_only = (
                 self.request.query_params.get("manage_only", "false").lower() == "true"

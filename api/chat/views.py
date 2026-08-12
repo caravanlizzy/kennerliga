@@ -8,12 +8,22 @@ from chat.serializer import ChatSerializer
 
 
 class ChatViewSet(ModelViewSet):
+    """
+    API viewset for viewing and creating chat messages.
+    Supports filtering by datetime and limiting the number of results.
+    """
     def get_permissions(self):
+        """
+        Determines the permissions for the current action.
+        """
         if self.action in ["list", "retrieve", "create"]:
             return [IsAuthenticated()]
         return [IsAdminUser()]
 
     def get_queryset(self):
+        """
+        Customizes the queryset for chat messages, allowing for pagination and filtering.
+        """
         limit = self.request.query_params.get("limit", None)
         last_datetime = self.request.query_params.get("last_datetime")
         before_datetime = self.request.query_params.get("before_datetime")

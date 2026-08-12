@@ -4,6 +4,9 @@ from taskboard.models import Task
 
 
 class TaskSerializer(ModelSerializer):
+    """
+    Serializer for the Task model.
+    """
     class Meta:
         model = Task
         fields = [

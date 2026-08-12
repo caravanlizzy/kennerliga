@@ -8,6 +8,10 @@ from user.models import PlayerProfile
 
 
 class Result(models.Model):
+    """
+    Model representing the result of a specific player in a selected game within a league.
+    Stores points, position, starting conditions, factions used, and tie-breaker information.
+    """
     player_profile = models.ForeignKey(
         PlayerProfile,
         on_delete=models.CASCADE,

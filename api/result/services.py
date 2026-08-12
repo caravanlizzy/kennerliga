@@ -18,6 +18,10 @@ def finalize_results(
     decisive_tb=None,
     needing_pids=None,
 ):
+    """
+    Finalizes match results by ranking players, saving results, and rebuilding standings snapshots.
+    Also handles marking the league as DONE if all games are finished.
+    """
     if needing_pids is None:
         needing_pids = set()
 
@@ -93,6 +97,9 @@ def finalize_results(
 
 
 def get_game_standings_data(league, selected_game_id):
+    """
+    Retrieves and serializes GameStanding objects for a specific game in a league.
+    """
     standings = (
         GameStanding.objects.filter(league=league, selected_game_id=selected_game_id)
         .select_related("player_profile")

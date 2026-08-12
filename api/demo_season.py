@@ -14,4 +14,7 @@ selected_games = [{"id": "t"}]
 
 
 def create_demo_season():
+    """
+    Placeholder function for creating a demo season with sample data.
+    """
     return

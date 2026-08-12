@@ -10,6 +10,9 @@ User = get_user_model()
 
 
 class UserSerializer(ModelSerializer):
+    """
+    Serializer for the User model.
+    """
     profile_id = serializers.IntegerField(source="profile.id", read_only=True)
 
     class Meta:
@@ -18,12 +21,19 @@ class UserSerializer(ModelSerializer):
 
 
 class PlayerProfileSerializer(ModelSerializer):
+    """
+    Serializer for the PlayerProfile model.
+    """
     class Meta:
         model = PlayerProfile
         fields = ["id", "user", "profile_name"]
 
 
 class UserInviteLinkSerializer(serializers.ModelSerializer):
+    """
+    Serializer for the UserInviteLink model.
+    Generates a full invite URL for the frontend.
+    """
     invite_url = serializers.SerializerMethodField()
     player_profile_details = PlayerProfileSerializer(
         source="player_profile", read_only=True
@@ -54,6 +64,9 @@ class UserInviteLinkSerializer(serializers.ModelSerializer):
 
 
 class UserRegistrationSerializer(serializers.Serializer):
+    """
+    Serializer for handling user registration data, including the invite key.
+    """
     username = serializers.CharField(max_length=150)
     password = serializers.CharField(write_only=True)
     invite_key = serializers.CharField(write_only=True)
@@ -65,6 +78,9 @@ class UserRegistrationSerializer(serializers.Serializer):
 
 
 class FeedbackSerializer(serializers.ModelSerializer):
+    """
+    Serializer for the Feedback model.
+    """
     username = serializers.SerializerMethodField()
 
     class Meta:
