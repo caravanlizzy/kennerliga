@@ -353,7 +353,9 @@ class SeasonParticipantViewSet(ModelViewSet):
     create: POST /season-participants/  {season, profile, rank?}
     """
 
-    queryset = SeasonParticipant.objects.select_related("season", "profile")
+    queryset = SeasonParticipant.objects.select_related("season", "profile").prefetch_related(
+        "leagues_member"
+    )
     serializer_class = SeasonParticipantSerializer
     filterset_fields = ["season", "profile", "profile__profile_name"]
 

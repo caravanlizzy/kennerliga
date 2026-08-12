@@ -29,6 +29,8 @@ export type TSeasonParticipantDto = {
   is_active_player: boolean;
   is_prev_unregistered?: boolean;
   position: number;
+  league_position?: number;
+  league_position_display?: string;
   banned_by: string[];
   league?: { id: number; level: number };
 };

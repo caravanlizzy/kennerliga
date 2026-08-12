@@ -276,7 +276,7 @@
                     <q-item-section side>
                       <div class="row items-center q-gutter-x-md">
                         <div class="column items-end">
-                          <div class="text-caption text-grey-6 uppercase">Final Position</div>
+                          <div class="text-caption text-grey-6 uppercase">{{ sp.league_position_display || 'Final Position' }}</div>
                           <q-badge
                             :color="getPosBadgeColor(sp.league_position || 0)"
                             class="text-weight-bold q-px-sm"

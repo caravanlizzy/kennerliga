@@ -97,6 +97,7 @@ class SeasonParticipantSerializer(ModelSerializer):
     has_banned = BooleanField(read_only=True)
     is_active_player = SerializerMethodField()
     league_position = SerializerMethodField()
+    league_position_display = SerializerMethodField()
     # Extra marker to indicate entries coming from previous season and not yet registered
     # Existing clients can ignore it; defaults to False for real participants
     is_prev_unregistered = serializers.BooleanField(read_only=True, default=False)
@@ -118,6 +119,7 @@ class SeasonParticipantSerializer(ModelSerializer):
             "is_prev_unregistered",
             "my_banned_game",
             "league_position",
+            "league_position_display",
             "league",
         ]
 
@@ -160,14 +162,27 @@ class SeasonParticipantSerializer(ModelSerializer):
         )
 
     # ---- field getters -----------------------------------------------------
-    def get_league(self, obj):
+    def _get_league_for_obj(self, obj):
         league = self._league()
+        if not league:
+            # Check if we already cached it on the instance during this serialization run
+            cached = getattr(obj, "_cached_league", None)
+            if cached is not None:
+                return cached
+            # Respect prefetch_related("leagues_member")
+            leagues = list(obj.leagues_member.all())
+            league = leagues[0] if leagues else None
+            obj._cached_league = league
+        return league
+
+    def get_league(self, obj):
+        league = self._get_league_for_obj(obj)
         if not league:
             return None
         return {"id": league.id, "level": league.level}
 
     def get_league_position(self, obj):
-        league = self._league()
+        league = self._get_league_for_obj(obj)
         if not league:
             return None
         standings_order = get_league_standings_order(league)
@@ -176,8 +191,17 @@ class SeasonParticipantSerializer(ModelSerializer):
         except ValueError:
             return None
 
+    def get_league_position_display(self, obj):
+        league = self._get_league_for_obj(obj)
+        if not league:
+            return None
+        pos = self.get_league_position(obj)
+        if not pos:
+            return None
+        return f"L{league.level} Pos {pos}"
+
     def get_my_banned_game(self, obj):
-        league = self._league()
+        league = self._get_league_for_obj(obj)
         if not league:
             return None
 
@@ -191,7 +215,7 @@ class SeasonParticipantSerializer(ModelSerializer):
         return SelectedGameSerializer(selected_game, context=self.context).data
 
     def get_selected_games(self, obj):
-        league = self._league()
+        league = self._get_league_for_obj(obj)
         if not league:
             return []
         return SelectedGameSerializer(
@@ -201,7 +225,7 @@ class SeasonParticipantSerializer(ModelSerializer):
         ).data
 
     def get_is_active_player(self, obj):
-        league = self._league()
+        league = self._get_league_for_obj(obj)
         if not league:
             return False
         # Prefer cached active_player_id (attached by attach_league_lookups)
