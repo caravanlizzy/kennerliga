@@ -1,12 +1,35 @@
 <template>
   <q-card class="q-pa-lg" flat bordered rounded>
-    <div class="row items-center q-mb-lg">
-      <div class="col">
+    <div class="row items-center q-mb-lg q-col-gutter-md">
+      <div class="col-12 col-md">
         <div class="text-h5 text-weight-bold text-dark">
           <q-icon name="emoji_events" color="primary" class="q-mr-sm" />
           Match Result
         </div>
         <div class="text-subtitle2 text-grey-6">{{ members.length }} Players Participating</div>
+      </div>
+
+      <!-- Win Condition selector -->
+      <div
+        v-if="winConditions.length > 0"
+        class="col-12 col-md-auto"
+      >
+        <q-card flat bordered class="q-pa-sm wc-card">
+          <div class="row items-center q-gutter-x-md">
+            <div class="text-subtitle2 text-weight-bold q-ml-sm">
+              <q-icon name="flag_circle" color="primary" class="q-mr-xs" />
+              Win Condition
+            </div>
+            <q-option-group
+              v-model="selectedWinConditionId"
+              :options="winConditions.map((wc) => ({ label: wc.name, value: wc.id }))"
+              color="primary"
+              type="radio"
+              inline
+              dense
+            />
+          </div>
+        </q-card>
       </div>
     </div>
 
@@ -37,25 +60,6 @@
         v-if="!isLoading && formData.length"
         @submit.prevent="submitResults"
       >
-        <!-- Win Condition selector -->
-        <q-card
-          v-if="winConditions.length > 0"
-          flat
-          bordered
-          class="q-mb-md q-pa-md wc-card"
-        >
-          <div class="text-subtitle2 text-weight-bold q-mb-sm">
-            <q-icon name="flag_circle" color="primary" class="q-mr-xs" />
-            Win Condition
-          </div>
-          <q-option-group
-            v-model="selectedWinConditionId"
-            :options="winConditions.map((wc) => ({ label: wc.name, value: wc.id }))"
-            color="primary"
-            type="radio"
-            inline
-          />
-        </q-card>
 
         <div class="row q-col-gutter-md q-mb-md">
           <div

@@ -108,7 +108,8 @@ defineEmits(['close', 'success']);
   width: 100%;
   background: #f8fafc;
   border-radius: 20px;
-  overflow: hidden;
+  overflow-y: auto;
+  max-height: 95vh;
   box-shadow: 0 20px 50px rgba(0, 0, 0, 0.1);
 
   // Stability for different screen sizes
