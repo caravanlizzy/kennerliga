@@ -90,9 +90,12 @@
 }
 
 // Global Rounded but Flat
-.q-card, .q-dialog__inner > div, .q-menu, .q-banner, .q-item, .q-chip, .q-badge, .q-field--outlined .q-field__control {
+.q-card, .q-dialog__inner > div, .q-menu, .q-banner, .q-item, .q-chip, .q-badge, .q-field--outlined:not(.q-field--rounded) .q-field__control {
   border-radius: var(--kenner-card-radius, 16px) !important;
-  box-shadow: none !important;
+}
+
+.q-field--rounded .q-field__control {
+  border-radius: 28px !important;
 }
 
 .q-btn--rectangle {
