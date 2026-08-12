@@ -46,16 +46,29 @@
       <div class="row q-col-gutter-lg">
         <!-- Left Column: User Summary & Actions -->
         <div class="col-12 col-md-4">
-          <!-- Selection Limit Status (Moved from sidebar to prominent position) -->
+          <!-- Pick Limit Status -->
           <q-card flat bordered class="rounded-borders overflow-hidden q-mb-lg surface-card">
             <q-card-section class="surface-card-header text-weight-bold text-uppercase letter-spacing-1 row items-center justify-between">
-              <div>Selections {{ new Date().getFullYear() }}</div>
+              <div class="row items-center q-gutter-x-sm">
+                <div>Picks</div>
+                <q-select
+                  v-model="selectedYear"
+                  :options="availableYears"
+                  dense
+                  borderless
+                  emit-value
+                  map-options
+                  style="min-width: 80px"
+                  class="text-weight-bold"
+                  @update:model-value="refreshPicks"
+                />
+              </div>
               <q-icon name="info_outline" size="xs">
-                <q-tooltip>Maximum {{ maxGameLimit }} selections per game per year</q-tooltip>
+                <q-tooltip>Maximum {{ maxGameLimit }} picks per game per year</q-tooltip>
               </q-icon>
             </q-card-section>
             <q-list separator>
-              <q-item v-for="game in selectedGamesThisYear" :key="game.name + game.platform">
+              <q-item v-for="game in pickedGames" :key="game.name + game.platform">
                 <q-item-section>
                   <q-item-label class="text-weight-bold">{{ game.name }}</q-item-label>
                   <q-item-label caption>{{ game.platform }}</q-item-label>
@@ -68,9 +81,9 @@
                   />
                 </q-item-section>
               </q-item>
-              <q-item v-if="selectedGamesThisYear.length === 0">
+              <q-item v-if="pickedGames.length === 0">
                 <q-item-section class="text-grey-6 italic text-center q-pa-md">
-                  No selections yet
+                  No picks yet
                 </q-item-section>
               </q-item>
             </q-list>
@@ -334,8 +347,10 @@ const overallStats = ref({
 });
 const gameStats = ref<any[]>([]);
 const topGames = ref<any[]>([]);
-const selectedGamesThisYear = ref<any[]>([]);
+const pickedGames = ref<any[]>([]);
 const maxGameLimit = ref(2);
+const selectedYear = ref(new Date().getFullYear());
+const availableYears = ref<number[]>([new Date().getFullYear()]);
 
 async function load() {
   loading.value = true;
@@ -358,7 +373,7 @@ async function load() {
       if (profileId) {
         const [seasonsRes, statsRes] = await Promise.all([
           api.get('season/season-participants/', { params: { profile: profileId } }),
-          api.get(`user/users/${foundUser.id}/statistics/`)
+          api.get(`user/users/${foundUser.id}/statistics/`, { params: { year: selectedYear.value } })
         ]);
 
         const participants: TSeasonParticipantDto[] = Array.isArray(seasonsRes.data) ? seasonsRes.data : seasonsRes.data.results || [];
@@ -366,8 +381,9 @@ async function load() {
         overallStats.value = statsRes.data.overall_stats;
         gameStats.value = statsRes.data.game_stats;
         topGames.value = statsRes.data.top_games || [];
-        selectedGamesThisYear.value = statsRes.data.selected_games_this_year || [];
+        pickedGames.value = statsRes.data.picked_games || [];
         maxGameLimit.value = statsRes.data.max_game_limit || 2;
+        availableYears.value = statsRes.data.available_years || [new Date().getFullYear()];
 
         const seasonIds = [...new Set(participants.map(p => p.season))];
         const seasonsData = await Promise.all(seasonIds.map(id => api.get(`season/seasons/${id}/`)));
@@ -386,6 +402,18 @@ async function load() {
     console.error('Failed to load user details:', err);
   } finally {
     loading.value = false;
+  }
+}
+
+async function refreshPicks() {
+  if (!user.value) return;
+  try {
+    const { data } = await api.get(`user/users/${user.value.id}/statistics/`, {
+      params: { year: selectedYear.value }
+    });
+    pickedGames.value = data.picked_games || [];
+  } catch (err) {
+    console.error('Failed to refresh picks:', err);
   }
 }
 

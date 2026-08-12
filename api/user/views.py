@@ -102,11 +102,18 @@ class UserViewSet(ModelViewSet):
     @action(detail=True, methods=["get"], url_path="statistics")
     def user_statistics(self, request, pk=None):
         """
-        GET /user/users/{id|username}/statistics/
+        GET /user/users/{id|username}/statistics/?year=2026
         Returns aggregated league and game statistics for the user.
         """
         user = self.get_object()
         profile = user.profile
+
+        # 0. Get year from query params
+        year_param = request.query_params.get("year")
+        try:
+            selected_year = int(year_param) if year_param else timezone.now().year
+        except ValueError:
+            selected_year = timezone.now().year
 
         # 1. Game Statistics (Aggregated)
         results = Result.objects.filter(player_profile=profile).select_related(
@@ -171,16 +178,15 @@ class UserViewSet(ModelViewSet):
         # Sort by count descending for the default list
         game_stats.sort(key=lambda x: x["count"], reverse=True)
 
-        # 1b. Selected Games This Year
-        current_year = timezone.now().year
+        # 1b. Picked Games for the selected year
         # We only count games that were NOT banned.
         from game.queries import get_successfully_banned_game_ids
 
-        banned_game_ids = get_successfully_banned_game_ids(year=current_year)
+        banned_game_ids = get_successfully_banned_game_ids(year=selected_year)
 
-        selected_games_this_year_qs = (
+        picked_games_qs = (
             SelectedGame.objects.filter(
-                profile=profile, league__season__year=current_year
+                profile=profile, league__season__year=selected_year
             )
             .exclude(id__in=banned_game_ids)
             .values("game_id", "game__name", "game__platform__name")
@@ -188,7 +194,7 @@ class UserViewSet(ModelViewSet):
             .order_by("game__name")
         )
 
-        selected_games_this_year = [
+        picked_games = [
             {
                 "game_id": item["game_id"],
                 "name": item["game__name"],
@@ -196,7 +202,7 @@ class UserViewSet(ModelViewSet):
                 "count": item["count"],
                 "limit_exceeded": item["count"] >= MAX_SAME_GAME_PER_YEAR,
             }
-            for item in selected_games_this_year_qs
+            for item in picked_games_qs
         ]
 
         # 2. League Statistics (Minimal, as requested to be less prominent)
@@ -204,7 +210,6 @@ class UserViewSet(ModelViewSet):
             player_profile=profile
         ).select_related("league")
         total_leagues = standings.count()
-        # (Distribution logic removed as it's considered "useless" by the user)
 
         # Derive Top 3 games by highest win rate (then by more plays, then by better avg position)
         top_games = sorted(
@@ -217,6 +222,11 @@ class UserViewSet(ModelViewSet):
             ),
         )[:3]
 
+        # Get available years
+        available_years = list(Season.objects.values_list('year', flat=True).distinct().order_by('-year'))
+        if not available_years:
+            available_years = [timezone.now().year]
+
         return Response(
             {
                 "overall_stats": overall_stats,
@@ -225,8 +235,9 @@ class UserViewSet(ModelViewSet):
                 },
                 "game_stats": game_stats,
                 "top_games": top_games,
-                "selected_games_this_year": selected_games_this_year,
+                "picked_games": picked_games,
                 "max_game_limit": MAX_SAME_GAME_PER_YEAR,
+                "available_years": available_years,
             }
         )
 
