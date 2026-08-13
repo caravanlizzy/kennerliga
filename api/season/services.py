@@ -235,6 +235,75 @@ def get_projection_result(profile: PlayerProfile) -> Optional[dict]:
     return get_previous_result(profile)
 
 
+def build_league_projection(profiles: List[PlayerProfile]) -> dict:
+    """
+    Pure (read-only) projection of how a given list of player profiles would
+    be distributed into leagues, applying the same promotion/relegation
+    logic used when a season's leagues are actually created (see
+    ``apply_promotion``). Nothing is persisted: no ``League``/
+    ``SeasonParticipant`` rows are created and no ranks are saved.
+
+    Profiles with a finalized/projectable result from the previous (or
+    currently running) season are placed into their projected league.
+    Profiles without such a result ("newcomers") are returned separately,
+    since their final league only gets decided by the random shuffle
+    performed when the season actually starts.
+
+    Returns a dict shaped like:
+    {
+        "leagues": [{"level": 1, "size": 4, "members": [
+            {"profile": .., "profile_name": .., "username": ..,
+             "prev_league": .., "prev_position": ..}
+        ]}, ...],
+        "newcomers": [{"profile": .., "profile_name": .., "username": ..}]
+    }
+    """
+    total = len(profiles)
+    sizes = _players_per_league(total) if total else []
+
+    prev_rows = []
+    newcomers = []
+    for profile in profiles:
+        info = get_projection_result(profile)
+        base = {
+            "profile": profile.id,
+            "profile_name": profile.profile_name,
+            "username": getattr(getattr(profile, "user", None), "username", None),
+        }
+        if info and info.get("position") is not None:
+            prev_rows.append(
+                {
+                    **base,
+                    "league": info["league"],
+                    "position": info["position"],
+                    "is_last": info["is_last"],
+                }
+            )
+        else:
+            newcomers.append(base)
+
+    ordered = apply_promotion(prev_rows, sizes if sizes else None)
+
+    leagues_payload = []
+    idx = 0
+    for level, size in enumerate(sizes, start=1):
+        chunk = ordered[idx : idx + size]
+        idx += size
+        members = [
+            {
+                "profile": r["profile"],
+                "profile_name": r["profile_name"],
+                "username": r["username"],
+                "prev_league": r.get("league"),
+                "prev_position": r.get("position"),
+            }
+            for r in chunk
+        ]
+        leagues_payload.append({"level": level, "size": size, "members": members})
+
+    return {"leagues": leagues_payload, "newcomers": newcomers}
+
+
 def order_previous(
     participants: List[PlayerProfile],
     new_league_sizes: Optional[List[int]] = None,

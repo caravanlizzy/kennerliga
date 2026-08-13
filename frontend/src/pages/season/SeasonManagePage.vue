@@ -24,6 +24,19 @@
           v-if="isAdmin && season?.status === 'OPEN'"
           outline
           no-caps
+          icon="groups"
+          round
+          color="secondary"
+          size="md"
+          :loading="filling"
+          @click="onFillLeagues"
+        >
+          <KennerTooltip>Fill Leagues from current participants</KennerTooltip>
+        </KennerButton>
+        <KennerButton
+          v-if="isAdmin && season?.status === 'OPEN'"
+          outline
+          no-caps
           icon="play_arrow"
           round
           color="positive"
@@ -150,7 +163,7 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue';
 import { useRoute } from 'vue-router';
-import { fetchLeaguesBySeason, fetchSeason, fetchSeasonParticipants, startSeason } from 'src/services/seasonService';
+import { fetchLeaguesBySeason, fetchSeason, fetchSeasonParticipants, fillLeagues, startSeason } from 'src/services/seasonService';
 import LeagueList from 'components/season/LeagueList.vue';
 import LeagueLevel from 'components/season/LeagueLevel.vue';
 import KennerButton from 'components/base/KennerButton.vue';
@@ -173,6 +186,7 @@ const season = ref<TSeasonDto | null>(null);
 const participants = ref<TSeasonParticipantDto[]>([]);
 const loading = ref(true);
 const starting = ref(false);
+const filling = ref(false);
 const error = ref<string | null>(null);
 
 const participantsByLeague = computed(() => {
@@ -234,6 +248,29 @@ async function load() {
   } finally {
     loading.value = false;
   }
+}
+
+async function onFillLeagues() {
+  if (!season.value) return;
+
+  setDialog(
+    'Confirm Fill Leagues',
+    `Are you sure you want to distribute the current participants of ${season.value.name} into leagues? This will replace any existing leagues for this season.`,
+    'warning',
+    async () => {
+      try {
+        filling.value = true;
+        await fillLeagues(seasonId);
+        await load();
+      } catch (e: any) {
+        error.value = e?.response?.data?.detail || e?.message || 'Failed to fill leagues.';
+      } finally {
+        filling.value = false;
+      }
+    },
+    undefined,
+    'Fill Leagues'
+  );
 }
 
 async function onStartSeason() {

@@ -278,6 +278,46 @@ class SeasonViewSet(ModelViewSet):
         except Exception as e:
             return Response({"detail": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
+    @action(detail=True, methods=["post"], url_path="fill-leagues")
+    def fill_leagues(self, request, pk=None):
+        """
+        POST /seasons/{id}/fill-leagues/
+
+        Distributes the season's currently registered participants into
+        leagues, reusing the same ranking/promotion logic applied during the
+        automated ``start_new_season`` transition, without closing the
+        running season or creating the next one. Existing leagues for the
+        season are removed and recreated from the current participants.
+        """
+        from django.db import transaction
+        from season.queries import get_registered_participants
+        from season.services import create_leagues, rank_participants
+
+        season = self.get_object()
+        if season.status != Season.SeasonStatus.OPEN:
+            return Response(
+                {"detail": "Only OPEN seasons can have their leagues filled."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        participants = list(get_registered_participants(season))
+        if not participants:
+            return Response(
+                {"detail": "No registered participants found for this season."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        try:
+            with transaction.atomic():
+                League.objects.filter(season=season).delete()
+                ranked = rank_participants(season, participants)
+                create_leagues(season, ranked)
+            return Response(
+                {"detail": "Leagues filled successfully."}, status=status.HTTP_200_OK
+            )
+        except Exception as e:
+            return Response({"detail": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
 
 class SeasonScoreboardViewSet(ViewSet):
     """
@@ -484,11 +524,7 @@ class SeasonParticipantViewSet(ModelViewSet):
           ]
         }
         """
-        from season.services import (
-            _players_per_league,
-            apply_promotion,
-            get_projection_result,
-        )
+        from season.services import build_league_projection
 
         season_id = request.query_params.get("season")
         season = None
@@ -511,53 +547,8 @@ class SeasonParticipantViewSet(ModelViewSet):
                 "profile", "profile__user"
             )
         )
-        total = len(participants)
-        sizes = _players_per_league(total) if total else []
-
-        prev_rows = []
-        newcomers = []
-        for sp in participants:
-            info = get_projection_result(sp.profile)
-            base = {
-                "profile": sp.profile_id,
-                "profile_name": sp.profile.profile_name,
-                "username": getattr(
-                    getattr(sp.profile, "user", None), "username", None
-                ),
-            }
-            if info and info.get("position") is not None:
-                prev_rows.append(
-                    {
-                        **base,
-                        "league": info["league"],
-                        "position": info["position"],
-                        "is_last": info["is_last"],
-                    }
-                )
-            else:
-                newcomers.append(base)
-
-        ordered = apply_promotion(prev_rows, sizes if sizes else None)
-
-        # Distribute ordered prev participants into leagues by capacity.
-        leagues_payload = []
-        idx = 0
-        for level, size in enumerate(sizes, start=1):
-            chunk = ordered[idx : idx + size]
-            idx += size
-            members = [
-                {
-                    "profile": r["profile"],
-                    "profile_name": r["profile_name"],
-                    "username": r["username"],
-                    "prev_league": r.get("league"),
-                    "prev_position": r.get("position"),
-                }
-                for r in chunk
-            ]
-            leagues_payload.append(
-                {"level": level, "size": size, "members": members}
-            )
+        profiles = [sp.profile for sp in participants]
+        projection = build_league_projection(profiles)
 
         return Response(
             {
@@ -566,8 +557,53 @@ class SeasonParticipantViewSet(ModelViewSet):
                     "name": season.name,
                     "status": season.status,
                 },
-                "leagues": leagues_payload,
-                "newcomers": newcomers,
+                "leagues": projection["leagues"],
+                "newcomers": projection["newcomers"],
+            },
+            status=200,
+        )
+
+    @action(detail=False, methods=["post"], url_path="preview-leagues")
+    def preview_leagues(self, request):
+        """
+        POST /season-participants/preview-leagues/
+        Body: {"profile_ids": [1, 2, 3, ...]}
+
+        Read-only preview of how the given (not-yet-registered) profiles
+        would be distributed across leagues, using the same
+        promotion/relegation logic applied when a season's leagues are
+        actually created. Nothing is persisted: this is meant to power a
+        live preview in the "Create Season" form, before the season and its
+        participants/leagues are actually submitted/saved.
+
+        Response is shaped the same way as ``projected-leagues``, minus the
+        ``season`` key (there is no season yet at this point).
+        """
+        from season.services import build_league_projection
+
+        profile_ids = request.data.get("profile_ids") or []
+        try:
+            profile_ids = [int(pid) for pid in profile_ids]
+        except (TypeError, ValueError):
+            return Response(
+                {"detail": "profile_ids must be a list of integers."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        profiles_by_id = PlayerProfile.objects.select_related("user").in_bulk(
+            profile_ids
+        )
+        # Preserve the order the ids were given in, ignore unknown ids.
+        profiles = [
+            profiles_by_id[pid] for pid in profile_ids if pid in profiles_by_id
+        ]
+
+        projection = build_league_projection(profiles)
+
+        return Response(
+            {
+                "leagues": projection["leagues"],
+                "newcomers": projection["newcomers"],
             },
             status=200,
         )

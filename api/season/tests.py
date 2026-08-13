@@ -101,6 +101,104 @@ class SeasonAPITests(TestCase):
         )
 
 
+class PreviewLeaguesAPITests(TestCase):
+    def setUp(self):
+        self.client = APIClient()
+        self.admin = User.objects.create_superuser(
+            username="admin", password="password"
+        )
+        self.client.force_authenticate(user=self.admin)
+        self.p1 = PlayerProfile.objects.create(profile_name="P1")
+        self.p2 = PlayerProfile.objects.create(profile_name="P2")
+
+    def test_preview_leagues_returns_distribution_without_persisting(self):
+        response = self.client.post(
+            "/api/season/season-participants/preview-leagues/",
+            {"profile_ids": [self.p1.id, self.p2.id]},
+            format="json",
+        )
+        self.assertEqual(response.status_code, 200)
+        leagues = response.data["leagues"]
+        self.assertEqual(len(leagues), 1)
+        all_members = leagues[0]["members"] + response.data["newcomers"]
+        self.assertEqual(len(all_members), 2)
+
+        # Nothing should have been persisted.
+        self.assertEqual(Season.objects.count(), 0)
+        self.assertEqual(League.objects.count(), 0)
+        self.assertEqual(SeasonParticipant.objects.count(), 0)
+
+    def test_preview_leagues_empty_profile_ids(self):
+        response = self.client.post(
+            "/api/season/season-participants/preview-leagues/",
+            {"profile_ids": []},
+            format="json",
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data["leagues"], [])
+        self.assertEqual(response.data["newcomers"], [])
+
+    def test_preview_leagues_rejects_non_integer_ids(self):
+        response = self.client.post(
+            "/api/season/season-participants/preview-leagues/",
+            {"profile_ids": ["abc"]},
+            format="json",
+        )
+        self.assertEqual(response.status_code, 400)
+
+
+class FillLeaguesAPITests(TestCase):
+    def setUp(self):
+        self.client = APIClient()
+        self.admin = User.objects.create_superuser(
+            username="admin", password="password"
+        )
+        self.client.force_authenticate(user=self.admin)
+        self.season = Season.objects.create(
+            year=2026, month=2, status=Season.SeasonStatus.OPEN
+        )
+        self.p1 = PlayerProfile.objects.create(profile_name="P1")
+        self.p2 = PlayerProfile.objects.create(profile_name="P2")
+        SeasonParticipant.objects.create(season=self.season, profile=self.p1)
+        SeasonParticipant.objects.create(season=self.season, profile=self.p2)
+
+    def test_fill_leagues_creates_leagues_from_participants(self):
+        response = self.client.post(
+            f"/api/season/seasons/{self.season.id}/fill-leagues/"
+        )
+        self.assertEqual(response.status_code, 200)
+        leagues = League.objects.filter(season=self.season)
+        self.assertEqual(leagues.count(), 1)
+        self.assertEqual(leagues.first().members.count(), 2)
+
+    def test_fill_leagues_replaces_existing_leagues(self):
+        # Pre-existing (stale) league for the season.
+        League.objects.create(season=self.season, level=1)
+        response = self.client.post(
+            f"/api/season/seasons/{self.season.id}/fill-leagues/"
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(League.objects.filter(season=self.season).count(), 1)
+
+    def test_fill_leagues_rejects_non_open_season(self):
+        running_season = Season.objects.create(
+            year=2026, month=3, status=Season.SeasonStatus.RUNNING
+        )
+        response = self.client.post(
+            f"/api/season/seasons/{running_season.id}/fill-leagues/"
+        )
+        self.assertEqual(response.status_code, 400)
+
+    def test_fill_leagues_rejects_when_no_participants(self):
+        empty_season = Season.objects.create(
+            year=2026, month=4, status=Season.SeasonStatus.OPEN
+        )
+        response = self.client.post(
+            f"/api/season/seasons/{empty_season.id}/fill-leagues/"
+        )
+        self.assertEqual(response.status_code, 400)
+
+
 class RankParticipantsTest(TestCase):
     def setUp(self):
         # Setup previous season

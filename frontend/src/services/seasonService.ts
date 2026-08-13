@@ -68,6 +68,35 @@ export async function startSeason(seasonId: number): Promise<void> {
   await api.post(`/season/seasons/${seasonId}/start-season/`);
 }
 
+export async function fillLeagues(seasonId: number): Promise<void> {
+  await api.post(`/season/seasons/${seasonId}/fill-leagues/`);
+}
+
+export type TLeaguePreviewMember = {
+  profile: number;
+  profile_name: string;
+  username: string | null;
+  prev_league?: number | null;
+  prev_position?: number | null;
+};
+
+export type TLeaguePreview = {
+  leagues: { level: number; size: number; members: TLeaguePreviewMember[] }[];
+  newcomers: { profile: number; profile_name: string; username: string | null }[];
+};
+
+/**
+ * Read-only preview of how the given (not-yet-registered) profile ids would be
+ * distributed into leagues, without persisting anything. Used to pre-fill the
+ * "Create Season" form before it is actually submitted.
+ */
+export async function previewLeagues(profileIds: number[]): Promise<TLeaguePreview> {
+  const { data } = await api.post('/season/season-participants/preview-leagues/', {
+    profile_ids: profileIds,
+  });
+  return data;
+}
+
 export async function fetchCurrentSeasonId(): Promise<number | null> {
   try {
     const { data } = await api.get('/season/current/');

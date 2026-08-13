@@ -28,6 +28,7 @@
     </div>
 
     <div>Then select which users to put in which league</div>
+    <div v-if="previewLoading" class="text-caption text-grey">Loading league preview…</div>
 
     <div
       v-for="(lg, idx) in preparedLeagues"
@@ -89,6 +90,7 @@ import {
   createLeagueForSeason,
   createSeason,
   ensureParticipants,
+  previewLeagues,
 } from 'src/services/seasonService';
 
 /* -------------------- State -------------------- */
@@ -101,6 +103,7 @@ const availableMembers = ref<RawProfile[]>([]);
 
 type PreparedLeague = { level: number | null; memberProfileIds: number[] };
 const preparedLeagues = ref<PreparedLeague[]>([{ level: 1, memberProfileIds: [] }]);
+const previewLoading = ref(false);
 
 /* -------------------- Options (normalized) -------------------- */
 const profileOptions = computed(() =>
@@ -158,6 +161,57 @@ function onMemberListChange(newList: any) {
 
   // Also remove duplicates across leagues (keep earlier leagues’ picks)
   dedupeAcrossLeagues();
+
+  void applyLeaguePreview();
+}
+
+/**
+ * Fetches a read-only preview of how the currently selected members would be
+ * distributed into leagues (reusing the same promotion/relegation logic used
+ * by start_new_season / Fill Leagues), and pre-fills preparedLeagues with it.
+ * Nothing is persisted here - it's only stored in the backend once the form
+ * is actually submitted via createAll().
+ */
+async function applyLeaguePreview() {
+  if (memberList.value.length === 0) {
+    preparedLeagues.value = [{ level: 1, memberProfileIds: [] }];
+    return;
+  }
+
+  previewLoading.value = true;
+  try {
+    const preview = await previewLeagues(memberList.value);
+
+    const leagues: PreparedLeague[] = preview.leagues.map((lg) => ({
+      level: lg.level,
+      memberProfileIds: lg.members.map((m) => Number(m.profile)),
+    }));
+
+    // Newcomers have no projected league yet (their final spot is decided by
+    // a random shuffle at season start) - distribute them into the open slots
+    // of the existing leagues, adding extra leagues if needed.
+    const newcomerIds = preview.newcomers.map((n) => Number(n.profile));
+    let leagueIdx = 0;
+    for (const pid of newcomerIds) {
+      while (
+        leagueIdx < leagues.length &&
+        leagues[leagueIdx].memberProfileIds.length >=
+          (preview.leagues[leagueIdx]?.size ?? 4)
+      ) {
+        leagueIdx++;
+      }
+      if (leagueIdx >= leagues.length) {
+        leagues.push({ level: leagues.length + 1, memberProfileIds: [] });
+      }
+      leagues[leagueIdx].memberProfileIds.push(pid);
+    }
+
+    preparedLeagues.value = leagues.length > 0 ? leagues : [{ level: 1, memberProfileIds: [] }];
+  } catch (e) {
+    console.error('Failed to load league preview:', e);
+  } finally {
+    previewLoading.value = false;
+  }
 }
 
 // When a league's selection changes, normalize and enforce cross-league uniqueness
