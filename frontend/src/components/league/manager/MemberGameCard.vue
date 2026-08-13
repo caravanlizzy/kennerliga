@@ -294,6 +294,46 @@
           </q-card-section>
         </q-card>
       </div>
+
+      <!-- Picking / Banning / Reporting status badges -->
+      <div class="col-12 col-md-4 column items-start q-gutter-y-sm">
+        <q-chip
+          square
+          dense
+          :color="isPickingDone(member) ? 'positive' : 'grey-3'"
+          :text-color="isPickingDone(member) ? 'white' : 'grey-7'"
+          icon="sports_esports"
+          size="sm"
+          class="text-weight-bold"
+        >
+          {{ pickingBadgeText(member) }}
+          <KennerTooltip>{{ pickingTooltip(member) }}</KennerTooltip>
+        </q-chip>
+        <q-chip
+          square
+          dense
+          :color="isBanningDone(member) ? 'positive' : 'grey-3'"
+          :text-color="isBanningDone(member) ? 'white' : 'grey-7'"
+          icon="block"
+          size="sm"
+          class="text-weight-bold"
+        >
+          {{ isBanningDone(member) ? 'Banned' : 'Ban Pending' }}
+          <KennerTooltip>{{ isBanningDone(member) ? 'Banning completed' : 'Banning not completed yet' }}</KennerTooltip>
+        </q-chip>
+        <q-chip
+          square
+          dense
+          :color="isReportingDone(member) ? 'positive' : 'grey-3'"
+          :text-color="isReportingDone(member) ? 'white' : 'grey-7'"
+          icon="emoji_events"
+          size="sm"
+          class="text-weight-bold"
+        >
+          {{ isReportingDone(member) ? 'Reported' : 'Report Pending' }}
+          <KennerTooltip>{{ isReportingDone(member) ? 'All results reported' : 'Results not fully reported yet' }}</KennerTooltip>
+        </q-chip>
+      </div>
     </div>
   </q-card-section>
 </q-card>
@@ -319,6 +359,47 @@ const maxGames = computed(() => {
   const memberCount = props.league?.members?.length || 0;
   return memberCount === 2 ? 3 : 2;
 });
+
+// After banning, a member usually keeps 1 game (2 in 2-player leagues, since they pick 3 and 1 gets banned)
+const requiredReportableGames = computed(() => maxGames.value - 1);
+
+// A player's own pick got banned by an opponent, so they are allowed to pick a replacement.
+function hasOwnGameBanned(member: any): boolean {
+  return (member.selected_games || []).some((sg: any) => sg.successfully_banned);
+}
+
+// Base picks allowed before any of the player's own picks gets banned (1 normal, 2 in
+// two-player leagues). A second (or third, for two-player leagues) pick is only allowed
+// once one of the player's own picked games has been successfully banned, so the player
+// can pick a replacement. Note: this is independent of whether the player themself has
+// already made their own ban decision against an opponent (see `isBanningDone`).
+function requiredPicks(member: any): number {
+  return hasOwnGameBanned(member) ? maxGames.value : requiredReportableGames.value;
+}
+
+function isPickingDone(member: any): boolean {
+  return (member.selected_games?.length || 0) >= requiredPicks(member);
+}
+
+function pickingTooltip(member: any): string {
+  const picked = member.selected_games?.length || 0;
+  return `Picked ${picked}/${requiredPicks(member)} games`;
+}
+
+function pickingBadgeText(member: any): string {
+  const picked = member.selected_games?.length || 0;
+  return isPickingDone(member) ? 'Picked' : `Picking ${picked}/${requiredPicks(member)}`;
+}
+
+function isBanningDone(member: any): boolean {
+  return member.has_banned || !!member.my_banned_game?.game;
+}
+
+function isReportingDone(member: any): boolean {
+  const reportableGames = (member.selected_games || []).filter((sg: any) => !sg.successfully_banned);
+  if (reportableGames.length < requiredReportableGames.value) return false;
+  return reportableGames.every((sg: any) => hasResult(sg));
+}
 
 defineEmits([
   'add-game',
