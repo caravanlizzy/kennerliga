@@ -113,6 +113,47 @@ class GameOptionAvailabilityCondition(models.Model):
     A single atomic requirement inside a group.
     Exactly one of expected_value or expected_choice must be set.
     """
+
+    group = models.ForeignKey(
+        GameOptionAvailabilityGroup,
+        on_delete=models.CASCADE,
+        related_name="conditions",
+    )
+    depends_on_option = models.ForeignKey(
+        GameOption,
+        on_delete=models.CASCADE,
+        related_name="required_by_conditions",
+    )
+    expected_choice = models.ForeignKey(
+        GameOptionChoice,
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name="required_by_conditions",
+    )
+    expected_value = models.BooleanField(null=True, blank=True)
+    negate = models.BooleanField(
+        default=False, help_text="If true, invert the condition (NOT)."
+    )
+
+    class Meta:
+        constraints = [
+            models.CheckConstraint(
+                name="availability_condition_exactly_one_expected",
+                check=models.Q(
+                    models.Q(
+                        ("expected_value__isnull", False),
+                        ("expected_choice__isnull", True),
+                    ),
+                    models.Q(
+                        ("expected_value__isnull", True),
+                        ("expected_choice__isnull", False),
+                    ),
+                    _connector="OR",
+                ),
+            )
+        ]
+
     def clean(self):
         """
         Validates that the expected_choice belongs to the depends_on_option.
