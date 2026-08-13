@@ -78,7 +78,7 @@
                   label="Add option"
                   icon="add"
                   unelevated
-                  @click="addEmptyOption"
+                  @click="onAddOption"
                 />
               </div>
 
@@ -144,6 +144,7 @@
                           v-model="opt.has_choices"
                           label="Has choices"
                           color="primary"
+                          @update:model-value="() => ensureMinimumChoices(opt.ref)"
                         />
                         <q-icon
                           name="help_outline"
@@ -434,6 +435,7 @@
 </template>
 
 <script setup lang="ts">
+import { ref, nextTick } from 'vue';
 import { useQuasar } from 'quasar';
 import { api } from 'boot/axios';
 import KennerInput from 'components/base/KennerInput.vue';
@@ -463,6 +465,7 @@ const {
   moveOption,
   removeOption,
   addChoice,
+  ensureMinimumChoices,
   moveChoice,
   removeChoice,
   addAvailabilityGroup,
@@ -479,6 +482,18 @@ const {
 let resultConfig: TResultConfig | undefined = undefined;
 function updateResultConfig(newResultConfig: TResultConfig) {
   resultConfig = newResultConfig;
+}
+
+async function onAddOption() {
+  addEmptyOption();
+  await nextTick();
+  const options = document.querySelectorAll('.option-card');
+  if (options.length > 0) {
+    options[options.length - 1].scrollIntoView({
+      behavior: 'smooth',
+      block: 'center',
+    });
+  }
 }
 
 const onSubmit = async () => {

@@ -124,6 +124,14 @@ export function useGameForm() {
     });
   }
 
+  function ensureMinimumChoices(optionRef: string): void {
+    const opt = gameOptions.value.find((o) => o.ref === optionRef);
+    if (!opt || !opt.has_choices) return;
+    while (opt.choices.length < 2) {
+      addChoice(optionRef);
+    }
+  }
+
   function moveChoice(
     optionRef: string,
     choiceIndex: number,
@@ -419,8 +427,8 @@ export function useGameForm() {
     addEmptyOption,
     moveOption,
     removeOption,
-    // choices
     addChoice,
+    ensureMinimumChoices,
     moveChoice,
     removeChoice,
     // availability groups / conditions

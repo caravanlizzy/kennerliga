@@ -81,7 +81,7 @@
                   label="Add option"
                   icon="add"
                   unelevated
-                  @click="addEmptyOption"
+                  @click="onAddOption"
                 />
               </div>
 
@@ -131,7 +131,12 @@
 
                     <q-card-section class="q-pa-md">
                       <div class="row items-center q-mb-md">
-                        <q-toggle v-model="opt.has_choices" label="Has choices" color="primary" />
+                        <q-toggle
+                          v-model="opt.has_choices"
+                          label="Has choices"
+                          color="primary"
+                          @update:model-value="() => ensureMinimumChoices(opt.ref)"
+                        />
                         <q-icon name="help_outline" size="xs" color="grey-5" class="q-ml-xs">
                           <KennerTooltip>If enabled, players can choose from a list. If disabled, it's a simple toggle.</KennerTooltip>
                         </q-icon>
@@ -373,7 +378,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from 'vue';
+import { onMounted, ref, nextTick } from 'vue';
 import { useQuasar } from 'quasar';
 import { api } from 'boot/axios';
 import KennerInput from 'components/base/KennerInput.vue';
@@ -407,6 +412,7 @@ const {
   moveOption,
   removeOption,
   addChoice,
+  ensureMinimumChoices,
   moveChoice,
   removeChoice,
   addAvailabilityGroup,
@@ -425,6 +431,18 @@ const initialResultConfig = ref<TResultConfig | null>(null);
 let resultConfig: TResultConfig | undefined = undefined;
 function updateResultConfig(newResultConfig: TResultConfig) {
   resultConfig = newResultConfig;
+}
+
+async function onAddOption() {
+  addEmptyOption();
+  await nextTick();
+  const options = document.querySelectorAll('.option-card');
+  if (options.length > 0) {
+    options[options.length - 1].scrollIntoView({
+      behavior: 'smooth',
+      block: 'center',
+    });
+  }
 }
 
 onMounted(async () => {
