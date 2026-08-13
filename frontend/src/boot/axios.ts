@@ -28,9 +28,23 @@ export default boot(({ app }) => {
   // ^ ^ ^ this will allow you to use this.$api (for Vue Options API form)
   //       so you can easily perform requests against your app's API
 
-  // guarantee the token the be set in headers if available.
+  // guarantee the token to be set in headers if available.
 
   loadToken();
 });
+
+/**
+ * Single place responsible for attaching/removing the auth token on the
+ * shared Axios instance. Callers (userStore, helpers.loadToken, ...) should
+ * use this instead of mutating `api.defaults.headers` themselves, so token
+ * handling isn't spread across multiple Axios-aware places.
+ */
+export function setAuthToken(token: string | null | undefined): void {
+  if (token) {
+    api.defaults.headers.common['Authorization'] = 'Token ' + token;
+  } else {
+    delete api.defaults.headers.common['Authorization'];
+  }
+}
 
 export { api };

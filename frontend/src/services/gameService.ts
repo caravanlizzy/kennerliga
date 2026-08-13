@@ -5,6 +5,9 @@ import {
   TGameOptionDto,
   TSelectedGameDtoPayload,
   TPlatform,
+  TFactionDto,
+  TResultConfigDto,
+  TWinConditionDto,
 } from 'src/types';
 import { api } from 'boot/axios';
 import {
@@ -12,6 +15,7 @@ import {
   TGameOptionChoice,
   TResultConfig,
 } from 'src/types';
+import { unwrapList } from 'src/services/httpTypes';
 
 import { useIDStorage } from 'src/composables/IDStorage';
 
@@ -32,10 +36,7 @@ export async function banGame(banDecision: TBanDecisionDtoPayload) {
   }
 
   try {
-    return await api('/game/ban-decisions/', {
-      method: 'POST',
-      data,
-    });
+    return await api.post('/game/ban-decisions/', data);
   } catch (error) {
     throw new Error('Error creating ban decision: ' + error);
   }
@@ -47,9 +48,10 @@ export async function createGame(
   short_name?: string
 ): Promise<number> {
   try {
-    const { data } = await api('game/games/', {
-      method: 'POST',
-      data: { name: name, platform: platform.id, short_name: short_name || name },
+    const { data } = await api.post('/game/games/', {
+      name: name,
+      platform: platform.id,
+      short_name: short_name || name,
     });
     return data.id;
   } catch (e) {
@@ -103,10 +105,7 @@ export async function addRestrictions(option: TGameOption): Promise<void> {
     return;
   }
 
-  await api(`game/options/${optionId}/`, {
-    method: 'PATCH',
-    data,
-  });
+  await api.patch(`/game/options/${optionId}/`, data);
 }
 
 async function createOption(
@@ -114,13 +113,10 @@ async function createOption(
   gameId: number
 ): Promise<TGameOptionDto> {
   try {
-    const { data: newOption } = await api('game/options/', {
-      method: 'POST',
-      data: {
-        name: option.title,
-        has_choices: option.hasChoices,
-        game: gameId,
-      },
+    const { data: newOption } = await api.post('/game/options/', {
+      name: option.title,
+      has_choices: option.hasChoices,
+      game: gameId,
     });
     addStorageItem(option.id as number, newOption.id);
     return newOption;
@@ -136,12 +132,9 @@ async function createOptionChoice(
   optionId: number
 ): Promise<TGameOptionChoiceDto> {
   try {
-    const { data: newChoice } = await api('game/option-choices/', {
-      method: 'POST',
-      data: {
-        name: choice.name,
-        option: optionId,
-      },
+    const { data: newChoice } = await api.post('/game/option-choices/', {
+      name: choice.name,
+      option: optionId,
     });
     addStorageItem(choice.id as number, newChoice.id);
     return newChoice;
@@ -177,15 +170,12 @@ export async function createResultConfigData(
   resultConfig: TResultConfig
 ): Promise<void> {
   try {
-    const { data: resultConfigData } = await api('game/result-configs/', {
-      method: 'POST',
-      data: {
-        game: gameId,
-        is_asymmetric: resultConfig?.isAsymmetric,
-        has_starting_player_order: resultConfig?.hasStartingPlayerOrder,
-        has_points: resultConfig?.hasPoints,
-        starting_points_system: resultConfig?.startingPointSystem,
-      },
+    const { data: resultConfigData } = await api.post('/game/result-configs/', {
+      game: gameId,
+      is_asymmetric: resultConfig?.isAsymmetric,
+      has_starting_player_order: resultConfig?.hasStartingPlayerOrder,
+      has_points: resultConfig?.hasPoints,
+      starting_points_system: resultConfig?.startingPointSystem,
     });
     await createFactions(gameId, resultConfig);
     await createWinConditions(resultConfigData.id, resultConfig);
@@ -204,13 +194,10 @@ export async function createFactions(
   if (resultConfig.factions === undefined) return;
   for (const faction of resultConfig.factions) {
     try {
-      await api('game/factions/', {
-        method: 'POST',
-        data: {
-          game: gameId,
-          name: faction.name,
-          level: faction.level
-        },
+      await api.post('/game/factions/', {
+        game: gameId,
+        name: faction.name,
+        level: faction.level,
       });
     } catch (e) {
       console.log('Error creating faction', e);
@@ -224,14 +211,11 @@ export async function createWinConditions(resultConfigId: number, resultConfig: 
   for (const [wcIndex, winCondition] of resultConfig.winConditions.entries()) {
     let winConditionId: number;
     try {
-      const { data: createdWc } = await api('game/win-conditions/', {
-        method: 'POST',
-        data: {
-          result_config: resultConfigId,
-          name: winCondition.name,
-          condition_type: winCondition.condition_type,
-          order: wcIndex * 10,
-        },
+      const { data: createdWc } = await api.post('/game/win-conditions/', {
+        result_config: resultConfigId,
+        name: winCondition.name,
+        condition_type: winCondition.condition_type,
+        order: wcIndex * 10,
       });
       winConditionId = createdWc.id;
     } catch (e) {
@@ -242,13 +226,10 @@ export async function createWinConditions(resultConfigId: number, resultConfig: 
     if (winCondition.condition_type === 'OPTION' && winCondition.options?.length) {
       for (const [optIndex, opt] of winCondition.options.entries()) {
         try {
-          await api('game/win-condition-options/', {
-            method: 'POST',
-            data: {
-              win_condition: winConditionId,
-              name: opt.name,
-              order: optIndex * 10,
-            },
+          await api.post('/game/win-condition-options/', {
+            win_condition: winConditionId,
+            name: opt.name,
+            order: optIndex * 10,
           });
         } catch (e) {
           console.log('Error creating winConditionOption', e);
@@ -260,14 +241,11 @@ export async function createWinConditions(resultConfigId: number, resultConfig: 
       const len = winCondition.tieBreakers.length;
       for (const [index, tieBreaker] of winCondition.tieBreakers.entries()) {
         try {
-          await api('game/tie-breakers/', {
-            method: 'POST',
-            data: {
-              win_condition: winConditionId,
-              name: tieBreaker.name,
-              order: (len - index) * 10,
-              higher_wins: tieBreaker.higher_wins,
-            },
+          await api.post('/game/tie-breakers/', {
+            win_condition: winConditionId,
+            name: tieBreaker.name,
+            order: (len - index) * 10,
+            higher_wins: tieBreaker.higher_wins,
           });
         } catch (e) {
           console.log('Error creating tieBreaker', e);
@@ -291,10 +269,7 @@ export async function createSelectedGame(
   };
 
   try {
-    return await api('/game/selected-games/', {
-      method: 'POST',
-      data,
-    });
+    return await api.post('/game/selected-games/', data);
   } catch (error) {
     throw new Error('Error creating selectedGame: ' + error);
   }
@@ -304,14 +279,11 @@ export async function editSelectedGame(
   selectedGame: TSelectedGameDtoPayload & { id: number }
 ) {
   try {
-    return await api(`/game/selected-games/${selectedGame.id}/`, {
-      method: 'PATCH',
-      data: {
-        game: selectedGame.game,
-        profile: selectedGame.profile,
-        league: selectedGame.league,
-        selected_options: selectedGame.selected_options,
-      },
+    return await api.patch(`/game/selected-games/${selectedGame.id}/`, {
+      game: selectedGame.game,
+      profile: selectedGame.profile,
+      league: selectedGame.league,
+      selected_options: selectedGame.selected_options,
     });
   } catch (error) {
     throw new Error('Error editing selectedGame: ' + error);
@@ -320,8 +292,10 @@ export async function editSelectedGame(
 
 export async function fetchGameOptions(gameId: number): Promise<TGameOptionDto[]> {
   try {
-    const { data } = await api.get<TGameOptionDto[]>(`/game/options/?game=${gameId}`);
-    return data;
+    const { data } = await api.get<TGameOptionDto[]>('/game/options/', {
+      params: { game: gameId },
+    });
+    return unwrapList(data);
   } catch (error) {
     throw new Error(
       `Error retrieving game options for game with id: ${gameId} \n ${error}`
@@ -331,8 +305,10 @@ export async function fetchGameOptions(gameId: number): Promise<TGameOptionDto[]
 
 export async function fetchGameOptionChoices(optionId: number): Promise<TGameOptionChoiceDto[]> {
   try {
-    const { data } = await api.get<TGameOptionChoiceDto[]>(`/game/option-choices/?option=${optionId}`);
-    return data;
+    const { data } = await api.get<TGameOptionChoiceDto[]>('/game/option-choices/', {
+      params: { option: optionId },
+    });
+    return unwrapList(data);
   } catch (error) {
     throw new Error(
       `Error retrieving game option choices for game with id: ${optionId} \n ${error}`
@@ -340,13 +316,112 @@ export async function fetchGameOptionChoices(optionId: number): Promise<TGameOpt
   }
 }
 
+export async function fetchPlatforms(): Promise<TPlatform[]> {
+  const { data } = await api.get<TPlatform[]>('/game/platforms/');
+  return unwrapList(data);
+}
+
+export async function fetchPlatform(platformId: number): Promise<TPlatform> {
+  const { data } = await api.get<TPlatform>(`/game/platforms/${platformId}/`);
+  return data;
+}
+
 export async function fetchFullGame(gameId: number): Promise<TFullGameDto> {
   try {
-    const { data } = await api(`game/games-full/${gameId}/?manage_only=true`);
+    const { data } = await api.get<TFullGameDto>(`/game/games-full/${gameId}/`, {
+      params: { manage_only: true },
+    });
     return data;
   } catch (error) {
     throw new Error(`Error fetching full game with id ${gameId}: ${error}`);
   }
+}
+
+export async function fetchResultConfigForGame(
+  gameId: number
+): Promise<TResultConfigDto | null> {
+  const { data } = await api.get<TResultConfigDto[]>('/game/result-configs/', {
+    params: { game: gameId },
+  });
+  const configs = unwrapList(data);
+  return configs.length > 0 ? configs[0] : null;
+}
+
+export async function fetchWinConditionsForResultConfig(
+  resultConfigId: number
+): Promise<TWinConditionDto[]> {
+  const { data } = await api.get<TWinConditionDto[]>('/game/win-conditions/', {
+    params: { result_config: resultConfigId },
+  });
+  return unwrapList(data);
+}
+
+export async function fetchFactionsForGame(gameId: number): Promise<TFactionDto[]> {
+  const { data } = await api.get<TFactionDto[]>('/game/factions/', {
+    params: { game: gameId },
+  });
+  return unwrapList(data);
+}
+
+export async function updateGameFull(gameId: number, payload: unknown): Promise<void> {
+  await api.put(`/game/games-full/${gameId}/`, payload);
+}
+
+export type TGameDetailBundle = {
+  game: TFullGameDto;
+  platform: TPlatform;
+  resultConfig: TResultConfigDto;
+  winConditions: TWinConditionDto[];
+  factions: TFactionDto[];
+};
+
+/**
+ * Loads everything GameDetailPage needs in one call, instead of the page
+ * hitting the API client directly for five separate endpoints.
+ */
+export async function fetchGameDetailBundle(gameId: number): Promise<TGameDetailBundle> {
+  const game = await fetchFullGame(gameId);
+  const resultConfig = await fetchResultConfigForGame(gameId);
+  if (!resultConfig) {
+    throw new Error(`No result configuration found for game with id ${gameId}`);
+  }
+  const [winConditions, factions, platform] = await Promise.all([
+    fetchWinConditionsForResultConfig(resultConfig.id),
+    fetchFactionsForGame(gameId),
+    fetchPlatform(game.platform),
+  ]);
+  return { game, platform, resultConfig, winConditions, factions };
+}
+
+export type TGameEditBundle = {
+  platforms: TPlatform[];
+  game: TFullGameDto;
+  resultConfig: TResultConfigDto | null;
+  winConditions: TWinConditionDto[];
+  factions: TFactionDto[];
+};
+
+/**
+ * Loads everything EditGamePage needs in one call, instead of the page
+ * hitting the API client directly for platforms/result-config/win-conditions/factions.
+ */
+export async function fetchGameEditBundle(gameId: number): Promise<TGameEditBundle> {
+  const [platforms, game, resultConfig] = await Promise.all([
+    fetchPlatforms(),
+    fetchFullGame(gameId),
+    fetchResultConfigForGame(gameId),
+  ]);
+
+  let winConditions: TWinConditionDto[] = [];
+  let factions: TFactionDto[] = [];
+  if (resultConfig) {
+    [winConditions, factions] = await Promise.all([
+      fetchWinConditionsForResultConfig(resultConfig.id),
+      fetchFactionsForGame(gameId),
+    ]);
+  }
+
+  return { platforms, game, resultConfig, winConditions, factions };
 }
 
 export async function updateResultConfigData(
@@ -355,51 +430,39 @@ export async function updateResultConfigData(
 ): Promise<void> {
   try {
     // 1. Fetch existing result config to get its ID
-    const { data: existingConfigs } = await api.get<TResultConfig[]>(
-      `game/result-configs/?game=${gameId}`
-    );
+    const existingConfig = await fetchResultConfigForGame(gameId);
 
     let configId: number;
 
-    if (existingConfigs.length > 0) {
-      configId = existingConfigs[0].id;
+    if (existingConfig) {
+      configId = existingConfig.id;
       // 2. Update existing result config
-      await api(`game/result-configs/${configId}/`, {
-        method: 'PATCH',
-        data: {
-          is_asymmetric: resultConfig?.isAsymmetric,
-          has_starting_player_order: resultConfig?.hasStartingPlayerOrder,
-          has_points: resultConfig?.hasPoints,
-          starting_points_system: resultConfig?.startingPointSystem,
-        },
+      await api.patch(`/game/result-configs/${configId}/`, {
+        is_asymmetric: resultConfig?.isAsymmetric,
+        has_starting_player_order: resultConfig?.hasStartingPlayerOrder,
+        has_points: resultConfig?.hasPoints,
+        starting_points_system: resultConfig?.startingPointSystem,
       });
 
       // 3. Delete existing factions and tie-breakers (simpler than selective update)
-      const { data: existingFactions } = await api.get<any[]>(
-        `game/factions/?game=${gameId}`
-      );
+      const existingFactions = await fetchFactionsForGame(gameId);
       for (const f of existingFactions) {
-        await api.delete(`game/factions/${f.id}/`);
+        await api.delete(`/game/factions/${f.id}/`);
       }
 
       // Deleting win-conditions cascades to their options and tie-breakers.
-      const { data: existingWinConditions } = await api.get<any[]>(
-        `game/win-conditions/?result_config=${configId}`
-      );
+      const existingWinConditions = await fetchWinConditionsForResultConfig(configId);
       for (const wc of existingWinConditions) {
-        await api.delete(`game/win-conditions/${wc.id}/`);
+        await api.delete(`/game/win-conditions/${wc.id}/`);
       }
     } else {
       // Create new if somehow missing
-      const { data: newConfig } = await api('game/result-configs/', {
-        method: 'POST',
-        data: {
-          game: gameId,
-          is_asymmetric: resultConfig?.isAsymmetric,
-          has_starting_player_order: resultConfig?.hasStartingPlayerOrder,
-          has_points: resultConfig?.hasPoints,
-          starting_points_system: resultConfig?.startingPointSystem,
-        },
+      const { data: newConfig } = await api.post('/game/result-configs/', {
+        game: gameId,
+        is_asymmetric: resultConfig?.isAsymmetric,
+        has_starting_player_order: resultConfig?.hasStartingPlayerOrder,
+        has_points: resultConfig?.hasPoints,
+        starting_points_system: resultConfig?.startingPointSystem,
       });
       configId = newConfig.id;
     }

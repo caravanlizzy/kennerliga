@@ -171,6 +171,25 @@ export type TResultConfig = {
   winConditions?: TWinCondition[];
 };
 
+export type TResultConfigDto = {
+  id: number;
+  game: number;
+  is_asymmetric: boolean;
+  has_starting_player_order: boolean;
+  has_points: boolean;
+  starting_points_system?: number | null;
+  starting_points_system_id?: number | null;
+  starting_points_system_code?: string;
+  starting_points_system_description?: string;
+};
+
+export type TFactionDto = {
+  id: number;
+  game: number;
+  name: string;
+  level: number;
+};
+
 export type TTieBreakerDto = {
   id: number;
   name: string;

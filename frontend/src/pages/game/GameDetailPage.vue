@@ -197,13 +197,12 @@
 </style>
 
 <script setup lang="ts">
-import { TFullGameDto, TPlatform } from 'src/types/game';
-import { api } from 'boot/axios';
 import { useRoute, useRouter } from 'vue-router';
 import ResultConfiguration from 'components/game/ResultConfiguration.vue';
 import KennerButton from 'components/base/KennerButton.vue';
 import LoadingSpinner from 'components/base/LoadingSpinner.vue';
 import { computed, ref } from 'vue';
+import { fetchGameDetailBundle } from 'src/services/gameService';
 
 const route = useRoute();
 const router = useRouter();
@@ -214,15 +213,8 @@ function toggleRules(id: number) {
   expandedRules.value[id] = !expandedRules.value[id];
 }
 
-const { data: game } = await api.get<TFullGameDto>(`game/games-full/${route.params.id}/?manage_only=true`);
-const {
-  data: [resultConfig],
-} = await api.get<any[]>(`game/result-configs/?game=${route.params.id}`);
-const { data: winConditions } = await api.get<any[]>(
-  `game/win-conditions/?result_config=${resultConfig.id}`
-);
-const { data: factions } = await api.get<any[]>(`game/factions/?game=${route.params.id}`);
-const { data: platform } = await api.get<TPlatform>(`game/platforms/${game.platform}/`);
+const { game, platform, resultConfig, winConditions, factions } =
+  await fetchGameDetailBundle(Number(route.params.id));
 
 isLoading.value = false;
 

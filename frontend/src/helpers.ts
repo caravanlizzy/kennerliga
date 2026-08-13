@@ -1,4 +1,4 @@
-import { api } from 'boot/axios';
+import { setAuthToken } from 'boot/axios';
 
 export function createRandomId(power = 10) {
   return Math.floor(Math.random() * 10 ** power);
@@ -19,9 +19,9 @@ export function loadToken(): void {
   const userStore = JSON.parse(<string>localStorage.getItem('userStore'));
   if(!userStore) return;
   if(userStore.isAuthenticated){
-    const token = userStore.user.token;
+    const token = userStore.user?.token;
     if (token) {
-      api.defaults.headers['Authorization'] = 'Token ' + token;
+      setAuthToken(token);
     }
   }
 }

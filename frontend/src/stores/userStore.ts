@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 import { ref, Ref, watch } from 'vue';
-import { api } from 'boot/axios';
+import { api, setAuthToken } from 'boot/axios';
 import { fetchMyCurrentLeagueInfo } from 'src/services/leagueService';
 import { TUserDto } from 'src/types';
 
@@ -73,9 +73,7 @@ export const useUserStore = defineStore(
 
     function storeToken(): void {
       if (user.value) {
-        api.defaults.headers.common['Authorization'] =
-          'Token ' + user.value.token;
-        api.defaults.headers['Authorization'] = 'Token ' + user.value.token;
+        setAuthToken(user.value.token);
       }
     }
 
@@ -102,8 +100,7 @@ export const useUserStore = defineStore(
         isAuthenticated.value = false;
 
         // Remove token from Axios headers
-        delete api.defaults.headers.common['Authorization'];
-        delete api.defaults.headers['Authorization'];
+        setAuthToken(null);
       }
     }
 

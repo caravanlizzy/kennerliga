@@ -380,15 +380,14 @@
 <script setup lang="ts">
 import { onMounted, ref, nextTick } from 'vue';
 import { useQuasar } from 'quasar';
-import { api } from 'boot/axios';
 import KennerInput from 'components/base/KennerInput.vue';
 import KennerSelect from 'components/base/KennerSelect.vue';
 import KennerButton from 'components/base/KennerButton.vue';
 import KennerTooltip from 'components/base/KennerTooltip.vue';
 import LoadingSpinner from 'components/base/LoadingSpinner.vue';
 import { useRoute, useRouter } from 'vue-router';
-import { TPlatform, TResultConfig } from 'src/types';
-import { fetchFullGame, updateResultConfigData } from 'src/services/gameService';
+import { TResultConfig } from 'src/types';
+import { fetchGameEditBundle, updateGameFull, updateResultConfigData } from 'src/services/gameService';
 import CreateResultConfig from 'components/game/CreateResultConfig.vue';
 import { useGameForm } from 'src/composables/gameForm';
 
@@ -447,32 +446,28 @@ async function onAddOption() {
 
 onMounted(async () => {
   try {
-    const [platformsRes, gameData, resultConfigsRes] = await Promise.all([
-      api.get<TPlatform[]>('game/platforms/'),
-      fetchFullGame(gameId),
-      api.get<any[]>(`game/result-configs/?game=${gameId}`)
-    ]);
+    const {
+      platforms: fetchedPlatforms,
+      game: gameData,
+      resultConfig: rc,
+      winConditions,
+      factions,
+    } = await fetchGameEditBundle(gameId);
 
-    platforms.value = platformsRes.data;
+    platforms.value = fetchedPlatforms;
 
     // Load Result Config
-    if (resultConfigsRes.data && resultConfigsRes.data.length > 0) {
-      const rc = resultConfigsRes.data[0];
-      const [winConditionsRes, factionsRes] = await Promise.all([
-        api.get<any[]>(`game/win-conditions/?result_config=${rc.id}`),
-        api.get<any[]>(`game/factions/?game=${gameId}`)
-      ]);
-
-      const sortedWinConditions = [...winConditionsRes.data].sort(
+    if (rc) {
+      const sortedWinConditions = [...winConditions].sort(
         (a, b) => (a.order ?? 0) - (b.order ?? 0)
       );
 
       initialResultConfig.value = {
         isAsymmetric: rc.is_asymmetric,
         hasPoints: rc.has_points,
-        startingPointSystem: rc.starting_points_system_id || rc.starting_points_system,
+        startingPointSystem: rc.starting_points_system_id || rc.starting_points_system || null,
         hasStartingPlayerOrder: rc.has_starting_player_order,
-        factions: factionsRes.data.map(f => ({ name: f.name, level: f.level })),
+        factions: factions.map(f => ({ name: f.name, level: f.level })),
         winConditions: sortedWinConditions.map(wc => ({
           name: wc.name,
           condition_type: wc.condition_type,
@@ -526,7 +521,7 @@ const onSubmit = async () => {
 
     const payload = buildPayload(platformId);
 
-    await api.put(`/game/games-full/${gameId}/`, payload);
+    await updateGameFull(gameId, payload);
 
     if (resultConfig !== undefined) {
       await updateResultConfigData(gameId, resultConfig);
