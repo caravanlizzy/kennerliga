@@ -12,7 +12,5 @@ source .virtualenvs/kennerliga-venv/bin/activate
 cd kennerliga/api
 ./prod_manage.py collectstatic --no-input
 
-# Reload PythonAnywhere web app
-touch /var/www/haligh_pythonanywhere_com_wsgi.py
 EOF
 
