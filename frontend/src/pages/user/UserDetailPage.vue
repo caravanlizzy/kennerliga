@@ -6,8 +6,9 @@
       :user="user"
       :league-stats="leagueStats"
       :game-stats-count="gameStats.length"
+      :loading="loadingStats"
     />
-    <div v-else-if="loading" class="profile-hero-skeleton bg-primary q-pa-md">
+    <div v-else-if="loadingUser" class="profile-hero-skeleton bg-primary q-pa-md">
       <div class="max-width-container q-mx-auto row items-center q-col-gutter-md">
         <div class="col-12 col-md-auto flex justify-center">
           <q-skeleton type="QAvatar" size="100px" />
@@ -19,7 +20,7 @@
       </div>
     </div>
 
-    <div v-if="loading" class="q-px-md q-py-lg max-width-container q-mx-auto">
+    <div v-if="loadingUser && !user" class="q-px-md q-py-lg max-width-container q-mx-auto">
       <div class="row q-col-gutter-lg">
         <div class="col-12 col-md-4">
           <q-skeleton type="rect" height="200px" class="q-mb-lg rounded-borders" />
@@ -42,16 +43,23 @@
         <div class="col-12 col-md-4">
           <div class="sticky-top">
             <!-- Pick Limit Status -->
+            <div v-if="loadingStats" class="q-mb-lg">
+              <q-skeleton type="rect" height="200px" class="rounded-borders" />
+            </div>
             <UserPicks
+              v-else
               v-model:selected-year="selectedYear"
               :picked-games="pickedGames"
               :max-game-limit="maxGameLimit"
               :available-years="availableYears"
-              @update:selected-year="refreshPicks"
+              @update:selected-year="fetchStatistics(user.id)"
             />
 
             <!-- Overall Performance Summary -->
-            <UserPerformance :overall-stats="overallStats" />
+            <div v-if="loadingStats" class="q-mb-lg">
+              <q-skeleton type="rect" height="350px" class="rounded-borders" />
+            </div>
+            <UserPerformance v-else :overall-stats="overallStats" />
           </div>
         </div>
 
@@ -73,7 +81,15 @@
           <q-tab-panels v-model="tab" animated class="bg-transparent">
             <!-- Games Tab -->
             <q-tab-panel name="games" class="q-pa-none">
+              <div v-if="loadingStats">
+                <div class="row q-col-gutter-md">
+                  <div v-for="i in 6" :key="i" class="col-12 col-sm-6 col-md-4">
+                    <q-skeleton type="rect" height="150px" class="rounded-borders" />
+                  </div>
+                </div>
+              </div>
               <UserGamesTab
+                v-else
                 v-model:game-search="gameSearch"
                 :top-games="topGames"
                 :filtered-game-stats="filteredGameStats"
@@ -82,7 +98,10 @@
 
             <!-- Seasons Tab -->
             <q-tab-panel name="seasons" class="q-pa-none">
-              <UserSeasonsTab :user-season-list="userSeasonList" />
+              <div v-if="loadingSeasons">
+                <q-skeleton v-for="i in 3" :key="i" type="rect" height="80px" class="q-mb-md rounded-borders" />
+              </div>
+              <UserSeasonsTab v-else :user-season-list="userSeasonList" />
             </q-tab-panel>
           </q-tab-panels>
         </div>
@@ -121,7 +140,9 @@ import { TUserDto, TSeasonParticipantDto, TSeasonDto } from 'src/types';
 
 const route = useRoute();
 const router = useRouter();
-const loading = ref(true);
+const loadingUser = ref(true);
+const loadingStats = ref(true);
+const loadingSeasons = ref(true);
 const user = ref<TUserDto | null>(null);
 const userSeasonList = ref<(TSeasonParticipantDto & { season_details?: TSeasonDto })[]>([]);
 const gameSearch = ref('');
@@ -145,9 +166,12 @@ const selectedYear = ref(new Date().getFullYear());
 const availableYears = ref<number[]>([new Date().getFullYear()]);
 
 async function load() {
-  loading.value = true;
+  loadingUser.value = true;
+  loadingStats.value = true;
+  loadingSeasons.value = true;
   user.value = null;
   userSeasonList.value = [];
+
   const username = String(route.params.username || '');
   try {
     const { data: usersResponse } = await api.get('user/users/', {
@@ -160,54 +184,76 @@ async function load() {
 
     if (foundUser) {
       user.value = foundUser;
+      loadingUser.value = false;
       const profileId = foundUser.profile?.id || foundUser.profile_id;
 
       if (profileId) {
-        const [seasonsRes, statsRes] = await Promise.all([
-          api.get('season/season-participants/', { params: { profile: profileId } }),
-          api.get(`user/users/${foundUser.id}/statistics/`, { params: { year: selectedYear.value } })
-        ]);
-
-        const participants: TSeasonParticipantDto[] = Array.isArray(seasonsRes.data) ? seasonsRes.data : seasonsRes.data.results || [];
-        leagueStats.value = statsRes.data.league_stats;
-        overallStats.value = statsRes.data.overall_stats;
-        gameStats.value = statsRes.data.game_stats;
-        topGames.value = statsRes.data.top_games || [];
-        pickedGames.value = statsRes.data.picked_games || [];
-        maxGameLimit.value = statsRes.data.max_game_limit || 2;
-        availableYears.value = statsRes.data.available_years || [new Date().getFullYear()];
-
-        const seasonIds = [...new Set(participants.map(p => p.season))];
-        const seasonsData = await Promise.all(seasonIds.map(id => api.get(`season/seasons/${id}/`)));
-        const seasonsMap: Record<number, TSeasonDto> = {};
-        seasonsData.forEach(res => {
-          if (res.data) seasonsMap[res.data.id] = res.data;
-        });
-
-        userSeasonList.value = participants.map(p => ({
-          ...p,
-          season_details: seasonsMap[p.season]
-        })).sort((a, b) => (b.season_details?.id || 0) - (a.season_details?.id || 0));
+        // Trigger background loads
+        fetchStatistics(foundUser.id);
+        fetchSeasonParticipation(profileId);
+      } else {
+        loadingStats.value = false;
+        loadingSeasons.value = false;
       }
+    } else {
+      loadingUser.value = false;
+      loadingStats.value = false;
+      loadingSeasons.value = false;
     }
   } catch (err) {
     console.error('Failed to load user details:', err);
-  } finally {
-    loading.value = false;
+    loadingUser.value = false;
+    loadingStats.value = false;
+    loadingSeasons.value = false;
   }
 }
 
-async function refreshPicks() {
-  if (!user.value) return;
+async function fetchStatistics(userId: number) {
+  loadingStats.value = true;
   try {
-    const { data } = await api.get(`user/users/${user.value.id}/statistics/`, {
+    const { data } = await api.get(`user/users/${userId}/statistics/`, {
       params: { year: selectedYear.value }
     });
+    leagueStats.value = data.league_stats;
+    overallStats.value = data.overall_stats;
+    gameStats.value = data.game_stats;
+    topGames.value = data.top_games || [];
     pickedGames.value = data.picked_games || [];
+    maxGameLimit.value = data.max_game_limit || 2;
+    availableYears.value = data.available_years || [new Date().getFullYear()];
   } catch (err) {
-    console.error('Failed to refresh picks:', err);
+    console.error('Failed to load statistics:', err);
+  } finally {
+    loadingStats.value = false;
   }
 }
+
+async function fetchSeasonParticipation(profileId: number) {
+  loadingSeasons.value = true;
+  try {
+    const { data: participantsRes } = await api.get('season/season-participants/', {
+      params: { profile: profileId }
+    });
+    const participants: TSeasonParticipantDto[] = Array.isArray(participantsRes) ? participantsRes : participantsRes.results || [];
+
+    const seasonIds = [...new Set(participants.map(p => p.season))];
+    const seasonsData = await Promise.all(seasonIds.map(id => api.get(`season/seasons/${id}/`)));
+    const seasonsMap: Record<number, TSeasonDto> = {};
+    seasonsData.forEach(res => {
+      if (res.data) seasonsMap[res.data.id] = res.data;
+    });
+
+    userSeasonList.value = participants.map(p => ({
+      ...p,
+      season_details: seasonsMap[p.season]
+    })).sort((a, b) => (b.season_details?.id || 0) - (a.season_details?.id || 0));
+  } catch (err) {
+    console.error('Failed to load season participation:', err);
+  } finally {
+    loadingSeasons.value = false;
+  }
+}
+
 
 
 const filteredGameStats = computed(() => {

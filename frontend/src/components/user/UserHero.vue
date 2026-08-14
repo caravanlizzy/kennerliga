@@ -21,12 +21,18 @@
           </div>
           <div class="row q-gutter-x-xl q-mt-sm justify-center justify-md-start">
             <div class="column items-center items-md-start">
-              <div class="text-h4 text-weight-bolder">{{ leagueStats.totalLeagues }}</div>
+              <div v-if="loading" class="text-h4 text-weight-bolder">
+                <q-skeleton type="text" width="40px" dark />
+              </div>
+              <div v-else class="text-h4 text-weight-bolder">{{ leagueStats.totalLeagues }}</div>
               <div class="text-caption text-uppercase letter-spacing-2 text-white text-opacity-60">Leagues</div>
             </div>
             <q-separator vertical dark color="white" class="opacity-20 q-mx-md gt-xs" style="height: 30px" />
             <div class="column items-center items-md-start">
-              <div class="text-h4 text-weight-bolder">{{ gameStatsCount }}</div>
+              <div v-if="loading" class="text-h4 text-weight-bolder">
+                <q-skeleton type="text" width="40px" dark />
+              </div>
+              <div v-else class="text-h4 text-weight-bolder">{{ gameStatsCount }}</div>
               <div class="text-caption text-uppercase letter-spacing-2 text-white text-opacity-60">Games</div>
             </div>
           </div>
@@ -47,6 +53,7 @@ defineProps<{
   user: TUserDto;
   leagueStats: { totalLeagues: number };
   gameStatsCount: number;
+  loading?: boolean;
 }>();
 </script>
 
