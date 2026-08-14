@@ -139,8 +139,16 @@
                 </div>
               </span>
               <span v-else-if="event.type === 'LEAGUE_FINISHED'">
-                League {{ event.data.leagueLevel || event.leagueLevel }} finishes! Winner:
-                <strong class="text-primary">{{ event.data.winners?.join(', ') }}</strong>
+                <template v-if="event.data.winners && event.data.winners.length > 1">
+                  League {{ event.data.leagueLevel || event.leagueLevel }} finishes!
+                  A decider game between
+                  <strong class="text-primary">{{ event.data.winners?.join(' and ') }}</strong>
+                  is to be scheduled for the league win.
+                </template>
+                <template v-else>
+                  League {{ event.data.leagueLevel || event.leagueLevel }} finishes! Winner:
+                  <strong class="text-primary">{{ event.data.winners?.[0] }}</strong>
+                </template>
               </span>
               <span v-else-if="event.type === 'SEASON_FINISHED'">
                 Season {{ event.data.seasonName }} finishes! Shout out to
