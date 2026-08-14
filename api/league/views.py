@@ -290,6 +290,9 @@ class LeagueViewSet(ModelViewSet):
             standings, ["unresolved_tie_group", "tie_break_priority"]
         )
 
+        # Update league updated_at so live events feed picks up the change
+        league.save(update_fields=["updated_at"])
+
         # Return refreshed standings
         qs = (
             LeagueStanding.objects.filter(league=league)

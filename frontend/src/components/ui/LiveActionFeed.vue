@@ -74,7 +74,7 @@
                   class="text-bold q-px-sm q-py-xs text-uppercase"
                 >
                   <q-icon :name="getEventIcon(event.type)" size="12px" class="q-mr-xs" />
-                  {{ getEventDisplayType(event.type) }}
+                  {{ getEventDisplayType(event) }}
                 </q-badge>
               </span>
               <span style="opacity: 0.85;">{{
@@ -140,10 +140,8 @@
               </span>
               <span v-else-if="event.type === 'LEAGUE_FINISHED'">
                 <template v-if="event.data.winners && event.data.winners.length > 1">
-                  League {{ event.data.leagueLevel || event.leagueLevel }} finishes!
-                  A decider game between
-                  <strong class="text-primary">{{ event.data.winners?.join(' and ') }}</strong>
-                  is to be scheduled for the league win.
+                  Decider game:
+                  <strong class="text-primary">{{ event.data.winners?.join(' vs ') }}</strong>
                 </template>
                 <template v-else>
                   League {{ event.data.leagueLevel || event.leagueLevel }} finishes! Winner:
@@ -244,7 +242,8 @@ function formatTime(timestamp: string) {
   return date.toLocaleDateString([], { month: 'short', day: 'numeric' });
 }
 
-function getEventDisplayType(type: TLiveEventType) {
+function getEventDisplayType(event: TLiveEvent) {
+  const { type, data } = event;
   switch (type) {
     case 'PICK':
       return 'PICK';
@@ -255,7 +254,7 @@ function getEventDisplayType(type: TLiveEventType) {
     case 'GAME_FINISHED':
       return 'WIN';
     case 'LEAGUE_FINISHED':
-      return 'COMPLETE';
+      return data.winners && data.winners.length > 1 ? 'DECIDER' : 'COMPLETE';
     case 'SEASON_FINISHED':
       return 'SEASON';
     default:

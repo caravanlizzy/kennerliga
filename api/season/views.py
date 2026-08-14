@@ -14,7 +14,7 @@ from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet, ViewSet
 
 from game.models import SelectedGame, BanDecision
-from league.models import League, LeagueStanding, GameStanding
+from league.models import League, LeagueStanding, GameStanding, LeagueTieResolution
 from result.models import Result
 from season.queries import (
     register,
@@ -798,13 +798,21 @@ class LiveEventViewSet(ViewSet):
         # by league_id in Python; replaces per-league queries below.
         standings_by_league: Dict[int, list] = defaultdict(list)
         for ls in (
-            LeagueStanding.objects.filter(
-                league_id__in=[l.id for l in leagues]
-            )
+            LeagueStanding.objects.filter(league_id__in=[l.id for l in leagues])
             .select_related("player_profile")
             .order_by("-league_points", "-wins", "-tie_break_priority")
         ):
             standings_by_league[ls.league_id].append(ls)
+
+        # Bulk-load all LeagueTieResolution for the season once
+        resolutions_by_league: Dict[int, list] = defaultdict(list)
+        resolutions = (
+            LeagueTieResolution.objects.filter(
+                league_id__in=[l.id for l in leagues], is_resolved=True
+            ).prefetch_related("entries__player_profile")
+        )
+        for res in resolutions:
+            resolutions_by_league[res.league_id].append(res)
 
         for sg_id, res_list in results_by_game.items():
             if not res_list:
@@ -892,29 +900,75 @@ class LiveEventViewSet(ViewSet):
                 continue
 
             standings = standings_by_league.get(league.id, [])
-            if standings:
-                top_standing = standings[0]
-                # Get all players tied for first place
-                winners = [
-                    s.player_profile.profile_name
-                    for s in standings
-                    if s.league_points == top_standing.league_points
-                    and s.wins == top_standing.wins
-                    and s.tie_break_priority == top_standing.tie_break_priority
-                ]
-            else:
-                winners = []
+            if not standings:
+                continue
 
-            events.append(
-                {
-                    "id": f"league-done-{league.id}",
-                    "type": "LEAGUE_FINISHED",
-                    "timestamp": league.updated_at,
-                    "leagueLevel": league.level,
-                    "leagueId": league.id,
-                    "data": {"leagueLevel": league.level, "winners": winners},
-                }
-            )
+            top_standing = standings[0]
+            # Get all players currently tied for first place (including tie-break priority)
+            winners = [
+                s.player_profile.profile_name
+                for s in standings
+                if s.league_points == top_standing.league_points
+                and s.wins == top_standing.wins
+                and s.tie_break_priority == top_standing.tie_break_priority
+            ]
+
+            # Determine if there was a tie at the top based on points and wins only
+            top_tie_players = [
+                s.player_profile.profile_name
+                for s in standings
+                if s.league_points == top_standing.league_points
+                and s.wins == top_standing.wins
+            ]
+
+            # Case A: Current tie needs a decider
+            if len(winners) > 1:
+                events.append(
+                    {
+                        "id": f"league-decider-{league.id}",
+                        "type": "LEAGUE_FINISHED",
+                        "timestamp": league.updated_at,
+                        "leagueLevel": league.level,
+                        "leagueId": league.id,
+                        "data": {"leagueLevel": league.level, "winners": winners},
+                    }
+                )
+            else:
+                # Case B: Resolved tie or no tie from the start
+                # Check for historical record of a top-level tie resolution
+                league_resolutions = resolutions_by_league.get(league.id, [])
+                for res in league_resolutions:
+                    res_players = [
+                        e.player_profile.profile_name for e in res.entries.all()
+                    ]
+                    # If this resolution matches the group that was tied at top
+                    if set(res_players) == set(top_tie_players) and len(res_players) > 1:
+                        events.append(
+                            {
+                                "id": f"league-decider-{league.id}",
+                                "type": "LEAGUE_FINISHED",
+                                "timestamp": res.created_at,
+                                "leagueLevel": league.level,
+                                "leagueId": league.id,
+                                "data": {
+                                    "leagueLevel": league.level,
+                                    "winners": res_players,
+                                },
+                            }
+                        )
+                        break
+
+                # The final COMPLETE event
+                events.append(
+                    {
+                        "id": f"league-done-{league.id}",
+                        "type": "LEAGUE_FINISHED",
+                        "timestamp": league.updated_at,
+                        "leagueLevel": league.level,
+                        "leagueId": league.id,
+                        "data": {"leagueLevel": league.level, "winners": winners},
+                    }
+                )
 
         # 5. SEASON_FINISHED events
         season = Season.objects.filter(id=season_id).first()
