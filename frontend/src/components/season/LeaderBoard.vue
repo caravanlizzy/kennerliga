@@ -71,10 +71,22 @@
         v-for="(row, index) in standings.standings"
         :key="row.player_profile_id"
       >
-        <!-- League level separator (e.g. L1 to L2) -->
-        <tr v-if="index > 0 && bestLeague(row) !== bestLeague(standings.standings[index-1])" class="league-separator-row">
+        <!-- League level header (e.g. League 1) -->
+        <tr v-if="index === 0 || bestLeague(row) !== bestLeague(standings.standings[index-1])" class="league-header-row">
           <td :colspan="showAllLeagues ? 2 + standings.levels.length : 6" class="q-pa-none">
-            <q-separator class="q-my-sm" />
+            <div class="row items-center q-gutter-x-sm q-mt-lg q-mb-sm q-px-md">
+              <div
+                v-if="bestLeague(row)"
+                class="league-header-badge"
+                :style="{
+                  backgroundColor: getHexLeagueColor(bestLeague(row)!),
+                }"
+              >
+                L{{ bestLeague(row) }}
+              </div>
+              <span v-if="bestLeague(row)" class="text-weight-bold text-grey-9 text-uppercase tracking-wider" style="font-size: 0.75rem">League {{ bestLeague(row) }}</span>
+              <q-separator class="col q-ml-sm" horizontal />
+            </div>
           </td>
         </tr>
 
@@ -85,25 +97,11 @@
           }"
         >
 
-          <!-- Rank (with league level badge) -->
+          <!-- Rank -->
           <td class="text-left q-pl-lg leaderboard-rank-text">
             <div class="row items-center no-wrap q-gutter-x-sm">
-              <div
-              >
+              <div>
                 {{ index + 1 }}
-              </div>
-              <div
-                v-if="bestLeague(row)"
-                class="league-dot"
-                :style="{
-                  color: getHexLeagueColor(bestLeague(row)!),
-                  borderColor: getHexLeagueColor(bestLeague(row)!)
-                }"
-              >
-                L{{ bestLeague(row) }}
-                <q-tooltip anchor="center right" self="center left">
-                  League {{ bestLeague(row) }}
-                </q-tooltip>
               </div>
             </div>
           </td>
@@ -315,19 +313,18 @@ watch(
 </script>
 
 <style scoped lang="scss">
-.league-dot {
-  width: 18px;
-  height: 18px;
+
+.league-header-badge {
+  padding: 2px 6px;
   border-radius: 4px;
-  flex-shrink: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background-color: white;
-  font-size: 9px;
+  color: white;
+  font-size: 10px;
   font-weight: 800;
-  border: 1px solid;
   line-height: 1;
+}
+
+.tracking-wider {
+  letter-spacing: 0.05em;
 }
 
 .leaderboard-row {
