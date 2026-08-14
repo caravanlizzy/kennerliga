@@ -1,7 +1,7 @@
 from typing import Optional, List, Dict, Iterable
 from django.db import transaction
 from django.db.models import Count, Prefetch
-from game.models import SelectedGame, BanDecision, ResultConfig
+from game.models import SelectedGame, BanDecision, ResultConfig, SelectedOption
 from league.models import (
     League,
     LeagueStatus,
@@ -19,6 +19,19 @@ def _serialize_selected_game(sg) -> Dict:
     Serializes a SelectedGame object into a dictionary for API payloads.
     """
     configs = list(sg.game.resultconfig_set.all())
+
+    # Build settings list from selected options
+    settings = []
+    for so in sg.selected_options.all():
+        value_str = ""
+        if so.choice:
+            value_str = so.choice.name
+        elif so.value is not None:
+            value_str = "Yes" if so.value else "No"
+
+        if value_str:
+            settings.append({"name": so.game_option.name, "value": value_str})
+
     return {
         "id": sg.id,
         "game_name": sg.game.name,
@@ -27,6 +40,7 @@ def _serialize_selected_game(sg) -> Dict:
         "has_points": configs[0].has_points if configs else True,
         "selected_by_id": sg.profile.id if sg.profile else None,
         "selected_by_name": sg.profile.profile_name if sg.profile else None,
+        "settings": settings,
     }
 
 
@@ -247,7 +261,11 @@ def _selected_games_qs(league_filter, season_ids):
             Prefetch(
                 "game__resultconfig_set",
                 queryset=ResultConfig.objects.only("id", "has_points", "game_id"),
-            )
+            ),
+            Prefetch(
+                "selected_options",
+                queryset=SelectedOption.objects.select_related("game_option", "choice"),
+            ),
         )
         .order_by("profile__season_participants__rank", "id")
     )

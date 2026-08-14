@@ -38,8 +38,25 @@
                  <q-icon name="stars" color="primary" size="14px" />
                  <span>{{ col.label }}</span>
               </div>
-              <div v-else-if="col.name.startsWith('game_')" class="column items-center">
-                <span>{{ col.label }}</span>
+              <div v-else-if="col.name.startsWith('game_')" class="column items-center relative-position">
+                <div class="row items-center no-wrap">
+                  <span>{{ col.label }}</span>
+                  <q-icon
+                    v-if="(col as any).settings && (col as any).settings.length > 0"
+                    name="settings"
+                    size="10px"
+                    color="grey-4"
+                    class="q-ml-xs cursor-pointer hover-settings-icon"
+                  >
+                    <q-tooltip class="bg-white text-grey-9 shadow-4 q-pa-sm" style="border: 1px solid #ddd; max-width: 200px;">
+                      <div class="text-weight-bold q-mb-xs text-primary" style="font-size: 0.75rem;">{{ (col as any).gameName || col.label }} Settings</div>
+                      <div v-for="s in (col as any).settings" :key="s.name" class="row no-wrap q-gutter-x-sm" style="font-size: 0.7rem; line-height: 1.4;">
+                        <span class="text-grey-7">{{ s.name }}:</span>
+                        <span class="text-weight-medium">{{ s.value }}</span>
+                      </div>
+                    </q-tooltip>
+                  </q-icon>
+                </div>
                 <div v-if="(col as any).platformName" class="text-grey-7 text-weight-medium" style="font-size: 0.55rem; line-height: 1; margin-top: 1px;">
                   {{ (col as any).platformName }}
                 </div>
@@ -338,6 +355,11 @@ interface TieGroup {
   resolution?: TieResolution;
 }
 
+interface SelectedGameSetting {
+  name: string;
+  value: string;
+}
+
 interface SelectedGame {
   id: number;
   game_name: string;
@@ -345,6 +367,7 @@ interface SelectedGame {
   platform_name?: string;
   has_points: boolean; // 🔹 added
   selected_by_name?: string;
+  settings?: SelectedGameSetting[];
 }
 
 interface StandingsData {
@@ -411,9 +434,11 @@ const tableColumns = computed<QTableColumn[]>(() => {
           : game.game_name,
       field: `game_${game.id}`,
       align: 'center',
+      gameName: game.game_name,
       selectedByName: game.selected_by_name,
       platformName: game.platform_name,
       hasPoints: game.has_points,
+      settings: game.settings,
     });
   });
 
@@ -516,5 +541,11 @@ function getRankBgClass(rank: number | undefined) {
 .username-link:hover {
   color: var(--q-primary);
   text-decoration: underline;
+}
+.hover-settings-icon {
+  transition: color 0.2s ease;
+}
+.hover-settings-icon:hover {
+  color: var(--q-primary) !important;
 }
 </style>
