@@ -51,8 +51,7 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
-import { api } from 'boot/axios';
-import { fetchSeasons } from 'src/services/seasonService';
+import { fetchCurrentChampion } from 'src/services/seasonService';
 import { useResponsive } from 'src/composables/responsive';
 
 interface ChampionInfo {
@@ -76,27 +75,12 @@ function navigateToSeason() {
 
 async function loadCurrentChampion() {
   try {
-    const seasons = await fetchSeasons({ status: 'DONE' });
-    if (seasons.length === 0) return;
-
-    const latestSeason = seasons.sort((a, b) => {
-      if (a.year !== b.year) return b.year - a.year;
-      return b.month - a.month;
-    })[0];
-
-    const { data } = await api.get(
-      `season/seasons/${latestSeason.id}/league-winners/`
-    );
-    const level1Winner = data.winners?.find((w: any) => w.league.level === 1);
-
-    const username = level1Winner?.winner?.username || level1Winner?.username;
-
-    if (username) {
+    const data = await fetchCurrentChampion();
+    if (data?.username && data?.season_id) {
       champion.value = {
-        username,
-        seasonName:
-          data.season?.name || `${latestSeason.year}-${latestSeason.month}`,
-        seasonId: latestSeason.id,
+        username: data.username,
+        seasonName: data.season_name,
+        seasonId: data.season_id,
       };
     }
   } catch (error) {

@@ -107,6 +107,27 @@ export async function fetchCurrentSeasonId(): Promise<number | null> {
     return null;
   }
 }
+
+export type TCurrentChampionResponse = {
+  username: string;
+  season_name: string;
+  season_id: number;
+  profile_id?: number;
+  profile_name?: string;
+  league_points?: number;
+};
+
+export async function fetchCurrentChampion(): Promise<TCurrentChampionResponse | null> {
+  try {
+    const { data } = await api.get<TCurrentChampionResponse>(
+      '/season/seasons/current-champion/'
+    );
+    return data || null;
+  } catch (error) {
+    console.error('Failed to fetch current champion:', error);
+    return null;
+  }
+}
 /** Backend helpers */
 // find-or-create season
 export async function createSeason(targetYear: number, targetMonth: number): Promise<TSeasonDto> {

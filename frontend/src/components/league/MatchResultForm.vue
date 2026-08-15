@@ -429,25 +429,7 @@ async function fetchWinConditions() {
   const { data } = await api.get<TWinConditionDto[]>(
     `game/win-conditions/?result_config=${resultConfig.value.id}`
   );
-  let wcs = (data ?? []).slice().sort((a, b) => a.order - b.order);
-
-  // Auto-create a default "Win" POINTS WinCondition if none exist (legacy data).
-  if (wcs.length === 0) {
-    try {
-      const { data: created } = await api.post<TWinConditionDto>(
-        'game/win-conditions/',
-        {
-          name: 'Win',
-          condition_type: 'POINTS',
-          order: 0,
-          result_config: resultConfig.value.id,
-        }
-      );
-      wcs = [{ ...created, options: created.options ?? [], tie_breakers: created.tie_breakers ?? [] }];
-    } catch (e) {
-      console.error('Failed to auto-create default WinCondition:', e);
-    }
-  }
+  const wcs = (data ?? []).slice().sort((a, b) => a.order - b.order);
   winConditions.value = wcs;
   selectedWinConditionId.value = wcs[0]?.id ?? null;
 }

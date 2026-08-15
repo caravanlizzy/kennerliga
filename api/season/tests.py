@@ -100,6 +100,44 @@ class SeasonAPITests(TestCase):
             ).exists()
         )
 
+    def test_current_champion_none_when_no_done_season(self):
+        response = self.client.get("/api/season/seasons/current-champion/")
+        self.assertEqual(response.status_code, 200)
+        self.assertIsNone(response.data)
+
+    def test_current_champion_returns_latest_done_season_winner(self):
+        s1 = Season.objects.create(
+            year=2025, month=11, status=Season.SeasonStatus.DONE
+        )
+        s2 = Season.objects.create(
+            year=2025, month=12, status=Season.SeasonStatus.DONE
+        )
+        # S1 winner
+        l1 = League.objects.create(season=s1, level=1)
+        p1 = PlayerProfile.objects.create(profile_name="P1")
+        LeagueStanding.objects.create(league=l1, player_profile=p1, league_points=10)
+
+        # S2 winner (level 1)
+        l2_1 = League.objects.create(season=s2, level=1)
+        champ_user = User.objects.create_user(username="champ", password="password")
+        p2 = PlayerProfile.objects.create(user=champ_user, profile_name="Champ Profile")
+        p3 = PlayerProfile.objects.create(profile_name="Runner Up")
+        LeagueStanding.objects.create(league=l2_1, player_profile=p2, league_points=25)
+        LeagueStanding.objects.create(league=l2_1, player_profile=p3, league_points=20)
+
+        # S2 level 2 winner (should NOT be crowned overall champion)
+        l2_2 = League.objects.create(season=s2, level=2)
+        p4 = PlayerProfile.objects.create(profile_name="Lvl2 Winner")
+        LeagueStanding.objects.create(league=l2_2, player_profile=p4, league_points=30)
+
+        # Query endpoint
+        response = self.client.get("/api/season/seasons/current-champion/")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data["username"], "champ")
+        self.assertEqual(response.data["season_id"], s2.id)
+        self.assertEqual(response.data["profile_id"], p2.id)
+        self.assertEqual(response.data["league_points"], 25)
+
 
 class PreviewLeaguesAPITests(TestCase):
     def setUp(self):

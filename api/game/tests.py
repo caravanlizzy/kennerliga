@@ -190,3 +190,18 @@ class GameAPITests(TestCase):
         self.assertEqual(len(response.data["factions"]), 3)
         self.assertEqual(len(response.data["win_conditions"]), 1)
         self.assertEqual(len(response.data["win_conditions"][0]["tie_breakers"]), 1)
+
+    def test_create_result_config_default_win_condition(self):
+        new_game = Game.objects.create(
+            name="Wingspan", min_players=1, max_players=5, platform=self.platform
+        )
+        payload = {
+            "game": new_game.id,
+            "has_points": True,
+            "starting_points_system": self.sps.id,
+        }
+        response = self.client.post("/api/game/result-configs/", payload, format="json")
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(len(response.data["win_conditions"]), 1)
+        self.assertEqual(response.data["win_conditions"][0]["name"], "Points")
+        self.assertEqual(response.data["win_conditions"][0]["condition_type"], "POINTS")

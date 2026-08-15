@@ -177,6 +177,13 @@ class ResultConfigSerializer(ModelSerializer):
             self._sync_factions(result_config.game, factions_data)
         if win_conditions_data is not None:
             self._sync_win_conditions(result_config, win_conditions_data)
+        if not result_config.win_conditions.exists():
+            WinCondition.objects.create(
+                result_config=result_config,
+                name="Win" if not result_config.has_points else "Points",
+                condition_type=WinCondition.WinConditionType.POINTS,
+                order=0,
+            )
 
         return result_config
 
@@ -195,6 +202,13 @@ class ResultConfigSerializer(ModelSerializer):
             self._sync_factions(instance.game, factions_data)
         if win_conditions_data is not None:
             self._sync_win_conditions(instance, win_conditions_data)
+        if not instance.win_conditions.exists():
+            WinCondition.objects.create(
+                result_config=instance,
+                name="Win" if not instance.has_points else "Points",
+                condition_type=WinCondition.WinConditionType.POINTS,
+                order=0,
+            )
 
         return instance
 

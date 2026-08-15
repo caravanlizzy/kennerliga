@@ -89,6 +89,7 @@ class SeasonViewSet(ModelViewSet):
             "scoreboards",
             "projected_leagues",
             "current",
+            "current_champion",
         ]:
             return [IsAuthenticated()]
         return [IsAdminUser()]
@@ -255,6 +256,54 @@ class SeasonViewSet(ModelViewSet):
                     "status": season.status,
                 },
                 "winners": winners_payload,
+            },
+            status=status.HTTP_200_OK,
+        )
+
+    @action(detail=False, methods=["get"], url_path="current-champion")
+    def current_champion(self, request):
+        """
+        GET /seasons/current-champion/
+
+        Returns the level-1 champion for the most recently completed (DONE) season.
+        """
+        latest_season = (
+            Season.objects.filter(status=Season.SeasonStatus.DONE)
+            .order_by("-year", "-month", "-id")
+            .first()
+        )
+        if not latest_season:
+            return Response(None, status=status.HTTP_200_OK)
+
+        level_1_league = (
+            League.objects.filter(season=latest_season, level=1)
+            .order_by("id")
+            .first()
+        )
+        if not level_1_league:
+            return Response(None, status=status.HTTP_200_OK)
+
+        winner_standing = (
+            LeagueStanding.objects.filter(league=level_1_league)
+            .select_related("player_profile", "player_profile__user")
+            .order_by("-league_points", "-wins", "-tie_break_priority", "id")
+            .first()
+        )
+        if not winner_standing or not winner_standing.player_profile:
+            return Response(None, status=status.HTTP_200_OK)
+
+        profile = winner_standing.player_profile
+        user = getattr(profile, "user", None)
+        username = getattr(user, "username", None) or profile.profile_name
+
+        return Response(
+            {
+                "username": username,
+                "season_id": latest_season.id,
+                "season_name": latest_season.name,
+                "profile_id": profile.id,
+                "profile_name": profile.profile_name,
+                "league_points": winner_standing.league_points,
             },
             status=status.HTTP_200_OK,
         )

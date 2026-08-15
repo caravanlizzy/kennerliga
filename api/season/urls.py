@@ -24,4 +24,9 @@ urlpatterns = [
     path("", include(router.urls)),
     path("register/", SeasonRegistrationView.as_view(), name="season-register"),
     path("current/", CurrentSeasonView.as_view(), name="season-current"),
+    path(
+        "current-champion/",
+        SeasonViewSet.as_view({"get": "current_champion"}),
+        name="season-current-champion",
+    ),
 ]
