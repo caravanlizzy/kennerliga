@@ -139,6 +139,56 @@ class SeasonAPITests(TestCase):
         self.assertEqual(response.data["league_points"], 25)
 
 
+class ProjectedLeaguesAPITests(TestCase):
+    def setUp(self):
+        self.client = APIClient()
+        self.admin = User.objects.create_superuser(
+            username="admin", password="password"
+        )
+        self.client.force_authenticate(user=self.admin)
+        self.s1 = Season.objects.create(
+            year=2026, month=1, status=Season.SeasonStatus.DONE
+        )
+        self.s2 = Season.objects.create(
+            year=2026, month=2, status=Season.SeasonStatus.OPEN
+        )
+        self.p1 = PlayerProfile.objects.create(profile_name="P1")
+        self.p2 = PlayerProfile.objects.create(profile_name="P2")
+        self.p3 = PlayerProfile.objects.create(profile_name="P3")
+
+        # P1 & P2 were in season 1
+        SeasonParticipant.objects.create(season=self.s1, profile=self.p1)
+        SeasonParticipant.objects.create(season=self.s1, profile=self.p2)
+
+        # Only P1 & P3 registered for season 2 (P2 is missing, P3 is newcomer)
+        SeasonParticipant.objects.create(season=self.s2, profile=self.p1)
+        SeasonParticipant.objects.create(season=self.s2, profile=self.p3)
+
+    def test_projected_leagues_returns_partitioned_participants(self):
+        response = self.client.get(
+            f"/api/season/season-participants/projected-leagues/?season={self.s2.id}"
+        )
+        self.assertEqual(response.status_code, 200)
+        data = response.data
+
+        self.assertEqual(data["season"]["id"], self.s2.id)
+
+        # Active participants: P1 and P3
+        active_ids = [p["profile"] for p in data["active_participants"]]
+        self.assertEqual(set(active_ids), {self.p1.id, self.p3.id})
+
+        # Missing participants: P2
+        missing_ids = [p["profile"] for p in data["missing_participants"]]
+        self.assertEqual(missing_ids, [self.p2.id])
+
+        # Newcomers: P3
+        newcomer_ids = [p["profile"] for p in data["newcomers"]]
+        self.assertIn(self.p3.id, newcomer_ids)
+
+        # Unprojected: empty (all are accounted for in leagues or newcomers)
+        self.assertEqual(data["unprojected_participants"], [])
+
+
 class PreviewLeaguesAPITests(TestCase):
     def setUp(self):
         self.client = APIClient()

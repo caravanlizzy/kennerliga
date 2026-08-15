@@ -305,8 +305,6 @@ import LeagueLevel from 'components/season/LeagueLevel.vue';
 import { useQuasar } from 'quasar';
 import {
   fetchRegistrationStatus,
-  fetchOpenSeasonParticipants,
-  fetchSeasonParticipants,
   fetchProjectedLeagues,
   registerForSeason,
 } from 'src/services/seasonService';
@@ -314,7 +312,7 @@ import type {
   TProjectedLeague,
   TProjectedLeagueMember,
 } from 'src/services/seasonService';
-import type { TAnnouncementDto, TSeasonParticipantDto } from 'src/types';
+import type { TAnnouncementDto } from 'src/types';
 
 const props = defineProps<{
   announcement: TAnnouncementDto & { season_id?: number };
@@ -332,10 +330,13 @@ const { isAuthenticated } = storeToRefs(userStore);
 
 const isSignedUpForOpenSeason = ref(false);
 const openSeasonId = ref<number | null>(null);
-const participants = ref<TSeasonParticipantDto[] | null>(null);
 const participantsLoading = ref(false);
 const participantsLoaded = ref(false);
 const projectedLeagues = ref<TProjectedLeague[]>([]);
+const newcomers = ref<TProjectedLeagueMember[]>([]);
+const activeParticipants = ref<TProjectedLeagueMember[]>([]);
+const missingParticipants = ref<TProjectedLeagueMember[]>([]);
+const unprojectedParticipants = ref<TProjectedLeagueMember[]>([]);
 
 const minimizedStorageKey = computed(() => {
   const sid = announcement.season_id || openSeasonId.value;
@@ -359,65 +360,31 @@ function toggleMinimized() {
     }
   }
 }
-const newcomers = ref<TProjectedLeagueMember[]>([]);
-
-const activeParticipants = computed(() => {
-  return (participants.value || []).filter((p) => !p.is_prev_unregistered);
-});
-
-const missingParticipants = computed(() => {
-  return (participants.value || []).filter((p) => p.is_prev_unregistered);
-});
 
 const projectedLeagueGroups = computed<TProjectedLeague[]>(() => {
   return (projectedLeagues.value || []).filter((g) => g.members && g.members.length > 0);
-});
-
-// Profile ids that appear anywhere in the projection (leagues or newcomers pool)
-const projectedProfileIds = computed<Set<number>>(() => {
-  const ids = new Set<number>();
-  for (const g of projectedLeagues.value || []) {
-    for (const m of g.members || []) ids.add(m.profile);
-  }
-  for (const m of newcomers.value || []) ids.add(m.profile);
-  return ids;
-});
-
-// Signed-up participants not yet reflected by the projection (kept as a flat fallback)
-const unprojectedParticipants = computed(() => {
-  const known = projectedProfileIds.value;
-  return activeParticipants.value.filter((p) => !known.has(p.profile));
 });
 
 async function loadParticipants() {
   if (participantsLoading.value) return;
   participantsLoading.value = true;
   try {
-    const seasonId = announcement.season_id || openSeasonId.value;
-    if (seasonId) {
-      // Include previous-season unregistered players for announcement context
-      participants.value = await fetchSeasonParticipants(seasonId, { includePrevUnregistered: true });
-    } else {
-      participants.value = await fetchOpenSeasonParticipants(true);
-    }
-    await loadProjectedLeagues();
-  } catch {
-    participants.value = [];
-  } finally {
-    participantsLoading.value = false;
-    participantsLoaded.value = true;
-  }
-}
-
-async function loadProjectedLeagues() {
-  try {
     const seasonId = announcement.season_id || openSeasonId.value || undefined;
     const proj = await fetchProjectedLeagues(seasonId);
     projectedLeagues.value = proj.leagues;
     newcomers.value = proj.newcomers;
+    activeParticipants.value = proj.active_participants;
+    missingParticipants.value = proj.missing_participants;
+    unprojectedParticipants.value = proj.unprojected_participants;
   } catch {
     projectedLeagues.value = [];
     newcomers.value = [];
+    activeParticipants.value = [];
+    missingParticipants.value = [];
+    unprojectedParticipants.value = [];
+  } finally {
+    participantsLoading.value = false;
+    participantsLoaded.value = true;
   }
 }
 

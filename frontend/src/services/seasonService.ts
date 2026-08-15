@@ -162,6 +162,7 @@ export async function fetchSeasonParticipants(
 }
 
 export type TProjectedLeagueMember = {
+  id?: number | null;
   profile: number;
   profile_name: string;
   username: string | null;
@@ -179,6 +180,9 @@ export type TProjectedLeaguesResponse = {
   season: { id: number; name: string; status: string } | null;
   leagues: TProjectedLeague[];
   newcomers: TProjectedLeagueMember[];
+  active_participants: TProjectedLeagueMember[];
+  missing_participants: TProjectedLeagueMember[];
+  unprojected_participants: TProjectedLeagueMember[];
 };
 
 export async function fetchProjectedLeagues(
@@ -192,10 +196,20 @@ export async function fetchProjectedLeagues(
       season: data?.season ?? null,
       leagues: unwrapList<TProjectedLeague>(data?.leagues),
       newcomers: unwrapList<TProjectedLeagueMember>(data?.newcomers),
+      active_participants: unwrapList<TProjectedLeagueMember>(data?.active_participants),
+      missing_participants: unwrapList<TProjectedLeagueMember>(data?.missing_participants),
+      unprojected_participants: unwrapList<TProjectedLeagueMember>(data?.unprojected_participants),
     };
   } catch (error) {
     console.error('Failed to fetch projected leagues:', error);
-    return { season: null, leagues: [], newcomers: [] };
+    return {
+      season: null,
+      leagues: [],
+      newcomers: [],
+      active_participants: [],
+      missing_participants: [],
+      unprojected_participants: [],
+    };
   }
 }
 

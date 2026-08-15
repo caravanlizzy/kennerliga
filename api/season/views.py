@@ -590,7 +590,15 @@ class SeasonParticipantViewSet(ModelViewSet):
             season = get_running_season()
         if not season:
             return Response(
-                {"season": None, "leagues": [], "newcomers": []}, status=200
+                {
+                    "season": None,
+                    "leagues": [],
+                    "newcomers": [],
+                    "active_participants": [],
+                    "missing_participants": [],
+                    "unprojected_participants": [],
+                },
+                status=200,
             )
 
         participants = list(
@@ -601,6 +609,58 @@ class SeasonParticipantViewSet(ModelViewSet):
         profiles = [sp.profile for sp in participants]
         projection = build_league_projection(profiles)
 
+        active_participants = [
+            {
+                "id": sp.id,
+                "profile": sp.profile_id,
+                "profile_name": sp.profile.profile_name,
+                "username": getattr(
+                    getattr(sp.profile, "user", None), "username", None
+                ),
+            }
+            for sp in participants
+        ]
+
+        prev = self._previous_season_for(season)
+        missing_participants = []
+        if prev:
+            current_profile_ids = set(sp.profile_id for sp in participants)
+            prev_profile_ids = list(
+                SeasonParticipant.objects.filter(season=prev).values_list(
+                    "profile_id", flat=True
+                )
+            )
+            missing_ids = [
+                pid for pid in prev_profile_ids if pid not in current_profile_ids
+            ]
+            if missing_ids:
+                missing_profiles = PlayerProfile.objects.select_related(
+                    "user"
+                ).filter(id__in=missing_ids)
+                missing_participants = [
+                    {
+                        "profile": p.id,
+                        "profile_name": p.profile_name,
+                        "username": getattr(
+                            getattr(p, "user", None), "username", None
+                        ),
+                    }
+                    for p in missing_profiles
+                ]
+
+        projected_profile_ids = set()
+        for lg in projection["leagues"]:
+            for m in lg.get("members", []):
+                projected_profile_ids.add(m["profile"])
+        for m in projection["newcomers"]:
+            projected_profile_ids.add(m["profile"])
+
+        unprojected_participants = [
+            p
+            for p in active_participants
+            if p["profile"] not in projected_profile_ids
+        ]
+
         return Response(
             {
                 "season": {
@@ -610,6 +670,9 @@ class SeasonParticipantViewSet(ModelViewSet):
                 },
                 "leagues": projection["leagues"],
                 "newcomers": projection["newcomers"],
+                "active_participants": active_participants,
+                "missing_participants": missing_participants,
+                "unprojected_participants": unprojected_participants,
             },
             status=200,
         )
