@@ -279,12 +279,17 @@ def build_full_standings_payload(
     )
     all_games_finished = expected_pairs > 0 and actual_pairs == expected_pairs
 
+    is_season_completed = False
+    if league and hasattr(league, "season") and league.season:
+        is_season_completed = league.season.is_completed
+
     return {
         "selected_games": selected_game_list,
         "standings": standings_list,
         "season_id": league.season_id,
         "tie_groups": tie_groups,
         "all_games_finished": all_games_finished,
+        "is_season_completed": is_season_completed,
     }
 
 

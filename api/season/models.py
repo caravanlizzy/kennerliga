@@ -52,6 +52,8 @@ class Season(models.Model):
 
     @property
     def is_completed(self) -> bool:
+        if self.status == self.SeasonStatus.DONE:
+            return True
         leagues = self.leagues.all()
         if not leagues.exists():
             return False

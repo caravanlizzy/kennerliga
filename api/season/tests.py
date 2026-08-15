@@ -138,6 +138,32 @@ class SeasonAPITests(TestCase):
         self.assertEqual(response.data["profile_id"], p2.id)
         self.assertEqual(response.data["league_points"], 25)
 
+    def test_league_winners_empty_when_season_not_completed(self):
+        s_running = Season.objects.create(
+            year=2026, month=5, status=Season.SeasonStatus.RUNNING
+        )
+        l1 = League.objects.create(season=s_running, level=1)
+        p1 = PlayerProfile.objects.create(profile_name="Leader")
+        LeagueStanding.objects.create(league=l1, player_profile=p1, league_points=30)
+
+        response = self.client.get(f"/api/season/seasons/{s_running.id}/league-winners/")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data["winners"], [])
+
+    def test_league_winners_returned_when_season_done(self):
+        s_done = Season.objects.create(
+            year=2026, month=4, status=Season.SeasonStatus.DONE
+        )
+        l1 = League.objects.create(season=s_done, level=1)
+        user = User.objects.create_user(username="winner_user", password="password")
+        p1 = PlayerProfile.objects.create(user=user, profile_name="Winner Profile")
+        LeagueStanding.objects.create(league=l1, player_profile=p1, league_points=30)
+
+        response = self.client.get(f"/api/season/seasons/{s_done.id}/league-winners/")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data["winners"]), 1)
+        self.assertEqual(response.data["winners"][0]["winner"]["username"], "winner_user")
+
 
 class ProjectedLeaguesAPITests(TestCase):
     def setUp(self):

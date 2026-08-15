@@ -43,6 +43,19 @@
               :show-standings="isOverviewPage"
             />
             <LeagueStandings v-else-if="mode === 'standings-simple'" :leagueId="league.id" />
+            <div v-else-if="mode === 'picks'" class="q-pa-sm">
+              <div class="row items-center q-gutter-x-sm q-mb-md q-px-sm q-pt-sm">
+                <LeagueLevel :level="league.level" />
+                <span class="text-subtitle1 text-weight-bold">{{ league.name }} Picks &amp; Bans</span>
+              </div>
+              <PlayerCard
+                v-if="getMembersForLeague(league.id).length > 0"
+                :all-members="getMembersForLeague(league.id)"
+              />
+              <div v-else class="q-pa-md text-grey-6 italic text-center">
+                No participant picks recorded for this league.
+              </div>
+            </div>
             <LeagueStandingsMatrix v-else :leagueId="league.id" :prefetchedData="allStandingsData[league.id]" :level="league.level" />
           </div>
         </div>
@@ -52,15 +65,19 @@
 </template>
 
 <script setup lang="ts">
-import { watch, computed } from 'vue';
+import { ref, watch, computed } from 'vue';
 import { useRoute } from 'vue-router';
 import LeagueMatchResults from 'components/league/LeagueMatchResults.vue';
 import LeagueStandings from 'components/league/LeagueStandings.vue';
 import LeagueStandingsMatrix from 'components/league/LeagueStandingsMatrix.vue';
+import LeagueLevel from 'components/season/LeagueLevel.vue';
+import PlayerCard from 'components/league/PlayerCard.vue';
 import LoadingSpinner from 'components/base/LoadingSpinner.vue';
 import { api } from 'boot/axios';
 import KennerButton from 'components/base/KennerButton.vue';
 import { useCachedResource } from 'src/composables/cachedResource';
+import { fetchSeasonParticipants } from 'src/services/seasonService';
+import type { TSeasonParticipantDto } from 'src/types';
 
 import { useLeagueStore } from 'stores/leagueStore';
 
@@ -79,12 +96,44 @@ interface SeasonPayload {
 
 const props = withDefaults(defineProps<{
   seasonId?: number | null;
-  mode?: 'standings' | 'results' | 'standings-simple';
+  mode?: 'standings' | 'results' | 'standings-simple' | 'picks';
+  participants?: TSeasonParticipantDto[];
 }>(), {
   mode: 'standings'
 });
 
 const isOverviewPage = computed(() => route.name === 'season-overview');
+
+const participantsList = ref<TSeasonParticipantDto[]>(props.participants || []);
+
+watch(() => props.participants, (newVal) => {
+  if (newVal && newVal.length > 0) {
+    participantsList.value = newVal;
+  }
+}, { immediate: true });
+
+async function ensureParticipantsLoaded() {
+  if (props.mode === 'picks' && participantsList.value.length === 0 && props.seasonId) {
+    try {
+      participantsList.value = await fetchSeasonParticipants(props.seasonId);
+    } catch (e) {
+      console.error('Failed to load season participants for picks:', e);
+    }
+  }
+}
+
+watch(() => [props.seasonId, props.mode], () => {
+  ensureParticipantsLoaded();
+}, { immediate: true });
+
+function getMembersForLeague(leagueId: number) {
+  return participantsList.value.filter((p) => {
+    if (typeof p.league === 'object' && p.league !== null) {
+      return (p.league as any).id === leagueId;
+    }
+    return p.league === leagueId;
+  });
+}
 
 // Stale-while-revalidate loader: cached data for the current season stays on
 // screen while a fresh request is in flight, so the UI never flashes the

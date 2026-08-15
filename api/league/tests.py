@@ -133,6 +133,8 @@ class LeagueServiceTests(TestCase):
             f"/api/league/leagues/{self.league.id}/full-standings/"
         )
         self.assertEqual(response.status_code, 200)
+        self.assertIn("is_season_completed", response.data)
+        self.assertFalse(response.data["is_season_completed"])
 
         standings = response.data["standings"]
         p0_row = next(

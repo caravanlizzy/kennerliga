@@ -122,14 +122,14 @@
                 </template>
               </template>
 
-              <!-- League Leader Celebration (First Row) -->
-              <div v-if="!isMobile && props.rowIndex === 0 && (standings?.selected_games && standings.selected_games.length > 0)" class="leader-crown q-ml-sm">
+              <!-- League Leader Celebration (First Row - only when season is completed) -->
+              <div v-if="!isMobile && props.rowIndex === 0 && standings?.is_season_completed && (standings?.selected_games && standings.selected_games.length > 0)" class="leader-crown q-ml-sm">
                 <q-icon
                   name="emoji_events"
                   color="amber-8"
                   size="18px"
                 />
-                <KennerTooltip>League Leader</KennerTooltip>
+                <KennerTooltip>League Winner</KennerTooltip>
               </div>
 
               <!-- Tie Group Indicator -->
@@ -378,6 +378,7 @@ interface StandingsData {
   season_id?: number;
   tie_groups?: TieGroup[];
   all_games_finished?: boolean;
+  is_season_completed?: boolean;
 }
 
 const standings = ref<StandingsData | null>(props.prefetchedData || null);

@@ -50,10 +50,15 @@
           <span class="text-caption text-grey-8">Participants</span>
           <span class="text-subtitle2 text-weight-bold">{{ participants.length }}</span>
         </div>
+        <div class="row items-center q-gutter-x-sm q-px-md q-py-xs bg-grey-1 rounded-borders-12 border-subtle">
+          <q-icon name="casino" color="grey-7" size="xs" />
+          <span class="text-caption text-grey-8">Total Picks</span>
+          <span class="text-subtitle2 text-weight-bold">{{ totalPicks }}</span>
+        </div>
       </div>
 
-      <!-- Champions Section -->
-      <div class="q-mb-lg">
+      <!-- Champions Section (only when season is completed) -->
+      <div v-if="isSeasonCompleted" class="q-mb-lg">
         <ContentSection
           title="Champions"
           icon="emoji_events"
@@ -64,13 +69,34 @@
         </ContentSection>
       </div>
 
-      <!-- Leagues: standings + match results integrated per league -->
+      <!-- Leagues: standings matrix, picks & bans, match results -->
       <div class="q-mt-xl">
-        <div class="row items-center q-gutter-x-xs q-px-md q-mb-sm">
-          <q-icon name="leaderboard" color="primary" size="sm" />
-          <span class="text-overline text-grey-7 text-weight-bold">League Standings &amp; Results</span>
+        <div class="row items-center justify-between q-px-md q-mb-sm">
+          <div class="row items-center q-gutter-x-xs">
+            <q-icon name="leaderboard" color="primary" size="sm" />
+            <span class="text-overline text-grey-7 text-weight-bold">League Details</span>
+          </div>
+          <q-btn-toggle
+            v-model="activeView"
+            no-caps
+            rounded
+            unelevated
+            dense
+            toggle-color="primary"
+            color="grey-2"
+            text-color="grey-8"
+            :options="[
+              { label: 'Standings Matrix', value: 'standings', icon: 'grid_view' },
+              { label: 'Picks & Bans', value: 'picks', icon: 'casino' },
+              { label: 'Match Results', value: 'results', icon: 'scoreboard' },
+            ]"
+          />
         </div>
-        <SeasonStandings :season-id="seasonId" mode="results" />
+        <SeasonStandings
+          :season-id="seasonId"
+          :mode="activeView"
+          :participants="participants"
+        />
       </div>
     </div>
   </q-page>
@@ -93,8 +119,16 @@ const seasonId = Number(route.params.id);
 const leagues = ref<TLeagueDto[]>([]);
 const season = ref<TSeasonDto | null>(null);
 const participants = ref<TSeasonParticipantDto[]>([]);
+const activeView = ref<'standings' | 'picks' | 'results'>('standings');
 const loading = ref(true);
 const error = ref<string | null>(null);
+
+const totalPicks = computed(() => {
+  return participants.value.reduce(
+    (acc, p) => acc + (p.selected_games?.length || 0),
+    0
+  );
+});
 
 const statusColor = computed(() => {
   if (isSeasonCompleted.value) return 'grey-7';

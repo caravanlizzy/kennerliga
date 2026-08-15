@@ -213,6 +213,19 @@ class SeasonViewSet(ModelViewSet):
             pk=pk,
         )
 
+        if not season.is_completed:
+            return Response(
+                {
+                    "season": {
+                        "id": season.id,
+                        "name": season.name,
+                        "status": season.status,
+                    },
+                    "winners": [],
+                },
+                status=status.HTTP_200_OK,
+            )
+
         leagues = League.objects.filter(season_id=season.id).order_by("level", "id")
 
         standings = (
