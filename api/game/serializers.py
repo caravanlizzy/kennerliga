@@ -82,7 +82,8 @@ class WinConditionSerializer(ModelSerializer):
 
 class ResultConfigSerializer(ModelSerializer):
     """
-    Serializer for the ResultConfig model, including win conditions and starting point system info.
+    Serializer for the ResultConfig model, including win conditions, factions, and starting point system info.
+    Supports atomic nested creation and update of factions, win conditions, options, and tie-breakers.
     """
     starting_points_system_code = serializers.SerializerMethodField(read_only=True)
     starting_points_system_description = serializers.SerializerMethodField(
@@ -92,6 +93,7 @@ class ResultConfigSerializer(ModelSerializer):
         queryset=StartingPointSystem.objects.all(), required=False, allow_null=True
     )
     win_conditions = WinConditionSerializer(many=True, read_only=True)
+    factions = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = ResultConfig
@@ -106,6 +108,95 @@ class ResultConfigSerializer(ModelSerializer):
             if obj.starting_points_system
             else None
         )
+
+    def get_factions(self, obj):
+        factions = Faction.objects.filter(game=obj.game).order_by("level", "name")
+        return FactionSerializer(factions, many=True).data
+
+    def _sync_factions(self, game, factions_data):
+        if factions_data is None:
+            return
+        Faction.objects.filter(game=game).delete()
+        for f in factions_data:
+            name = f.get("name", "")
+            if name:
+                Faction.objects.create(
+                    game=game,
+                    name=name,
+                    level=f.get("level", 0),
+                )
+
+    def _sync_win_conditions(self, result_config, win_conditions_data):
+        if win_conditions_data is None:
+            return
+        WinCondition.objects.filter(result_config=result_config).delete()
+        for wc_idx, wc_data in enumerate(win_conditions_data):
+            name = wc_data.get("name", "")
+            if not name:
+                continue
+            wc = WinCondition.objects.create(
+                result_config=result_config,
+                name=name,
+                condition_type=wc_data.get(
+                    "condition_type", WinCondition.WinConditionType.POINTS
+                ),
+                order=wc_data.get("order", wc_idx * 10),
+            )
+            for opt_idx, opt_data in enumerate(wc_data.get("options", [])):
+                opt_name = opt_data.get("name", "")
+                if opt_name:
+                    WinConditionOption.objects.create(
+                        win_condition=wc,
+                        name=opt_name,
+                        order=opt_data.get("order", opt_idx * 10),
+                    )
+            tie_breakers = wc_data.get("tie_breakers", []) or wc_data.get(
+                "tieBreakers", []
+            )
+            for tb_idx, tb_data in enumerate(tie_breakers):
+                tb_name = tb_data.get("name", "")
+                if tb_name:
+                    TieBreaker.objects.create(
+                        win_condition=wc,
+                        name=tb_name,
+                        higher_wins=tb_data.get("higher_wins", True),
+                        order=tb_data.get(
+                            "order", (len(tie_breakers) - tb_idx) * 10
+                        ),
+                    )
+
+    @transaction.atomic
+    def create(self, validated_data):
+        factions_data = self.initial_data.get("factions", None)
+        win_conditions_data = self.initial_data.get(
+            "win_conditions", self.initial_data.get("winConditions", None)
+        )
+
+        result_config = ResultConfig.objects.create(**validated_data)
+        if factions_data is not None:
+            self._sync_factions(result_config.game, factions_data)
+        if win_conditions_data is not None:
+            self._sync_win_conditions(result_config, win_conditions_data)
+
+        return result_config
+
+    @transaction.atomic
+    def update(self, instance, validated_data):
+        factions_data = self.initial_data.get("factions", None)
+        win_conditions_data = self.initial_data.get(
+            "win_conditions", self.initial_data.get("winConditions", None)
+        )
+
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+        instance.save()
+
+        if factions_data is not None:
+            self._sync_factions(instance.game, factions_data)
+        if win_conditions_data is not None:
+            self._sync_win_conditions(instance, win_conditions_data)
+
+        return instance
 
 
 class StartingPointSystemSerializer(ModelSerializer):

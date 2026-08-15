@@ -394,8 +394,10 @@ class SeasonParticipantViewSet(ModelViewSet):
     API viewset for managing participants in a season.
     Supports listing participants, projecting league distributions, and retrieving current participants.
     """
-    queryset = SeasonParticipant.objects.select_related("season", "profile").prefetch_related(
-        "leagues_member"
+    queryset = (
+        SeasonParticipant.objects.select_related("season", "profile")
+        .prefetch_related("leagues_member")
+        .order_by("-season__year", "-season__month", "-season_id")
     )
     serializer_class = SeasonParticipantSerializer
     filterset_fields = ["season", "profile", "profile__profile_name"]

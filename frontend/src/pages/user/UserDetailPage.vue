@@ -174,13 +174,7 @@ async function load() {
 
   const username = String(route.params.username || '');
   try {
-    const { data: usersResponse } = await api.get('user/users/', {
-      params: { username }
-    });
-
-    let foundUser: TUserDto | null;
-    const users = Array.isArray(usersResponse) ? usersResponse : usersResponse.results || [];
-    foundUser = users.find((u: TUserDto) => u.username.toLowerCase() === username.toLowerCase()) || null;
+    const { data: foundUser } = await api.get<TUserDto>(`user/users/${encodeURIComponent(username)}/`);
 
     if (foundUser) {
       user.value = foundUser;
@@ -234,19 +228,11 @@ async function fetchSeasonParticipation(profileId: number) {
     const { data: participantsRes } = await api.get('season/season-participants/', {
       params: { profile: profileId }
     });
-    const participants: TSeasonParticipantDto[] = Array.isArray(participantsRes) ? participantsRes : participantsRes.results || [];
+    const participants: (TSeasonParticipantDto & { season_details?: TSeasonDto })[] = Array.isArray(participantsRes)
+      ? participantsRes
+      : participantsRes.results || [];
 
-    const seasonIds = [...new Set(participants.map(p => p.season))];
-    const seasonsData = await Promise.all(seasonIds.map(id => api.get(`season/seasons/${id}/`)));
-    const seasonsMap: Record<number, TSeasonDto> = {};
-    seasonsData.forEach(res => {
-      if (res.data) seasonsMap[res.data.id] = res.data;
-    });
-
-    userSeasonList.value = participants.map(p => ({
-      ...p,
-      season_details: seasonsMap[p.season]
-    })).sort((a, b) => (b.season_details?.id || 0) - (a.season_details?.id || 0));
+    userSeasonList.value = participants;
   } catch (err) {
     console.error('Failed to load season participation:', err);
   } finally {

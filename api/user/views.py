@@ -63,18 +63,25 @@ class UserViewSet(ModelViewSet):
             permission_classes = [IsAdminUser]
         return [permission() for permission in permission_classes]
 
+    def get_queryset(self):
+        qs = super().get_queryset()
+        username = self.request.query_params.get("username")
+        if username:
+            qs = qs.filter(username__iexact=username)
+        return qs
+
     def get_object(self):
         """
         Retrieves a user object by ID or username.
         """
         lookup = self.kwargs["pk"]  # Django REST by default uses pk
-        qs = self.get_queryset()
+        qs = User.objects.all()
         # Try ID first, then username
         user = None
         if lookup.isdigit():
             user = qs.filter(id=lookup).first()
         if user is None:
-            user = qs.filter(username=lookup).first()
+            user = qs.filter(username__iexact=lookup).first() or qs.filter(username=lookup).first()
         if not user:
             raise NotFound("User not found.")
         return user

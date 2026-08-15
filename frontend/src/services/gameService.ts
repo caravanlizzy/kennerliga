@@ -165,22 +165,45 @@ export async function createOptions(
   }
 }
 
+function buildResultConfigPayload(
+  gameId: number,
+  resultConfig: TResultConfig
+) {
+  return {
+    game: gameId,
+    is_asymmetric: resultConfig?.isAsymmetric,
+    has_starting_player_order: resultConfig?.hasStartingPlayerOrder,
+    has_points: resultConfig?.hasPoints,
+    starting_points_system: resultConfig?.startingPointSystem,
+    factions: (resultConfig?.factions || []).map((f) => ({
+      name: f.name,
+      level: f.level,
+    })),
+    win_conditions: (resultConfig?.winConditions || []).map((wc, index) => ({
+      name: wc.name,
+      condition_type: wc.condition_type,
+      order: wc.order ?? index * 10,
+      options: (wc.options || []).map((opt, optIndex) => ({
+        name: opt.name,
+        order: opt.order ?? optIndex * 10,
+      })),
+      tie_breakers: (wc.tieBreakers || []).map((tb, tbIndex) => ({
+        name: tb.name,
+        higher_wins: tb.higher_wins,
+        order: tb.order ?? ((wc.tieBreakers?.length || 0) - tbIndex) * 10,
+      })),
+    })),
+  };
+}
+
 export async function createResultConfigData(
   gameId: number,
   resultConfig: TResultConfig
 ): Promise<void> {
   try {
-    const { data: resultConfigData } = await api.post('/game/result-configs/', {
-      game: gameId,
-      is_asymmetric: resultConfig?.isAsymmetric,
-      has_starting_player_order: resultConfig?.hasStartingPlayerOrder,
-      has_points: resultConfig?.hasPoints,
-      starting_points_system: resultConfig?.startingPointSystem,
-    });
-    await createFactions(gameId, resultConfig);
-    await createWinConditions(resultConfigData.id, resultConfig);
+    const payload = buildResultConfigPayload(gameId, resultConfig);
+    await api.post('/game/result-configs/', payload);
   } catch (e) {
-    // errorMessages.value.push('CreateResultConfig');
     console.log('Error creating the result configuration', e);
     throw new Error('Error creating the result configuration: \n' + e);
   }
@@ -429,47 +452,14 @@ export async function updateResultConfigData(
   resultConfig: TResultConfig
 ): Promise<void> {
   try {
-    // 1. Fetch existing result config to get its ID
     const existingConfig = await fetchResultConfigForGame(gameId);
-
-    let configId: number;
+    const payload = buildResultConfigPayload(gameId, resultConfig);
 
     if (existingConfig) {
-      configId = existingConfig.id;
-      // 2. Update existing result config
-      await api.patch(`/game/result-configs/${configId}/`, {
-        is_asymmetric: resultConfig?.isAsymmetric,
-        has_starting_player_order: resultConfig?.hasStartingPlayerOrder,
-        has_points: resultConfig?.hasPoints,
-        starting_points_system: resultConfig?.startingPointSystem,
-      });
-
-      // 3. Delete existing factions and tie-breakers (simpler than selective update)
-      const existingFactions = await fetchFactionsForGame(gameId);
-      for (const f of existingFactions) {
-        await api.delete(`/game/factions/${f.id}/`);
-      }
-
-      // Deleting win-conditions cascades to their options and tie-breakers.
-      const existingWinConditions = await fetchWinConditionsForResultConfig(configId);
-      for (const wc of existingWinConditions) {
-        await api.delete(`/game/win-conditions/${wc.id}/`);
-      }
+      await api.patch(`/game/result-configs/${existingConfig.id}/`, payload);
     } else {
-      // Create new if somehow missing
-      const { data: newConfig } = await api.post('/game/result-configs/', {
-        game: gameId,
-        is_asymmetric: resultConfig?.isAsymmetric,
-        has_starting_player_order: resultConfig?.hasStartingPlayerOrder,
-        has_points: resultConfig?.hasPoints,
-        starting_points_system: resultConfig?.startingPointSystem,
-      });
-      configId = newConfig.id;
+      await api.post('/game/result-configs/', payload);
     }
-
-    // 4. Create new factions and win-conditions (with options and tie-breakers)
-    await createFactions(gameId, resultConfig);
-    await createWinConditions(configId, resultConfig);
   } catch (e) {
     console.log('Error updating the result configuration', e);
     throw new Error('Error updating the result configuration: \n' + e);
