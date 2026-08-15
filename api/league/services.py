@@ -1,3 +1,4 @@
+from decimal import Decimal
 from typing import Optional, List, Dict, Iterable
 from django.db import transaction
 from django.db.models import Count, Prefetch
@@ -12,6 +13,32 @@ from league.models import (
 from season.models import SeasonParticipant
 from league import queries as q
 from api.constants import get_ban_amount_for_success
+
+
+def _format_ordinal(n: Optional[int]) -> Optional[str]:
+    if n is None:
+        return None
+    try:
+        n_int = int(n)
+    except (ValueError, TypeError):
+        return str(n)
+    if 11 <= (n_int % 100) <= 13:
+        suffix = "th"
+    else:
+        suffix = {1: "st", 2: "nd", 3: "rd"}.get(n_int % 10, "th")
+    return f"{n_int}{suffix}"
+
+
+def _format_points(val) -> Optional[str]:
+    if val is None:
+        return None
+    try:
+        dec = Decimal(str(val))
+        if dec % 1 == 0:
+            return str(int(dec))
+        return f"{dec:.2f}".rstrip("0").rstrip(".")
+    except Exception:
+        return str(val)
 
 
 def _serialize_selected_game(sg) -> Dict:
@@ -44,14 +71,22 @@ def _serialize_selected_game(sg) -> Dict:
     }
 
 
-def _gs_row(gs) -> Dict:
+def _gs_row(gs, has_points: bool = True) -> Dict:
     """
     Serializes a GameStanding object into a dictionary row for API payloads.
     """
+    display_rank = _format_ordinal(gs.rank) if gs.rank is not None else None
+    if not has_points:
+        display_val = display_rank
+    else:
+        display_val = _format_points(gs.points)
+
     return {
-        "points": str(gs.points),
-        "league_points": str(gs.league_points),
+        "points": str(gs.points) if gs.points is not None else None,
+        "league_points": str(gs.league_points) if gs.league_points is not None else None,
         "rank": gs.rank,
+        "display_rank": display_rank,
+        "display_value": display_val,
         "decisive_tie_breaker_name": gs.decisive_tie_breaker.name
         if gs.decisive_tie_breaker
         else None,
@@ -76,6 +111,12 @@ def build_full_standings_payload(
     """
     selected_game_list = [_serialize_selected_game(sg) for sg in selected_games]
     selected_game_ids = [sg.id for sg in selected_games]
+    has_points_by_sg = {
+        sg.id: sg.game.resultconfig_set.all()[0].has_points
+        if sg.game.resultconfig_set.all()
+        else True
+        for sg in selected_games
+    }
 
     league_standing_dict = {ls.player_profile_id: ls for ls in league_standing_list}
 
@@ -84,7 +125,7 @@ def build_full_standings_payload(
     for gs in game_standings:
         game_data_by_player.setdefault(gs.player_profile_id, {})[
             gs.selected_game_id
-        ] = _gs_row(gs)
+        ] = _gs_row(gs, has_points=has_points_by_sg.get(gs.selected_game_id, True))
 
     # 5. Build the response rows
     standings_list = []
@@ -102,6 +143,8 @@ def build_full_standings_payload(
                     "points": None,
                     "league_points": None,
                     "rank": None,
+                    "display_rank": None,
+                    "display_value": None,
                 }
 
         standings_list.append(

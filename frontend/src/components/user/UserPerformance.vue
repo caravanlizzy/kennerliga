@@ -43,16 +43,6 @@
           </div>
         </div>
       </div>
-
-      <q-separator class="q-my-md opacity-50" />
-      <div class="row items-center justify-between">
-        <div class="text-caption text-grey-7 text-weight-bold">Podiums</div>
-        <div class="row q-gutter-x-xs">
-          <q-badge v-for="i in 3" :key="i" :color="getPosColor(i)" rounded class="q-px-xs">
-            {{ overallStats.positions[i] || 0 }}
-          </q-badge>
-        </div>
-      </div>
     </q-card-section>
   </q-card>
 </template>

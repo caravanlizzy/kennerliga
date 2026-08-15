@@ -177,17 +177,17 @@
 
             <div
               v-if="
-                props.value && (props.value.points || props.value.league_points)
+                props.value && (props.value.display_value != null || props.value.points != null || props.value.league_points != null)
               "
               class="column items-center"
               style="line-height: 1.1"
             >
               <div
-                v-if="props.value.points"
+                v-if="props.value.display_value != null || props.value.points != null"
                 class="text-weight-bold row items-baseline"
                 style="font-size: 0.9rem"
               >
-                <span>{{ displayPointsValue(props.value.points, (props.col as any).hasPoints) }}</span>
+                <span>{{ displayPointsValue(props.value) }}</span>
                 <span
                   v-if="(props.col as any).hasPoints"
                   class="text-weight-medium q-ml-xs"
@@ -317,6 +317,8 @@ interface GameStats {
   points: string;
   league_points: string;
   rank: number;
+  display_rank?: string;
+  display_value?: string;
   decisive_tie_breaker_name?: string;
   tie_breaker_value?: string;
 }
@@ -496,25 +498,15 @@ const formatNumber = (value: string | number): string => {
   return (num as number) % 1 === 0 ? (num as number).toFixed(0) : String(num);
 };
 
-function displayPointsValue(points: string, hasPoints: boolean) {
-  if (!hasPoints) {
-    switch (points) {
-      case '-1.00':
-        return '1st';
-      case '-2.00':
-        return '2nd';
-      case '-3.00':
-        return '3rd';
-      case '-4.00':
-        return '4th';
-      default:
-        // Fallback for positions > 4 if they occur
-        if (parseFloat(points) < 0) {
-          return `${Math.abs(Math.round(parseFloat(points)))}th`;
-        }
-    }
+function displayPointsValue(gameData: any) {
+  if (!gameData) return '-';
+  if (gameData.display_value != null) {
+    return gameData.display_value;
   }
-  return formatNumber(points);
+  if (gameData.display_rank != null) {
+    return gameData.display_rank;
+  }
+  return formatNumber(gameData.points ?? gameData);
 }
 
 function getRankBgClass(rank: number | undefined) {

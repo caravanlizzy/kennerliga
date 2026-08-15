@@ -147,6 +147,8 @@ class GameStandingSerializer(serializers.ModelSerializer):
     decisive_tie_breaker_name = serializers.CharField(
         source="decisive_tie_breaker.name", read_only=True
     )
+    display_rank = serializers.SerializerMethodField()
+    display_value = serializers.SerializerMethodField()
 
     class Meta:
         model = GameStanding
@@ -158,12 +160,30 @@ class GameStandingSerializer(serializers.ModelSerializer):
             "selected_game",
             "points",
             "rank",
+            "display_rank",
+            "display_value",
             "league_points",
             "win_share",
             "decisive_tie_breaker",
             "decisive_tie_breaker_name",
             "tie_breaker_value",
         )
+
+    def get_display_rank(self, obj):
+        from league.services import _format_ordinal
+
+        return _format_ordinal(obj.rank) if obj.rank is not None else None
+
+    def get_display_value(self, obj):
+        from league.services import _format_ordinal, _format_points
+
+        if not obj.selected_game or not obj.selected_game.game:
+            return _format_points(obj.points)
+        configs = list(obj.selected_game.game.resultconfig_set.all())
+        has_points = configs[0].has_points if configs else True
+        if not has_points:
+            return _format_ordinal(obj.rank) if obj.rank is not None else None
+        return _format_points(obj.points)
 
 
 class LeagueMinimalSerializer(serializers.ModelSerializer):
