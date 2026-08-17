@@ -1,21 +1,21 @@
 <template>
-  <q-card v-if="results.length > 0" flat>
+  <q-card v-if="results.length > 0" flat class="match-results-card">
     <q-card-section
       v-if="displayGameName"
-      class="q-py-sm q-px-md row items-center"
+      class="q-py-sm q-px-md row items-center bg-grey-1"
     >
-      <div class="text-subtitle1 text-weight-medium ellipsis">
+      <div class="text-subtitle1 text-weight-bold text-grey-9 ellipsis">
         {{ selectedGame.game_name }}
       </div>
       <q-space />
-      <q-badge outline color="grey-7" class="q-ml-sm">
+      <q-badge rounded color="grey-3" text-color="grey-7" class="q-px-sm">
         {{ results.length }} players
       </q-badge>
     </q-card-section>
 
     <q-separator v-if="displayGameName" />
 
-    <q-list class="q-py-xs">
+    <q-list class="q-py-sm">
       <q-item
         v-for="result in results"
         :key="result.id"
@@ -24,63 +24,60 @@
       >
         <!-- Rank / Position -->
         <q-item-section side class="q-pr-sm">
-          <q-avatar
-            size="34px"
-            :color="rankColor(result.position)"
-            :text-color="rankTextColor(result.position)"
-            class="rank-avatar"
+          <div
+            class="rank-display column items-center justify-center"
+            :class="rankClass(result.position)"
           >
-            <span class="text-weight-bold">{{ result.position ?? '-' }}</span>
-          </q-avatar>
+            <span class="text-weight-bolder">{{ result.position ?? '-' }}</span>
+          </div>
         </q-item-section>
 
         <!-- Name + optional note + tie-breaker + Stats -->
         <q-item-section>
-          <div class="row items-center full-width content-container">
+          <div class="row items-center full-width no-wrap content-container">
             <div class="player-name-col">
-              <q-item-label class="row items-center no-wrap">
+              <div class="row items-center no-wrap">
                 <q-icon
                   v-if="result.position != null && result.position <= 3"
                   :name="rankIcon(result.position)"
                   :color="rankColor(result.position)"
-                  size="18px"
-                  class="q-mr-xs shrink-0"
+                  size="20px"
+                  class="q-mr-xs shrink-0 podium-icon"
                 />
-                <span class="text-weight-medium ellipsis">
+                <span class="text-subtitle2 text-weight-bold ellipsis name-text">
                   {{ result.profile_name }}
                 </span>
-              </q-item-label>
+              </div>
 
-              <q-item-label
+              <div
                 v-if="result.notes || result.decisive_tie_breaker"
-                caption
-                class="text-grey-7 ellipsis"
+                class="text-caption text-grey-6 row items-center q-mt-xs"
               >
                 <template v-if="result.notes">
                   <q-icon name="notes" size="14px" class="q-mr-xs" />
-                  {{ result.notes }}
+                  <span class="ellipsis">{{ result.notes }}</span>
                 </template>
                 <span
                   v-if="result.notes && result.decisive_tie_breaker"
-                  class="q-mx-xs"
+                  class="q-mx-xs opacity-50"
                   >•</span
                 >
                 <template v-if="result.decisive_tie_breaker">
-                  <q-icon name="equalizer" size="14px" class="q-mr-xs" />
-                  <span class="text-weight-bold">TB:</span> {{ result.decisive_tie_breaker }} ({{
-                    result.tie_breaker_value
-                  }})
+                  <q-icon name="balance" size="14px" class="q-mr-xs" />
+                  <span class="text-weight-medium text-grey-8">TB:</span>
+                  <span class="q-ml-xs text-grey-7">{{ result.decisive_tie_breaker }} ({{ result.tie_breaker_value }})</span>
                 </template>
-              </q-item-label>
+              </div>
             </div>
 
             <!-- Stats -->
-            <div class="stats-col-new row items-center justify-end q-gutter-xs">
+            <div class="stats-col-new row items-center justify-end q-gutter-sm">
               <!-- Win Condition / Option badge -->
               <q-badge
-                v-if="result.win_condition_option_name || result.win_condition_name"
-                color="deep-purple-5"
-                class="stat-badge"
+                v-if="shouldShowWinCondition(result)"
+                color="indigo-1"
+                text-color="indigo-8"
+                class="stat-badge elegant-badge"
               >
                 <q-icon name="flag_circle" size="14px" class="q-mr-xs" />
                 <span class="ellipsis">
@@ -96,26 +93,29 @@
 
               <q-badge
                 v-if="result.points != null && selectedGame.has_points !== false"
-                :color="result.position === 1 ? 'amber-7' : 'grey-6'"
-                class="stat-badge"
+                :color="result.position === 1 ? 'amber-1' : 'grey-2'"
+                :text-color="result.position === 1 ? 'amber-9' : 'grey-8'"
+                class="stat-badge elegant-badge"
               >
-                <q-icon name="star" size="14px" class="q-mr-xs" />
-                {{ result.points }}
+                <q-icon name="stars" size="14px" class="q-mr-xs" />
+                <span class="text-weight-bold">{{ result.points }}</span>
               </q-badge>
 
               <q-badge
                 v-if="result.starting_position"
-                color="grey-5"
-                class="stat-badge"
+                color="grey-2"
+                text-color="grey-7"
+                class="stat-badge elegant-badge"
               >
-                <q-icon name="flag" size="14px" class="q-mr-xs" />
+                <q-icon name="start" size="14px" class="q-mr-xs" />
                 {{ result.starting_position }}
               </q-badge>
 
               <q-badge
                 v-if="result.starting_points != null"
-                color="blue-grey-4"
-                class="stat-badge"
+                color="blue-grey-1"
+                text-color="blue-grey-7"
+                class="stat-badge elegant-badge"
               >
                 <q-icon name="bolt" size="14px" class="q-mr-xs" />
                 {{ result.starting_points }}
@@ -125,8 +125,9 @@
               <q-badge
                 v-for="faction in result.factions"
                 :key="faction.id"
-                color="indigo-6"
-                class="stat-badge"
+                color="deep-purple-1"
+                text-color="deep-purple-8"
+                class="stat-badge elegant-badge"
               >
                 <q-icon name="shield" size="14px" class="q-mr-xs" />
                 <span class="ellipsis max-faction-width">
@@ -219,6 +220,18 @@ const results = computed(() => {
   return mapped;
 });
 
+function shouldShowWinCondition(result: any) {
+  const name = result.win_condition_name;
+  if (!name) return !!result.win_condition_option_name;
+  const lowerName = name.toLowerCase().trim();
+  return (
+    lowerName !== 'points' &&
+    lowerName !== 'victory points' &&
+    lowerName !== 'score' &&
+    lowerName !== 'point'
+  );
+}
+
 function rankColor(position: number | null) {
   if (position === 1) return 'amber-7';
   if (position === 2) return 'blue-grey-5';
@@ -236,6 +249,13 @@ function rankIcon(position: number | null) {
   return 'military_tech';
 }
 
+function rankClass(position: number | null) {
+  if (position === 1) return 'rank-1';
+  if (position === 2) return 'rank-2';
+  if (position === 3) return 'rank-3';
+  return '';
+}
+
 function rowClass(position: number | null) {
   return {
     'is-first': position === 1,
@@ -244,50 +264,124 @@ function rowClass(position: number | null) {
 }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
+.match-results-card {
+  border-radius: 12px;
+  overflow: hidden;
+}
+
 .match-result-item {
-  padding: 10px 12px;
+  padding: 12px 16px;
+  border-radius: 10px;
+  margin: 4px 12px;
+  transition: all 0.2s ease;
+  border: 1px solid transparent;
+
+  &:hover {
+    background: #f8f9fa;
+    border-color: #eee;
+  }
+
+  &.is-podium {
+    margin-top: 6px;
+    margin-bottom: 6px;
+  }
+
+  &.is-first {
+    background: linear-gradient(
+      to right,
+      rgba(255, 193, 7, 0.05),
+      rgba(255, 193, 7, 0.02)
+    );
+    border-color: rgba(255, 193, 7, 0.2);
+
+    &:hover {
+      background: linear-gradient(
+        to right,
+        rgba(255, 193, 7, 0.08),
+        rgba(255, 193, 7, 0.04)
+      );
+      border-color: rgba(255, 193, 7, 0.3);
+    }
+  }
+}
+
+.rank-display {
+  width: 32px;
+  height: 32px;
   border-radius: 8px;
-  margin: 6px 8px;
+  background: #f1f3f5;
+  color: #495057;
+  font-size: 0.9rem;
+
+  &.rank-1 {
+    background: #fff3bf;
+    color: #f08c00;
+    border: 1px solid #ffe066;
+  }
+  &.rank-2 {
+    background: #f1f3f5;
+    color: #495057;
+    border: 1px solid #dee2e6;
+  }
+  &.rank-3 {
+    background: #fff4e6;
+    color: #d9480f;
+    border: 1px solid #ffd8a8;
+  }
 }
-.match-result-item.is-first {
-  box-shadow: inset 0 0 0 1px rgba(251, 192, 45, 0.45);
-  background: rgba(251, 192, 45, 0.08);
+
+.podium-icon {
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1));
 }
-.rank-avatar {
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+
+.name-text {
+  letter-spacing: -0.01em;
 }
-.stat-badge {
-  padding: 4px 8px;
-  border-radius: 999px;
-  height: 24px;
+
+.elegant-badge {
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-weight: 500;
+  height: 26px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
 }
+
 .content-container {
-  gap: 8px;
-  flex-wrap: wrap;
+  gap: 12px;
 }
+
 .player-name-col {
   flex: 1 1 120px;
   min-width: 0;
-  overflow: hidden;
 }
+
 .stats-col-new {
-  flex: 1 1 auto;
-  min-width: 0;
-  flex-wrap: wrap;
+  flex: 0 0 auto;
 }
+
+.max-faction-width {
+  max-width: 100px;
+}
+
 .shrink-0 {
   flex-shrink: 0;
 }
-.max-faction-width {
-  max-width: 120px;
+
+.opacity-50 {
+  opacity: 0.5;
 }
 
-@media (max-width: 480px) {
+@media (max-width: 600px) {
+  .content-container {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
   .player-name-col {
     flex-basis: 100%;
   }
   .stats-col-new {
+    width: 100%;
     justify-content: flex-start !important;
   }
 }

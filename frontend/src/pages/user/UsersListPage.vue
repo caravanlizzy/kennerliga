@@ -232,6 +232,20 @@ const createButton: TKennerButton = {
   forwardName: 'invite-user',
 };
 
+const sortNullableLarge = (a: number | null | undefined, b: number | null | undefined) => {
+  if (a === b) return 0;
+  if (a === null || a === undefined) return 1;
+  if (b === null || b === undefined) return -1;
+  return a - b;
+};
+
+const sortNullableSmall = (a: number | null | undefined, b: number | null | undefined) => {
+  if (a === b) return 0;
+  if (a === null || a === undefined) return -1;
+  if (b === null || b === undefined) return 1;
+  return a - b;
+};
+
 const columns = [
   {
     name: 'user',
@@ -257,6 +271,7 @@ const columns = [
     field: (x: TUserDto) => x.win_rate,
     format: (val: number | null | undefined) =>
       val !== null && val !== undefined ? `${val.toFixed(1)}%` : '-',
+    sort: sortNullableSmall,
     sortable: true,
   },
   {
@@ -266,6 +281,7 @@ const columns = [
     field: (x: TUserDto) => x.avg_position,
     format: (val: number | null | undefined) =>
       val !== null && val !== undefined ? val.toFixed(2) : '-',
+    sort: sortNullableLarge,
     sortable: true,
   },
   {
@@ -275,6 +291,7 @@ const columns = [
     field: (x: TUserDto) => x.most_participated_league_level,
     format: (val: number | null | undefined) =>
       val !== null && val !== undefined ? `L${val}` : '-',
+    sort: sortNullableLarge,
     sortable: true,
   },
 ];
