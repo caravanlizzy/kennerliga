@@ -140,14 +140,27 @@ def get_user_summary_stats(
     if parsed_years:
         res_qs = res_qs.filter(season__year__in=parsed_years)
 
+    parsed_player_counts = []
     if player_count:
-        pc_str = str(player_count).lower().replace("p", "").strip()
-        if pc_str.isdigit():
-            pc_num = int(pc_str)
-            res_qs = res_qs.filter(
+        if isinstance(player_count, str):
+            tokens = player_count.split(",")
+        elif isinstance(player_count, (list, tuple, set)):
+            tokens = list(player_count)
+        else:
+            tokens = [player_count]
+        for token in tokens:
+            t = str(token).lower().replace("p", "").strip()
+            if t.isdigit():
+                parsed_player_counts.append(int(t))
+
+    if parsed_player_counts:
+        pc_filter = Q()
+        for pc_num in parsed_player_counts:
+            pc_filter |= Q(
                 selected_game__game__min_players__lte=pc_num,
                 selected_game__game__max_players__gte=pc_num,
             )
+        res_qs = res_qs.filter(pc_filter)
 
     if exclude_2p_only:
         res_qs = res_qs.exclude(
@@ -174,7 +187,7 @@ def get_user_summary_stats(
     avg_position = round(avg_pos, 2) if avg_pos is not None else None
 
     # Calculate most played league level respecting active filters
-    has_game_filter = bool(player_count or exclude_2p_only or exclude_3p_only)
+    has_game_filter = bool(parsed_player_counts or exclude_2p_only or exclude_3p_only)
     top_level_from_results = (
         res_qs.values("league__level")
         .annotate(distinct_leagues=Count("league_id", distinct=True), game_count=Count("id"))

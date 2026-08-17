@@ -357,42 +357,49 @@ class UserAPITests(TestCase):
         self.assertEqual(stats_all["avg_position"], 2.0)
         self.assertEqual(stats_all["most_participated_league_level"], 1)
 
-        # 2. Player count: 2p -> sg_2025_2p (pos 1), sg_2026_flex (pos 1) -> 2 games, 2 wins = 100.0%, avg 1.0
+        # 2. Player count: 2p -> sg_2025_2p (pos 1), sg_2026_flex (pos 1) -> 2 games, 2 wins = 100.0%, avg 1.0, L1 (tie-break)
         stats_2p = get_user_summary_stats(self.user, player_count="2p")
         self.assertEqual(stats_2p["total_games"], 2)
         self.assertEqual(stats_2p["win_rate"], 100.0)
         self.assertEqual(stats_2p["avg_position"], 1.0)
         self.assertEqual(stats_2p["most_participated_league_level"], 1)
 
-        # 3. Player count: 3p -> sg_2026_3p (pos 2), sg_2026_flex (pos 1) -> 2 games, 1 win = 50.0%, avg 1.5
+        # 3. Player count: 3p -> sg_2026_3p (pos 2), sg_2026_flex (pos 1) -> 2 games, 1 win = 50.0%, avg 1.5, L1
         stats_3p = get_user_summary_stats(self.user, player_count="3p")
         self.assertEqual(stats_3p["total_games"], 2)
         self.assertEqual(stats_3p["win_rate"], 50.0)
         self.assertEqual(stats_3p["avg_position"], 1.5)
         self.assertEqual(stats_3p["most_participated_league_level"], 1)
 
-        # 4. Player count: 4p -> sg_2025_4p (pos 4), sg_2026_flex (pos 1) -> 2 games, 1 win = 50.0%, avg 2.5
+        # 4. Player count: 4p -> sg_2025_4p (pos 4), sg_2026_flex (pos 1) -> 2 games, 1 win = 50.0%, avg 2.5, L1 (tie-break)
         stats_4p = get_user_summary_stats(self.user, player_count="4p")
         self.assertEqual(stats_4p["total_games"], 2)
         self.assertEqual(stats_4p["win_rate"], 50.0)
         self.assertEqual(stats_4p["avg_position"], 2.5)
         self.assertEqual(stats_4p["most_participated_league_level"], 1)
 
-        # 5. Year filter: 2025 only -> sg_2025_2p (1), sg_2025_4p (4) -> 1 win / 2 = 50.0%, avg 2.5, most played league L2
+        # 5. Multi-select player count: 2p and 3p -> sg_2025_2p (1) + sg_2026_3p (2) + sg_2026_flex (1) -> 3 games, 2 wins = 66.7%, avg 1.33, L1
+        stats_2p_3p = get_user_summary_stats(self.user, player_count="2p,3p")
+        self.assertEqual(stats_2p_3p["total_games"], 3)
+        self.assertEqual(stats_2p_3p["win_rate"], 66.7)
+        self.assertEqual(stats_2p_3p["avg_position"], 1.33)
+        self.assertEqual(stats_2p_3p["most_participated_league_level"], 1)
+
+        # 6. Year filter: 2025 only -> sg_2025_2p (1), sg_2025_4p (4) -> 1 win / 2 = 50.0%, avg 2.5, most played league L2
         stats_2025 = get_user_summary_stats(self.user, years=[2025])
         self.assertEqual(stats_2025["total_games"], 2)
         self.assertEqual(stats_2025["win_rate"], 50.0)
         self.assertEqual(stats_2025["avg_position"], 2.5)
         self.assertEqual(stats_2025["most_participated_league_level"], 2)
 
-        # 6. Year filter: 2026 only -> sg_2026_3p (2), sg_2026_flex (1) -> 1 win / 2 = 50.0%, avg 1.5, most played league L1
+        # 7. Year filter: 2026 only -> sg_2026_3p (2), sg_2026_flex (1) -> 1 win / 2 = 50.0%, avg 1.5, most played league L1
         stats_2026 = get_user_summary_stats(self.user, years=[2026])
         self.assertEqual(stats_2026["total_games"], 2)
         self.assertEqual(stats_2026["win_rate"], 50.0)
         self.assertEqual(stats_2026["avg_position"], 1.5)
         self.assertEqual(stats_2026["most_participated_league_level"], 1)
 
-        # 7. Combined: player_count=2p AND year=2025 -> sg_2025_2p only (pos 1) -> win_rate 100.0%, avg 1.0, most played league L2
+        # 8. Combined: player_count=2p AND year=2025 -> sg_2025_2p only (pos 1) -> win_rate 100.0%, avg 1.0, most played league L2
         stats_comb = get_user_summary_stats(self.user, player_count="2p", years=[2025])
         self.assertEqual(stats_comb["total_games"], 1)
         self.assertEqual(stats_comb["win_rate"], 100.0)
@@ -422,10 +429,10 @@ class UserAPITests(TestCase):
         self.assertEqual(user_row["avg_position"], 2.5)
         self.assertEqual(user_row["most_participated_league_level"], 2)
 
-        res_list_multi_years = self.client.get("/api/user/users/?years=2025,2026&player_count=3p")
-        self.assertEqual(res_list_multi_years.status_code, 200)
-        user_row = next(u for u in res_list_multi_years.data if u["id"] == self.user.id)
-        self.assertEqual(user_row["total_games"], 2)
-        self.assertEqual(user_row["win_rate"], 50.0)
-        self.assertEqual(user_row["avg_position"], 1.5)
+        res_list_multi = self.client.get("/api/user/users/?years=2025,2026&player_count=2p,3p")
+        self.assertEqual(res_list_multi.status_code, 200)
+        user_row = next(u for u in res_list_multi.data if u["id"] == self.user.id)
+        self.assertEqual(user_row["total_games"], 3)
+        self.assertEqual(user_row["win_rate"], 66.7)
+        self.assertEqual(user_row["avg_position"], 1.33)
         self.assertEqual(user_row["most_participated_league_level"], 1)

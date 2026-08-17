@@ -1,57 +1,78 @@
 <template>
   <div class="q-mb-md filter-toolbar">
-    <div class="row items-center justify-between q-col-gutter-sm">
-      <div class="row items-center q-gutter-md">
-        <!-- Player Count Settings Filter -->
-        <div class="row items-center q-gutter-x-sm">
-          <div class="row items-center text-caption text-weight-bold text-grey-8">
-            <q-icon name="groups" size="18px" class="q-mr-xs text-primary" />
-            <span>Players:</span>
-          </div>
-          <q-btn-toggle
-            v-model="playerCount"
+    <div class="filter-controls row items-center q-col-gutter-md">
+      <!-- Player Count Filter -->
+      <div class="filter-item row items-center q-gutter-x-sm">
+        <div class="row items-center text-caption text-weight-bold text-grey-8 filter-label">
+          <q-icon name="groups" size="18px" class="q-mr-xs text-primary" />
+          <span>Players:</span>
+        </div>
+        <div class="player-btn-group row no-wrap items-center">
+          <q-btn
+            label="All"
             dense
             no-caps
-            rounded
             unelevated
-            toggle-color="primary"
-            color="white"
-            text-color="grey-8"
-            toggle-text-color="white"
-            class="player-filter-toggle shadow-1"
-            :options="[
-              { label: 'All', value: 'all' },
-              { label: '2P', value: '2p' },
-              { label: '3P', value: '3p' },
-              { label: '4P', value: '4p' }
-            ]"
+            :color="selectedPlayerCounts.length === 0 ? 'primary' : 'white'"
+            :text-color="selectedPlayerCounts.length === 0 ? 'white' : 'grey-8'"
+            class="player-filter-btn"
+            @click="togglePlayerCount('all')"
+          />
+          <q-btn
+            label="2P"
+            dense
+            no-caps
+            unelevated
+            :color="selectedPlayerCounts.includes('2p') ? 'primary' : 'white'"
+            :text-color="selectedPlayerCounts.includes('2p') ? 'white' : 'grey-8'"
+            class="player-filter-btn"
+            @click="togglePlayerCount('2p')"
+          />
+          <q-btn
+            label="3P"
+            dense
+            no-caps
+            unelevated
+            :color="selectedPlayerCounts.includes('3p') ? 'primary' : 'white'"
+            :text-color="selectedPlayerCounts.includes('3p') ? 'white' : 'grey-8'"
+            class="player-filter-btn"
+            @click="togglePlayerCount('3p')"
+          />
+          <q-btn
+            label="4P"
+            dense
+            no-caps
+            unelevated
+            :color="selectedPlayerCounts.includes('4p') ? 'primary' : 'white'"
+            :text-color="selectedPlayerCounts.includes('4p') ? 'white' : 'grey-8'"
+            class="player-filter-btn"
+            @click="togglePlayerCount('4p')"
           />
         </div>
+      </div>
 
-        <!-- Years Multi-select Filter -->
-        <div class="row items-center q-gutter-x-sm">
-          <div class="row items-center text-caption text-weight-bold text-grey-8">
-            <q-icon name="calendar_today" size="16px" class="q-mr-xs text-primary" />
-            <span>Years:</span>
-          </div>
-          <q-select
-            v-model="selectedYears"
-            :options="availableYears"
-            multiple
-            clearable
-            dense
-            outlined
-            options-dense
-            placeholder="All Years"
-            :display-value="!selectedYears || selectedYears.length === 0 ? 'All Years' : selectedYears.slice().sort((a, b) => b - a).join(', ')"
-            style="min-width: 170px"
-            class="bg-white rounded-borders"
-          >
-            <template v-slot:prepend>
-              <q-icon name="event" size="xs" color="grey-6" />
-            </template>
-          </q-select>
+      <!-- Years Multi-select Filter -->
+      <div class="filter-item row items-center q-gutter-x-sm">
+        <div class="row items-center text-caption text-weight-bold text-grey-8 filter-label">
+          <q-icon name="calendar_today" size="16px" class="q-mr-xs text-primary" />
+          <span>Years:</span>
         </div>
+        <q-select
+          v-model="selectedYears"
+          :options="availableYears"
+          multiple
+          clearable
+          dense
+          outlined
+          options-dense
+          placeholder="All Years"
+          :display-value="!selectedYears || selectedYears.length === 0 ? 'All Years' : selectedYears.slice().sort((a, b) => b - a).join(', ')"
+          class="bg-white rounded-borders years-select"
+        >
+          <template v-slot:prepend>
+            <q-icon name="event" size="xs" color="grey-6" />
+          </template>
+        </q-select>
       </div>
     </div>
   </div>
@@ -88,17 +109,30 @@ import { useUserStore } from 'stores/userStore';
 
 const { listUsers, getAvailableYears } = useUserStore();
 const users = ref<TUserDto[]>([]);
-const playerCount = ref<'all' | '2p' | '3p' | '4p'>('all');
+const selectedPlayerCounts = ref<string[]>([]);
 const selectedYears = ref<number[]>([]);
 const availableYears = ref<number[]>([]);
 const loading = ref(false);
+
+function togglePlayerCount(val: string) {
+  if (val === 'all') {
+    selectedPlayerCounts.value = [];
+  } else {
+    const idx = selectedPlayerCounts.value.indexOf(val);
+    if (idx >= 0) {
+      selectedPlayerCounts.value.splice(idx, 1);
+    } else {
+      selectedPlayerCounts.value.push(val);
+    }
+  }
+}
 
 async function loadUsers() {
   loading.value = true;
   try {
     const params: Record<string, string> = {};
-    if (playerCount.value && playerCount.value !== 'all') {
-      params.player_count = playerCount.value;
+    if (selectedPlayerCounts.value.length > 0) {
+      params.player_count = selectedPlayerCounts.value.join(',');
     }
     if (selectedYears.value && selectedYears.value.length > 0) {
       params.years = selectedYears.value.join(',');
@@ -109,9 +143,9 @@ async function loadUsers() {
   }
 }
 
-watch([playerCount, selectedYears], () => {
+watch([selectedPlayerCounts, selectedYears], () => {
   loadUsers();
-});
+}, { deep: true });
 
 onMounted(async () => {
   const years = await getAvailableYears();
@@ -173,7 +207,7 @@ const columns = [
   {
     name: 'most_participated_league_level',
     align: 'right',
-    label: 'Most Played League',
+    label: 'Most Played',
     field: (x: TUserDto) => x.most_participated_league_level,
     format: (val: number | null | undefined) =>
       val !== null && val !== undefined ? `L${val}` : '-',
@@ -190,11 +224,59 @@ const columns = [
   border: 1px solid rgba(54, 64, 88, 0.08);
   border-radius: 12px;
   padding: 10px 16px;
-  box-shadow: 0 2px 12px rgba(54, 64, 88, 0.03);
 }
 
-.player-filter-toggle {
-  border: 1px solid rgba(54, 64, 88, 0.12);
+.filter-controls {
+  width: 100%;
+}
+
+.filter-item {
+  flex-shrink: 0;
+}
+
+.years-select {
+  min-width: 170px;
+}
+
+.player-btn-group {
+  border: 1px solid rgba(54, 64, 88, 0.15);
+  border-radius: 20px;
+  background: white;
   padding: 2px;
+  overflow: hidden;
+  box-shadow: none !important;
+}
+
+.player-filter-btn {
+  border-radius: 16px;
+  padding: 2px 10px;
+  font-weight: 500;
+  font-size: 0.82rem;
+  box-shadow: none !important;
+  transition: all 0.2s ease;
+}
+
+@media (max-width: 599px) {
+  .filter-toolbar {
+    padding: 10px 12px;
+  }
+
+  .filter-controls {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .filter-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+  }
+
+  .years-select {
+    min-width: 140px;
+    flex-grow: 1;
+  }
 }
 </style>
