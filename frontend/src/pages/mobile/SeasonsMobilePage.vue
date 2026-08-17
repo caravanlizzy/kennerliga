@@ -41,6 +41,17 @@
         >
           <q-tooltip>Current Season</q-tooltip>
         </q-btn>
+        <q-btn
+          v-if="selectedSeasonId"
+          flat
+          round
+          dense
+          icon="visibility"
+          color="primary"
+          :to="{ name: 'season-overview', params: { id: selectedSeasonId } }"
+        >
+          <q-tooltip>Season Overview</q-tooltip>
+        </q-btn>
         <q-icon name="military_tech" size="sm" color="primary" />
       </div>
     </div>

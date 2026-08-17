@@ -70,16 +70,6 @@ function handleClick() {
     background: rgba(var(--q-primary), 0.08);
     color: var(--q-primary);
     font-weight: 600;
-
-    &::before {
-      content: '';
-      position: absolute;
-      left: -8px;
-      top: 15%;
-      height: 70%;
-      width: 4px;
-      background: var(--q-primary);
-    }
   }
 }
 
