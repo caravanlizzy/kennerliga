@@ -1,48 +1,57 @@
 <template>
-  <div class="q-mb-md row items-center justify-between q-gutter-sm">
-    <div class="row items-center q-gutter-md">
-      <!-- Player Count Settings Filter -->
-      <div class="row items-center q-gutter-x-sm">
-        <span class="text-caption text-weight-bold text-grey-7">Player Count:</span>
-        <q-btn-toggle
-          v-model="playerCount"
-          dense
-          no-caps
-          rounded
-          unelevated
-          toggle-color="primary"
-          color="grey-3"
-          text-color="grey-8"
-          toggle-text-color="white"
-          :options="[
-            { label: 'All', value: 'all' },
-            { label: '2P', value: '2p' },
-            { label: '3P', value: '3p' },
-            { label: '4P', value: '4p' }
-          ]"
-        />
-      </div>
+  <div class="q-mb-md filter-toolbar">
+    <div class="row items-center justify-between q-col-gutter-sm">
+      <div class="row items-center q-gutter-md">
+        <!-- Player Count Settings Filter -->
+        <div class="row items-center q-gutter-x-sm">
+          <div class="row items-center text-caption text-weight-bold text-grey-8">
+            <q-icon name="groups" size="18px" class="q-mr-xs text-primary" />
+            <span>Players:</span>
+          </div>
+          <q-btn-toggle
+            v-model="playerCount"
+            dense
+            no-caps
+            rounded
+            unelevated
+            toggle-color="primary"
+            color="white"
+            text-color="grey-8"
+            toggle-text-color="white"
+            class="player-filter-toggle shadow-1"
+            :options="[
+              { label: 'All', value: 'all' },
+              { label: '2P', value: '2p' },
+              { label: '3P', value: '3p' },
+              { label: '4P', value: '4p' }
+            ]"
+          />
+        </div>
 
-      <!-- Years Multi-select Filter -->
-      <div class="row items-center q-gutter-x-sm">
-        <span class="text-caption text-weight-bold text-grey-7">Years:</span>
-        <q-select
-          v-model="selectedYears"
-          :options="availableYears"
-          multiple
-          clearable
-          dense
-          outlined
-          options-dense
-          placeholder="All Years"
-          :display-value="!selectedYears || selectedYears.length === 0 ? 'All Years' : selectedYears.slice().sort((a, b) => b - a).join(', ')"
-          style="min-width: 170px"
-          class="bg-white rounded-borders"
-        >
-          <template v-slot:prepend>
-            <q-icon name="calendar_today" size="xs" />
-          </template>
-        </q-select>
+        <!-- Years Multi-select Filter -->
+        <div class="row items-center q-gutter-x-sm">
+          <div class="row items-center text-caption text-weight-bold text-grey-8">
+            <q-icon name="calendar_today" size="16px" class="q-mr-xs text-primary" />
+            <span>Years:</span>
+          </div>
+          <q-select
+            v-model="selectedYears"
+            :options="availableYears"
+            multiple
+            clearable
+            dense
+            outlined
+            options-dense
+            placeholder="All Years"
+            :display-value="!selectedYears || selectedYears.length === 0 ? 'All Years' : selectedYears.slice().sort((a, b) => b - a).join(', ')"
+            style="min-width: 170px"
+            class="bg-white rounded-borders"
+          >
+            <template v-slot:prepend>
+              <q-icon name="event" size="xs" color="grey-6" />
+            </template>
+          </q-select>
+        </div>
       </div>
     </div>
   </div>
@@ -135,6 +144,15 @@ const columns = [
     sortable: true,
   },
   {
+    name: 'total_games',
+    align: 'right',
+    label: 'Games',
+    field: (x: TUserDto) => x.total_games,
+    format: (val: number | null | undefined) =>
+      val !== null && val !== undefined ? `${val}` : '0',
+    sortable: true,
+  },
+  {
     name: 'win_rate',
     align: 'right',
     label: 'Win %',
@@ -163,3 +181,20 @@ const columns = [
   },
 ];
 </script>
+
+<style scoped lang="scss">
+.filter-toolbar {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(54, 64, 88, 0.08);
+  border-radius: 12px;
+  padding: 10px 16px;
+  box-shadow: 0 2px 12px rgba(54, 64, 88, 0.03);
+}
+
+.player-filter-toggle {
+  border: 1px solid rgba(54, 64, 88, 0.12);
+  padding: 2px;
+}
+</style>

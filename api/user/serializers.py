@@ -14,6 +14,7 @@ class UserSerializer(ModelSerializer):
     Serializer for the User model.
     """
     profile_id = serializers.IntegerField(source="profile.id", read_only=True)
+    total_games = serializers.SerializerMethodField(read_only=True)
     win_rate = serializers.SerializerMethodField(read_only=True)
     avg_position = serializers.SerializerMethodField(read_only=True)
     most_participated_league_level = serializers.SerializerMethodField(read_only=True)
@@ -24,6 +25,7 @@ class UserSerializer(ModelSerializer):
             "id",
             "username",
             "profile_id",
+            "total_games",
             "win_rate",
             "avg_position",
             "most_participated_league_level",
@@ -73,6 +75,9 @@ class UserSerializer(ModelSerializer):
                 years=years,
             )
         return obj._cached_summary_stats[cache_key]
+
+    def get_total_games(self, obj):
+        return self._get_stats(obj).get("total_games", 0)
 
     def get_win_rate(self, obj):
         return self._get_stats(obj)["win_rate"]

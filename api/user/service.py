@@ -102,9 +102,10 @@ def get_user_summary_stats(
 ):
     """
     Calculates summary statistics for a user:
+    - total_games: total number of games played matching the filter range.
     - win_rate: percentage of games where position == 1 among positioned games (float, rounded to 1 decimal place), or None if no games played.
     - avg_position: average position among positioned games (float, rounded to 2 decimal places), or None if no games played.
-    - most_participated_league_level: league level integer with the most participations for the user, or None if no participations.
+    - most_participated_league_level: league level integer with the most participations/games played for the user matching the filters, or None if no participations.
     Optional filters:
     - exclude_2p_only: if True, filters out games where max_players <= 2 (or min=2, max=2)
     - exclude_3p_only: if True, filters out games where min=3 and max=3
@@ -114,6 +115,7 @@ def get_user_summary_stats(
     profile = getattr(user, "profile", None)
     if not profile:
         return {
+            "total_games": 0,
             "win_rate": None,
             "avg_position": None,
             "most_participated_league_level": None,
@@ -171,24 +173,40 @@ def get_user_summary_stats(
     win_rate = round((wins / total_games) * 100, 1) if total_games > 0 else None
     avg_position = round(avg_pos, 2) if avg_pos is not None else None
 
-    league_filter = (
-        Q(members__profile=profile)
-        | Q(standings__player_profile=profile)
-        | Q(results__player_profile=profile)
-    )
-    if parsed_years:
-        league_filter &= Q(season__year__in=parsed_years)
-
-    top_level = (
-        League.objects.filter(league_filter)
-        .values("level")
-        .annotate(count=Count("id", distinct=True))
-        .order_by("-count", "level")
+    # Calculate most played league level respecting active filters
+    has_game_filter = bool(player_count or exclude_2p_only or exclude_3p_only)
+    top_level_from_results = (
+        res_qs.values("league__level")
+        .annotate(distinct_leagues=Count("league_id", distinct=True), game_count=Count("id"))
+        .order_by("-distinct_leagues", "-game_count", "league__level")
         .first()
     )
-    most_participated_level = top_level["level"] if top_level else None
+
+    if top_level_from_results:
+        most_participated_level = top_level_from_results["league__level"]
+    elif not has_game_filter:
+        # Fallback to general league membership if no results exist yet and no game filter is applied
+        league_filter = (
+            Q(members__profile=profile)
+            | Q(standings__player_profile=profile)
+            | Q(results__player_profile=profile)
+        )
+        if parsed_years:
+            league_filter &= Q(season__year__in=parsed_years)
+
+        top_level = (
+            League.objects.filter(league_filter)
+            .values("level")
+            .annotate(count=Count("id", distinct=True))
+            .order_by("-count", "level")
+            .first()
+        )
+        most_participated_level = top_level["level"] if top_level else None
+    else:
+        most_participated_level = None
 
     return {
+        "total_games": total_games,
         "win_rate": win_rate,
         "avg_position": avg_position,
         "most_participated_league_level": most_participated_level,
