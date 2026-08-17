@@ -212,9 +212,10 @@
 <script setup lang="ts">
 import { QTableProps } from 'quasar';
 import { storeToRefs } from 'pinia';
-import { computed, ref, onMounted } from 'vue';
+import { computed, ref, onMounted, onUnmounted } from 'vue';
 import { useLeagueStore } from 'stores/leagueStore';
 import { useUserStore } from 'stores/userStore';
+import { useUpdateStore } from 'stores/updateStore';
 import { api } from 'boot/axios';
 import { formatNumbers } from 'src/helpers';
 import { useResponsive } from 'src/composables/responsive';
@@ -226,6 +227,10 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits(['resolve-tie']);
+
+const updateStore = useUpdateStore();
+let unsubSeason: (() => void) | null = null;
+let unsubLeague: (() => void) | null = null;
 
 const { user } = storeToRefs(useUserStore());
 const myLeagueStore = computed(() => {
@@ -299,7 +304,16 @@ const fetchStandings = async () => {
   }
 };
 
-onMounted(fetchStandings);
+onMounted(() => {
+  fetchStandings();
+  unsubSeason = updateStore.subscribe('/season/', fetchStandings);
+  unsubLeague = updateStore.subscribe('/league/', fetchStandings);
+});
+
+onUnmounted(() => {
+  if (unsubSeason) unsubSeason();
+  if (unsubLeague) unsubLeague();
+});
 
 const rows = computed(() => {
   return [...standings.value].sort((a, b) => {

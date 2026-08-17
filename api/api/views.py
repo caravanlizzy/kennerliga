@@ -82,7 +82,7 @@ class LogoutApiView(APIView):
 from django.utils import timezone
 from datetime import timedelta
 from chat.models import Chat
-from league.models import League
+from league.models import League, LeagueTieResolution
 from game.models import SelectedGame, BanDecision
 from result.models import Result
 from season.models import Season
@@ -125,6 +125,7 @@ class NeedsUpdateView(APIView):
             or SelectedGame.objects.filter(updated_at__gt=since_dt).exists()
             or Result.objects.filter(updated_at__gt=since_dt).exists()
             or BanDecision.objects.filter(created_at__gt=since_dt).exists()
+            or LeagueTieResolution.objects.filter(updated_at__gt=since_dt).exists()
         ):
             updates.append("/league/")
             updates.append("/season/")

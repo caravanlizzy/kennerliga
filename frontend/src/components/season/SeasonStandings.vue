@@ -65,7 +65,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch, computed } from 'vue';
+import { ref, watch, computed, onMounted, onUnmounted } from 'vue';
 import { useRoute } from 'vue-router';
 import LeagueMatchResults from 'components/league/LeagueMatchResults.vue';
 import LeagueStandings from 'components/league/LeagueStandings.vue';
@@ -80,8 +80,12 @@ import { fetchSeasonParticipants } from 'src/services/seasonService';
 import type { TSeasonParticipantDto } from 'src/types';
 
 import { useLeagueStore } from 'stores/leagueStore';
+import { useUpdateStore } from 'stores/updateStore';
 
 const route = useRoute();
+const updateStore = useUpdateStore();
+let unsubSeason: (() => void) | null = null;
+let unsubLeague: (() => void) | null = null;
 
 interface League {
   id: number;
@@ -192,6 +196,29 @@ watch(() => props.seasonId, (id) => {
   if (!id) return;
   loadLeaguesForSeason(id);
 }, { immediate: true });
+
+async function refreshData() {
+  if (props.seasonId) {
+    if (props.mode === 'picks') {
+      try {
+        participantsList.value = await fetchSeasonParticipants(props.seasonId);
+      } catch (e) {
+        console.error('Failed to reload season participants for picks:', e);
+      }
+    }
+    await loadLeaguesForSeason(props.seasonId);
+  }
+}
+
+onMounted(() => {
+  unsubSeason = updateStore.subscribe('/season/', refreshData);
+  unsubLeague = updateStore.subscribe('/league/', refreshData);
+});
+
+onUnmounted(() => {
+  if (unsubSeason) unsubSeason();
+  if (unsubLeague) unsubLeague();
+});
 
 // Silence unused-var warning; kept in the destructure for API symmetry.
 void resetLeagues;

@@ -297,13 +297,14 @@
 
 
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue';
+import { ref, computed, watch, onMounted, onUnmounted } from 'vue';
 import { api } from 'boot/axios';
 import LoadingSpinner from 'components/base/LoadingSpinner.vue';
 import type { QTableColumn } from 'quasar';
 import { useResponsive } from 'src/composables/responsive';
 import KennerTooltip from 'components/base/KennerTooltip.vue';
 import LeagueLevel from 'components/season/LeagueLevel.vue';
+import { useUpdateStore } from 'stores/updateStore';
 
 const props = defineProps<{
   leagueId: number;
@@ -408,6 +409,28 @@ watch(() => props.prefetchedData, (newVal) => {
     loading.value = false;
   }
 }, { immediate: true });
+
+const updateStore = useUpdateStore();
+let unsubSeason: (() => void) | null = null;
+let unsubLeague: (() => void) | null = null;
+
+const refreshStandings = async () => {
+  if (!props.prefetchedData) {
+    await fetchStandings();
+  }
+};
+
+onMounted(() => {
+  if (!props.prefetchedData) {
+    unsubSeason = updateStore.subscribe('/season/', refreshStandings);
+    unsubLeague = updateStore.subscribe('/league/', refreshStandings);
+  }
+});
+
+onUnmounted(() => {
+  if (unsubSeason) unsubSeason();
+  if (unsubLeague) unsubLeague();
+});
 
 // initial load
 if (!props.prefetchedData) {
