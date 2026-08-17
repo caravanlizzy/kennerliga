@@ -30,11 +30,23 @@ class UserSerializer(ModelSerializer):
         ]
 
     def _get_stats(self, obj):
+        request = self.context.get("request") if hasattr(self, "context") and self.context else None
+        exclude_2p_only = False
+        exclude_3p_only = False
+        if request and hasattr(request, "query_params"):
+            exclude_2p_only = request.query_params.get("exclude_2p_only", "").lower() in ["true", "1"]
+            exclude_3p_only = request.query_params.get("exclude_3p_only", "").lower() in ["true", "1"]
+
+        cache_key = (exclude_2p_only, exclude_3p_only)
         if not hasattr(obj, "_cached_summary_stats"):
+            obj._cached_summary_stats = {}
+        if cache_key not in obj._cached_summary_stats:
             from user.service import get_user_summary_stats
 
-            obj._cached_summary_stats = get_user_summary_stats(obj)
-        return obj._cached_summary_stats
+            obj._cached_summary_stats[cache_key] = get_user_summary_stats(
+                obj, exclude_2p_only=exclude_2p_only, exclude_3p_only=exclude_3p_only
+            )
+        return obj._cached_summary_stats[cache_key]
 
     def get_win_rate(self, obj):
         return self._get_stats(obj)["win_rate"]

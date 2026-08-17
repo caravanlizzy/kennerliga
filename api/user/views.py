@@ -3,7 +3,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 from django.db import transaction
-from django.db.models import Count
+from django.db.models import Count, Q
 from django.db.models.functions import Lower
 from django.utils import timezone
 from rest_framework.decorators import action
@@ -132,10 +132,26 @@ class UserViewSet(ModelViewSet):
         except ValueError:
             selected_year = timezone.now().year
 
+        exclude_2p_only = (
+            request.query_params.get("exclude_2p_only", "").lower() in ["true", "1"]
+        )
+        exclude_3p_only = (
+            request.query_params.get("exclude_3p_only", "").lower() in ["true", "1"]
+        )
+
         # 1. Game Statistics (Aggregated)
         results = Result.objects.filter(player_profile=profile).select_related(
             "selected_game__game"
         )
+        if exclude_2p_only:
+            results = results.exclude(
+                Q(selected_game__game__min_players=2, selected_game__game__max_players=2)
+                | Q(selected_game__game__max_players__lte=2)
+            )
+        if exclude_3p_only:
+            results = results.exclude(
+                selected_game__game__min_players=3, selected_game__game__max_players=3
+            )
 
         # Aggregated game metrics (overall)
         overall_stats = {

@@ -1,4 +1,30 @@
 <template>
+  <div class="q-mb-md row items-center justify-between q-gutter-sm">
+    <div class="row items-center q-gutter-x-sm">
+      <span class="text-caption text-weight-bold text-grey-7">Filter Games:</span>
+      <q-chip
+        clickable
+        v-model:selected="exclude2p"
+        :color="exclude2p ? 'primary' : 'grey-3'"
+        :text-color="exclude2p ? 'white' : 'grey-8'"
+        icon="filter_alt"
+        class="text-weight-medium"
+      >
+        Exclude 2P Only
+      </q-chip>
+      <q-chip
+        clickable
+        v-model:selected="exclude3p"
+        :color="exclude3p ? 'primary' : 'grey-3'"
+        :text-color="exclude3p ? 'white' : 'grey-8'"
+        icon="filter_alt"
+        class="text-weight-medium"
+      >
+        Exclude 3P Only
+      </q-chip>
+    </div>
+  </div>
+
   <KennerTable
     :create-button="createButton"
     flat
@@ -6,6 +32,7 @@
     @row-click="onRowClick"
     :rows="users"
     :columns="columns"
+    :loading="loading"
   >
     <template v-slot:body-cell-most_participated_league_level="props">
       <q-td :props="props">
@@ -25,14 +52,33 @@ import KennerTable from 'components/tables/KennerTable.vue';
 import LeagueLevel from 'components/season/LeagueLevel.vue';
 import { useRouter } from 'vue-router';
 import { TKennerButton, TUserDto } from 'src/types';
-import { onMounted, ref } from 'vue';
+import { onMounted, ref, watch } from 'vue';
 import { useUserStore } from 'stores/userStore';
 
 const { listUsers } = useUserStore();
 const users = ref<TUserDto[]>([]);
+const exclude2p = ref(false);
+const exclude3p = ref(false);
+const loading = ref(false);
 
-onMounted(async () => {
-  users.value = await listUsers();
+async function loadUsers() {
+  loading.value = true;
+  try {
+    const params: Record<string, boolean> = {};
+    if (exclude2p.value) params.exclude_2p_only = true;
+    if (exclude3p.value) params.exclude_3p_only = true;
+    users.value = (await listUsers(params)) ?? [];
+  } finally {
+    loading.value = false;
+  }
+}
+
+watch([exclude2p, exclude3p], () => {
+  loadUsers();
+});
+
+onMounted(() => {
+  loadUsers();
 });
 
 const router = useRouter();

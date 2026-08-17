@@ -11,9 +11,9 @@ export const useUserStore = defineStore(
     const isAdmin: Ref<boolean> = ref(false);
     const isAuthenticated: Ref<boolean> = ref(false);
 
-    async function listUsers() {
+    async function listUsers(params?: Record<string, string | number | boolean>) {
       try {
-        const { data: users } = await api.get('/user/users/');
+        const { data: users } = await api.get('/user/users/', { params });
         return users;
       } catch (e) {
         console.log(e);

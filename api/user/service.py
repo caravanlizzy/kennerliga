@@ -93,12 +93,15 @@ def find_users_current_league(profile):
         raise ValueError("Multiple leagues found for the current running season.")
 
 
-def get_user_summary_stats(user):
+def get_user_summary_stats(user, exclude_2p_only=False, exclude_3p_only=False):
     """
     Calculates summary statistics for a user:
     - win_rate: percentage of games where position == 1 among positioned games (float, rounded to 1 decimal place), or None if no games played.
     - avg_position: average position among positioned games (float, rounded to 2 decimal places), or None if no games played.
     - most_participated_league_level: league level integer with the most participations for the user, or None if no participations.
+    Optional filters:
+    - exclude_2p_only: if True, filters out games where max_players <= 2 (or min=2, max=2)
+    - exclude_3p_only: if True, filters out games where min=3 and max=3
     """
     profile = getattr(user, "profile", None)
     if not profile:
@@ -111,9 +114,22 @@ def get_user_summary_stats(user):
     from result.models import Result
     from django.db.models import Avg, Count, Q
 
-    res_agg = Result.objects.filter(
+    res_qs = Result.objects.filter(
         player_profile=profile, position__isnull=False
-    ).aggregate(
+    )
+
+    if exclude_2p_only:
+        res_qs = res_qs.exclude(
+            Q(selected_game__game__min_players=2, selected_game__game__max_players=2)
+            | Q(selected_game__game__max_players__lte=2)
+        )
+
+    if exclude_3p_only:
+        res_qs = res_qs.exclude(
+            selected_game__game__min_players=3, selected_game__game__max_players=3
+        )
+
+    res_agg = res_qs.aggregate(
         avg_pos=Avg("position"),
         total_games=Count("id"),
         wins=Count("id", filter=Q(position=1)),

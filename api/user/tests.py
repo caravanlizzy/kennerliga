@@ -173,3 +173,102 @@ class UserAPITests(TestCase):
         self.assertIsNone(serializer.data["win_rate"])
         self.assertIsNone(serializer.data["avg_position"])
         self.assertIsNone(serializer.data["most_participated_league_level"])
+
+    def test_user_summary_stats_exclude_2p_and_3p_games(self):
+        platform = Platform.objects.create(name="BGA_filter_test")
+        season = Season.objects.create(year=2026, month=1)
+        part = SeasonParticipant.objects.create(season=season, profile=self.profile)
+        league = League.objects.create(season=season, level=1, status=LeagueStatus.PLAYING)
+        league.members.add(part)
+
+        game_2p = Game.objects.create(
+            name="Patchwork", min_players=2, max_players=2, platform=platform
+        )
+        game_3p = Game.objects.create(
+            name="Maria", min_players=3, max_players=3, platform=platform
+        )
+        game_4p = Game.objects.create(
+            name="Terraforming Mars", min_players=2, max_players=4, platform=platform
+        )
+
+        sg_2p = SelectedGame.objects.create(game=game_2p, league=league, profile=self.profile)
+        sg_3p = SelectedGame.objects.create(game=game_3p, league=league, profile=self.profile)
+        sg_4p = SelectedGame.objects.create(game=game_4p, league=league, profile=self.profile)
+
+        # 2p: pos 1, 3p: pos 2, 4p: pos 3
+        Result.objects.create(
+            player_profile=self.profile,
+            selected_game=sg_2p,
+            season=season,
+            league=league,
+            position=1,
+            points=100,
+        )
+        Result.objects.create(
+            player_profile=self.profile,
+            selected_game=sg_3p,
+            season=season,
+            league=league,
+            position=2,
+            points=90,
+        )
+        Result.objects.create(
+            player_profile=self.profile,
+            selected_game=sg_4p,
+            season=season,
+            league=league,
+            position=3,
+            points=80,
+        )
+
+        # Base: all 3 games -> 1 win, avg 2.0
+        stats_all = get_user_summary_stats(self.user)
+        self.assertEqual(stats_all["win_rate"], 33.3)
+        self.assertEqual(stats_all["avg_position"], 2.0)
+
+        # Exclude 2p: games 3p & 4p -> 0 wins, avg (2+3)/2 = 2.5
+        stats_no_2p = get_user_summary_stats(self.user, exclude_2p_only=True)
+        self.assertEqual(stats_no_2p["win_rate"], 0.0)
+        self.assertEqual(stats_no_2p["avg_position"], 2.5)
+
+        # Exclude 3p: games 2p & 4p -> 1 win, avg (1+3)/2 = 2.0
+        stats_no_3p = get_user_summary_stats(self.user, exclude_3p_only=True)
+        self.assertEqual(stats_no_3p["win_rate"], 50.0)
+        self.assertEqual(stats_no_3p["avg_position"], 2.0)
+
+        # Exclude both 2p & 3p: game 4p only -> 0 wins, avg 3.0
+        stats_no_2p_3p = get_user_summary_stats(
+            self.user, exclude_2p_only=True, exclude_3p_only=True
+        )
+        self.assertEqual(stats_no_2p_3p["win_rate"], 0.0)
+        self.assertEqual(stats_no_2p_3p["avg_position"], 3.0)
+
+        # Test via list API endpoint with query params
+        res_list_no_2p = self.client.get("/api/user/users/?exclude_2p_only=true")
+        self.assertEqual(res_list_no_2p.status_code, 200)
+        user_data = next(u for u in res_list_no_2p.data if u["id"] == self.user.id)
+        self.assertEqual(user_data["win_rate"], 0.0)
+        self.assertEqual(user_data["avg_position"], 2.5)
+
+        res_list_no_3p = self.client.get("/api/user/users/?exclude_3p_only=true")
+        self.assertEqual(res_list_no_3p.status_code, 200)
+        user_data = next(u for u in res_list_no_3p.data if u["id"] == self.user.id)
+        self.assertEqual(user_data["win_rate"], 50.0)
+        self.assertEqual(user_data["avg_position"], 2.0)
+
+        res_list_no_both = self.client.get(
+            "/api/user/users/?exclude_2p_only=true&exclude_3p_only=true"
+        )
+        self.assertEqual(res_list_no_both.status_code, 200)
+        user_data = next(u for u in res_list_no_both.data if u["id"] == self.user.id)
+        self.assertEqual(user_data["win_rate"], 0.0)
+        self.assertEqual(user_data["avg_position"], 3.0)
+
+        # Test user statistics action endpoint
+        res_stats_no_2p = self.client.get(
+            f"/api/user/users/{self.user.id}/statistics/?exclude_2p_only=true"
+        )
+        self.assertEqual(res_stats_no_2p.status_code, 200)
+        self.assertEqual(res_stats_no_2p.data["overall_stats"]["total_games"], 2)
+        self.assertEqual(res_stats_no_2p.data["overall_stats"]["wins"], 0)
+        self.assertEqual(res_stats_no_2p.data["overall_stats"]["avg_pos"], 2.5)
