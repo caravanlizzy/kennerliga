@@ -208,7 +208,7 @@ const columns = [
   {
     name: 'most_participated_league_level',
     align: 'right',
-    label: 'Most Played',
+    label: 'Home League',
     field: (x: TUserDto) => x.most_participated_league_level,
     format: (val: number | null | undefined) =>
       val !== null && val !== undefined ? `L${val}` : '-',
