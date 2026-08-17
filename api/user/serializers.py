@@ -14,10 +14,36 @@ class UserSerializer(ModelSerializer):
     Serializer for the User model.
     """
     profile_id = serializers.IntegerField(source="profile.id", read_only=True)
+    win_rate = serializers.SerializerMethodField(read_only=True)
+    avg_position = serializers.SerializerMethodField(read_only=True)
+    most_participated_league_level = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = User
-        fields = ["id", "username", "profile_id"]
+        fields = [
+            "id",
+            "username",
+            "profile_id",
+            "win_rate",
+            "avg_position",
+            "most_participated_league_level",
+        ]
+
+    def _get_stats(self, obj):
+        if not hasattr(obj, "_cached_summary_stats"):
+            from user.service import get_user_summary_stats
+
+            obj._cached_summary_stats = get_user_summary_stats(obj)
+        return obj._cached_summary_stats
+
+    def get_win_rate(self, obj):
+        return self._get_stats(obj)["win_rate"]
+
+    def get_avg_position(self, obj):
+        return self._get_stats(obj)["avg_position"]
+
+    def get_most_participated_league_level(self, obj):
+        return self._get_stats(obj)["most_participated_league_level"]
 
 
 class PlayerProfileSerializer(ModelSerializer):

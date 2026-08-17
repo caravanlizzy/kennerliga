@@ -91,3 +91,56 @@ def find_users_current_league(profile):
         return None  # No league found for the running season
     except League.MultipleObjectsReturned:
         raise ValueError("Multiple leagues found for the current running season.")
+
+
+def get_user_summary_stats(user):
+    """
+    Calculates summary statistics for a user:
+    - win_rate: percentage of games where position == 1 among positioned games (float, rounded to 1 decimal place), or None if no games played.
+    - avg_position: average position among positioned games (float, rounded to 2 decimal places), or None if no games played.
+    - most_participated_league_level: league level integer with the most participations for the user, or None if no participations.
+    """
+    profile = getattr(user, "profile", None)
+    if not profile:
+        return {
+            "win_rate": None,
+            "avg_position": None,
+            "most_participated_league_level": None,
+        }
+
+    from result.models import Result
+    from django.db.models import Avg, Count, Q
+
+    res_agg = Result.objects.filter(
+        player_profile=profile, position__isnull=False
+    ).aggregate(
+        avg_pos=Avg("position"),
+        total_games=Count("id"),
+        wins=Count("id", filter=Q(position=1)),
+    )
+
+    total_games = res_agg["total_games"] or 0
+    wins = res_agg["wins"] or 0
+    avg_pos = res_agg["avg_pos"]
+
+    win_rate = round((wins / total_games) * 100, 1) if total_games > 0 else None
+    avg_position = round(avg_pos, 2) if avg_pos is not None else None
+
+    top_level = (
+        League.objects.filter(
+            Q(members__profile=profile)
+            | Q(standings__player_profile=profile)
+            | Q(results__player_profile=profile)
+        )
+        .values("level")
+        .annotate(count=Count("id", distinct=True))
+        .order_by("-count", "level")
+        .first()
+    )
+    most_participated_level = top_level["level"] if top_level else None
+
+    return {
+        "win_rate": win_rate,
+        "avg_position": avg_position,
+        "most_participated_league_level": most_participated_level,
+    }

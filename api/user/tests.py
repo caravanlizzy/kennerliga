@@ -1,7 +1,12 @@
 from django.test import TestCase
 from rest_framework.test import APIClient
-from user.models import User, PlayerProfile
+from user.models import User, PlayerProfile, Platform
 from season.models import Season, SeasonParticipant
+from league.models import League, LeagueStatus
+from game.models import Game, SelectedGame
+from result.models import Result
+from user.service import get_user_summary_stats
+from user.serializers import UserSerializer
 
 
 class UserAPITests(TestCase):
@@ -66,3 +71,105 @@ class UserAPITests(TestCase):
         self.assertIn("season_details", response.data[0])
         self.assertEqual(response.data[0]["season_details"]["year"], 2026)
         self.assertEqual(response.data[0]["season_details"]["month"], 1)
+
+    def test_user_summary_stats_empty(self):
+        stats = get_user_summary_stats(self.user)
+        self.assertIsNone(stats["win_rate"])
+        self.assertIsNone(stats["avg_position"])
+        self.assertIsNone(stats["most_participated_league_level"])
+
+        serializer = UserSerializer(self.user)
+        self.assertIsNone(serializer.data["win_rate"])
+        self.assertIsNone(serializer.data["avg_position"])
+        self.assertIsNone(serializer.data["most_participated_league_level"])
+
+    def test_user_summary_stats_calculations(self):
+        platform = Platform.objects.create(name="BGA_test")
+        season1 = Season.objects.create(year=2026, month=1)
+        season2 = Season.objects.create(year=2026, month=2)
+        season3 = Season.objects.create(year=2026, month=3)
+
+        part1 = SeasonParticipant.objects.create(season=season1, profile=self.profile)
+        part2 = SeasonParticipant.objects.create(season=season2, profile=self.profile)
+        part3 = SeasonParticipant.objects.create(season=season3, profile=self.profile)
+
+        # 2 leagues at level 2, 1 league at level 1
+        l1 = League.objects.create(season=season1, level=2, status=LeagueStatus.PLAYING)
+        l1.members.add(part1)
+
+        l2 = League.objects.create(season=season2, level=2, status=LeagueStatus.PLAYING)
+        l2.members.add(part2)
+
+        l3 = League.objects.create(season=season3, level=1, status=LeagueStatus.PLAYING)
+        l3.members.add(part3)
+
+        game = Game.objects.create(name="Terraforming Mars", platform=platform)
+        sg1 = SelectedGame.objects.create(game=game, league=l1, profile=self.profile)
+        sg2 = SelectedGame.objects.create(game=game, league=l2, profile=self.profile)
+        sg3 = SelectedGame.objects.create(game=game, league=l3, profile=self.profile)
+
+        # Positions: 1, 2, 3 -> wins = 1/3 (33.3%), avg_position = (1+2+3)/3 = 2.0
+        Result.objects.create(
+            player_profile=self.profile,
+            selected_game=sg1,
+            season=season1,
+            league=l1,
+            position=1,
+            points=100,
+        )
+        Result.objects.create(
+            player_profile=self.profile,
+            selected_game=sg2,
+            season=season2,
+            league=l2,
+            position=2,
+            points=90,
+        )
+        Result.objects.create(
+            player_profile=self.profile,
+            selected_game=sg3,
+            season=season3,
+            league=l3,
+            position=3,
+            points=80,
+        )
+
+        stats = get_user_summary_stats(self.user)
+        self.assertEqual(stats["win_rate"], 33.3)
+        self.assertEqual(stats["avg_position"], 2.0)
+        self.assertEqual(stats["most_participated_league_level"], 2)
+
+        res = self.client.get(f"/api/user/users/{self.user.id}/")
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(res.data["win_rate"], 33.3)
+        self.assertEqual(res.data["avg_position"], 2.0)
+        self.assertEqual(res.data["most_participated_league_level"], 2)
+
+    def test_user_summary_stats_tie_breaking_league_level(self):
+        season1 = Season.objects.create(year=2026, month=1)
+        season2 = Season.objects.create(year=2026, month=2)
+
+        part1 = SeasonParticipant.objects.create(season=season1, profile=self.profile)
+        part2 = SeasonParticipant.objects.create(season=season2, profile=self.profile)
+
+        l1 = League.objects.create(season=season1, level=2)
+        l1.members.add(part1)
+
+        l2 = League.objects.create(season=season2, level=1)
+        l2.members.add(part2)
+
+        stats = get_user_summary_stats(self.user)
+        # When tie between level 1 and 2 (both 1 participation), level 1 wins (lowest level number)
+        self.assertEqual(stats["most_participated_league_level"], 1)
+
+    def test_user_without_profile(self):
+        user_no_prof = User.objects.create_user(username="noprof", password="password")
+        stats = get_user_summary_stats(user_no_prof)
+        self.assertIsNone(stats["win_rate"])
+        self.assertIsNone(stats["avg_position"])
+        self.assertIsNone(stats["most_participated_league_level"])
+
+        serializer = UserSerializer(user_no_prof)
+        self.assertIsNone(serializer.data["win_rate"])
+        self.assertIsNone(serializer.data["avg_position"])
+        self.assertIsNone(serializer.data["most_participated_league_level"])

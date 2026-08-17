@@ -18,4 +18,7 @@ export type TUserDto = {
   admin?: boolean;
   myCurrentLeagueId?: number | null;
   isMyTurn?: boolean;
+  win_rate?: number | null;
+  avg_position?: number | null;
+  most_participated_league_level?: number | null;
 };
