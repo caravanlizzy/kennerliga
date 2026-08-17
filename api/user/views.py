@@ -3,7 +3,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 from django.db import transaction
-from django.db.models import Count, Q
+from django.db.models import Count, IntegerField, OuterRef, Q, Subquery
 from django.db.models.functions import Lower
 from django.utils import timezone
 from rest_framework.decorators import action
@@ -201,24 +201,23 @@ class UserViewSet(ModelViewSet):
                 if t.isdigit():
                     parsed_pcs.append(int(t))
 
-        if parsed_pcs:
-            pc_filter = Q()
-            for pc_num in parsed_pcs:
-                pc_filter |= Q(
-                    selected_game__game__min_players__lte=pc_num,
-                    selected_game__game__max_players__gte=pc_num,
-                )
-            results = results.filter(pc_filter)
-
-        if exclude_2p_only:
-            results = results.exclude(
-                Q(selected_game__game__min_players=2, selected_game__game__max_players=2)
-                | Q(selected_game__game__max_players__lte=2)
+        if parsed_pcs or exclude_2p_only or exclude_3p_only:
+            player_count_subquery = (
+                Result.objects.filter(selected_game=OuterRef("selected_game"))
+                .order_by()
+                .values("selected_game")
+                .annotate(cnt=Count("id"))
+                .values("cnt")
             )
-        if exclude_3p_only:
-            results = results.exclude(
-                selected_game__game__min_players=3, selected_game__game__max_players=3
+            results = results.annotate(
+                match_player_count=Subquery(player_count_subquery, output_field=IntegerField())
             )
+            if parsed_pcs:
+                results = results.filter(match_player_count__in=parsed_pcs)
+            if exclude_2p_only:
+                results = results.exclude(match_player_count__lte=2)
+            if exclude_3p_only:
+                results = results.exclude(match_player_count=3)
 
         # Aggregated game metrics (overall)
         overall_stats = {

@@ -7,47 +7,35 @@
           <q-icon name="groups" size="18px" class="q-mr-xs text-primary" />
           <span>Players:</span>
         </div>
-        <div class="player-btn-group row no-wrap items-center">
-          <q-btn
-            label="All"
+        <div class="row q-gutter-xs items-center">
+          <q-chip
+            clickable
             dense
-            no-caps
-            unelevated
-            :color="selectedPlayerCounts.length === 0 ? 'primary' : 'white'"
-            :text-color="selectedPlayerCounts.length === 0 ? 'white' : 'grey-8'"
-            class="player-filter-btn"
-            @click="togglePlayerCount('all')"
-          />
-          <q-btn
-            label="2P"
+            :outline="!isAllPlayerCountsSelected"
+            :color="isAllPlayerCountsSelected ? 'primary' : 'grey-7'"
+            text-color="white"
+            size="sm"
+            class="text-weight-bold"
+            style="border-radius: 4px"
+            @click="toggleAllPlayerCounts"
+          >
+            All
+          </q-chip>
+          <q-chip
+            v-for="pc in availablePlayerCounts"
+            :key="pc"
+            clickable
             dense
-            no-caps
-            unelevated
-            :color="selectedPlayerCounts.includes('2p') ? 'primary' : 'white'"
-            :text-color="selectedPlayerCounts.includes('2p') ? 'white' : 'grey-8'"
-            class="player-filter-btn"
-            @click="togglePlayerCount('2p')"
-          />
-          <q-btn
-            label="3P"
-            dense
-            no-caps
-            unelevated
-            :color="selectedPlayerCounts.includes('3p') ? 'primary' : 'white'"
-            :text-color="selectedPlayerCounts.includes('3p') ? 'white' : 'grey-8'"
-            class="player-filter-btn"
-            @click="togglePlayerCount('3p')"
-          />
-          <q-btn
-            label="4P"
-            dense
-            no-caps
-            unelevated
-            :color="selectedPlayerCounts.includes('4p') ? 'primary' : 'white'"
-            :text-color="selectedPlayerCounts.includes('4p') ? 'white' : 'grey-8'"
-            class="player-filter-btn"
-            @click="togglePlayerCount('4p')"
-          />
+            :outline="!selectedPlayerCounts.includes(pc)"
+            :color="selectedPlayerCounts.includes(pc) ? 'primary' : 'grey-7'"
+            text-color="white"
+            size="sm"
+            class="text-weight-bold"
+            style="border-radius: 4px"
+            @click="togglePlayerCount(pc)"
+          >
+            {{ pc.toUpperCase() }}
+          </q-chip>
         </div>
       </div>
 
@@ -104,12 +92,16 @@ import KennerTable from 'components/tables/KennerTable.vue';
 import LeagueLevel from 'components/season/LeagueLevel.vue';
 import { useRouter } from 'vue-router';
 import { TKennerButton, TUserDto } from 'src/types';
-import { onMounted, ref, watch } from 'vue';
+import { computed, onMounted, ref, watch } from 'vue';
 import { useUserStore } from 'stores/userStore';
 
 const { listUsers, getAvailableYears } = useUserStore();
 const users = ref<TUserDto[]>([]);
+const availablePlayerCounts = ['2p', '3p', '4p'];
 const selectedPlayerCounts = ref<string[]>([]);
+const isAllPlayerCountsSelected = computed(
+  () => selectedPlayerCounts.value.length === 0
+);
 const selectedYears = ref<number[]>([]);
 const availableYears = ref<number[]>([]);
 const loading = ref(false);
@@ -117,14 +109,23 @@ const loading = ref(false);
 function togglePlayerCount(val: string) {
   if (val === 'all') {
     selectedPlayerCounts.value = [];
-  } else {
-    const idx = selectedPlayerCounts.value.indexOf(val);
-    if (idx >= 0) {
-      selectedPlayerCounts.value.splice(idx, 1);
-    } else {
-      selectedPlayerCounts.value.push(val);
-    }
+    return;
   }
+  const idx = selectedPlayerCounts.value.indexOf(val);
+  if (idx >= 0) {
+    selectedPlayerCounts.value.splice(idx, 1);
+  } else {
+    selectedPlayerCounts.value.push(val);
+  }
+
+  // If all individual player counts are selected, automatically switch to "All" (empty array)
+  if (selectedPlayerCounts.value.length === availablePlayerCounts.length) {
+    selectedPlayerCounts.value = [];
+  }
+}
+
+function toggleAllPlayerCounts() {
+  selectedPlayerCounts.value = [];
 }
 
 async function loadUsers() {
@@ -236,24 +237,6 @@ const columns = [
 
 .years-select {
   min-width: 170px;
-}
-
-.player-btn-group {
-  border: 1px solid rgba(54, 64, 88, 0.15);
-  border-radius: 20px;
-  background: white;
-  padding: 2px;
-  overflow: hidden;
-  box-shadow: none !important;
-}
-
-.player-filter-btn {
-  border-radius: 16px;
-  padding: 2px 10px;
-  font-weight: 500;
-  font-size: 0.82rem;
-  box-shadow: none !important;
-  transition: all 0.2s ease;
 }
 
 @media (max-width: 599px) {

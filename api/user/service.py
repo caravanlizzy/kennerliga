@@ -122,7 +122,7 @@ def get_user_summary_stats(
         }
 
     from result.models import Result
-    from django.db.models import Avg, Count, Q
+    from django.db.models import Avg, Count, IntegerField, OuterRef, Q, Subquery
 
     res_qs = Result.objects.filter(
         player_profile=profile, position__isnull=False
@@ -153,25 +153,23 @@ def get_user_summary_stats(
             if t.isdigit():
                 parsed_player_counts.append(int(t))
 
-    if parsed_player_counts:
-        pc_filter = Q()
-        for pc_num in parsed_player_counts:
-            pc_filter |= Q(
-                selected_game__game__min_players__lte=pc_num,
-                selected_game__game__max_players__gte=pc_num,
-            )
-        res_qs = res_qs.filter(pc_filter)
-
-    if exclude_2p_only:
-        res_qs = res_qs.exclude(
-            Q(selected_game__game__min_players=2, selected_game__game__max_players=2)
-            | Q(selected_game__game__max_players__lte=2)
+    if parsed_player_counts or exclude_2p_only or exclude_3p_only:
+        player_count_subquery = (
+            Result.objects.filter(selected_game=OuterRef("selected_game"))
+            .order_by()
+            .values("selected_game")
+            .annotate(cnt=Count("id"))
+            .values("cnt")
         )
-
-    if exclude_3p_only:
-        res_qs = res_qs.exclude(
-            selected_game__game__min_players=3, selected_game__game__max_players=3
+        res_qs = res_qs.annotate(
+            match_player_count=Subquery(player_count_subquery, output_field=IntegerField())
         )
+        if parsed_player_counts:
+            res_qs = res_qs.filter(match_player_count__in=parsed_player_counts)
+        if exclude_2p_only:
+            res_qs = res_qs.exclude(match_player_count__lte=2)
+        if exclude_3p_only:
+            res_qs = res_qs.exclude(match_player_count=3)
 
     res_agg = res_qs.aggregate(
         avg_pos=Avg("position"),

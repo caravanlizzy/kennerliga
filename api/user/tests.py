@@ -186,6 +186,10 @@ class UserAPITests(TestCase):
         league = League.objects.create(season=season, level=1, status=LeagueStatus.PLAYING)
         league.members.add(part)
 
+        opp1 = PlayerProfile.objects.create(profile_name="Opponent 1")
+        opp2 = PlayerProfile.objects.create(profile_name="Opponent 2")
+        opp3 = PlayerProfile.objects.create(profile_name="Opponent 3")
+
         game_2p = Game.objects.create(
             name="Patchwork", min_players=2, max_players=2, platform=platform
         )
@@ -210,6 +214,15 @@ class UserAPITests(TestCase):
             points=100,
         )
         Result.objects.create(
+            player_profile=opp1,
+            selected_game=sg_2p,
+            season=season,
+            league=league,
+            position=2,
+            points=50,
+        )
+
+        Result.objects.create(
             player_profile=self.profile,
             selected_game=sg_3p,
             season=season,
@@ -218,12 +231,53 @@ class UserAPITests(TestCase):
             points=90,
         )
         Result.objects.create(
+            player_profile=opp1,
+            selected_game=sg_3p,
+            season=season,
+            league=league,
+            position=1,
+            points=100,
+        )
+        Result.objects.create(
+            player_profile=opp2,
+            selected_game=sg_3p,
+            season=season,
+            league=league,
+            position=3,
+            points=40,
+        )
+
+        Result.objects.create(
             player_profile=self.profile,
             selected_game=sg_4p,
             season=season,
             league=league,
             position=3,
             points=80,
+        )
+        Result.objects.create(
+            player_profile=opp1,
+            selected_game=sg_4p,
+            season=season,
+            league=league,
+            position=1,
+            points=100,
+        )
+        Result.objects.create(
+            player_profile=opp2,
+            selected_game=sg_4p,
+            season=season,
+            league=league,
+            position=2,
+            points=90,
+        )
+        Result.objects.create(
+            player_profile=opp3,
+            selected_game=sg_4p,
+            season=season,
+            league=league,
+            position=4,
+            points=70,
         )
 
         # Base: all 3 games -> 1 win, avg 2.0
@@ -292,6 +346,10 @@ class UserAPITests(TestCase):
         league_2026 = League.objects.create(season=season_2026, level=1, status=LeagueStatus.PLAYING)
         league_2026.members.add(part_2026)
 
+        opp1 = PlayerProfile.objects.create(profile_name="Opponent PC 1")
+        opp2 = PlayerProfile.objects.create(profile_name="Opponent PC 2")
+        opp3 = PlayerProfile.objects.create(profile_name="Opponent PC 3")
+
         game_2p = Game.objects.create(
             name="Duel 2P", min_players=2, max_players=2, platform=platform
         )
@@ -311,8 +369,8 @@ class UserAPITests(TestCase):
         sg_2026_flex = SelectedGame.objects.create(game=game_24p, league=league_2026, profile=self.profile)
 
         # 2025:
-        # sg_2025_2p -> win (pos 1)
-        # sg_2025_4p -> pos 4
+        # sg_2025_2p -> win (pos 1) (2 players in match)
+        # sg_2025_4p -> pos 4 (4 players in match)
         Result.objects.create(
             player_profile=self.profile,
             selected_game=sg_2025_2p,
@@ -322,6 +380,15 @@ class UserAPITests(TestCase):
             points=100,
         )
         Result.objects.create(
+            player_profile=opp1,
+            selected_game=sg_2025_2p,
+            season=season_2025,
+            league=league_2025,
+            position=2,
+            points=80,
+        )
+
+        Result.objects.create(
             player_profile=self.profile,
             selected_game=sg_2025_4p,
             season=season_2025,
@@ -329,10 +396,34 @@ class UserAPITests(TestCase):
             position=4,
             points=60,
         )
+        Result.objects.create(
+            player_profile=opp1,
+            selected_game=sg_2025_4p,
+            season=season_2025,
+            league=league_2025,
+            position=1,
+            points=100,
+        )
+        Result.objects.create(
+            player_profile=opp2,
+            selected_game=sg_2025_4p,
+            season=season_2025,
+            league=league_2025,
+            position=2,
+            points=90,
+        )
+        Result.objects.create(
+            player_profile=opp3,
+            selected_game=sg_2025_4p,
+            season=season_2025,
+            league=league_2025,
+            position=3,
+            points=70,
+        )
 
         # 2026:
-        # sg_2026_3p -> pos 2
-        # sg_2026_flex -> win (pos 1)
+        # sg_2026_3p -> pos 2 (3 players in match)
+        # sg_2026_flex -> win (pos 1) (3 players in match)
         Result.objects.create(
             player_profile=self.profile,
             selected_game=sg_2026_3p,
@@ -342,12 +433,45 @@ class UserAPITests(TestCase):
             points=80,
         )
         Result.objects.create(
+            player_profile=opp1,
+            selected_game=sg_2026_3p,
+            season=season_2026,
+            league=league_2026,
+            position=1,
+            points=100,
+        )
+        Result.objects.create(
+            player_profile=opp2,
+            selected_game=sg_2026_3p,
+            season=season_2026,
+            league=league_2026,
+            position=3,
+            points=60,
+        )
+
+        Result.objects.create(
             player_profile=self.profile,
             selected_game=sg_2026_flex,
             season=season_2026,
             league=league_2026,
             position=1,
             points=95,
+        )
+        Result.objects.create(
+            player_profile=opp1,
+            selected_game=sg_2026_flex,
+            season=season_2026,
+            league=league_2026,
+            position=2,
+            points=85,
+        )
+        Result.objects.create(
+            player_profile=opp2,
+            selected_game=sg_2026_flex,
+            season=season_2026,
+            league=league_2026,
+            position=3,
+            points=75,
         )
 
         # 1. All (no filter) -> 4 games: pos 1, 4, 2, 1 -> 2 wins / 4 = 50.0%, avg (1+4+2+1)/4 = 2.0
@@ -357,12 +481,12 @@ class UserAPITests(TestCase):
         self.assertEqual(stats_all["avg_position"], 2.0)
         self.assertEqual(stats_all["most_participated_league_level"], 1)
 
-        # 2. Player count: 2p -> sg_2025_2p (pos 1), sg_2026_flex (pos 1) -> 2 games, 2 wins = 100.0%, avg 1.0, L1 (tie-break)
+        # 2. Player count: 2p -> sg_2025_2p (pos 1) only -> 1 game, 1 win = 100.0%, avg 1.0, L2
         stats_2p = get_user_summary_stats(self.user, player_count="2p")
-        self.assertEqual(stats_2p["total_games"], 2)
+        self.assertEqual(stats_2p["total_games"], 1)
         self.assertEqual(stats_2p["win_rate"], 100.0)
         self.assertEqual(stats_2p["avg_position"], 1.0)
-        self.assertEqual(stats_2p["most_participated_league_level"], 1)
+        self.assertEqual(stats_2p["most_participated_league_level"], 2)
 
         # 3. Player count: 3p -> sg_2026_3p (pos 2), sg_2026_flex (pos 1) -> 2 games, 1 win = 50.0%, avg 1.5, L1
         stats_3p = get_user_summary_stats(self.user, player_count="3p")
@@ -371,12 +495,12 @@ class UserAPITests(TestCase):
         self.assertEqual(stats_3p["avg_position"], 1.5)
         self.assertEqual(stats_3p["most_participated_league_level"], 1)
 
-        # 4. Player count: 4p -> sg_2025_4p (pos 4), sg_2026_flex (pos 1) -> 2 games, 1 win = 50.0%, avg 2.5, L1 (tie-break)
+        # 4. Player count: 4p -> sg_2025_4p (pos 4) only -> 1 game, 0 win = 0.0%, avg 4.0, L2
         stats_4p = get_user_summary_stats(self.user, player_count="4p")
-        self.assertEqual(stats_4p["total_games"], 2)
-        self.assertEqual(stats_4p["win_rate"], 50.0)
-        self.assertEqual(stats_4p["avg_position"], 2.5)
-        self.assertEqual(stats_4p["most_participated_league_level"], 1)
+        self.assertEqual(stats_4p["total_games"], 1)
+        self.assertEqual(stats_4p["win_rate"], 0.0)
+        self.assertEqual(stats_4p["avg_position"], 4.0)
+        self.assertEqual(stats_4p["most_participated_league_level"], 2)
 
         # 5. Multi-select player count: 2p and 3p -> sg_2025_2p (1) + sg_2026_3p (2) + sg_2026_flex (1) -> 3 games, 2 wins = 66.7%, avg 1.33, L1
         stats_2p_3p = get_user_summary_stats(self.user, player_count="2p,3p")
@@ -416,10 +540,10 @@ class UserAPITests(TestCase):
         res_list_2p = self.client.get("/api/user/users/?player_count=2p")
         self.assertEqual(res_list_2p.status_code, 200)
         user_row = next(u for u in res_list_2p.data if u["id"] == self.user.id)
-        self.assertEqual(user_row["total_games"], 2)
+        self.assertEqual(user_row["total_games"], 1)
         self.assertEqual(user_row["win_rate"], 100.0)
         self.assertEqual(user_row["avg_position"], 1.0)
-        self.assertEqual(user_row["most_participated_league_level"], 1)
+        self.assertEqual(user_row["most_participated_league_level"], 2)
 
         res_list_years = self.client.get("/api/user/users/?years=2025")
         self.assertEqual(res_list_years.status_code, 200)
