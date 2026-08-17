@@ -11,12 +11,22 @@ export const useUserStore = defineStore(
     const isAdmin: Ref<boolean> = ref(false);
     const isAuthenticated: Ref<boolean> = ref(false);
 
-    async function listUsers(params?: Record<string, string | number | boolean>) {
+    async function listUsers(params?: Record<string, string | number | boolean | (string | number)[]>) {
       try {
         const { data: users } = await api.get('/user/users/', { params });
         return users;
       } catch (e) {
         console.log(e);
+      }
+    }
+
+    async function getAvailableYears(): Promise<number[]> {
+      try {
+        const { data: years } = await api.get<number[]>('/user/users/available-years/');
+        return years;
+      } catch (e) {
+        console.log(e);
+        return [];
       }
     }
 
@@ -120,6 +130,6 @@ export const useUserStore = defineStore(
 
     loadDataFromLocalStorage();
 
-    return { user, listUsers, isAuthenticated, isAdmin, isMe, login, logout, loadDataFromLocalStorage, setMyCurrentLeagueId };
+    return { user, listUsers, getAvailableYears, isAuthenticated, isAdmin, isMe, login, logout, loadDataFromLocalStorage, setMyCurrentLeagueId };
   }
 );

@@ -57,6 +57,7 @@ class UserViewSet(ModelViewSet):
             "user_seasons",
             "user_results",
             "user_statistics",
+            "available_years",
         ]:
             permission_classes = [IsAuthenticated]
         else:
@@ -116,6 +117,28 @@ class UserViewSet(ModelViewSet):
         serializer = ResultSerializer(results, many=True)
         return Response(serializer.data)
 
+    @action(detail=False, methods=["get"], url_path="available-years")
+    def available_years(self, request):
+        """
+        GET /api/user/users/available-years/
+        Returns list of years that have data (seasons with match results).
+        """
+        years = list(
+            Season.objects.filter(results__isnull=False)
+            .values_list("year", flat=True)
+            .distinct()
+            .order_by("-year")
+        )
+        if not years:
+            years = list(
+                Season.objects.values_list("year", flat=True)
+                .distinct()
+                .order_by("-year")
+            )
+        if not years:
+            years = [timezone.now().year]
+        return Response(years)
+
     @action(detail=True, methods=["get"], url_path="statistics")
     def user_statistics(self, request, pk=None):
         """
@@ -132,6 +155,25 @@ class UserViewSet(ModelViewSet):
         except ValueError:
             selected_year = timezone.now().year
 
+        player_count = request.query_params.get("player_count")
+        if player_count and player_count.lower() == "all":
+            player_count = None
+
+        raw_years = request.query_params.getlist("years") + request.query_params.getlist("years[]")
+        if not raw_years and "years" in request.query_params:
+            raw_years = [request.query_params.get("years")]
+        if not raw_years and "years[]" in request.query_params:
+            raw_years = [request.query_params.get("years[]")]
+
+        parsed_years = []
+        for item in raw_years:
+            if isinstance(item, str) and "," in item:
+                for part in item.split(","):
+                    if part.strip().isdigit():
+                        parsed_years.append(int(part.strip()))
+            elif str(item).isdigit():
+                parsed_years.append(int(item))
+
         exclude_2p_only = (
             request.query_params.get("exclude_2p_only", "").lower() in ["true", "1"]
         )
@@ -143,6 +185,18 @@ class UserViewSet(ModelViewSet):
         results = Result.objects.filter(player_profile=profile).select_related(
             "selected_game__game"
         )
+        if parsed_years:
+            results = results.filter(season__year__in=parsed_years)
+
+        if player_count:
+            pc_str = str(player_count).lower().replace("p", "").strip()
+            if pc_str.isdigit():
+                pc_num = int(pc_str)
+                results = results.filter(
+                    selected_game__game__min_players__lte=pc_num,
+                    selected_game__game__max_players__gte=pc_num,
+                )
+
         if exclude_2p_only:
             results = results.exclude(
                 Q(selected_game__game__min_players=2, selected_game__game__max_players=2)

@@ -33,18 +33,44 @@ class UserSerializer(ModelSerializer):
         request = self.context.get("request") if hasattr(self, "context") and self.context else None
         exclude_2p_only = False
         exclude_3p_only = False
+        player_count = None
+        years = None
+
         if request and hasattr(request, "query_params"):
             exclude_2p_only = request.query_params.get("exclude_2p_only", "").lower() in ["true", "1"]
             exclude_3p_only = request.query_params.get("exclude_3p_only", "").lower() in ["true", "1"]
+            player_count = request.query_params.get("player_count")
+            if player_count and player_count.lower() == "all":
+                player_count = None
 
-        cache_key = (exclude_2p_only, exclude_3p_only)
+            raw_years = request.query_params.getlist("years") + request.query_params.getlist("years[]")
+            if not raw_years and "years" in request.query_params:
+                raw_years = [request.query_params.get("years")]
+            if not raw_years and "years[]" in request.query_params:
+                raw_years = [request.query_params.get("years[]")]
+
+            parsed_years = []
+            for item in raw_years:
+                if isinstance(item, str) and "," in item:
+                    for part in item.split(","):
+                        if part.strip().isdigit():
+                            parsed_years.append(int(part.strip()))
+                elif str(item).isdigit():
+                    parsed_years.append(int(item))
+            years = tuple(sorted(list(set(parsed_years)))) if parsed_years else None
+
+        cache_key = (exclude_2p_only, exclude_3p_only, player_count, years)
         if not hasattr(obj, "_cached_summary_stats"):
             obj._cached_summary_stats = {}
         if cache_key not in obj._cached_summary_stats:
             from user.service import get_user_summary_stats
 
             obj._cached_summary_stats[cache_key] = get_user_summary_stats(
-                obj, exclude_2p_only=exclude_2p_only, exclude_3p_only=exclude_3p_only
+                obj,
+                exclude_2p_only=exclude_2p_only,
+                exclude_3p_only=exclude_3p_only,
+                player_count=player_count,
+                years=years,
             )
         return obj._cached_summary_stats[cache_key]
 

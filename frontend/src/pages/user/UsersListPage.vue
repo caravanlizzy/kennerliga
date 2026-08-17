@@ -1,27 +1,49 @@
 <template>
   <div class="q-mb-md row items-center justify-between q-gutter-sm">
-    <div class="row items-center q-gutter-x-sm">
-      <span class="text-caption text-weight-bold text-grey-7">Filter Games:</span>
-      <q-chip
-        clickable
-        v-model:selected="exclude2p"
-        :color="exclude2p ? 'primary' : 'grey-3'"
-        :text-color="exclude2p ? 'white' : 'grey-8'"
-        icon="filter_alt"
-        class="text-weight-medium"
-      >
-        Exclude 2P Only
-      </q-chip>
-      <q-chip
-        clickable
-        v-model:selected="exclude3p"
-        :color="exclude3p ? 'primary' : 'grey-3'"
-        :text-color="exclude3p ? 'white' : 'grey-8'"
-        icon="filter_alt"
-        class="text-weight-medium"
-      >
-        Exclude 3P Only
-      </q-chip>
+    <div class="row items-center q-gutter-md">
+      <!-- Player Count Settings Filter -->
+      <div class="row items-center q-gutter-x-sm">
+        <span class="text-caption text-weight-bold text-grey-7">Player Count:</span>
+        <q-btn-toggle
+          v-model="playerCount"
+          dense
+          no-caps
+          rounded
+          unelevated
+          toggle-color="primary"
+          color="grey-3"
+          text-color="grey-8"
+          toggle-text-color="white"
+          :options="[
+            { label: 'All', value: 'all' },
+            { label: '2P', value: '2p' },
+            { label: '3P', value: '3p' },
+            { label: '4P', value: '4p' }
+          ]"
+        />
+      </div>
+
+      <!-- Years Multi-select Filter -->
+      <div class="row items-center q-gutter-x-sm">
+        <span class="text-caption text-weight-bold text-grey-7">Years:</span>
+        <q-select
+          v-model="selectedYears"
+          :options="availableYears"
+          multiple
+          clearable
+          dense
+          outlined
+          options-dense
+          placeholder="All Years"
+          :display-value="!selectedYears || selectedYears.length === 0 ? 'All Years' : selectedYears.slice().sort((a, b) => b - a).join(', ')"
+          style="min-width: 170px"
+          class="bg-white rounded-borders"
+        >
+          <template v-slot:prepend>
+            <q-icon name="calendar_today" size="xs" />
+          </template>
+        </q-select>
+      </div>
     </div>
   </div>
 
@@ -55,29 +77,38 @@ import { TKennerButton, TUserDto } from 'src/types';
 import { onMounted, ref, watch } from 'vue';
 import { useUserStore } from 'stores/userStore';
 
-const { listUsers } = useUserStore();
+const { listUsers, getAvailableYears } = useUserStore();
 const users = ref<TUserDto[]>([]);
-const exclude2p = ref(false);
-const exclude3p = ref(false);
+const playerCount = ref<'all' | '2p' | '3p' | '4p'>('all');
+const selectedYears = ref<number[]>([]);
+const availableYears = ref<number[]>([]);
 const loading = ref(false);
 
 async function loadUsers() {
   loading.value = true;
   try {
-    const params: Record<string, boolean> = {};
-    if (exclude2p.value) params.exclude_2p_only = true;
-    if (exclude3p.value) params.exclude_3p_only = true;
+    const params: Record<string, string> = {};
+    if (playerCount.value && playerCount.value !== 'all') {
+      params.player_count = playerCount.value;
+    }
+    if (selectedYears.value && selectedYears.value.length > 0) {
+      params.years = selectedYears.value.join(',');
+    }
     users.value = (await listUsers(params)) ?? [];
   } finally {
     loading.value = false;
   }
 }
 
-watch([exclude2p, exclude3p], () => {
+watch([playerCount, selectedYears], () => {
   loadUsers();
 });
 
-onMounted(() => {
+onMounted(async () => {
+  const years = await getAvailableYears();
+  if (years && years.length > 0) {
+    availableYears.value = years;
+  }
   loadUsers();
 });
 

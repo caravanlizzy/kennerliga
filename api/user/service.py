@@ -93,7 +93,13 @@ def find_users_current_league(profile):
         raise ValueError("Multiple leagues found for the current running season.")
 
 
-def get_user_summary_stats(user, exclude_2p_only=False, exclude_3p_only=False):
+def get_user_summary_stats(
+    user,
+    exclude_2p_only=False,
+    exclude_3p_only=False,
+    player_count=None,
+    years=None,
+):
     """
     Calculates summary statistics for a user:
     - win_rate: percentage of games where position == 1 among positioned games (float, rounded to 1 decimal place), or None if no games played.
@@ -102,6 +108,8 @@ def get_user_summary_stats(user, exclude_2p_only=False, exclude_3p_only=False):
     Optional filters:
     - exclude_2p_only: if True, filters out games where max_players <= 2 (or min=2, max=2)
     - exclude_3p_only: if True, filters out games where min=3 and max=3
+    - player_count: '2p', '3p', '4p', 2, 3, 4, or 'all' to filter games by player count
+    - years: list, tuple, set, comma-separated str, or int of years to filter by season year
     """
     profile = getattr(user, "profile", None)
     if not profile:
@@ -117,6 +125,27 @@ def get_user_summary_stats(user, exclude_2p_only=False, exclude_3p_only=False):
     res_qs = Result.objects.filter(
         player_profile=profile, position__isnull=False
     )
+
+    parsed_years = None
+    if years:
+        if isinstance(years, (int, str)) and str(years).isdigit():
+            parsed_years = [int(years)]
+        elif isinstance(years, str):
+            parsed_years = [int(y.strip()) for y in years.split(",") if y.strip().isdigit()]
+        elif isinstance(years, (list, tuple, set)):
+            parsed_years = [int(y) for y in years if str(y).isdigit()]
+
+    if parsed_years:
+        res_qs = res_qs.filter(season__year__in=parsed_years)
+
+    if player_count:
+        pc_str = str(player_count).lower().replace("p", "").strip()
+        if pc_str.isdigit():
+            pc_num = int(pc_str)
+            res_qs = res_qs.filter(
+                selected_game__game__min_players__lte=pc_num,
+                selected_game__game__max_players__gte=pc_num,
+            )
 
     if exclude_2p_only:
         res_qs = res_qs.exclude(
@@ -142,12 +171,16 @@ def get_user_summary_stats(user, exclude_2p_only=False, exclude_3p_only=False):
     win_rate = round((wins / total_games) * 100, 1) if total_games > 0 else None
     avg_position = round(avg_pos, 2) if avg_pos is not None else None
 
+    league_filter = (
+        Q(members__profile=profile)
+        | Q(standings__player_profile=profile)
+        | Q(results__player_profile=profile)
+    )
+    if parsed_years:
+        league_filter &= Q(season__year__in=parsed_years)
+
     top_level = (
-        League.objects.filter(
-            Q(members__profile=profile)
-            | Q(standings__player_profile=profile)
-            | Q(results__player_profile=profile)
-        )
+        League.objects.filter(league_filter)
         .values("level")
         .annotate(count=Count("id", distinct=True))
         .order_by("-count", "level")
