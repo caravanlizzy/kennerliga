@@ -110,6 +110,14 @@ const routes: RouteRecordRaw[] = [
         meta: { icon: 'home', label: 'Home' },
       },
       userRoutes,
+      {
+        path: 'users',
+        redirect: '/players',
+      },
+      {
+        path: 'users/:rest(.*)*',
+        redirect: (to) => '/players/' + ((to.params.rest as string[]) ?? []).join('/'),
+      },
       gameRoutes,
       seasonRoutes,
       {

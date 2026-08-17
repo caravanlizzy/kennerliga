@@ -128,7 +128,7 @@ import { useUserStore } from 'stores/userStore';
 const { listUsers, getAvailableYears } = useUserStore();
 const users = ref<TUserDto[]>([]);
 const availablePlayerCounts = ['2p', '3p', '4p'];
-const selectedPlayerCounts = ref<string[]>([]);
+const selectedPlayerCounts = ref<string[]>(['4p']);
 const isAllPlayerCountsSelected = computed(
   () => selectedPlayerCounts.value.length === 0
 );

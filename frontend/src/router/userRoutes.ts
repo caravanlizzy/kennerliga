@@ -1,10 +1,10 @@
 export default {
-  path: 'users/',
+  path: 'players/',
   meta: { requiresAuth: true, requiresAdmin: false, label: 'Players', icon: 'people_alt' },
   children: [
     {
       path: '',
-      name: 'users',
+      name: 'players',
       component: () => import('pages/user/UsersListPage.vue'),
       meta: { icon: 'people_alt', label: 'Players' },
     },
