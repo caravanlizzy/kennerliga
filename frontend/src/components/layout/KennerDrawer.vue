@@ -17,7 +17,7 @@
           label="Seasons"
           forward-name="seasons"
         />
-        <DrawerItem icon="people_alt" icon-color="primary" label="Users" forward-name="users" />
+        <DrawerItem icon="people_alt" icon-color="primary" label="Players" forward-name="users" />
 
         <q-separator class="q-my-sm drawer-separator" />
         <DrawerSubGroup>Info</DrawerSubGroup>

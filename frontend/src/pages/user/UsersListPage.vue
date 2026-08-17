@@ -68,12 +68,42 @@
   <KennerTable
     :create-button="createButton"
     flat
-    title="Users"
+    title="Players"
     @row-click="onRowClick"
     :rows="users"
     :columns="columns"
     :loading="loading"
   >
+    <template v-slot:body-cell-win_rate="props">
+      <q-td :props="props">
+        <div class="row items-center justify-end no-wrap q-gutter-x-xs">
+          <span>{{ props.value }}</span>
+          <q-badge
+            v-if="isBestWinRate(props.row)"
+            color="positive"
+            text-color="white"
+            class="text-weight-bolder"
+            style="font-size: 0.65rem; padding: 2px 5px; border-radius: 4px;"
+            label="best"
+          />
+        </div>
+      </q-td>
+    </template>
+    <template v-slot:body-cell-avg_position="props">
+      <q-td :props="props">
+        <div class="row items-center justify-end no-wrap q-gutter-x-xs">
+          <span>{{ props.value }}</span>
+          <q-badge
+            v-if="isBestAvgPosition(props.row)"
+            color="primary"
+            text-color="white"
+            class="text-weight-bolder"
+            style="font-size: 0.65rem; padding: 2px 5px; border-radius: 4px;"
+            label="best"
+          />
+        </div>
+      </q-td>
+    </template>
     <template v-slot:body-cell-most_participated_league_level="props">
       <q-td :props="props">
         <LeagueLevel
@@ -105,6 +135,39 @@ const isAllPlayerCountsSelected = computed(
 const selectedYears = ref<number[]>([]);
 const availableYears = ref<number[]>([]);
 const loading = ref(false);
+
+const bestWinRate = computed(() => {
+  const validUsers = users.value.filter(
+    (u) => (u.total_games ?? 0) > 0 && u.win_rate !== null && u.win_rate !== undefined
+  );
+  if (validUsers.length === 0) return null;
+  const max = Math.max(...validUsers.map((u) => u.win_rate as number));
+  return max > 0 ? max : null;
+});
+
+const bestAvgPosition = computed(() => {
+  const validUsers = users.value.filter(
+    (u) => (u.total_games ?? 0) > 0 && u.avg_position !== null && u.avg_position !== undefined
+  );
+  if (validUsers.length === 0) return null;
+  return Math.min(...validUsers.map((u) => u.avg_position as number));
+});
+
+function isBestWinRate(row: TUserDto) {
+  return (
+    bestWinRate.value !== null &&
+    (row.total_games ?? 0) > 0 &&
+    row.win_rate === bestWinRate.value
+  );
+}
+
+function isBestAvgPosition(row: TUserDto) {
+  return (
+    bestAvgPosition.value !== null &&
+    (row.total_games ?? 0) > 0 &&
+    row.avg_position === bestAvgPosition.value
+  );
+}
 
 function togglePlayerCount(val: string) {
   if (val === 'all') {

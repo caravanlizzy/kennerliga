@@ -111,7 +111,7 @@
     <div v-else class="flex flex-center q-my-xl text-grey-6">
       <div class="column items-center">
         <q-icon name="person_off" size="64px" class="q-mb-md opacity-20" />
-        <div class="text-h6">User not found</div>
+        <div class="text-h6">Player not found</div>
         <KennerButton
           flat
           color="primary"
