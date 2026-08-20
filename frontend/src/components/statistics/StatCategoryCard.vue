@@ -42,8 +42,14 @@
               <span class="rank-badge" :class="medalClass(row.entry.rank)">{{ row.entry.rank }}</span>
               <span :class="{ 'text-weight-bolder': row.entry.is_me }">{{ row.entry.profile_name }}</span>
             </div>
-            <span class="text-weight-bold">
-              {{ row.entry.display ?? formatStatValue(category.key, category.unit, row.entry.value) }}
+            <span class="row items-center no-wrap q-gutter-x-xs text-weight-bold">
+              <template v-if="row.entry.best_level != null">
+                <LeagueLevel badge :level="row.entry.best_level" />
+                <span>{{ formatStatValue(category.key, category.unit, row.entry.value) }}</span>
+              </template>
+              <template v-else>
+                {{ row.entry.display ?? formatStatValue(category.key, category.unit, row.entry.value) }}
+              </template>
             </span>
           </div>
         </template>
@@ -59,8 +65,12 @@
           <span class="rank-badge">{{ category.me.rank ?? '–' }}</span>
           <span class="text-weight-bolder">{{ category.me.profile_name }}</span>
         </div>
-        <div class="text-caption text-grey-6 text-right">
-          <template v-if="category.me.display">{{ category.me.display }} so far</template>
+        <div class="text-caption text-grey-6 text-right row items-center no-wrap q-gutter-x-xs justify-end">
+          <template v-if="category.me.best_level != null">
+            <LeagueLevel badge :level="category.me.best_level" />
+            <span>{{ formatStatValue(category.key, category.unit, category.me.value) }} so far</span>
+          </template>
+          <template v-else-if="category.me.display">{{ category.me.display }} so far</template>
           <template v-else-if="category.me.value !== null">
             {{ formatStatValue(category.key, category.unit, category.me.value) }} so far
           </template>
@@ -76,6 +86,7 @@
 import { computed } from 'vue';
 import { TStatCategory, TStatEntry } from 'src/types';
 import { formatStatValue } from 'src/composables/statFormat';
+import LeagueLevel from 'components/season/LeagueLevel.vue';
 
 const props = defineProps<{ category: TStatCategory }>();
 

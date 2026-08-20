@@ -6,6 +6,8 @@ export type TStatEntry = {
   // Optional pre-formatted label shown verbatim instead of `value`
   // (e.g. "L1 · 24 pts" for the career metric).
   display?: string | null;
+  // Highest league reached (career metric), used to render a league badge.
+  best_level?: number | null;
   profile_id: number;
   profile_name: string;
   username: string | null;

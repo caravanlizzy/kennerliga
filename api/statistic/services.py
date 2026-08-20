@@ -359,6 +359,9 @@ def _entry(player, is_me):
         # Optional pre-formatted label (e.g. "L1 · 24 pts" for the career
         # metric); the card shows it verbatim when present.
         "display": player.get("display"),
+        # Highest league reached (career metric), so the card can render a
+        # proper league badge instead of the "L1" text baked into `display`.
+        "best_level": player.get("best_level"),
         "profile_id": player["profile_id"],
         "profile_name": player["profile_name"],
         "username": player["username"],
@@ -372,6 +375,7 @@ def _unranked_me_entry(profile, raw_value):
         "rank": None,
         "value": raw_value,
         "display": None,
+        "best_level": None,
         "profile_id": profile.id,
         "profile_name": profile.profile_name,
         "username": profile.user.username if profile.user else None,
