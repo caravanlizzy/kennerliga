@@ -13,10 +13,10 @@ class Command(BaseCommand):
     help = "Create a MySQL backup using .env credentials"
 
     def handle(self, *args, **options):
-        # File name: DD-MM-YYYY.sql
+        # File name: YYYY-MM-DD.sql
         backup_dir = os.path.join(settings.BASE_DIR, "backups")
         os.makedirs(backup_dir, exist_ok=True)
-        filename = date.today().strftime("%d-%m-%Y") + ".sql"
+        filename = date.today().strftime("%Y-%m-%d") + ".sql"
         backup_path = os.path.join(backup_dir, filename)
 
         # Build the mysqldump command using settings from .env
