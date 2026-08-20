@@ -86,6 +86,25 @@ class CareerPerformanceTests(StatisticsServiceTestBase):
         ranked = _rank_career(_build_player_pool())
         self.assertEqual(ranked[0]["value"], 9)
 
+    def test_display_shows_highest_league_reached_with_points(self):
+        # Reached L1 and L2; the label must lead with the highest league
+        # (L1) and read the total points cleanly (9, not 9.0).
+        a = self.make_profile("A")
+        self.add_standing(self.make_league(2), a, 3)
+        self.add_standing(self.make_league(1), a, 6)
+
+        ranked = _rank_career(_build_player_pool())
+        self.assertEqual(ranked[0]["best_level"], 1)
+        self.assertEqual(ranked[0]["display"], "L1 · 9 pts")
+
+    def test_display_uses_lowest_league_when_top_not_reached(self):
+        # Only ever played L3: the label reflects L3, not L1.
+        a = self.make_profile("A")
+        self.add_standing(self.make_league(3), a, 4)
+
+        ranked = _rank_career(_build_player_pool())
+        self.assertEqual(ranked[0]["display"], "L3 · 4 pts")
+
 
 class CategorySetTests(StatisticsServiceTestBase):
     def test_removed_categories_are_gone(self):

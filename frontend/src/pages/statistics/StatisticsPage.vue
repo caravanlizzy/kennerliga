@@ -60,7 +60,7 @@
          leaderboard pinned top-right so it is visible without scrolling
          past all the category cards first. -->
     <div class="row q-col-gutter-md">
-      <div class="col-12 col-md-8 order-last order-md-first">
+      <div class="col-12 col-md-7 order-last order-md-first">
         <div v-if="loadingOverview" class="row q-col-gutter-md">
           <div v-for="i in 4" :key="i" class="col-12 col-sm-6">
             <q-skeleton type="rect" height="240px" class="rounded-borders" />
@@ -78,7 +78,7 @@
         </div>
       </div>
 
-      <div class="col-12 col-md-4 order-first order-md-last">
+      <div class="col-12 col-md-5 order-first order-md-last">
         <q-card flat bordered class="game-stats-card">
       <q-card-section class="q-pb-none">
         <div class="row items-center no-wrap">
@@ -95,17 +95,14 @@
       <q-card-section>
         <q-select
           v-model="selectedGameId"
-          :options="filteredGameOptions"
-          label="Search a game..."
-          use-input
+          :options="gameOptions"
+          label="Select a game"
           clearable
           dense
           outlined
           emit-value
           map-options
-          input-debounce="150"
           class="q-mb-md game-select"
-          @filter="filterGames"
         >
           <template v-slot:option="scope">
             <q-item v-bind="scope.itemProps">
@@ -129,6 +126,40 @@
             <span v-if="leaderboard.excluded_low_sample_count > 0">
               ({{ leaderboard.excluded_low_sample_count }} player(s) below that threshold are hidden)
             </span>
+          </div>
+
+          <!-- Hall of Fame: the three most dominant players at this game,
+               ranked by win % divided by average position (a higher win
+               rate combined with a lower/better average position wins). -->
+          <div v-if="fameLeaders.length > 0" class="fame-card q-mb-md">
+            <div class="fame-card__header row items-center no-wrap">
+              <q-icon name="emoji_events" size="18px" class="q-mr-xs" />
+              <span class="text-weight-bolder">Hall of Fame</span>
+              <q-space />
+              <span class="fame-card__subtitle">Win % ÷ Avg Pos</span>
+            </div>
+            <div class="row q-col-gutter-sm q-mt-sm">
+              <div
+                v-for="(leader, idx) in fameLeaders"
+                :key="leader.profile_id"
+                class="col"
+              >
+                <div class="fame-player" :class="`fame-player--${idx + 1}`">
+                  <q-icon
+                    :name="idx === 0 ? 'emoji_events' : 'military_tech'"
+                    size="22px"
+                    class="fame-player__medal"
+                  />
+                  <div
+                    class="fame-player__name ellipsis"
+                    :class="{ 'text-weight-bolder': leader.is_me }"
+                  >
+                    {{ leader.profile_name }}
+                  </div>
+                  <div class="fame-player__score">{{ leader.fameScore.toFixed(2) }}</div>
+                </div>
+              </div>
+            </div>
           </div>
 
           <div
@@ -241,24 +272,30 @@ const gameOptions = computed(() =>
     distinct_players: game.distinct_players,
   }))
 );
-const filteredGameOptions = ref<typeof gameOptions.value>([]);
-
-function filterGames(val: string, update: (callback: () => void) => void) {
-  update(() => {
-    if (!val) {
-      filteredGameOptions.value = gameOptions.value;
-      return;
-    }
-    const needle = val.toLowerCase();
-    filteredGameOptions.value = gameOptions.value.filter((option) =>
-      option.label.toLowerCase().includes(needle)
-    );
-  });
-}
-
 const selectedGameId = ref<number | null>(null);
 const leaderboard = ref<TGameLeaderboard | null>(null);
 const loadingLeaderboard = ref(false);
+
+// The three most dominant players at the selected game: win rate divided by
+// average position, so a high win % paired with a low (better) average
+// position rises to the top. Only ranked players with both metrics qualify.
+const fameLeaders = computed(() => {
+  if (!leaderboard.value) return [];
+  return leaderboard.value.leaderboard
+    .filter(
+      (entry) =>
+        entry.eligible &&
+        entry.win_rate !== null &&
+        entry.avg_position !== null &&
+        entry.avg_position > 0
+    )
+    .map((entry) => ({
+      ...entry,
+      fameScore: (entry.win_rate as number) / (entry.avg_position as number),
+    }))
+    .sort((a, b) => b.fameScore - a.fameScore)
+    .slice(0, 3);
+});
 
 async function loadOverview() {
   loadingOverview.value = true;
@@ -274,7 +311,6 @@ async function loadOverview() {
 
 async function loadGames() {
   allGames.value = await fetchGameStatsList(selectedYears.value, playerCountsParam.value);
-  filteredGameOptions.value = gameOptions.value;
 }
 
 async function loadLeaderboard() {
@@ -338,13 +374,6 @@ const gameLeaderboardColumns = [
     sortable: true,
   },
   {
-    name: 'wins',
-    label: 'Wins',
-    align: 'right',
-    field: (row: { wins: number }) => row.wins,
-    sortable: true,
-  },
-  {
     name: 'win_rate',
     label: 'Win %',
     align: 'right',
@@ -387,6 +416,70 @@ const gameLeaderboardColumns = [
 
 .game-select {
   max-width: 420px;
+}
+
+// Hall of Fame flair: a warm golden gradient panel that lifts the top
+// three players above the plain leaderboard table.
+.fame-card {
+  border-radius: 12px;
+  padding: 12px 14px;
+  background: linear-gradient(135deg, #fff8e1 0%, #ffe7ba 100%);
+  border: 1px solid rgba(217, 164, 6, 0.35);
+  box-shadow: 0 2px 10px rgba(217, 164, 6, 0.18);
+
+  &__header {
+    color: #8a6d02;
+  }
+
+  &__subtitle {
+    font-size: 11px;
+    color: #a9862b;
+  }
+}
+
+.fame-player {
+  position: relative;
+  height: 100%;
+  text-align: center;
+  padding: 10px 6px 8px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.7);
+  border: 1px solid rgba(217, 164, 6, 0.25);
+
+  &__medal {
+    color: #b8860b;
+  }
+
+  &__name {
+    font-size: 12px;
+    line-height: 1.2;
+    margin-top: 2px;
+    color: #5f4b06;
+  }
+
+  &__score {
+    font-weight: 800;
+    font-size: 15px;
+    color: #7a5c00;
+  }
+
+  &--1 {
+    background: linear-gradient(160deg, #fff3c4 0%, #ffd54f 100%);
+    border-color: rgba(217, 164, 6, 0.6);
+    box-shadow: 0 2px 8px rgba(217, 164, 6, 0.3);
+
+    .fame-player__medal {
+      color: #d4a006;
+    }
+  }
+
+  &--2 .fame-player__medal {
+    color: #9e9e9e;
+  }
+
+  &--3 .fame-player__medal {
+    color: #b07b46;
+  }
 }
 
 // Keep the per-game panel visible while scrolling the (usually taller)

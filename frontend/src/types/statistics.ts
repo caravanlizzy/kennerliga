@@ -3,6 +3,9 @@ export type TStatBetter = 'higher' | 'lower';
 export type TStatEntry = {
   rank: number | null;
   value: number | null;
+  // Optional pre-formatted label shown verbatim instead of `value`
+  // (e.g. "L1 · 24 pts" for the career metric).
+  display?: string | null;
   profile_id: number;
   profile_name: string;
   username: string | null;

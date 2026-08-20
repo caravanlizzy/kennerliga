@@ -38,7 +38,7 @@ CATEGORY_DEFS = [
     {
         "key": "career_performance",
         "label": "Career League Performance",
-        "description": "Weighted by how high you've climbed - any L1 result outranks every lower league.",
+        "description": "Highest league you've reached, with total league points as a tie-break - any L1 result outranks every lower league.",
         "unit": "pts",
         "better": "higher",
         "rate_based": False,
@@ -280,6 +280,14 @@ def _rank_players(players, value_key, better, min_games=None):
     return ranked
 
 
+def _format_points(points):
+    """Formats league points without a trailing ".0" (e.g. 24 not 24.0)."""
+    rounded = round(float(points), 2)
+    if rounded == int(rounded):
+        return str(int(rounded))
+    return f"{rounded:g}"
+
+
 def _rank_career(players):
     """
     Dense-ranks players by career *league performance* using a strict
@@ -287,9 +295,10 @@ def _rank_career(players):
     L2, which dominates L3, and so on. Merely participating in a level
     (having any standing there) already outranks anyone who never reached
     it; within the same level, accumulated league points break the tie
-    before falling through to the next level. The displayed `value` is the
-    player's total career league points (a readable number), while ordering
-    follows the level-weighted rule.
+    before falling through to the next level. The displayed value is a
+    readable label -- the highest league reached plus total league points,
+    e.g. "L1 \u00b7 24 pts" -- so the shown number always agrees with the
+    highest-league-first ranking instead of a bare points total.
     """
     eligible = [p for p in players if p.get("leagues_played", 0) > 0]
     if not eligible:
@@ -324,7 +333,22 @@ def _rank_career(players):
         if key != previous_key:
             rank += 1
             previous_key = key
-        ranked.append({**player, "rank": rank, "value": player["career_performance"]})
+        # Highest league reached is the smallest level number (L1 is top).
+        # The card shows this as the primary metric ("L1"), with total
+        # league points as a readable detail ("L1 · 24 pts"), so the number
+        # on the card always matches the highest-league-first ranking.
+        best_level = min(player["reached_levels"])
+        points = player["career_performance"]
+        display = f"L{best_level} · {_format_points(points)} pts"
+        ranked.append(
+            {
+                **player,
+                "rank": rank,
+                "value": player["career_performance"],
+                "best_level": best_level,
+                "display": display,
+            }
+        )
     return ranked
 
 
@@ -332,6 +356,9 @@ def _entry(player, is_me):
     return {
         "rank": player["rank"],
         "value": player["value"],
+        # Optional pre-formatted label (e.g. "L1 · 24 pts" for the career
+        # metric); the card shows it verbatim when present.
+        "display": player.get("display"),
         "profile_id": player["profile_id"],
         "profile_name": player["profile_name"],
         "username": player["username"],
@@ -344,6 +371,7 @@ def _unranked_me_entry(profile, raw_value):
     return {
         "rank": None,
         "value": raw_value,
+        "display": None,
         "profile_id": profile.id,
         "profile_name": profile.profile_name,
         "username": profile.user.username if profile.user else None,

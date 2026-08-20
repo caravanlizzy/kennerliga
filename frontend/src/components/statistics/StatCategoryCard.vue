@@ -15,89 +15,66 @@
     </q-card-section>
 
     <q-card-section class="q-pt-sm">
+      <div v-if="rows.length === 0" class="text-caption text-grey-6 q-pa-sm">
+        Not enough data to rank players yet.
+      </div>
+
+      <!-- A single continuous ranking: the top players and the requesting
+           player's neighbourhood are one list. The player's own row is only
+           highlighted (no separate "You" section), and a divider marks any
+           ranks skipped between the two ends. -->
+      <template v-else>
+        <template v-for="row in rows" :key="row.key">
+          <div v-if="row.type === 'gap'" class="gap-separator row items-center q-my-sm">
+            <q-separator class="col" />
+            <span class="gap-separator__label text-caption text-grey-6">
+              <q-icon name="more_vert" size="14px" />
+              {{ row.count }} more
+            </span>
+            <q-separator class="col" />
+          </div>
+          <div
+            v-else
+            class="rank-row row items-center justify-between"
+            :class="{ 'rank-row--me': row.entry.is_me }"
+          >
+            <div class="row items-center no-wrap q-gutter-x-sm">
+              <span class="rank-badge" :class="medalClass(row.entry.rank)">{{ row.entry.rank }}</span>
+              <span :class="{ 'text-weight-bolder': row.entry.is_me }">{{ row.entry.profile_name }}</span>
+            </div>
+            <span class="text-weight-bold">
+              {{ row.entry.display ?? formatStatValue(category.key, category.unit, row.entry.value) }}
+            </span>
+          </div>
+        </template>
+      </template>
+
+      <!-- The player has data but not enough to be formally ranked: show
+           their standing on its own highlighted row, without a heading. -->
       <div
-        class="me-row row items-center justify-between q-pa-sm q-mb-sm rounded-borders"
-        :class="category.me.eligible ? 'me-row--ranked' : 'me-row--unranked'"
+        v-if="!category.me.eligible"
+        class="rank-row rank-row--me row items-center justify-between q-mt-sm"
       >
         <div class="row items-center no-wrap q-gutter-x-sm">
-          <q-avatar size="26px" color="primary" text-color="white" class="text-weight-bold text-caption">
-            {{ category.me.rank ?? '-' }}
-          </q-avatar>
-          <span class="text-weight-bold">You</span>
+          <span class="rank-badge">{{ category.me.rank ?? '–' }}</span>
+          <span class="text-weight-bolder">{{ category.me.profile_name }}</span>
         </div>
-        <div v-if="category.me.eligible" class="text-weight-bolder">
-          {{ formatStatValue(category.key, category.unit, category.me.value) }}
-        </div>
-        <div v-else class="text-caption text-grey-6 text-right">
-          <template v-if="category.me.value !== null">
+        <div class="text-caption text-grey-6 text-right">
+          <template v-if="category.me.display">{{ category.me.display }} so far</template>
+          <template v-else-if="category.me.value !== null">
             {{ formatStatValue(category.key, category.unit, category.me.value) }} so far
           </template>
           <template v-else>No data yet</template>
           <div v-if="category.min_games">Need {{ category.min_games }}+ games to rank</div>
         </div>
       </div>
-
-      <div v-if="category.top.length === 0" class="text-caption text-grey-6 q-pa-sm">
-        Not enough data to rank players yet.
-      </div>
-
-      <template v-else>
-        <div class="text-caption text-weight-bold text-grey-7 text-uppercase q-mb-xs">
-          Top Players
-        </div>
-        <div
-          v-for="entry in category.top"
-          :key="'top-' + entry.profile_id"
-          class="rank-row row items-center justify-between"
-          :class="{ 'rank-row--me': entry.is_me }"
-        >
-          <div class="row items-center no-wrap q-gutter-x-sm">
-            <span class="rank-badge" :class="medalClass(entry.rank)">{{ entry.rank }}</span>
-            <span :class="{ 'text-weight-bolder': entry.is_me }">{{ entry.profile_name }}</span>
-          </div>
-          <span class="text-weight-bold">
-            {{ formatStatValue(category.key, category.unit, entry.value) }}
-          </span>
-        </div>
-
-        <template v-if="visibleAroundMe.length > 0">
-          <!-- When the player's neighbourhood is not adjacent to the top
-               list, show a divider that makes the skipped ranks obvious. -->
-          <div v-if="hasGap" class="gap-separator row items-center q-my-sm">
-            <q-separator class="col" />
-            <span class="gap-separator__label text-caption text-grey-6">
-              <q-icon name="more_vert" size="14px" />
-              {{ gapCount }} more
-            </span>
-            <q-separator class="col" />
-          </div>
-          <q-separator v-else class="q-my-sm" />
-          <div class="text-caption text-weight-bold text-grey-7 text-uppercase q-mb-xs">
-            Around You
-          </div>
-          <div
-            v-for="entry in visibleAroundMe"
-            :key="'around-' + entry.profile_id"
-            class="rank-row row items-center justify-between"
-            :class="{ 'rank-row--me': entry.is_me }"
-          >
-            <div class="row items-center no-wrap q-gutter-x-sm">
-              <span class="rank-badge">{{ entry.rank }}</span>
-              <span :class="{ 'text-weight-bolder': entry.is_me }">{{ entry.profile_name }}</span>
-            </div>
-            <span class="text-weight-bold">
-              {{ formatStatValue(category.key, category.unit, entry.value) }}
-            </span>
-          </div>
-        </template>
-      </template>
     </q-card-section>
   </q-card>
 </template>
 
 <script setup lang="ts">
 import { computed } from 'vue';
-import { TStatCategory } from 'src/types';
+import { TStatCategory, TStatEntry } from 'src/types';
 import { formatStatValue } from 'src/composables/statFormat';
 
 const props = defineProps<{ category: TStatCategory }>();
@@ -143,6 +120,32 @@ const gapCount = computed(() =>
   aroundFirstRank.value !== null ? aroundFirstRank.value - topLastRank.value - 1 : 0
 );
 
+// Flatten the top list and the player's neighbourhood into one ordered
+// stream of rows so the template renders a single continuous ranking. A
+// `gap` row is inserted only when ranks are skipped between the two ends.
+type TRankRow =
+  | { type: 'entry'; key: string; entry: TStatEntry }
+  | { type: 'gap'; key: string; count: number };
+
+const rows = computed<TRankRow[]>(() => {
+  const result: TRankRow[] = props.category.top.map((entry) => ({
+    type: 'entry',
+    key: 'top-' + entry.profile_id,
+    entry,
+  }));
+
+  if (visibleAroundMe.value.length > 0) {
+    if (hasGap.value) {
+      result.push({ type: 'gap', key: 'gap', count: gapCount.value });
+    }
+    for (const entry of visibleAroundMe.value) {
+      result.push({ type: 'entry', key: 'around-' + entry.profile_id, entry });
+    }
+  }
+
+  return result;
+});
+
 function medalClass(rank: number | null): string {
   if (rank === 1) return 'rank-badge--gold';
   if (rank === 2) return 'rank-badge--silver';
@@ -161,16 +164,6 @@ function medalClass(rank: number | null): string {
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-}
-
-.me-row {
-  background: rgba(99, 102, 241, 0.06);
-  border: 1px solid rgba(99, 102, 241, 0.15);
-}
-
-.me-row--unranked {
-  background: rgba(0, 0, 0, 0.03);
-  border: 1px solid rgba(0, 0, 0, 0.06);
 }
 
 .rank-row {
