@@ -1,6 +1,7 @@
 import { RouteRecordRaw } from 'vue-router';
 import gameRoutes from 'src/router/gameRoutes';
 import userRoutes from 'src/router/userRoutes';
+import statisticsRoutes from 'src/router/statisticsRoutes';
 // This can be directly added to any of your `.ts` files like `router.ts`
 // It can also be added to a `.d.ts` file. Make sure it's included in
 // project's tsconfig.json "files"
@@ -110,6 +111,7 @@ const routes: RouteRecordRaw[] = [
         meta: { icon: 'home', label: 'Home' },
       },
       userRoutes,
+      statisticsRoutes,
       {
         path: 'users',
         redirect: '/players',

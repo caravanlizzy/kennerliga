@@ -1,0 +1,441 @@
+"""
+Aggregation and ranking logic backing the player/game statistics dashboard.
+
+This module intentionally owns no models of its own: it only reads from
+`result.Result` and `league.LeagueStanding`, which already hold all the raw
+data a player-facing statistics page needs. Keeping the logic here (rather
+than on the models or in the view) mirrors the separation already used by
+`user.service.get_user_summary_stats`.
+"""
+from django.db.models import Avg, Count, Min, Q, Sum
+
+from league.models import LeagueStanding
+from result.models import Result
+from user.models import PlayerProfile
+
+DEFAULT_MIN_GAMES = 3
+DEFAULT_WINDOW = 2
+DEFAULT_TOP_N = 5
+DEFAULT_GAME_MIN_GAMES = 2
+
+# Each category key must match a key present in the player dicts built by
+# `_build_player_pool`. `rate_based` categories only make sense with a
+# minimum sample size (win rate/avg position on 1 game is noise), so a
+# `min_games` threshold is applied to them before ranking.
+CATEGORY_DEFS = [
+    {
+        "key": "league_points",
+        "label": "Career League Points",
+        "description": "Total league points earned across all leagues.",
+        "unit": "pts",
+        "better": "higher",
+        "rate_based": False,
+    },
+    {
+        "key": "total_wins",
+        "label": "Total Wins",
+        "description": "Total number of games won.",
+        "unit": "",
+        "better": "higher",
+        "rate_based": False,
+    },
+    {
+        "key": "podiums",
+        "label": "Podium Finishes",
+        "description": "Total number of top-3 finishes.",
+        "unit": "",
+        "better": "higher",
+        "rate_based": False,
+    },
+    {
+        "key": "win_rate",
+        "label": "Win Rate",
+        "description": "Percentage of played games won.",
+        "unit": "%",
+        "better": "higher",
+        "rate_based": True,
+    },
+    {
+        "key": "avg_position",
+        "label": "Average Position",
+        "description": "Average finishing position across all games (lower is better).",
+        "unit": "",
+        "better": "lower",
+        "rate_based": True,
+    },
+    {
+        "key": "games_played",
+        "label": "Games Played",
+        "description": "Total number of games played.",
+        "unit": "",
+        "better": "higher",
+        "rate_based": False,
+    },
+    {
+        "key": "best_league_level",
+        "label": "Best League Reached",
+        "description": "Highest league level ever competed in (L1 is the top league).",
+        "unit": "",
+        "better": "lower",
+        "rate_based": False,
+    },
+]
+
+
+def parse_years(raw):
+    """
+    Accepts a comma-separated string, list/tuple/set of ints/strings, or
+    None, and returns a list of ints (or None if nothing usable was found).
+    Mirrors the `years` parsing already used by `user.views.user_statistics`.
+    """
+    if not raw:
+        return None
+    tokens = raw.split(",") if isinstance(raw, str) else raw
+    years = [int(str(token).strip()) for token in tokens if str(token).strip().isdigit()]
+    return years or None
+
+
+def _build_player_pool(years=None):
+    """
+    Returns one dict per player who has at least one Result or
+    LeagueStanding, merging per-game Result aggregates with per-league
+    LeagueStanding aggregates into a single flat set of fields that the
+    categories above rank on directly.
+    """
+    result_qs = Result.objects.all()
+    if years:
+        result_qs = result_qs.filter(season__year__in=years)
+
+    result_rows = result_qs.values("player_profile_id").annotate(
+        games_played=Count("id"),
+        total_wins=Count("id", filter=Q(position=1)),
+        podiums=Count("id", filter=Q(position__isnull=False, position__lte=3)),
+        avg_position=Avg("position"),
+    )
+
+    standing_qs = LeagueStanding.objects.all()
+    if years:
+        standing_qs = standing_qs.filter(league__season__year__in=years)
+
+    standing_rows = standing_qs.values("player_profile_id").annotate(
+        league_points=Sum("league_points"),
+        leagues_played=Count("id", distinct=True),
+        best_league_level=Min("league__level"),
+    )
+
+    pool = {}
+
+    def blank_entry():
+        return {
+            "games_played": 0,
+            "total_wins": 0,
+            "podiums": 0,
+            "avg_position": None,
+            "league_points": 0.0,
+            "leagues_played": 0,
+            "best_league_level": None,
+        }
+
+    for row in result_rows:
+        entry = pool.setdefault(row["player_profile_id"], blank_entry())
+        entry["games_played"] = row["games_played"] or 0
+        entry["total_wins"] = row["total_wins"] or 0
+        entry["podiums"] = row["podiums"] or 0
+        entry["avg_position"] = (
+            float(row["avg_position"]) if row["avg_position"] is not None else None
+        )
+
+    for row in standing_rows:
+        entry = pool.setdefault(row["player_profile_id"], blank_entry())
+        entry["league_points"] = float(row["league_points"] or 0)
+        entry["leagues_played"] = row["leagues_played"] or 0
+        entry["best_league_level"] = row["best_league_level"]
+
+    if not pool:
+        return []
+
+    profiles = PlayerProfile.objects.filter(id__in=pool.keys()).select_related("user")
+
+    players = []
+    for profile in profiles:
+        entry = pool[profile.id]
+        games_played = entry["games_played"]
+        win_rate = (
+            round(entry["total_wins"] / games_played * 100, 1) if games_played > 0 else None
+        )
+        players.append(
+            {
+                "profile_id": profile.id,
+                "profile_name": profile.profile_name,
+                "username": profile.user.username if profile.user else None,
+                "games_played": games_played,
+                "total_wins": entry["total_wins"],
+                "podiums": entry["podiums"],
+                "avg_position": (
+                    round(entry["avg_position"], 2) if entry["avg_position"] is not None else None
+                ),
+                "league_points": entry["league_points"],
+                "leagues_played": entry["leagues_played"],
+                "best_league_level": entry["best_league_level"],
+                "win_rate": win_rate,
+            }
+        )
+    return players
+
+
+def _rank_players(players, value_key, better, min_games=None):
+    """
+    Dense-ranks players by `value_key`: tied players share a rank and the
+    next distinct value takes the next rank (matching the dense-rank
+    convention already used by `league.models.GameStanding.rank`). Players
+    with a None value, or below `min_games` games played, are left out of
+    the ranking entirely so a single lucky game can't top a rate-based
+    leaderboard.
+    """
+    eligible = [p for p in players if p.get(value_key) is not None]
+    if min_games:
+        eligible = [p for p in eligible if p.get("games_played", 0) >= min_games]
+
+    def sort_key(player):
+        value = player[value_key]
+        primary = -value if better == "higher" else value
+        return (primary, player["profile_name"].lower())
+
+    eligible.sort(key=sort_key)
+
+    ranked = []
+    rank = 0
+    previous_value = object()
+    for player in eligible:
+        value = player[value_key]
+        if value != previous_value:
+            rank += 1
+            previous_value = value
+        ranked.append({**player, "rank": rank, "value": value})
+    return ranked
+
+
+def _entry(player, is_me):
+    return {
+        "rank": player["rank"],
+        "value": player["value"],
+        "profile_id": player["profile_id"],
+        "profile_name": player["profile_name"],
+        "username": player["username"],
+        "is_me": is_me,
+        "eligible": True,
+    }
+
+
+def _unranked_me_entry(profile, raw_value):
+    return {
+        "rank": None,
+        "value": raw_value,
+        "profile_id": profile.id,
+        "profile_name": profile.profile_name,
+        "username": profile.user.username if profile.user else None,
+        "is_me": True,
+        "eligible": False,
+    }
+
+
+def get_statistics_overview(
+    profile,
+    years=None,
+    min_games=DEFAULT_MIN_GAMES,
+    window=DEFAULT_WINDOW,
+    top_n=DEFAULT_TOP_N,
+):
+    """
+    Builds, for every category in CATEGORY_DEFS, the top N players plus a
+    window of players surrounding `profile`'s own rank, so a player can
+    always see the best players AND exactly where they themselves stand --
+    even if they don't have enough games played to be formally ranked.
+    """
+    players = _build_player_pool(years=years)
+    me_raw = next((p for p in players if p["profile_id"] == profile.id), None)
+
+    categories = []
+    for definition in CATEGORY_DEFS:
+        threshold = min_games if definition["rate_based"] else None
+        ranked = _rank_players(players, definition["key"], definition["better"], min_games=threshold)
+
+        top = [_entry(p, p["profile_id"] == profile.id) for p in ranked[:top_n]]
+
+        me_index = next((i for i, p in enumerate(ranked) if p["profile_id"] == profile.id), None)
+        if me_index is not None:
+            lo = max(0, me_index - window)
+            hi = min(len(ranked), me_index + window + 1)
+            around_me = [_entry(p, p["profile_id"] == profile.id) for p in ranked[lo:hi]]
+            me_summary = around_me[me_index - lo]
+        else:
+            around_me = []
+            raw_value = me_raw[definition["key"]] if me_raw else None
+            me_summary = _unranked_me_entry(profile, raw_value)
+
+        categories.append(
+            {
+                "key": definition["key"],
+                "label": definition["label"],
+                "description": definition["description"],
+                "unit": definition["unit"],
+                "better": definition["better"],
+                "min_games": threshold,
+                "total_ranked": len(ranked),
+                "me": me_summary,
+                "top": top,
+                "around_me": around_me,
+            }
+        )
+
+    return {
+        "min_games": min_games,
+        "window": window,
+        "categories": categories,
+    }
+
+
+def list_games_with_stats(years=None):
+    """
+    Returns every game that has at least one recorded result, with basic
+    popularity stats, for use as a picker for the per-game leaderboard.
+    """
+    qs = Result.objects.select_related("selected_game__game__platform")
+    if years:
+        qs = qs.filter(season__year__in=years)
+
+    rows = (
+        qs.values(
+            "selected_game__game_id",
+            "selected_game__game__name",
+            "selected_game__game__platform__name",
+        )
+        .annotate(
+            games_played=Count("id"),
+            distinct_players=Count("player_profile", distinct=True),
+        )
+        .order_by("-games_played", "selected_game__game__name")
+    )
+
+    return [
+        {
+            "game_id": row["selected_game__game_id"],
+            "name": row["selected_game__game__name"],
+            "platform": row["selected_game__game__platform__name"],
+            "games_played": row["games_played"],
+            "distinct_players": row["distinct_players"],
+        }
+        for row in rows
+        if row["selected_game__game_id"] is not None
+    ]
+
+
+def get_game_leaderboard(game, profile, years=None, min_games=DEFAULT_GAME_MIN_GAMES):
+    """
+    Ranks every player who has played `game`, ordered by win rate (desc)
+    then average position (asc) as a tie-break -- the same "most wins, then
+    most consistent" ordering already used to pick a player's `top_games` in
+    `user.views.UserViewSet.user_statistics`. Players below `min_games` are
+    excluded from the ranking (too few games to mean anything) but the
+    requesting player's own row is always returned separately via `me`.
+    """
+    qs = Result.objects.filter(selected_game__game=game)
+    if years:
+        qs = qs.filter(season__year__in=years)
+
+    rows = qs.values("player_profile_id").annotate(
+        games_played=Count("id"),
+        wins=Count("id", filter=Q(position=1)),
+        podiums=Count("id", filter=Q(position__isnull=False, position__lte=3)),
+        avg_position=Avg("position"),
+    )
+
+    profile_map = {
+        p.id: p
+        for p in PlayerProfile.objects.filter(
+            id__in=[row["player_profile_id"] for row in rows]
+        ).select_related("user")
+    }
+
+    players = []
+    for row in rows:
+        p = profile_map.get(row["player_profile_id"])
+        if not p:
+            continue
+        played = row["games_played"] or 0
+        wins = row["wins"] or 0
+        players.append(
+            {
+                "profile_id": p.id,
+                "profile_name": p.profile_name,
+                "username": p.user.username if p.user else None,
+                "games_played": played,
+                "wins": wins,
+                "podiums": row["podiums"] or 0,
+                "avg_position": (
+                    round(float(row["avg_position"]), 2)
+                    if row["avg_position"] is not None
+                    else None
+                ),
+                "win_rate": round(wins / played * 100, 1) if played > 0 else None,
+            }
+        )
+
+    eligible = [p for p in players if p["games_played"] >= min_games]
+    excluded_low_sample_count = len(players) - len(eligible)
+
+    def sort_key(player):
+        return (
+            -(player["win_rate"] or 0),
+            player["avg_position"] if player["avg_position"] is not None else float("inf"),
+            -player["games_played"],
+            player["profile_name"].lower(),
+        )
+
+    eligible.sort(key=sort_key)
+
+    leaderboard = []
+    rank = 0
+    previous_key = None
+    for player in eligible:
+        key = (player["win_rate"], player["avg_position"])
+        if key != previous_key:
+            rank += 1
+            previous_key = key
+        leaderboard.append(
+            {
+                **player,
+                "rank": rank,
+                "is_me": player["profile_id"] == profile.id,
+                "eligible": True,
+            }
+        )
+
+    me_entry = next((row for row in leaderboard if row["profile_id"] == profile.id), None)
+    if me_entry is None:
+        raw = next((p for p in players if p["profile_id"] == profile.id), None)
+        me_entry = {
+            **(raw or {
+                "profile_id": profile.id,
+                "profile_name": profile.profile_name,
+                "username": profile.user.username if profile.user else None,
+                "games_played": 0,
+                "wins": 0,
+                "podiums": 0,
+                "avg_position": None,
+                "win_rate": None,
+            }),
+            "rank": None,
+            "is_me": True,
+            "eligible": False,
+        }
+
+    return {
+        "game_id": game.id,
+        "name": game.name,
+        "platform": game.platform.name,
+        "min_games": min_games,
+        "excluded_low_sample_count": excluded_low_sample_count,
+        "leaderboard": leaderboard,
+        "me": me_entry,
+    }

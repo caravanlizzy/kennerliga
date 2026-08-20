@@ -57,6 +57,7 @@ MY_APPS = [
     "result",
     "user",
     "taskboard",
+    "statistic",
     "api",
 ]
 
