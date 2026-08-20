@@ -12,6 +12,7 @@ from statistic.services import (
     get_statistics_overview,
     list_games_with_stats,
     parse_years,
+    parse_player_counts,
 )
 
 
@@ -38,12 +39,18 @@ class StatisticsOverviewView(APIView):
     def get(self, request):
         profile = request.user.profile
         years = parse_years(request.query_params.get("years"))
+        player_counts = parse_player_counts(request.query_params.get("player_count"))
         min_games = max(0, _int_param(request, "min_games", DEFAULT_MIN_GAMES))
         window = max(1, min(5, _int_param(request, "window", DEFAULT_WINDOW)))
         top_n = max(1, min(20, _int_param(request, "top_n", DEFAULT_TOP_N)))
 
         data = get_statistics_overview(
-            profile, years=years, min_games=min_games, window=window, top_n=top_n
+            profile,
+            years=years,
+            player_counts=player_counts,
+            min_games=min_games,
+            window=window,
+            top_n=top_n,
         )
         return Response(data)
 
@@ -58,7 +65,8 @@ class GameStatisticsListView(APIView):
 
     def get(self, request):
         years = parse_years(request.query_params.get("years"))
-        return Response(list_games_with_stats(years=years))
+        player_counts = parse_player_counts(request.query_params.get("player_count"))
+        return Response(list_games_with_stats(years=years, player_counts=player_counts))
 
 
 class GameLeaderboardView(APIView):
@@ -73,7 +81,10 @@ class GameLeaderboardView(APIView):
         game = get_object_or_404(Game, pk=game_id)
         profile = request.user.profile
         years = parse_years(request.query_params.get("years"))
+        player_counts = parse_player_counts(request.query_params.get("player_count"))
         min_games = max(0, _int_param(request, "min_games", DEFAULT_GAME_MIN_GAMES))
 
-        data = get_game_leaderboard(game, profile, years=years, min_games=min_games)
+        data = get_game_leaderboard(
+            game, profile, years=years, player_counts=player_counts, min_games=min_games
+        )
         return Response(data)

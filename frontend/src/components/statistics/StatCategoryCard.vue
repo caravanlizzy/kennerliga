@@ -61,7 +61,17 @@
         </div>
 
         <template v-if="visibleAroundMe.length > 0">
-          <q-separator class="q-my-sm" />
+          <!-- When the player's neighbourhood is not adjacent to the top
+               list, show a divider that makes the skipped ranks obvious. -->
+          <div v-if="hasGap" class="gap-separator row items-center q-my-sm">
+            <q-separator class="col" />
+            <span class="gap-separator__label text-caption text-grey-6">
+              <q-icon name="more_vert" size="14px" />
+              {{ gapCount }} more
+            </span>
+            <q-separator class="col" />
+          </div>
+          <q-separator v-else class="q-my-sm" />
           <div class="text-caption text-weight-bold text-grey-7 text-uppercase q-mb-xs">
             Around You
           </div>
@@ -93,13 +103,10 @@ import { formatStatValue } from 'src/composables/statFormat';
 const props = defineProps<{ category: TStatCategory }>();
 
 const ICONS: Record<string, string> = {
-  league_points: 'military_tech',
-  total_wins: 'emoji_events',
-  podiums: 'workspace_premium',
+  career_performance: 'military_tech',
   win_rate: 'percent',
   avg_position: 'trending_up',
   games_played: 'sports_esports',
-  best_league_level: 'shield',
 };
 
 const icon = computed(() => ICONS[props.category.key] ?? 'insights');
@@ -110,6 +117,31 @@ const visibleAroundMe = computed(() => {
   const topRanks = new Set(props.category.top.map((entry) => entry.rank));
   return props.category.around_me.filter((entry) => !topRanks.has(entry.rank));
 });
+
+// A gap exists when the highest-ranked "around me" row does not directly
+// follow the last row already shown in the top list -- i.e. there are
+// players in between that neither section displays.
+const topLastRank = computed(() => {
+  const ranks = props.category.top
+    .map((entry) => entry.rank)
+    .filter((rank): rank is number => rank !== null);
+  return ranks.length > 0 ? Math.max(...ranks) : 0;
+});
+
+const aroundFirstRank = computed(() => {
+  const ranks = visibleAroundMe.value
+    .map((entry) => entry.rank)
+    .filter((rank): rank is number => rank !== null);
+  return ranks.length > 0 ? Math.min(...ranks) : null;
+});
+
+const hasGap = computed(
+  () => aroundFirstRank.value !== null && aroundFirstRank.value > topLastRank.value + 1
+);
+
+const gapCount = computed(() =>
+  aroundFirstRank.value !== null ? aroundFirstRank.value - topLastRank.value - 1 : 0
+);
 
 function medalClass(rank: number | null): string {
   if (rank === 1) return 'rank-badge--gold';
@@ -176,5 +208,17 @@ function medalClass(rank: number | null): string {
 .rank-badge--bronze {
   background: #d99a63;
   color: #3d2306;
+}
+
+.gap-separator {
+  gap: 8px;
+}
+
+.gap-separator__label {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  white-space: nowrap;
+  font-style: italic;
 }
 </style>

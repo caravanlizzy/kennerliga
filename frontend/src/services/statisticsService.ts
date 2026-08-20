@@ -3,6 +3,7 @@ import { TGameLeaderboard, TGameStatSummary, TStatisticsOverview } from 'src/typ
 
 export type TStatisticsFilters = {
   years?: number[];
+  playerCounts?: string[];
   minGames?: number;
   window?: number;
   topN?: number;
@@ -12,6 +13,9 @@ function toQueryParams(filters?: TStatisticsFilters): Record<string, string | nu
   const params: Record<string, string | number> = {};
   if (filters?.years && filters.years.length > 0) {
     params.years = filters.years.join(',');
+  }
+  if (filters?.playerCounts && filters.playerCounts.length > 0) {
+    params.player_count = filters.playerCounts.join(',');
   }
   if (filters?.minGames !== undefined) {
     params.min_games = filters.minGames;
@@ -39,11 +43,19 @@ export async function fetchStatisticsOverview(
   }
 }
 
-export async function fetchGameStatsList(years?: number[]): Promise<TGameStatSummary[]> {
+export async function fetchGameStatsList(
+  years?: number[],
+  playerCounts?: string[]
+): Promise<TGameStatSummary[]> {
   try {
-    const { data } = await api.get<TGameStatSummary[]>('statistics/games/', {
-      params: years && years.length > 0 ? { years: years.join(',') } : {},
-    });
+    const params: Record<string, string> = {};
+    if (years && years.length > 0) {
+      params.years = years.join(',');
+    }
+    if (playerCounts && playerCounts.length > 0) {
+      params.player_count = playerCounts.join(',');
+    }
+    const { data } = await api.get<TGameStatSummary[]>('statistics/games/', { params });
     return data;
   } catch (e) {
     console.log(e);
@@ -54,12 +66,16 @@ export async function fetchGameStatsList(years?: number[]): Promise<TGameStatSum
 export async function fetchGameLeaderboard(
   gameId: number,
   years?: number[],
+  playerCounts?: string[],
   minGames?: number
 ): Promise<TGameLeaderboard | null> {
   try {
     const params: Record<string, string | number> = {};
     if (years && years.length > 0) {
       params.years = years.join(',');
+    }
+    if (playerCounts && playerCounts.length > 0) {
+      params.player_count = playerCounts.join(',');
     }
     if (minGames !== undefined) {
       params.min_games = minGames;

@@ -18,23 +18,68 @@
       </div>
     </div>
 
-    <div v-if="loadingOverview" class="row q-col-gutter-md q-mb-lg">
-      <div v-for="i in 6" :key="i" class="col-12 col-sm-6 col-md-4">
-        <q-skeleton type="rect" height="240px" class="rounded-borders" />
+    <!-- Player-count filter, mirroring the chips on the players list. -->
+    <div class="row items-center q-gutter-x-sm q-mb-md">
+      <div class="row items-center text-caption text-weight-bold text-grey-8">
+        <q-icon name="groups" size="18px" class="q-mr-xs text-primary" />
+        <span>Players:</span>
+      </div>
+      <div class="row q-gutter-xs items-center">
+        <q-chip
+          clickable
+          dense
+          :outline="!isAllPlayerCountsSelected"
+          :color="isAllPlayerCountsSelected ? 'primary' : 'grey-7'"
+          text-color="white"
+          size="sm"
+          class="text-weight-bold"
+          style="border-radius: 4px"
+          @click="toggleAllPlayerCounts"
+        >
+          All
+        </q-chip>
+        <q-chip
+          v-for="pc in availablePlayerCounts"
+          :key="pc"
+          clickable
+          dense
+          :outline="!selectedPlayerCounts.includes(pc)"
+          :color="selectedPlayerCounts.includes(pc) ? 'primary' : 'grey-7'"
+          text-color="white"
+          size="sm"
+          class="text-weight-bold"
+          style="border-radius: 4px"
+          @click="togglePlayerCount(pc)"
+        >
+          {{ pc.toUpperCase() }}
+        </q-chip>
       </div>
     </div>
 
-    <div v-else class="row q-col-gutter-md q-mb-lg">
-      <div
-        v-for="category in overview?.categories ?? []"
-        :key="category.key"
-        class="col-12 col-sm-6 col-md-4"
-      >
-        <StatCategoryCard :category="category" />
-      </div>
-    </div>
+    <!-- Split layout: ranking categories on the left, the per-game
+         leaderboard pinned top-right so it is visible without scrolling
+         past all the category cards first. -->
+    <div class="row q-col-gutter-md">
+      <div class="col-12 col-md-8 order-last order-md-first">
+        <div v-if="loadingOverview" class="row q-col-gutter-md">
+          <div v-for="i in 4" :key="i" class="col-12 col-sm-6">
+            <q-skeleton type="rect" height="240px" class="rounded-borders" />
+          </div>
+        </div>
 
-    <q-card flat bordered>
+        <div v-else class="row q-col-gutter-md">
+          <div
+            v-for="category in overview?.categories ?? []"
+            :key="category.key"
+            class="col-12 col-sm-6"
+          >
+            <StatCategoryCard :category="category" />
+          </div>
+        </div>
+      </div>
+
+      <div class="col-12 col-md-4 order-first order-md-last">
+        <q-card flat bordered class="game-stats-card">
       <q-card-section class="q-pb-none">
         <div class="row items-center no-wrap">
           <div class="stat-icon-box q-mr-sm">
@@ -127,7 +172,9 @@
           Search for a game above to see its leaderboard.
         </div>
       </q-card-section>
-    </q-card>
+        </q-card>
+      </div>
+    </div>
   </q-page>
 </template>
 
@@ -155,6 +202,32 @@ const yearsDisplayValue = computed(() =>
     ? 'All Time'
     : selectedYears.value.slice().sort((a, b) => b - a).join(', ')
 );
+
+// Player-count filter, mirroring UsersListPage: default to 4P, empty means
+// "All". A backend-friendly value (undefined when All) is derived below.
+const availablePlayerCounts = ['2p', '3p', '4p'];
+const selectedPlayerCounts = ref<string[]>(['4p']);
+const isAllPlayerCountsSelected = computed(() => selectedPlayerCounts.value.length === 0);
+const playerCountsParam = computed(() =>
+  selectedPlayerCounts.value.length > 0 ? selectedPlayerCounts.value : undefined
+);
+
+function togglePlayerCount(val: string) {
+  const idx = selectedPlayerCounts.value.indexOf(val);
+  if (idx >= 0) {
+    selectedPlayerCounts.value.splice(idx, 1);
+  } else {
+    selectedPlayerCounts.value.push(val);
+  }
+  // If every individual count is selected, collapse to "All" (empty array).
+  if (selectedPlayerCounts.value.length === availablePlayerCounts.length) {
+    selectedPlayerCounts.value = [];
+  }
+}
+
+function toggleAllPlayerCounts() {
+  selectedPlayerCounts.value = [];
+}
 
 const overview = ref<TStatisticsOverview | null>(null);
 const loadingOverview = ref(false);
@@ -190,14 +263,17 @@ const loadingLeaderboard = ref(false);
 async function loadOverview() {
   loadingOverview.value = true;
   try {
-    overview.value = await fetchStatisticsOverview({ years: selectedYears.value });
+    overview.value = await fetchStatisticsOverview({
+      years: selectedYears.value,
+      playerCounts: playerCountsParam.value,
+    });
   } finally {
     loadingOverview.value = false;
   }
 }
 
 async function loadGames() {
-  allGames.value = await fetchGameStatsList(selectedYears.value);
+  allGames.value = await fetchGameStatsList(selectedYears.value, playerCountsParam.value);
   filteredGameOptions.value = gameOptions.value;
 }
 
@@ -208,14 +284,18 @@ async function loadLeaderboard() {
   }
   loadingLeaderboard.value = true;
   try {
-    leaderboard.value = await fetchGameLeaderboard(selectedGameId.value, selectedYears.value);
+    leaderboard.value = await fetchGameLeaderboard(
+      selectedGameId.value,
+      selectedYears.value,
+      playerCountsParam.value
+    );
   } finally {
     loadingLeaderboard.value = false;
   }
 }
 
 watch(
-  selectedYears,
+  [selectedYears, selectedPlayerCounts],
   () => {
     void loadOverview();
     void loadGames();
@@ -280,13 +360,6 @@ const gameLeaderboardColumns = [
     format: (val: number | null) => (val !== null ? val.toFixed(2) : '-'),
     sortable: true,
   },
-  {
-    name: 'podiums',
-    label: 'Podiums',
-    align: 'right',
-    field: (row: { podiums: number }) => row.podiums,
-    sortable: true,
-  },
 ];
 </script>
 
@@ -314,5 +387,14 @@ const gameLeaderboardColumns = [
 
 .game-select {
   max-width: 420px;
+}
+
+// Keep the per-game panel visible while scrolling the (usually taller)
+// column of category cards next to it on wide screens.
+@media (min-width: 1024px) {
+  .game-stats-card {
+    position: sticky;
+    top: 16px;
+  }
 }
 </style>

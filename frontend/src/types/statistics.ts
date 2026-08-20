@@ -44,7 +44,6 @@ export type TGameLeaderboardEntry = {
   username: string | null;
   games_played: number;
   wins: number;
-  podiums: number;
   avg_position: number | null;
   win_rate: number | null;
   is_me: boolean;
