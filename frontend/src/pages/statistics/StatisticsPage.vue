@@ -74,7 +74,7 @@
 
         <div v-else class="row q-col-gutter-md">
           <div v-for="award in overview?.awards ?? []" :key="award.key" class="col-12 col-sm-6">
-            <StatAwardCard :award="award" />
+            <StatCategoryCard :category="award" />
           </div>
           <div
             v-for="category in overview?.categories ?? []"
@@ -233,7 +233,6 @@ defineOptions({ name: 'StatisticsPage' });
 import { computed, onMounted, ref, watch } from 'vue';
 import KennerSelect from 'components/base/KennerSelect.vue';
 import KennerTable from 'components/tables/KennerTable.vue';
-import StatAwardCard from 'components/statistics/StatAwardCard.vue';
 import StatCategoryCard from 'components/statistics/StatCategoryCard.vue';
 import { useUserStore } from 'stores/userStore';
 import {

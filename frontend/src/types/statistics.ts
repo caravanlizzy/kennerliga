@@ -28,20 +28,9 @@ export type TStatCategory = {
   around_me: TStatEntry[];
 };
 
-export type TAwardEntry = {
-  profile_id: number;
-  profile_name: string;
-  value: number;
-  is_me: boolean;
-};
-
-export type TAward = {
-  key: string;
-  label: string;
-  description: string;
-  unit: string;
-  top3: TAwardEntry[];
-};
+// The "fun" awards (Hater, Inspirer) are ranked and shaped identically to
+// the categories above, so both render through the same StatCategoryCard.
+export type TAward = TStatCategory;
 
 export type TStatisticsOverview = {
   min_games: number;

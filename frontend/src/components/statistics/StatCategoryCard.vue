@@ -2,8 +2,8 @@
   <q-card flat bordered class="stat-card full-height">
     <q-card-section class="q-pb-sm">
       <div class="row items-center no-wrap">
-        <div class="stat-icon-box q-mr-sm">
-          <q-icon :name="icon" color="primary" size="22px" />
+        <div class="stat-icon-box q-mr-sm" :style="{ background: accentColor + '14' }">
+          <q-icon :name="icon" :style="{ color: accentColor }" size="22px" />
         </div>
         <div class="column">
           <div class="text-subtitle1 text-weight-bolder text-dark line-height-1">
@@ -33,7 +33,7 @@
               >
                 {{ entry.profile_name }}
               </div>
-              <div class="podium-player__score">
+              <div class="podium-player__score" :style="{ color: accentColor }">
                 <template v-if="entry.best_level != null">
                   <LeagueLevel badge :level="entry.best_level" />
                   <div>{{ formatStatValue(category.key, category.unit, entry.value) }}</div>
@@ -68,7 +68,10 @@
                   <span class="rank-badge">{{ entry.rank }}</span>
                   <span :class="{ 'text-weight-bolder': entry.is_me }">{{ entry.profile_name }}</span>
                 </div>
-                <span class="row items-center no-wrap q-gutter-x-xs rank-row__value">
+                <span
+                  class="row items-center no-wrap q-gutter-x-xs rank-row__value"
+                  :style="{ color: accentColor }"
+                >
                   <template v-if="entry.best_level != null">
                     <LeagueLevel badge :level="entry.best_level" />
                     <span>{{ formatStatValue(category.key, category.unit, entry.value) }}</span>
@@ -138,9 +141,21 @@ const ICONS: Record<string, string> = {
   win_rate: 'percent',
   avg_position: 'trending_up',
   games_played: 'sports_esports',
+  hater: 'thumb_down',
+  inspirer: 'auto_awesome',
 };
 
+// The ranked categories all share the app's plain indigo accent; the "fun"
+// superlative awards (Hater, Inspirer) get their own, matching the app's
+// existing negative/accent palette (quasar.variables.scss).
+const ACCENT_COLORS: Record<string, string> = {
+  hater: '#d63a38',
+  inspirer: '#5e35b1',
+};
+const DEFAULT_ACCENT_COLOR = '#4338ca';
+
 const icon = computed(() => ICONS[props.category.key] ?? 'insights');
+const accentColor = computed(() => ACCENT_COLORS[props.category.key] ?? DEFAULT_ACCENT_COLOR);
 
 // Only the top 3 are shown as boxes -- mirrors the award podium cards.
 const top3 = computed(() => props.category.top.slice(0, 3));
@@ -240,7 +255,6 @@ const displayedRows = computed(() => (expanded.value ? restOfList.value : visibl
     font-size: 16px;
     font-weight: 800;
     margin-top: 4px;
-    color: #4338ca;
     font-variant-numeric: tabular-nums;
   }
 }
@@ -275,7 +289,6 @@ const displayedRows = computed(() => (expanded.value ? restOfList.value : visibl
 .rank-row__value {
   font-weight: 800;
   font-size: 14.5px;
-  color: #4338ca;
   font-variant-numeric: tabular-nums;
 }
 

@@ -28,12 +28,12 @@ DEFAULT_MIN_GAMES = 0
 DEFAULT_WINDOW = 1
 DEFAULT_TOP_N = 5
 DEFAULT_GAME_MIN_GAMES = 0
-DEFAULT_AWARD_TOP_N = 3
 
-# Fun "superlative" awards: a fixed top-N podium rather than a full ranking
-# (no min-games gate or "around me" window -- these are lighthearted counts,
-# not skill rankings). Each definition's `key` matches the award key
-# returned by `get_awards`.
+# Fun "superlative" awards: ranked the same way as the categories below (no
+# min-games gate, since these are lighthearted counts rather than skill
+# rankings) so they can share the same card -- top N, an "around me" window,
+# and a highlighted own-rank row. Each definition's `key` matches the award
+# key returned by `get_awards`.
 AWARD_DEFS = [
     {
         "key": "hater",
@@ -467,18 +467,22 @@ def get_statistics_overview(
         "min_games": min_games,
         "window": window,
         "categories": categories,
-        "awards": get_awards(profile, years=years, player_counts=player_counts),
+        "awards": get_awards(
+            profile, years=years, player_counts=player_counts, top_n=top_n, window=window
+        ),
     }
 
 
-def get_awards(profile, years=None, player_counts=None, top_n=DEFAULT_AWARD_TOP_N):
+def get_awards(
+    profile, years=None, player_counts=None, top_n=DEFAULT_TOP_N, window=DEFAULT_WINDOW
+):
     """
-    Builds the fun "superlative" awards podiums: the Hater (most games
-    banned, where skipping a ban doesn't count) and the Inspirer (most
-    `SelectedGame` picks made across leagues -- picking the same game again
-    in a different league still counts). Unlike the ranked categories
-    above, these are a fixed top-N with no min-games gate or "around me"
-    window -- just a lighthearted leaderboard.
+    Builds the fun "superlative" awards: the Hater (most games banned, where
+    skipping a ban doesn't count) and the Inspirer (most `SelectedGame`
+    picks made across leagues -- picking the same game again in a different
+    league still counts). Ranked the same way as the categories in
+    `get_statistics_overview` -- dense rank, top N plus a window around the
+    requesting player -- so they render through the same card.
     """
     ban_qs = BanDecision.objects.filter(skipped_ban=False, selected_game__isnull=False)
     if years:
@@ -504,28 +508,57 @@ def get_awards(profile, years=None, player_counts=None, top_n=DEFAULT_AWARD_TOP_
         for p in PlayerProfile.objects.filter(id__in=profile_ids).select_related("user")
     }
 
-    def top_entries(rows, id_key):
-        named = [(row, profile_map[row[id_key]]) for row in rows if row[id_key] in profile_map]
-        named.sort(key=lambda pair: (-pair[0]["value"], pair[1].profile_name.lower()))
-        return [
+    def rank_award(rows, id_key):
+        value_by_id = {row[id_key]: row["value"] for row in rows}
+        players = [
             {
-                "profile_id": player.id,
+                "profile_id": pid,
                 "profile_name": player.profile_name,
-                "value": row["value"],
-                "is_me": player.id == profile.id,
+                "username": player.user.username if player.user else None,
+                "value": value_by_id[pid],
             }
-            for row, player in named[:top_n]
+            for pid, player in profile_map.items()
+            if pid in value_by_id
         ]
+        ranked = _rank_players(players, "value", "higher")
 
-    entries_by_key = {
-        "hater": top_entries(ban_rows, "player_banning_id"),
-        "inspirer": top_entries(pick_rows, "profile_id"),
+        top = [_entry(p, p["profile_id"] == profile.id) for p in ranked[:top_n]]
+
+        me_index = next((i for i, p in enumerate(ranked) if p["profile_id"] == profile.id), None)
+        if me_index is not None:
+            lo = max(0, me_index - window)
+            hi = min(len(ranked), me_index + window + 1)
+            around_me = [_entry(p, p["profile_id"] == profile.id) for p in ranked[lo:hi]]
+            me_summary = around_me[me_index - lo]
+        else:
+            around_me = []
+            me_summary = _unranked_me_entry(profile, value_by_id.get(profile.id, 0))
+
+        return top, around_me, me_summary, len(ranked)
+
+    rankings_by_key = {
+        "hater": rank_award(ban_rows, "player_banning_id"),
+        "inspirer": rank_award(pick_rows, "profile_id"),
     }
 
-    return [
-        {**definition, "top3": entries_by_key[definition["key"]]}
-        for definition in AWARD_DEFS
-    ]
+    awards = []
+    for definition in AWARD_DEFS:
+        top, around_me, me_summary, total_ranked = rankings_by_key[definition["key"]]
+        awards.append(
+            {
+                "key": definition["key"],
+                "label": definition["label"],
+                "description": definition["description"],
+                "unit": definition["unit"],
+                "better": "higher",
+                "min_games": None,
+                "total_ranked": total_ranked,
+                "me": me_summary,
+                "top": top,
+                "around_me": around_me,
+            }
+        )
+    return awards
 
 
 def _best_player_by_game(qs):

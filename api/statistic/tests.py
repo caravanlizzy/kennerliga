@@ -2,7 +2,7 @@ from decimal import Decimal
 
 from django.test import TestCase
 
-from game.models import Game, SelectedGame
+from game.models import BanDecision, Game, SelectedGame
 from league.models import League, LeagueStanding
 from result.models import Result
 from season.models import Season
@@ -10,6 +10,7 @@ from statistic.services import (
     CATEGORY_DEFS,
     _build_player_pool,
     _rank_career,
+    get_awards,
     get_statistics_overview,
 )
 from user.models import PlayerProfile, Platform, User
@@ -52,6 +53,16 @@ class StatisticsServiceTestBase(TestCase):
                 position=position,
             )
         return selected_game
+
+    def make_ban(self, league, banner):
+        """Records one ban by `banner` in `league` (one per league, per the model's unique constraint)."""
+        game = Game.objects.create(
+            name=f"banned-{banner.profile_name}-{league.level}", platform=self.platform
+        )
+        selected_game = SelectedGame.objects.create(profile=banner, game=game, league=league)
+        return BanDecision.objects.create(
+            league=league, player_banning=banner, selected_game=selected_game
+        )
 
 
 class CareerPerformanceTests(StatisticsServiceTestBase):
@@ -177,3 +188,68 @@ class PlayerCountFilterTests(StatisticsServiceTestBase):
         # Only the 4-player league counts toward career points/levels.
         self.assertEqual(me_4p["league_points"], 6)
         self.assertEqual(me_4p["reached_levels"], {1})
+
+
+class AwardTests(StatisticsServiceTestBase):
+    def test_hater_award_is_ranked_like_a_category(self):
+        a = self.make_profile("A")
+        b = self.make_profile("B")
+        c = self.make_profile("C")
+        leagues = [self.make_league(level) for level in range(1, 4)]
+
+        # A bans in all three leagues (3 bans), B in two, C in one.
+        for league in leagues:
+            self.make_ban(league, a)
+        for league in leagues[:2]:
+            self.make_ban(league, b)
+        self.make_ban(leagues[0], c)
+
+        awards = get_awards(a, top_n=5, window=1)
+        hater = next(award for award in awards if award["key"] == "hater")
+
+        self.assertEqual(hater["better"], "higher")
+        self.assertIsNone(hater["min_games"])
+        self.assertEqual(hater["total_ranked"], 3)
+        self.assertEqual(
+            [(entry["profile_id"], entry["rank"], entry["value"]) for entry in hater["top"]],
+            [(a.id, 1, 3), (b.id, 2, 2), (c.id, 3, 1)],
+        )
+        self.assertTrue(hater["me"]["eligible"])
+        self.assertEqual(hater["me"]["rank"], 1)
+
+    def test_player_with_no_bans_gets_an_unranked_me_row(self):
+        a = self.make_profile("A")
+        d = self.make_profile("D")
+        league = self.make_league(1)
+        self.make_ban(league, a)
+
+        awards = get_awards(d, top_n=5, window=1)
+        hater = next(award for award in awards if award["key"] == "hater")
+
+        self.assertFalse(hater["me"]["eligible"])
+        self.assertIsNone(hater["me"]["rank"])
+        self.assertEqual(hater["me"]["value"], 0)
+        self.assertEqual(hater["around_me"], [])
+
+    def test_top_n_and_window_are_respected(self):
+        a = self.make_profile("A")
+        b = self.make_profile("B")
+        c = self.make_profile("C")
+        leagues = [self.make_league(level) for level in range(1, 4)]
+
+        for league in leagues:
+            self.make_ban(league, a)
+        for league in leagues[:2]:
+            self.make_ban(league, b)
+        self.make_ban(leagues[0], c)
+
+        awards = get_awards(c, top_n=1, window=1)
+        hater = next(award for award in awards if award["key"] == "hater")
+
+        # top_n=1 caps the podium, but the requesting player (rank 3, last)
+        # still gets an "around me" window centered on their own rank.
+        self.assertEqual([entry["profile_id"] for entry in hater["top"]], [a.id])
+        self.assertEqual(
+            [entry["profile_id"] for entry in hater["around_me"]], [b.id, c.id]
+        )
+        self.assertEqual(hater["me"]["rank"], 3)
