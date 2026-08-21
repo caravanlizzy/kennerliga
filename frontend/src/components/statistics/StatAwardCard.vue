@@ -22,7 +22,7 @@
       <div v-else class="row q-col-gutter-sm">
         <div v-for="(entry, idx) in award.top3" :key="entry.profile_id" class="col">
           <div class="podium-player" :class="{ 'podium-player--me': entry.is_me }">
-            <span class="rank-badge" :class="medalClass(idx + 1)">{{ idx + 1 }}</span>
+            <span class="rank-badge">{{ idx + 1 }}</span>
             <div
               class="podium-player__name ellipsis"
               :class="{ 'text-weight-bolder text-primary': entry.is_me }"
@@ -30,7 +30,7 @@
               {{ entry.profile_name }}
             </div>
             <div class="podium-player__score text-weight-bolder text-dark">
-              {{ entry.value }}<span class="podium-player__unit"> {{ award.unit }}</span>
+              {{ entry.value }}
             </div>
           </div>
         </div>
@@ -51,13 +51,6 @@ const ICONS: Record<string, string> = {
 };
 
 const icon = computed(() => ICONS[props.award.key] ?? 'emoji_events');
-
-function medalClass(rank: number): string {
-  if (rank === 1) return 'rank-badge--gold';
-  if (rank === 2) return 'rank-badge--silver';
-  if (rank === 3) return 'rank-badge--bronze';
-  return '';
-}
 </script>
 
 <style scoped lang="scss">
@@ -95,12 +88,6 @@ function medalClass(rank: number): string {
     font-size: 15px;
     margin-top: 2px;
   }
-
-  &__unit {
-    font-size: 11px;
-    font-weight: 500;
-    color: #64748b;
-  }
 }
 
 .rank-badge {
@@ -114,20 +101,5 @@ function medalClass(rank: number): string {
   font-size: 11px;
   font-weight: 700;
   color: #64748b;
-}
-
-.rank-badge--gold {
-  background: #f5c344;
-  color: #4a3300;
-}
-
-.rank-badge--silver {
-  background: #c9ccd1;
-  color: #33363b;
-}
-
-.rank-badge--bronze {
-  background: #d99a63;
-  color: #3d2306;
 }
 </style>

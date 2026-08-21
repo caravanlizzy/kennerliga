@@ -39,7 +39,7 @@
             :class="{ 'rank-row--me': row.entry.is_me }"
           >
             <div class="row items-center no-wrap q-gutter-x-sm">
-              <span class="rank-badge" :class="medalClass(row.entry.rank)">{{ row.entry.rank }}</span>
+              <span class="rank-badge">{{ row.entry.rank }}</span>
               <span :class="{ 'text-weight-bolder': row.entry.is_me }">{{ row.entry.profile_name }}</span>
             </div>
             <span class="row items-center no-wrap q-gutter-x-xs text-weight-bold">
@@ -156,12 +156,6 @@ const rows = computed<TRankRow[]>(() => {
   return result;
 });
 
-function medalClass(rank: number | null): string {
-  if (rank === 1) return 'rank-badge--gold';
-  if (rank === 2) return 'rank-badge--silver';
-  if (rank === 3) return 'rank-badge--bronze';
-  return '';
-}
 </script>
 
 <style scoped lang="scss">
@@ -196,21 +190,6 @@ function medalClass(rank: number | null): string {
   font-size: 11px;
   font-weight: 700;
   color: #64748b;
-}
-
-.rank-badge--gold {
-  background: #f5c344;
-  color: #4a3300;
-}
-
-.rank-badge--silver {
-  background: #c9ccd1;
-  color: #33363b;
-}
-
-.rank-badge--bronze {
-  background: #d99a63;
-  color: #3d2306;
 }
 
 .gap-separator {

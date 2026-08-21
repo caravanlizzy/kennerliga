@@ -39,13 +39,13 @@ AWARD_DEFS = [
         "key": "hater",
         "label": "Hater",
         "description": "Most bans.",
-        "unit": "bans",
+        "unit": "",
     },
     {
         "key": "inspirer",
         "label": "Inspirer",
         "description": "Most different picks.",
-        "unit": "picks",
+        "unit": "",
     },
 ]
 
