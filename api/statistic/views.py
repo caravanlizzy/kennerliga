@@ -42,7 +42,7 @@ class StatisticsOverviewView(APIView):
         player_counts = parse_player_counts(request.query_params.get("player_count"))
         min_games = max(0, _int_param(request, "min_games", DEFAULT_MIN_GAMES))
         window = max(1, min(5, _int_param(request, "window", DEFAULT_WINDOW)))
-        top_n = max(1, min(20, _int_param(request, "top_n", DEFAULT_TOP_N)))
+        top_n = max(1, min(200, _int_param(request, "top_n", DEFAULT_TOP_N)))
 
         data = get_statistics_overview(
             profile,
