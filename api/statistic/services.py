@@ -71,7 +71,7 @@ CATEGORY_DEFS = [
         "unit": "pts",
         "better": "higher",
         "rate_based": False,
-        "custom": True,
+        "custom": "career",
     },
     {
         "key": "win_rate",
@@ -96,6 +96,15 @@ CATEGORY_DEFS = [
         "unit": "",
         "better": "higher",
         "rate_based": False,
+    },
+    {
+        "key": "iron_will",
+        "label": "Iron Will",
+        "description": "Most games played among players below the median win rate -- keeps showing up, game after game.",
+        "unit": "",
+        "better": "higher",
+        "rate_based": False,
+        "custom": "iron_will",
     },
 ]
 
@@ -383,6 +392,30 @@ def _rank_career(players):
     return ranked
 
 
+def _rank_iron_will(players, min_games):
+    """
+    Iron Will: most games played among players at or below the median win
+    rate -- a nod to persistence rather than skill. Deliberately ranks (and
+    displays) games played, never win rate, so the players who show up here
+    are never shown a number that reads as "you're bad at this".
+    """
+    eligible = [p for p in players if p.get("win_rate") is not None]
+    if min_games:
+        eligible = [p for p in eligible if p.get("games_played", 0) >= min_games]
+    if not eligible:
+        return []
+
+    win_rates = sorted(p["win_rate"] for p in eligible)
+    mid = len(win_rates) // 2
+    median = (
+        win_rates[mid]
+        if len(win_rates) % 2 == 1
+        else (win_rates[mid - 1] + win_rates[mid]) / 2
+    )
+    below_median = [p for p in eligible if p["win_rate"] <= median]
+    return _rank_players(below_median, "games_played", "higher")
+
+
 def _entry(player, is_me):
     return {
         "rank": player["rank"],
@@ -434,9 +467,13 @@ def get_statistics_overview(
 
     categories = []
     for definition in CATEGORY_DEFS:
-        if definition.get("custom"):
+        custom = definition.get("custom")
+        if custom == "career":
             threshold = None
             ranked = _rank_career(players)
+        elif custom == "iron_will":
+            threshold = min_games
+            ranked = _rank_iron_will(players, min_games)
         else:
             threshold = min_games if definition["rate_based"] else None
             ranked = _rank_players(
@@ -453,7 +490,11 @@ def get_statistics_overview(
             me_summary = around_me[me_index - lo]
         else:
             around_me = []
-            raw_value = me_raw[definition["key"]] if me_raw else None
+            # Iron Will isn't a raw pool field (it's a derived ranking), so
+            # an unranked player's "so far" value falls back to the field
+            # it's actually ranked and displayed by: games played.
+            raw_value_key = "games_played" if custom == "iron_will" else definition["key"]
+            raw_value = me_raw.get(raw_value_key) if me_raw else None
             me_summary = _unranked_me_entry(profile, raw_value)
 
         categories.append(

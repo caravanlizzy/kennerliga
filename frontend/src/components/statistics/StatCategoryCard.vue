@@ -140,6 +140,7 @@ const ICONS: Record<string, string> = {
   win_rate: 'percent',
   avg_position: 'trending_up',
   games_played: 'sports_esports',
+  iron_will: 'shield',
   hater: 'thumb_down',
   inspirer: 'auto_awesome',
   spammer: 'repeat',
@@ -147,13 +148,14 @@ const ICONS: Record<string, string> = {
 
 // Each category gets its own accent so the page reads as varied rather than
 // a wall of the same purple; the "fun" superlative awards (Hater, Inspirer,
-// Spammer) keep colors matching the app's existing negative/accent palette
-// (quasar.variables.scss).
+// Spammer, Iron Will) keep colors matching the app's existing negative/accent
+// palette (quasar.variables.scss).
 const ACCENT_COLORS: Record<string, string> = {
   career_performance: '#b45309',
   win_rate: '#0f766e',
   avg_position: '#2563eb',
   games_played: '#059669',
+  iron_will: '#52606d',
   hater: '#d63a38',
   inspirer: '#5e35b1',
   spammer: '#e08a1e',

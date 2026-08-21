@@ -10,6 +10,7 @@ from statistic.services import (
     CATEGORY_DEFS,
     _build_player_pool,
     _rank_career,
+    _rank_iron_will,
     get_awards,
     get_statistics_overview,
 )
@@ -132,7 +133,13 @@ class CategorySetTests(StatisticsServiceTestBase):
 
         self.assertEqual(
             keys,
-            {"career_performance", "win_rate", "avg_position", "games_played"},
+            {
+                "career_performance",
+                "win_rate",
+                "avg_position",
+                "games_played",
+                "iron_will",
+            },
         )
         self.assertNotIn("total_wins", keys)
         self.assertNotIn("podiums", keys)
@@ -142,8 +149,56 @@ class CategorySetTests(StatisticsServiceTestBase):
         keys = {definition["key"] for definition in CATEGORY_DEFS}
         self.assertEqual(
             keys,
-            {"career_performance", "win_rate", "avg_position", "games_played"},
+            {
+                "career_performance",
+                "win_rate",
+                "avg_position",
+                "games_played",
+                "iron_will",
+            },
         )
+
+
+class IronWillTests(StatisticsServiceTestBase):
+    def test_ranks_below_median_win_rate_players_by_games_played(self):
+        winner = self.make_profile("Winner")
+        grinder = self.make_profile("Grinder")
+        regular = self.make_profile("Regular")
+        rookie = self.make_profile("Rookie")
+        game = Game.objects.create(name="Catan", platform=self.platform)
+
+        # The winner always takes 1st, so their 100% win rate sits well
+        # above the median and they're excluded from Iron Will entirely.
+        for opponent, count in [(grinder, 3), (regular, 2), (rookie, 1)]:
+            for _ in range(count):
+                league = self.make_league(1)
+                self.add_match(game, league, [(winner, 1), (opponent, 2)])
+
+        pool = _build_player_pool()
+        ranked = _rank_iron_will(pool, min_games=0)
+
+        self.assertEqual(
+            [(entry["profile_id"], entry["rank"], entry["value"]) for entry in ranked],
+            [(grinder.id, 1, 3), (regular.id, 2, 2), (rookie.id, 3, 1)],
+        )
+        self.assertNotIn(winner.id, [entry["profile_id"] for entry in ranked])
+
+    def test_unranked_player_falls_back_to_games_played_not_win_rate(self):
+        # Solo wins their only match (100% win rate), which keeps them above
+        # the median and out of the ranking -- confirms the "so far" value
+        # falls back to games played rather than raising or leaking a raw
+        # win-rate number.
+        solo = self.make_profile("Solo")
+        other = self.make_profile("Other")
+        game = Game.objects.create(name="Catan", platform=self.platform)
+        league = self.make_league(1)
+        self.add_match(game, league, [(solo, 1), (other, 2)])
+
+        overview = get_statistics_overview(solo, top_n=5, window=1)
+        iron_will = next(c for c in overview["categories"] if c["key"] == "iron_will")
+
+        self.assertFalse(iron_will["me"]["eligible"])
+        self.assertEqual(iron_will["me"]["value"], 1)
 
 
 class PlayerCountFilterTests(StatisticsServiceTestBase):
