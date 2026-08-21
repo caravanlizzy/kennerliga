@@ -38,14 +38,14 @@ AWARD_DEFS = [
     {
         "key": "hater",
         "label": "Hater",
-        "description": "Most games banned (skipping a ban doesn't count).",
+        "description": "Most bans.",
         "unit": "bans",
     },
     {
         "key": "inspirer",
         "label": "Inspirer",
-        "description": "Most different games picked for a league.",
-        "unit": "games",
+        "description": "Most different picks.",
+        "unit": "picks",
     },
 ]
 
@@ -475,7 +475,8 @@ def get_awards(profile, years=None, player_counts=None, top_n=DEFAULT_AWARD_TOP_
     """
     Builds the fun "superlative" awards podiums: the Hater (most games
     banned, where skipping a ban doesn't count) and the Inspirer (most
-    different games picked for a league). Unlike the ranked categories
+    `SelectedGame` picks made across leagues -- picking the same game again
+    in a different league still counts). Unlike the ranked categories
     above, these are a fixed top-N with no min-games gate or "around me"
     window -- just a lighthearted leaderboard.
     """
@@ -492,9 +493,7 @@ def get_awards(profile, years=None, player_counts=None, top_n=DEFAULT_AWARD_TOP_
         pick_qs = pick_qs.filter(league__season__year__in=years)
     pick_qs = _filter_standings_by_player_count(pick_qs, player_counts)
     pick_rows = list(
-        pick_qs.values("profile_id")
-        .annotate(value=Count("game", distinct=True))
-        .order_by()
+        pick_qs.values("profile_id").annotate(value=Count("id")).order_by()
     )
 
     profile_ids = {row["player_banning_id"] for row in ban_rows} | {
