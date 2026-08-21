@@ -1,60 +1,63 @@
 <template>
   <q-page class="q-pa-md max-width-container q-mx-auto statistics-page">
-    <div class="row items-center justify-between q-mb-md">
+    <div class="row items-center justify-between q-mb-md q-col-gutter-y-sm">
       <div class="row items-center q-gutter-x-sm">
         <div class="stat-icon-box stat-icon-box--lg">
           <q-icon name="query_stats" color="primary" size="24px" />
         </div>
         <div class="text-body2 text-grey-7">Rankings, records &amp; leaderboards.</div>
       </div>
-      <div style="min-width: 180px">
-        <KennerSelect
-          v-model="selectedYears"
-          :options="yearOptions"
-          label="Years"
-          multiple
-          clearable
-          dense
-          :display-value="yearsDisplayValue"
-        />
-      </div>
-    </div>
 
-    <!-- Player-count filter, mirroring the chips on the players list. -->
-    <div class="row items-center q-gutter-x-sm q-mb-md filter-toolbar">
-      <div class="row items-center text-caption text-weight-bold text-grey-8">
-        <q-icon name="groups" size="18px" class="q-mr-xs text-primary" />
-        <span>Players:</span>
-      </div>
-      <div class="row q-gutter-xs items-center">
-        <q-chip
-          clickable
-          dense
-          :outline="!isAllPlayerCountsSelected"
-          :color="isAllPlayerCountsSelected ? 'primary' : 'grey-7'"
-          text-color="white"
-          size="sm"
-          class="text-weight-bold"
-          style="border-radius: 4px"
-          @click="toggleAllPlayerCounts"
-        >
-          All
-        </q-chip>
-        <q-chip
-          v-for="pc in availablePlayerCounts"
-          :key="pc"
-          clickable
-          dense
-          :outline="!selectedPlayerCounts.includes(pc)"
-          :color="selectedPlayerCounts.includes(pc) ? 'primary' : 'grey-7'"
-          text-color="white"
-          size="sm"
-          class="text-weight-bold"
-          style="border-radius: 4px"
-          @click="togglePlayerCount(pc)"
-        >
-          {{ pc.toUpperCase() }}
-        </q-chip>
+      <div class="row items-center q-gutter-x-md">
+        <!-- Player-count filter, mirroring the chips on the players list. -->
+        <div class="row items-center q-gutter-x-sm">
+          <div class="row items-center text-caption text-weight-bold text-grey-8">
+            <q-icon name="groups" size="18px" class="q-mr-xs text-primary" />
+            <span>Players:</span>
+          </div>
+          <div class="row q-gutter-xs items-center">
+            <q-chip
+              clickable
+              dense
+              :outline="!isAllPlayerCountsSelected"
+              :color="isAllPlayerCountsSelected ? 'primary' : 'grey-7'"
+              text-color="white"
+              size="sm"
+              class="text-weight-bold"
+              style="border-radius: 4px"
+              @click="toggleAllPlayerCounts"
+            >
+              All
+            </q-chip>
+            <q-chip
+              v-for="pc in availablePlayerCounts"
+              :key="pc"
+              clickable
+              dense
+              :outline="!selectedPlayerCounts.includes(pc)"
+              :color="selectedPlayerCounts.includes(pc) ? 'primary' : 'grey-7'"
+              text-color="white"
+              size="sm"
+              class="text-weight-bold"
+              style="border-radius: 4px"
+              @click="togglePlayerCount(pc)"
+            >
+              {{ pc.toUpperCase() }}
+            </q-chip>
+          </div>
+        </div>
+
+        <div style="min-width: 180px">
+          <KennerSelect
+            v-model="selectedYears"
+            :options="yearOptions"
+            label="Years"
+            multiple
+            clearable
+            dense
+            :display-value="yearsDisplayValue"
+          />
+        </div>
       </div>
     </div>
 
@@ -423,13 +426,6 @@ const gameLeaderboardColumns = [
   width: 44px;
   height: 44px;
   border-radius: 10px;
-}
-
-.filter-toolbar {
-  padding: 8px 12px;
-  border-radius: 8px;
-  background: var(--kenner-bg-page-accent, #f1f5f9);
-  border: 1px solid var(--kenner-border-color, rgba(0, 0, 0, 0.08));
 }
 
 .me-row {

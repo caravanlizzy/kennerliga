@@ -1,6 +1,28 @@
 <template>
   <div v-if="show" class="breadcrumb-bar">
-    <div class="breadcrumb-bar__inner q-mx-auto q-px-md">
+    <div class="breadcrumb-bar__inner q-mx-auto q-px-md row items-center no-wrap">
+      <div class="row items-center no-wrap history-nav">
+        <KennerButton
+          flat
+          icon="arrow_back"
+          shape="circle"
+          color="grey-7"
+          size="sm"
+          @click="router.back()"
+        >
+          <KennerTooltip>Back</KennerTooltip>
+        </KennerButton>
+        <KennerButton
+          flat
+          icon="arrow_forward"
+          shape="circle"
+          color="grey-7"
+          size="sm"
+          @click="router.forward()"
+        >
+          <KennerTooltip>Forward</KennerTooltip>
+        </KennerButton>
+      </div>
       <q-breadcrumbs gutter="xs" class="text-grey-6 text-weight-medium">
         <q-breadcrumbs-el icon="home" to="/" />
         <q-breadcrumbs-el
@@ -17,10 +39,13 @@
 
 <script setup lang="ts">
 import { computed } from 'vue';
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import { useResponsive } from 'src/composables/responsive';
+import KennerButton from 'components/base/KennerButton.vue';
+import KennerTooltip from 'components/base/KennerTooltip.vue';
 
 const route = useRoute();
+const router = useRouter();
 const { isMobile } = useResponsive();
 
 const show = computed(() => {
@@ -74,7 +99,9 @@ const crumbs = computed(() => {
 // stays visually quiet (small text, no border/shadow of its own).
 .breadcrumb-bar {
   width: 100%;
-  background: var(--kenner-bg-page-accent, #f1f5f9);
+  // Neutral warm-grey tint, not the app's slate/blue page-accent token --
+  // keeps the strip visually quiet without leaning into any hue.
+  background: rgba(0, 0, 0, 0.035);
   border-bottom: 1px solid var(--kenner-border-color);
 }
 
@@ -83,6 +110,23 @@ const crumbs = computed(() => {
   padding-top: 6px;
   padding-bottom: 6px;
   font-size: 11px;
+  gap: 2px;
+}
+
+.history-nav {
+  gap: 2px;
+  margin-right: 4px;
+
+  :deep(.q-btn) {
+    width: 22px;
+    height: 22px;
+    min-height: 22px;
+    margin: 0;
+  }
+
+  :deep(.q-icon) {
+    font-size: 16px;
+  }
 }
 
 :deep(.q-breadcrumbs__el) {
