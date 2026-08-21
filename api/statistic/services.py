@@ -22,12 +22,12 @@ from league.models import LeagueStanding
 from result.models import Result
 from user.models import PlayerProfile
 
-DEFAULT_MIN_GAMES = 3
+DEFAULT_MIN_GAMES = 0
 # One player above and one below the requesting player, per the statistics
 # dashboard spec ("with a player above and below").
 DEFAULT_WINDOW = 1
 DEFAULT_TOP_N = 5
-DEFAULT_GAME_MIN_GAMES = 2
+DEFAULT_GAME_MIN_GAMES = 0
 DEFAULT_AWARD_TOP_N = 3
 
 # Fun "superlative" awards: a fixed top-N podium rather than a full ranking

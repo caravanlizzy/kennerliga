@@ -90,7 +90,7 @@
           </div>
           <div class="column">
             <div class="text-subtitle1 text-weight-bolder text-dark">Best Players by Game</div>
-            <div class="text-caption text-grey-6">Pick a game to see who performs best at it.</div>
+            <div class="text-caption text-grey-6">Search for a game to see who performs best at it.</div>
           </div>
         </div>
       </q-card-section>
@@ -98,14 +98,19 @@
       <q-card-section>
         <q-select
           v-model="selectedGameId"
-          :options="gameOptions"
-          label="Select a game"
+          :options="filteredGameOptions"
+          label="Search for a game"
           clearable
           dense
           outlined
+          use-input
+          hide-selected
+          fill-input
+          input-debounce="0"
           emit-value
           map-options
           class="q-mb-md game-select"
+          @filter="filterGameOptions"
         >
           <template v-slot:option="scope">
             <q-item v-bind="scope.itemProps">
@@ -117,6 +122,11 @@
               </q-item-section>
             </q-item>
           </template>
+          <template v-slot:no-option>
+            <q-item>
+              <q-item-section class="text-grey-6"> No games match that search. </q-item-section>
+            </q-item>
+          </template>
         </q-select>
 
         <div v-if="loadingLeaderboard" class="flex justify-center q-pa-lg">
@@ -125,10 +135,7 @@
 
         <template v-else-if="leaderboard">
           <div class="text-caption text-grey-6 q-mb-sm">
-            {{ leaderboard.platform }} &middot; min {{ leaderboard.min_games }} games played to be ranked
-            <span v-if="leaderboard.excluded_low_sample_count > 0">
-              ({{ leaderboard.excluded_low_sample_count }} player(s) below that threshold are hidden)
-            </span>
+            {{ leaderboard.platform }}
           </div>
 
           <!-- Hall of Fame: the three most dominant players at this game,
@@ -169,7 +176,7 @@
           >
             <span class="text-weight-bold">You</span>
             <span class="text-caption text-grey-6">
-              {{ leaderboard.me.games_played }} game(s) played &middot; need {{ leaderboard.min_games }}+ to be ranked
+              {{ leaderboard.me.games_played }} game(s) played &middot; no ranking yet
             </span>
           </div>
 
@@ -196,7 +203,7 @@
             </template>
           </KennerTable>
           <div v-else class="text-caption text-grey-6 q-pa-md">
-            No player has reached the {{ leaderboard.min_games }}-game minimum for this game yet.
+            No one has played this game yet.
           </div>
         </template>
 
@@ -274,6 +281,26 @@ const gameOptions = computed(() =>
     distinct_players: game.distinct_players,
   }))
 );
+// Mirrors gameOptions until the user types a search term, at which point
+// filterGameOptions narrows it to matching game names.
+const filteredGameOptions = ref(gameOptions.value);
+watch(gameOptions, (options) => {
+  filteredGameOptions.value = options;
+});
+
+function filterGameOptions(val: string, update: (fn: () => void) => void) {
+  update(() => {
+    if (val === '') {
+      filteredGameOptions.value = gameOptions.value;
+      return;
+    }
+    const needle = val.toLowerCase();
+    filteredGameOptions.value = gameOptions.value.filter((option) =>
+      option.label.toLowerCase().includes(needle)
+    );
+  });
+}
+
 const selectedGameId = ref<number | null>(null);
 const leaderboard = ref<TGameLeaderboard | null>(null);
 const loadingLeaderboard = ref(false);

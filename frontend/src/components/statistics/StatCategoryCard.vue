@@ -75,7 +75,6 @@
             {{ formatStatValue(category.key, category.unit, category.me.value) }} so far
           </template>
           <template v-else>No data yet</template>
-          <div v-if="category.min_games">Need {{ category.min_games }}+ games to rank</div>
         </div>
       </div>
     </q-card-section>
