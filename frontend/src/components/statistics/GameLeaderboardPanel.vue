@@ -9,13 +9,13 @@
         {{ leaderboard.platform }}
       </div>
 
-      <!-- Hall of Fame: the three most dominant players at this game,
-           ranked by win %. Medal-colored badges (gold/silver/bronze) match
-           the podium styling used for season winners. -->
+      <!-- Experts: the three most dominant players at this game, ranked by
+           win %. Medal-colored badges (gold/silver/bronze) match the
+           podium styling used for season winners. -->
       <div v-if="fameLeaders.length > 0" class="fame-card q-mb-md">
         <div class="fame-card__header row items-center no-wrap q-mb-sm">
           <q-icon name="emoji_events" size="18px" color="primary" class="q-mr-xs" />
-          <span class="text-weight-bolder text-dark">Hall of Fame</span>
+          <span class="text-weight-bolder text-dark">Experts</span>
           <q-space />
           <span class="text-caption text-grey-6">Win %</span>
         </div>
@@ -100,7 +100,7 @@ defineProps<{
   border: 1px solid rgba(0, 0, 0, 0.06);
 }
 
-// Hall of Fame: a plain bordered panel matching the app's flat card style
+// Experts: a plain bordered panel matching the app's flat card style
 // (no gradients).
 .fame-card {
   border: 1px solid rgba(0, 0, 0, 0.08);

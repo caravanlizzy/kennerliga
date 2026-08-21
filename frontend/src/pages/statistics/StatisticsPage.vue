@@ -68,22 +68,22 @@
     <!-- Split layout: ranking categories on the left, the per-game
          leaderboard pinned top-right so it is visible without scrolling
          past all the category cards first. -->
-    <div class="row q-col-gutter-md">
+    <div class="row q-col-gutter-lg">
       <div class="col-12 col-md-7 order-last order-md-first">
-        <div v-if="loadingOverview" class="row q-col-gutter-md">
-          <div v-for="i in 6" :key="i" class="col-12 col-sm-6">
+        <div v-if="loadingOverview" class="row q-col-gutter-lg">
+          <div v-for="i in 6" :key="i" class="col-12 col-lg-6">
             <q-skeleton type="rect" height="240px" class="rounded-borders" />
           </div>
         </div>
 
-        <div v-else class="row q-col-gutter-md">
-          <div v-for="award in overview?.awards ?? []" :key="award.key" class="col-12 col-sm-6">
+        <div v-else class="row q-col-gutter-lg">
+          <div v-for="award in overview?.awards ?? []" :key="award.key" class="col-12 col-lg-6">
             <StatCategoryCard :category="award" />
           </div>
           <div
             v-for="category in overview?.categories ?? []"
             :key="category.key"
-            class="col-12 col-sm-6"
+            class="col-12 col-lg-6"
           >
             <StatCategoryCard :category="category" />
           </div>
@@ -120,7 +120,10 @@
           </template>
         </q-input>
 
-        <div class="game-preview-list q-mb-md">
+        <div
+          class="game-preview-list q-mb-md"
+          :class="{ 'game-preview-list--collapsed': selectedGameId !== null }"
+        >
           <div
             v-for="game in filteredGames"
             :key="game.game_id"
@@ -146,13 +149,26 @@
         <!-- Desktop/tablet: the leaderboard expands inline, right below the
              game list, since the sticky column gives it room to breathe. -->
         <template v-if="!smallScreen">
-          <GameLeaderboardPanel
-            v-if="selectedGameId !== null"
-            :loading="loadingLeaderboard"
-            :leaderboard="leaderboard"
-            :fame-leaders="fameLeaders"
-            :columns="gameLeaderboardColumns"
-          />
+          <template v-if="selectedGameId !== null">
+            <div class="selected-game-header row items-center justify-between q-mb-sm">
+              <div class="text-weight-bolder text-dark ellipsis">{{ selectedGame?.name }}</div>
+              <q-btn
+                flat
+                round
+                dense
+                size="sm"
+                icon="close"
+                color="grey-7"
+                @click="selectedGameId = null"
+              />
+            </div>
+            <GameLeaderboardPanel
+              :loading="loadingLeaderboard"
+              :leaderboard="leaderboard"
+              :fame-leaders="fameLeaders"
+              :columns="gameLeaderboardColumns"
+            />
+          </template>
           <div v-else class="text-caption text-grey-6 q-pa-md">
             Pick a game above to see its full leaderboard.
           </div>
@@ -416,12 +432,24 @@ const gameLeaderboardColumns = [
   overflow-y: auto;
   border: 1px solid rgba(0, 0, 0, 0.08);
   border-radius: 8px;
+  transition: max-height 0.2s ease;
 
   // Fewer rows in view at once on phones -- easier to scan, with the
   // scrollbar making it obvious there's more below.
   @media (max-width: 599px) {
     max-height: 200px;
   }
+
+  // Once a game is picked, the picker itself is no longer the focus --
+  // shrink it so the leaderboard below gets the room instead.
+  &--collapsed {
+    max-height: 120px;
+  }
+}
+
+.selected-game-header {
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
 }
 
 .game-preview-row {
