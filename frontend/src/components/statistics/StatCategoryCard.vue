@@ -1,12 +1,12 @@
 <template>
-  <q-card flat bordered class="stat-card full-height">
-    <q-card-section class="q-pb-sm">
+  <q-card flat bordered class="stat-card full-height" :style="{ '--accent': accentColor }">
+    <q-card-section class="stat-card__header">
       <div class="row items-center no-wrap">
         <div class="stat-icon-box q-mr-sm" :style="{ background: accentColor + '14' }">
-          <q-icon :name="icon" :style="{ color: accentColor }" size="22px" />
+          <q-icon :name="icon" :style="{ color: accentColor }" size="19px" />
         </div>
         <div class="column">
-          <div class="text-subtitle1 text-weight-bolder text-dark line-height-1">
+          <div class="text-subtitle2 text-weight-bolder text-dark line-height-1">
             {{ category.label }}
           </div>
           <div class="text-caption text-grey-6">{{ category.description }}</div>
@@ -16,7 +16,7 @@
 
     <q-separator class="q-mx-md" />
 
-    <q-card-section class="q-pt-sm">
+    <q-card-section class="stat-card__body">
       <div v-if="top3.length === 0" class="text-caption text-grey-6 q-pa-sm">
         Not enough data to rank players yet.
       </div>
@@ -26,14 +26,14 @@
         <div class="row q-col-gutter-sm">
           <div v-for="(entry, idx) in top3" :key="entry.profile_id" class="col">
             <div class="podium-player" :class="{ 'podium-player--me': entry.is_me }">
-              <span class="rank-badge">{{ idx + 1 }}</span>
+              <span class="rank-badge" :class="`rank-badge--${idx}`">{{ idx + 1 }}</span>
               <div
                 class="podium-player__name ellipsis"
                 :class="{ 'text-weight-bolder text-primary': entry.is_me }"
               >
                 {{ entry.profile_name }}
               </div>
-              <div class="podium-player__score" :style="{ color: accentColor }">
+              <div class="podium-player__score text-primary">
                 <template v-if="entry.best_level != null">
                   <LeagueLevel badge :level="entry.best_level" />
                   <div>{{ formatStatValue(category.key, category.unit, entry.value) }}</div>
@@ -69,8 +69,7 @@
                   <span :class="{ 'text-weight-bolder': entry.is_me }">{{ entry.profile_name }}</span>
                 </div>
                 <span
-                  class="row items-center no-wrap q-gutter-x-xs rank-row__value"
-                  :style="{ color: accentColor }"
+                  class="row items-center no-wrap q-gutter-x-xs rank-row__value text-primary"
                 >
                   <template v-if="entry.best_level != null">
                     <LeagueLevel badge :level="entry.best_level" />
@@ -146,15 +145,20 @@ const ICONS: Record<string, string> = {
   spammer: 'repeat',
 };
 
-// The ranked categories all share the app's plain indigo accent; the "fun"
-// superlative awards (Hater, Inspirer, Spammer) get their own, matching the
-// app's existing negative/accent palette (quasar.variables.scss).
+// Each category gets its own accent so the page reads as varied rather than
+// a wall of the same purple; the "fun" superlative awards (Hater, Inspirer,
+// Spammer) keep colors matching the app's existing negative/accent palette
+// (quasar.variables.scss).
 const ACCENT_COLORS: Record<string, string> = {
+  career_performance: '#b45309',
+  win_rate: '#0f766e',
+  avg_position: '#2563eb',
+  games_played: '#059669',
   hater: '#d63a38',
   inspirer: '#5e35b1',
   spammer: '#e08a1e',
 };
-const DEFAULT_ACCENT_COLOR = '#4338ca';
+const DEFAULT_ACCENT_COLOR = '#475569';
 
 const icon = computed(() => ICONS[props.category.key] ?? 'insights');
 const accentColor = computed(() => ACCENT_COLORS[props.category.key] ?? DEFAULT_ACCENT_COLOR);
@@ -210,15 +214,23 @@ const displayedRows = computed(() => (expanded.value ? restOfList.value : visibl
   transition: border-color 0.15s ease;
 
   &:hover {
-    border-color: rgba(99, 102, 241, 0.3);
+    border-color: color-mix(in srgb, var(--accent) 30%, transparent);
   }
 }
 
+.stat-card__header {
+  padding: 14px 16px 10px;
+}
+
+.stat-card__body {
+  padding: 10px 16px 14px;
+}
+
 .stat-icon-box {
-  width: 36px;
-  height: 36px;
-  border-radius: 8px;
-  background: rgba(99, 102, 241, 0.08);
+  width: 32px;
+  height: 32px;
+  border-radius: 7px;
+  background: rgba(100, 116, 139, 0.08);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -228,41 +240,41 @@ const displayedRows = computed(() => (expanded.value ? restOfList.value : visibl
 .podium-player {
   height: 100%;
   text-align: center;
-  padding: 10px 6px 8px;
+  padding: 8px 6px 6px;
   border-radius: 8px;
   background: rgba(0, 0, 0, 0.02);
   border: 1px solid rgba(0, 0, 0, 0.06);
   transition: border-color 0.15s ease;
 
   &:hover {
-    border-color: rgba(99, 102, 241, 0.25);
+    border-color: color-mix(in srgb, var(--accent) 25%, transparent);
   }
 
   &--me {
-    background: rgba(99, 102, 241, 0.08);
-    border-color: rgba(99, 102, 241, 0.2);
+    background: color-mix(in srgb, var(--accent) 8%, white);
+    border-color: color-mix(in srgb, var(--accent) 20%, transparent);
   }
 
   &__name {
-    font-size: 12px;
+    font-size: 11.5px;
     line-height: 1.2;
-    margin-top: 6px;
+    margin-top: 5px;
   }
 
   &__score {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 2px;
-    font-size: 16px;
-    font-weight: 800;
-    margin-top: 4px;
+    gap: 1px;
+    font-size: 13.5px;
+    font-weight: 700;
+    margin-top: 3px;
     font-variant-numeric: tabular-nums;
   }
 }
 
 .rank-row {
-  padding: 9px 6px;
+  padding: 7px 6px;
   border-radius: 6px;
   transition: background-color 0.15s ease;
 
@@ -281,16 +293,16 @@ const displayedRows = computed(() => (expanded.value ? restOfList.value : visibl
 }
 
 .rank-row--me {
-  background: rgba(99, 102, 241, 0.08);
+  background: color-mix(in srgb, var(--accent) 8%, white);
 
   &:hover {
-    background: rgba(99, 102, 241, 0.12);
+    background: color-mix(in srgb, var(--accent) 12%, white);
   }
 }
 
 .rank-row__value {
-  font-weight: 800;
-  font-size: 14.5px;
+  font-weight: 700;
+  font-size: 13px;
   font-variant-numeric: tabular-nums;
 }
 
@@ -298,14 +310,30 @@ const displayedRows = computed(() => (expanded.value ? restOfList.value : visibl
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 22px;
-  height: 22px;
+  width: 20px;
+  height: 20px;
   border-radius: 50%;
   background: rgba(0, 0, 0, 0.06);
-  font-size: 11px;
+  font-size: 10.5px;
   font-weight: 700;
   color: #64748b;
   flex-shrink: 0;
+
+  // Podium top 3 get medal colors instead of a flat grey circle.
+  &--0 {
+    background: #f6d365;
+    color: #7a5b00;
+  }
+
+  &--1 {
+    background: #d7dde8;
+    color: #4b5563;
+  }
+
+  &--2 {
+    background: #d6a77a;
+    color: #6b3f16;
+  }
 }
 
 .gap-separator {

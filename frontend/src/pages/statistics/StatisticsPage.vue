@@ -1,53 +1,57 @@
 <template>
   <q-page class="q-pa-md max-width-container q-mx-auto statistics-page">
-    <div class="row items-center justify-between q-mb-md q-col-gutter-y-sm">
-      <div class="row items-center q-gutter-x-sm">
+    <div class="q-mb-md">
+      <div class="row items-center q-gutter-x-sm q-mb-sm">
         <div class="stat-icon-box stat-icon-box--lg">
           <q-icon name="query_stats" color="primary" size="24px" />
         </div>
         <div class="text-body2 text-grey-7">Rankings, records &amp; leaderboards.</div>
       </div>
 
-      <div class="row items-center q-gutter-x-md">
-        <!-- Player-count filter, mirroring the chips on the players list. -->
-        <div class="row items-center q-gutter-x-sm">
-          <div class="row items-center text-caption text-weight-bold text-grey-8">
-            <q-icon name="groups" size="18px" class="q-mr-xs text-primary" />
-            <span>Players:</span>
-          </div>
-          <div class="row q-gutter-xs items-center">
-            <q-chip
-              clickable
-              dense
-              :outline="!isAllPlayerCountsSelected"
-              :color="isAllPlayerCountsSelected ? 'primary' : 'grey-7'"
-              text-color="white"
-              size="sm"
-              class="text-weight-bold"
-              style="border-radius: 4px"
-              @click="toggleAllPlayerCounts"
-            >
-              All
-            </q-chip>
-            <q-chip
-              v-for="pc in availablePlayerCounts"
-              :key="pc"
-              clickable
-              dense
-              :outline="!selectedPlayerCounts.includes(pc)"
-              :color="selectedPlayerCounts.includes(pc) ? 'primary' : 'grey-7'"
-              text-color="white"
-              size="sm"
-              class="text-weight-bold"
-              style="border-radius: 4px"
-              @click="togglePlayerCount(pc)"
-            >
-              {{ pc.toUpperCase() }}
-            </q-chip>
+      <!-- Full width and stacked on mobile so the chips/select never wrap
+           into each other; inline once there's room (col-sm-auto). -->
+      <div class="row q-col-gutter-sm items-center filters-row">
+        <div class="col-12 col-sm-auto">
+          <!-- Player-count filter, mirroring the chips on the players list. -->
+          <div class="row items-center q-gutter-x-sm">
+            <div class="row items-center text-caption text-weight-bold text-grey-8">
+              <q-icon name="groups" size="18px" class="q-mr-xs text-primary" />
+              <span>Players:</span>
+            </div>
+            <div class="row q-gutter-xs items-center">
+              <q-chip
+                clickable
+                dense
+                :outline="!isAllPlayerCountsSelected"
+                :color="isAllPlayerCountsSelected ? 'primary' : 'grey-7'"
+                text-color="white"
+                size="sm"
+                class="text-weight-bold"
+                style="border-radius: 4px"
+                @click="toggleAllPlayerCounts"
+              >
+                All
+              </q-chip>
+              <q-chip
+                v-for="pc in availablePlayerCounts"
+                :key="pc"
+                clickable
+                dense
+                :outline="!selectedPlayerCounts.includes(pc)"
+                :color="selectedPlayerCounts.includes(pc) ? 'primary' : 'grey-7'"
+                text-color="white"
+                size="sm"
+                class="text-weight-bold"
+                style="border-radius: 4px"
+                @click="togglePlayerCount(pc)"
+              >
+                {{ pc.toUpperCase() }}
+              </q-chip>
+            </div>
           </div>
         </div>
 
-        <div style="min-width: 180px">
+        <div class="col-12 col-sm-auto years-filter" style="min-width: 180px">
           <KennerSelect
             v-model="selectedYears"
             :options="yearOptions"
@@ -139,90 +143,53 @@
           </div>
         </div>
 
-        <div v-if="loadingLeaderboard" class="flex justify-center q-pa-lg">
-          <q-spinner color="primary" size="32px" />
-        </div>
-
-        <template v-else-if="leaderboard">
-          <div class="text-caption text-grey-6 q-mb-sm">
-            {{ leaderboard.platform }}
-          </div>
-
-          <!-- Hall of Fame: the three most dominant players at this game,
-               ranked by win %. -->
-          <div v-if="fameLeaders.length > 0" class="fame-card q-mb-md">
-            <div class="fame-card__header row items-center no-wrap q-mb-sm">
-              <q-icon name="emoji_events" size="18px" color="primary" class="q-mr-xs" />
-              <span class="text-weight-bolder text-dark">Hall of Fame</span>
-              <q-space />
-              <span class="text-caption text-grey-6">Win %</span>
-            </div>
-            <div class="row q-col-gutter-sm">
-              <div
-                v-for="(leader, idx) in fameLeaders"
-                :key="leader.profile_id"
-                class="col"
-              >
-                <div class="fame-player">
-                  <span class="rank-badge">{{ idx + 1 }}</span>
-                  <div
-                    class="fame-player__name ellipsis"
-                    :class="{ 'text-weight-bolder text-primary': leader.is_me }"
-                  >
-                    {{ leader.profile_name }}
-                  </div>
-                  <div class="fame-player__score text-weight-bolder text-dark">
-                    {{ leader.fameScore.toFixed(1) }}%
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div
-            v-if="!leaderboard.me.eligible"
-            class="me-row row items-center justify-between q-pa-sm q-mb-sm rounded-borders me-row--unranked"
-          >
-            <span class="text-weight-bold">You</span>
-            <span class="text-caption text-grey-6">
-              {{ leaderboard.me.games_played }} game(s) played &middot; no ranking yet
-            </span>
-          </div>
-
-          <KennerTable
-            v-if="leaderboard.leaderboard.length > 0"
-            flat
-            :rows="leaderboard.leaderboard"
+        <!-- Desktop/tablet: the leaderboard expands inline, right below the
+             game list, since the sticky column gives it room to breathe. -->
+        <template v-if="!smallScreen">
+          <GameLeaderboardPanel
+            v-if="selectedGameId !== null"
+            :loading="loadingLeaderboard"
+            :leaderboard="leaderboard"
+            :fame-leaders="fameLeaders"
             :columns="gameLeaderboardColumns"
-            row-key="profile_id"
-          >
-            <template v-slot:body-cell-profile_name="props">
-              <q-td :props="props">
-                <span :class="{ 'text-weight-bolder text-primary': props.row.is_me }">
-                  {{ props.row.profile_name }}
-                  <q-badge
-                    v-if="props.row.is_me"
-                    color="primary"
-                    text-color="white"
-                    class="q-ml-xs"
-                    label="you"
-                  />
-                </span>
-              </q-td>
-            </template>
-          </KennerTable>
+          />
           <div v-else class="text-caption text-grey-6 q-pa-md">
-            No one has played this game yet.
+            Pick a game above to see its full leaderboard.
           </div>
         </template>
-
-        <div v-else-if="selectedGameId === null" class="text-caption text-grey-6 q-pa-md">
-          Pick a game above to see its full leaderboard.
-        </div>
       </q-card-section>
         </q-card>
       </div>
     </div>
+
+    <!-- Mobile: a maximized dialog instead of an inline panel -- avoids the
+         nested-scrolling mess of a growing field inside an already-scrolling
+         page. -->
+    <q-dialog
+      v-model="mobileLeaderboardOpen"
+      maximized
+      transition-show="slide-up"
+      transition-hide="slide-down"
+    >
+      <q-card class="mobile-leaderboard-card">
+        <div class="mobile-leaderboard-header row items-center no-wrap">
+          <q-icon name="emoji_events" size="22px" color="white" class="q-mr-sm" />
+          <div class="text-subtitle1 text-weight-bolder text-white ellipsis">
+            {{ selectedGame?.name ?? 'Leaderboard' }}
+          </div>
+          <q-space />
+          <q-btn flat round dense icon="close" color="white" v-close-popup />
+        </div>
+        <q-card-section class="mobile-leaderboard-body">
+          <GameLeaderboardPanel
+            :loading="loadingLeaderboard"
+            :leaderboard="leaderboard"
+            :fame-leaders="fameLeaders"
+            :columns="gameLeaderboardColumns"
+          />
+        </q-card-section>
+      </q-card>
+    </q-dialog>
   </q-page>
 </template>
 
@@ -231,8 +198,9 @@ defineOptions({ name: 'StatisticsPage' });
 
 import { computed, onMounted, ref, watch } from 'vue';
 import KennerSelect from 'components/base/KennerSelect.vue';
-import KennerTable from 'components/tables/KennerTable.vue';
 import StatCategoryCard from 'components/statistics/StatCategoryCard.vue';
+import GameLeaderboardPanel from 'components/statistics/GameLeaderboardPanel.vue';
+import { useResponsive } from 'src/composables/responsive';
 import { useUserStore } from 'stores/userStore';
 import {
   fetchGameLeaderboard,
@@ -242,6 +210,9 @@ import {
 import { TGameLeaderboard, TGameStatSummary, TStatisticsOverview } from 'src/types';
 
 const { getAvailableYears } = useUserStore();
+// Same breakpoint the layout already stacks at (col-md-*), so the dialog
+// takes over exactly when the two-column split collapses into one.
+const { smallScreen } = useResponsive();
 
 const selectedYears = ref<number[]>([]);
 const yearOptions = ref<number[]>([]);
@@ -289,8 +260,18 @@ const filteredGames = computed(() => {
 });
 
 const selectedGameId = ref<number | null>(null);
+const selectedGame = computed(
+  () => allGames.value.find((game) => game.game_id === selectedGameId.value) ?? null
+);
 const leaderboard = ref<TGameLeaderboard | null>(null);
 const loadingLeaderboard = ref(false);
+
+const mobileLeaderboardOpen = computed({
+  get: () => smallScreen.value && selectedGameId.value !== null,
+  set: (open: boolean) => {
+    if (!open) selectedGameId.value = null;
+  },
+});
 
 // The three most dominant players at the selected game, ranked by win rate.
 const fameLeaders = computed(() => {
@@ -421,14 +402,13 @@ const gameLeaderboardColumns = [
   border-radius: 10px;
 }
 
-.me-row {
-  background: rgba(99, 102, 241, 0.06);
-  border: 1px solid rgba(99, 102, 241, 0.15);
-}
-
-.me-row--unranked {
-  background: rgba(0, 0, 0, 0.03);
-  border: 1px solid rgba(0, 0, 0, 0.06);
+// KennerSelect's floating label rises above its own box -- once the Years
+// filter wraps onto its own line below the player chips (mobile), it needs
+// a bit of headroom so the label doesn't sit on top of the chips.
+@media (max-width: 599px) {
+  .years-filter {
+    margin-top: 12px;
+  }
 }
 
 .game-preview-list {
@@ -436,6 +416,12 @@ const gameLeaderboardColumns = [
   overflow-y: auto;
   border: 1px solid rgba(0, 0, 0, 0.08);
   border-radius: 8px;
+
+  // Fewer rows in view at once on phones -- easier to scan, with the
+  // scrollbar making it obvious there's more below.
+  @media (max-width: 599px) {
+    max-height: 200px;
+  }
 }
 
 .game-preview-row {
@@ -468,53 +454,6 @@ const gameLeaderboardColumns = [
   }
 }
 
-// Hall of Fame: a plain bordered panel matching the app's flat card style
-// (no gradients).
-.fame-card {
-  border: 1px solid rgba(0, 0, 0, 0.08);
-  border-radius: 8px;
-  padding: 12px;
-  background: rgba(0, 0, 0, 0.02);
-}
-
-.fame-player {
-  height: 100%;
-  text-align: center;
-  padding: 10px 6px 8px;
-  border-radius: 8px;
-  background: #fff;
-  border: 1px solid rgba(0, 0, 0, 0.06);
-  transition: border-color 0.15s ease;
-
-  &:hover {
-    border-color: rgba(99, 102, 241, 0.25);
-  }
-
-  &__name {
-    font-size: 12px;
-    line-height: 1.2;
-    margin-top: 6px;
-  }
-
-  &__score {
-    font-size: 15px;
-    margin-top: 2px;
-  }
-}
-
-.rank-badge {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 22px;
-  height: 22px;
-  border-radius: 50%;
-  background: rgba(0, 0, 0, 0.06);
-  font-size: 11px;
-  font-weight: 700;
-  color: #64748b;
-}
-
 // Keep the per-game panel visible while scrolling the (usually taller)
 // column of category cards next to it on wide screens.
 @media (min-width: 1024px) {
@@ -522,5 +461,28 @@ const gameLeaderboardColumns = [
     position: sticky;
     top: 16px;
   }
+}
+
+.mobile-leaderboard-card {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  // The app applies a global rounded-corners style to every q-card; a
+  // maximized dialog should fill the screen edge to edge instead.
+  border-radius: 0 !important;
+}
+
+// A trophy-gold gradient rather than the app's indigo accent -- gives the
+// mobile leaderboard its own bit of color instead of adding to the purple
+// already used everywhere else.
+.mobile-leaderboard-header {
+  flex: 0 0 auto;
+  padding: 14px 16px;
+  background: linear-gradient(135deg, #b45309, #f59e0b);
+}
+
+.mobile-leaderboard-body {
+  flex: 1 1 auto;
+  overflow-y: auto;
 }
 </style>
