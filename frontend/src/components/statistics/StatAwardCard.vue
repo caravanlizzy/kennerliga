@@ -1,9 +1,9 @@
 <template>
   <q-card flat bordered class="award-card full-height">
-    <q-card-section class="q-pb-none">
+    <q-card-section class="q-pb-sm">
       <div class="row items-center no-wrap">
-        <div class="stat-icon-box q-mr-sm">
-          <q-icon :name="icon" color="primary" size="22px" />
+        <div class="stat-icon-box q-mr-sm" :style="{ background: accentColor + '14' }">
+          <q-icon :name="icon" :style="{ color: accentColor }" size="22px" />
         </div>
         <div class="column">
           <div class="text-subtitle1 text-weight-bolder text-dark line-height-1">
@@ -13,6 +13,8 @@
         </div>
       </div>
     </q-card-section>
+
+    <q-separator class="q-mx-md" />
 
     <q-card-section class="q-pt-sm">
       <div v-if="award.top3.length === 0" class="text-caption text-grey-6 q-pa-sm">
@@ -50,10 +52,27 @@ const ICONS: Record<string, string> = {
   inspirer: 'auto_awesome',
 };
 
+// Give each "fun" superlative its own accent, matching the app's existing
+// negative/accent palette (quasar.variables.scss), rather than the plain
+// indigo used by the ranked categories.
+const ACCENT_COLORS: Record<string, string> = {
+  hater: '#d63a38',
+  inspirer: '#5e35b1',
+};
+
 const icon = computed(() => ICONS[props.award.key] ?? 'emoji_events');
+const accentColor = computed(() => ACCENT_COLORS[props.award.key] ?? '#6366f1');
 </script>
 
 <style scoped lang="scss">
+.award-card {
+  transition: border-color 0.15s ease;
+
+  &:hover {
+    border-color: rgba(99, 102, 241, 0.3);
+  }
+}
+
 .stat-icon-box {
   width: 36px;
   height: 36px;
@@ -72,6 +91,11 @@ const icon = computed(() => ICONS[props.award.key] ?? 'emoji_events');
   border-radius: 8px;
   background: rgba(0, 0, 0, 0.02);
   border: 1px solid rgba(0, 0, 0, 0.06);
+  transition: border-color 0.15s ease;
+
+  &:hover {
+    border-color: rgba(99, 102, 241, 0.25);
+  }
 
   &--me {
     background: rgba(99, 102, 241, 0.08);

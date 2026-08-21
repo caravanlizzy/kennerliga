@@ -14,6 +14,7 @@
       <!-- Chat feature temporarily disabled -->
       <!-- <q-tab name="chat" icon="chat" label="Chat" /> -->
       <q-tab name="leaderboard" icon="stars" label="Rank" class="tab-leaderboard" />
+      <q-tab name="stats" icon="query_stats" label="Stats" class="tab-stats" />
     </q-tabs>
   </q-footer>
 </template>
@@ -36,6 +37,7 @@ const activeTab = computed(() => {
     case 'live': return 'live';
     case 'chat': return 'chat';
     case 'leaderboard': return 'leaderboard';
+    case 'statistics': return 'stats';
     default: return null;
   }
 });
@@ -45,6 +47,7 @@ const tabToRoute = {
   live: 'live',
   chat: 'chat',
   leaderboard: 'leaderboard',
+  stats: 'statistics',
 } as const;
 
 function handleTabChange(value: string) {
@@ -117,6 +120,16 @@ function handleTabChange(value: string) {
       &.q-tab--active {
         background: rgba(59, 130, 246, 0.05);
         color: #1d4ed8;
+      }
+    }
+
+    &.tab-stats {
+      .q-tab__icon {
+        color: #6366f1; // Indigo
+      }
+      &.q-tab--active {
+        background: rgba(99, 102, 241, 0.05);
+        color: #4338ca;
       }
     }
   }

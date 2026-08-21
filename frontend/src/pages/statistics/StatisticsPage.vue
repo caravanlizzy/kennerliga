@@ -2,8 +2,13 @@
   <q-page class="q-pa-md max-width-container q-mx-auto statistics-page">
     <div class="row items-center justify-between q-mb-md">
       <div class="row items-center q-gutter-x-sm">
-        <q-icon name="query_stats" size="sm" color="primary" />
-        <div class="text-h6 text-weight-bolder">Statistics</div>
+        <div class="stat-icon-box stat-icon-box--lg">
+          <q-icon name="query_stats" color="primary" size="24px" />
+        </div>
+        <div class="column">
+          <div class="text-h6 text-weight-bolder line-height-1">Statistics</div>
+          <div class="text-caption text-grey-6">Rankings, records &amp; leaderboards.</div>
+        </div>
       </div>
       <div style="min-width: 180px">
         <KennerSelect
@@ -19,7 +24,7 @@
     </div>
 
     <!-- Player-count filter, mirroring the chips on the players list. -->
-    <div class="row items-center q-gutter-x-sm q-mb-md">
+    <div class="row items-center q-gutter-x-sm q-mb-md filter-toolbar">
       <div class="row items-center text-caption text-weight-bold text-grey-8">
         <q-icon name="groups" size="18px" class="q-mr-xs text-primary" />
         <span>Players:</span>
@@ -83,17 +88,19 @@
 
       <div class="col-12 col-md-5 order-first order-md-last">
         <q-card flat bordered class="game-stats-card">
-      <q-card-section class="q-pb-none">
+      <q-card-section class="q-pb-sm">
         <div class="row items-center no-wrap">
           <div class="stat-icon-box q-mr-sm">
             <q-icon name="sports_esports" color="primary" size="22px" />
           </div>
           <div class="column">
-            <div class="text-subtitle1 text-weight-bolder text-dark">Best Players by Game</div>
+            <div class="text-subtitle1 text-weight-bolder text-dark line-height-1">Best Players by Game</div>
             <div class="text-caption text-grey-6">Search for a game to see who performs best at it.</div>
           </div>
         </div>
       </q-card-section>
+
+      <q-separator class="q-mx-md" />
 
       <q-card-section>
         <q-input
@@ -415,6 +422,19 @@ const gameLeaderboardColumns = [
   flex-shrink: 0;
 }
 
+.stat-icon-box--lg {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+}
+
+.filter-toolbar {
+  padding: 8px 12px;
+  border-radius: 8px;
+  background: var(--kenner-bg-page-accent, #f1f5f9);
+  border: 1px solid var(--kenner-border-color, rgba(0, 0, 0, 0.08));
+}
+
 .me-row {
   background: rgba(99, 102, 241, 0.06);
   border: 1px solid rgba(99, 102, 241, 0.15);
@@ -437,13 +457,14 @@ const gameLeaderboardColumns = [
   cursor: pointer;
   gap: 12px;
   border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  transition: background-color 0.15s ease;
 
   &:last-child {
     border-bottom: none;
   }
 
   &:hover {
-    background: rgba(0, 0, 0, 0.03);
+    background: rgba(99, 102, 241, 0.04);
   }
 
   &--active {
@@ -477,6 +498,11 @@ const gameLeaderboardColumns = [
   border-radius: 8px;
   background: #fff;
   border: 1px solid rgba(0, 0, 0, 0.06);
+  transition: border-color 0.15s ease;
+
+  &:hover {
+    border-color: rgba(99, 102, 241, 0.25);
+  }
 
   &__name {
     font-size: 12px;

@@ -1,6 +1,6 @@
 <template>
   <q-card flat bordered class="stat-card full-height">
-    <q-card-section class="q-pb-none">
+    <q-card-section class="q-pb-sm">
       <div class="row items-center no-wrap">
         <div class="stat-icon-box q-mr-sm">
           <q-icon :name="icon" color="primary" size="22px" />
@@ -13,6 +13,8 @@
         </div>
       </div>
     </q-card-section>
+
+    <q-separator class="q-mx-md" />
 
     <q-card-section class="q-pt-sm">
       <div v-if="rows.length === 0" class="text-caption text-grey-6 q-pa-sm">
@@ -155,10 +157,17 @@ const rows = computed<TRankRow[]>(() => {
 
   return result;
 });
-
 </script>
 
 <style scoped lang="scss">
+.stat-card {
+  transition: border-color 0.15s ease;
+
+  &:hover {
+    border-color: rgba(99, 102, 241, 0.3);
+  }
+}
+
 .stat-icon-box {
   width: 36px;
   height: 36px;
@@ -173,10 +182,19 @@ const rows = computed<TRankRow[]>(() => {
 .rank-row {
   padding: 6px 4px;
   border-radius: 6px;
+  transition: background-color 0.15s ease;
+
+  &:hover {
+    background: rgba(0, 0, 0, 0.03);
+  }
 }
 
 .rank-row--me {
   background: rgba(99, 102, 241, 0.08);
+
+  &:hover {
+    background: rgba(99, 102, 241, 0.12);
+  }
 }
 
 .rank-badge {
