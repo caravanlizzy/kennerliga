@@ -64,6 +64,10 @@ class StatisticsServiceTestBase(TestCase):
             league=league, player_banning=banner, selected_game=selected_game
         )
 
+    def make_pick(self, league, picker, game):
+        """Records `picker` picking `game` in `league` (one pick per game, per league)."""
+        return SelectedGame.objects.create(profile=picker, game=game, league=league)
+
 
 class CareerPerformanceTests(StatisticsServiceTestBase):
     def test_reaching_a_higher_league_outranks_all_lower_league_play(self):
@@ -253,3 +257,37 @@ class AwardTests(StatisticsServiceTestBase):
             [entry["profile_id"] for entry in hater["around_me"]], [b.id, c.id]
         )
         self.assertEqual(hater["me"]["rank"], 3)
+
+    def test_spammer_award_ranks_by_most_repeated_single_game(self):
+        a = self.make_profile("A")
+        b = self.make_profile("B")
+        catan = Game.objects.create(name="Catan", platform=self.platform)
+        chess = Game.objects.create(name="Chess", platform=self.platform)
+        leagues = [self.make_league(level) for level in range(1, 5)]
+
+        # A picks Catan three times (across three leagues) and Chess once --
+        # A's Spammer value is 3 (their most-repeated game), not 4 (their
+        # total picks, which would be the Inspirer value instead).
+        self.make_pick(leagues[0], a, catan)
+        self.make_pick(leagues[1], a, catan)
+        self.make_pick(leagues[2], a, catan)
+        self.make_pick(leagues[3], a, chess)
+
+        # B only ever picks Catan once.
+        other_league = self.make_league(5)
+        self.make_pick(other_league, b, catan)
+
+        awards = get_awards(a, top_n=5, window=1)
+        spammer = next(award for award in awards if award["key"] == "spammer")
+        inspirer = next(award for award in awards if award["key"] == "inspirer")
+
+        self.assertEqual(
+            [(entry["profile_id"], entry["value"]) for entry in spammer["top"]],
+            [(a.id, 3), (b.id, 1)],
+        )
+        self.assertEqual(spammer["top"][0]["display"], "3x Catan")
+        # Sanity check that Spammer and Inspirer measure different things.
+        self.assertEqual(
+            [(entry["profile_id"], entry["value"]) for entry in inspirer["top"]],
+            [(a.id, 4), (b.id, 1)],
+        )

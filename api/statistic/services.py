@@ -7,6 +7,8 @@ data a player-facing statistics page needs. Keeping the logic here (rather
 than on the models or in the view) mirrors the separation already used by
 `user.service.get_user_summary_stats`.
 """
+from collections import defaultdict
+
 from django.db.models import (
     Avg,
     Count,
@@ -45,6 +47,12 @@ AWARD_DEFS = [
         "key": "inspirer",
         "label": "Inspirer",
         "description": "Most different picks.",
+        "unit": "",
+    },
+    {
+        "key": "spammer",
+        "label": "Spammer",
+        "description": "Most picks of the same game.",
         "unit": "",
     },
 ]
@@ -478,11 +486,13 @@ def get_awards(
 ):
     """
     Builds the fun "superlative" awards: the Hater (most games banned, where
-    skipping a ban doesn't count) and the Inspirer (most `SelectedGame`
-    picks made across leagues -- picking the same game again in a different
-    league still counts). Ranked the same way as the categories in
-    `get_statistics_overview` -- dense rank, top N plus a window around the
-    requesting player -- so they render through the same card.
+    skipping a ban doesn't count), the Inspirer (most `SelectedGame` picks
+    made across leagues -- picking the same game again in a different
+    league still counts), and the Spammer (the most times any single player
+    has picked the *same* game across leagues). Ranked the same way as the
+    categories in `get_statistics_overview` -- dense rank, top N plus a
+    window around the requesting player -- so they render through the same
+    card.
     """
     ban_qs = BanDecision.objects.filter(skipped_ban=False, selected_game__isnull=False)
     if years:
@@ -500,6 +510,19 @@ def get_awards(
         pick_qs.values("profile_id").annotate(value=Count("id")).order_by()
     )
 
+    # Per player, per game, how many times that game was picked -- the
+    # Spammer's value is each player's own most-repeated game.
+    pick_by_game_rows = list(
+        pick_qs.values("profile_id", "game__name").annotate(value=Count("id")).order_by()
+    )
+    rows_by_profile = defaultdict(list)
+    for row in pick_by_game_rows:
+        rows_by_profile[row["profile_id"]].append(row)
+    most_repeated_pick = {
+        pid: min(rows, key=lambda r: (-r["value"], r["game__name"].lower()))
+        for pid, rows in rows_by_profile.items()
+    }
+
     profile_ids = {row["player_banning_id"] for row in ban_rows} | {
         row["profile_id"] for row in pick_rows
     }
@@ -508,18 +531,20 @@ def get_awards(
         for p in PlayerProfile.objects.filter(id__in=profile_ids).select_related("user")
     }
 
-    def rank_award(rows, id_key):
-        value_by_id = {row[id_key]: row["value"] for row in rows}
-        players = [
+    def players_from_counts(value_by_id, display_by_id=None):
+        return [
             {
                 "profile_id": pid,
                 "profile_name": player.profile_name,
                 "username": player.user.username if player.user else None,
                 "value": value_by_id[pid],
+                "display": (display_by_id or {}).get(pid),
             }
             for pid, player in profile_map.items()
             if pid in value_by_id
         ]
+
+    def rank_award(players, value_by_id):
         ranked = _rank_players(players, "value", "higher")
 
         top = [_entry(p, p["profile_id"] == profile.id) for p in ranked[:top_n]]
@@ -536,9 +561,19 @@ def get_awards(
 
         return top, around_me, me_summary, len(ranked)
 
+    ban_value_by_id = {row["player_banning_id"]: row["value"] for row in ban_rows}
+    pick_value_by_id = {row["profile_id"]: row["value"] for row in pick_rows}
+    spam_value_by_id = {pid: row["value"] for pid, row in most_repeated_pick.items()}
+    spam_display_by_id = {
+        pid: f'{row["value"]}x {row["game__name"]}' for pid, row in most_repeated_pick.items()
+    }
+
     rankings_by_key = {
-        "hater": rank_award(ban_rows, "player_banning_id"),
-        "inspirer": rank_award(pick_rows, "profile_id"),
+        "hater": rank_award(players_from_counts(ban_value_by_id), ban_value_by_id),
+        "inspirer": rank_award(players_from_counts(pick_value_by_id), pick_value_by_id),
+        "spammer": rank_award(
+            players_from_counts(spam_value_by_id, spam_display_by_id), spam_value_by_id
+        ),
     }
 
     awards = []

@@ -143,14 +143,16 @@ const ICONS: Record<string, string> = {
   games_played: 'sports_esports',
   hater: 'thumb_down',
   inspirer: 'auto_awesome',
+  spammer: 'repeat',
 };
 
 // The ranked categories all share the app's plain indigo accent; the "fun"
-// superlative awards (Hater, Inspirer) get their own, matching the app's
-// existing negative/accent palette (quasar.variables.scss).
+// superlative awards (Hater, Inspirer, Spammer) get their own, matching the
+// app's existing negative/accent palette (quasar.variables.scss).
 const ACCENT_COLORS: Record<string, string> = {
   hater: '#d63a38',
   inspirer: '#5e35b1',
+  spammer: '#e08a1e',
 };
 const DEFAULT_ACCENT_COLOR = '#4338ca';
 
