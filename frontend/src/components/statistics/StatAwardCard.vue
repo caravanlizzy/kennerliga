@@ -31,7 +31,7 @@
             >
               {{ entry.profile_name }}
             </div>
-            <div class="podium-player__score text-weight-bolder text-dark">
+            <div class="podium-player__score text-weight-bolder" :style="{ color: accentColor }">
               {{ entry.value }}
             </div>
           </div>
@@ -109,8 +109,9 @@ const accentColor = computed(() => ACCENT_COLORS[props.award.key] ?? '#6366f1');
   }
 
   &__score {
-    font-size: 15px;
+    font-size: 16px;
     margin-top: 2px;
+    font-variant-numeric: tabular-nums;
   }
 }
 

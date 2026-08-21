@@ -73,15 +73,15 @@
         </div>
 
         <div v-else class="row q-col-gutter-md">
+          <div v-for="award in overview?.awards ?? []" :key="award.key" class="col-12 col-sm-6">
+            <StatAwardCard :award="award" />
+          </div>
           <div
             v-for="category in overview?.categories ?? []"
             :key="category.key"
             class="col-12 col-sm-6"
           >
             <StatCategoryCard :category="category" />
-          </div>
-          <div v-for="award in overview?.awards ?? []" :key="award.key" class="col-12 col-sm-6">
-            <StatAwardCard :award="award" />
           </div>
         </div>
       </div>
@@ -321,6 +321,9 @@ async function loadOverview() {
     overview.value = await fetchStatisticsOverview({
       years: selectedYears.value,
       playerCounts: playerCountsParam.value,
+      // Large enough to cover every player in any realistic league, so the
+      // category cards' "show all" expansion never needs a second request.
+      topN: 200,
     });
   } finally {
     loadingOverview.value = false;
