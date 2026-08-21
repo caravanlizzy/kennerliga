@@ -96,38 +96,41 @@
       </q-card-section>
 
       <q-card-section>
-        <q-select
-          v-model="selectedGameId"
-          :options="filteredGameOptions"
-          label="Search for a game"
+        <q-input
+          v-model="gameSearch"
+          label="Search games"
           clearable
           dense
           outlined
-          use-input
-          hide-selected
-          fill-input
-          input-debounce="0"
-          emit-value
-          map-options
-          class="q-mb-md game-select"
-          @filter="filterGameOptions"
+          class="q-mb-md"
         >
-          <template v-slot:option="scope">
-            <q-item v-bind="scope.itemProps">
-              <q-item-section>
-                <q-item-label>{{ scope.opt.label }}</q-item-label>
-                <q-item-label caption>
-                  {{ scope.opt.games_played }} games played &middot; {{ scope.opt.distinct_players }} players
-                </q-item-label>
-              </q-item-section>
-            </q-item>
+          <template v-slot:prepend>
+            <q-icon name="search" />
           </template>
-          <template v-slot:no-option>
-            <q-item>
-              <q-item-section class="text-grey-6"> No games match that search. </q-item-section>
-            </q-item>
-          </template>
-        </q-select>
+        </q-input>
+
+        <div class="game-preview-list q-mb-md">
+          <div
+            v-for="game in filteredGames"
+            :key="game.game_id"
+            class="game-preview-row row items-center justify-between no-wrap"
+            :class="{ 'game-preview-row--active': game.game_id === selectedGameId }"
+            @click="selectedGameId = selectedGameId === game.game_id ? null : game.game_id"
+          >
+            <div class="game-preview-row__name ellipsis text-weight-bold">{{ game.name }}</div>
+            <div v-if="game.best_player" class="game-preview-row__best text-caption ellipsis">
+              <q-icon name="emoji_events" size="14px" class="text-amber-8 q-mr-xs" />
+              {{ game.best_player.profile_name }}
+              <span v-if="game.best_player.win_rate !== null" class="text-grey-6">
+                &middot; {{ game.best_player.win_rate }}%
+              </span>
+            </div>
+            <div v-else class="text-caption text-grey-5">No ranked player</div>
+          </div>
+          <div v-if="filteredGames.length === 0" class="text-caption text-grey-6 q-pa-sm">
+            No games match that search.
+          </div>
+        </div>
 
         <div v-if="loadingLeaderboard" class="flex justify-center q-pa-lg">
           <q-spinner color="primary" size="32px" />
@@ -208,7 +211,7 @@
         </template>
 
         <div v-else-if="selectedGameId === null" class="text-caption text-grey-6 q-pa-md">
-          Search for a game above to see its leaderboard.
+          Pick a game above to see its full leaderboard.
         </div>
       </q-card-section>
         </q-card>
@@ -273,33 +276,12 @@ const overview = ref<TStatisticsOverview | null>(null);
 const loadingOverview = ref(false);
 
 const allGames = ref<TGameStatSummary[]>([]);
-const gameOptions = computed(() =>
-  allGames.value.map((game) => ({
-    label: game.name,
-    value: game.game_id,
-    games_played: game.games_played,
-    distinct_players: game.distinct_players,
-  }))
-);
-// Mirrors gameOptions until the user types a search term, at which point
-// filterGameOptions narrows it to matching game names.
-const filteredGameOptions = ref(gameOptions.value);
-watch(gameOptions, (options) => {
-  filteredGameOptions.value = options;
+const gameSearch = ref('');
+const filteredGames = computed(() => {
+  const needle = gameSearch.value.trim().toLowerCase();
+  if (!needle) return allGames.value;
+  return allGames.value.filter((game) => game.name.toLowerCase().includes(needle));
 });
-
-function filterGameOptions(val: string, update: (fn: () => void) => void) {
-  update(() => {
-    if (val === '') {
-      filteredGameOptions.value = gameOptions.value;
-      return;
-    }
-    const needle = val.toLowerCase();
-    filteredGameOptions.value = gameOptions.value.filter((option) =>
-      option.label.toLowerCase().includes(needle)
-    );
-  });
-}
 
 const selectedGameId = ref<number | null>(null);
 const leaderboard = ref<TGameLeaderboard | null>(null);
@@ -451,8 +433,40 @@ const gameLeaderboardColumns = [
   border: 1px solid rgba(0, 0, 0, 0.06);
 }
 
-.game-select {
-  max-width: 420px;
+.game-preview-list {
+  max-height: 320px;
+  overflow-y: auto;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 8px;
+}
+
+.game-preview-row {
+  padding: 8px 12px;
+  cursor: pointer;
+  gap: 12px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+
+  &:last-child {
+    border-bottom: none;
+  }
+
+  &:hover {
+    background: rgba(0, 0, 0, 0.03);
+  }
+
+  &--active {
+    background: rgba(99, 102, 241, 0.08);
+  }
+
+  &__name {
+    min-width: 0;
+    flex: 1 1 auto;
+  }
+
+  &__best {
+    flex: 0 0 auto;
+    max-width: 55%;
+  }
 }
 
 // Hall of Fame: a plain bordered panel matching the app's flat card style

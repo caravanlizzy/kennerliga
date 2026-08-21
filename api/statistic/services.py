@@ -528,10 +528,68 @@ def get_awards(profile, years=None, player_counts=None, top_n=DEFAULT_AWARD_TOP_
     ]
 
 
+def _best_player_by_game(qs):
+    """
+    Ranks every player within each game by the same "most wins, then most
+    consistent" ordering as `get_game_leaderboard` (win rate desc, avg
+    position asc, games played desc, name asc), and keeps only the winner
+    per game. A single grouped query, rather than one `get_game_leaderboard`
+    call per game, so the game picker can show a "best player" preview for
+    every game at once.
+    """
+    rows = qs.values("selected_game__game_id", "player_profile_id").annotate(
+        games_played=Count("id"),
+        wins=Count("id", filter=Q(position=1)),
+        avg_position=Avg("position"),
+    )
+
+    profile_map = {
+        p.id: p
+        for p in PlayerProfile.objects.filter(
+            id__in={row["player_profile_id"] for row in rows}
+        ).select_related("user")
+    }
+
+    best_by_game = {}
+    for row in rows:
+        game_id = row["selected_game__game_id"]
+        player = profile_map.get(row["player_profile_id"])
+        if game_id is None or not player:
+            continue
+        played = row["games_played"] or 0
+        wins = row["wins"] or 0
+        win_rate = round(wins / played * 100, 1) if played > 0 else None
+        avg_position = (
+            round(float(row["avg_position"]), 2)
+            if row["avg_position"] is not None
+            else None
+        )
+        sort_key = (
+            -(win_rate or 0),
+            avg_position if avg_position is not None else float("inf"),
+            -played,
+            player.profile_name.lower(),
+        )
+        best = best_by_game.get(game_id)
+        if best is None or sort_key < best[0]:
+            best_by_game[game_id] = (
+                sort_key,
+                {
+                    "profile_id": player.id,
+                    "profile_name": player.profile_name,
+                    "win_rate": win_rate,
+                    "avg_position": avg_position,
+                },
+            )
+
+    return {game_id: entry[1] for game_id, entry in best_by_game.items()}
+
+
 def list_games_with_stats(years=None, player_counts=None):
     """
     Returns every game that has at least one recorded result, with basic
-    popularity stats, for use as a picker for the per-game leaderboard.
+    popularity stats and the current best player, for use as a searchable
+    picker for the per-game leaderboard.
     """
     qs = Result.objects.select_related("selected_game__game__platform")
     if years:
@@ -551,6 +609,8 @@ def list_games_with_stats(years=None, player_counts=None):
         .order_by("-games_played", "selected_game__game__name")
     )
 
+    best_players = _best_player_by_game(qs)
+
     return [
         {
             "game_id": row["selected_game__game_id"],
@@ -558,6 +618,7 @@ def list_games_with_stats(years=None, player_counts=None):
             "platform": row["selected_game__game__platform__name"],
             "games_played": row["games_played"],
             "distinct_players": row["distinct_players"],
+            "best_player": best_players.get(row["selected_game__game_id"]),
         }
         for row in rows
         if row["selected_game__game_id"] is not None

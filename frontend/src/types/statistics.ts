@@ -50,12 +50,20 @@ export type TStatisticsOverview = {
   awards: TAward[];
 };
 
+export type TGameBestPlayer = {
+  profile_id: number;
+  profile_name: string;
+  win_rate: number | null;
+  avg_position: number | null;
+};
+
 export type TGameStatSummary = {
   game_id: number;
   name: string;
   platform: string;
   games_played: number;
   distinct_players: number;
+  best_player: TGameBestPlayer | null;
 };
 
 export type TGameLeaderboardEntry = {
