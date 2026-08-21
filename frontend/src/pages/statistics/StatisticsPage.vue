@@ -94,7 +94,7 @@
             <q-icon name="sports_esports" color="primary" size="22px" />
           </div>
           <div class="column">
-            <div class="text-subtitle1 text-weight-bolder text-dark line-height-1">Best Players by Game</div>
+            <div class="text-subtitle1 text-weight-bolder text-dark line-height-1">Game Stats</div>
             <div class="text-caption text-grey-6">Search for a game to see who performs best at it.</div>
           </div>
         </div>
