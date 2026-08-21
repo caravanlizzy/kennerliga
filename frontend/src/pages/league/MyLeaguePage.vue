@@ -58,8 +58,9 @@
 
         <!-- Unified Content Area -->
         <div class="col-12 col-md-9">
-          <BanGameSection />
           <div class="unified-content-container">
+            <BanGameSection flat no-margin />
+            <div v-if="leagueStatus === 'BANNING'" class="section-divider" />
             <LeagueStandingsSection flat no-margin />
             <div class="section-divider" />
             

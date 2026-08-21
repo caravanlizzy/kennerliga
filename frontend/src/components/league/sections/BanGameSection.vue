@@ -1,40 +1,80 @@
 <template>
-  <div />
+  <ContentSection
+    v-if="showBanSection"
+    title="Ban a Game"
+    color="negative"
+    icon="block"
+    v-bind="$attrs"
+  >
+    <div class="text-body2 text-grey-7 q-mb-md">
+      <template v-if="candidates.length">
+        Click a game picked by another player to ban it, or skip your ban.
+      </template>
+      <template v-else>No games available to ban.</template>
+    </div>
+
+    <div v-if="candidates.length" class="ban-candidate-grid q-mb-md">
+      <q-card
+        v-for="(c, idx) in candidates"
+        :key="c.id"
+        flat
+        bordered
+        class="ban-candidate-card cursor-pointer"
+        @click="performBan(c.id, false)"
+      >
+        <q-card-section class="row items-center no-wrap q-pa-sm">
+          <div class="ban-candidate-index text-caption text-weight-bold text-grey-6 q-mr-sm">
+            {{ String(idx + 1).padStart(2, '0') }}
+          </div>
+          <div class="col">
+            <div class="text-weight-bold text-dark ellipsis">{{ c.game_name }}</div>
+            <div class="text-caption text-grey-7 ellipsis">
+              <q-icon name="person" size="14px" class="q-mr-xs" />
+              Picked by {{ c.owner_name }}
+            </div>
+          </div>
+          <q-icon name="block" size="sm" color="negative" class="q-ml-sm ban-candidate-icon" />
+        </q-card-section>
+      </q-card>
+    </div>
+
+    <div class="row justify-end">
+      <KennerButton
+        flat
+        label="Skip Ban"
+        color="grey-7"
+        :loading="banning"
+        @click="performBan(undefined, true)"
+      />
+    </div>
+  </ContentSection>
 </template>
 
 <script setup lang="ts">
-import { h, watch } from 'vue';
+import { computed, ref } from 'vue';
 import { storeToRefs } from 'pinia';
-import { QCard, QCardSection, QIcon, QSeparator } from 'quasar';
+import ContentSection from 'components/base/ContentSection.vue';
+import KennerButton from 'components/base/KennerButton.vue';
 import { useMyLeagueStore } from 'src/composables/myLeague';
-import { useActionBar } from 'src/composables/actionBar';
 import { banGame } from 'src/services/gameService';
 import type { TSeasonParticipantDto, TSelectedGameDto } from 'src/types';
 
-// Statuses whose action-bar contents are owned by this section.
-const OWNED_STATUSES = ['BANNING'] as const;
-type TOwnedStatus = (typeof OWNED_STATUSES)[number];
+const myLeagueStore = useMyLeagueStore();
+const { isMeBanningGame, leagueStatus, members, myProfileId, leagueId } =
+  storeToRefs(myLeagueStore);
+const { updateLeagueData } = myLeagueStore;
 
-const isOwnedStatus = (status: unknown): status is TOwnedStatus =>
-  OWNED_STATUSES.includes(status as TOwnedStatus);
+const banning = ref(false);
+
+const showBanSection = computed(
+  () => leagueStatus.value === 'BANNING' && isMeBanningGame.value
+);
 
 interface TBanCandidate extends TSelectedGameDto {
   owner_name: string;
 }
 
-const myLeagueStore = useMyLeagueStore();
-const {
-  isMeBanningGame,
-  leagueStatus,
-  members,
-  myProfileId,
-  leagueId,
-} = storeToRefs(myLeagueStore);
-const { updateLeagueData } = myLeagueStore;
-
-const { setActions, setLeadText, setSubject, reset } = useActionBar();
-
-function buildCandidates(): TBanCandidate[] {
+const candidates = computed<TBanCandidate[]>(() => {
   const out: TBanCandidate[] = [];
   members.value.forEach((m: TSeasonParticipantDto) => {
     // Players can't ban their own picks
@@ -44,10 +84,11 @@ function buildCandidates(): TBanCandidate[] {
     });
   });
   return out;
-}
+});
 
 async function performBan(selectedGameId?: number, skip = false) {
   if (myProfileId.value == null || leagueId.value == null) return;
+  banning.value = true;
   try {
     await banGame({
       profileId: myProfileId.value,
@@ -58,142 +99,13 @@ async function performBan(selectedGameId?: number, skip = false) {
     await updateLeagueData();
   } catch (e) {
     console.error('Error banning game:', e);
+  } finally {
+    banning.value = false;
   }
 }
-
-function renderCandidateList(candidates: TBanCandidate[]) {
-  if (!candidates.length) {
-    return () =>
-      h(
-        'div',
-        { class: 'row items-center q-gutter-sm text-grey-7 q-py-sm' },
-        [
-          h(QIcon, { name: 'info', size: 'sm', color: 'grey-5' }),
-          h('span', 'No games available to ban.'),
-        ]
-      );
-  }
-
-  return () =>
-    h(
-      'div',
-      { class: 'ban-candidate-grid q-mt-sm' },
-      candidates.map((c, idx) =>
-        h(
-          QCard,
-          {
-            key: c.id,
-            flat: true,
-            bordered: true,
-            class: 'ban-candidate-card cursor-pointer',
-            onClick: () => performBan(c.id, false),
-          },
-          {
-            default: () => [
-              h(
-                QCardSection,
-                { class: 'row items-center no-wrap q-pa-sm' },
-                {
-                  default: () => [
-                    h(
-                      'div',
-                      {
-                        class:
-                          'ban-candidate-index text-caption text-weight-bold text-grey-6 q-mr-sm',
-                      },
-                      String(idx + 1).padStart(2, '0')
-                    ),
-                    h('div', { class: 'col' }, [
-                      h(
-                        'div',
-                        { class: 'text-weight-bold text-dark ellipsis' },
-                        c.game_name
-                      ),
-                      h(
-                        'div',
-                        { class: 'text-caption text-grey-7 ellipsis' },
-                        [
-                          h(QIcon, {
-                            name: 'person',
-                            size: '14px',
-                            class: 'q-mr-xs',
-                          }),
-                          `Picked by ${c.owner_name}`,
-                        ]
-                      ),
-                    ]),
-                    h(QIcon, {
-                      name: 'block',
-                      size: 'sm',
-                      color: 'negative',
-                      class: 'q-ml-sm ban-candidate-icon',
-                    }),
-                  ],
-                }
-              ),
-            ],
-          }
-        )
-      )
-    );
-}
-
-function manageActionBar() {
-  if (!isOwnedStatus(leagueStatus.value)) return;
-  if (!isMeBanningGame.value) {
-    reset();
-    return;
-  }
-
-  const candidates = buildCandidates();
-
-  setLeadText('Ban a game picked by another player');
-  setSubject(() =>
-    h('div', [
-      h(
-        'div',
-        { class: 'text-body2 text-grey-7 q-mb-xs' },
-        candidates.length
-          ? 'Click a game to ban it, or skip your ban.'
-          : ''
-      ),
-      h(QSeparator, { class: 'q-my-xs' }),
-      renderCandidateList(candidates)(),
-    ])
-  );
-
-  setActions([
-    {
-      name: 'Skip Ban',
-      buttonVariant: 'grey-7',
-      callback: () => performBan(undefined, true),
-    },
-  ]);
-}
-
-// Re-render the action bar when ban-relevant inputs change.
-watch(
-  [leagueStatus, isMeBanningGame, members],
-  manageActionBar,
-  { immediate: true, deep: true }
-);
-
-// When leaving the BANNING status, clear the action bar so a later remount
-// doesn't start from stale values.
-watch(
-  leagueStatus,
-  (status, prev) => {
-    if (isOwnedStatus(prev) && !isOwnedStatus(status)) {
-      reset();
-    }
-  },
-  { immediate: true }
-);
 </script>
 
-<style lang="scss">
-/* Global styles: this component renders into ActionBar via a render fn,
-   so scoped styles wouldn't reach the nodes. */
+<style scoped lang="scss">
 .ban-candidate-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
@@ -217,7 +129,6 @@ watch(
     }
   }
 }
-
 
 .ban-candidate-icon {
   transition: transform 0.2s ease;

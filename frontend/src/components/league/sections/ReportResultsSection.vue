@@ -19,10 +19,8 @@ import { storeToRefs } from 'pinia';
 import ContentSection from 'components/base/ContentSection.vue';
 import MatchResultTabs from 'components/league/MatchResultTabs.vue';
 import { useMyLeagueStore } from 'src/composables/myLeague';
-import { useActionBar } from 'src/composables/actionBar';
 
 const { leagueStatus } = storeToRefs(useMyLeagueStore());
-const { reset } = useActionBar();
 
 const isOpened = ref(false);
 
@@ -30,9 +28,6 @@ watch(
   leagueStatus,
   (status) => {
     isOpened.value = status === 'PLAYING';
-    if (status === 'PLAYING') {
-      reset();
-    }
   },
   { immediate: true }
 );
