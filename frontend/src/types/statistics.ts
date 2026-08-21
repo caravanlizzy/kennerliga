@@ -28,10 +28,26 @@ export type TStatCategory = {
   around_me: TStatEntry[];
 };
 
+export type TAwardEntry = {
+  profile_id: number;
+  profile_name: string;
+  value: number;
+  is_me: boolean;
+};
+
+export type TAward = {
+  key: string;
+  label: string;
+  description: string;
+  unit: string;
+  top3: TAwardEntry[];
+};
+
 export type TStatisticsOverview = {
   min_games: number;
   window: number;
   categories: TStatCategory[];
+  awards: TAward[];
 };
 
 export type TGameStatSummary = {

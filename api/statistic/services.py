@@ -17,6 +17,7 @@ from django.db.models import (
     Sum,
 )
 
+from game.models import BanDecision, SelectedGame
 from league.models import LeagueStanding
 from result.models import Result
 from user.models import PlayerProfile
@@ -27,6 +28,26 @@ DEFAULT_MIN_GAMES = 3
 DEFAULT_WINDOW = 1
 DEFAULT_TOP_N = 5
 DEFAULT_GAME_MIN_GAMES = 2
+DEFAULT_AWARD_TOP_N = 3
+
+# Fun "superlative" awards: a fixed top-N podium rather than a full ranking
+# (no min-games gate or "around me" window -- these are lighthearted counts,
+# not skill rankings). Each definition's `key` matches the award key
+# returned by `get_awards`.
+AWARD_DEFS = [
+    {
+        "key": "hater",
+        "label": "Hater",
+        "description": "Most games banned (skipping a ban doesn't count).",
+        "unit": "bans",
+    },
+    {
+        "key": "inspirer",
+        "label": "Inspirer",
+        "description": "Most different games picked for a league.",
+        "unit": "games",
+    },
+]
 
 # Each category key must match a key present in the player dicts built by
 # `_build_player_pool`. `rate_based` categories only make sense with a
@@ -132,9 +153,11 @@ def _filter_results_by_player_count(qs, player_counts):
 
 def _filter_standings_by_player_count(qs, player_counts):
     """
-    Restricts a `LeagueStanding` queryset to leagues whose size (number of
-    standings) is one of `player_counts`, so the career metric respects the
-    same player-count filter as the per-game aggregates.
+    Restricts a queryset whose model has a direct `league` FK (e.g.
+    `LeagueStanding`, `BanDecision`, `SelectedGame`) to leagues whose size
+    (number of standings) is one of `player_counts`, so career/ban/pick
+    metrics all respect the same player-count filter as the per-game
+    aggregates.
     """
     if not player_counts:
         return qs
@@ -444,7 +467,66 @@ def get_statistics_overview(
         "min_games": min_games,
         "window": window,
         "categories": categories,
+        "awards": get_awards(profile, years=years, player_counts=player_counts),
     }
+
+
+def get_awards(profile, years=None, player_counts=None, top_n=DEFAULT_AWARD_TOP_N):
+    """
+    Builds the fun "superlative" awards podiums: the Hater (most games
+    banned, where skipping a ban doesn't count) and the Inspirer (most
+    different games picked for a league). Unlike the ranked categories
+    above, these are a fixed top-N with no min-games gate or "around me"
+    window -- just a lighthearted leaderboard.
+    """
+    ban_qs = BanDecision.objects.filter(skipped_ban=False, selected_game__isnull=False)
+    if years:
+        ban_qs = ban_qs.filter(league__season__year__in=years)
+    ban_qs = _filter_standings_by_player_count(ban_qs, player_counts)
+    ban_rows = list(
+        ban_qs.values("player_banning_id").annotate(value=Count("id")).order_by()
+    )
+
+    pick_qs = SelectedGame.objects.all()
+    if years:
+        pick_qs = pick_qs.filter(league__season__year__in=years)
+    pick_qs = _filter_standings_by_player_count(pick_qs, player_counts)
+    pick_rows = list(
+        pick_qs.values("profile_id")
+        .annotate(value=Count("game", distinct=True))
+        .order_by()
+    )
+
+    profile_ids = {row["player_banning_id"] for row in ban_rows} | {
+        row["profile_id"] for row in pick_rows
+    }
+    profile_map = {
+        p.id: p
+        for p in PlayerProfile.objects.filter(id__in=profile_ids).select_related("user")
+    }
+
+    def top_entries(rows, id_key):
+        named = [(row, profile_map[row[id_key]]) for row in rows if row[id_key] in profile_map]
+        named.sort(key=lambda pair: (-pair[0]["value"], pair[1].profile_name.lower()))
+        return [
+            {
+                "profile_id": player.id,
+                "profile_name": player.profile_name,
+                "value": row["value"],
+                "is_me": player.id == profile.id,
+            }
+            for row, player in named[:top_n]
+        ]
+
+    entries_by_key = {
+        "hater": top_entries(ban_rows, "player_banning_id"),
+        "inspirer": top_entries(pick_rows, "profile_id"),
+    }
+
+    return [
+        {**definition, "top3": entries_by_key[definition["key"]]}
+        for definition in AWARD_DEFS
+    ]
 
 
 def list_games_with_stats(years=None, player_counts=None):

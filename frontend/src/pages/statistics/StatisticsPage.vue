@@ -62,7 +62,7 @@
     <div class="row q-col-gutter-md">
       <div class="col-12 col-md-7 order-last order-md-first">
         <div v-if="loadingOverview" class="row q-col-gutter-md">
-          <div v-for="i in 4" :key="i" class="col-12 col-sm-6">
+          <div v-for="i in 6" :key="i" class="col-12 col-sm-6">
             <q-skeleton type="rect" height="240px" class="rounded-borders" />
           </div>
         </div>
@@ -74,6 +74,9 @@
             class="col-12 col-sm-6"
           >
             <StatCategoryCard :category="category" />
+          </div>
+          <div v-for="award in overview?.awards ?? []" :key="award.key" class="col-12 col-sm-6">
+            <StatAwardCard :award="award" />
           </div>
         </div>
       </div>
@@ -213,6 +216,7 @@ defineOptions({ name: 'StatisticsPage' });
 import { computed, onMounted, ref, watch } from 'vue';
 import KennerSelect from 'components/base/KennerSelect.vue';
 import KennerTable from 'components/tables/KennerTable.vue';
+import StatAwardCard from 'components/statistics/StatAwardCard.vue';
 import StatCategoryCard from 'components/statistics/StatCategoryCard.vue';
 import { useUserStore } from 'stores/userStore';
 import {
