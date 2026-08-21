@@ -149,14 +149,13 @@
           </div>
 
           <!-- Hall of Fame: the three most dominant players at this game,
-               ranked by win % divided by average position (a higher win
-               rate combined with a lower/better average position wins). -->
+               ranked by win %. -->
           <div v-if="fameLeaders.length > 0" class="fame-card q-mb-md">
             <div class="fame-card__header row items-center no-wrap q-mb-sm">
               <q-icon name="emoji_events" size="18px" color="primary" class="q-mr-xs" />
               <span class="text-weight-bolder text-dark">Hall of Fame</span>
               <q-space />
-              <span class="text-caption text-grey-6">Win % ÷ Avg Pos</span>
+              <span class="text-caption text-grey-6">Win %</span>
             </div>
             <div class="row q-col-gutter-sm">
               <div
@@ -173,7 +172,7 @@
                     {{ leader.profile_name }}
                   </div>
                   <div class="fame-player__score text-weight-bolder text-dark">
-                    {{ leader.fameScore.toFixed(2) }}
+                    {{ leader.fameScore.toFixed(1) }}%
                   </div>
                 </div>
               </div>
@@ -293,22 +292,14 @@ const selectedGameId = ref<number | null>(null);
 const leaderboard = ref<TGameLeaderboard | null>(null);
 const loadingLeaderboard = ref(false);
 
-// The three most dominant players at the selected game: win rate divided by
-// average position, so a high win % paired with a low (better) average
-// position rises to the top. Only ranked players with both metrics qualify.
+// The three most dominant players at the selected game, ranked by win rate.
 const fameLeaders = computed(() => {
   if (!leaderboard.value) return [];
   return leaderboard.value.leaderboard
-    .filter(
-      (entry) =>
-        entry.eligible &&
-        entry.win_rate !== null &&
-        entry.avg_position !== null &&
-        entry.avg_position > 0
-    )
+    .filter((entry) => entry.eligible && entry.win_rate !== null)
     .map((entry) => ({
       ...entry,
-      fameScore: (entry.win_rate as number) / (entry.avg_position as number),
+      fameScore: entry.win_rate as number,
     }))
     .sort((a, b) => b.fameScore - a.fameScore)
     .slice(0, 3);
