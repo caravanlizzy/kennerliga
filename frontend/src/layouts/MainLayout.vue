@@ -2,6 +2,7 @@
   <q-layout view="hHh LpR fFf">
     <q-header class="no-shadow bg-transparent">
       <NavBar :onToggle="toggleDrawer" />
+      <BreadcrumbBar />
     </q-header>
 
     <q-drawer
@@ -69,6 +70,7 @@
 <script setup lang="ts">
 import MobileBottomNav from 'components/layout/MobileBottomNav.vue';
 import KennerTitleBar from 'components/layout/KennerTitleBar.vue';
+import BreadcrumbBar from 'components/layout/BreadcrumbBar.vue';
 import ActionBarRight from 'components/ui/ActionBarRight.vue';
 import ActionBarBottom from 'components/ui/ActionBarBottom.vue';
 import NavBar from 'components/layout/NavBar.vue';

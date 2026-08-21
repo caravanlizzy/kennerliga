@@ -25,27 +25,12 @@
               <KennerTooltip>Back</KennerTooltip>
             </KennerButton>
             
-            <div class="column justify-center q-ml-xs">
-              <div 
-                v-if="pageTitle" 
-                class="text-weight-bolder text-dark line-height-1"
-                :class="isMobile ? 'text-subtitle1' : 'text-h6'"
-              >
-                {{ pageTitle }}
-              </div>
-              <q-breadcrumbs 
-                gutter="xs" 
-                class="text-grey-6 text-weight-medium overflow-hidden breadcrumbs-small"
-              >
-                <q-breadcrumbs-el icon="home" to="/" />
-                <q-breadcrumbs-el
-                  v-for="crumb in crumbs"
-                  :key="crumb.path"
-                  :label="crumb.label"
-                  :icon="crumb.icon"
-                  :to="crumb.path"
-                />
-              </q-breadcrumbs>
+            <div
+              v-if="pageTitle"
+              class="text-weight-bolder text-dark line-height-1 q-ml-xs"
+              :class="isMobile ? 'text-subtitle1' : 'text-h6'"
+            >
+              {{ pageTitle }}
             </div>
           </div>
         </slot>
@@ -86,37 +71,6 @@ const show = computed(() => {
 });
 
 const pageTitle = computed(() => route.meta.label as string | undefined);
-
-const crumbs = computed(() => {
-  const result: { label: string; icon?: string; path: string }[] = [];
-
-  route.matched.forEach((record) => {
-    if (record.meta && record.meta.label && record.path !== '/') {
-      if (result.length > 0 && result[result.length - 1].label === record.meta.label) {
-        return;
-      }
-
-      let path = record.path;
-      if (path.includes(':')) {
-         if (record.name === route.name) {
-             path = route.path;
-         } else {
-             Object.entries(route.params).forEach(([key, value]) => {
-               path = path.replace(`:${key}`, Array.isArray(value) ? value[0] : value);
-             });
-         }
-      }
-
-      result.push({
-        label: record.meta.label as string,
-        icon: record.meta.icon as string | undefined,
-        path: path || '/',
-      });
-    }
-  });
-
-  return result;
-});
 </script>
 
 <style scoped lang="scss">
@@ -157,18 +111,6 @@ const crumbs = computed(() => {
 
 .line-height-1 {
   line-height: 1.2;
-}
-
-.breadcrumbs-small {
-  font-size: 11px;
-}
-
-::deep(.q-breadcrumbs__el) {
-  white-space: nowrap;
-}
-
-::deep(.q-breadcrumbs__el-icon) {
-  font-size: 14px;
 }
 
 .left-section {
