@@ -3,11 +3,8 @@
     <!-- Page Header -->
     <div class="page-header row items-center justify-between no-wrap q-gutter-x-md">
       <div class="row items-center q-gutter-x-md no-wrap">
-        <div class="column">
-          <div class="text-h5 text-weight-bolder page-title">Task Board</div>
-          <div class="text-caption page-subtitle">
-            Plan, track, and manage tasks across the team.
-          </div>
+        <div class="text-caption page-subtitle">
+          Plan, track, and manage tasks across the team.
         </div>
       </div>
       <KennerButton
@@ -356,11 +353,6 @@ onMounted(() => {
   justify-content: center;
   background: linear-gradient(135deg, var(--q-primary) 0%, #6366f1 100%);
   flex-shrink: 0;
-}
-
-.page-title {
-  color: var(--tb-title, #1a1a1a);
-  line-height: 1.2;
 }
 
 .page-subtitle {

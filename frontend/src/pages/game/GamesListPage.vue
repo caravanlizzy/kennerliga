@@ -3,7 +3,6 @@
     v-if="!loading && !error && data && Array.isArray(data)"
     :create-button="button"
     flat
-    title="Games"
     row-key="id"
     @row-click="onRowClick"
     :rows="data"

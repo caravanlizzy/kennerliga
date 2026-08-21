@@ -5,10 +5,7 @@
         <div class="stat-icon-box stat-icon-box--lg">
           <q-icon name="query_stats" color="primary" size="24px" />
         </div>
-        <div class="column">
-          <div class="text-h6 text-weight-bolder line-height-1">Statistics</div>
-          <div class="text-caption text-grey-6">Rankings, records &amp; leaderboards.</div>
-        </div>
+        <div class="text-body2 text-grey-7">Rankings, records &amp; leaderboards.</div>
       </div>
       <div style="min-width: 180px">
         <KennerSelect

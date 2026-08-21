@@ -1,14 +1,8 @@
 <template>
   <q-page class="q-py-md">
     <!-- Header Area -->
-    <div class="row items-center justify-between q-mb-md">
-      <div class="row items-center q-gutter-x-sm">
-        <q-icon name="settings" size="md" color="primary" />
-        <div class="text-h4 text-weight-bolder text-dark tracking-tighter row items-center no-wrap">
-          Manage League
-          <LeagueLevel v-if="league" :level="league.level" class="q-ml-sm" size="40px" font-size="18px" />
-        </div>
-      </div>
+    <div v-if="league" class="row items-center justify-between q-mb-md">
+      <LeagueLevel :level="league.level" size="40px" font-size="18px" />
     </div>
 
     <!-- Info Section -->

@@ -2,7 +2,6 @@
     <KennerTable
       v-if="data"
       flat
-      title="Invitations"
       :rows="data"
       :columns="columns"
       :createButton="createBtn"

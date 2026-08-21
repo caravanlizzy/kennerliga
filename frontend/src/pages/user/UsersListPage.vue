@@ -68,7 +68,6 @@
   <KennerTable
     :create-button="createButton"
     flat
-    title="Players"
     @row-click="onRowClick"
     :rows="users"
     :columns="columns"

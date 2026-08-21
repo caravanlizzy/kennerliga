@@ -3,7 +3,6 @@
     v-if="!loading && !error && seasons && Array.isArray(seasons)"
     :create-button="isAdmin ? createBtn : undefined"
     flat
-    title="Seasons"
     row-key="id"
     :rows="seasons"
     :columns="columns"

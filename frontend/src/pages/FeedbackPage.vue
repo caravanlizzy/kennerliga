@@ -3,11 +3,8 @@
     <!-- Page Header -->
     <div class="page-header">
       <div class="row items-center q-gutter-x-md no-wrap">
-        <div class="column">
-          <div class="text-h5 text-weight-bolder page-title">Feedback</div>
-          <div class="text-caption page-subtitle">
-            Share ideas, report issues, or tell us what you love.
-          </div>
+        <div class="text-caption page-subtitle">
+          Share ideas, report issues, or tell us what you love.
         </div>
       </div>
     </div>
@@ -268,11 +265,6 @@ onMounted(() => {
   justify-content: center;
   background: linear-gradient(135deg, var(--q-primary) 0%, #6366f1 100%);
   flex-shrink: 0;
-}
-
-.page-title {
-  color: var(--feedback-title, #1a1a1a);
-  line-height: 1.2;
 }
 
 .page-subtitle {

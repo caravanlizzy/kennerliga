@@ -25,9 +25,6 @@
         <!-- Sticky Sidebar Navigation -->
         <div class="col-12 col-md-3 gt-sm">
           <div class="sticky-column">
-            <div class="text-h6 text-weight-bold q-mb-md q-px-md text-dark">
-              My League
-            </div>
             <q-list padding class="navigation-list">
               <q-item
                 v-for="section in navSections"
