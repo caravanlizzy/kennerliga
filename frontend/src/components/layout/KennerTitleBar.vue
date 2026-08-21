@@ -115,12 +115,6 @@ const crumbs = computed(() => {
     }
   });
 
-  // The current page's title is already shown as the bold heading right
-  // above this trail, so drop a trailing crumb that would just repeat it.
-  if (result.length > 0 && result[result.length - 1].label === pageTitle.value) {
-    result.pop();
-  }
-
   return result;
 });
 </script>
