@@ -66,6 +66,13 @@ function handleTabChange(value: string) {
   border-top: none !important;
   box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.03);
 
+  // Force the tabs content wrapper to span the full width. Quasar's q-tabs
+  // measures its width internally and can misfire during route transitions,
+  // leaving the tabs squished into the left half of the bar.
+  :deep(.q-tabs__content) {
+    width: 100%;
+  }
+
   :deep(.q-tab) {
     min-height: 50px;
     padding: 0;

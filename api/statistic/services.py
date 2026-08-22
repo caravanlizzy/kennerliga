@@ -45,7 +45,7 @@ AWARD_DEFS = [
     },
     {
         "key": "inspirer",
-        "label": "Inspirer",
+        "label": "Inspiration",
         "description": "Most different picks.",
         "unit": "",
     },
