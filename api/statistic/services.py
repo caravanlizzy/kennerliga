@@ -64,13 +64,12 @@ AWARD_DEFS = [
 # `_build_player_pool`. `rate_based` categories only make sense with a
 # minimum sample size (win rate/avg position on 1 game is noise), so a
 # `min_games` threshold is applied to them before ranking. The category
-# flagged `custom` is not ranked by a single numeric field but by the
-# dedicated lexicographic ranker in `_rank_career`.
+# flagged `custom` is ranked by the dedicated ranker in `_rank_career`.
 CATEGORY_DEFS = [
     {
         "key": "career_performance",
-        "label": "Career League Performance",
-        "description": "Highest league you've reached, with total league points as a tie-break - any L1 result outranks every lower league.",
+        "label": "Career League Points",
+        "description": "Total league points earned across all leagues.",
         "unit": "pts",
         "better": "higher",
         "rate_based": False,
@@ -323,76 +322,15 @@ def _rank_players(players, value_key, better, min_games=None):
     return ranked
 
 
-def _format_points(points):
-    """Formats league points without a trailing ".0" (e.g. 24 not 24.0)."""
-    rounded = round(float(points), 2)
-    if rounded == int(rounded):
-        return str(int(rounded))
-    return f"{rounded:g}"
-
-
 def _rank_career(players):
     """
-    Dense-ranks players by career *league performance* using a strict
-    lexicographic comparison across league levels: L1 achievement dominates
-    L2, which dominates L3, and so on. Merely participating in a level
-    (having any standing there) already outranks anyone who never reached
-    it; within the same level, accumulated league points break the tie
-    before falling through to the next level. The displayed value is a
-    readable label -- the highest league reached plus total league points,
-    e.g. "L1 \u00b7 24 pts" -- so the shown number always agrees with the
-    highest-league-first ranking instead of a bare points total.
+    Dense-ranks players by total career league points, summed across every
+    league they have a standing in. Only players who have actually played a
+    league (at least one standing) are ranked; higher total points rank
+    higher, with no regard for which league level those points came from.
     """
     eligible = [p for p in players if p.get("leagues_played", 0) > 0]
-    if not eligible:
-        return []
-
-    levels = sorted({lvl for p in eligible for lvl in p["reached_levels"]})
-
-    def sort_key(player):
-        components = []
-        for level in levels:
-            reached = 1 if level in player["reached_levels"] else 0
-            points = player["level_points"].get(level, 0.0)
-            # Negated so "reached" and higher points sort first (better).
-            components.append(-reached)
-            components.append(-points)
-        components.append(player["profile_name"].lower())
-        return tuple(components)
-
-    def tie_key(player):
-        return tuple(
-            (1 if level in player["reached_levels"] else 0, player["level_points"].get(level, 0.0))
-            for level in levels
-        )
-
-    eligible.sort(key=sort_key)
-
-    ranked = []
-    rank = 0
-    previous_key = object()
-    for player in eligible:
-        key = tie_key(player)
-        if key != previous_key:
-            rank += 1
-            previous_key = key
-        # Highest league reached is the smallest level number (L1 is top).
-        # The card shows this as the primary metric ("L1"), with total
-        # league points as a readable detail ("L1 · 24 pts"), so the number
-        # on the card always matches the highest-league-first ranking.
-        best_level = min(player["reached_levels"])
-        points = player["career_performance"]
-        display = f"L{best_level} · {_format_points(points)} pts"
-        ranked.append(
-            {
-                **player,
-                "rank": rank,
-                "value": player["career_performance"],
-                "best_level": best_level,
-                "display": display,
-            }
-        )
-    return ranked
+    return _rank_players(eligible, "career_performance", "higher")
 
 
 def _rank_iron_will(players, min_games):
