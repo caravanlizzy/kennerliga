@@ -30,6 +30,9 @@ DEFAULT_MIN_GAMES = 0
 DEFAULT_WINDOW = 1
 DEFAULT_TOP_N = 5
 DEFAULT_GAME_MIN_GAMES = 0
+# Podium size for the "most picked"/"most banned" games shown atop the games
+# statistics section.
+DEFAULT_POPULAR_GAMES_N = 3
 
 # Fun "superlative" awards: ranked the same way as the categories below (no
 # min-games gate, since these are lighthearted counts rather than skill
@@ -692,6 +695,59 @@ def _best_player_by_game(qs):
             )
 
     return {game_id: entry[1] for game_id, entry in best_by_game.items()}
+
+
+def get_popular_games(years=None, player_counts=None, top_n=DEFAULT_POPULAR_GAMES_N):
+    """
+    Returns the most picked and most banned games (top N each), so the games
+    statistics section can lead with an at-a-glance podium of which games get
+    chosen most and which get vetoed most before drilling into a single
+    game's leaderboard. Respects the same year/player-count filters as the
+    rest of the dashboard.
+    """
+    pick_qs = SelectedGame.objects.all()
+    if years:
+        pick_qs = pick_qs.filter(league__season__year__in=years)
+    pick_qs = _filter_standings_by_player_count(pick_qs, player_counts)
+    picked_rows = (
+        pick_qs.values("game_id", "game__name", "game__platform__name")
+        .annotate(count=Count("id"))
+        .order_by("-count", "game__name")[:top_n]
+    )
+
+    ban_qs = BanDecision.objects.filter(skipped_ban=False, selected_game__isnull=False)
+    if years:
+        ban_qs = ban_qs.filter(league__season__year__in=years)
+    ban_qs = _filter_standings_by_player_count(ban_qs, player_counts)
+    banned_rows = (
+        ban_qs.values(
+            "selected_game__game_id",
+            "selected_game__game__name",
+            "selected_game__game__platform__name",
+        )
+        .annotate(count=Count("id"))
+        .order_by("-count", "selected_game__game__name")[:top_n]
+    )
+
+    most_picked = [
+        {
+            "game_id": row["game_id"],
+            "name": row["game__name"],
+            "platform": row["game__platform__name"],
+            "count": row["count"],
+        }
+        for row in picked_rows
+    ]
+    most_banned = [
+        {
+            "game_id": row["selected_game__game_id"],
+            "name": row["selected_game__game__name"],
+            "platform": row["selected_game__game__platform__name"],
+            "count": row["count"],
+        }
+        for row in banned_rows
+    ]
+    return {"most_picked": most_picked, "most_banned": most_banned}
 
 
 def list_games_with_stats(years=None, player_counts=None):

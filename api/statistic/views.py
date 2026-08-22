@@ -6,9 +6,11 @@ from game.models import Game
 from statistic.services import (
     DEFAULT_GAME_MIN_GAMES,
     DEFAULT_MIN_GAMES,
+    DEFAULT_POPULAR_GAMES_N,
     DEFAULT_TOP_N,
     DEFAULT_WINDOW,
     get_game_leaderboard,
+    get_popular_games,
     get_statistics_overview,
     list_games_with_stats,
     parse_years,
@@ -67,6 +69,23 @@ class GameStatisticsListView(APIView):
         years = parse_years(request.query_params.get("years"))
         player_counts = parse_player_counts(request.query_params.get("player_count"))
         return Response(list_games_with_stats(years=years, player_counts=player_counts))
+
+
+class PopularGamesView(APIView):
+    """
+    GET /api/statistics/games/popular/?years=2025&player_count=4p&top_n=3
+
+    Returns the most picked and most banned games (top N each), leading the
+    games statistics section before the per-game leaderboard.
+    """
+
+    def get(self, request):
+        years = parse_years(request.query_params.get("years"))
+        player_counts = parse_player_counts(request.query_params.get("player_count"))
+        top_n = max(1, min(10, _int_param(request, "top_n", DEFAULT_POPULAR_GAMES_N)))
+        return Response(
+            get_popular_games(years=years, player_counts=player_counts, top_n=top_n)
+        )
 
 
 class GameLeaderboardView(APIView):

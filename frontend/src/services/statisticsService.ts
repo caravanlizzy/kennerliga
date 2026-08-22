@@ -1,5 +1,10 @@
 import { api } from 'boot/axios';
-import { TGameLeaderboard, TGameStatSummary, TStatisticsOverview } from 'src/types';
+import {
+  TGameLeaderboard,
+  TGameStatSummary,
+  TPopularGames,
+  TStatisticsOverview,
+} from 'src/types';
 
 export type TStatisticsFilters = {
   years?: number[];
@@ -60,6 +65,26 @@ export async function fetchGameStatsList(
   } catch (e) {
     console.log(e);
     return [];
+  }
+}
+
+export async function fetchPopularGames(
+  years?: number[],
+  playerCounts?: string[]
+): Promise<TPopularGames | null> {
+  try {
+    const params: Record<string, string> = {};
+    if (years && years.length > 0) {
+      params.years = years.join(',');
+    }
+    if (playerCounts && playerCounts.length > 0) {
+      params.player_count = playerCounts.join(',');
+    }
+    const { data } = await api.get<TPopularGames>('statistics/games/popular/', { params });
+    return data;
+  } catch (e) {
+    console.log(e);
+    return null;
   }
 }
 

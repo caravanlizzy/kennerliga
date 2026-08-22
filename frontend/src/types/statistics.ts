@@ -68,6 +68,20 @@ export type TGameLeaderboardEntry = {
   eligible: boolean;
 };
 
+// A single entry in the "most picked"/"most banned" games podiums shown atop
+// the games statistics section.
+export type TPopularGame = {
+  game_id: number;
+  name: string;
+  platform: string;
+  count: number;
+};
+
+export type TPopularGames = {
+  most_picked: TPopularGame[];
+  most_banned: TPopularGame[];
+};
+
 export type TGameLeaderboard = {
   game_id: number;
   name: string;

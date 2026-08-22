@@ -70,6 +70,18 @@
          past all the category cards first. -->
     <div class="row q-col-gutter-lg">
       <div class="col-12 col-md-7 order-last order-md-first">
+        <div class="section-header row items-center no-wrap q-mb-md">
+          <div class="section-header__icon">
+            <q-icon name="groups" color="primary" size="20px" />
+          </div>
+          <div class="column">
+            <div class="text-h6 text-weight-bolder text-dark line-height-1">Players</div>
+            <div class="text-caption text-grey-6">
+              Rankings, records &amp; superlatives across every player.
+            </div>
+          </div>
+        </div>
+
         <div v-if="loadingOverview" class="row q-col-gutter-lg">
           <div v-for="i in 6" :key="i" class="col-12 col-lg-6">
             <q-skeleton type="rect" height="240px" class="rounded-borders" />
@@ -91,6 +103,31 @@
       </div>
 
       <div class="col-12 col-md-5 order-first order-md-last">
+        <div class="section-header row items-center no-wrap q-mb-md">
+          <div class="section-header__icon">
+            <q-icon name="sports_esports" color="primary" size="20px" />
+          </div>
+          <div class="column">
+            <div class="text-h6 text-weight-bolder text-dark line-height-1">Games</div>
+            <div class="text-caption text-grey-6">
+              Which games get played, picked, banned &amp; who masters them.
+            </div>
+          </div>
+        </div>
+
+        <q-skeleton
+          v-if="loadingPopular"
+          type="rect"
+          height="180px"
+          class="rounded-borders q-mb-lg"
+        />
+        <PopularGamesCard
+          v-else
+          :popular="popular"
+          class="q-mb-lg"
+          @select="onSelectPopularGame"
+        />
+
         <q-card flat bordered class="game-stats-card">
       <q-card-section class="q-pb-sm">
         <div class="row items-center no-wrap">
@@ -216,14 +253,21 @@ import { computed, onMounted, ref, watch } from 'vue';
 import KennerSelect from 'components/base/KennerSelect.vue';
 import StatCategoryCard from 'components/statistics/StatCategoryCard.vue';
 import GameLeaderboardPanel from 'components/statistics/GameLeaderboardPanel.vue';
+import PopularGamesCard from 'components/statistics/PopularGamesCard.vue';
 import { useResponsive } from 'src/composables/responsive';
 import { useUserStore } from 'stores/userStore';
 import {
   fetchGameLeaderboard,
   fetchGameStatsList,
+  fetchPopularGames,
   fetchStatisticsOverview,
 } from 'src/services/statisticsService';
-import { TGameLeaderboard, TGameStatSummary, TStatisticsOverview } from 'src/types';
+import {
+  TGameLeaderboard,
+  TGameStatSummary,
+  TPopularGames,
+  TStatisticsOverview,
+} from 'src/types';
 
 const { getAvailableYears } = useUserStore();
 // Same breakpoint the layout already stacks at (col-md-*), so the dialog
@@ -266,6 +310,9 @@ function toggleAllPlayerCounts() {
 
 const overview = ref<TStatisticsOverview | null>(null);
 const loadingOverview = ref(false);
+
+const popular = ref<TPopularGames | null>(null);
+const loadingPopular = ref(false);
 
 const allGames = ref<TGameStatSummary[]>([]);
 const gameSearch = ref('');
@@ -321,6 +368,21 @@ async function loadGames() {
   allGames.value = await fetchGameStatsList(selectedYears.value, playerCountsParam.value);
 }
 
+async function loadPopular() {
+  loadingPopular.value = true;
+  try {
+    popular.value = await fetchPopularGames(selectedYears.value, playerCountsParam.value);
+  } finally {
+    loadingPopular.value = false;
+  }
+}
+
+// Selecting a picked/banned game opens its full leaderboard, same as tapping
+// it in the game picker below.
+function onSelectPopularGame(gameId: number) {
+  selectedGameId.value = gameId;
+}
+
 async function loadLeaderboard() {
   if (selectedGameId.value === null) {
     leaderboard.value = null;
@@ -343,6 +405,7 @@ watch(
   () => {
     void loadOverview();
     void loadGames();
+    void loadPopular();
     void loadLeaderboard();
   },
   { deep: true }
@@ -355,7 +418,7 @@ watch(selectedGameId, () => {
 onMounted(async () => {
   const years = await getAvailableYears();
   yearOptions.value = years ?? [];
-  await Promise.all([loadOverview(), loadGames()]);
+  await Promise.all([loadOverview(), loadGames(), loadPopular()]);
 });
 
 const gameLeaderboardColumns = [
@@ -416,6 +479,23 @@ const gameLeaderboardColumns = [
   width: 44px;
   height: 44px;
   border-radius: 10px;
+}
+
+// Section headers that split the page into a clearly labelled "Games" and
+// "Players" side, so users understand which stats belong where.
+.section-header {
+  gap: 10px;
+
+  &__icon {
+    width: 38px;
+    height: 38px;
+    border-radius: 9px;
+    background: rgba(99, 102, 241, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
 }
 
 // KennerSelect's floating label rises above its own box -- once the Years
