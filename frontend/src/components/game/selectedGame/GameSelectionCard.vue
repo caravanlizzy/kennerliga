@@ -61,20 +61,6 @@
     border-radius: 12px;
   }
 
-  &:hover {
-    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.06);
-    border-color: rgba($kenner-red, 0.4);
-    // transform: translateY(-2px); // Removed to prevent horizontal/vertical jump
-
-    .icon-circle {
-      background: rgba($kenner-red, 0.05);
-    }
-    .icon-container .q-icon {
-      color: $kenner-red !important;
-      transform: scale(1.1);
-    }
-  }
-
   &.selected {
     border: 2px solid $kenner-red;
     box-shadow:

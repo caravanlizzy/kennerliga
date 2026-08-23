@@ -116,11 +116,6 @@ defineProps<{
   border-radius: 8px;
   background: #fff;
   border: 1px solid rgba(0, 0, 0, 0.06);
-  transition: border-color 0.15s ease;
-
-  &:hover {
-    border-color: rgba(99, 102, 241, 0.25);
-  }
 
   &__name {
     font-size: 11.5px;

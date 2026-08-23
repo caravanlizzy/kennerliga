@@ -125,9 +125,6 @@ async function submit(skip = false) {
 .border-red {
   border: 1px solid var(--q-red-7);
 }
-.hover-shadow:hover {
-  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.1);
-}
 .transition-base {
   transition: all 0.3s ease;
 }

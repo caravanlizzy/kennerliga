@@ -11,41 +11,6 @@
             {{ member.profile_name }}
           </div>
 
-          <!-- Banned Game Display -->
-          <q-chip
-            v-if="member.my_banned_game"
-            unelevated
-            square
-            color="red-1"
-            text-color="red-7"
-            icon="block"
-            size="sm"
-            class="q-ml-sm text-weight-bold"
-          >
-            Banned: {{ member.my_banned_game.game_name }}
-            <span
-              v-if="getOwnerName(member.my_banned_game.profile)"
-              class="text-weight-light q-ml-xs"
-            >
-              (by {{ getOwnerName(member.my_banned_game.profile) }})
-            </span>
-          </q-chip>
-
-          <q-chip
-            v-for="banner in getBannersInfo(member)"
-            :key="banner.id"
-            unelevated
-            square
-            color="orange-1"
-            text-color="orange-9"
-            icon="group"
-            size="sm"
-            class="q-ml-sm text-weight-bold"
-          >
-            Banned Pick: {{ banner.game_name }} (by
-            {{ formatBannerNames(banner.banner_names) }})
-          </q-chip>
-
           <template v-if="!member.my_banned_game">
             <q-chip
               v-if="member.has_banned"
@@ -295,8 +260,28 @@
         </q-card>
       </div>
 
-      <!-- Picking / Banning / Reporting status badges -->
-      <div class="col-12 col-md-4 column items-start q-gutter-y-sm">
+      <!-- Ban info + Picking / Banning / Reporting status badges -->
+      <div class="col-12 col-md-4 column items-end q-gutter-y-sm">
+        <!-- What this player has banned -->
+        <q-chip
+          v-if="member.my_banned_game"
+          unelevated
+          square
+          dense
+          color="red-1"
+          text-color="red-7"
+          icon="block"
+          size="sm"
+          class="text-weight-bold"
+        >
+          Banned: {{ member.my_banned_game.game_name }}
+          <span
+            v-if="getOwnerName(member.my_banned_game.profile)"
+            class="text-weight-light q-ml-xs"
+          >
+            (by {{ getOwnerName(member.my_banned_game.profile) }})
+          </span>
+        </q-chip>
         <q-chip
           square
           dense
@@ -420,31 +405,6 @@ function hasResult(selGame: any) {
 function getOwnerName(profileId: number) {
   const owner = props.league?.members?.find((m: any) => m.profile === profileId);
   return owner?.profile_name || null;
-}
-
-function getBannersInfo(member: any) {
-  const info: { id: number; game_name: string; banner_names: string[] }[] = [];
-  (member.selected_games || []).forEach((sg: any) => {
-    const bannerNames = (props.league?.members || [])
-      .filter((m: any) => m.my_banned_game?.game && m.my_banned_game.id === sg.id)
-      .map((m: any) => m.profile_name);
-
-    if (bannerNames.length > 0) {
-      info.push({
-        id: sg.id,
-        game_name: sg.game_name,
-        banner_names: bannerNames,
-      });
-    }
-  });
-  return info;
-}
-
-function formatBannerNames(names: string[]) {
-  if (names.length === 0) return '';
-  if (names.length === 1) return names[0];
-  if (names.length === 2) return `${names[0]} and ${names[1]}`;
-  return `${names.slice(0, -1).join(', ')} and ${names[names.length - 1]}`;
 }
 </script>
 

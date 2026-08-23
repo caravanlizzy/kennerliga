@@ -430,13 +430,6 @@ onMounted(() => {
   background: var(--tb-task-bg, #ffffff);
   border: 1px solid var(--tb-task-border, rgba(54, 64, 88, 0.08));
   border-radius: 10px;
-  transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
-}
-
-.task-card.cursor-pointer:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
-  border-color: var(--column-accent, rgba(99, 102, 241, 0.4));
 }
 
 .task-title {

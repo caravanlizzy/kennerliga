@@ -1,5 +1,5 @@
 <template>
-  <q-card flat bordered class="game-stat-card transition-all">
+  <q-card flat bordered class="game-stat-card">
     <q-card-section class="q-pa-md">
       <!-- Title & Plays Count -->
       <div class="row items-center justify-between no-wrap q-mb-sm">
@@ -82,13 +82,6 @@ function getPosColor(pos: number) {
   background: var(--surface-bg) !important;
   border: 1px solid var(--surface-border) !important;
   overflow: hidden;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
-
-  &:hover {
-    border-color: var(--q-primary) !important;
-    background: #ffffff !important;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-  }
 }
 
 .plays-badge {

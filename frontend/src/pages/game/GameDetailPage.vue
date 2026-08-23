@@ -169,13 +169,6 @@
   letter-spacing: 1px;
   font-size: 0.75rem;
 }
-.option-item {
-  transition: all 0.2s ease;
-}
-.option-item:hover {
-  border-color: var(--q-primary);
-  background-color: #fafafa;
-}
 .stat-pill {
   display: inline-flex;
   align-items: center;

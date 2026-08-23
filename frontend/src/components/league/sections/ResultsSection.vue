@@ -58,11 +58,5 @@ watchEffect(() => {
   border-radius: var(--kenner-card-radius, 16px);
   border: 1px solid var(--kenner-border-color);
   background: rgba(0, 0, 0, 0.015);
-  transition: all 0.3s ease;
-
-  &:hover {
-    background: rgba(0, 0, 0, 0.03);
-    transform: translateY(-1px);
-  }
 }
 </style>

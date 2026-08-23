@@ -84,11 +84,6 @@ function getPosColorClass(pos: number) {
   background: var(--surface-bg) !important;
   border-color: var(--surface-border) !important;
   border-radius: 12px;
-  transition: border-color 0.2s ease;
-
-  &:hover {
-    border-color: var(--surface-border-strong) !important;
-  }
 }
 
 .surface-card-header {
@@ -100,13 +95,7 @@ function getPosColorClass(pos: number) {
 .stat-tile {
   background: var(--stat-tile-bg, #f8fafc);
   border: 1px solid var(--surface-border) !important;
-  border-radius: 16px;
-  transition: all 0.3s ease;
-
-  &:hover {
-    border-color: var(--q-primary) !important;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-  }
+  border-radius: 12px;
 }
 
 .distribution-row {

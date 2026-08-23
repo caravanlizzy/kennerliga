@@ -213,11 +213,7 @@ const displayedRows = computed(() => (expanded.value ? restOfList.value : visibl
 
 <style scoped lang="scss">
 .stat-card {
-  transition: border-color 0.15s ease;
-
-  &:hover {
-    border-color: color-mix(in srgb, var(--accent) 30%, transparent);
-  }
+  border-radius: 12px;
 }
 
 .stat-card__header {
@@ -246,11 +242,6 @@ const displayedRows = computed(() => (expanded.value ? restOfList.value : visibl
   border-radius: 8px;
   background: rgba(0, 0, 0, 0.02);
   border: 1px solid rgba(0, 0, 0, 0.06);
-  transition: border-color 0.15s ease;
-
-  &:hover {
-    border-color: color-mix(in srgb, var(--accent) 25%, transparent);
-  }
 
   &--me {
     background: color-mix(in srgb, var(--accent) 8%, white);

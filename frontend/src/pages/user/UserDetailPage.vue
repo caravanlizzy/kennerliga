@@ -287,14 +287,8 @@ onMounted(load);
 .surface-card {
   background: var(--surface-bg) !important;
   border: 1px solid var(--surface-border) !important;
-  border-radius: 16px;
+  border-radius: 12px;
   box-shadow: var(--surface-shadow);
-  transition: all 0.3s ease;
-
-  &:hover {
-    border-color: var(--surface-border-strong) !important;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-  }
 }
 
 .surface-card-header {
@@ -307,12 +301,6 @@ onMounted(load);
   background: var(--stat-tile-bg);
   border: 1px solid var(--surface-border) !important;
   border-radius: 12px;
-  transition: all 0.2s ease;
-
-  &:hover {
-    background: #ffffff;
-    border-color: var(--q-primary) !important;
-  }
 }
 
 @media (max-width: 599px) {

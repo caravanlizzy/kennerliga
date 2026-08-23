@@ -101,14 +101,8 @@ onMounted(async () => {
 
 <style scoped lang="scss">
 .match-game-card {
-  transition: all 0.3s ease;
   border-radius: 12px;
   background: #fff;
-
-  &:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
-  }
 }
 
 .game-icon-box {

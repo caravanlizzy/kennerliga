@@ -114,24 +114,8 @@ async function performBan(selectedGameId?: number, skip = false) {
 
 .ban-candidate-card {
   border-radius: var(--kenner-card-radius, 16px);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   border: 1px solid var(--kenner-border-color);
   background: white;
-
-  &:hover {
-    border-color: var(--q-negative);
-    background: rgba(193, 0, 21, 0.04);
-    transform: translateY(-2px);
-    box-shadow: var(--kenner-card-shadow-hover);
-
-    .ban-candidate-icon {
-      transform: scale(1.1);
-    }
-  }
-}
-
-.ban-candidate-icon {
-  transition: transform 0.2s ease;
 }
 
 .ban-candidate-index {

@@ -549,10 +549,4 @@ const onSubmit = async () => {
 .border-light {
   border: 1px solid #f0f0f0;
 }
-.option-card {
-  transition: transform 0.2s, shadow 0.2s;
-}
-.option-card:hover {
-  border-color: var(--q-primary);
-}
 </style>

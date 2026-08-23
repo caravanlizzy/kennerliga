@@ -10,7 +10,7 @@
       </div>
       <div class="row q-col-gutter-md">
         <div v-for="(game, idx) in topGames" :key="'top-'+game.name" class="col-12 col-sm-4">
-          <q-card flat class="top-game-card relative-position transition-all overflow-hidden" :class="`rank-${idx+1}`">
+          <q-card flat class="top-game-card relative-position overflow-hidden" :class="`rank-${idx+1}`">
             <div class="rank-badge absolute-top-left q-pa-sm text-weight-bolder shadow-2">
               <q-icon v-if="idx === 0" name="emoji_events" size="14px" class="q-mr-xs" />
               #{{ idx + 1 }}
@@ -110,35 +110,26 @@ defineEmits<{
 .letter-spacing-1 { letter-spacing: 1px; }
 
 .top-game-card {
-  border-radius: 20px;
+  border-radius: 12px;
   background: #ffffff;
   border: 1px solid var(--surface-border);
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.04);
-  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-
-  &:hover {
-    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.08);
-  }
-
-  &.rank-1 { border-color: rgba(255, 193, 7, 0.4); background: linear-gradient(135deg, #fffcf0 0%, #ffffff 100%); }
-  &.rank-2 { border-color: rgba(176, 190, 197, 0.4); background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%); }
-  &.rank-3 { border-color: rgba(255, 152, 0, 0.4); background: linear-gradient(135deg, #fffaf5 0%, #ffffff 100%); }
 
   .rank-badge {
-    border-bottom-right-radius: 14px;
+    border-bottom-right-radius: 12px;
     font-size: 0.8rem;
     padding: 6px 14px;
     z-index: 2;
     font-weight: 900;
   }
-  &.rank-1 .rank-badge { background: #ffc107; color: #000; }
-  &.rank-2 .rank-badge { background: #b0bec5; color: #fff; }
-  &.rank-3 .rank-badge { background: #ff9800; color: #fff; }
+  // Shared gold/silver/bronze palette with the statistics page.
+  &.rank-1 .rank-badge { background: #f6d365; color: #7a5b00; }
+  &.rank-2 .rank-badge { background: #d7dde8; color: #4b5563; }
+  &.rank-3 .rank-badge { background: #d6a77a; color: #6b3f16; }
 }
 
-.bg-rank-1 { background: #ffc107; }
-.bg-rank-2 { background: #b0bec5; }
-.bg-rank-3 { background: #ff9800; }
+.bg-rank-1 { background: #f6d365; }
+.bg-rank-2 { background: #d7dde8; }
+.bg-rank-3 { background: #d6a77a; }
 
 .card-footer-accent {
   height: 4px;

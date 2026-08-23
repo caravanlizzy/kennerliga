@@ -69,13 +69,7 @@ defineEmits<{
 .surface-card {
   background: var(--surface-bg) !important;
   border-color: var(--surface-border) !important;
-  border-radius: 16px;
-  transition: all 0.3s ease;
-
-  &:hover {
-    border-color: var(--surface-border-strong) !important;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
-  }
+  border-radius: 12px;
 }
 
 .pick-item {

@@ -99,9 +99,15 @@ const crumbs = computed(() => {
 // stays visually quiet (small text, no border/shadow of its own).
 .breadcrumb-bar {
   width: 100%;
-  // Neutral warm-grey tint, not the app's slate/blue page-accent token --
-  // keeps the strip visually quiet without leaning into any hue.
-  background: rgba(0, 0, 0, 0.035);
+  // Sits in the fixed header over scrolling page content, so it needs an
+  // opaque surface -- reuse the same near-solid "glass" white as the navbar
+  // above it so content never bleeds through, with a faint grey overlay to
+  // keep the strip subtly distinct from the navbar.
+  background:
+    linear-gradient(rgba(0, 0, 0, 0.02), rgba(0, 0, 0, 0.02)),
+    var(--kenner-bg-glass, rgba(255, 255, 255, 0.98));
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   border-bottom: 1px solid var(--kenner-border-color);
 }
 

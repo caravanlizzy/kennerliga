@@ -144,21 +144,17 @@ onMounted(() => {
 
 <style scoped lang="scss">
 .admin-card {
-  transition: all 0.2s ease;
-
-  &:hover {
+  // Instant (no-transition) hover affordance so users can tell the card is
+  // clickable, without reintroducing the removed lift/shadow animation.
+  &:not(.admin-card--disabled):hover {
     border-color: var(--q-primary);
-    transform: translateY(-2px);
+    background-color: rgba(0, 0, 0, 0.03);
+    cursor: pointer;
   }
 
   &--disabled {
     opacity: 0.5;
     cursor: not-allowed;
-
-    &:hover {
-      border-color: inherit;
-      transform: none;
-    }
   }
 }
 </style>

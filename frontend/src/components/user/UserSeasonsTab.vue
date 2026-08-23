@@ -92,7 +92,7 @@ function getPosColorClass(pos: number) {
 .surface-card {
   background: var(--surface-bg) !important;
   border-color: var(--surface-border) !important;
-  border-radius: 16px;
+  border-radius: 12px;
   box-shadow: var(--surface-shadow);
 }
 
