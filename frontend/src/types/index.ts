@@ -7,3 +7,4 @@ export * from './releaseNote';
 export * from './events';
 export * from './taskboard';
 export * from './statistics';
+export * from './configuration';

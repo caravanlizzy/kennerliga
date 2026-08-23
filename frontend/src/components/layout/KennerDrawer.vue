@@ -48,6 +48,12 @@
             label="Invitations"
             forward-name="invitations"
           />
+          <DrawerItem
+            icon="settings"
+            icon-color="primary"
+            label="Configuration"
+            forward-name="configuration"
+          />
         </template>
 
       </q-list>

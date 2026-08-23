@@ -63,6 +63,19 @@ const routes: RouteRecordRaw[] = [
     ],
   },
   {
+    path: '/configuration',
+    component: () => import('layouts/MainLayout.vue'),
+    meta: { requiresAuth: true, requiresAdmin: true },
+    children: [
+      {
+        path: '',
+        name: 'configuration',
+        component: () => import('pages/AppConfigurationPage.vue'),
+        meta: { label: 'Configuration', icon: 'settings' },
+      },
+    ],
+  },
+  {
     path: '/feedback',
     component: () => import('layouts/MainLayout.vue'),
     children: [
