@@ -34,6 +34,12 @@
           <q-separator class="q-my-sm drawer-separator" />
           <DrawerSubGroup>Management</DrawerSubGroup>
           <DrawerItem
+            icon="admin_panel_settings"
+            icon-color="primary"
+            label="Admin"
+            forward-name="admin"
+          />
+          <DrawerItem
             v-if="currentSeasonId"
             icon="settings_applications"
             icon-color="primary"

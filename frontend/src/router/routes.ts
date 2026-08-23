@@ -63,6 +63,19 @@ const routes: RouteRecordRaw[] = [
     ],
   },
   {
+    path: '/admin',
+    component: () => import('layouts/MainLayout.vue'),
+    meta: { requiresAuth: true, requiresAdmin: true },
+    children: [
+      {
+        path: '',
+        name: 'admin',
+        component: () => import('pages/AdminPage.vue'),
+        meta: { label: 'Admin', icon: 'admin_panel_settings' },
+      },
+    ],
+  },
+  {
     path: '/configuration',
     component: () => import('layouts/MainLayout.vue'),
     meta: { requiresAuth: true, requiresAdmin: true },
