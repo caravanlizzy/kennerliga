@@ -66,14 +66,28 @@ function handleTabChange(value: string) {
   border-top: none !important;
   box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.03);
 
-  // Force the tabs content wrapper to span the full width. Quasar's q-tabs
-  // measures its width internally and can misfire during route transitions,
-  // leaving the tabs squished into the left half of the bar.
+  // Pin the tab layout deterministically instead of trusting q-tabs' own
+  // width measurement. q-tabs measures its content width internally to decide
+  // whether to enter "scrollable" mode; on a bfcache restore (reopening the
+  // site from cache) that stale/misfired measurement survives and the content
+  // wrapper stays in flex-start/scrollable state, squishing every tab into the
+  // left half of the bar. Forcing the wrapper full width + space-between and
+  // giving each tab equal flex makes the bar always span full width regardless
+  // of what q-tabs thinks its size is (a hard refresh re-measures, which is why
+  // it never persisted there).
   :deep(.q-tabs__content) {
     width: 100%;
+    justify-content: space-between;
+  }
+
+  :deep(.q-tabs--scrollable) {
+    .q-tabs__arrow {
+      display: none;
+    }
   }
 
   :deep(.q-tab) {
+    flex: 1 1 0;
     min-height: 50px;
     padding: 0;
     transition: all 0.2s ease;
