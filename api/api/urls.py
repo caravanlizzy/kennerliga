@@ -27,6 +27,7 @@ urlpatterns = [
     path("result/", include("result.urls")),
     path("taskboard/", include("taskboard.urls")),
     path("statistics/", include("statistic.urls")),
+    path("configuration/", include("configuration.urls")),
     path("leaderboard/", LeaderboardViewSet.as_view(), name="leaderboard"),
     path("api-token-auth/", views.obtain_auth_token),
     # swagger endpoints
