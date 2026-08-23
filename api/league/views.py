@@ -311,11 +311,19 @@ class LeagueViewSet(ModelViewSet):
     @action(detail=True, methods=["get"], url_path="tie-resolution-reasons")
     def tie_resolution_reasons(self, request, pk=None):
         """
-        Returns the available reasons for resolving a tie.
+        Returns the available reasons for resolving a tie. The CANT_STOP
+        reason ("a game is played to decide the league") is labelled with the
+        game configured as the tie-decider in the app configuration, falling
+        back to its default label when none is configured.
         """
-        reasons = [
-            {"value": val, "label": label} for val, label in TieResolutionReason.choices
-        ]
+        from configuration.services import get_tie_decider_game
+
+        tie_decider_game = get_tie_decider_game()
+        reasons = []
+        for val, label in TieResolutionReason.choices:
+            if val == TieResolutionReason.CANT_STOP and tie_decider_game is not None:
+                label = tie_decider_game.name
+            reasons.append({"value": val, "label": label})
         return Response(reasons, status=status.HTTP_200_OK)
 
     @action(detail=True, methods=["post"], url_path="set-active-player")

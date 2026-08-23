@@ -2,7 +2,7 @@ from django.db import transaction
 from rest_framework import serializers
 from rest_framework.serializers import ModelSerializer
 
-from api.constants import MAX_SAME_GAME_PER_YEAR
+from configuration.services import get_max_same_game_per_year
 from result.models import Result
 from result.serializers import ResultSerializer
 from .services import create_selected_game, create_ban_decision
@@ -378,7 +378,7 @@ class SelectedGameSerializer(serializers.ModelSerializer):
 
         if game.id in max_selected_game_ids:
             raise serializers.ValidationError(
-                f"You have already selected '{game.name}' or a related game {MAX_SAME_GAME_PER_YEAR} times this season."
+                f"You have already selected '{game.name}' or a related game {get_max_same_game_per_year()} times this season."
             )
 
     def get_game_name(self, obj):

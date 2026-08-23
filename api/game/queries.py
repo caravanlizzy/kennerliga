@@ -10,7 +10,8 @@ from game.models import (
     ResultConfig,
 )
 from league.models import League
-from api.constants import get_ban_amount_for_success, MAX_SAME_GAME_PER_YEAR
+from api.constants import get_ban_amount_for_success
+from configuration.services import get_max_same_game_per_year
 
 
 def get_all_games(selectable_only=True) -> QuerySet:
@@ -105,10 +106,11 @@ def get_max_selected_game_ids_for_profile_in_year_including_related(
         for game_id in counted_game_ids:
             selection_counts[game_id] += 1
 
+    max_same_game_per_year = get_max_same_game_per_year()
     return {
         game_id
         for game_id, count in selection_counts.items()
-        if count >= MAX_SAME_GAME_PER_YEAR
+        if count >= max_same_game_per_year
     }
 
 

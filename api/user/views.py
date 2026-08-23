@@ -33,7 +33,7 @@ from user.serializers import (
     PlayerProfileSerializer,
     FeedbackSerializer,
 )
-from api.constants import MAX_SAME_GAME_PER_YEAR
+from configuration.services import get_max_same_game_per_year
 from game.models import SelectedGame
 
 
@@ -283,6 +283,8 @@ class UserViewSet(ModelViewSet):
 
         banned_game_ids = get_successfully_banned_game_ids(year=selected_year)
 
+        max_game_limit = get_max_same_game_per_year()
+
         picked_games_qs = (
             SelectedGame.objects.filter(
                 profile=profile, league__season__year=selected_year
@@ -299,7 +301,7 @@ class UserViewSet(ModelViewSet):
                 "name": item["game__name"],
                 "platform": item["game__platform__name"],
                 "count": item["count"],
-                "limit_exceeded": item["count"] >= MAX_SAME_GAME_PER_YEAR,
+                "limit_exceeded": item["count"] >= max_game_limit,
             }
             for item in picked_games_qs
         ]
@@ -335,7 +337,7 @@ class UserViewSet(ModelViewSet):
                 "game_stats": game_stats,
                 "top_games": top_games,
                 "picked_games": picked_games,
-                "max_game_limit": MAX_SAME_GAME_PER_YEAR,
+                "max_game_limit": max_game_limit,
                 "available_years": available_years,
             }
         )
