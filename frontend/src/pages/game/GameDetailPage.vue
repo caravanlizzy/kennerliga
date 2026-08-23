@@ -9,12 +9,13 @@
           <q-card-section class="bg-primary text-white q-pa-lg">
             <div class="row items-center justify-between">
               <div>
-                <div class="text-h3 text-weight-bold">{{ game.name }}</div>
-                <div class="text-subtitle1 opacity-80">{{ platform.name }}</div>
+                <div class="text-h5 text-weight-bold tracking-tight">{{ game.name }}</div>
+                <div class="text-subtitle2 opacity-80">{{ platform.name }}</div>
               </div>
               <div class="row q-gutter-sm">
                 <KennerButton
                   unelevated
+                  size="sm"
                   color="white"
                   text-color="primary"
                   icon="edit"
@@ -27,23 +28,10 @@
 
           <q-card-section class="q-pa-md bg-grey-1 row items-center justify-between border-bottom">
             <div class="row items-center q-gutter-sm">
-              <q-chip dense square color="white" text-color="grey-8" class="shadow-1">
-                <q-icon name="tune" color="primary" class="q-mr-xs" />
-                Options: {{ game.options?.length ?? 0 }}
-              </q-chip>
-              <q-chip v-if="yesNoOptions.length" dense square color="white" text-color="grey-8" class="shadow-1">
-                <q-icon name="toggle_on" color="secondary" class="q-mr-xs" />
-                Toggles: {{ yesNoOptions.length }}
-              </q-chip>
-              <q-chip v-if="choiceOptions.length" dense square color="white" text-color="grey-8" class="shadow-1">
-                <q-icon name="list" color="secondary" class="q-mr-xs" />
-                Lists: {{ choiceOptions.length }}
-              </q-chip>
-              <q-separator vertical inset class="q-mx-xs" />
-              <q-chip dense square color="white" text-color="grey-8" class="shadow-1">
-                <q-icon name="groups" color="accent" class="q-mr-xs" />
-                Players: {{ game.min_players }} - {{ game.max_players }}
-              </q-chip>
+              <div class="stat-pill">{{ game.options?.length ?? 0 }} options</div>
+              <div v-if="yesNoOptions.length" class="stat-pill">{{ yesNoOptions.length }} toggles</div>
+              <div v-if="choiceOptions.length" class="stat-pill">{{ choiceOptions.length }} lists</div>
+              <div class="stat-pill">{{ game.min_players }} - {{ game.max_players }} players</div>
             </div>
 
             <div class="row items-center">
@@ -60,10 +48,7 @@
 
           <q-card-section class="q-pa-lg">
             <!-- Options Section -->
-            <div class="row items-center q-mb-md q-gutter-x-sm">
-              <q-icon name="tune" size="md" color="grey-8" />
-              <h2 class="text-h4 q-my-none text-weight-medium">Game Options</h2>
-            </div>
+            <h2 class="text-h6 q-my-none q-mb-md text-weight-bold">Game Options</h2>
 
             <q-banner v-if="!hasOptions" rounded class="bg-blue-1 text-primary q-mb-lg shadow-1">
               <template #avatar>
@@ -149,10 +134,7 @@
 
           <!-- Result Configuration Section -->
           <q-card-section class="q-pa-lg">
-            <div class="row items-center q-mb-md q-gutter-x-sm">
-              <q-icon name="emoji_events" size="md" color="grey-8" />
-              <h2 class="text-h4 q-my-none text-weight-medium">Result & Scoring</h2>
-            </div>
+            <h2 class="text-h6 q-my-none q-mb-md text-weight-bold">Result & Scoring</h2>
 
             <div class="border-light rounded-borders overflow-hidden bg-grey-1">
               <ResultConfiguration
@@ -193,6 +175,16 @@
 .option-item:hover {
   border-color: var(--q-primary);
   background-color: #fafafa;
+}
+.stat-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: rgba(54, 64, 88, 0.06);
+  color: #475569;
+  font-size: 12px;
+  font-weight: 600;
 }
 </style>
 

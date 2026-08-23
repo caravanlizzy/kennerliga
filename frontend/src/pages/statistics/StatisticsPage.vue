@@ -1,13 +1,6 @@
 <template>
   <q-page class="q-pa-md max-width-container q-mx-auto statistics-page">
     <div class="q-mb-md">
-      <div class="row items-center q-gutter-x-sm q-mb-sm">
-        <div class="stat-icon-box stat-icon-box--lg">
-          <q-icon name="query_stats" color="primary" size="24px" />
-        </div>
-        <div class="text-body2 text-grey-7">Rankings, records &amp; leaderboards.</div>
-      </div>
-
       <!-- Full width and stacked on mobile so the chips/select never wrap
            into each other; inline once there's room (col-sm-auto). -->
       <div class="row q-col-gutter-sm items-center filters-row">
@@ -475,11 +468,6 @@ const gameLeaderboardColumns = [
   flex-shrink: 0;
 }
 
-.stat-icon-box--lg {
-  width: 44px;
-  height: 44px;
-  border-radius: 10px;
-}
 
 // Section headers that split the page into a clearly labelled "Games" and
 // "Players" side, so users understand which stats belong where.

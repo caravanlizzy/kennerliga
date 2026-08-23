@@ -1,8 +1,7 @@
 <template>
   <q-page class="q-py-md flex justify-center">
     <div style="max-width: var(--kenner-max-width-text); width: 100%">
-      <div class="text-h4 text-weight-bold q-mb-lg text-primary row items-center">
-        <q-icon name="info" class="q-mr-md" />
+      <div class="text-h5 text-weight-bold q-mb-lg text-dark tracking-tight">
         About KennerLiga
       </div>
 

@@ -1,10 +1,5 @@
 <template>
   <q-page class="q-py-md">
-    <!-- Header Area -->
-    <div v-if="league" class="row items-center justify-between q-mb-md">
-      <LeagueLevel :level="league.level" size="40px" font-size="18px" />
-    </div>
-
     <!-- Info Section -->
     <div v-if="!loading && league" class="row q-col-gutter-md q-mb-lg">
       <div class="col-12 col-md-6">

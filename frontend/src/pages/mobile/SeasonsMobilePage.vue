@@ -52,7 +52,6 @@
         >
           <q-tooltip>Season Overview</q-tooltip>
         </q-btn>
-        <q-icon name="military_tech" size="sm" color="primary" />
       </div>
     </div>
     <SeasonStandings v-if="selectedSeasonId" :seasonId="selectedSeasonId" />

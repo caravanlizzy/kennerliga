@@ -2,11 +2,8 @@
   <q-page class="q-pa-md">
     <!-- Header Area -->
     <div v-if="route.name !== 'league-manager'" class="row items-center justify-between q-mb-md">
-      <div class="row items-center q-gutter-x-sm">
-        <q-icon name="military_tech" size="md" color="primary" />
-        <div class="text-h4 text-weight-bolder text-dark tracking-tighter">
-          {{ isAdmin ? 'Manage Season' : 'Season Details' }} {{ season?.name || '…' }}
-        </div>
+      <div class="text-h5 text-weight-bold text-dark tracking-tight">
+        {{ season?.name || '…' }}
       </div>
       <div class="row items-center q-gutter-x-sm">
         <KennerButton
@@ -15,7 +12,7 @@
           icon="visibility"
           round
           color="secondary"
-          size="md"
+          size="sm"
           :to="{ name: 'season-overview', params: { id: seasonId } }"
         >
           <KennerTooltip>View Public Overview</KennerTooltip>
@@ -27,7 +24,7 @@
           icon="groups"
           round
           color="secondary"
-          size="md"
+          size="sm"
           :loading="filling"
           @click="onFillLeagues"
         >
@@ -40,7 +37,7 @@
           icon="play_arrow"
           round
           color="positive"
-          size="md"
+          size="sm"
           :loading="starting"
           @click="onStartSeason"
         >
@@ -64,30 +61,15 @@
       <template v-else>
         <!-- Season Info & Members -->
         <div class="season-summary q-mb-lg">
-          <div class="season-summary__header row items-center q-gutter-sm q-px-md q-py-md">
-            <div class="season-summary__icon">
-              <q-icon name="groups" size="20px" />
-            </div>
-            <div class="col">
-              <div class="text-subtitle1 text-weight-bolder season-summary__title">Players</div>
-              <div class="text-caption text-grey-6">Overview for this season</div>
-            </div>
-            <div class="row items-center q-gutter-x-xs">
-              <div class="stat-pill">
-                <q-icon name="emoji_events" size="14px" class="q-mr-xs" />
-                <span>{{ leagues.length }} leagues</span>
-              </div>
-              <div class="stat-pill">
-                <q-icon name="person" size="14px" class="q-mr-xs" />
-                <span>{{ participants.length }} players</span>
-              </div>
-              <div
-                v-if="seasonStatusLabel"
-                class="status-pill"
-                :class="`status-pill--${statusColor}`"
-              >
-                {{ seasonStatusLabel }}
-              </div>
+          <div class="season-summary__header row items-center q-gutter-x-sm q-px-md q-py-sm">
+            <div class="stat-pill">{{ leagues.length }} leagues</div>
+            <div class="stat-pill">{{ participants.length }} players</div>
+            <div
+              v-if="seasonStatusLabel"
+              class="status-pill"
+              :class="`status-pill--${statusColor}`"
+            >
+              {{ seasonStatusLabel }}
             </div>
           </div>
 
@@ -312,23 +294,6 @@ onMounted(load);
 
 .season-summary__header {
   background: linear-gradient(135deg, rgba(255, 255, 255, 0.6) 0%, rgba(255, 255, 255, 0.2) 100%);
-}
-
-.season-summary__title {
-  color: #1f2937;
-  letter-spacing: -0.2px;
-}
-
-.season-summary__icon {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 36px;
-  height: 36px;
-  border-radius: 10px;
-  color: #fff;
-  background: linear-gradient(135deg, var(--q-primary) 0%, var(--q-accent) 100%);
-  flex: 0 0 auto;
 }
 
 .season-summary__divider {

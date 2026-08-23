@@ -1,14 +1,5 @@
 <template>
   <div class="q-py-md q-gutter-y-lg page-container">
-    <!-- Page Header -->
-    <div class="page-header">
-      <div class="row items-center q-gutter-x-md no-wrap">
-        <div class="text-caption page-subtitle">
-          Share ideas, report issues, or tell us what you love.
-        </div>
-      </div>
-    </div>
-
     <!-- Feedback Submission Form -->
     <div class="feedback-form-container">
       <q-card flat class="feedback-card">
@@ -251,26 +242,6 @@ onMounted(() => {
   margin: 0 auto;
 }
 
-/* ---------- Page header ---------- */
-.page-header {
-  padding: 8px 4px 0;
-}
-
-.header-icon-wrap {
-  width: 52px;
-  height: 52px;
-  border-radius: 14px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: linear-gradient(135deg, var(--q-primary) 0%, #6366f1 100%);
-  flex-shrink: 0;
-}
-
-.page-subtitle {
-  color: var(--feedback-subtle-text, #6b7280);
-}
-
 /* ---------- Cards (glass) ---------- */
 .feedback-card {
   background: var(--feedback-bg, rgba(255, 255, 255, 0.6));
@@ -400,12 +371,6 @@ onMounted(() => {
 
   .submit-row .send-btn {
     width: 100%;
-  }
-
-  .header-icon-wrap {
-    width: 44px;
-    height: 44px;
-    border-radius: 12px;
   }
 }
 </style>

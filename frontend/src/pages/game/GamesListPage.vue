@@ -11,11 +11,9 @@
     <template v-slot:body-cell-selectable="props">
       <q-td :props="props">
         <div v-if="!props.row.selectable" class="row items-center text-negative">
-          <q-icon name="block" size="xs" class="q-mr-xs" />
           <span class="text-caption text-weight-bold">NOT SELECTABLE</span>
         </div>
         <div v-else class="row items-center text-grey-6">
-          <q-icon name="check" size="xs" class="q-mr-xs" />
           <span class="text-caption">Selectable</span>
         </div>
       </q-td>

@@ -1,6 +1,6 @@
 <template>
   <q-page class="q-pa-md">
-    <div class="text-h4 q-mb-lg">App Configuration</div>
+    <div class="text-h5 text-weight-bold q-mb-lg">App Configuration</div>
 
     <LoadingSpinner v-if="loading" />
 

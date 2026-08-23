@@ -1,9 +1,6 @@
 <template>
   <q-page class="q-pa-md">
-    <div class="text-h4 q-mb-sm">Admin</div>
-    <div class="text-subtitle2 text-grey-7 q-mb-lg">
-      Central hub for managing seasons, leagues, games and app-wide settings.
-    </div>
+    <div class="text-h5 text-weight-bold q-mb-lg">Admin</div>
 
     <div v-for="group in groups" :key="group.title" class="q-mb-lg">
       <div class="text-h6 q-mb-md">{{ group.title }}</div>

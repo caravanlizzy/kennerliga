@@ -3,14 +3,7 @@
     <div class="row justify-center">
       <div class="col-12 col-md-10 col-lg-8">
         <q-card flat bordered class="q-pa-lg shadow-2">
-          <div class="row items-center q-mb-lg q-gutter-x-sm">
-            <q-icon
-              name="add_circle"
-              size="md"
-              color="primary"
-            />
-            <h1 class="text-h4 q-my-none text-weight-bold">New Game</h1>
-          </div>
+          <h1 class="text-h5 q-my-none q-mb-lg text-weight-bold text-dark tracking-tight">New Game</h1>
 
           <q-form
             @submit.prevent="onSubmit"

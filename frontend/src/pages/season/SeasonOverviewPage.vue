@@ -2,16 +2,8 @@
   <q-page class="q-pa-md">
     <!-- Header Area -->
     <div class="row items-center justify-between q-mb-lg">
-      <div class="row items-center q-gutter-x-md">
-        <div class="column">
-          <div class="row items-center q-gutter-x-xs">
-            <q-icon name="military_tech" size="sm" color="primary" />
-            <span class="text-overline text-grey-7">Season Overview</span>
-          </div>
-          <div class="text-h4 text-weight-bolder text-dark tracking-tighter">
-            {{ season?.name || '…' }}
-          </div>
-        </div>
+      <div class="text-h5 text-weight-bold text-dark tracking-tight">
+        {{ season?.name || '…' }}
       </div>
       <div class="row items-center q-gutter-x-sm">
         <div
@@ -36,22 +28,15 @@
     <div v-else-if="!error && season">
       <!-- League Distribution - inline stat pills -->
       <div class="row items-center q-gutter-x-md q-gutter-y-sm q-mb-md">
-        <div class="row items-center q-gutter-x-xs">
-          <q-icon name="hub" color="primary" size="sm" />
-          <span class="text-overline text-grey-7 text-weight-bold">League Distribution</span>
-        </div>
         <div class="row items-center q-gutter-x-sm q-px-md q-py-xs bg-grey-1 rounded-borders-12 border-subtle">
-          <q-icon name="groups" color="grey-7" size="xs" />
           <span class="text-caption text-grey-8">Total Leagues</span>
           <span class="text-subtitle2 text-weight-bold">{{ leagues.length }}</span>
         </div>
         <div class="row items-center q-gutter-x-sm q-px-md q-py-xs bg-grey-1 rounded-borders-12 border-subtle">
-          <q-icon name="person" color="grey-7" size="xs" />
           <span class="text-caption text-grey-8">Participants</span>
           <span class="text-subtitle2 text-weight-bold">{{ participants.length }}</span>
         </div>
         <div class="row items-center q-gutter-x-sm q-px-md q-py-xs bg-grey-1 rounded-borders-12 border-subtle">
-          <q-icon name="casino" color="grey-7" size="xs" />
           <span class="text-caption text-grey-8">Total Picks</span>
           <span class="text-subtitle2 text-weight-bold">{{ totalPicks }}</span>
         </div>
@@ -72,10 +57,7 @@
       <!-- Leagues: standings matrix, picks & bans, match results -->
       <div class="q-mt-xl">
         <div class="row items-center justify-between q-px-md q-mb-sm">
-          <div class="row items-center q-gutter-x-xs">
-            <q-icon name="leaderboard" color="primary" size="sm" />
-            <span class="text-overline text-grey-7 text-weight-bold">League Details</span>
-          </div>
+          <span class="text-overline text-grey-7 text-weight-bold">League Details</span>
           <q-btn-toggle
             v-model="activeView"
             no-caps
