@@ -10,10 +10,10 @@
       <div class="text-caption">The results will appear here once games are played and recorded.</div>
     </div>
 
-    <div v-else class="row q-col-gutter-md">
-      <!-- Standings card -->
-      <div v-if="showStandings" class="col-12 col-md-6 col-lg-4">
-        <q-card flat bordered class="match-game-card full-height">
+    <div v-else class="row q-col-gutter-md items-start">
+      <!-- Standings card: smaller, own column, kept visually distinct from the results -->
+      <div v-if="showStandings" class="col-12 col-md-4 col-lg-3">
+        <q-card flat bordered class="match-game-card standings-card full-height">
           <q-card-section class="q-pb-none">
             <div class="row items-center no-wrap">
               <div class="game-icon-box q-mr-sm">
@@ -36,36 +36,41 @@
         </q-card>
       </div>
 
-      <div
-        v-for="game in selectedGamesWithResults"
-        :key="game.id"
-        class="col-12 col-md-6 col-lg-4"
-      >
-        <q-card flat bordered class="match-game-card full-height">
-          <q-card-section class="q-pb-none">
-            <div class="row items-center no-wrap">
-              <div class="game-icon-box q-mr-sm">
-                <q-icon name="sports_esports" color="primary" size="24px" />
-              </div>
-              <div class="column">
-                <div class="text-subtitle1 text-weight-bolder text-dark line-height-1 ellipsis">
-                  {{ game.game_name }}
+      <!-- Results: grouped together in their own grid, next to the standings box -->
+      <div :class="showStandings ? 'col-12 col-md-8 col-lg-9' : 'col-12'">
+        <div class="row q-col-gutter-md">
+          <div
+            v-for="game in selectedGamesWithResults"
+            :key="game.id"
+            class="col-12 col-sm-6 col-lg-4"
+          >
+            <q-card flat bordered class="match-game-card full-height">
+              <q-card-section class="q-pb-none">
+                <div class="row items-center no-wrap">
+                  <div class="game-icon-box q-mr-sm">
+                    <q-icon name="sports_esports" color="primary" size="24px" />
+                  </div>
+                  <div class="column">
+                    <div class="text-subtitle1 text-weight-bolder text-dark line-height-1 ellipsis">
+                      {{ game.game_name }}
+                    </div>
+                    <div class="text-caption text-grey-6 text-uppercase letter-spacing-1">
+                      Selected by {{ game.selected_by }}
+                    </div>
+                  </div>
                 </div>
-                <div class="text-caption text-grey-6 text-uppercase letter-spacing-1">
-                  Selected by {{ game.selected_by }}
-                </div>
-              </div>
-            </div>
-          </q-card-section>
+              </q-card-section>
 
-          <q-card-section class="q-pt-sm">
-             <MatchResult
-               :selected-game="game"
-               :display-game-name="false"
-               :match-results="matchResultsBySelectedGame"
-             />
-          </q-card-section>
-        </q-card>
+              <q-card-section class="q-pt-sm">
+                 <MatchResult
+                   :selected-game="game"
+                   :display-game-name="false"
+                   :match-results="matchResultsBySelectedGame"
+                 />
+              </q-card-section>
+            </q-card>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -103,6 +108,11 @@ onMounted(async () => {
 .match-game-card {
   border-radius: 12px;
   background: #fff;
+}
+
+.standings-card {
+  background: rgba(var(--q-primary), 0.03);
+  border-color: rgba(var(--q-primary), 0.2);
 }
 
 .game-icon-box {

@@ -37,6 +37,13 @@
           :class="`league-card--l${league.level}`"
         >
           <div class="q-pa-xs">
+            <div
+              v-if="mode === 'results'"
+              class="row items-center q-gutter-x-sm q-mb-md q-px-sm q-pt-sm"
+            >
+              <LeagueLevel :level="league.level" />
+              <span class="text-subtitle1 text-weight-bold">{{ league.name }}</span>
+            </div>
             <LeagueMatchResults
               v-if="mode === 'results'"
               :leagueId="league.id"
@@ -223,4 +230,13 @@ onUnmounted(() => {
 // Silence unused-var warning; kept in the destructure for API symmetry.
 void resetLeagues;
 </script>
+
+<style scoped lang="scss">
+.league-card {
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 16px;
+  background: #fafafa;
+  padding: 8px;
+}
+</style>
 
