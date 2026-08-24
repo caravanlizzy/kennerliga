@@ -13,7 +13,7 @@
     <div v-else class="row q-col-gutter-md items-start">
       <!-- Standings card: smaller, own column, kept visually distinct from the results -->
       <div v-if="showStandings" class="col-12 col-md-4 col-lg-3">
-        <q-card flat bordered class="match-game-card standings-card full-height">
+        <q-card flat class="match-game-card standings-card full-height">
           <q-card-section class="q-pb-none">
             <div class="row items-center no-wrap">
               <div class="game-icon-box q-mr-sm">
@@ -38,11 +38,10 @@
 
       <!-- Results: grouped together in their own grid, next to the standings box -->
       <div :class="showStandings ? 'col-12 col-md-8 col-lg-9' : 'col-12'">
-        <div class="row q-col-gutter-md">
+        <div class="game-cards-grid">
           <div
             v-for="game in selectedGamesWithResults"
             :key="game.id"
-            class="col-12 col-sm-6 col-lg-4"
           >
             <q-card flat bordered class="match-game-card full-height">
               <q-card-section class="q-pb-none">
@@ -110,9 +109,14 @@ onMounted(async () => {
   background: #fff;
 }
 
+.game-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+  gap: 16px;
+}
+
 .standings-card {
   background: rgba(var(--q-primary), 0.03);
-  border-color: rgba(var(--q-primary), 0.2);
 }
 
 .game-icon-box {

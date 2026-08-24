@@ -34,7 +34,7 @@
 
         <!-- Name + optional note + tie-breaker + Stats -->
         <q-item-section>
-          <div class="row items-center full-width no-wrap content-container">
+          <div class="row items-center full-width wrap content-container">
             <div class="player-name-col">
               <div class="row items-center no-wrap">
                 <q-icon
@@ -51,27 +51,27 @@
 
               <div
                 v-if="result.notes || result.decisive_tie_breaker"
-                class="text-caption text-grey-6 row items-center q-mt-xs"
+                class="text-caption text-grey-6 row items-center wrap q-mt-xs note-line"
               >
                 <template v-if="result.notes">
-                  <q-icon name="notes" size="14px" class="q-mr-xs" />
-                  <span class="ellipsis">{{ result.notes }}</span>
+                  <q-icon name="notes" size="14px" class="q-mr-xs shrink-0" />
+                  <span class="note-text">{{ result.notes }}</span>
                 </template>
                 <span
                   v-if="result.notes && result.decisive_tie_breaker"
-                  class="q-mx-xs opacity-50"
+                  class="q-mx-xs opacity-50 shrink-0"
                   >•</span
                 >
                 <template v-if="result.decisive_tie_breaker">
-                  <q-icon name="balance" size="14px" class="q-mr-xs" />
-                  <span class="text-weight-medium text-grey-8">TB:</span>
-                  <span class="q-ml-xs text-grey-7">{{ result.decisive_tie_breaker }} ({{ result.tie_breaker_value }})</span>
+                  <q-icon name="balance" size="14px" class="q-mr-xs shrink-0" />
+                  <span class="text-weight-medium text-grey-8 shrink-0">TB:</span>
+                  <span class="q-ml-xs text-grey-7 note-text">{{ result.decisive_tie_breaker }} ({{ result.tie_breaker_value }})</span>
                 </template>
               </div>
             </div>
 
             <!-- Stats -->
-            <div class="stats-col-new row items-center justify-end q-gutter-sm">
+            <div class="stats-col-new row items-center wrap justify-end q-gutter-sm">
               <!-- Win Condition / Option badge -->
               <q-badge
                 v-if="shouldShowWinCondition(result)"
@@ -79,8 +79,11 @@
                 text-color="indigo-8"
                 class="stat-badge elegant-badge"
               >
-                <q-icon name="flag_circle" size="14px" class="q-mr-xs" />
-                <span class="ellipsis">
+                <q-icon name="flag_circle" size="14px" class="q-mr-xs shrink-0" />
+                <span
+                  class="ellipsis win-condition-text"
+                  :title="result.win_condition_option_name || result.win_condition_name"
+                >
                   {{ result.win_condition_option_name || result.win_condition_name }}
                 </span>
                 <KennerTooltip v-if="result.win_condition_name">
@@ -129,8 +132,8 @@
                 text-color="deep-purple-8"
                 class="stat-badge elegant-badge"
               >
-                <q-icon name="shield" size="14px" class="q-mr-xs" />
-                <span class="ellipsis max-faction-width">
+                <q-icon name="shield" size="14px" class="q-mr-xs shrink-0" />
+                <span class="ellipsis max-faction-width" :title="faction.name">
                   {{ faction.name }}
                 </span>
               </q-badge>
@@ -276,6 +279,12 @@ function rowClass(position: number | null) {
   margin: 4px 12px;
   transition: all 0.2s ease;
   border: 1px solid transparent;
+  border-top-color: rgba(0, 0, 0, 0.06);
+  align-items: flex-start !important;
+
+  &:first-child {
+    border-top-color: transparent;
+  }
 
   &:hover {
     background: #f8f9fa;
@@ -349,18 +358,40 @@ function rowClass(position: number | null) {
 
 .content-container {
   gap: 12px;
+  row-gap: 6px;
 }
 
 .player-name-col {
-  flex: 1 1 120px;
+  flex: 1 1 160px;
   min-width: 0;
 }
 
 .stats-col-new {
-  flex: 0 0 auto;
+  flex: 1 1 auto;
+  min-width: 0;
+  max-width: 100%;
+  row-gap: 6px;
+}
+
+.note-line {
+  min-width: 0;
+  row-gap: 2px;
+}
+
+.note-text {
+  min-width: 0;
+  max-width: 100%;
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
+
+.win-condition-text {
+  min-width: 0;
+  max-width: 160px;
 }
 
 .max-faction-width {
+  min-width: 0;
   max-width: 100px;
 }
 
@@ -373,10 +404,6 @@ function rowClass(position: number | null) {
 }
 
 @media (max-width: 600px) {
-  .content-container {
-    flex-wrap: wrap;
-    gap: 8px;
-  }
   .player-name-col {
     flex-basis: 100%;
   }
