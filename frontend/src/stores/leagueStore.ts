@@ -313,15 +313,5 @@ export const useLeagueStore = (id: number) => {
       hasSelectedGameResult,
       refresh,
     };
-  }, {
-    persist: {
-      paths: [
-        'leagueData',
-        'members',
-        'leagueStatus',
-        'initialized',
-        'matchResultsBySelectedGame'
-      ]
-    }
   });
 }
