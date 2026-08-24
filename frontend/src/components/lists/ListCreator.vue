@@ -14,8 +14,8 @@
             <kenner-counter v-if="ranked" :content="index"/>
           </template>
           <template v-slot:append>
-            <KennerButton color="primary" dense flat icon="check" @click="item.isEditable=false"
-                           @blur="item.isEditable=false"/>
+            <KennerButton color="primary" dense flat icon="check" @click="confirmEdit(item)"
+                           @blur="confirmEdit(item)"/>
           </template>
         </KennerInput>
       </div>
@@ -101,6 +101,11 @@ function moveItemDown(index: number): void {
 
 function removeItem(item: TItem): void {
   listItems.value = listItems.value.filter(i => i !== item);
+  updateList();
+}
+
+function confirmEdit(item: TItem): void {
+  item.isEditable = false;
   updateList();
 }
 
