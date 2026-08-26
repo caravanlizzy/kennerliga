@@ -111,8 +111,13 @@ onMounted(async () => {
 
 .game-cards-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+  // `auto-fit` collapses empty tracks so a single result fills the row instead
+  // of leaving a phantom column, and `min(100%, 360px)` lets cards shrink below
+  // 360px on narrow columns so the grid never overflows the league container.
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 360px), 1fr));
   gap: 16px;
+  width: 100%;
+  min-width: 0;
 }
 
 .standings-card {
