@@ -22,6 +22,7 @@
 
     <div v-else class="q-py-md relative-position league-page">
       <div class="unified-content-container">
+        <LeagueStatusBar />
         <BanGameSection flat no-margin />
         <div v-if="leagueStatus === 'BANNING'" class="section-divider" />
         <LeagueStandingsSection flat no-margin />
@@ -52,6 +53,7 @@
 import { onMounted, onUnmounted } from 'vue';
 import { storeToRefs } from 'pinia';
 import LoadingSpinner from 'components/base/LoadingSpinner.vue';
+import LeagueStatusBar from 'components/league/LeagueStatusBar.vue';
 import LeagueStandingsSection from 'components/league/sections/LeagueStandingsSection.vue';
 import GameSelectionSection from 'components/league/sections/GameSelectionSection.vue';
 import BanGameSection from 'components/league/sections/BanGameSection.vue';
