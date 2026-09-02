@@ -71,9 +71,8 @@ class StatisticsServiceTestBase(TestCase):
 
 
 class CareerPerformanceTests(StatisticsServiceTestBase):
-    def test_reaching_a_higher_league_outranks_all_lower_league_play(self):
-        # A merely participated in L1 (0 points); B piled up points in L2 but
-        # never reached L1; C earned points in L1.
+    def test_total_career_points_determine_ranking(self):
+        # League level no longer affects career rank: total points decide it.
         a = self.make_profile("A")
         b = self.make_profile("B")
         c = self.make_profile("C")
@@ -88,8 +87,7 @@ class CareerPerformanceTests(StatisticsServiceTestBase):
         ranked = _rank_career(pool)
         order = [entry["profile_id"] for entry in ranked]
 
-        # C (L1, 6 pts) > A (L1, 0 pts) > B (L2 only), regardless of B's total.
-        self.assertEqual(order, [c.id, a.id, b.id])
+        self.assertEqual(order, [b.id, c.id, a.id])
         self.assertEqual([entry["rank"] for entry in ranked], [1, 2, 3])
 
     def test_displayed_value_is_total_career_points(self):
@@ -101,26 +99,6 @@ class CareerPerformanceTests(StatisticsServiceTestBase):
 
         ranked = _rank_career(_build_player_pool())
         self.assertEqual(ranked[0]["value"], 9)
-
-    def test_display_shows_highest_league_reached_with_points(self):
-        # Reached L1 and L2; the label must lead with the highest league
-        # (L1) and read the total points cleanly (9, not 9.0).
-        a = self.make_profile("A")
-        self.add_standing(self.make_league(2), a, 3)
-        self.add_standing(self.make_league(1), a, 6)
-
-        ranked = _rank_career(_build_player_pool())
-        self.assertEqual(ranked[0]["best_level"], 1)
-        self.assertEqual(ranked[0]["display"], "L1 · 9 pts")
-
-    def test_display_uses_lowest_league_when_top_not_reached(self):
-        # Only ever played L3: the label reflects L3, not L1.
-        a = self.make_profile("A")
-        self.add_standing(self.make_league(3), a, 4)
-
-        ranked = _rank_career(_build_player_pool())
-        self.assertEqual(ranked[0]["display"], "L3 · 4 pts")
-
 
 class CategorySetTests(StatisticsServiceTestBase):
     def test_removed_categories_are_gone(self):
@@ -202,6 +180,34 @@ class IronWillTests(StatisticsServiceTestBase):
 
 
 class PlayerCountFilterTests(StatisticsServiceTestBase):
+    def test_unplaced_results_do_not_count_toward_performance(self):
+        me = self.make_profile("me")
+        opponent = self.make_profile("opponent")
+        game = Game.objects.create(name="G", platform=self.platform)
+        league = self.make_league(1)
+        selected_game = SelectedGame.objects.create(profile=me, game=game, league=league)
+        Result.objects.create(
+            player_profile=me,
+            selected_game=selected_game,
+            league=league,
+            season=self.season,
+            position=1,
+        )
+        Result.objects.create(
+            player_profile=opponent,
+            selected_game=selected_game,
+            league=league,
+            season=self.season,
+            position=None,
+        )
+
+        pool = _build_player_pool()
+        me_stats = next(player for player in pool if player["profile_id"] == me.id)
+
+        self.assertEqual(me_stats["games_played"], 1)
+        self.assertEqual(me_stats["win_rate"], 100)
+        self.assertNotIn(opponent.id, [player["profile_id"] for player in pool])
+
     def test_results_are_filtered_by_match_size(self):
         me = self.make_profile("me")
         o1 = self.make_profile("o1")

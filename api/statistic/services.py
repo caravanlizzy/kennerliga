@@ -199,11 +199,12 @@ def _build_player_pool(years=None, player_counts=None):
     LeagueStanding aggregates into a single flat set of fields that the
     categories above rank on directly.
 
-    Career fields (`level_points`, `reached_levels`, `career_performance`)
-    capture, per league level, how far the player has climbed so the
-    lexicographic career ranker in `_rank_career` can favour higher leagues.
+    Career fields include the accumulated league points used to rank a
+    player's career performance.
     """
-    result_qs = Result.objects.all()
+    # Results are written before a finishing position is necessarily known.
+    # They are not completed games and must not affect player performance.
+    result_qs = Result.objects.filter(position__isnull=False)
     if years:
         result_qs = result_qs.filter(season__year__in=years)
     result_qs = _filter_results_by_player_count(result_qs, player_counts)
@@ -694,7 +695,9 @@ def list_games_with_stats(years=None, player_counts=None):
     popularity stats and the current best player, for use as a searchable
     picker for the per-game leaderboard.
     """
-    qs = Result.objects.select_related("selected_game__game__platform")
+    qs = Result.objects.filter(position__isnull=False).select_related(
+        "selected_game__game__platform"
+    )
     if years:
         qs = qs.filter(season__year__in=years)
     qs = _filter_results_by_player_count(qs, player_counts)
@@ -739,7 +742,7 @@ def get_game_leaderboard(
     excluded from the ranking (too few games to mean anything) but the
     requesting player's own row is always returned separately via `me`.
     """
-    qs = Result.objects.filter(selected_game__game=game)
+    qs = Result.objects.filter(selected_game__game=game, position__isnull=False)
     if years:
         qs = qs.filter(season__year__in=years)
     qs = _filter_results_by_player_count(qs, player_counts)
