@@ -104,16 +104,36 @@ type AvatarColor = {
 };
 
 const AVATAR_COLORS: readonly AvatarColor[] = [
+  { background: '#dc2626', hover: '#b91c1c', foreground: '#ffffff' },
   { background: '#e11d48', hover: '#be123c', foreground: '#ffffff' },
+  { background: '#f43f5e', hover: '#e11d48', foreground: '#ffffff' },
+  { background: '#f05924', hover: '#d9481a', foreground: '#ffffff' },
   { background: '#f97316', hover: '#ea580c', foreground: '#1f2937' },
+  { background: '#fb923c', hover: '#f97316', foreground: '#1f2937' },
+  { background: '#f59e0b', hover: '#d97706', foreground: '#1f2937' },
   { background: '#eab308', hover: '#ca8a04', foreground: '#1f2937' },
+  { background: '#facc15', hover: '#eab308', foreground: '#1f2937' },
   { background: '#84cc16', hover: '#65a30d', foreground: '#1f2937' },
+  { background: '#a3e635', hover: '#84cc16', foreground: '#1f2937' },
+  { background: '#22c55e', hover: '#16a34a', foreground: '#1f2937' },
   { background: '#10b981', hover: '#059669', foreground: '#1f2937' },
+  { background: '#14b8a6', hover: '#0f766e', foreground: '#1f2937' },
+  { background: '#2dd4bf', hover: '#14b8a6', foreground: '#1f2937' },
   { background: '#06b6d4', hover: '#0891b2', foreground: '#1f2937' },
+  { background: '#38bdf8', hover: '#0ea5e9', foreground: '#1f2937' },
+  { background: '#0ea5e9', hover: '#0284c7', foreground: '#1f2937' },
   { background: '#2563eb', hover: '#1d4ed8', foreground: '#ffffff' },
+  { background: '#4f46e5', hover: '#4338ca', foreground: '#ffffff' },
+  { background: '#6366f1', hover: '#4f46e5', foreground: '#ffffff' },
   { background: '#7c3aed', hover: '#6d28d9', foreground: '#ffffff' },
+  { background: '#8b5cf6', hover: '#7c3aed', foreground: '#ffffff' },
+  { background: '#a855f7', hover: '#9333ea', foreground: '#ffffff' },
   { background: '#c026d3', hover: '#a21caf', foreground: '#ffffff' },
+  { background: '#d946ef', hover: '#c026d3', foreground: '#ffffff' },
   { background: '#db2777', hover: '#be185d', foreground: '#ffffff' },
+  { background: '#ec4899', hover: '#db2777', foreground: '#ffffff' },
+  { background: '#e879a9', hover: '#ec4899', foreground: '#1f2937' },
+  { background: '#fb7185', hover: '#f43f5e', foreground: '#1f2937' },
 ];
 
 function hash(value: string) {
