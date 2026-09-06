@@ -179,3 +179,15 @@ class PushDeviceSerializer(serializers.ModelSerializer):
             "updated_at",
         ]
         read_only_fields = ["id", "last_seen_at", "created_at", "updated_at"]
+
+
+class PushDeviceUpsertSerializer(serializers.Serializer):
+    token = serializers.CharField(max_length=300)
+    platform = serializers.ChoiceField(
+        choices=PushDevice.Platform.choices, required=False, default=PushDevice.Platform.UNKNOWN
+    )
+    device_id = serializers.CharField(max_length=120, required=False, allow_blank=True, allow_null=True)
+    app_version = serializers.CharField(max_length=40, required=False, allow_blank=True, allow_null=True)
+    notify_registration_open = serializers.BooleanField(required=False)
+    notify_league_started = serializers.BooleanField(required=False)
+    notify_active_player = serializers.BooleanField(required=False)

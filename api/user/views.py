@@ -33,6 +33,7 @@ from user.serializers import (
     PlayerProfileSerializer,
     FeedbackSerializer,
     PushDeviceSerializer,
+    PushDeviceUpsertSerializer,
 )
 from user.push_notifications import upsert_push_device, deactivate_push_device
 from configuration.services import get_max_same_game_per_year
@@ -405,7 +406,7 @@ class MeViewSet(ViewSet):
             removed = deactivate_push_device(request.user, token=token)
             return Response({"deactivated": removed})
 
-        serializer = PushDeviceSerializer(data=request.data)
+        serializer = PushDeviceUpsertSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         payload = serializer.validated_data
         device = upsert_push_device(

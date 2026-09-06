@@ -7,7 +7,7 @@ from user.models import User, PushDevice
 class PushDeviceApiTests(TestCase):
     def setUp(self):
         self.client = APIClient()
-        self.user = User.objects.create_user(username="push-user", ******)
+        self.user = User.objects.create_user(username="push-user")
         self.client.force_authenticate(user=self.user)
 
     def test_register_push_device(self):
@@ -29,7 +29,7 @@ class PushDeviceApiTests(TestCase):
         )
 
     def test_register_existing_token_reassigns_owner(self):
-        other = User.objects.create_user(username="other-user", ******)
+        other = User.objects.create_user(username="other-user")
         PushDevice.objects.create(user=other, token="shared-token", platform="ios")
 
         response = self.client.post(
