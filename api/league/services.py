@@ -449,6 +449,9 @@ def set_league_active_player(league: League, participant) -> None:
     league.active_player = participant
     league.updated_at = timezone.now()
     league.save(update_fields=["active_player", "updated_at"])
+    from user.push_notifications import notify_active_player_turn
+
+    notify_active_player_turn(league, participant)
 
 
 def touch_league(league: League) -> None:
@@ -483,6 +486,9 @@ def rotate_active_player(
     league.active_player = next_player
     league.updated_at = timezone.now()
     league.save(update_fields=["active_player", "updated_at"])
+    from user.push_notifications import notify_active_player_turn
+
+    notify_active_player_turn(league, next_player)
     return next_player
 
 
@@ -499,6 +505,9 @@ def advance_turn(league: League):
             league.active_player = q.get_members_ordered(league).first()
             league.updated_at = timezone.now()
             league.save(update_fields=["status", "active_player", "updated_at"])
+            from user.push_notifications import notify_active_player_turn
+
+            notify_active_player_turn(league, league.active_player)
         else:
             if q.is_two_player_league(league):
                 if q.both_players_exactly_one_pick(league):

@@ -32,7 +32,9 @@ from user.serializers import (
     UserRegistrationSerializer,
     PlayerProfileSerializer,
     FeedbackSerializer,
+    PushDeviceSerializer,
 )
+from user.push_notifications import upsert_push_device, deactivate_push_device
 from configuration.services import get_max_same_game_per_year
 from game.models import SelectedGame
 
@@ -391,6 +393,32 @@ class MeViewSet(ViewSet):
         """
         results = Result.objects.filter(player_profile=request.user.profile)
         return Response(ResultSerializer(results, many=True).data)
+
+    @action(detail=False, methods=["get", "post", "delete"], url_path="push-devices")
+    def push_devices(self, request):
+        if request.method == "GET":
+            devices = request.user.push_devices.all().order_by("-last_seen_at")
+            return Response(PushDeviceSerializer(devices, many=True).data)
+
+        if request.method == "DELETE":
+            token = request.data.get("token") or request.query_params.get("token")
+            removed = deactivate_push_device(request.user, token=token)
+            return Response({"deactivated": removed})
+
+        serializer = PushDeviceSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        payload = serializer.validated_data
+        device = upsert_push_device(
+            request.user,
+            token=payload["token"],
+            platform=payload.get("platform"),
+            device_id=payload.get("device_id"),
+            app_version=payload.get("app_version"),
+            notify_registration_open=payload.get("notify_registration_open"),
+            notify_league_started=payload.get("notify_league_started"),
+            notify_active_player=payload.get("notify_active_player"),
+        )
+        return Response(PushDeviceSerializer(device).data, status=201)
 
 
 class UserInviteLinkViewSet(ModelViewSet):

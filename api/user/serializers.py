@@ -4,7 +4,7 @@ from django.utils.http import urlencode
 from rest_framework.serializers import ModelSerializer
 from rest_framework import serializers
 
-from user.models import PlayerProfile, UserInviteLink, Feedback
+from user.models import PlayerProfile, UserInviteLink, Feedback, PushDevice
 
 User = get_user_model()
 
@@ -159,3 +159,23 @@ class FeedbackSerializer(serializers.ModelSerializer):
 
     def get_username(self, obj):
         return obj.user.username
+
+
+class PushDeviceSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PushDevice
+        fields = [
+            "id",
+            "token",
+            "platform",
+            "device_id",
+            "app_version",
+            "is_active",
+            "notify_registration_open",
+            "notify_league_started",
+            "notify_active_player",
+            "last_seen_at",
+            "created_at",
+            "updated_at",
+        ]
+        read_only_fields = ["id", "last_seen_at", "created_at", "updated_at"]

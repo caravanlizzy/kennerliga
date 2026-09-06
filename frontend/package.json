@@ -14,6 +14,8 @@
     "build": "quasar build && cp -r dist ../api/"
   },
   "dependencies": {
+    "@capacitor/core": "^6.2.1",
+    "@capacitor/push-notifications": "^6.0.3",
     "@quasar/extras": "^1.16.4",
     "@vueuse/core": "^10.7.2",
     "@vueuse/integrations": "^10.7.2",

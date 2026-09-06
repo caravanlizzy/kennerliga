@@ -13,6 +13,7 @@ from season.services import (
     create_next_season,
 )
 from announcement.services import delete_registration_announcements
+from user.push_notifications import notify_league_started_active_players
 
 
 def start_new_season(new_season=None):
@@ -38,4 +39,5 @@ def start_new_season(new_season=None):
 
         create_leagues(new_season, ranked)
         start_open_season(new_season)
+        notify_league_started_active_players(new_season)
         create_next_season(new_season)

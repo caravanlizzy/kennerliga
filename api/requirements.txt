@@ -9,3 +9,4 @@ python-dotenv
 python-dateutil
 drf-spectacular
 drf-spectacular-sidecar
+firebase-admin==6.8.0

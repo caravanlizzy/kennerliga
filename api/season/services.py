@@ -54,6 +54,9 @@ def open_registration(season: Season):
         raise ValueError("No current season")
     season.status = Season.SeasonStatus.OPEN
     season.save()
+    from user.push_notifications import notify_registration_open
+
+    notify_registration_open(season)
 
 
 def create_leagues(season: Season, participants: List) -> List[League]:

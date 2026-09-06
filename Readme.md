@@ -75,6 +75,50 @@ _This part is still under development. Stay tuned!_
 
 ---
 
+## 📱 Mobile Apps (Android + iOS with Quasar/Capacitor)
+
+The project is prepared for Capacitor builds. In `frontend/`:
+
+```bash
+quasar mode add capacitor
+quasar build -m capacitor -T android
+quasar build -m capacitor -T ios
+```
+
+For local native projects:
+
+```bash
+quasar dev -m capacitor -T android
+quasar dev -m capacitor -T ios
+```
+
+### Push notifications
+
+The backend now supports device registration at:
+
+- `GET /api/user/me/push-devices/`
+- `POST /api/user/me/push-devices/`
+- `DELETE /api/user/me/push-devices/`
+
+Events sent:
+- registration for a new season is opened
+- season starts and you are first active player in your league
+- your active-player turn in a league
+
+Firebase credentials for server-side delivery:
+
+- `FIREBASE_SERVICE_ACCOUNT_JSON` (full JSON string), or
+- `FIREBASE_SERVICE_ACCOUNT_FILE` (path to service-account file)
+
+Without credentials, push sending is skipped safely.
+
+### Distribution without app stores
+
+- **Android**: APK download from your website is possible (manual install/update).
+- **iOS**: no equivalent public direct IPA sideload for normal users; use App Store or TestFlight/enterprise-style restricted options.
+
+---
+
 ## 📂 Project Structure
 
 ```
@@ -114,4 +158,3 @@ Tokens are required for most write actions (CRUD, posting results, etc.).
 - Quasar 2.x  
 - Uses `drf-spectacular` for OpenAPI 3.0 documentation  
 - Modular Django app structure  
-

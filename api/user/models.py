@@ -139,3 +139,42 @@ class Feedback(models.Model):
     message = models.TextField()
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     datetime = models.DateTimeField(auto_now_add=True)
+
+
+class PushDevice(models.Model):
+    """
+    Mobile/web push registration bound to a user account.
+    """
+
+    class Platform(models.TextChoices):
+        ANDROID = "android", "Android"
+        IOS = "ios", "iOS"
+        WEB = "web", "Web"
+        UNKNOWN = "unknown", "Unknown"
+
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="push_devices",
+    )
+    token = models.CharField(max_length=300, unique=True, db_index=True)
+    platform = models.CharField(
+        max_length=20, choices=Platform.choices, default=Platform.UNKNOWN
+    )
+    device_id = models.CharField(max_length=120, blank=True, null=True, db_index=True)
+    app_version = models.CharField(max_length=40, blank=True, null=True)
+    is_active = models.BooleanField(default=True)
+    notify_registration_open = models.BooleanField(default=True)
+    notify_league_started = models.BooleanField(default=True)
+    notify_active_player = models.BooleanField(default=True)
+    last_seen_at = models.DateTimeField(auto_now=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        indexes = [
+            models.Index(fields=["user", "is_active"]),
+        ]
+
+    def __str__(self):
+        return f"{self.user} {self.platform} ({'active' if self.is_active else 'inactive'})"
