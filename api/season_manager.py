@@ -13,6 +13,7 @@ from season.services import (
     create_next_season,
 )
 from announcement.services import delete_registration_announcements
+from notification.services import notify_users
 
 
 def start_new_season(new_season=None):
@@ -39,3 +40,11 @@ def start_new_season(new_season=None):
         create_leagues(new_season, ranked)
         start_open_season(new_season)
         create_next_season(new_season)
+        notify_users(
+            new_season.participants.exclude(profile__user__isnull=True).values_list(
+                "profile__user_id", flat=True
+            ),
+            "Your new season has started",
+            f"{new_season.name} has started. Your league is ready.",
+            "/#/league/my-league",
+        )

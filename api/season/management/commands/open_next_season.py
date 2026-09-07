@@ -3,6 +3,7 @@ from announcement.models import Announcement
 from season.models import Season
 from season.queries import get_open_season
 from chat.service import create_chat_announcement
+from notification.services import notify_all_users
 from datetime import timedelta
 
 
@@ -19,6 +20,11 @@ class Command(BaseCommand):
         if next_season:
             next_season.status = Season.SeasonStatus.OPEN
             next_season.save()
+            notify_all_users(
+                "Season registration is open",
+                f"Registration for {next_season.name} is now open.",
+                "/#/register",
+            )
             self.stdout.write(
                 self.style.SUCCESS(f"Season {next_season.name} is now OPEN.")
             )

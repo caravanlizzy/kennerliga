@@ -60,6 +60,7 @@ MY_APPS = [
     "statistic",
     "configuration",
     "api",
+    "notification",
 ]
 
 INSTALLED_APPS = DJANGO_APPS + MY_APPS
@@ -195,3 +196,7 @@ SESSION_COOKIE_SAMESITE = "Lax"
 FRONTEND_REGISTER_URL = "http://localhost:9000/#/register"
 
 DATA_UPLOAD_MAX_NUMBER_FIELDS = 4000
+
+VAPID_PUBLIC_KEY = os.getenv("VAPID_PUBLIC_KEY")
+VAPID_PRIVATE_KEY = os.getenv("VAPID_PRIVATE_KEY")
+VAPID_SUBJECT = os.getenv("VAPID_SUBJECT")

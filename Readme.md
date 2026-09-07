@@ -75,6 +75,24 @@ _This part is still under development. Stay tuned!_
 
 ---
 
+## 🔔 Push Notifications
+
+Installed users are prompted to enable notifications for registration openings,
+season starts, and when it is their turn. Configure the following environment
+variables on the Django host before deploying:
+
+```env
+VAPID_PUBLIC_KEY=<base64url VAPID public key>
+VAPID_PRIVATE_KEY=<VAPID private key PEM>
+VAPID_SUBJECT=mailto:admin@example.com
+```
+
+Generate a VAPID key pair with the `vapid --gen` utility installed by
+`pywebpush`. Keep the private key secret. Then run the Django migrations before
+deploying the frontend so subscriptions can be stored.
+
+---
+
 ## 📂 Project Structure
 
 ```
@@ -114,4 +132,3 @@ Tokens are required for most write actions (CRUD, posting results, etc.).
 - Quasar 2.x  
 - Uses `drf-spectacular` for OpenAPI 3.0 documentation  
 - Modular Django app structure  
-
