@@ -2,7 +2,11 @@ import { Notify } from 'quasar';
 import { boot } from 'quasar/wrappers';
 import { watch } from 'vue';
 
-import { isPushNotificationSupported, subscribeToPushNotifications } from 'src/services/notificationService';
+import {
+  isPushNotificationSupported,
+  PushNotConfiguredError,
+  subscribeToPushNotifications,
+} from 'src/services/notificationService';
 import { useUserStore } from 'stores/userStore';
 
 export default boot(() => {
@@ -13,7 +17,11 @@ export default boot(() => {
       await subscribeToPushNotifications();
     } catch (error) {
       console.error('Unable to enable push notifications:', error);
-      Notify.create({ type: 'negative', message: 'Notifications could not be enabled.' });
+      const message =
+        error instanceof PushNotConfiguredError
+          ? 'Notifications are not configured on the server yet.'
+          : 'Notifications could not be enabled.';
+      Notify.create({ type: 'negative', message });
     }
   }
 

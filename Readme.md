@@ -83,13 +83,60 @@ variables on the Django host before deploying:
 
 ```env
 VAPID_PUBLIC_KEY=<base64url VAPID public key>
-VAPID_PRIVATE_KEY=<VAPID private key PEM>
+VAPID_PRIVATE_KEY=<VAPID private key PEM or path to a .pem file>
 VAPID_SUBJECT=mailto:admin@example.com
 ```
 
 Generate a VAPID key pair with the `vapid --gen` utility installed by
-`pywebpush`. Keep the private key secret. Then run the Django migrations before
-deploying the frontend so subscriptions can be stored.
+`pywebpush`. Keep the private key secret.
+
+**All three variables must be set** — if any is missing the backend logs a
+warning naming it and silently sends nothing. They are only read through the
+production settings module, so run the server with
+`DJANGO_SETTINGS_MODULE=django_rest.settings_production` (which loads `.env`);
+under the plain dev `settings.py` the `VAPID_*` values stay unset.
+
+### Storing the private key in `.env`
+
+`VAPID_PRIVATE_KEY` accepts either form:
+
+- **A path** to the `.pem` file, which avoids multi-line issues entirely:
+
+  ```env
+  VAPID_PRIVATE_KEY=/etc/kennerliga/vapid_private_key.pem
+  ```
+
+- **The PEM inlined**. Since a `.env` value must stay on one line, escape the
+  newlines as `\n` and wrap the value in double quotes; the backend restores
+  the real newlines before use:
+
+  ```env
+  VAPID_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\nMIGT...\n-----END PRIVATE KEY-----\n"
+  ```
+
+Make sure `VAPID_PUBLIC_KEY` is the base64url public key derived from that same
+private key — a mismatched pair lets the browser subscribe but the push server
+rejects every send.
+
+Run the Django migrations before deploying the frontend so subscriptions can be
+stored.
+
+### Verifying the pipeline
+
+Once configured, a logged-in user can confirm the end-to-end chain without
+waiting for a real game event by POSTing to the test endpoint:
+
+```bash
+curl -X POST https://<host>/api/notifications/test/ \
+  -H "Authorization: Token <your-token>"
+```
+
+It returns `{"targeted": N, "succeeded": M}` (how many of your own
+subscriptions were reached), or `503` if VAPID is not configured.
+
+> **iOS:** web push only reaches a PWA on iOS 16.4+ **when it is installed to
+> the home screen** — it will not arrive in Safari tabs. This is an Apple
+> platform requirement, not a bug.
 
 ---
 

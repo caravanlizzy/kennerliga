@@ -5,6 +5,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from notification.models import PushSubscription
+from notification.services import send_test_notification
 
 
 class PushSubscriptionSerializer(serializers.Serializer):
@@ -27,6 +28,21 @@ class VapidPublicKeyView(APIView):
                 status=status.HTTP_503_SERVICE_UNAVAILABLE,
             )
         return Response({"public_key": settings.VAPID_PUBLIC_KEY})
+
+
+class SendTestNotificationView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        result = send_test_notification(request.user)
+        if not result["configured"]:
+            return Response(
+                {"detail": "Push notifications are not configured."},
+                status=status.HTTP_503_SERVICE_UNAVAILABLE,
+            )
+        return Response(
+            {"targeted": result["targeted"], "succeeded": result["succeeded"]}
+        )
 
 
 class PushSubscriptionView(APIView):
