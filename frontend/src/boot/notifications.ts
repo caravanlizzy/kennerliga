@@ -32,15 +32,6 @@ export default boot(() => {
 
     if (Notification.permission === 'granted') {
       void enableNotifications();
-      return;
-    }
-
-    if (Notification.permission === 'default') {
-      Notify.create({
-        message: 'Enable notifications for registration, season starts, and your turn.',
-        timeout: 0,
-        actions: [{ label: 'Enable', color: 'white', handler: enableNotifications }],
-      });
     }
   }
 
