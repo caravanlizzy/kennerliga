@@ -1,17 +1,8 @@
-import os
-from pathlib import Path
-from dotenv import load_dotenv
+from .settings import *  # noqa: F401,F403
 
-# Adjust BASE_DIR to where your .env is
-# If .env is next to manage.py:
-BASE_DIR = Path(__file__).resolve().parent.parent
+DEBUG = env_bool("DEBUG", False)
 
-# Load .env BEFORE importing base settings and BEFORE using os.getenv
-load_dotenv(BASE_DIR / ".env")
+CORS_ALLOW_ALL_ORIGINS = env_bool("CORS_ALLOW_ALL", False)
 
-from .settings import *  # noqa: E402, F401
-
-SECRET_KEY = os.getenv("SECRET_KEY", SECRET_KEY)
-DEBUG = os.getenv("DEBUG", "False").lower() in ("true", "1", "yes")
-
-FRONTEND_REGISTER_URL = "www.kennerliga.de/#/register"
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
