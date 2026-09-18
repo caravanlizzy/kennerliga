@@ -194,6 +194,7 @@ USE_TZ = True
 
 STATIC_URL = "/static/"
 STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
+WHITENOISE_MANIFEST_STRICT = False
 try:
     import whitenoise  # noqa: F401
     STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
