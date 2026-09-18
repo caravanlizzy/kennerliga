@@ -1,5 +1,9 @@
 [phases.build]
-cmds = ['pip install -r requirements.txt', 'python prod_manage.py migrate']
+cmds = [
+    'pip install -r requirements.txt',
+    'python prod_manage.py collectstatic --noinput',
+    'python prod_manage.py migrate'
+]
 
 [start]
 cmd = 'gunicorn django_rest.wsgi:application --bind 0.0.0.0:$PORT'
