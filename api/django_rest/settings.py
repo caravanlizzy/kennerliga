@@ -214,6 +214,10 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 AUTH_USER_MODEL = "user.User"
 
+# Proxy SSL header for reverse proxy deployments (e.g. Railway)
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+USE_X_FORWARDED_HOST = True
+
 ORIGIN_LIST = [
     "http://localhost:9000",
     "http://127.0.0.1:9000",
@@ -222,6 +226,8 @@ ORIGIN_LIST = [
     "http://www.kennerliga.de",
     "https://www.kennerliga.de",
     "https://kennerliga.de",
+    "https://*.up.railway.app",
+    "https://kennerliga-production.up.railway.app",
 ]
 
 # Add FRONTEND_URL or extra CORS origins from environment
@@ -239,8 +245,12 @@ if _cors_origins:
         if cleaned and cleaned not in ORIGIN_LIST:
             ORIGIN_LIST.append(cleaned)
 
+CORS_ALLOW_ALL_ORIGINS = os.getenv("CORS_ALLOW_ALL", "True").lower() in ("true", "1", "yes")
+CORS_ALLOWED_ORIGINS = [origin for origin in ORIGIN_LIST if not origin.startswith("https://*")]
+CORS_ALLOWED_ORIGIN_REGEXES = [
+    r"^https://.*\.up\.railway\.app$",
+]
 CSRF_TRUSTED_ORIGINS = ORIGIN_LIST
-CORS_ALLOWED_ORIGINS = ORIGIN_LIST
 
 CORS_ALLOW_CREDENTIALS = True
 
