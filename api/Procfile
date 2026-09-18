@@ -1,1 +1,1 @@
-web: python prod_manage.py migrate && gunicorn django_rest.wsgi:application --bind 0.0.0.0:$PORT
+web: python prod_manage.py migrate && python prod_manage.py collectstatic --noinput && gunicorn django_rest.wsgi:application --bind 0.0.0.0:$PORT
