@@ -10,3 +10,9 @@ python-dateutil
 drf-spectacular
 drf-spectacular-sidecar
 pywebpush
+gunicorn
+dj-database-url
+mysqlclient
+PyMySQL
+cryptography
+whitenoise

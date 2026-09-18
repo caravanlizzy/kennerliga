@@ -12,20 +12,32 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 
 import os
 from pathlib import Path
+from dotenv import load_dotenv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+# Load environment variables from .env if present
+load_dotenv(BASE_DIR / ".env")
+
+try:
+    import dj_database_url
+except ImportError:
+    dj_database_url = None
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure-3=2$mgwx0)o1(d*%5!92x-oaa(+7c1%1=n!3plo2pg_$q7z)dd"
+SECRET_KEY = os.getenv(
+    "SECRET_KEY", "django-insecure-3=2$mgwx0)o1(d*%5!92x-oaa(+7c1%1=n!3plo2pg_$q7z)dd"
+)
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.getenv("DEBUG", "True").lower() in ("true", "1", "yes")
 
-ALLOWED_HOSTS = ["*"]
+ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "*").split(",") if os.getenv("ALLOWED_HOSTS") else ["*"]
+ALLOWED_HOSTS = [host.strip() for host in ALLOWED_HOSTS if host.strip()]
 
 # Application definition
 
@@ -67,6 +79,15 @@ INSTALLED_APPS = DJANGO_APPS + MY_APPS
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+]
+if "whitenoise" in [p.lower() for p in (DJANGO_APPS + MY_APPS)] or True:
+    try:
+        import whitenoise  # noqa: F401
+        MIDDLEWARE.append("whitenoise.middleware.WhiteNoiseMiddleware")
+    except ImportError:
+        pass
+
+MIDDLEWARE.extend([
     "django.contrib.sessions.middleware.SessionMiddleware",
     "corsheaders.middleware.CorsMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -74,7 +95,7 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "django.middleware.common.CommonMiddleware",
-]
+])
 
 ROOT_URLCONF = "django_rest.urls"
 
@@ -116,12 +137,20 @@ WSGI_APPLICATION = "django_rest.wsgi.application"
 
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
+if os.getenv("DATABASE_URL") and dj_database_url:
+    DATABASES = {
+        "default": dj_database_url.config(
+            default=os.getenv("DATABASE_URL"),
+            conn_max_age=600,
+        )
     }
-}
+else:
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": BASE_DIR / "db.sqlite3",
+        }
+    }
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
 
@@ -152,11 +181,13 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
 STATIC_URL = "static/"
-STATIC_ROOT = os.path.join(BASE_DIR, "static")
+STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, "dist/spa"),
-    os.path.join(BASE_DIR, "dist/spa/assets"),
-    os.path.join(BASE_DIR, "dist/spa/icons"),
+    p for p in [
+        os.path.join(BASE_DIR, "dist/spa"),
+        os.path.join(BASE_DIR, "dist/spa/assets"),
+        os.path.join(BASE_DIR, "dist/spa/icons"),
+    ] if os.path.exists(p)
 ]
 
 # Default primary key field type
@@ -168,6 +199,7 @@ AUTH_USER_MODEL = "user.User"
 
 ORIGIN_LIST = [
     "http://localhost:9000",
+    "http://127.0.0.1:9000",
     "https://haligh.pythonanywhere.com",
     "http://haligh.pythonanywhere.com",
     "http://www.kennerliga.de",
@@ -175,25 +207,33 @@ ORIGIN_LIST = [
     "https://kennerliga.de",
 ]
 
+# Add FRONTEND_URL or extra CORS origins from environment
+_frontend_url = os.getenv("FRONTEND_URL")
+if _frontend_url:
+    for url in _frontend_url.split(","):
+        cleaned = url.strip().rstrip("/")
+        if cleaned and cleaned not in ORIGIN_LIST:
+            ORIGIN_LIST.append(cleaned)
+
+_cors_origins = os.getenv("CORS_ALLOWED_ORIGINS")
+if _cors_origins:
+    for url in _cors_origins.split(","):
+        cleaned = url.strip().rstrip("/")
+        if cleaned and cleaned not in ORIGIN_LIST:
+            ORIGIN_LIST.append(cleaned)
+
 CSRF_TRUSTED_ORIGINS = ORIGIN_LIST
 CORS_ALLOWED_ORIGINS = ORIGIN_LIST
 
-# from corsheaders.defaults import default_methods
-
-# CORS_ALLOW_METHODS = (
-#    *default_methods,
-# )
-
 CORS_ALLOW_CREDENTIALS = True
-# CORS_ALLOWED_HEADERS = [
-#    'Authorization',
-#    'Content-Type'
-# ]
 
-SESSION_COOKIE_SECURE = True
+SESSION_COOKIE_SECURE = not DEBUG
 SESSION_COOKIE_SAMESITE = "Lax"
 
-FRONTEND_REGISTER_URL = "http://localhost:9000/#/register"
+FRONTEND_REGISTER_URL = os.getenv(
+    "FRONTEND_REGISTER_URL",
+    f"{_frontend_url}/#/register" if _frontend_url else "http://localhost:9000/#/register",
+)
 
 DATA_UPLOAD_MAX_NUMBER_FIELDS = 4000
 

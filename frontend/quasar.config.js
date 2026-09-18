@@ -50,9 +50,9 @@ module.exports = configure(function (ctx) {
     build: {
       // env: require('dotenv').config().parsed,
       env: {
-        API_URL: ctx.dev
+        API_URL: process.env.API_URL || (ctx.dev
           ? 'http://localhost:8000/api'
-          : 'https://www.kennerliga.de/api',
+          : 'https://www.kennerliga.de/api'),
       },
       target: {
         browser: ['es2019', 'edge88', 'firefox78', 'chrome87', 'safari13.1'],

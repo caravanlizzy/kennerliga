@@ -11,7 +11,8 @@
     "test": "echo \"No test specified\" && exit 0",
     "dev": "quasar dev",
     "prebuild": "rm -rf ../api/dist",
-    "build": "quasar build -m pwa && mkdir -p ../api/dist && cp -r dist/pwa ../api/dist/spa"
+    "build": "quasar build -m pwa && mkdir -p ../api/dist && cp -r dist/pwa ../api/dist/spa",
+    "start": "npx serve -s dist/pwa -l tcp://0.0.0.0:${PORT:-9000}"
   },
   "dependencies": {
     "@quasar/extras": "^1.16.4",
@@ -23,6 +24,7 @@
     "pinia": "^2.0.11",
     "pinia-plugin-persistedstate": "^3.2.3",
     "quasar": "^2.6.0",
+    "serve": "^14.2.4",
     "vue": "^3.0.0",
     "vue-router": "^4.0.0"
   },
