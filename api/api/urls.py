@@ -1,4 +1,5 @@
 from django.urls import path, include
+from django.views.generic import RedirectView
 from rest_framework.authtoken import views
 from rest_framework.routers import DefaultRouter
 
@@ -13,10 +14,10 @@ from api.views import LoginApiView, LogoutApiView, LeaderboardViewSet, NeedsUpda
 router = DefaultRouter()
 
 urlpatterns = [
+    path("", RedirectView.as_view(url="docs/", permanent=False)),
     path("login/", LoginApiView.as_view()),
     path("logout/", LogoutApiView.as_view()),
     path("needs-update/", NeedsUpdateView.as_view(), name="needs-update"),
-    path("", include(router.urls)),
     path("game/", include("game.urls")),
     path("season/", include("season.urls")),
     path("league/", include("league.urls")),

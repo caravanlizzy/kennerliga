@@ -137,12 +137,24 @@ WSGI_APPLICATION = "django_rest.wsgi.application"
 
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
-if os.getenv("DATABASE_URL") and dj_database_url:
+_db_url = os.getenv("DATABASE_URL") or os.getenv("MYSQL_URL")
+if _db_url and dj_database_url:
     DATABASES = {
         "default": dj_database_url.config(
-            default=os.getenv("DATABASE_URL"),
+            default=_db_url,
             conn_max_age=600,
         )
+    }
+elif os.getenv("DB_NAME"):
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.mysql",
+            "NAME": os.getenv("DB_NAME"),
+            "USER": os.getenv("DB_USER"),
+            "PASSWORD": os.getenv("DB_PASSWORD"),
+            "HOST": os.getenv("DB_HOST") or "127.0.0.1",
+            "PORT": os.getenv("DB_PORT") or "3306",
+        }
     }
 else:
     DATABASES = {

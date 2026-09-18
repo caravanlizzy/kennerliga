@@ -11,19 +11,7 @@ load_dotenv(BASE_DIR / ".env")
 
 from .settings import *  # noqa: E402, F401
 
-SECRET_KEY = os.getenv("SECRET_KEY")
+SECRET_KEY = os.getenv("SECRET_KEY", SECRET_KEY)
+DEBUG = os.getenv("DEBUG", "False").lower() in ("true", "1", "yes")
 
 FRONTEND_REGISTER_URL = "www.kennerliga.de/#/register"
-
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.mysql",
-        "NAME": os.getenv("DB_NAME"),
-        "USER": os.getenv("DB_USER"),
-        "PASSWORD": os.getenv("DB_PASSWORD"),
-        # never allow None here, fall back to something sensible
-        "HOST": os.getenv("DB_HOST") or "127.0.0.1",
-        # optional but recommended:
-        "PORT": os.getenv("DB_PORT") or "3306",
-    }
-}
