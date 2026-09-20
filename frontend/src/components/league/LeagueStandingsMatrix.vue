@@ -65,7 +65,7 @@
                 </div>
               </div>
               <div v-else-if="col.name === 'profile_name'" class="row items-center">
-                <LeagueLevel :level="level" v-if="level" />
+                <LeagueLevel :level="level" shape size="26px" fontSize="11px" v-if="level" />
                 <span v-else>{{ col.label }}</span>
               </div>
               <span v-else>{{ col.label }}</span>
