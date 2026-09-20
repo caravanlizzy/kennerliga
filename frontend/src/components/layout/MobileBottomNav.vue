@@ -9,12 +9,12 @@
       no-caps
       @update:model-value="handleTabChange"
     >
-      <q-tab name="seasons" icon="military_tech" label="Seasons" class="tab-seasons" />
-      <q-tab name="live" icon="bolt" label="Live" class="tab-live" />
+      <q-tab name="seasons" icon="military_tech" label="Seasons" />
+      <q-tab name="live" icon="bolt" label="Live" />
       <!-- Chat feature temporarily disabled -->
       <!-- <q-tab name="chat" icon="chat" label="Chat" /> -->
-      <q-tab name="leaderboard" icon="stars" label="Rank" class="tab-leaderboard" />
-      <q-tab name="stats" icon="query_stats" label="Stats" class="tab-stats" />
+      <q-tab name="leaderboard" icon="stars" label="Rank" />
+      <q-tab name="stats" icon="query_stats" label="Stats" />
     </q-tabs>
   </q-footer>
 </template>
@@ -63,8 +63,8 @@ function handleTabChange(value: string) {
   background: var(--kenner-bg-glass, rgba(255, 255, 255, 0.98)) !important;
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
-  border-top: none !important;
-  box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.03);
+  border-top: 1px solid var(--kenner-border-color) !important;
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.04);
 
   // Pin the tab layout deterministically instead of trusting q-tabs' own
   // width measurement. q-tabs measures its content width internally to decide
@@ -90,67 +90,35 @@ function handleTabChange(value: string) {
     flex: 1 1 0;
     min-height: 50px;
     padding: 0;
+    color: #64748b;
     transition: all 0.2s ease;
 
     .q-tab__icon {
       font-size: 22px;
       margin-bottom: 2px;
-      transition: transform 0.2s ease;
+      color: #64748b;
+      transition: transform 0.2s ease, color 0.2s ease;
     }
 
     .q-tab__label {
       font-size: 10px;
-      font-weight: 600;
+      font-weight: 500;
       margin-top: 1px;
-      opacity: 0.8;
+      color: #64748b;
+      transition: color 0.2s ease, font-weight 0.2s ease;
     }
 
     &.q-tab--active {
+      color: $dark;
+
       .q-tab__icon {
         transform: translateY(-2px);
+        color: $dark;
       }
+
       .q-tab__label {
-        opacity: 1;
-      }
-    }
-
-    &.tab-seasons {
-      .q-tab__icon {
-        color: #f59e0b; // Amber
-      }
-      &.q-tab--active {
-        background: rgba(245, 158, 11, 0.05);
-        color: #b45309;
-      }
-    }
-
-    &.tab-live {
-      .q-tab__icon {
-        color: #ef4444; // Red
-      }
-      &.q-tab--active {
-        background: rgba(239, 68, 68, 0.05);
-        color: #b91c1c;
-      }
-    }
-
-    &.tab-leaderboard {
-      .q-tab__icon {
-        color: #3b82f6; // Blue
-      }
-      &.q-tab--active {
-        background: rgba(59, 130, 246, 0.05);
-        color: #1d4ed8;
-      }
-    }
-
-    &.tab-stats {
-      .q-tab__icon {
-        color: #6366f1; // Indigo
-      }
-      &.q-tab--active {
-        background: rgba(99, 102, 241, 0.05);
-        color: #4338ca;
+        font-weight: 600;
+        color: $dark;
       }
     }
   }
