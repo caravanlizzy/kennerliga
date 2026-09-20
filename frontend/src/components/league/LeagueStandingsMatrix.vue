@@ -30,7 +30,9 @@
               ]"
               :style="
                 col.name.startsWith('game_')
-                  ? 'max-width: 90px; white-space: normal; line-height: 1.2; padding: 12px 8px;'
+                  ? (isMobile
+                    ? 'max-width: 68px; white-space: normal; line-height: 1.2; padding: 8px 4px;'
+                    : 'min-width: 80px; white-space: normal; line-height: 1.2; padding: 12px 8px;')
                   : 'padding: 12px 8px;'
               "
             >
@@ -38,11 +40,21 @@
                  <q-icon name="stars" color="primary" size="14px" />
                  <span>{{ col.label }}</span>
               </div>
-              <div v-else-if="col.name.startsWith('game_')" class="column items-center relative-position">
-                <div class="row items-center no-wrap">
-                  <span>{{ col.label }}</span>
+              <div
+                v-else-if="col.name.startsWith('game_')"
+                class="column items-center relative-position"
+                :class="{ 'cursor-pointer': isMobile }"
+              >
+                <div class="row items-center no-wrap justify-center full-width">
+                  <span
+                    class="text-center"
+                    :class="{ ellipsis: isMobile }"
+                    :style="isMobile ? { maxWidth: '56px', display: 'inline-block' } : undefined"
+                  >
+                    {{ col.label }}
+                  </span>
                   <q-icon
-                    v-if="(col as any).settings && (col as any).settings.length > 0"
+                    v-if="!isMobile && (col as any).settings && (col as any).settings.length > 0"
                     name="settings"
                     size="10px"
                     color="grey-4"
@@ -57,12 +69,71 @@
                     </q-tooltip>
                   </q-icon>
                 </div>
-                <div v-if="(col as any).platformName" class="text-grey-7 text-weight-medium" style="font-size: 0.55rem; line-height: 1; margin-top: 1px;">
+                <div
+                  v-if="(col as any).platformName"
+                  class="text-grey-7 text-weight-medium"
+                  :class="{ ellipsis: isMobile }"
+                  :style="{ fontSize: '0.55rem', lineHeight: 1, marginTop: '1px', ...(isMobile ? { maxWidth: '56px' } : {}) }"
+                >
                   {{ (col as any).platformName }}
                 </div>
-                <div v-if="(col as any).selectedByName" class="text-grey-6" style="font-size: 0.6rem; font-weight: normal; margin-top: 2px;">
+                <div
+                  v-if="(col as any).selectedByName"
+                  class="text-grey-6"
+                  :class="{ ellipsis: isMobile }"
+                  :style="{ fontSize: '0.6rem', fontWeight: 'normal', marginTop: '2px', ...(isMobile ? { maxWidth: '56px' } : {}) }"
+                >
                   <span class="text-grey-5">by </span>{{ (col as any).selectedByName }}
                 </div>
+
+                <!-- Closable details & settings popup for mobile -->
+                <q-menu
+                  v-if="isMobile"
+                  anchor="bottom middle"
+                  self="top middle"
+                  :offset="[0, 6]"
+                  class="bg-white text-grey-9 shadow-6 q-pa-sm rounded-borders"
+                  style="border: 1px solid rgba(0, 0, 0, 0.12); min-width: 190px; max-width: 260px;"
+                >
+                  <div class="row items-start justify-between no-wrap q-mb-xs">
+                    <div class="text-weight-bold text-primary q-pr-xs" style="font-size: 0.8rem; line-height: 1.25; word-break: break-word;">
+                      {{ (col as any).gameName || col.label }}
+                    </div>
+                    <q-btn
+                      flat
+                      round
+                      dense
+                      size="xs"
+                      icon="close"
+                      color="grey-6"
+                      v-close-popup
+                      class="q-ml-xs"
+                    />
+                  </div>
+
+                  <div v-if="(col as any).platformName || (col as any).selectedByName" class="q-mb-xs text-caption text-grey-7" style="font-size: 0.7rem; line-height: 1.3;">
+                    <div v-if="(col as any).platformName">
+                      <span class="text-grey-5">Platform:</span> {{ (col as any).platformName }}
+                    </div>
+                    <div v-if="(col as any).selectedByName">
+                      <span class="text-grey-5">Selected by:</span> {{ (col as any).selectedByName }}
+                    </div>
+                  </div>
+
+                  <template v-if="(col as any).settings && (col as any).settings.length > 0">
+                    <q-separator class="q-my-xs" />
+                    <div class="text-weight-bold text-grey-8 q-mb-xs" style="font-size: 0.72rem;">Settings</div>
+                    <div
+                      v-for="s in (col as any).settings"
+                      :key="s.name"
+                      class="row no-wrap justify-between q-py-xs"
+                      style="font-size: 0.7rem; line-height: 1.3; border-bottom: 1px dashed #f0f0f0;"
+                    >
+                      <span class="text-grey-7 q-pr-sm">{{ s.name }}</span>
+                      <span class="text-weight-medium text-right">{{ s.value }}</span>
+                    </div>
+                  </template>
+                </q-menu>
               </div>
               <div v-else-if="col.name === 'profile_name'" class="row items-center">
                 <LeagueLevel :level="level" shape size="26px" fontSize="11px" v-if="level" />
