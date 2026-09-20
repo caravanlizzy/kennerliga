@@ -29,14 +29,31 @@
     </div>
 
     <div v-else class="column q-gutter-y-md">
-      <div class="column q-gutter-y-lg">
+      <!-- Standings mode (matrix) -->
+      <div v-if="!mode || mode === 'standings'" class="column">
+        <div
+          v-for="(league, index) in leagues"
+          :key="league.id"
+          class="league-standings-matrix-item"
+        >
+          <q-separator v-if="index > 0" class="q-my-lg" />
+          <LeagueStandingsMatrix
+            :leagueId="league.id"
+            :prefetchedData="allStandingsData[league.id]"
+            :level="league.level"
+          />
+        </div>
+      </div>
+
+      <!-- Other modes (results, simple standings, picks) -->
+      <div v-else class="column q-gutter-y-lg">
         <div
           v-for="league in leagues"
           :key="league.id"
           class="league-card"
           :class="`league-card--l${league.level}`"
         >
-          <div :class="isMobile && (!mode || mode === 'standings') ? 'q-pa-none' : 'q-pa-xs'">
+          <div :class="isMobile ? 'q-pa-none' : 'q-pa-xs'">
             <div
               v-if="mode === 'results'"
               class="row items-center q-gutter-x-sm q-mb-md q-px-sm q-pt-sm"
@@ -63,7 +80,6 @@
                 No participant picks recorded for this league.
               </div>
             </div>
-            <LeagueStandingsMatrix v-else :leagueId="league.id" :prefetchedData="allStandingsData[league.id]" :level="league.level" />
           </div>
         </div>
       </div>

@@ -550,12 +550,12 @@ function getRankBgClass(rank: number | undefined) {
   width: 100%;
 }
 
-@media (max-width: 599px) {
-  :deep(.q-table__container),
-  :deep(.q-table__card) {
-    border-radius: 0 !important;
-    box-shadow: none !important;
-  }
+:deep(.q-table__container),
+:deep(.q-table__card) {
+  background: transparent !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+  border: none !important;
 }
 
 .username-link {
