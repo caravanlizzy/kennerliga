@@ -5,6 +5,11 @@ export interface LeagueStyle {
   text: string;
 }
 
+export interface LeagueTheme {
+  bg: string;
+  text: string;
+}
+
 export function leagueColors() {
   const getLeagueColor = (league: number): string => {
     if (league <= 1) return 'amber-8'; // best
@@ -36,9 +41,53 @@ export function leagueColors() {
     return '#616161'; // grey-7
   };
 
+  const getLeagueTheme = (league: number): LeagueTheme => {
+    if (league <= 1) {
+      return {
+        bg: 'rgba(217, 119, 6, 0.12)',
+        text: '#b45309',
+      };
+    }
+    if (league === 2) {
+      return {
+        bg: 'rgba(71, 85, 105, 0.12)',
+        text: '#334155',
+      };
+    }
+    if (league === 3) {
+      return {
+        bg: 'rgba(194, 65, 12, 0.12)',
+        text: '#9a3412',
+      };
+    }
+    if (league === 4) {
+      return {
+        bg: 'rgba(225, 29, 72, 0.12)',
+        text: '#be123c',
+      };
+    }
+    if (league <= 6) {
+      return {
+        bg: 'rgba(124, 58, 237, 0.12)',
+        text: '#6d28d9',
+      };
+    }
+    if (league <= 10) {
+      return {
+        bg: 'rgba(67, 56, 202, 0.12)',
+        text: '#3730a3',
+      };
+    }
+    return {
+      bg: 'rgba(75, 85, 99, 0.12)',
+      text: '#374151',
+    };
+  };
+
   return {
     getLeagueColor,
     getLeagueBgColor,
-    getHexLeagueColor
+    getHexLeagueColor,
+    getLeagueTheme,
   };
 }

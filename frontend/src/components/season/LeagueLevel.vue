@@ -18,20 +18,17 @@
   </q-chip>
   <div
     v-else
-    class="league-level-shape flex flex-center relative-position"
+    class="league-level-shape flex flex-center"
     :style="computedStyle"
     v-bind="$attrs"
   >
-    <span class="league-level-shape__prefix">L</span>
-    <span class="league-level-shape__number">{{ level }}</span>
-    <KennerTooltip>League {{ level }}</KennerTooltip>
+    L{{ level }}
   </div>
 </template>
 
 <script setup lang="ts">
 import { computed } from 'vue';
 import { leagueColors } from 'src/composables/leagueColors';
-import KennerTooltip from 'components/base/KennerTooltip.vue';
 
 defineOptions({
   inheritAttrs: false,
@@ -54,22 +51,26 @@ const props = withDefaults(defineProps<Props>(), {
   fontSize: '',
 });
 
-const { getLeagueColor } = leagueColors();
+const { getLeagueColor, getLeagueTheme } = leagueColors();
 
 const computedStyle = computed(() => {
   const sizeVal = props.size || '36px';
   const numericSize = parseFloat(sizeVal);
   const calculatedFontSize =
-    props.fontSize || (numericSize ? `${Math.round(numericSize * 0.44)}px` : '14px');
+    props.fontSize || (numericSize ? `${Math.round(numericSize * 0.48)}px` : '15px');
   const calculatedRadius = numericSize
     ? `${Math.max(4, Math.min(8, Math.round(numericSize * 0.22)))}px`
     : '6px';
+
+  const theme = getLeagueTheme(Number(props.level) || 1);
 
   return {
     width: sizeVal,
     height: sizeVal,
     fontSize: calculatedFontSize,
     borderRadius: calculatedRadius,
+    background: theme.bg,
+    color: theme.text,
   };
 });
 </script>
@@ -82,25 +83,10 @@ const computedStyle = computed(() => {
   user-select: none;
   vertical-align: middle;
   box-sizing: border-box;
-  border: 1.5px solid #334155;
-  color: #334155;
-  background: rgba(51, 65, 85, 0.04);
+  border: none;
+  font-weight: 700;
   line-height: 1;
-
-  &__prefix {
-    font-size: 0.72em;
-    font-weight: 600;
-    opacity: 0.72;
-    margin-right: 1px;
-    letter-spacing: 0.02em;
-    pointer-events: none;
-  }
-
-  &__number {
-    font-size: 1em;
-    font-weight: 800;
-    letter-spacing: -0.02em;
-    pointer-events: none;
-  }
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
 }
 </style>
