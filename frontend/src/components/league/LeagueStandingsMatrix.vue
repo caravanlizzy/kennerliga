@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="standings-matrix-wrapper">
     <!-- Table / states -->
     <div class="overflow-auto">
       <q-table
@@ -74,18 +74,17 @@
         </template>
 
         <template #body-cell-profile_name="props">
-          <q-td :props="props" class="text-left q-py-sm q-px-md">
+          <q-td :props="props" class="text-left" :class="isMobile ? 'q-py-xs q-px-xs' : 'q-py-sm q-px-md'">
             <div class="row items-center no-wrap">
               <template v-if="props.row.username">
                 <div class="row items-center no-wrap q-gutter-x-sm">
                   <div v-if="isMobile">
-                    <span
-                      class="text-weight-bold cursor-pointer username-link"
-                      @click="$router.push({ name: 'user-detail', params: { username: props.row.username } })"
-                    >
-                      {{ props.row.username }}
-                    </span>
-                    <KennerTooltip>{{ props.row.username }}</KennerTooltip>
+                    <UserAvatar
+                      :display-username="props.row.username"
+                      :subtitle="props.row.profile_name && props.row.profile_name !== props.row.username ? props.row.profile_name : undefined"
+                      size="26px"
+                      shape="squircle"
+                    />
                   </div>
                   <div v-else class="column">
                     <span
@@ -106,16 +105,11 @@
               </template>
               <template v-else>
                 <template v-if="isMobile">
-                  <q-badge
-                    color="grey-2"
-                    text-color="grey-9"
-                    class="text-weight-bold"
-                  >
-                    {{ props.value.substring(0, 3).toUpperCase() }}
-                    <q-tooltip>
-                      {{ props.value }}
-                    </q-tooltip>
-                  </q-badge>
+                  <UserAvatar
+                    :display-username="props.value"
+                    size="26px"
+                    shape="squircle"
+                  />
                 </template>
                 <template v-else>
                   <span class="text-weight-bold">{{ props.value }}</span>
@@ -300,6 +294,7 @@
 import { ref, computed, watch, onMounted, onUnmounted } from 'vue';
 import { api } from 'boot/axios';
 import LoadingSpinner from 'components/base/LoadingSpinner.vue';
+import UserAvatar from 'components/ui/UserAvatar.vue';
 import type { QTableColumn } from 'quasar';
 import { useResponsive } from 'src/composables/responsive';
 import KennerTooltip from 'components/base/KennerTooltip.vue';
@@ -550,6 +545,18 @@ function getRankBgClass(rank: number | undefined) {
 </script>
 
 <style scoped lang="scss">
+
+.standings-matrix-wrapper {
+  width: 100%;
+}
+
+@media (max-width: 599px) {
+  :deep(.q-table__container),
+  :deep(.q-table__card) {
+    border-radius: 0 !important;
+    box-shadow: none !important;
+  }
+}
 
 .username-link {
   transition: color 0.2s ease;

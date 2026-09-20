@@ -1,5 +1,5 @@
 <template>
-  <div class="q-pa-md column season-standings">
+  <div class="column season-standings" :class="isMobile ? 'q-pa-none' : 'q-pa-md'">
     <!-- State primary -->
     <LoadingSpinner v-if="loadingLeagues" text="Loading standings..." />
 
@@ -36,7 +36,7 @@
           class="league-card"
           :class="`league-card--l${league.level}`"
         >
-          <div class="q-pa-xs">
+          <div :class="isMobile && (!mode || mode === 'standings') ? 'q-pa-none' : 'q-pa-xs'">
             <div
               v-if="mode === 'results'"
               class="row items-center q-gutter-x-sm q-mb-md q-px-sm q-pt-sm"
@@ -88,8 +88,10 @@ import type { TSeasonParticipantDto } from 'src/types';
 
 import { useLeagueStore } from 'stores/leagueStore';
 import { useUpdateStore } from 'stores/updateStore';
+import { useResponsive } from 'src/composables/responsive';
 
 const route = useRoute();
+const { isMobile } = useResponsive();
 const updateStore = useUpdateStore();
 let unsubSeason: (() => void) | null = null;
 let unsubLeague: (() => void) | null = null;
@@ -237,6 +239,15 @@ void resetLeagues;
   border-radius: 16px;
   background: #fafafa;
   padding: 8px;
+}
+
+@media (max-width: 599px) {
+  .league-card {
+    border-left: none;
+    border-right: none;
+    border-radius: 0;
+    padding: 0;
+  }
 }
 </style>
 
