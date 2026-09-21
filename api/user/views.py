@@ -3,7 +3,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 from django.db import transaction
-from django.db.models import Count, IntegerField, OuterRef, Q, Subquery
+from django.db.models import Count, IntegerField, OuterRef, Subquery
 from django.db.models.functions import Lower
 from django.utils import timezone
 from rest_framework.decorators import action

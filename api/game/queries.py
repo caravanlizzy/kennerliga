@@ -6,7 +6,6 @@ from game.models import (
     SelectedGame,
     BanDecision,
     Faction,
-    TieBreaker,
     ResultConfig,
 )
 from league.models import League
@@ -145,14 +144,13 @@ def get_banned_selected_game_ids(league: League) -> List[int]:
     """
     Returns a list of IDs for SelectedGames that have been successfully banned in the given league.
     """
-    member_count = league.members.count()
-    min_bans = 2 if member_count > 2 else 1
+    required_bans = get_ban_amount_for_success(league.members.count())
 
     return list(
         BanDecision.objects.filter(league=league, selected_game__isnull=False)
         .values("selected_game_id")
         .annotate(c=Count("id"))
-        .filter(c__gte=min_bans)
+        .filter(c__gte=required_bans)
         .values_list("selected_game_id", flat=True)
     )
 
@@ -163,38 +161,35 @@ def get_successfully_banned_game_ids(year: int = None) -> List[int]:
     A game is successfully banned if the number of BanDecisions for it
     reaches the required threshold for its league.
     """
-    from api.constants import get_ban_amount_for_success
-
     qs = BanDecision.objects.filter(selected_game__isnull=False)
     if year:
         qs = qs.filter(league__season__year=year)
 
-    # We need to group by selected_game and check if count >= required_bans
-    # Since required_bans depends on league member count, we need to handle it per league
-
-    # Efficient way:
-    # 1. Get all selected_game_ids and their ban counts for the given year
-    # 2. Get the required ban count for each of those selected games
-    # 3. Filter those that match
-
-    ban_counts = qs.values(
-        "selected_game_id", "selected_game__league__members"
-    ).annotate(c=Count("id"))
-
-    # Note: selected_game__league__members is a many-to-many, so this might duplicate rows
-    # if not careful, but we just need the count of members.
-    # Better:
     selected_games = SelectedGame.objects.filter(id__in=qs.values("selected_game_id"))
     if year:
         selected_games = selected_games.filter(league__season__year=year)
 
-    successfully_banned_ids = []
-    for sg in selected_games.annotate(ban_count=Count("bandecision")):
-        member_count = sg.league.members.count()
-        if sg.ban_count >= get_ban_amount_for_success(member_count):
-            successfully_banned_ids.append(sg.id)
+    # The ban threshold depends on the league's member count, so load the
+    # member count for every league involved in one grouped query over the
+    # M2M through table instead of calling ``league.members.count()`` per
+    # SelectedGame.
+    rows = list(selected_games.annotate(ban_count=Count("bandecision")).values_list(
+        "id", "league_id", "ban_count"
+    ))
+    member_counts = {
+        row["league_id"]: row["c"]
+        for row in League.members.through.objects.filter(
+            league_id__in={league_id for _, league_id, _ in rows}
+        )
+        .values("league_id")
+        .annotate(c=Count("id"))
+    }
 
-    return successfully_banned_ids
+    return [
+        sg_id
+        for sg_id, league_id, ban_count in rows
+        if ban_count >= get_ban_amount_for_success(member_counts.get(league_id, 0))
+    ]
 
 
 def get_factions_for_game(game: Game) -> QuerySet:
@@ -202,13 +197,6 @@ def get_factions_for_game(game: Game) -> QuerySet:
     Returns a queryset of Faction objects for a specific game.
     """
     return Faction.objects.filter(game=game)
-
-
-def get_tie_breakers_for_config(result_config: ResultConfig) -> QuerySet:
-    """
-    Returns a queryset of TieBreaker objects for a specific result configuration, ordered by importance.
-    """
-    return TieBreaker.objects.filter(result_config=result_config).order_by("order")
 
 
 def get_result_config_for_game(game: Game) -> Optional[ResultConfig]:

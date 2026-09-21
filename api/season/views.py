@@ -14,7 +14,7 @@ from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet, ViewSet
 
 from game.models import SelectedGame, BanDecision
-from league.models import League, LeagueStanding, GameStanding, LeagueTieResolution
+from league.models import League, LeagueStanding, LeagueTieResolution
 from result.models import Result
 from season.queries import (
     register,
@@ -46,7 +46,11 @@ class SeasonRegistrationView(APIView):
         except PlayerProfile.DoesNotExist:
             return HttpResponseNotFound("Player profile not found.")
         open_season = get_open_season()
-        # if not player_profile in current_season.participants.all():
+        if not open_season:
+            return Response(
+                {"detail": "No season is currently open for registration."},
+                status=status.HTTP_409_CONFLICT,
+            )
         if not is_profile_registered(player_profile, open_season):
             register(player_profile)
             return Response(

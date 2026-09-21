@@ -73,7 +73,7 @@ def notify_turn(league, participant):
         [user_id],
         "Your turn in Kennerliga",
         f"It is your turn in {league}.",
-        "/#/league/my-league",
+        "/#/my",
     )
 
 

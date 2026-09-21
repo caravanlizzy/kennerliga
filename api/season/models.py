@@ -52,12 +52,17 @@ class Season(models.Model):
 
     @property
     def is_completed(self) -> bool:
+        from league.queries import are_leagues_finished
+
         if self.status == self.SeasonStatus.DONE:
             return True
-        leagues = self.leagues.all()
-        if not leagues.exists():
+        leagues = list(self.leagues.all())
+        if not leagues:
             return False
-        return all(league.is_finished for league in leagues)
+        # Resolve every league in one batch; the per-league ``is_finished``
+        # property would re-query for each game of each league.
+        finished = are_leagues_finished(leagues)
+        return all(finished.get(league.id, False) for league in leagues)
 
     def __str__(self):
         return self.name

@@ -204,6 +204,22 @@ _LEAGUE_MEMBER_COUNT_SQ = Subquery(
     .values("c"),
     output_field=IntegerField(),
 )
+_BAN_COUNT_SQ = Subquery(
+    BanDecision.objects.filter(selected_game=OuterRef("pk"))
+    .order_by()
+    .values("selected_game")
+    .annotate(c=Count("*"))
+    .values("c"),
+    output_field=IntegerField(),
+)
+# Highest SelectedGame id within the same league — used by the serializer to
+# flag the most recent pick without querying once per serialized row.
+_LAST_SELECTED_GAME_ID_SQ = Subquery(
+    SelectedGame.objects.filter(league_id=OuterRef("league_id"))
+    .order_by("-id")
+    .values("id")[:1],
+    output_field=IntegerField(),
+)
 
 
 class SelectedGameViewSet(ModelViewSet):
@@ -221,6 +237,8 @@ class SelectedGameViewSet(ModelViewSet):
         .annotate(
             result_count=Coalesce(_RESULT_COUNT_SQ, 0),
             league_member_count=Coalesce(_LEAGUE_MEMBER_COUNT_SQ, 0),
+            ban_count=Coalesce(_BAN_COUNT_SQ, 0),
+            league_last_selected_game_id=_LAST_SELECTED_GAME_ID_SQ,
         )
     )
     serializer_class = SelectedGameSerializer

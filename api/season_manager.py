@@ -46,5 +46,5 @@ def start_new_season(new_season=None):
             ),
             "Your new season has started",
             f"{new_season.name} has started. Your league is ready.",
-            "/#/league/my-league",
+            "/#/my",
         )

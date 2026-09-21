@@ -1,8 +1,6 @@
 import logging
 from typing import List
 
-from django.db.models import QuerySet
-
 from season.models import Season, SeasonParticipant
 from user.models import PlayerProfile
 
@@ -46,13 +44,6 @@ def get_participants(season_name: str) -> List[PlayerProfile]:
         return []
 
 
-def get_leagues(season: Season) -> QuerySet:
-    """
-    Retrieves all leagues associated with a given season.
-    """
-    return season.league_set.all()
-
-
 def get_registered_participants(season=None) -> List[SeasonParticipant]:
     """
     Returns all participants registered in the given or current open season.
@@ -71,10 +62,19 @@ def get_registered_participants(season=None) -> List[SeasonParticipant]:
 def register(profile):
     """
     Registers a player profile for the current open season.
+
+    Returns the created SeasonParticipant, or ``None`` when no season is
+    currently open for registration. ``SeasonParticipant.season`` is not
+    nullable, so creating one without an open season would raise an
+    IntegrityError.
     """
     open_season = get_open_season()
+    if not open_season:
+        logging.info("No open season found; registration skipped.")
+        return None
     new_participant = SeasonParticipant(season=open_season, profile=profile)
     new_participant.save()
+    return new_participant
 
 
 def is_profile_registered(profile, season):

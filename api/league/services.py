@@ -2,7 +2,7 @@ from decimal import Decimal
 from typing import Optional, List, Dict, Iterable
 from django.db import transaction
 from django.db.models import Count, Prefetch
-from game.models import SelectedGame, BanDecision, ResultConfig, SelectedOption
+from game.models import SelectedGame, ResultConfig, SelectedOption
 from league.models import (
     League,
     LeagueStatus,
@@ -101,6 +101,7 @@ def build_full_standings_payload(
     game_standings: Iterable,
     members: Iterable,
     tie_resolutions: Iterable,
+    is_season_completed: Optional[bool] = None,
 ) -> Dict:
     """Build the full-standings payload for one league from pre-loaded data.
 
@@ -108,6 +109,11 @@ def build_full_standings_payload(
     the function reusable between the per-league endpoint and the batched
     season-wide endpoint, where data is bulk-loaded once and grouped by
     league_id.
+
+    ``is_season_completed`` should be passed by callers that build payloads
+    for several leagues of the same season: ``Season.is_completed`` inspects
+    every league of the season, so computing it per league turns the batched
+    endpoint back into an O(leagues^2) query fan-out.
     """
     selected_game_list = [_serialize_selected_game(sg) for sg in selected_games]
     selected_game_ids = [sg.id for sg in selected_games]
@@ -279,9 +285,10 @@ def build_full_standings_payload(
     )
     all_games_finished = expected_pairs > 0 and actual_pairs == expected_pairs
 
-    is_season_completed = False
-    if league and hasattr(league, "season") and league.season:
-        is_season_completed = league.season.is_completed
+    if is_season_completed is None:
+        is_season_completed = False
+        if league and hasattr(league, "season") and league.season:
+            is_season_completed = league.season.is_completed
 
     return {
         "selected_games": selected_game_list,
@@ -417,6 +424,14 @@ def build_full_standings_for_season(leagues: List[League]) -> List[Dict]:
     ).prefetch_related("entries__player_profile__user"):
         tie_resolutions_by_league.setdefault(tr.league_id, []).append(tr)
 
+    # Every league here belongs to the same season (or a handful of them),
+    # so resolve completion once per season rather than once per league.
+    completed_by_season: Dict[int, bool] = {}
+    for league in leagues:
+        if league.season_id in completed_by_season or league.season is None:
+            continue
+        completed_by_season[league.season_id] = league.season.is_completed
+
     # ---- per-league payload (filter selected_games by ban threshold) -------
     payloads: List[Dict] = []
     for league in leagues:
@@ -434,6 +449,7 @@ def build_full_standings_for_season(leagues: List[League]) -> List[Dict]:
             game_standings=game_standings_by_league.get(league.id, []),
             members=members_for_league,
             tie_resolutions=tie_resolutions_by_league.get(league.id, []),
+            is_season_completed=completed_by_season.get(league.season_id, False),
         )
         payload.update({"id": league.id, "level": league.level, "name": str(league)})
         payloads.append(payload)
@@ -541,25 +557,3 @@ def advance_turn(league: League):
             rotate_active_player(league)
 
     # PLAYING/DONE → do nothing
-
-
-def select_game(league: League, player, game):
-    """
-    Records a game selection for a player in a league, ensuring it is their turn.
-    """
-    if league.active_player != player:
-        raise ValueError("It's not this player's turn to select a game.")
-    selected = SelectedGame.objects.create(league=league, player=player, game=game)
-    touch_league(league)
-    return selected
-
-
-def ban_game(league: League, player, game):
-    """
-    Records a game ban for a player in a league, ensuring it is their turn.
-    """
-    if league.active_player != player:
-        raise ValueError("It's not this player's turn to ban a game.")
-    ban = BanDecision.objects.create(league=league, player=player, game=game)
-    touch_league(league)
-    return ban

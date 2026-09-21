@@ -1,8 +1,10 @@
+from collections import defaultdict
+
 from django.db.models import Count
 from typing import List, Dict, Any
 from league.models import League, LeagueStanding
 from game.models import SelectedGame, BanDecision
-from api.constants import get_game_picks_per_player
+from api.constants import get_ban_amount_for_success, get_game_picks_per_player
 
 
 def get_members_ordered(league: League):
@@ -59,54 +61,64 @@ def get_players_to_repick(league: League) -> List:
     """
     Identifies league members who need to pick another game because one of their initial picks was banned.
     """
-    member_count = league.members.count()
-    min_bans = 2 if member_count > 2 else 1
+    members = list(league.members.all().select_related("profile"))
+    required_bans = get_ban_amount_for_success(len(members))
 
     # Get all banned game IDs for this league
-    banned_game_ids = (
+    banned_game_ids = set(
         BanDecision.objects.filter(league=league, selected_game__isnull=False)
         .values("selected_game_id")
         .annotate(c=Count("id"))
-        .filter(c__gte=min_bans)
+        .filter(c__gte=required_bans)
         .values_list("selected_game_id", flat=True)
     )
+    if not banned_game_ids:
+        return []
 
-    # Find members who have at least one of these games as their pick
-    repick_players = []
-    for member in league.members.all().select_related("profile"):
-        # We only care about the first 2 picks (per the original logic)
-        has_banned_pick = SelectedGame.objects.filter(
-            profile=member.profile, league=league, id__in=banned_game_ids
-        ).exists()
+    # Load every pick of the league once and bucket it per profile, instead
+    # of running two queries per member.
+    picks_by_profile: Dict[int, List[int]] = defaultdict(list)
+    for sg_id, profile_id in SelectedGame.objects.filter(league=league).order_by(
+        "id"
+    ).values_list("id", "profile_id"):
+        picks_by_profile[profile_id].append(sg_id)
 
-        # Original logic had some slicing: sgs = list(qs.only("id")[:2])
-        # If we want to be exact:
-        if has_banned_pick:
-            sgs_ids = list(
-                SelectedGame.objects.filter(
-                    profile=member.profile, league=league
-                ).values_list("id", flat=True)[:2]
-            )
-            if any(sg_id in banned_game_ids for sg_id in sgs_ids):
-                repick_players.append(member)
-
-    return repick_players
+    # Only a player's first two picks can trigger a repick.
+    return [
+        member
+        for member in members
+        if any(
+            sg_id in banned_game_ids
+            for sg_id in picks_by_profile.get(member.profile_id, [])[:2]
+        )
+    ]
 
 
 def all_repickers_have_repicked(league: League) -> bool:
     """
     Checks if all players identified for repicking have completed their additional selections.
     """
+    repickers = get_players_to_repick(league)
+    if not repickers:
+        return True
+
     expected_count = get_game_picks_per_player(league.members.count()) + 1
-    for player in get_players_to_repick(league):
-        # For 2-player leagues, players should have 3 games if they had to repick
-        # For other leagues, they should have more than 1 game
-        actual_count = SelectedGame.objects.filter(
-            profile=player.profile, league=league
-        ).count()
-        if actual_count < expected_count:
-            return False
-    return True
+
+    # For 2-player leagues, players should have 3 games if they had to repick;
+    # for other leagues, more than 1. One grouped query covers every repicker.
+    pick_counts = {
+        row["profile"]: row["c"]
+        for row in SelectedGame.objects.filter(
+            league=league, profile__in=[p.profile_id for p in repickers]
+        )
+        .values("profile")
+        .annotate(c=Count("id"))
+    }
+
+    return all(
+        pick_counts.get(player.profile_id, 0) >= expected_count
+        for player in repickers
+    )
 
 
 def is_two_player_league(league: League) -> bool:
@@ -128,52 +140,90 @@ def is_league_finished(league: League) -> bool:
     """
     Checks if all non-banned game selections in the league have recorded results.
     """
-    # Check if all expected games in the league have been played and have results.
-    member_count = league.members.count()
-    if member_count == 0:
-        return False
+    return are_leagues_finished([league]).get(league.id, False)
 
-    # Expected games count
-    picks_per_player = get_game_picks_per_player(member_count)
-    expected_games_count = member_count * picks_per_player
 
-    # Games that are not banned
-    # Assuming there's no easy way to check if a game is NOT banned without checking BanDecision
-    # Actually, a better way is to see if we have enough SelectedGames that have results.
+def are_leagues_finished(leagues: List[League]) -> Dict[int, bool]:
+    """
+    Bulk variant of :func:`is_league_finished`.
 
-    # Get all SelectedGames for this league
-    selected_games = SelectedGame.objects.filter(league=league)
-
-    # We need to filter out banned games.
-    # A game is banned if there is a BanDecision pointing to it.
-    # Actually, it depends on min_bans.
-    min_bans = 2 if member_count > 2 else 1
-
-    from django.db.models import Count
-
-    banned_game_ids = (
-        BanDecision.objects.filter(league=league, selected_game__isnull=False)
-        .values("selected_game_id")
-        .annotate(c=Count("id"))
-        .filter(c__gte=min_bans)
-        .values_list("selected_game_id", flat=True)
-    )
-
-    active_games = selected_games.exclude(id__in=banned_game_ids)
-
-    if active_games.count() < expected_games_count:
-        # Not all games have been picked/repicked yet
-        return False
-
-    # Check if all active games have results
+    Answers "is this league finished?" for many leagues using a constant
+    number of queries (four) instead of the ``O(leagues x games)`` fan-out
+    you get from calling ``league.is_finished`` in a loop. A league counts
+    as finished when every non-banned SelectedGame in it has a Result for
+    each of its members.
+    """
     from result.models import Result
 
-    for game in active_games:
-        result_count = Result.objects.filter(selected_game=game).count()
-        if result_count < member_count:
-            return False
+    league_ids = [lg.id for lg in leagues]
+    if not league_ids:
+        return {}
 
-    return True
+    # 1. Member count per league (one query over the M2M through table).
+    member_counts: Dict[int, int] = {lid: 0 for lid in league_ids}
+    for row in (
+        League.members.through.objects.filter(league_id__in=league_ids)
+        .values("league_id")
+        .annotate(c=Count("id"))
+    ):
+        member_counts[row["league_id"]] = row["c"]
+
+    # 2. Successfully banned games per league. The ban threshold depends on
+    #    the league's member count, so count bans per game and compare in
+    #    Python rather than issuing one filtered query per league.
+    ban_counts: Dict[int, Dict[int, int]] = defaultdict(dict)
+    for row in (
+        BanDecision.objects.filter(
+            league_id__in=league_ids, selected_game__isnull=False
+        )
+        .values("league_id", "selected_game_id")
+        .annotate(c=Count("id"))
+    ):
+        ban_counts[row["league_id"]][row["selected_game_id"]] = row["c"]
+
+    # 3. All SelectedGames of these leagues.
+    games_by_league: Dict[int, List[int]] = defaultdict(list)
+    for sg_id, lid in SelectedGame.objects.filter(
+        league_id__in=league_ids
+    ).values_list("id", "league_id"):
+        games_by_league[lid].append(sg_id)
+
+    # 4. Result count per SelectedGame.
+    result_counts: Dict[int, int] = {}
+    for row in (
+        Result.objects.filter(league_id__in=league_ids)
+        .values("selected_game_id")
+        .annotate(c=Count("id"))
+    ):
+        result_counts[row["selected_game_id"]] = row["c"]
+
+    finished: Dict[int, bool] = {}
+    for lid in league_ids:
+        member_count = member_counts.get(lid, 0)
+        if member_count == 0:
+            finished[lid] = False
+            continue
+
+        expected_games_count = member_count * get_game_picks_per_player(member_count)
+        required_bans = get_ban_amount_for_success(member_count)
+
+        league_ban_counts = ban_counts.get(lid, {})
+        active_game_ids = [
+            sg_id
+            for sg_id in games_by_league.get(lid, [])
+            if league_ban_counts.get(sg_id, 0) < required_bans
+        ]
+
+        if len(active_game_ids) < expected_games_count:
+            # Not all games have been picked/repicked yet
+            finished[lid] = False
+            continue
+
+        finished[lid] = all(
+            result_counts.get(sg_id, 0) >= member_count for sg_id in active_game_ids
+        )
+
+    return finished
 
 
 def detect_unresolved_tie_groups(league: League) -> List[Dict[str, Any]]:

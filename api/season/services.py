@@ -4,7 +4,7 @@ from league.services import set_league_active_player
 from season.models import Season, SeasonParticipant
 from random import shuffle
 from typing import List, Optional
-from season.queries import get_previous_season
+from season.queries import get_previous_season, get_running_season
 from user.models import PlayerProfile
 
 
@@ -134,8 +134,10 @@ def rank_participants(
     for i, profile in enumerate(final_ordered_profiles, start=1):
         participant = profile_to_participant[profile.id]
         participant.rank = i
-        participant.save()
         ranked_participants.append(participant)
+
+    # One UPDATE instead of one per participant.
+    SeasonParticipant.objects.bulk_update(ranked_participants, ["rank"])
 
     return ranked_participants
 
@@ -215,6 +217,85 @@ def _result_for_season(profile: PlayerProfile, season: Season) -> Optional[dict]
     }
 
 
+def results_for_season_bulk(
+    profile_ids: List[int], season: Optional[Season]
+) -> dict:
+    """Bulk equivalent of :func:`_result_for_season` for many profiles.
+
+    Loads the season's leagues, their memberships and their standings in
+    three queries and derives each profile's league level, position and
+    "finished last" flag in Python. Calling ``_result_for_season`` per
+    profile costs two queries each, which is what made the league
+    projection endpoints scale with the number of registered players.
+
+    Returns ``{profile_id: {"league", "position", "is_last"}}``, omitting
+    profiles without a standing in that season.
+    """
+    if not season or not profile_ids:
+        return {}
+
+    leagues = {lg.id: lg for lg in League.objects.filter(season=season)}
+    if not leagues:
+        return {}
+
+    wanted = set(profile_ids)
+    # profile_id -> league_id, via the SeasonParticipant membership rows.
+    league_by_profile: dict = {}
+    for league_id, profile_id in SeasonParticipant.objects.filter(
+        leagues_member__in=leagues.keys()
+    ).values_list("leagues_member", "profile_id"):
+        if profile_id in wanted and profile_id not in league_by_profile:
+            league_by_profile[profile_id] = league_id
+
+    standings_by_league: dict = {}
+    for ls in LeagueStanding.objects.filter(league_id__in=leagues.keys()).order_by(
+        "-league_points", "-wins", "player_profile__profile_name"
+    ):
+        standings_by_league.setdefault(ls.league_id, []).append(ls)
+
+    results = {}
+    for profile_id, league_id in league_by_profile.items():
+        standings = standings_by_league.get(league_id, [])
+        rank = next(
+            (
+                index + 1
+                for index, ls in enumerate(standings)
+                if ls.player_profile_id == profile_id
+            ),
+            None,
+        )
+        if rank is None:
+            continue
+        results[profile_id] = {
+            "league": leagues[league_id].level,
+            "position": rank,
+            "is_last": (rank == len(standings) and len(standings) > 1),
+        }
+    return results
+
+
+def projection_results_bulk(profiles: List[PlayerProfile]) -> dict:
+    """Bulk equivalent of :func:`get_projection_result`.
+
+    Prefers the currently RUNNING season's live standings and falls back to
+    the finalized previous season, mirroring the single-profile helper.
+    """
+    profile_ids = [p.id for p in profiles]
+    if not profile_ids:
+        return {}
+
+    results = results_for_season_bulk(profile_ids, get_running_season())
+
+    missing = [pid for pid in profile_ids if pid not in results]
+    if missing:
+        # ``get_previous_result`` only returns a result when the player's
+        # most recent DONE season is the globally latest one — and since
+        # ``get_previous_season()`` returns exactly that season, taking part
+        # in it is the same condition.
+        results.update(results_for_season_bulk(missing, get_previous_season()))
+    return results
+
+
 def get_projection_result(profile: PlayerProfile) -> Optional[dict]:
     """Return a 'previous result' for projection purposes.
 
@@ -261,10 +342,12 @@ def build_league_projection(profiles: List[PlayerProfile]) -> dict:
     total = len(profiles)
     sizes = _players_per_league(total) if total else []
 
+    projections = projection_results_bulk(profiles)
+
     prev_rows = []
     newcomers = []
     for profile in profiles:
-        info = get_projection_result(profile)
+        info = projections.get(profile.id)
         base = {
             "profile": profile.id,
             "profile_name": profile.profile_name,
@@ -311,9 +394,13 @@ def order_previous(
     """
     Orders a list of previous participants for the new season's ranking, applying promotion rules.
     """
+    prev_results = results_for_season_bulk(
+        [p.id for p in participants], get_previous_season()
+    )
+
     data = []
     for p in participants:
-        info = get_previous_result(p)
+        info = prev_results.get(p.id)
         if info and info["position"] is not None:
             data.append(
                 {

@@ -3,14 +3,13 @@ from rest_framework.test import APIClient
 from decimal import Decimal
 from user.models import User, PlayerProfile, Platform
 from season.models import Season, SeasonParticipant
-from league.models import League, LeagueStatus, GameStanding, LeagueStanding
+from league.models import League, LeagueStatus, GameStanding
 from league.services import (
     advance_turn,
     rotate_active_player,
     _format_ordinal,
     _format_points,
 )
-from league.serializer import GameStandingSerializer
 from game.models import Game, SelectedGame, ResultConfig, StartingPointSystem
 from api.constants import get_game_picks_per_player
 

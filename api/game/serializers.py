@@ -2,6 +2,7 @@ from django.db import transaction
 from rest_framework import serializers
 from rest_framework.serializers import ModelSerializer
 
+from api.constants import get_ban_amount_for_success
 from configuration.services import get_max_same_game_per_year
 from result.models import Result
 from result.serializers import ResultSerializer
@@ -321,11 +322,18 @@ class SelectedGameSerializer(serializers.ModelSerializer):
         ]
 
     def get_is_selectable(self, obj):
-        # The rightmost chip is the one with the highest ID in the league for the profile
-        # However, looking at the UI context, maybe it's just the last one in the league overall?
-        # Let's assume it's per league, as chips are usually displayed per league.
-        last_game = SelectedGame.objects.filter(league=obj.league).order_by("id").last()
-        return obj == last_game
+        # Only the most recently picked game of a league stays selectable
+        # (it's the rightmost chip in the UI).
+        # Prefer the annotation set by the viewset to avoid N+1 queries.
+        last_id = getattr(obj, "league_last_selected_game_id", None)
+        if last_id is None:
+            last_id = (
+                SelectedGame.objects.filter(league=obj.league)
+                .order_by("id")
+                .values_list("id", flat=True)
+                .last()
+            )
+        return obj.id == last_id
 
     def get_results(self, obj):
         results = obj.result_set.all()
@@ -413,7 +421,15 @@ class SelectedGameSerializer(serializers.ModelSerializer):
         return result_count >= member_count and member_count > 0
 
     def get_successfully_banned(self, obj):
-        return game_q.is_game_successfully_banned(obj)
+        # Prefer the annotations set by the viewset; falling back to the
+        # query helper costs two queries per serialized row.
+        ban_count = getattr(obj, "ban_count", None)
+        member_count = getattr(obj, "league_member_count", None)
+        if ban_count is None or member_count is None:
+            return game_q.is_game_successfully_banned(obj)
+        if not member_count:
+            return False
+        return ban_count >= get_ban_amount_for_success(member_count)
 
     def create(self, validated_data):
         manage_only = validated_data.pop("manage_only", False)
