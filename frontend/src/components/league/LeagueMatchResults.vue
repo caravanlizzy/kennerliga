@@ -13,7 +13,7 @@
     <div v-else class="row q-col-gutter-md items-start">
       <!-- Standings card: smaller, own column, kept visually distinct from the results -->
       <div v-if="showStandings" class="col-12 col-md-4 col-lg-3">
-        <q-card flat class="match-game-card standings-card full-height">
+        <q-card flat class="match-game-card standings-card">
           <q-card-section class="q-pb-none">
             <div class="row items-center no-wrap">
               <div class="game-icon-box q-mr-sm">
@@ -43,7 +43,7 @@
             v-for="game in selectedGamesWithResults"
             :key="game.id"
           >
-            <q-card flat bordered class="match-game-card full-height">
+            <q-card flat bordered class="match-game-card">
               <q-card-section class="q-pb-none">
                 <div class="row items-center no-wrap">
                   <div class="game-icon-box q-mr-sm">
@@ -118,6 +118,7 @@ onMounted(async () => {
   gap: 16px;
   width: 100%;
   min-width: 0;
+  align-items: start;
 }
 
 .standings-card {

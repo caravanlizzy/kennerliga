@@ -15,7 +15,7 @@
 
     <q-separator v-if="displayGameName" />
 
-    <q-list class="q-py-sm">
+    <q-list class="q-py-none">
       <q-item
         v-for="result in results"
         :key="result.id"
@@ -247,10 +247,6 @@ function rankColor(position: number | null) {
   return 'grey-4';
 }
 
-function rankTextColor(position: number | null) {
-  return position != null && position <= 3 ? 'white' : 'grey-9';
-}
-
 function rankIcon(position: number | null) {
   if (position === 1) return 'emoji_events';
   if (position === 2) return 'workspace_premium';
@@ -279,13 +275,13 @@ function rowClass(position: number | null) {
 }
 
 .match-result-item {
-  padding: 12px 16px;
+  padding: 8px 12px;
   border-radius: 10px;
-  margin: 4px 12px;
+  margin: 3px 6px;
   transition: all 0.2s ease;
   border: 1px solid transparent;
   border-top-color: rgba(0, 0, 0, 0.06);
-  align-items: flex-start !important;
+  align-items: center;
 
   &:first-child {
     border-top-color: transparent;
@@ -297,8 +293,8 @@ function rowClass(position: number | null) {
   }
 
   &.is-podium {
-    margin-top: 6px;
-    margin-bottom: 6px;
+    margin-top: 4px;
+    margin-bottom: 4px;
   }
 
   &.is-first {
@@ -362,12 +358,12 @@ function rowClass(position: number | null) {
 }
 
 .content-container {
-  gap: 12px;
-  row-gap: 6px;
+  gap: 8px;
+  row-gap: 4px;
 }
 
 .player-name-col {
-  flex: 1 1 160px;
+  flex: 0 1 auto;
   min-width: 0;
 }
 
@@ -375,7 +371,7 @@ function rowClass(position: number | null) {
   flex: 1 1 auto;
   min-width: 0;
   max-width: 100%;
-  row-gap: 6px;
+  row-gap: 4px;
 }
 
 .note-line {
