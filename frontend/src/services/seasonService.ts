@@ -1,6 +1,12 @@
 import { AxiosResponse } from 'axios';
 import { api } from 'boot/axios';
-import { TSeasonDto, TSeasonParticipantDto, TLeagueDto, TLiveEvent } from 'src/types';
+import {
+  TSeasonDto,
+  TSeasonParticipantDto,
+  TLeagueDto,
+  TLiveEvent,
+  TSeasonLeagueWinners,
+} from 'src/types';
 import { unwrapList } from 'src/services/httpTypes';
 
 export async function registerForSeason(seasonId: number): Promise<AxiosResponse | undefined> {
@@ -314,5 +320,29 @@ export async function createLeagueForSeason(
     member_ids: spIds,
     status: 'PLAYING',
   });
+  return data;
+}
+
+/**
+ * Every season a profile has taken part in, newest first as the API orders
+ * them. Each row carries `season_details`, so callers don't need a second
+ * request per season.
+ */
+export async function fetchParticipantsForProfile(
+  profileId: number
+): Promise<(TSeasonParticipantDto & { season_details?: TSeasonDto })[]> {
+  const { data } = await api.get('season/season-participants/', {
+    params: { profile: profileId },
+  });
+  return unwrapList<TSeasonParticipantDto & { season_details?: TSeasonDto }>(data);
+}
+
+/** Per-league winners of a completed season (`SeasonViewSet.league_winners`). */
+export async function fetchSeasonLeagueWinners(
+  seasonId: number
+): Promise<TSeasonLeagueWinners> {
+  const { data } = await api.get<TSeasonLeagueWinners>(
+    `season/seasons/${seasonId}/league-winners/`
+  );
   return data;
 }

@@ -8,6 +8,10 @@ import { useUserStore } from 'stores/userStore';
  */
 export function useMyLeagueStore() {
   const userStore = useUserStore();
+  // Falls back to id 0 when the user isn't in a league. `useLeagueStore`
+  // registers one Pinia store definition per id, so this deliberately reuses
+  // a single `league-0` placeholder rather than minting new ones; callers
+  // should check `leagueId` before triggering a fetch.
   const leagueId = userStore.user?.myCurrentLeagueId ?? 0;
   return useLeagueStore(leagueId)();
 }

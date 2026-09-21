@@ -46,11 +46,32 @@ export default route(async function(/* { store, ssrContext } */) {
       return next({ name: 'season-standings' });
     }
 
-    if (!to.meta.requiresAuth) return next();
+    // `requiresAuth` / `requiresAdmin` are declared on parent routes as well
+    // as leaves, so resolve them across the whole matched chain. The record
+    // closest to the leaf wins, which lets a child opt out of a section-wide
+    // flag (e.g. `requiresAdmin: false` under an admin parent).
+    const resolveMeta = (key: 'requiresAuth' | 'requiresAdmin'): boolean => {
+      for (let i = to.matched.length - 1; i >= 0; i--) {
+        const value = to.matched[i].meta[key];
+        if (value !== undefined) return Boolean(value);
+      }
+      return false;
+    };
+
+    const requiresAuth = resolveMeta('requiresAuth');
+    const requiresAdmin = resolveMeta('requiresAdmin');
+
+    if (!requiresAuth && !requiresAdmin) return next();
+
     const userStore = useUserStore();
     const { user } = userStore;
-    if (user) return next();
-    return next({ name: 'login' });
+    if (!user) return next({ name: 'login' });
+
+    // Admin pages are still enforced by the API, but without this check a
+    // non-admin can open them and see a broken, half-empty screen.
+    if (requiresAdmin && !userStore.isAdmin) return next({ name: 'home' });
+
+    return next();
   });
   return Router;
 });

@@ -31,34 +31,27 @@
 
 <script setup lang="ts">
 import KennerTable from 'components/tables/KennerTable.vue';
-import { useAxios } from '@vueuse/integrations/useAxios';
-import { api } from 'boot/axios';
+import { useAsyncData } from 'src/composables/asyncData';
+import { fetchGamesForManagement, fetchPlatforms } from 'src/services/gameService';
 import { useRouter } from 'vue-router';
-import { TKennerButton } from 'src/types';
+import { TGameDto, TKennerButton, TPlatform } from 'src/types';
 import { computed } from 'vue';
 
-type GameRow = {
-  id: number | string;
-  name: string;
-  platform: number | string; // id
-  selectable: boolean;
-};
-
-type Platform = { id: number | string; name: string };
+type GameRow = TGameDto;
 
 // Fetch games
 const {
   data,
   isFinished,
   error: gamesError,
-} = useAxios<GameRow[]>('game/games?manage_only=true', api);
+} = useAsyncData<GameRow[]>(fetchGamesForManagement, []);
 
 // Fetch platforms
 const {
   data: platformData,
   isFinished: isPlatformFinished,
   error: platformError,
-} = useAxios<Platform[]>('game/platforms', api);
+} = useAsyncData<TPlatform[]>(fetchPlatforms, []);
 
 // Unified loading/error
 const loading = computed(() => !isFinished.value || !isPlatformFinished.value);
@@ -66,7 +59,7 @@ const error = computed(() => gamesError?.value?.message || platformError?.value?
 
 // Build a map id->name from platformData (reactive, no manual watch needed)
 const platformMap = computed<Record<string, string>>(() => {
-  const arr = platformData.value ?? [];
+  const arr = platformData.value;
   const map: Record<string, string> = {};
   for (const p of arr) {
     // coerce id to string to avoid 1 vs "1" mismatches

@@ -91,3 +91,26 @@ export type TGameLeaderboard = {
   leaderboard: TGameLeaderboardEntry[];
   me: TGameLeaderboardEntry;
 };
+
+/** Per-league-level placement tallies for one player in one year. */
+export type TPerLevelCounts = {
+  first: number;
+  second: number;
+  third: number;
+  fourth: number;
+};
+
+export type TPlayerYearStanding = {
+  player_profile_id: number;
+  profile_name: string;
+  username: string;
+  /** Keyed by league level, stringified. */
+  per_level: Record<string, TPerLevelCounts>;
+};
+
+/** Mirrors the `/leaderboard/` endpoint (`api.views.LeaderboardViewSet`). */
+export type TYearLeaderboard = {
+  year: number;
+  levels: number[];
+  standings: TPlayerYearStanding[];
+};

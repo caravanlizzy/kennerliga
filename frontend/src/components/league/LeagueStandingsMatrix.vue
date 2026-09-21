@@ -54,15 +54,15 @@
                     {{ col.label }}
                   </span>
                   <q-icon
-                    v-if="!isMobile && (col as any).settings && (col as any).settings.length > 0"
+                    v-if="!isMobile && col.settings && col.settings.length > 0"
                     name="settings"
                     size="10px"
                     color="grey-4"
                     class="q-ml-xs cursor-pointer hover-settings-icon"
                   >
                     <q-tooltip class="bg-white text-grey-9 shadow-4 q-pa-sm" style="border: 1px solid #ddd; max-width: 200px;">
-                      <div class="text-weight-bold q-mb-xs text-primary" style="font-size: 0.75rem;">{{ (col as any).gameName || col.label }} Settings</div>
-                      <div v-for="s in (col as any).settings" :key="s.name" class="row no-wrap q-gutter-x-sm" style="font-size: 0.7rem; line-height: 1.4;">
+                      <div class="text-weight-bold q-mb-xs text-primary" style="font-size: 0.75rem;">{{ col.gameName || col.label }} Settings</div>
+                      <div v-for="s in col.settings" :key="s.name" class="row no-wrap q-gutter-x-sm" style="font-size: 0.7rem; line-height: 1.4;">
                         <span class="text-grey-7">{{ s.name }}:</span>
                         <span class="text-weight-medium">{{ s.value }}</span>
                       </div>
@@ -70,20 +70,20 @@
                   </q-icon>
                 </div>
                 <div
-                  v-if="(col as any).platformName"
+                  v-if="col.platformName"
                   class="text-grey-7 text-weight-medium"
                   :class="{ ellipsis: isMobile }"
                   :style="{ fontSize: '0.55rem', lineHeight: 1, marginTop: '1px', ...(isMobile ? { maxWidth: '56px' } : {}) }"
                 >
-                  {{ (col as any).platformName }}
+                  {{ col.platformName }}
                 </div>
                 <div
-                  v-if="(col as any).selectedByName"
+                  v-if="col.selectedByName"
                   class="text-grey-6"
                   :class="{ ellipsis: isMobile }"
                   :style="{ fontSize: '0.6rem', fontWeight: 'normal', marginTop: '2px', ...(isMobile ? { maxWidth: '56px' } : {}) }"
                 >
-                  <span class="text-grey-5">by </span>{{ (col as any).selectedByName }}
+                  <span class="text-grey-5">by </span>{{ col.selectedByName }}
                 </div>
 
                 <!-- Closable details & settings popup for mobile -->
@@ -97,7 +97,7 @@
                 >
                   <div class="row items-start justify-between no-wrap q-mb-xs">
                     <div class="text-weight-bold text-primary q-pr-xs" style="font-size: 0.8rem; line-height: 1.25; word-break: break-word;">
-                      {{ (col as any).gameName || col.label }}
+                      {{ col.gameName || col.label }}
                     </div>
                     <q-btn
                       flat
@@ -111,20 +111,20 @@
                     />
                   </div>
 
-                  <div v-if="(col as any).platformName || (col as any).selectedByName" class="q-mb-xs text-caption text-grey-7" style="font-size: 0.7rem; line-height: 1.3;">
-                    <div v-if="(col as any).platformName">
-                      <span class="text-grey-5">Platform:</span> {{ (col as any).platformName }}
+                  <div v-if="col.platformName || col.selectedByName" class="q-mb-xs text-caption text-grey-7" style="font-size: 0.7rem; line-height: 1.3;">
+                    <div v-if="col.platformName">
+                      <span class="text-grey-5">Platform:</span> {{ col.platformName }}
                     </div>
-                    <div v-if="(col as any).selectedByName">
-                      <span class="text-grey-5">Selected by:</span> {{ (col as any).selectedByName }}
+                    <div v-if="col.selectedByName">
+                      <span class="text-grey-5">Selected by:</span> {{ col.selectedByName }}
                     </div>
                   </div>
 
-                  <template v-if="(col as any).settings && (col as any).settings.length > 0">
+                  <template v-if="col.settings && col.settings.length > 0">
                     <q-separator class="q-my-xs" />
                     <div class="text-weight-bold text-grey-8 q-mb-xs" style="font-size: 0.72rem;">Settings</div>
                     <div
-                      v-for="s in (col as any).settings"
+                      v-for="s in col.settings"
                       :key="s.name"
                       class="row no-wrap justify-between q-py-xs"
                       style="font-size: 0.7rem; line-height: 1.3; border-bottom: 1px dashed #f0f0f0;"
@@ -160,7 +160,7 @@
                   <div v-else class="column">
                     <span
                       class="text-subtitle2 text-weight-bold cursor-pointer username-link"
-                      @click="$router.push({ name: 'user-detail', params: { username: props.row.username } })"
+                      @click="goToPlayer(props.row.username)"
                     >
                       {{ props.row.username }}
                     </span>
@@ -254,7 +254,7 @@
               >
                 <span>{{ displayPointsValue(props.value) }}</span>
                 <span
-                  v-if="(props.col as any).hasPoints"
+                  v-if="props.col.hasPoints"
                   class="text-weight-medium q-ml-xs"
                   style="font-size: 0.6rem; opacity: 0.7"
                   >VP</span
@@ -363,7 +363,9 @@
 
 <script setup lang="ts">
 import { ref, computed, watch, onMounted, onUnmounted } from 'vue';
-import { api } from 'boot/axios';
+import { useRouter } from 'vue-router';
+import { fetchLeagueFullStandings } from 'src/services/standingsService';
+import type { TFullStandings, TGameStandingCell } from 'src/types';
 import LoadingSpinner from 'components/base/LoadingSpinner.vue';
 import UserAvatar from 'components/ui/UserAvatar.vue';
 import type { QTableColumn } from 'quasar';
@@ -374,81 +376,31 @@ import { useUpdateStore } from 'stores/updateStore';
 
 const props = defineProps<{
   leagueId: number;
-  prefetchedData?: StandingsData | null;
+  prefetchedData?: TFullStandings | null;
   level?: number | string;
 }>();
 
 const { isMobile } = useResponsive();
+const router = useRouter();
 
-interface GameStats {
-  points: string;
-  league_points: string;
-  rank: number;
-  display_rank?: string;
-  display_value?: string;
-  decisive_tie_breaker_name?: string;
-  tie_breaker_value?: string;
+function goToPlayer(username?: string | null): void {
+  if (!username) return;
+  router.push({ name: 'user-detail', params: { username } });
 }
 
-interface Standing {
-  player_profile_id: number;
-  profile_name: string;
-  username?: string;
-  total_league_points: string;
-  total_wins: string;
-  games: Record<string, GameStats>;
-  unresolved_tie_group?: string;
-  resolved_tie_reason?: string;
-}
+/**
+ * Quasar's column type plus the game metadata this table hangs off each
+ * column, so the template can read them without casting through `any`.
+ */
+type TStandingsColumn = QTableColumn & {
+  gameName?: string;
+  selectedByName?: string | null;
+  platformName?: string | null;
+  hasPoints?: boolean;
+  settings?: { name: string; value: string }[];
+};
 
-interface TieGroupMember {
-  player_profile_id: number;
-  profile_name: string;
-  user_id?: number;
-  username?: string;
-}
-
-interface TieResolution {
-  reason: string;
-  reason_display: string;
-  note?: string;
-  is_resolved: boolean;
-}
-
-interface TieGroup {
-  group_key: string;
-  unresolved: boolean;
-  members: TieGroupMember[];
-  league_points?: string;
-  wins?: string;
-  resolution?: TieResolution;
-}
-
-interface SelectedGameSetting {
-  name: string;
-  value: string;
-}
-
-interface SelectedGame {
-  id: number;
-  game_name: string;
-  game_short_name: string;
-  platform_name?: string;
-  has_points: boolean; // 🔹 added
-  selected_by_name?: string;
-  settings?: SelectedGameSetting[];
-}
-
-interface StandingsData {
-  selected_games: SelectedGame[];
-  standings: Standing[];
-  season_id?: number;
-  tie_groups?: TieGroup[];
-  all_games_finished?: boolean;
-  is_season_completed?: boolean;
-}
-
-const standings = ref<StandingsData | null>(props.prefetchedData || null);
+const standings = ref<TFullStandings | null>(props.prefetchedData || null);
 const loading = ref(!props.prefetchedData);
 const error = ref(false);
 
@@ -457,10 +409,7 @@ const fetchStandings = async () => {
   loading.value = true;
   error.value = false;
   try {
-    const { data } = await api.get<StandingsData>(
-      `league/leagues/${props.leagueId}/full-standings/`
-    );
-    standings.value = data;
+    standings.value = await fetchLeagueFullStandings(props.leagueId);
   } catch (e) {
     console.error('Error fetching standings:', e);
     error.value = true;
@@ -503,10 +452,10 @@ if (!props.prefetchedData) {
   fetchStandings();
 }
 
-const tableColumns = computed<QTableColumn[]>(() => {
+const tableColumns = computed<TStandingsColumn[]>(() => {
   if (!standings.value) return [];
 
-  const cols: QTableColumn[] = [
+  const cols: TStandingsColumn[] = [
     {
       name: 'profile_name',
       label: '',
@@ -570,7 +519,7 @@ const tableRows = computed(() => {
   });
 });
 
-const rowClass = (row: any, index: number) => {
+const rowClass = (_row: unknown, index: number) => {
   // Only highlight if there are actually points (total > 0) or if games have been played
   // Actually, usually we only highlight if total_league_points is non-zero or if we want to show current leader even at 0-0.
   // The user said "just headers with profile names", so maybe don't highlight yet?
@@ -588,7 +537,7 @@ const formatNumber = (value: string | number): string => {
   return (num as number) % 1 === 0 ? (num as number).toFixed(0) : String(num);
 };
 
-function displayPointsValue(gameData: any) {
+function displayPointsValue(gameData: TGameStandingCell | null) {
   if (!gameData) return '-';
   if (gameData.display_value != null) {
     return gameData.display_value;
@@ -596,7 +545,7 @@ function displayPointsValue(gameData: any) {
   if (gameData.display_rank != null) {
     return gameData.display_rank;
   }
-  return formatNumber(gameData.points ?? gameData);
+  return formatNumber(gameData.points ?? '');
 }
 
 function getRankBgClass(rank: number | undefined) {

@@ -77,6 +77,22 @@ function createState<K, T>(): CachedResourceState<K, T> {
   };
 }
 
+/**
+ * Drops every shared cache entry. Must be called whenever the identity of
+ * the current user changes (log in, log out, dev impersonation): the
+ * registry outlives components and routes, so without this the next user
+ * would be served the previous user's cached payloads.
+ */
+export function clearCachedResources(): void {
+  for (const state of registry.values()) {
+    state.entries.value = new Map();
+    state.currentKey.value = null;
+    state.refreshing.value = false;
+    state.inflight.clear();
+  }
+  registry.clear();
+}
+
 export function useCachedResource<K, T>(
   loader: (key: K) => Promise<T>,
   options: UseCachedResourceOptions = {}

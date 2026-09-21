@@ -72,7 +72,11 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
-import { api } from 'boot/axios';
+import {
+  fetchTieResolutionReasons,
+  resolveTie,
+  type TTieResolutionReason,
+} from 'src/services/leagueService';
 import { useQuasar } from 'quasar';
 import type { TSeasonParticipantDto } from 'src/types';
 
@@ -88,15 +92,14 @@ const $q = useQuasar();
 const sortedMembers = ref<TSeasonParticipantDto[]>([...props.members]);
 const reason = ref<string | null>(null);
 const note = ref('');
-const reasons = ref<{ value: string; label: string }[]>([]);
+const reasons = ref<TTieResolutionReason[]>([]);
 const loadingReasons = ref(false);
 const submitting = ref(false);
 
 const fetchReasons = async () => {
   loadingReasons.value = true;
   try {
-    const { data } = await api.get(`league/leagues/${props.leagueId}/tie-resolution-reasons/`);
-    reasons.value = data;
+    reasons.value = await fetchTieResolutionReasons(props.leagueId);
     if (reasons.value.length > 0) {
       reason.value = reasons.value[0].value;
     }
@@ -120,7 +123,7 @@ const submit = async () => {
   if (!reason.value) return;
   submitting.value = true;
   try {
-    await api.post(`league/leagues/${props.leagueId}/resolve-tie/`, {
+    await resolveTie(props.leagueId, {
       group_key: props.groupKey,
       reason: reason.value,
       player_order: sortedMembers.value.map(m => m.profile),

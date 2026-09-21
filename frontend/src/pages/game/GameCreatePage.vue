@@ -428,9 +428,9 @@
 </template>
 
 <script setup lang="ts">
-import { ref, nextTick } from 'vue';
+import { nextTick } from 'vue';
 import { useQuasar } from 'quasar';
-import { api } from 'boot/axios';
+import { createFullGame, fetchPlatforms } from 'src/services/gameService';
 import KennerInput from 'components/base/KennerInput.vue';
 import KennerSelect from 'components/base/KennerSelect.vue';
 import KennerButton from 'components/base/KennerButton.vue';
@@ -444,7 +444,7 @@ import { useGameForm } from 'src/composables/gameForm';
 const router = useRouter();
 const $q = useQuasar();
 
-const { data: platforms } = await api('game/platforms/');
+const platforms = await fetchPlatforms();
 
 const {
   name,
@@ -508,7 +508,7 @@ const onSubmit = async () => {
 
     const payload = buildPayload(selectedPlatform.id);
 
-    const { data: game } = await api.post('/game/games-full/', payload);
+    const game = await createFullGame(payload);
 
     if (resultConfig !== undefined) {
       await createResultConfigData(game.id, resultConfig);

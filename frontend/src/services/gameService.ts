@@ -1,6 +1,9 @@
 import {
   TBanDecisionDtoPayload,
   TFullGameDto,
+  TGameDto,
+  TSelectedGameDto,
+  TStartingPointSystemDto,
   TGameOptionChoiceDto,
   TGameOptionDto,
   TSelectedGameDtoPayload,
@@ -464,4 +467,48 @@ export async function updateResultConfigData(
     console.log('Error updating the result configuration', e);
     throw new Error('Error updating the result configuration: \n' + e);
   }
+}
+
+export async function fetchStartingPointSystems(): Promise<
+  TStartingPointSystemDto[]
+> {
+  const { data } = await api.get('game/starting-point-systems');
+  return unwrapList<TStartingPointSystemDto>(data);
+}
+
+export async function fetchGame(gameId: number): Promise<TGameDto> {
+  const { data } = await api.get<TGameDto>(`game/games/${gameId}`);
+  return data;
+}
+
+export async function fetchSelectedGameById(
+  selectedGameId: number
+): Promise<TSelectedGameDto> {
+  const { data } = await api.get<TSelectedGameDto>(
+    `game/selected-games/${selectedGameId}`
+  );
+  return data;
+}
+
+/** Creates a game together with its options/choices in one request. */
+export async function createFullGame(payload: unknown): Promise<TFullGameDto> {
+  const { data } = await api.post<TFullGameDto>('/game/games-full/', payload);
+  return data;
+}
+
+/** Deletes a game selection and everything hanging off it (admin only). */
+export async function deleteSelectedGame(selectedGameId: number): Promise<void> {
+  await api.delete(`game/selected-games/${selectedGameId}/`);
+}
+
+/**
+ * Games for the admin management list. `manage_only` bypasses the
+ * league-availability filtering that `GameViewSet.get_queryset` otherwise
+ * applies, so unselectable games stay visible.
+ */
+export async function fetchGamesForManagement(): Promise<TGameDto[]> {
+  const { data } = await api.get('game/games', {
+    params: { manage_only: true },
+  });
+  return unwrapList<TGameDto>(data);
 }

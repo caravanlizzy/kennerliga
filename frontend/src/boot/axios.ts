@@ -17,6 +17,32 @@ declare module '@vue/runtime-core' {
 // for each client)
 const api = axios.create({ baseURL: process.env.API_URL });
 
+/**
+ * Called when the API rejects our token. Registered by the user store so
+ * this module doesn't have to import it (which would create a cycle:
+ * userStore -> boot/axios -> userStore).
+ */
+let onUnauthorized: (() => void) | null = null;
+
+export function setUnauthorizedHandler(handler: (() => void) | null): void {
+  onUnauthorized = handler;
+}
+
+// A token can expire or be revoked server-side while the SPA still believes
+// it is signed in. Without this the app keeps rendering an authenticated
+// shell and every request fails silently in a component-local catch.
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    const status = error?.response?.status;
+    const isLoginAttempt = String(error?.config?.url ?? '').includes('login/');
+    if (status === 401 && !isLoginAttempt && onUnauthorized) {
+      onUnauthorized();
+    }
+    return Promise.reject(error);
+  }
+);
+
 export default boot(({ app }) => {
   // for use inside Vue files (Options API) through this.$axios and this.$api
 

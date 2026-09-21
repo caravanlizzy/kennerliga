@@ -19,10 +19,12 @@ export {};
 
 declare module 'vue-router' {
   interface RouteMeta {
-    // is optional
     label?: string;
-    // must be declared by every route
     icon?: string;
+    /** Redirect to the login page when nobody is signed in. */
+    requiresAuth?: boolean;
+    /** Additionally require an admin account; enforced in `router/index.ts`. */
+    requiresAdmin?: boolean;
   }
 }
 
@@ -192,11 +194,17 @@ const routes: RouteRecordRaw[] = [
         path: 'm/:rest(.*)*',
         redirect: (to) => '/' + ((to.params.rest as string[]) ?? []).join('/'),
       },
-      {
-        path: 'dev',
-        name: 'dev',
-        component: () => import('pages/DevPage.vue'),
-      },
+      // Dev-only: the tools behind this page sign in as arbitrary accounts
+      // with a shared password, so it must never reach a production build.
+      ...(process.env.DEV
+        ? [
+            {
+              path: 'dev',
+              name: 'dev',
+              component: () => import('pages/DevPage.vue'),
+            },
+          ]
+        : []),
     ],
   },
 

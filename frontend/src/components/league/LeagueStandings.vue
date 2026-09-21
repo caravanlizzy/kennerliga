@@ -216,7 +216,8 @@ import { computed, ref, onMounted, onUnmounted } from 'vue';
 import { useLeagueStore } from 'stores/leagueStore';
 import { useUserStore } from 'stores/userStore';
 import { useUpdateStore } from 'stores/updateStore';
-import { api } from 'boot/axios';
+import { fetchLeagueFullStandings } from 'src/services/standingsService';
+import type { TLeagueStandingRow, TTieGroup } from 'src/types';
 import { formatNumbers } from 'src/helpers';
 import { useResponsive } from 'src/composables/responsive';
 import KennerButton from 'components/base/KennerButton.vue';
@@ -240,38 +241,8 @@ const myLeagueStore = computed(() => {
 const storeLeagueId = computed(() => myLeagueStore.value?.leagueId);
 const { isMobile } = useResponsive();
 
-interface LeagueStanding {
-  player_profile: number;
-  profile_name: string;
-  wins: number;
-  league_points: number;
-  unresolved_tie_group?: string;
-  resolved_tie_reason?: string;
-}
-
-interface TieGroup {
-  group_key: string;
-  unresolved: boolean;
-  members: Array<{
-    player_profile_id: number;
-    profile_name: string;
-    user_id?: number;
-    username?: string;
-  }>;
-  resolution?: {
-    reason_display: string;
-    note?: string;
-  };
-}
-
-interface FullStandingsResponse {
-  standings: any[];
-  tie_groups: TieGroup[];
-  all_games_finished?: boolean;
-}
-
-const standings = ref<LeagueStanding[]>([]);
-const tieGroups = ref<TieGroup[]>([]);
+const standings = ref<TLeagueStandingRow[]>([]);
+const tieGroups = ref<TTieGroup[]>([]);
 const allGamesFinished = ref(false);
 const loading = ref(false);
 
@@ -280,9 +251,7 @@ const fetchStandings = async () => {
   if (!idToUse) return;
   loading.value = true;
   try {
-    const { data } = await api.get<FullStandingsResponse>(
-      `league/leagues/${idToUse}/full-standings/`
-    );
+    const data = await fetchLeagueFullStandings(idToUse);
     // Transform full-standings to LeagueStanding format
     standings.value = data.standings.map(s => {
       const group = data.tie_groups?.find(g => g.group_key === s.unresolved_tie_group);

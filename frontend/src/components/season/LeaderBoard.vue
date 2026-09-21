@@ -229,7 +229,12 @@
 </template>
 
 <script setup lang="ts">
-import { api } from 'boot/axios';
+import { fetchYearLeaderboard } from 'src/services/statisticsService';
+import type {
+  TPerLevelCounts,
+  TPlayerYearStanding,
+  TYearLeaderboard,
+} from 'src/types';
 import { ref, watch } from 'vue';
 import LoadingSpinner from 'components/base/LoadingSpinner.vue';
 import ErrorDisplay from 'components/base/ErrorDisplay.vue';
@@ -239,24 +244,6 @@ import LeagueLevel from 'components/season/LeagueLevel.vue';
 
 const props = defineProps<{ year: number }>();
 const {  getHexLeagueColor } = leagueColors();
-
-interface PerLevelCounts {
-  first: number;
-  second: number;
-  third: number;
-  fourth: number;
-}
-interface PlayerYearStanding {
-  player_profile_id: number;
-  profile_name: string;
-  username: string;
-  per_level: Record<string, PerLevelCounts>;
-}
-interface LeaderBoardResponse {
-  year: number;
-  levels: number[];
-  standings: PlayerYearStanding[];
-}
 
 const error = ref(false);
 const showAllLeagues = defineModel<boolean>('showAllLeagues', { default: false });
@@ -269,14 +256,11 @@ const {
   data: standings,
   loading,
   load: loadStandings,
-} = useCachedResource<number, LeaderBoardResponse>(
+} = useCachedResource<number, TYearLeaderboard>(
   async (year) => {
     error.value = false;
     try {
-      const { data } = await api.get<LeaderBoardResponse>(
-        `leaderboard/?year=${year}`
-      );
-      return data;
+      return await fetchYearLeaderboard(year);
     } catch (e) {
       error.value = true;
       throw e;
@@ -289,7 +273,7 @@ function fetchStandings(): void {
   void loadStandings(props.year);
 }
 
-function bestLeague(row: PlayerYearStanding): number | null {
+function bestLeague(row: TPlayerYearStanding): number | null {
   const levels = Object.entries(row.per_level)
     .filter(([, c]) => c.first || c.second || c.third || c.fourth)
     .map(([level]) => Number(level));
@@ -298,7 +282,7 @@ function bestLeague(row: PlayerYearStanding): number | null {
   return Math.min(...levels);
 }
 
-function getHighestLeagueCounts(row: PlayerYearStanding): PerLevelCounts {
+function getHighestLeagueCounts(row: TPlayerYearStanding): TPerLevelCounts {
   const highestLvl = bestLeague(row);
   if (highestLvl === null) return { first: 0, second: 0, third: 0, fourth: 0 };
   return row.per_level[String(highestLvl)] || { first: 0, second: 0, third: 0, fourth: 0 };

@@ -39,37 +39,31 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
-import { api } from 'src/boot/axios';
 import { useQuasar } from 'quasar';
 import KennerButton from 'components/base/KennerButton.vue';
 import { useRouter } from 'vue-router';
 import KennerSelect from 'components/base/KennerSelect.vue';
 import KennerInput from 'components/base/KennerInput.vue';
-
-interface PlayerProfile {
-  id: number;
-  user: number | null;
-  profile_name: string;
-}
+import { createInvitation, fetchProfiles } from 'src/services/userService';
+import type { TPlayerProfileDto } from 'src/types';
 
 const $q = useQuasar();
 const note = ref('');
 const selectedProfile = ref<number | null>(null);
-const profileOptions = ref<PlayerProfile[]>([]);
-const allProfiles = ref<PlayerProfile[]>([]);
+const profileOptions = ref<TPlayerProfileDto[]>([]);
+const allProfiles = ref<TPlayerProfileDto[]>([]);
 const loading = ref(false);
 const loadingProfiles = ref(false);
 const router = useRouter();
 
 onMounted(async () => {
-  await fetchProfiles();
+  await loadProfiles();
 });
 
-const fetchProfiles = async () => {
+const loadProfiles = async () => {
   loadingProfiles.value = true;
   try {
-    const { data } = await api.get('/user/profiles/?user__isnull=true/');
-    allProfiles.value = Array.isArray(data) ? data : data.results || [];
+    allProfiles.value = await fetchProfiles({ unlinkedOnly: true });
     profileOptions.value = allProfiles.value;
   } catch (error) {
     console.error('Failed to fetch profiles:', error);
@@ -98,7 +92,7 @@ const filterProfiles = (val: string, update: (fn: () => void) => void) => {
 const handleInvite = async () => {
   loading.value = true;
   try {
-    const payload: any = {
+    const payload: { label: string; player_profile?: number } = {
       label: note.value,
     };
 
@@ -106,7 +100,7 @@ const handleInvite = async () => {
       payload.player_profile = selectedProfile.value;
     }
 
-    await api.post('/user/invitations/', payload);
+    await createInvitation(payload);
 
     await router.push({ name: 'invitations' });
     $q.notify({

@@ -66,8 +66,8 @@
 
 <script setup lang="ts">
 import KennerTable from 'components/tables/KennerTable.vue';
-import { useAxios } from '@vueuse/integrations/useAxios';
-import { api } from 'boot/axios';
+import { useAsyncData } from 'src/composables/asyncData';
+import { fetchSeasons } from 'src/services/seasonService';
 import { useRouter } from 'vue-router';
 import { computed } from 'vue';
 import { storeToRefs } from 'pinia';
@@ -91,7 +91,10 @@ const {
   data: seasons,
   isFinished,
   error: fetchError,
-} = useAxios<SeasonExtra[]>('/season/seasons/', api);
+} = useAsyncData<SeasonExtra[]>(
+  () => fetchSeasons() as Promise<SeasonExtra[]>,
+  []
+);
 
 const loading = computed(() => !isFinished.value);
 const error = computed(() => fetchError.value?.message || null);

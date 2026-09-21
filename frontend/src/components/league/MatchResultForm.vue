@@ -270,7 +270,16 @@
 
 <script setup lang="ts">
 import { ref, watch, computed, onMounted } from 'vue';
-import { api } from 'boot/axios';
+import {
+  fetchMatchResults,
+  fetchOrderedWinConditions,
+  fetchSelectedGame,
+  submitMatchResults,
+} from 'src/services/resultService';
+import {
+  fetchFactionsForGame,
+  fetchResultConfigForGame,
+} from 'src/services/gameService';
 import { useQuasar } from 'quasar';
 import { storeToRefs } from 'pinia';
 import { useLeagueStore } from 'stores/leagueStore';
@@ -278,7 +287,7 @@ import KennerSelect from 'components/base/KennerSelect.vue';
 import KennerInput from 'components/base/KennerInput.vue';
 import KennerButton from 'components/base/KennerButton.vue';
 import LoadingSpinner from 'components/base/LoadingSpinner.vue';
-import { TLeagueDto, TResultConfig, TTieBreakerDto, TMatchResultPayload, TMatchResultSubmitPayload, TMatchResult, TWinConditionDto } from 'src/types';
+import { TLeagueDto, TResultConfigDto, TTieBreakerDto, TMatchResultPayload, TMatchResultSubmitPayload, TMatchResult, TWinConditionDto } from 'src/types';
 
 type Faction = { id: number; name: string; level: number };
 
@@ -312,7 +321,7 @@ onMounted(() => {
   }
 });
 
-const resultConfig = ref<TResultConfig | null>(null);
+const resultConfig = ref<TResultConfigDto | null>(null);
 const factions = ref<Faction[]>([]);
 const formData = ref<FormDataEntry[]>([]);
 const isLoading = ref(false);
@@ -411,53 +420,42 @@ function setPosition(memberId: number, pos: number) {
 }
 
 async function fetchResultConfig() {
-  const { data: selectedGame } = await api.get(
-    `game/selected-games/${props.selectedGameId}/`
-  );
-  const gameId = selectedGame.game;
-  if (!gameId) return;
-  const { data } = await api.get(`game/result-configs/?game=${gameId}`);
-  resultConfig.value = data?.[0] ?? null;
+  const selectedGame = await fetchSelectedGame(props.selectedGameId);
+  if (!selectedGame.game) return;
+  resultConfig.value = await fetchResultConfigForGame(selectedGame.game);
 }
 
-async function fetchWinConditions() {
+async function loadWinConditions() {
   if (!resultConfig.value?.id) {
     winConditions.value = [];
     selectedWinConditionId.value = null;
     return;
   }
-  const { data } = await api.get<TWinConditionDto[]>(
-    `game/win-conditions/?result_config=${resultConfig.value.id}`
-  );
-  const wcs = (data ?? []).slice().sort((a, b) => a.order - b.order);
+  const wcs = await fetchOrderedWinConditions(resultConfig.value.id);
   winConditions.value = wcs;
   selectedWinConditionId.value = wcs[0]?.id ?? null;
 }
 
 async function fetchFactions() {
-  const { data } = await api.get(
-    `game/selected-games/${props.selectedGameId}/`
-  );
-  const gameId = data.game;
-  const factionRes = await api.get(`game/factions/?game=${gameId}`);
-  factions.value = (factionRes.data ?? []) as Faction[];
+  const selectedGame = await fetchSelectedGame(props.selectedGameId);
+  if (!selectedGame.game) return;
+  factions.value = (await fetchFactionsForGame(selectedGame.game)) as Faction[];
 }
 
 async function fetchExistingResults() {
-  if (!leagueStore.leagueData?.season) {
-    // If season is not in leagueData, try the league prop if available
-    const seasonId = props.league?.season || leagueStore.leagueData?.season;
-    if (!seasonId) {
-      console.warn('Cannot fetch existing results: season ID is missing');
-      return false;
-    }
-    // Update local reference if needed or just use it
-  }
+  // The guard used to sit inside an `if` block, so the `seasonId` actually
+  // passed to the request was never checked and could be undefined.
   const seasonId = props.league?.season || leagueStore.leagueData?.season;
+  if (!seasonId) {
+    console.warn('Cannot fetch existing results: season ID is missing');
+    return false;
+  }
   try {
-    const { data } = await api.get<TMatchResult[]>(
-      `result/match-results/?season=${seasonId}&league=${props.leagueId}&selected_game=${props.selectedGameId}`
-    );
+    const data = await fetchMatchResults({
+      seasonId,
+      leagueId: props.leagueId,
+      selectedGameId: props.selectedGameId,
+    });
     if (data && data.length > 0) {
       // Map existing results to formData
       formData.value = members.value.map((m) => {
@@ -542,7 +540,7 @@ watch(
       isLoading.value = true;
       try {
         await Promise.all([fetchResultConfig(), fetchFactions()]);
-        await fetchWinConditions();
+        await loadWinConditions();
         const hasResults = await fetchExistingResults();
         if (!hasResults) {
           initFormData();
@@ -702,7 +700,7 @@ async function submitResults() {
   }
 
   try {
-    const response = await api.post('/result/match-results/', payload);
+    const response = await submitMatchResults(payload);
 
     if (response.status === 201 || response.status === 200) {
       $q.notify({ type: 'positive', message: 'Result saved.' });

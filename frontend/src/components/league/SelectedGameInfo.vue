@@ -9,7 +9,7 @@
             </q-avatar>
 
             <div class="text-subtitle1 text-weight-medium ellipsis" >
-              {{ truncateString(member.selected_game.game_name) }}
+              {{ truncateString(member.selected_game.game_name || '') }}
               <KennerTooltip v-if="(member.selected_game.game_name || '').length > 28">
                 {{ member.selected_game.game_name }}
               </KennerTooltip>
@@ -82,31 +82,24 @@ import { truncateString } from 'src/helpers';
 import GameSettingsDisplay from 'components/game/selectedGame/GameSettingsDisplay.vue';
 import KennerButton from 'components/base/KennerButton.vue';
 import KennerTooltip from 'components/base/KennerTooltip.vue';
+import type { TSelectedGameDto } from 'src/types';
 
-// --- types trimmed to what we actually render ---
-type Choice = { id: number; name: string; option: number };
-type GameOption = { id: number; name: string; /* other fields omitted */ };
-
-type SelectedOption = {
-  id: number;
-  game_option: GameOption;
-  choice: Choice | null;
-  value: boolean | null;
-};
-
-type SelectedGame = {
-  id: number;
-  game: number;
-  game_name: string;
-  selected_options: SelectedOption[];
-};
+/**
+ * The member shape this card renders. The game/option pieces reuse the
+ * shared DTOs rather than re-declaring trimmed copies, which is how they
+ * previously drifted away from `types/game.ts`.
+ */
+type SelectedGameRef = Pick<
+  TSelectedGameDto,
+  'id' | 'game' | 'game_name' | 'selected_options'
+>;
 
 type Member = {
   id: number;
   username: string;
   profile_name: string;
-  selected_game: SelectedGame | null;
-  banned_selected_game: SelectedGame | null;
+  selected_game: SelectedGameRef | null;
+  banned_selected_game: SelectedGameRef | null;
   banned_by: string[];           // array of display names (e.g., profile_name or username)
   selected_game_id?: number | null; // optional convenience
   is_active_player: boolean;
@@ -126,9 +119,10 @@ const banners = computed(() => props.member.banned_by ?? []);
 
 
 const bannedGameName = computed(() => {
-  const bsg = props.member?.banned_selected_game;
-  // try nested first, then flat
-  return bsg?.game?.game_name ?? bsg?.game_name ?? null;
+  // `game` is the game's id on this payload, so the game's display name only
+  // ever comes from `game_name` (the old nested `game.game_name` lookup could
+  // never resolve).
+  return props.member?.banned_selected_game?.game_name ?? null;
 });
 </script>
 

@@ -69,7 +69,7 @@ import { useResponsive } from 'src/composables/responsive';
 import { ref, onMounted } from 'vue';
 import { useQuasar } from 'quasar';
 import { useRouter, useRoute } from 'vue-router';
-import { api } from 'boot/axios';
+import { registerUser } from 'src/services/userService';
 
 const { isMobile } = useResponsive();
 const $q = useQuasar();
@@ -118,19 +118,13 @@ async function doRegister(): Promise<void> {
 
   isSubmitting.value = true;
   try {
-    const res = await api.post('/user/register/', {
+    const data = await registerUser({
       username: username.value,
       password: password.value,
       invite_key: inviteKey.value,
     });
 
-    // Axios automatically parses JSON and puts the response in .data
-    const data = res.data;
-
-    if (res.status >= 400) {
-      throw new Error(data?.detail || 'Sign up failed.');
-    }
-
+    // Axios rejects on 4xx/5xx, so reaching this point means success.
     $q.notify({
       type: 'positive',
       message: data?.detail || `User ${username.value} created successfully.`,

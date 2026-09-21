@@ -1,5 +1,6 @@
 import { api } from 'boot/axios';
-import { TLeagueDto } from 'src/types';
+import { TLeagueDto, TLeagueStatus } from 'src/types';
+import { unwrapList } from 'src/services/httpTypes';
 
 export async function fetchLeagueDetails(
   leagueId: number
@@ -30,4 +31,69 @@ export async function fetchMyCurrentLeagueInfo(): Promise<{ id: number; is_my_tu
     console.error('Error fetching league ID:', error);
     throw error;
   }
+}
+
+/**
+ * All leagues of a season. Throws on failure so callers can distinguish a
+ * season without leagues from a failed request.
+ */
+export async function fetchLeaguesForSeason(
+  seasonId: number
+): Promise<TLeagueDto[]> {
+  const { data } = await api.get('league/leagues', {
+    params: { season: seasonId },
+  });
+  return unwrapList<TLeagueDto>(data);
+}
+
+export type TTieResolutionReason = { value: string; label: string };
+
+/**
+ * The reasons an admin may pick when resolving a tie. The label for the
+ * "decider game" reason is the game configured in the App Configuration,
+ * so this must be fetched rather than hard-coded in the UI.
+ */
+export async function fetchTieResolutionReasons(
+  leagueId: number
+): Promise<TTieResolutionReason[]> {
+  const { data } = await api.get(
+    `league/leagues/${leagueId}/tie-resolution-reasons/`
+  );
+  return unwrapList<TTieResolutionReason>(data);
+}
+
+/** Records an admin's tie resolution; `playerOrder` is best-placed first. */
+export async function resolveTie(
+  leagueId: number,
+  payload: {
+    group_key: string;
+    reason: string;
+    player_order: number[];
+    note?: string;
+  }
+): Promise<void> {
+  await api.post(`league/leagues/${leagueId}/resolve-tie/`, payload);
+}
+
+/** Admin-only: force a league into a given `LeagueStatus`. */
+export async function setLeagueStatus(
+  leagueId: number,
+  status: string
+): Promise<{ id: number; status: TLeagueStatus }> {
+  const { data } = await api.post(`league/leagues/${leagueId}/set-status/`, {
+    status,
+  });
+  return data;
+}
+
+/** Admin-only: make the given profile the league's active player. */
+export async function setLeagueActivePlayer(
+  leagueId: number,
+  profileId: number
+): Promise<{ participant_id: number }> {
+  const { data } = await api.post(
+    `league/leagues/${leagueId}/set-active-player/`,
+    { profile_id: profileId }
+  );
+  return data;
 }

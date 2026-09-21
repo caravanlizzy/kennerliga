@@ -82,7 +82,7 @@
 
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue';
-import { api } from 'boot/axios';
+import { fetchProfiles } from 'src/services/userService';
 import KennerInput from 'components/base/KennerInput.vue';
 import KennerButton from 'components/base/KennerButton.vue';
 import KennerSelect from 'components/base/KennerSelect.vue';
@@ -141,10 +141,10 @@ function optionsForLeague(leagueIndex: number) {
 onMounted(loadMembers);
 
 async function loadMembers() {
-  const { data } = await api('/user/profiles/');
-  const arr = Array.isArray(data) ? data : Array.isArray(data?.results) ? data.results : [];
+  // The service already unwraps paginated vs. plain-array responses.
+  const profiles = await fetchProfiles();
   // Normalize ids to numbers immediately
-  availableMembers.value = arr.map((p: any) => ({ ...p, id: Number(p.id) }));
+  availableMembers.value = profiles.map((p) => ({ ...p, id: Number(p.id) }));
 }
 
 /* -------------------- Event-driven uniqueness (no deep watchers) -------------------- */

@@ -14,8 +14,8 @@
 <script setup lang="ts">
 import { useGameSelection } from 'src/composables/gameSelection';
 import { onMounted, provide, ref } from 'vue';
-import { api } from 'boot/axios';
 import GameSelectionForm from 'components/game/selectedGame/GameSelectionForm.vue';
+import { fetchGame, fetchSelectedGameById } from 'src/services/gameService';
 import { editSelectedGame } from 'src/services/gameService';
 import LoadingSpinner from 'components/base/LoadingSpinner.vue';
 
@@ -42,10 +42,10 @@ const {
 onMounted(async () => {
   isLoading.value = true;
   await fetchPlatforms();
-  const { data: game } = await api(`game/games/${props.gameId}`);
-  const { data: selection } = await api(
-    `game/selected-games/${props.selectedGameId}`
-  );
+  const [game, selection] = await Promise.all([
+    fetchGame(props.gameId),
+    fetchSelectedGameById(props.selectedGameId),
+  ]);
   gameSelection.leagueId = props.leagueId;
   gameSelection.profileId = props.profileId;
   await initGameInformation(game);

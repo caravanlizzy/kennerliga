@@ -76,19 +76,8 @@
 
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue';
-import { api } from 'boot/axios';
+import { fetchSeasonLeagueWinners } from 'src/services/seasonService';
 import LeagueLevel from 'components/season/LeagueLevel.vue';
-
-type LeagueWinnerApiResponse = {
-  season: { id: number; name: string; status: string };
-  winners: Array<{
-    league: { id: number; level: number };
-    winner: string | null;
-    username: string | null;
-    profile_name: string | null;
-    league_points: number | null;
-  }>;
-};
 
 const props = defineProps<{
   seasonId: number;
@@ -99,9 +88,7 @@ const winners = ref<Array<{ username: string; profile_name: string; level: numbe
 
 onMounted(async () => {
   if (!props.seasonId) return;
-  const { data } = await api.get<LeagueWinnerApiResponse>(
-    `season/seasons/${props.seasonId}/league-winners/`
-  );
+  const data = await fetchSeasonLeagueWinners(props.seasonId);
 
   season.value = data.season?.name ?? '';
 
@@ -110,8 +97,8 @@ onMounted(async () => {
     .slice()
     .sort((a, b) => a.league.level - b.league.level)
     .map((x) => ({
-      username: x.winner?.username || x.username || '',
-      profile_name: x.winner?.profile_name || x.profile_name || '',
+      username: x.winner?.username || '',
+      profile_name: x.winner?.profile_name || '',
       level: x.league.level
     }))
     .filter((x) => x.username !== '');

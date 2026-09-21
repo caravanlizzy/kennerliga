@@ -1,14 +1,5 @@
 import { TSelectedGameDto, TSelectedGameOptionDto } from './game';
 
-export type TSeasonDto = {
-  id: number;
-  year: number;
-  month: number;
-  name?: string;
-  status?: string;
-  is_completed?: boolean;
-};
-
 export type TLeagueStatus =
   | 'PICKING'
   | 'REPICKING'

@@ -1,7 +1,13 @@
 import { defineStore } from 'pinia';
-import { ref, Ref, watch } from 'vue';
-import { api, setAuthToken } from 'boot/axios';
+import { ref, Ref } from 'vue';
+import { api, setAuthToken, setUnauthorizedHandler } from 'boot/axios';
+import { clearCachedResources } from 'src/composables/cachedResource';
 import { fetchMyCurrentLeagueInfo } from 'src/services/leagueService';
+import {
+  fetchAvailableYears,
+  fetchUsers,
+  type UserListParams,
+} from 'src/services/userService';
 import { TUserDto } from 'src/types';
 
 export const useUserStore = defineStore(
@@ -11,21 +17,20 @@ export const useUserStore = defineStore(
     const isAdmin: Ref<boolean> = ref(false);
     const isAuthenticated: Ref<boolean> = ref(false);
 
-    async function listUsers(params?: Record<string, string | number | boolean | (string | number)[]>) {
+    async function listUsers(params?: UserListParams): Promise<TUserDto[]> {
       try {
-        const { data: users } = await api.get('/user/users/', { params });
-        return users;
+        return await fetchUsers(params);
       } catch (e) {
-        console.log(e);
+        console.error('Failed to list users:', e);
+        return [];
       }
     }
 
     async function getAvailableYears(): Promise<number[]> {
       try {
-        const { data: years } = await api.get<number[]>('/user/users/available-years/');
-        return years;
+        return await fetchAvailableYears();
       } catch (e) {
-        console.log(e);
+        console.error('Failed to load available years:', e);
         return [];
       }
     }
@@ -40,18 +45,20 @@ export const useUserStore = defineStore(
           method: 'POST',
           data: { username, password },
         });
-        const userData = data.user;
-        applyLogin(userData, ignorePermission);
+        // Anything cached for the previous identity must not leak into this
+        // session (dev impersonation switches users without a reload).
+        clearCachedResources();
+        applyLogin(data.user, ignorePermission);
         await setMyCurrentLeagueId();
         return true;
       } catch (error) {
-        console.log(error);
+        console.error('Login failed:', error);
         return false;
       }
     }
 
     async function setMyCurrentLeagueId() {
-      if( !user.value ) return;
+      if (!user.value) return;
       const info = await fetchMyCurrentLeagueInfo();
       if (info) {
         user.value.myCurrentLeagueId = info.id;
@@ -59,21 +66,6 @@ export const useUserStore = defineStore(
       } else {
         user.value.myCurrentLeagueId = null;
         user.value.isMyTurn = false;
-      }
-    }
-
-    function loadDataFromLocalStorage(): void {
-      const data = localStorage.getItem('userStore');
-      if (data) {
-        try {
-          const parsedData = JSON.parse(data);
-          user.value = parsedData.user;
-          isAuthenticated.value = parsedData.isAuthenticated;
-          isAdmin.value = parsedData.user?.admin ?? false;
-          storeToken();
-        } catch (e) {
-          console.error('Failed to parse userStore from localStorage', e);
-        }
       }
     }
 
@@ -90,11 +82,19 @@ export const useUserStore = defineStore(
     function applyLogin(userData: TUserDto, ignorePermission: boolean): void {
       isAuthenticated.value = true;
       user.value = userData;
-      isAdmin.value = true;
-      if( !ignorePermission ){
-        isAdmin.value = userData.admin;
-      }
+      // `ignorePermission` is a dev-tools escape hatch: it shows the admin UI
+      // for an impersonated account. The API still enforces the real one.
+      isAdmin.value = ignorePermission ? true : Boolean(userData.admin);
       storeToken();
+    }
+
+    /** Drops all local session state. Does not call the API. */
+    function clearSession(): void {
+      user.value = null;
+      isAuthenticated.value = false;
+      isAdmin.value = false;
+      setAuthToken(null);
+      clearCachedResources();
     }
 
     async function logout(): Promise<void> {
@@ -105,31 +105,47 @@ export const useUserStore = defineStore(
       } catch (err) {
         console.error('An error occurred during logout:', err);
       } finally {
-        // Clear the local user data
-        user.value = null;
-        isAuthenticated.value = false;
-
-        // Remove token from Axios headers
-        setAuthToken(null);
+        clearSession();
       }
     }
 
-    watch(
-      () => [user.value, isAuthenticated.value],
-      () => {
-        localStorage.setItem(
-          'userStore',
-          JSON.stringify({
-            user: user.value,
-            isAuthenticated: isAuthenticated.value,
-          })
-        );
+    // When the API rejects our token, drop the session instead of leaving the
+    // app in a signed-in shell whose every request 401s.
+    setUnauthorizedHandler(() => {
+      if (isAuthenticated.value) clearSession();
+    });
+
+    return {
+      user,
+      listUsers,
+      getAvailableYears,
+      isAuthenticated,
+      isAdmin,
+      isMe,
+      login,
+      logout,
+      clearSession,
+      setMyCurrentLeagueId,
+    };
+  },
+  {
+    // Replaces the hand-rolled `watch` + localStorage pair. Same storage key
+    // and same field names, so sessions saved by the old code still restore
+    // (and `helpers.loadToken` keeps reading them).
+    persist: {
+      paths: ['user', 'isAuthenticated', 'isAdmin'],
+      afterRestore: (ctx) => {
+        const store = ctx.store as unknown as {
+          user: TUserDto | null;
+          isAdmin: boolean;
+        };
+        // Sessions written before `isAdmin` was persisted only carry
+        // `user.admin`; derive it so those users aren't demoted on reload.
+        if (store.user && !store.isAdmin) {
+          store.isAdmin = Boolean(store.user.admin);
+        }
+        if (store.user?.token) setAuthToken(store.user.token);
       },
-      { deep: true }
-    );
-
-    loadDataFromLocalStorage();
-
-    return { user, listUsers, getAvailableYears, isAuthenticated, isAdmin, isMe, login, logout, loadDataFromLocalStorage, setMyCurrentLeagueId };
+    },
   }
 );

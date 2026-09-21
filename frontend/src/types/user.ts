@@ -23,3 +23,61 @@ export type TUserDto = {
   avg_position?: number | null;
   most_participated_league_level?: number | null;
 };
+
+export type TPlayerProfileDto = {
+  id: number;
+  profile_name: string;
+  user?: number | null;
+};
+
+/** Mirrors `UserInviteLinkSerializer`. */
+export type TUserInviteDto = {
+  id: number;
+  key: string;
+  label: string;
+  player_profile?: number | null;
+  player_profile_details?: TPlayerProfileDto | null;
+  created_by?: number | null;
+  created_at: string;
+  expires_at?: string | null;
+  invite_url: string;
+};
+
+/** One game's aggregate row in the player statistics payload. */
+export type TPlayerGameStat = {
+  name: string;
+  winRate: number;
+  avgPos: number;
+  count: number;
+  positions: number[];
+};
+
+/** A game the player picked this year, with the per-year limit applied. */
+export type TPlayerPickedGame = {
+  game_id: number;
+  name: string;
+  platform: string;
+  count: number;
+  limit_exceeded: boolean;
+};
+
+/** Mirrors the payload of `UserViewSet.user_statistics`. */
+export type TUserStatistics = {
+  overall_stats: {
+    total_games: number;
+    wins: number;
+    podiums: number;
+    avg_pos: number;
+    /** Keyed by finishing position. */
+    positions: Record<number, number>;
+  };
+  league_stats: {
+    totalLeagues: number;
+  };
+  game_stats: TPlayerGameStat[];
+  top_games: TPlayerGameStat[];
+  picked_games: TPlayerPickedGame[];
+  /** Comes from the App Configuration (`max_same_game_per_year`). */
+  max_game_limit: number;
+  available_years: number[];
+};

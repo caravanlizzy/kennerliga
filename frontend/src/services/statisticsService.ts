@@ -4,6 +4,7 @@ import {
   TGameStatSummary,
   TPopularGames,
   TStatisticsOverview,
+  TYearLeaderboard,
 } from 'src/types';
 
 export type TStatisticsFilters = {
@@ -114,4 +115,14 @@ export async function fetchGameLeaderboard(
     console.log(e);
     return null;
   }
+}
+
+/** Hall-of-fame style placement tallies for a whole year. */
+export async function fetchYearLeaderboard(
+  year: number
+): Promise<TYearLeaderboard> {
+  const { data } = await api.get<TYearLeaderboard>('leaderboard/', {
+    params: { year },
+  });
+  return data;
 }

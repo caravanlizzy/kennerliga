@@ -116,8 +116,13 @@
 import { onMounted, ref } from 'vue';
 import { useRoute } from 'vue-router';
 import { useQuasar } from 'quasar';
-import { api } from 'boot/axios';
-import { fetchLeagueDetails } from 'src/services/leagueService';
+import {
+  fetchLeagueDetails,
+  setLeagueActivePlayer,
+  setLeagueStatus,
+} from 'src/services/leagueService';
+import { deleteSelectedGame } from 'src/services/gameService';
+import { deleteMatchResults } from 'src/services/resultService';
 import { fetchSeason } from 'src/services/seasonService';
 import ContentSection from 'components/base/ContentSection.vue';
 import KennerSelect from 'components/base/KennerSelect.vue';
@@ -187,10 +192,7 @@ async function onStatusChange(newStatus: string) {
   if (!league.value || !newStatus || newStatus === league.value.status) return;
   updatingStatus.value = true;
   try {
-    const { data } = await api.post(
-      `league/leagues/${league.value.id}/set-status/`,
-      { status: newStatus }
-    );
+    const data = await setLeagueStatus(league.value.id, newStatus);
     league.value.status = data.status;
     $q.notify({ type: 'positive', message: `Status set to ${data.status}` });
   } catch (e) {
@@ -203,10 +205,7 @@ async function onStatusChange(newStatus: string) {
 async function setActivePlayer(profileId: number) {
   if (!league.value) return;
   try {
-    const { data } = await api.post(
-      `league/leagues/${league.value.id}/set-active-player/`,
-      { profile_id: profileId }
-    );
+    const data = await setLeagueActivePlayer(league.value.id, profileId);
     league.value.active_player = data.participant_id;
   } catch (e) {
     $q.notify({ type: 'negative', message: 'Failed to set active player' });
@@ -220,7 +219,7 @@ async function onDeleteSelectedGame(selGame: TSelectedGameDto) {
     'warning',
     async () => {
       try {
-        await api.delete(`game/selected-games/${selGame.id}/`);
+        await deleteSelectedGame(selGame.id);
         await load();
         $q.notify({ type: 'positive', message: 'Selection deleted' });
       } catch (err) {
@@ -239,7 +238,7 @@ async function onDeleteResult(selGame: TSelectedGameDto) {
     'warning',
     async () => {
       try {
-        await api.delete(`result/match-results/${selGame.id}/`);
+        await deleteMatchResults(selGame.id);
         await load();
         $q.notify({ type: 'positive', message: 'Match results deleted' });
       } catch (err) {

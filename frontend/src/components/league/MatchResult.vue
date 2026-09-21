@@ -223,7 +223,12 @@ const results = computed(() => {
   return mapped;
 });
 
-function shouldShowWinCondition(result: any) {
+/** A row as produced by the `rawResults` mapping above. */
+type ResultRow = ReturnType<typeof rawResults.value.at> extends infer R
+  ? NonNullable<R>
+  : never;
+
+function shouldShowWinCondition(result: ResultRow) {
   const name = result.win_condition_name;
   if (!name) return !!result.win_condition_option_name;
   const lowerName = name.toLowerCase().trim();

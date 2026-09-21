@@ -23,11 +23,11 @@
 <script setup lang="ts">
 import KennerTable from 'components/tables/KennerTable.vue';
 import KennerButton from 'components/base/KennerButton.vue';
-import { api } from 'boot/axios';
+import { fetchInvitations } from 'src/services/userService';
 import type { TKennerButton } from 'src/types';
 import { copyToClipboard, useQuasar } from 'quasar';
 
-const { data } = await api('user/invitations/');
+const data = await fetchInvitations();
 
 const createBtn: TKennerButton = {
   color: 'secondary',

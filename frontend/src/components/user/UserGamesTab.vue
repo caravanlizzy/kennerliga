@@ -93,10 +93,11 @@
 
 <script setup lang="ts">
 import UserGameCard from 'components/user/UserGameCard.vue';
+import type { TPlayerGameStat } from 'src/types';
 
 defineProps<{
-  topGames: any[];
-  filteredGameStats: any[];
+  topGames: TPlayerGameStat[];
+  filteredGameStats: TPlayerGameStat[];
   gameSearch: string;
 }>();
 

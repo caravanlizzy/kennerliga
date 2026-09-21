@@ -128,15 +128,21 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import { api } from 'boot/axios';
+import { fetchUser, fetchUserStatistics } from 'src/services/userService';
+import { fetchParticipantsForProfile } from 'src/services/seasonService';
 import UserHero from 'components/user/UserHero.vue';
 import UserPicks from 'components/user/UserPicks.vue';
 import UserPerformance from 'components/user/UserPerformance.vue';
 import UserGamesTab from 'components/user/UserGamesTab.vue';
 import UserSeasonsTab from 'components/user/UserSeasonsTab.vue';
 import KennerButton from 'components/base/KennerButton.vue';
-import LoadingSpinner from 'components/base/LoadingSpinner.vue';
-import { TUserDto, TSeasonParticipantDto, TSeasonDto } from 'src/types';
+import type {
+  TUserDto,
+  TSeasonParticipantDto,
+  TSeasonDto,
+  TPlayerGameStat,
+  TPlayerPickedGame,
+} from 'src/types';
 
 const route = useRoute();
 const router = useRouter();
@@ -158,9 +164,9 @@ const overallStats = ref({
   avg_pos: 0,
   positions: {} as Record<number, number>
 });
-const gameStats = ref<any[]>([]);
-const topGames = ref<any[]>([]);
-const pickedGames = ref<any[]>([]);
+const gameStats = ref<TPlayerGameStat[]>([]);
+const topGames = ref<TPlayerGameStat[]>([]);
+const pickedGames = ref<TPlayerPickedGame[]>([]);
 const maxGameLimit = ref(2);
 const selectedYear = ref(new Date().getFullYear());
 const availableYears = ref<number[]>([new Date().getFullYear()]);
@@ -174,7 +180,7 @@ async function load() {
 
   const username = String(route.params.username || '');
   try {
-    const { data: foundUser } = await api.get<TUserDto>(`user/users/${encodeURIComponent(username)}/`);
+    const foundUser = await fetchUser(username);
 
     if (foundUser) {
       user.value = foundUser;
@@ -205,9 +211,7 @@ async function load() {
 async function fetchStatistics(userId: number) {
   loadingStats.value = true;
   try {
-    const { data } = await api.get(`user/users/${userId}/statistics/`, {
-      params: { year: selectedYear.value }
-    });
+    const data = await fetchUserStatistics(userId, { year: selectedYear.value });
     leagueStats.value = data.league_stats;
     overallStats.value = data.overall_stats;
     gameStats.value = data.game_stats;
@@ -225,14 +229,7 @@ async function fetchStatistics(userId: number) {
 async function fetchSeasonParticipation(profileId: number) {
   loadingSeasons.value = true;
   try {
-    const { data: participantsRes } = await api.get('season/season-participants/', {
-      params: { profile: profileId }
-    });
-    const participants: (TSeasonParticipantDto & { season_details?: TSeasonDto })[] = Array.isArray(participantsRes)
-      ? participantsRes
-      : participantsRes.results || [];
-
-    userSeasonList.value = participants;
+    userSeasonList.value = await fetchParticipantsForProfile(profileId);
   } catch (err) {
     console.error('Failed to load season participation:', err);
   } finally {

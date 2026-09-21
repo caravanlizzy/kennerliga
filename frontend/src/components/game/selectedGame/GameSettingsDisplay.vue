@@ -8,13 +8,13 @@
     >
       <!-- Option Name -->
       <div class="option-name">
-        {{ selected.game_option.name }}
+        {{ selected.game_option?.name }}
       </div>
 
       <!-- Value / Choice -->
       <div class="option-value">
         <!-- mit Choices -->
-        <template v-if="selected.game_option.has_choices">
+        <template v-if="selected.game_option?.has_choices">
           <span class="choice-pill">
             {{ getChoiceLabel(selected) }}
           </span>
@@ -43,35 +43,10 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
-
-interface GameOption {
-  id: number
-  name: string
-  has_choices: boolean
-  // weitere Felder, falls nötig:
-  only_if_value: boolean | null
-  game: number
-  only_if_option: number | null
-  only_if_choice: number | null
-}
-
-interface Choice {
-  id: number
-  // passe das an dein echtes Modell an
-  name?: string
-  label?: string
-  // ...
-}
-
-interface SelectedOption {
-  id: number
-  game_option: GameOption
-  choice: Choice | null
-  value: boolean | null
-}
+import type { TSelectedGameOptionDto } from 'src/types'
 
 const props = defineProps<{
-  selectedOptions: SelectedOption[]
+  selectedOptions: TSelectedGameOptionDto[]
 }>()
 
 const orderedOptions = computed(() => {
@@ -81,13 +56,12 @@ const orderedOptions = computed(() => {
 /**
  * Liefert den anzuzeigenden Text für eine Choice-Option
  */
-const getChoiceLabel = (selected: SelectedOption): string => {
+const getChoiceLabel = (selected: TSelectedGameOptionDto): string => {
   if (!selected.choice) {
     return 'Keine Auswahl'
   }
 
-  // Passen je nach Choice-Modell an:
-  return selected.choice.name ?? selected.choice.label ?? `Choice #${selected.choice.id}`
+  return selected.choice.name ?? `Choice #${selected.choice.id}`
 }
 </script>
 

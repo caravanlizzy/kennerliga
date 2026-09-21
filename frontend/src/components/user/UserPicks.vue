@@ -53,8 +53,10 @@
 </template>
 
 <script setup lang="ts">
+import type { TPlayerPickedGame } from 'src/types';
+
 defineProps<{
-  pickedGames: any[];
+  pickedGames: TPlayerPickedGame[];
   maxGameLimit: number;
   selectedYear: number;
   availableYears: number[];

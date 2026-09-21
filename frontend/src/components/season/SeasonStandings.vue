@@ -59,7 +59,7 @@
               class="row items-center q-gutter-x-sm q-mb-md q-px-sm q-pt-sm"
             >
               <LeagueLevel :level="league.level" />
-              <span class="text-subtitle1 text-weight-bold">{{ league.name }}</span>
+              <span class="text-subtitle1 text-weight-bold">{{ leagueName(league) }}</span>
             </div>
             <LeagueMatchResults
               v-if="mode === 'results'"
@@ -70,7 +70,7 @@
             <div v-else-if="mode === 'picks'" class="q-pa-sm">
               <div class="row items-center q-gutter-x-sm q-mb-md q-px-sm q-pt-sm">
                 <LeagueLevel :level="league.level" />
-                <span class="text-subtitle1 text-weight-bold">{{ league.name }} Picks &amp; Bans</span>
+                <span class="text-subtitle1 text-weight-bold">{{ leagueName(league) }} Picks &amp; Bans</span>
               </div>
               <PlayerCard
                 v-if="getMembersForLeague(league.id).length > 0"
@@ -96,11 +96,12 @@ import LeagueStandingsMatrix from 'components/league/LeagueStandingsMatrix.vue';
 import LeagueLevel from 'components/season/LeagueLevel.vue';
 import PlayerCard from 'components/league/PlayerCard.vue';
 import LoadingSpinner from 'components/base/LoadingSpinner.vue';
-import { api } from 'boot/axios';
 import KennerButton from 'components/base/KennerButton.vue';
 import { useCachedResource } from 'src/composables/cachedResource';
 import { fetchSeasonParticipants } from 'src/services/seasonService';
-import type { TSeasonParticipantDto } from 'src/types';
+import { fetchLeaguesForSeason } from 'src/services/leagueService';
+import { fetchSeasonFullStandings } from 'src/services/standingsService';
+import type { TSeasonLeagueStandings, TSeasonParticipantDto } from 'src/types';
 
 import { useLeagueStore } from 'stores/leagueStore';
 import { useUpdateStore } from 'stores/updateStore';
@@ -112,15 +113,23 @@ const updateStore = useUpdateStore();
 let unsubSeason: (() => void) | null = null;
 let unsubLeague: (() => void) | null = null;
 
-interface League {
+/**
+ * The minimal league identity this component renders sections for.
+ *
+ * `name` is optional on purpose: the batched full-standings endpoint sends
+ * it, but `GET league/leagues` (used by the results/picks modes) does not,
+ * so headings fall back to `leagueName()` below.
+ */
+type LeagueRef = {
   id: number;
-  name: string;
-  level: number;
-}
+  level: number | string;
+  name?: string;
+};
 
 interface SeasonPayload {
-  leagues: League[];
-  standingsMap: Record<number, any>;
+  leagues: LeagueRef[];
+  /** Keyed by league id; empty unless `mode === 'standings'`. */
+  standingsMap: Record<number, TSeasonLeagueStandings>;
 }
 
 const props = withDefaults(defineProps<{
@@ -155,10 +164,15 @@ watch(() => [props.seasonId, props.mode], () => {
   ensureParticipantsLoaded();
 }, { immediate: true });
 
+/** Heading for a league, tolerating payloads that omit `name`. */
+function leagueName(league: LeagueRef): string {
+  return league.name || `L${league.level}`;
+}
+
 function getMembersForLeague(leagueId: number) {
   return participantsList.value.filter((p) => {
     if (typeof p.league === 'object' && p.league !== null) {
-      return (p.league as any).id === leagueId;
+      return p.league.id === leagueId;
     }
     return p.league === leagueId;
   });
@@ -178,23 +192,21 @@ const {
   // cached instead of showing the blocking spinner.
   if (props.mode === 'standings') {
     // Batched: single request returns all leagues + their full standings.
-    const { data } = await api.get(`season/seasons/${seasonId}/full-standings/`);
-    const leaguesPayload: any[] = data?.leagues ?? [];
-    const leaguesOut: League[] = leaguesPayload.map(l => ({
+    const data = await fetchSeasonFullStandings(seasonId);
+    const leaguesPayload = data?.leagues ?? [];
+    const leaguesOut: LeagueRef[] = leaguesPayload.map((l) => ({
       id: l.id,
       name: l.name,
       level: l.level,
     }));
-    const standingsMap: Record<number, any> = {};
-    leaguesPayload.forEach(l => {
+    const standingsMap: Record<number, TSeasonLeagueStandings> = {};
+    leaguesPayload.forEach((l) => {
       standingsMap[l.id] = l;
     });
     return { leagues: leaguesOut, standingsMap };
   }
 
-  const { data: leaguesData } = await api.get<League[]>('league/leagues', {
-    params: { season: seasonId },
-  });
+  const leaguesData = await fetchLeaguesForSeason(seasonId);
 
   if (leaguesData.length > 0 && props.mode === 'results') {
     // In results mode, initialize all league stores in parallel
@@ -207,8 +219,8 @@ const {
   return { leagues: leaguesData, standingsMap: {} };
 }, { cacheKey: `season-standings:${props.mode}` });
 
-const leagues = computed<League[]>(() => payload.value?.leagues ?? []);
-const allStandingsData = computed<Record<number, any>>(
+const leagues = computed<LeagueRef[]>(() => payload.value?.leagues ?? []);
+const allStandingsData = computed<Record<number, TSeasonLeagueStandings>>(
   () => payload.value?.standingsMap ?? {}
 );
 

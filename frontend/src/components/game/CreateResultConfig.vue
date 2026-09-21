@@ -384,10 +384,11 @@ import KennerSelect from 'components/base/KennerSelect.vue';
 import KennerInput from 'components/base/KennerInput.vue';
 import KennerButton from 'components/base/KennerButton.vue';
 import ListCreator from 'components/lists/ListCreator.vue';
-import { api } from 'boot/axios';
+import { fetchStartingPointSystems } from 'src/services/gameService';
 import {
   TFaction,
   TResultConfig,
+  TStartingPointSystemDto,
   TTieBreaker,
   TWinCondition,
   TWinConditionOption,
@@ -475,12 +476,11 @@ const winConditionsUi = ref<UiWinCondition[]>(
 );
 
 const loadingSystems = ref(true);
-const startingPointSystemOptions = ref<any[]>([]);
-const startingPointSystem = ref<any | null>(null);
+const startingPointSystemOptions = ref<TStartingPointSystemDto[]>([]);
+const startingPointSystem = ref<TStartingPointSystemDto | null>(null);
 
 try {
-  const { data } = await api('game/starting-point-systems');
-  startingPointSystemOptions.value = data || [];
+  startingPointSystemOptions.value = await fetchStartingPointSystems();
 
   if (props.initialConfig?.startingPointSystem) {
     startingPointSystem.value =
