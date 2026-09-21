@@ -1,4 +1,5 @@
 import { TSelectedGameDto, TSelectedGameOptionDto } from './game';
+import type { AvatarShape } from './avatar';
 
 export type TLeagueStatus =
   | 'PICKING'
@@ -12,6 +13,8 @@ export type TSeasonParticipantDto = {
   season: number;
   rank: number;
   username: string;
+  avatar_shape?: AvatarShape;
+  avatar_color?: string;
   profile_name: string;
   profile: number; // player_profile id
   selected_games: TSelectedGameDto[] | null;

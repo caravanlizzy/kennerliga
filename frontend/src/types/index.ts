@@ -1,4 +1,5 @@
 export * from './common';
+export * from './avatar';
 export * from './user';
 export * from './season';
 export * from './league';

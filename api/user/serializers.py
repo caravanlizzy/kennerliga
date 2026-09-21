@@ -24,6 +24,8 @@ class UserSerializer(ModelSerializer):
         fields = [
             "id",
             "username",
+            "avatar_shape",
+            "avatar_color",
             "profile_id",
             "total_games",
             "win_rate",

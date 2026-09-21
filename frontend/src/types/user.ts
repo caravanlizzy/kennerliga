@@ -1,3 +1,5 @@
+import type { AvatarShape } from './avatar';
+
 export type TProfileDto = {
   id: number;
   name: string;
@@ -12,6 +14,8 @@ export type TUserDto = {
   is_active: boolean;
   date_joined: string;
   last_login: string | null;
+  avatar_shape?: AvatarShape;
+  avatar_color?: string;
   profile?: TProfileDto;
   profile_id?: number;
   token?: string;

@@ -1,3 +1,5 @@
+import type { AvatarShape } from './avatar';
+
 /**
  * The `full-standings` contract.
  *
@@ -27,6 +29,8 @@ export type TFullStandingsRow = {
   profile_name: string;
   user_id?: number | null;
   username?: string | null;
+  avatar_shape?: AvatarShape;
+  avatar_color?: string;
   total_league_points: string;
   total_wins: string;
   unresolved_tie_group?: string | null;
@@ -41,6 +45,8 @@ export type TTieGroupMember = {
   profile_name: string;
   user_id?: number | null;
   username?: string | null;
+  avatar_shape?: AvatarShape;
+  avatar_color?: string;
   order_index?: number;
 };
 
@@ -102,6 +108,9 @@ export type TSeasonFullStandings = {
 export type TLeagueStandingRow = {
   player_profile: number;
   profile_name: string;
+  username?: string | null;
+  avatar_shape?: AvatarShape;
+  avatar_color?: string;
   wins: number;
   league_points: number;
   unresolved_tie_group?: string | null;

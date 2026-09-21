@@ -56,8 +56,24 @@
     >
       <template #body-cell-profile_name="props">
         <q-td :props="props">
-          <div class="row items-center no-wrap">
-            {{ props.value }}
+          <div class="row items-center no-wrap q-gutter-x-sm">
+            <UserAvatar
+              :display-username="props.row.username || props.value"
+              :subtitle="props.row.username && props.row.profile_name !== props.row.username ? props.row.profile_name : undefined"
+              :size="isMobile ? '24px' : '28px'"
+              :shape="props.row.avatar_shape"
+              :color="props.row.avatar_color"
+            />
+            <div class="column">
+              <span class="text-weight-medium">{{ props.row.username || props.value }}</span>
+              <span
+                v-if="props.row.username && props.row.profile_name !== props.row.username"
+                class="text-caption text-grey-6"
+                style="font-size: 0.7rem; line-height: 1"
+              >
+                {{ props.row.profile_name }}
+              </span>
+            </div>
             <template v-if="props.row.unresolved_tie_group">
               <span class="text-orange q-ml-xs cursor-pointer" style="font-size: 1.1rem; line-height: 1;">
                 *
@@ -221,6 +237,7 @@ import type { TLeagueStandingRow, TTieGroup } from 'src/types';
 import { formatNumbers } from 'src/helpers';
 import { useResponsive } from 'src/composables/responsive';
 import KennerButton from 'components/base/KennerButton.vue';
+import UserAvatar from 'components/ui/UserAvatar.vue';
 
 const props = defineProps<{
   leagueId?: number;
@@ -258,6 +275,9 @@ const fetchStandings = async () => {
       return {
         player_profile: s.player_profile_id,
         profile_name: s.profile_name,
+        username: s.username,
+        avatar_shape: s.avatar_shape,
+        avatar_color: s.avatar_color,
         wins: parseFloat(s.total_wins || '0'),
         league_points: parseFloat(s.total_league_points || '0'),
         unresolved_tie_group: s.unresolved_tie_group,

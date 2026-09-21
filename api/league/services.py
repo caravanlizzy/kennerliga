@@ -153,14 +153,15 @@ def build_full_standings_payload(
                     "display_value": None,
                 }
 
+        user = member.profile.user if hasattr(member.profile, "user") else None
         standings_list.append(
             {
                 "player_profile_id": pid,
                 "profile_name": member.profile.profile_name,
-                "user_id": member.profile.user.id if member.profile.user else None,
-                "username": member.profile.user.username
-                if member.profile.user
-                else None,
+                "user_id": user.id if user else None,
+                "username": user.username if user else None,
+                "avatar_shape": getattr(user, "avatar_shape", "squircle") if user else "squircle",
+                "avatar_color": getattr(user, "avatar_color", "") if user else "",
                 "total_league_points": str(ls.league_points) if ls else "0",
                 "total_wins": str(ls.wins) if ls else "0",
                 "unresolved_tie_group": ls.unresolved_tie_group if ls else None,
@@ -196,16 +197,15 @@ def build_full_standings_payload(
                 "wins": str(ls.wins),
                 "resolution": None,
             }
+        user = ls.player_profile.user if hasattr(ls.player_profile, "user") else None
         unresolved_map[key]["members"].append(
             {
                 "player_profile_id": ls.player_profile_id,
                 "profile_name": ls.player_profile.profile_name,
-                "user_id": ls.player_profile.user.id
-                if ls.player_profile.user
-                else None,
-                "username": ls.player_profile.user.username
-                if ls.player_profile.user
-                else None,
+                "user_id": user.id if user else None,
+                "username": user.username if user else None,
+                "avatar_shape": getattr(user, "avatar_shape", "squircle") if user else "squircle",
+                "avatar_color": getattr(user, "avatar_color", "") if user else "",
             }
         )
 
@@ -214,18 +214,20 @@ def build_full_standings_payload(
     for res in tie_resolutions:
         # Members ordered by order_index for display
         ordered_entries = sorted(res.entries.all(), key=lambda e: e.order_index)
-        members = [
-            {
-                "player_profile_id": e.player_profile_id,
-                "profile_name": e.player_profile.profile_name,
-                "user_id": e.player_profile.user.id if e.player_profile.user else None,
-                "username": e.player_profile.user.username
-                if e.player_profile.user
-                else None,
-                "order_index": e.order_index,
-            }
-            for e in ordered_entries
-        ]
+        members = []
+        for e in ordered_entries:
+            user = e.player_profile.user if hasattr(e.player_profile, "user") else None
+            members.append(
+                {
+                    "player_profile_id": e.player_profile_id,
+                    "profile_name": e.player_profile.profile_name,
+                    "user_id": user.id if user else None,
+                    "username": user.username if user else None,
+                    "avatar_shape": getattr(user, "avatar_shape", "squircle") if user else "squircle",
+                    "avatar_color": getattr(user, "avatar_color", "") if user else "",
+                    "order_index": e.order_index,
+                }
+            )
 
         resolution_map[res.group_key] = {
             "group_key": res.group_key,

@@ -1,5 +1,6 @@
 import { api } from 'boot/axios';
 import {
+  AvatarShape,
   TPlayerProfileDto,
   TUserDto,
   TUserInviteDto,
@@ -85,5 +86,21 @@ export async function registerUser(payload: {
   invite_key: string;
 }): Promise<{ detail: string }> {
   const { data } = await api.post<{ detail: string }>('/user/register/', payload);
+  return data;
+}
+
+/** Updates the authenticated user's avatar shape. */
+export async function updateAvatarShape(shape: AvatarShape): Promise<TUserDto> {
+  const { data } = await api.patch<TUserDto>('/user/users/avatar-shape/', {
+    avatar_shape: shape,
+  });
+  return data;
+}
+
+/** Updates the authenticated user's avatar color (hex code or empty string for auto). */
+export async function updateAvatarColor(color: string): Promise<TUserDto> {
+  const { data } = await api.patch<TUserDto>('/user/users/avatar-color/', {
+    avatar_color: color,
+  });
   return data;
 }

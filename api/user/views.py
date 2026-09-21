@@ -25,6 +25,7 @@ from user.models import (
     PlayerProfile,
     UserInviteLink,
     Feedback,
+    AVATAR_SHAPE_CHOICES,
 )
 from user.serializers import (
     UserSerializer,
@@ -58,6 +59,8 @@ class UserViewSet(ModelViewSet):
             "user_results",
             "user_statistics",
             "available_years",
+            "update_avatar_shape",
+            "update_avatar_color",
         ]:
             permission_classes = [IsAuthenticated]
         else:
@@ -116,6 +119,50 @@ class UserViewSet(ModelViewSet):
         results = Result.objects.filter(player_profile=user.profile)
         serializer = ResultSerializer(results, many=True)
         return Response(serializer.data)
+
+    @action(detail=False, methods=["patch", "put"], url_path="avatar-shape")
+    def update_avatar_shape(self, request):
+        """
+        PATCH/PUT /user/users/avatar-shape/
+        Updates the authenticated user's avatar shape.
+        """
+        shape = request.data.get("avatar_shape") or request.data.get("shape")
+        valid_shapes = [c[0] for c in AVATAR_SHAPE_CHOICES]
+        if not shape or shape not in valid_shapes:
+            return Response(
+                {"detail": f"Invalid shape '{shape}'. Valid shapes are: {', '.join(valid_shapes)}."},
+                status=400,
+            )
+        user = request.user
+        user.avatar_shape = shape
+        user.save(update_fields=["avatar_shape"])
+        return Response(UserSerializer(user, context={"request": request}).data)
+
+    @action(detail=False, methods=["patch", "put"], url_path="avatar-color")
+    def update_avatar_color(self, request):
+        """
+        PATCH/PUT /user/users/avatar-color/
+        Updates the authenticated user's avatar color (hex or empty string for auto).
+        """
+        import re
+        color = request.data.get("avatar_color")
+        if color is None and "color" in request.data:
+            color = request.data.get("color")
+        color = str(color).strip() if color is not None else ""
+
+        if color and color != "auto":
+            if not re.match(r"^#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})$", color):
+                return Response(
+                    {"detail": "Invalid color format. Please provide a valid hex color (e.g. #2563eb) or empty string for auto."},
+                    status=400,
+                )
+        if color == "auto":
+            color = ""
+
+        user = request.user
+        user.avatar_color = color
+        user.save(update_fields=["avatar_color"])
+        return Response(UserSerializer(user, context={"request": request}).data)
 
     @action(detail=False, methods=["get"], url_path="available-years")
     def available_years(self, request):

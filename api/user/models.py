@@ -9,6 +9,20 @@ from django.utils import timezone
 from dateutil.relativedelta import relativedelta
 
 
+AVATAR_SHAPE_CHOICES = [
+    ("squircle", "Squircle"),
+    ("circle", "Circle"),
+    ("heart", "Heart"),
+    ("star", "Star"),
+    ("diamond", "Diamond"),
+    ("hexagon", "Hexagon"),
+    ("shield", "Shield"),
+    ("clover", "Clover"),
+    ("octagon", "Octagon"),
+    ("badge", "Badge"),
+]
+
+
 class User(AbstractUser):
     """
     Custom User model for authentication, using username as the primary identifier.
@@ -30,6 +44,20 @@ class User(AbstractUser):
         error_messages={
             "unique": "A user with that username already exists.",
         },
+    )
+
+    avatar_shape = models.CharField(
+        max_length=32,
+        choices=AVATAR_SHAPE_CHOICES,
+        default="squircle",
+        help_text="User avatar shape",
+    )
+
+    avatar_color = models.CharField(
+        max_length=32,
+        blank=True,
+        default="",
+        help_text="User avatar color hex or preset",
     )
 
     USERNAME_FIELD = "username"

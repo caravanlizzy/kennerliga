@@ -366,14 +366,19 @@ def get_user_information(user):
     Returns a dictionary containing basic user information and their token.
     """
     token = get_token(user)
-    user = {
+    user_dict = {
+        "id": user.id,
         "username": user.username,
         "admin": user.is_superuser,
+        "avatar_shape": getattr(user, "avatar_shape", "squircle"),
+        "avatar_color": getattr(user, "avatar_color", ""),
         "token": token,
         # "platform_players": get_platform_players(user),
-        "profile": {"id": user.profile.id, "name": user.profile.profile_name},
+        "profile": {"id": user.profile.id, "name": user.profile.profile_name}
+        if hasattr(user, "profile") and user.profile
+        else None,
     }
-    return user
+    return user_dict
 
 
 def get_platform_players(user):

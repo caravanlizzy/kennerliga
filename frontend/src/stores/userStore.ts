@@ -6,9 +6,11 @@ import { fetchMyCurrentLeagueInfo } from 'src/services/leagueService';
 import {
   fetchAvailableYears,
   fetchUsers,
+  updateAvatarColor,
+  updateAvatarShape,
   type UserListParams,
 } from 'src/services/userService';
-import { TUserDto } from 'src/types';
+import { AvatarShape, TUserDto } from 'src/types';
 
 export const useUserStore = defineStore(
   'userStore',
@@ -109,6 +111,32 @@ export const useUserStore = defineStore(
       }
     }
 
+    async function changeAvatarShape(shape: AvatarShape): Promise<boolean> {
+      try {
+        const updated = await updateAvatarShape(shape);
+        if (user.value) {
+          user.value.avatar_shape = updated.avatar_shape || shape;
+        }
+        return true;
+      } catch (err) {
+        console.error('Failed to update avatar shape:', err);
+        return false;
+      }
+    }
+
+    async function changeAvatarColor(color: string): Promise<boolean> {
+      try {
+        const updated = await updateAvatarColor(color);
+        if (user.value) {
+          user.value.avatar_color = updated.avatar_color ?? color;
+        }
+        return true;
+      } catch (err) {
+        console.error('Failed to update avatar color:', err);
+        return false;
+      }
+    }
+
     // When the API rejects our token, drop the session instead of leaving the
     // app in a signed-in shell whose every request 401s.
     setUnauthorizedHandler(() => {
@@ -126,6 +154,8 @@ export const useUserStore = defineStore(
       logout,
       clearSession,
       setMyCurrentLeagueId,
+      changeAvatarShape,
+      changeAvatarColor,
     };
   },
   {

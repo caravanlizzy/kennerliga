@@ -560,3 +560,49 @@ class UserAPITests(TestCase):
         self.assertEqual(user_row["win_rate"], 66.7)
         self.assertEqual(user_row["avg_position"], 1.33)
         self.assertEqual(user_row["most_participated_league_level"], 1)
+
+    def test_avatar_shape_default_and_update(self):
+        # Default shape should be squircle
+        self.assertEqual(self.user.avatar_shape, "squircle")
+        res = self.client.get(f"/api/user/users/{self.user.id}/")
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(res.data.get("avatar_shape"), "squircle")
+
+        # Update shape to star
+        update_res = self.client.patch("/api/user/users/avatar-shape/", {"avatar_shape": "star"})
+        self.assertEqual(update_res.status_code, 200)
+        self.assertEqual(update_res.data.get("avatar_shape"), "star")
+
+        self.user.refresh_from_db()
+        self.assertEqual(self.user.avatar_shape, "star")
+
+        # Invalid shape should return 400
+        invalid_res = self.client.patch("/api/user/users/avatar-shape/", {"avatar_shape": "non_existent"})
+        self.assertEqual(invalid_res.status_code, 400)
+
+    def test_avatar_color_default_and_update(self):
+        # Default color should be empty string (auto)
+        self.assertEqual(self.user.avatar_color, "")
+        res = self.client.get(f"/api/user/users/{self.user.id}/")
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(res.data.get("avatar_color"), "")
+
+        # Update color to valid hex
+        update_res = self.client.patch("/api/user/users/avatar-color/", {"avatar_color": "#2563eb"})
+        self.assertEqual(update_res.status_code, 200)
+        self.assertEqual(update_res.data.get("avatar_color"), "#2563eb")
+
+        self.user.refresh_from_db()
+        self.assertEqual(self.user.avatar_color, "#2563eb")
+
+        # Reset to auto by passing empty string
+        reset_res = self.client.patch("/api/user/users/avatar-color/", {"avatar_color": ""})
+        self.assertEqual(reset_res.status_code, 200)
+        self.assertEqual(reset_res.data.get("avatar_color"), "")
+
+        self.user.refresh_from_db()
+        self.assertEqual(self.user.avatar_color, "")
+
+        # Invalid hex color should return 400
+        invalid_res = self.client.patch("/api/user/users/avatar-color/", {"avatar_color": "not-a-color"})
+        self.assertEqual(invalid_res.status_code, 400)

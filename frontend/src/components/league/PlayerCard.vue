@@ -6,6 +6,8 @@
         <UserAvatar
           :display-username="m.username"
           :subtitle="m.profile_name !== m.username ? m.profile_name : undefined"
+          :shape="m.avatar_shape"
+          :color="m.avatar_color"
           size="40px"
         />
         <div class="header-content q-ml-md">

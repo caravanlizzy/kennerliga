@@ -81,15 +81,25 @@ class SeasonParticipantMiniSerializer(ModelSerializer):
     """
     profile_name = CharField(source="profile.profile_name", read_only=True)
     username = SerializerMethodField()
+    avatar_shape = SerializerMethodField()
+    avatar_color = SerializerMethodField()
 
     class Meta:
         model = SeasonParticipant
-        fields = ("id", "profile_name", "username")
-        read_only_fields = ("id", "profile_name", "username")
+        fields = ("id", "profile_name", "username", "avatar_shape", "avatar_color")
+        read_only_fields = ("id", "profile_name", "username", "avatar_shape", "avatar_color")
 
     def get_username(self, obj):
         user = getattr(obj.profile, "user", None)
         return getattr(user, "username", None)
+
+    def get_avatar_shape(self, obj):
+        user = getattr(obj.profile, "user", None)
+        return getattr(user, "avatar_shape", "squircle") if user else "squircle"
+
+    def get_avatar_color(self, obj):
+        user = getattr(obj.profile, "user", None)
+        return getattr(user, "avatar_color", "") if user else ""
 
 
 class SeasonParticipantSerializer(ModelSerializer):
@@ -98,6 +108,8 @@ class SeasonParticipantSerializer(ModelSerializer):
     Enriches participant data with selected games, bans, league info, and rankings.
     """
     username = CharField(source="profile.user.username", read_only=True)
+    avatar_shape = SerializerMethodField()
+    avatar_color = SerializerMethodField()
     profile_name = CharField(source="profile.profile_name", read_only=True)
     season_details = SeasonSerializer(source="season", read_only=True)
     profile = serializers.PrimaryKeyRelatedField(
@@ -127,6 +139,8 @@ class SeasonParticipantSerializer(ModelSerializer):
             "profile",
             "rank",  # write
             "username",
+            "avatar_shape",
+            "avatar_color",
             "profile_name",
             "season_details",
             "selected_games",  # read
@@ -138,6 +152,14 @@ class SeasonParticipantSerializer(ModelSerializer):
             "league_position_display",
             "league",
         ]
+
+    def get_avatar_shape(self, obj):
+        user = getattr(obj.profile, "user", None)
+        return getattr(user, "avatar_shape", "squircle") if user else "squircle"
+
+    def get_avatar_color(self, obj):
+        user = getattr(obj.profile, "user", None)
+        return getattr(user, "avatar_color", "") if user else ""
 
     # ---- context / prefetch helpers ----------------------------------------
     def _league(self):

@@ -149,15 +149,14 @@
             <div class="row items-center no-wrap">
               <template v-if="props.row.username">
                 <div class="row items-center no-wrap q-gutter-x-sm">
-                  <div v-if="isMobile">
-                    <UserAvatar
-                      :display-username="props.row.username"
-                      :subtitle="props.row.profile_name && props.row.profile_name !== props.row.username ? props.row.profile_name : undefined"
-                      size="26px"
-                      shape="squircle"
-                    />
-                  </div>
-                  <div v-else class="column">
+                  <UserAvatar
+                    :display-username="props.row.username"
+                    :subtitle="props.row.profile_name && props.row.profile_name !== props.row.username ? props.row.profile_name : undefined"
+                    :size="isMobile ? '26px' : '28px'"
+                    :shape="props.row.avatar_shape"
+                    :color="props.row.avatar_color"
+                  />
+                  <div v-if="!isMobile" class="column">
                     <span
                       class="text-subtitle2 text-weight-bold cursor-pointer username-link"
                       @click="goToPlayer(props.row.username)"
@@ -175,16 +174,15 @@
                 </div>
               </template>
               <template v-else>
-                <template v-if="isMobile">
+                <div class="row items-center no-wrap q-gutter-x-sm">
                   <UserAvatar
                     :display-username="props.value"
-                    size="26px"
-                    shape="squircle"
+                    :size="isMobile ? '26px' : '28px'"
+                    :shape="props.row.avatar_shape"
+                    :color="props.row.avatar_color"
                   />
-                </template>
-                <template v-else>
-                  <span class="text-weight-bold">{{ props.value }}</span>
-                </template>
+                  <span v-if="!isMobile" class="text-weight-bold">{{ props.value }}</span>
+                </div>
               </template>
 
               <!-- League Leader Celebration (First Row - only when season is completed) -->
@@ -502,6 +500,8 @@ const tableRows = computed(() => {
       player_profile_id: standing.player_profile_id,
       profile_name: standing.profile_name,
       username: standing.username,
+      avatar_shape: standing.avatar_shape,
+      avatar_color: standing.avatar_color,
       total: standing.total_league_points,
       unresolved_tie_group: standing.unresolved_tie_group,
       resolved_tie_reason: (() => {

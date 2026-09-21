@@ -10,7 +10,7 @@
       },
     ]"
     :style="avatarStyle"
-    :square="shape === 'rounded' || shape === 'squircle'"
+    :square="resolvedShape !== 'circle'"
     :role="canNavigate ? 'link' : 'img'"
     :tabindex="canNavigate ? 0 : undefined"
     :aria-label="
@@ -50,6 +50,7 @@
 import { computed } from 'vue';
 import { useRouter } from 'vue-router';
 import KennerTooltip from 'components/base/KennerTooltip.vue';
+import { type AvatarShape, getContrastTextColor } from 'src/types/avatar';
 
 const router = useRouter();
 
@@ -60,13 +61,15 @@ const props = withDefaults(
     subtitle?: string;
     size?: string;
     maxLetters?: 1 | 2;
-    shape?: 'circle' | 'rounded' | 'squircle';
+    shape?: AvatarShape | 'rounded' | string;
+    color?: string;
     border?: boolean;
   }>(),
   {
     size: '32px',
     maxLetters: 2,
     shape: 'squircle',
+    color: '',
     border: false,
   }
 );
@@ -145,12 +148,28 @@ function hash(value: string) {
   return result >>> 0;
 }
 
-const avatarColor = computed(
-  () =>
-    AVATAR_COLORS[
-      hash(clean.value.toLocaleLowerCase() || 'user') % AVATAR_COLORS.length
-    ]
-);
+const avatarColor = computed<AvatarColor>(() => {
+  if (props.color && props.color.trim()) {
+    const rawColor = props.color.trim();
+    const matched = AVATAR_COLORS.find(
+      (c) => c.background.toLowerCase() === rawColor.toLowerCase()
+    );
+    if (matched) return matched;
+
+    if (rawColor.startsWith('#')) {
+      const fg = getContrastTextColor(rawColor);
+      return {
+        background: rawColor,
+        hover: rawColor,
+        foreground: fg,
+      };
+    }
+  }
+
+  return AVATAR_COLORS[
+    hash(clean.value.toLocaleLowerCase() || 'user') % AVATAR_COLORS.length
+  ];
+});
 
 const avatarStyle = computed(() => {
   const color = avatarColor.value;
@@ -163,25 +182,26 @@ const avatarStyle = computed(() => {
   } as Record<string, string>;
 });
 
+/* shape */
+const resolvedShape = computed<AvatarShape>(() => {
+  const shapeProp = props.shape;
+  if (!shapeProp || shapeProp === 'rounded') return 'squircle';
+  return shapeProp as AvatarShape;
+});
+
+const shapeClass = computed(() => `shape-${resolvedShape.value}`);
+
 const textStyle = computed(() => {
-  // Simple heuristic for font-size based on avatar size
   const numericSize = parseFloat(props.size || '32');
-  const fontSize = numericSize * 0.42;
+  let factor = 0.42;
+  const s = resolvedShape.value;
+  if (s === 'star' || s === 'diamond' || s === 'heart' || s === 'shield' || s === 'clover' || s === 'badge') {
+    factor = 0.35;
+  }
+  const fontSize = numericSize * factor;
   return {
     fontSize: `${fontSize}px`,
   };
-});
-
-/* shape */
-const shapeClass = computed(() => {
-  switch (props.shape) {
-    case 'circle':
-      return ''; // q-avatar is circular by default
-    case 'squircle':
-      return 'squircle-shape';
-    default:
-      return 'rounded-borders';
-  }
 });
 </script>
 
@@ -196,7 +216,7 @@ const shapeClass = computed(() => {
   color: var(--avatar-text-color);
   background-color: var(--avatar-bg-color);
   box-shadow: none;
-  transition: background-color 0.15s ease, border-color 0.15s ease;
+  transition: background-color 0.15s ease, border-color 0.15s ease, transform 0.15s ease;
 }
 
 .user-avatar--bordered {
@@ -233,8 +253,52 @@ const shapeClass = computed(() => {
   opacity: 1;
 }
 
-/* squircle magic: proportional border radius */
-.squircle-shape {
-  border-radius: var(--kenner-card-radius, 0px) !important;
+/* Shape definitions */
+.shape-circle {
+  border-radius: 50% !important;
+}
+
+.shape-squircle {
+  border-radius: var(--kenner-card-radius, 8px) !important;
+}
+
+.shape-heart {
+  clip-path: url(#avatar-clip-heart);
+}
+
+.shape-heart .avatar-inner {
+  padding-bottom: 8%;
+}
+
+.shape-star {
+  clip-path: url(#avatar-clip-star);
+}
+
+.shape-diamond {
+  clip-path: url(#avatar-clip-diamond);
+}
+
+.shape-hexagon {
+  clip-path: url(#avatar-clip-hexagon);
+}
+
+.shape-shield {
+  clip-path: url(#avatar-clip-shield);
+}
+
+.shape-shield .avatar-inner {
+  padding-bottom: 6%;
+}
+
+.shape-clover {
+  clip-path: url(#avatar-clip-clover);
+}
+
+.shape-octagon {
+  clip-path: url(#avatar-clip-octagon);
+}
+
+.shape-badge {
+  clip-path: url(#avatar-clip-badge);
 }
 </style>

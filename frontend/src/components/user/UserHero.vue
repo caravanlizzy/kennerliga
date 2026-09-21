@@ -3,12 +3,24 @@
     <div class="max-width-container q-mx-auto">
       <div class="hero-content row items-center q-col-gutter-md relative-position z-index-1">
         <div class="col-12 col-md-auto flex justify-center">
-          <div class="avatar-wrapper shadow-24 rounded-borders bg-white q-pa-xs">
+          <div
+            class="avatar-wrapper shadow-24 rounded-borders bg-white q-pa-xs relative-position"
+            :class="{ 'cursor-pointer avatar-wrapper--editable': isMe }"
+            @click="isMe ? (showShapeModal = true) : undefined"
+          >
             <UserAvatar
               :display-username="user.username"
               size="100px"
-              shape="rounded"
+              :shape="effectiveAvatarShape"
+              :color="effectiveAvatarColor"
             />
+            <div
+              v-if="isMe"
+              class="edit-shape-badge flex flex-center shadow-3"
+            >
+              <q-icon name="edit" size="14px" color="dark" />
+              <KennerTooltip>Customize Avatar</KennerTooltip>
+            </div>
           </div>
         </div>
         <div class="col-12 col-md column items-center items-md-start">
@@ -42,19 +54,80 @@
     <!-- Decorative background elements -->
     <div class="hero-bg-overlay absolute-full" />
     <q-icon name="sports_esports" class="hero-watermark absolute-bottom-right text-white" size="300px" />
+
+    <!-- Avatar Style Picker Modal -->
+    <AvatarShapePickerModal
+      v-if="isMe"
+      v-model="showShapeModal"
+      :username="user.username"
+      :current-shape="effectiveAvatarShape"
+      :current-color="effectiveAvatarColor"
+      @shape-updated="onShapeUpdated"
+      @color-updated="onColorUpdated"
+      @updated="onAvatarUpdated"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
+import { ref, computed } from 'vue';
 import UserAvatar from 'components/ui/UserAvatar.vue';
-import { TUserDto } from 'src/types';
+import AvatarShapePickerModal from 'components/user/AvatarShapePickerModal.vue';
+import KennerTooltip from 'components/base/KennerTooltip.vue';
+import { useUserStore } from 'stores/userStore';
+import { AvatarShape, TUserDto } from 'src/types';
 
-defineProps<{
+const props = defineProps<{
   user: TUserDto;
   leagueStats: { totalLeagues: number };
   gameStatsCount: number;
   loading?: boolean;
 }>();
+
+const emit = defineEmits<{
+  (e: 'update:avatar-shape', shape: AvatarShape): void;
+  (e: 'update:avatar-color', color: string): void;
+}>();
+
+const userStore = useUserStore();
+const showShapeModal = ref(false);
+const localShape = ref<AvatarShape | null>(null);
+const localColor = ref<string | null>(null);
+
+const isMe = computed(() => userStore.isMe(props.user.username));
+
+const effectiveAvatarShape = computed<AvatarShape>(() => {
+  if (localShape.value) return localShape.value;
+  if (isMe.value && userStore.user?.avatar_shape) {
+    return userStore.user.avatar_shape as AvatarShape;
+  }
+  return (props.user.avatar_shape as AvatarShape) || 'squircle';
+});
+
+const effectiveAvatarColor = computed<string>(() => {
+  if (localColor.value !== null) return localColor.value;
+  if (isMe.value && userStore.user?.avatar_color !== undefined) {
+    return userStore.user.avatar_color || '';
+  }
+  return props.user.avatar_color || '';
+});
+
+function onShapeUpdated(newShape: AvatarShape) {
+  localShape.value = newShape;
+  emit('update:avatar-shape', newShape);
+}
+
+function onColorUpdated(newColor: string) {
+  localColor.value = newColor;
+  emit('update:avatar-color', newColor);
+}
+
+function onAvatarUpdated(payload: { shape: AvatarShape; color: string }) {
+  localShape.value = payload.shape;
+  localColor.value = payload.color;
+  emit('update:avatar-shape', payload.shape);
+  emit('update:avatar-color', payload.color);
+}
 </script>
 
 <style scoped lang="scss">
@@ -85,9 +158,31 @@ defineProps<{
 
 .avatar-wrapper {
   border-radius: 24px;
-  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  transition: box-shadow 0.3s ease;
+
   &:hover {
     box-shadow: 0 12px 30px rgba(0,0,0,0.3);
+  }
+
+  &--editable:hover .edit-shape-badge {
+    transform: scale(1.2);
+  }
+}
+
+.edit-shape-badge {
+  position: absolute;
+  bottom: 2px;
+  right: 2px;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: #ffffff;
+  border: 2px solid var(--q-primary);
+  z-index: 3;
+  transition: transform 0.2s ease;
+
+  &:hover {
+    transform: scale(1.2);
   }
 }
 

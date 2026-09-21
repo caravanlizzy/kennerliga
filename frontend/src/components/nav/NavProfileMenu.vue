@@ -3,6 +3,8 @@
     <UserAvatar
       v-if="isAuthenticated"
       :display-username="user?.username || ''"
+      :shape="user?.avatar_shape"
+      :color="user?.avatar_color"
       size="36px"
     />
 
