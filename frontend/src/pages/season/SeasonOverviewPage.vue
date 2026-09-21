@@ -55,12 +55,12 @@
     </div>
 
     <!-- Main Content -->
-    <div v-else-if="!error && season" class="overview-content column q-gutter-y-lg">
+    <div v-else-if="!error && season" class="overview-content column q-gutter-y-md">
       <!-- Season KPI Summary Banner -->
       <div class="kpi-grid">
         <div class="kpi-card">
           <div class="kpi-icon-wrapper bg-primary-1 text-primary">
-            <q-icon name="military_tech" size="24px" />
+            <q-icon name="military_tech" size="18px" />
           </div>
           <div class="kpi-info">
             <div class="kpi-value text-primary">{{ sortedLeagues.length }}</div>
@@ -70,7 +70,7 @@
 
         <div class="kpi-card">
           <div class="kpi-icon-wrapper bg-teal-1 text-teal-8">
-            <q-icon name="groups" size="24px" />
+            <q-icon name="groups" size="18px" />
           </div>
           <div class="kpi-info">
             <div class="kpi-value text-teal-8">{{ participants.length }}</div>
@@ -80,7 +80,7 @@
 
         <div class="kpi-card">
           <div class="kpi-icon-wrapper bg-amber-1 text-amber-9">
-            <q-icon name="casino" size="24px" />
+            <q-icon name="casino" size="18px" />
           </div>
           <div class="kpi-info">
             <div class="kpi-value text-amber-9">{{ totalPicks }}</div>
@@ -90,7 +90,7 @@
 
         <div class="kpi-card">
           <div class="kpi-icon-wrapper bg-indigo-1 text-indigo-7">
-            <q-icon name="sports_esports" size="24px" />
+            <q-icon name="sports_esports" size="18px" />
           </div>
           <div class="kpi-info">
             <div class="kpi-value text-indigo-7">{{ totalSelectedGames }}</div>
@@ -293,7 +293,7 @@
       </div>
 
       <!-- VIEW B: ALL LEAGUES (OVERVIEW) -->
-      <div v-else class="all-leagues-view column q-gutter-y-lg">
+      <div v-else class="all-leagues-view column q-gutter-y-md">
         <!-- View Toggle for All Leagues -->
         <div class="row items-center justify-between q-px-xs">
           <div class="text-overline text-grey-7 text-weight-bold">
@@ -326,72 +326,113 @@
             class="league-overview-card"
             :class="{ 'league-overview-card--user': isUserInLeague(league.id) }"
           >
-            <div class="league-card-header row items-center justify-between q-pb-sm">
-              <div class="row items-center q-gutter-x-sm">
-                <LeagueLevel :level="league.level" />
-                <span class="text-subtitle1 text-weight-bold text-dark">
+            <!-- Card Header -->
+            <div class="row items-center justify-between no-wrap q-gutter-x-sm">
+              <div class="row items-center q-gutter-x-xs no-wrap ellipsis">
+                <LeagueLevel :level="league.level" badge />
+                <span class="text-subtitle1 text-weight-bold text-dark ellipsis">
                   {{ leagueDisplayName(league) }}
                 </span>
-              </div>
-              <q-badge
-                v-if="league.status"
-                :color="leagueStatusColor(league.status)"
-                class="text-weight-bold text-caption text-uppercase"
-                rounded
-              >
-                {{ league.status }}
-              </q-badge>
-            </div>
-
-            <!-- Members Preview -->
-            <div class="q-py-sm">
-              <div class="text-caption text-grey-6 q-mb-xs">
-                Participants ({{ getMembersForLeague(league.id).length }})
-              </div>
-              <div class="row items-center q-gutter-xs">
-                <UserAvatar
-                  v-for="m in getMembersForLeague(league.id)"
-                  :key="m.id"
-                  :display-username="m.username"
-                  :subtitle="m.profile_name"
-                  :shape="m.avatar_shape"
-                  :color="m.avatar_color"
-                  size="28px"
-                />
-              </div>
-            </div>
-
-            <!-- Standings Preview (Top Players) -->
-            <div v-if="standingsMap[league.id]?.standings?.length" class="q-py-xs">
-              <div class="text-caption text-grey-6 q-mb-xs">Top Standings</div>
-              <div class="column q-gutter-y-xs">
-                <div
-                  v-for="(row, idx) in standingsMap[league.id].standings.slice(0, 3)"
-                  :key="row.player_profile_id"
-                  class="row items-center justify-between text-caption bg-grey-1 rounded-borders q-px-sm q-py-xs"
+                <q-badge
+                  v-if="isUserInLeague(league.id)"
+                  color="primary"
+                  class="text-weight-bold text-caption q-px-xs"
+                  rounded
                 >
-                  <div class="row items-center q-gutter-x-xs no-wrap ellipsis">
-                    <span class="text-weight-bold text-grey-8">{{ idx + 1 }}.</span>
-                    <span class="ellipsis">{{ row.profile_name || row.username }}</span>
-                  </div>
-                  <div class="row items-center q-gutter-x-xs no-wrap text-weight-bold text-primary">
-                    <span>{{ row.total_league_points }} pts</span>
-                  </div>
+                  You
+                </q-badge>
+                <q-badge
+                  v-if="league.status"
+                  :color="leagueStatusColor(league.status)"
+                  class="text-weight-bold text-caption text-uppercase q-px-xs"
+                  rounded
+                >
+                  {{ league.status }}
+                </q-badge>
+              </div>
+              <KennerButton
+                outline
+                dense
+                no-caps
+                size="sm"
+                color="primary"
+                icon-right="arrow_forward"
+                label="View"
+                @click="selectLeague(league.id)"
+              />
+            </div>
+
+            <!-- League Meta / Stats summary -->
+            <div class="row items-center q-gutter-x-md text-caption text-grey-7 q-py-xs">
+              <div class="row items-center q-gutter-x-xs">
+                <q-icon name="groups" size="16px" color="grey-6" />
+                <span>{{ getMembersForLeague(league.id).length }} players</span>
+              </div>
+              <div class="row items-center q-gutter-x-xs">
+                <q-icon name="casino" size="16px" color="grey-6" />
+                <span>{{ getLeaguePicksCount(league.id) }} picks</span>
+              </div>
+            </div>
+
+            <!-- Standings Table (Complete list of participants in this league) -->
+            <div v-if="standingsMap[league.id]?.standings?.length" class="column q-gutter-y-xs">
+              <div
+                v-for="(row, idx) in standingsMap[league.id].standings"
+                :key="row.player_profile_id"
+                class="standings-mini-row row items-center justify-between q-py-xs q-px-sm rounded-borders"
+                :class="{
+                  'standings-mini-row--leader': idx === 0,
+                  'standings-mini-row--user': isCurrentUser(row.player_profile_id, row.username)
+                }"
+              >
+                <div class="row items-center q-gutter-x-xs no-wrap ellipsis">
+                  <span
+                    class="rank-badge text-caption text-weight-bold"
+                    :class="idx === 0 ? 'text-amber-9' : 'text-grey-7'"
+                  >
+                    {{ idx + 1 }}.
+                  </span>
+                  <UserAvatar
+                    :display-username="row.username"
+                    :subtitle="row.profile_name"
+                    :shape="getMemberShape(league.id, row.player_profile_id, row.username)"
+                    :color="getMemberColor(league.id, row.player_profile_id, row.username)"
+                    size="22px"
+                  />
+                  <span class="ellipsis text-caption text-weight-medium">
+                    {{ row.profile_name || row.username }}
+                  </span>
+                </div>
+                <div
+                  class="text-caption text-weight-bold"
+                  :class="idx === 0 ? 'text-amber-10' : 'text-primary'"
+                >
+                  {{ formatPoints(row.total_league_points) }} pts
                 </div>
               </div>
             </div>
 
-            <!-- Quick Action Button -->
-            <div class="q-mt-md row justify-end">
-              <KennerButton
-                outline
-                color="primary"
-                dense
-                no-caps
-                icon-right="arrow_forward"
-                label="View League"
-                @click="selectLeague(league.id)"
-              />
+            <!-- Fallback: Participants preview if no standings yet -->
+            <div v-else class="column q-gutter-y-xs">
+              <div class="text-caption text-grey-6">Participants</div>
+              <div class="row items-center q-gutter-xs">
+                <div
+                  v-for="m in getMembersForLeague(league.id)"
+                  :key="m.id"
+                  class="row items-center q-gutter-x-xs bg-grey-1 rounded-borders q-px-sm q-py-xs text-caption"
+                >
+                  <UserAvatar
+                    :display-username="m.username"
+                    :subtitle="m.profile_name"
+                    :shape="m.avatar_shape"
+                    :color="m.avatar_color"
+                    size="20px"
+                  />
+                  <span class="text-weight-medium text-grey-8 ellipsis" style="max-width: 90px">
+                    {{ m.profile_name || m.username }}
+                  </span>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -664,6 +705,59 @@ function getMembersForLeague(leagueId: number): TSeasonParticipantDto[] {
   });
 }
 
+function getLeaguePicksCount(leagueId: number): number {
+  const members = getMembersForLeague(leagueId);
+  return members.reduce(
+    (acc, m) => acc + (m.selected_games?.length || 0),
+    0
+  );
+}
+
+function findParticipant(
+  leagueId: number,
+  playerProfileId?: number,
+  username?: string
+): TSeasonParticipantDto | undefined {
+  const members = getMembersForLeague(leagueId);
+  return members.find(
+    (m) =>
+      (playerProfileId !== undefined && (m.profile === playerProfileId || m.id === playerProfileId)) ||
+      (username && m.username === username)
+  );
+}
+
+function getMemberShape(
+  leagueId: number,
+  playerProfileId?: number,
+  username?: string
+): string | undefined {
+  const p = findParticipant(leagueId, playerProfileId, username);
+  return p?.avatar_shape;
+}
+
+function getMemberColor(
+  leagueId: number,
+  playerProfileId?: number,
+  username?: string
+): string | undefined {
+  const p = findParticipant(leagueId, playerProfileId, username);
+  return p?.avatar_color;
+}
+
+function isCurrentUser(playerProfileId?: number, username?: string): boolean {
+  if (!user.value) return false;
+  if (playerProfileId !== undefined && user.value.profile_id === playerProfileId) return true;
+  if (username && user.value.username === username) return true;
+  return false;
+}
+
+function formatPoints(pts: number | string | undefined | null): string {
+  if (pts === undefined || pts === null) return '0';
+  const num = Number(pts);
+  if (isNaN(num)) return '0';
+  return num % 1 === 0 ? num.toFixed(0) : num.toFixed(2);
+}
+
 function isUserInLeague(leagueId: number): boolean {
   if (!user.value) return false;
   const members = getMembersForLeague(leagueId);
@@ -800,35 +894,40 @@ onUnmounted(() => {
 }
 
 .kpi-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 16px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
 }
 
 .kpi-card {
   background: white;
   border: 1px solid rgba(0, 0, 0, 0.08);
-  border-radius: 16px;
-  padding: 16px 20px;
+  border-radius: 10px;
+  padding: 6px 14px;
   display: flex;
   align-items: center;
-  gap: 16px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  gap: 10px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+  transition: box-shadow 0.2s ease;
+  flex: 0 0 auto;
+
+  @media (max-width: 599px) {
+    flex: 1 1 calc(50% - 10px);
+  }
 
   &:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.06);
   }
 }
 
 .kpi-icon-wrapper {
-  width: 48px;
-  height: 48px;
-  border-radius: 12px;
+  width: 30px;
+  height: 30px;
+  border-radius: 6px;
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0;
 }
 
 .bg-primary-1 {
@@ -845,30 +944,30 @@ onUnmounted(() => {
 }
 
 .kpi-value {
-  font-size: 1.5rem;
+  font-size: 1.1rem;
   font-weight: 800;
-  line-height: 1.2;
+  line-height: 1.1;
 }
 
 .kpi-label {
-  font-size: 0.8rem;
+  font-size: 0.68rem;
   color: #757575;
-  font-weight: 500;
+  font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.3px;
 }
 
 .champions-card {
   background: linear-gradient(135deg, #fffbf0 0%, #ffffff 100%);
   border: 1px solid rgba(255, 193, 7, 0.3);
-  border-radius: 16px;
+  border-radius: 14px;
   box-shadow: 0 2px 8px rgba(255, 193, 7, 0.08);
 }
 
 .champions-icon-wrap {
-  width: 40px;
-  height: 40px;
-  border-radius: 10px;
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
   background: rgba(255, 193, 7, 0.2);
   display: flex;
   align-items: center;
@@ -879,8 +978,8 @@ onUnmounted(() => {
 .league-nav-container {
   background: white;
   border: 1px solid rgba(0, 0, 0, 0.08);
-  border-radius: 16px;
-  padding: 10px 16px;
+  border-radius: 14px;
+  padding: 8px 14px;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
 }
 
@@ -909,9 +1008,9 @@ onUnmounted(() => {
   border: 1px solid rgba(0, 0, 0, 0.08);
   background: #f8f9fa;
   color: #424242;
-  border-radius: 24px;
-  padding: 6px 14px;
-  font-size: 0.875rem;
+  border-radius: 20px;
+  padding: 5px 12px;
+  font-size: 0.825rem;
   font-weight: 600;
   cursor: pointer;
   display: inline-flex;
@@ -944,8 +1043,8 @@ onUnmounted(() => {
 .pill-badge {
   background: rgba(0, 0, 0, 0.06);
   color: #616161;
-  font-size: 0.75rem;
-  padding: 2px 6px;
+  font-size: 0.72rem;
+  padding: 1px 5px;
   border-radius: 10px;
   margin-left: 6px;
   font-weight: 700;
@@ -954,30 +1053,52 @@ onUnmounted(() => {
 /* League Cards Grid */
 .league-cards-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-  gap: 20px;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+  align-content: start;
 }
 
 .league-overview-card {
   background: white;
   border: 1px solid rgba(0, 0, 0, 0.08);
-  border-radius: 16px;
-  padding: 20px;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+  border-radius: 14px;
+  padding: 14px 16px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  transition: all 0.2s ease;
+  gap: 8px;
+  height: 100%;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
 
   &:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
-    border-color: rgba(var(--q-primary), 0.3);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+    border-color: rgba(var(--q-primary), 0.35);
   }
 
   &--user {
     border-left: 4px solid var(--q-primary);
   }
+}
+
+.standings-mini-row {
+  background: #f8f9fa;
+  border: 1px solid rgba(0, 0, 0, 0.04);
+  min-height: 30px;
+  transition: background-color 0.15s ease;
+
+  &--leader {
+    background: rgba(255, 193, 7, 0.12);
+    border-color: rgba(255, 193, 7, 0.3);
+  }
+
+  &--user {
+    border-color: rgba(var(--q-primary), 0.4);
+    background: rgba(var(--q-primary), 0.05);
+  }
+}
+
+.rank-badge {
+  min-width: 18px;
 }
 
 /* Focused League View & Section Cards */
