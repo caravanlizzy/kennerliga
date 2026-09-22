@@ -199,8 +199,8 @@
               :key="m.id"
               :display-username="m.username"
               :subtitle="m.profile_name"
-              :shape="m.avatar_shape"
-              :color="m.avatar_color"
+              :shape="getMemberShape(activeLeague.id, m.profile, m.username)"
+              :color="getMemberColor(activeLeague.id, m.profile, m.username)"
               size="32px"
             />
           </div>
@@ -424,8 +424,8 @@
                   <UserAvatar
                     :display-username="m.username"
                     :subtitle="m.profile_name"
-                    :shape="m.avatar_shape"
-                    :color="m.avatar_color"
+                    :shape="getMemberShape(league.id, m.profile, m.username)"
+                    :color="getMemberColor(league.id, m.profile, m.username)"
                     size="20px"
                   />
                   <span class="text-weight-medium text-grey-8 ellipsis" style="max-width: 90px">
@@ -731,6 +731,9 @@ function getMemberShape(
   playerProfileId?: number,
   username?: string
 ): string | undefined {
+  if (isCurrentUser(playerProfileId, username) && user.value?.avatar_shape) {
+    return user.value.avatar_shape;
+  }
   const p = findParticipant(leagueId, playerProfileId, username);
   return p?.avatar_shape;
 }
@@ -740,6 +743,9 @@ function getMemberColor(
   playerProfileId?: number,
   username?: string
 ): string | undefined {
+  if (isCurrentUser(playerProfileId, username) && user.value?.avatar_color !== undefined) {
+    return user.value.avatar_color;
+  }
   const p = findParticipant(leagueId, playerProfileId, username);
   return p?.avatar_color;
 }

@@ -11,6 +11,7 @@ import {
   type UserListParams,
 } from 'src/services/userService';
 import { AvatarShape, TUserDto } from 'src/types';
+import { useUpdateStore } from 'stores/updateStore';
 
 export const useUserStore = defineStore(
   'userStore',
@@ -117,6 +118,11 @@ export const useUserStore = defineStore(
         if (user.value) {
           user.value.avatar_shape = updated.avatar_shape || shape;
         }
+        clearCachedResources();
+        const updateStore = useUpdateStore();
+        updateStore.notify('/user/');
+        updateStore.notify('/season/');
+        updateStore.notify('/league/');
         return true;
       } catch (err) {
         console.error('Failed to update avatar shape:', err);
@@ -130,6 +136,11 @@ export const useUserStore = defineStore(
         if (user.value) {
           user.value.avatar_color = updated.avatar_color ?? color;
         }
+        clearCachedResources();
+        const updateStore = useUpdateStore();
+        updateStore.notify('/user/');
+        updateStore.notify('/season/');
+        updateStore.notify('/league/');
         return true;
       } catch (err) {
         console.error('Failed to update avatar color:', err);

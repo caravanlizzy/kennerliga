@@ -371,6 +371,7 @@ import { useResponsive } from 'src/composables/responsive';
 import KennerTooltip from 'components/base/KennerTooltip.vue';
 import LeagueLevel from 'components/season/LeagueLevel.vue';
 import { useUpdateStore } from 'stores/updateStore';
+import { useUserStore } from 'stores/userStore';
 
 const props = defineProps<{
   leagueId: number;
@@ -492,16 +493,32 @@ const tableColumns = computed<TStandingsColumn[]>(() => {
   return cols;
 });
 
+const userStore = useUserStore();
+
 const tableRows = computed(() => {
   if (!standings.value) return [];
 
   return standings.value.standings.map((standing) => {
+    const isCurrentUser =
+      (standing.username && userStore.isMe(standing.username)) ||
+      (standing.player_profile_id && userStore.user?.profile_id === standing.player_profile_id);
+
+    const shape =
+      isCurrentUser && userStore.user?.avatar_shape
+        ? userStore.user.avatar_shape
+        : standing.avatar_shape;
+
+    const color =
+      isCurrentUser && userStore.user?.avatar_color !== undefined
+        ? userStore.user.avatar_color
+        : standing.avatar_color;
+
     const row: Record<string, unknown> = {
       player_profile_id: standing.player_profile_id,
       profile_name: standing.profile_name,
       username: standing.username,
-      avatar_shape: standing.avatar_shape,
-      avatar_color: standing.avatar_color,
+      avatar_shape: shape,
+      avatar_color: color,
       total: standing.total_league_points,
       unresolved_tie_group: standing.unresolved_tie_group,
       resolved_tie_reason: (() => {

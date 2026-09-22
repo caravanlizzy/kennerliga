@@ -305,12 +305,29 @@ onUnmounted(() => {
 });
 
 const rows = computed(() => {
-  return [...standings.value].sort((a, b) => {
-    if (b.league_points !== a.league_points)
-      return b.league_points - a.league_points;
-    if (b.wins !== a.wins) return b.wins - a.wins;
-    return a.profile_name.localeCompare(b.profile_name);
-  });
+  return [...standings.value]
+    .map((s) => {
+      const isCurrentUser =
+        (s.username && user.value?.username === s.username) ||
+        (s.player_profile && user.value?.profile_id === s.player_profile);
+      return {
+        ...s,
+        avatar_shape:
+          isCurrentUser && user.value?.avatar_shape
+            ? user.value.avatar_shape
+            : s.avatar_shape,
+        avatar_color:
+          isCurrentUser && user.value?.avatar_color !== undefined
+            ? user.value.avatar_color
+            : s.avatar_color,
+      };
+    })
+    .sort((a, b) => {
+      if (b.league_points !== a.league_points)
+        return b.league_points - a.league_points;
+      if (b.wins !== a.wins) return b.wins - a.wins;
+      return a.profile_name.localeCompare(b.profile_name);
+    });
 });
 
 const columns: QTableProps['columns'] = [

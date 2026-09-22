@@ -6,8 +6,8 @@
         <UserAvatar
           :display-username="m.username"
           :subtitle="m.profile_name !== m.username ? m.profile_name : undefined"
-          :shape="m.avatar_shape"
-          :color="m.avatar_color"
+          :shape="getMemberShape(m)"
+          :color="getMemberColor(m)"
           size="40px"
         />
         <div class="header-content q-ml-md">
@@ -143,8 +143,33 @@ import UserAvatar from 'components/ui/UserAvatar.vue';
 import GameSettingsDisplay from 'components/game/selectedGame/GameSettingsDisplay.vue';
 import KennerButton from 'components/base/KennerButton.vue';
 import KennerTooltip from 'components/base/KennerTooltip.vue';
+import { useUserStore } from 'stores/userStore';
 
 import { TSeasonParticipantDto } from 'src/types';
+
+const userStore = useUserStore();
+
+function getMemberShape(m: TSeasonParticipantDto) {
+  if (
+    userStore.isMe(m.username) ||
+    (userStore.user?.profile_id && m.profile === userStore.user.profile_id)
+  ) {
+    return userStore.user?.avatar_shape || m.avatar_shape;
+  }
+  return m.avatar_shape;
+}
+
+function getMemberColor(m: TSeasonParticipantDto) {
+  if (
+    userStore.isMe(m.username) ||
+    (userStore.user?.profile_id && m.profile === userStore.user.profile_id)
+  ) {
+    return userStore.user?.avatar_color !== undefined
+      ? userStore.user.avatar_color
+      : m.avatar_color;
+  }
+  return m.avatar_color;
+}
 
 const props = withDefaults(
   defineProps<{
