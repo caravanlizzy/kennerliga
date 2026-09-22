@@ -1,11 +1,9 @@
 <template>
   <ContentSection
-    title="Games - Picks and Bans"
+    title="Players & Game Picks"
     color="secondary"
     icon="groups"
     v-bind="$attrs"
-    v-model:is-opened="isOpened"
-    expandable
     class="league-section"
   >
     <PlayerCard :all-members="members" />
@@ -13,15 +11,12 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
 import { storeToRefs } from 'pinia';
 import ContentSection from 'components/base/ContentSection.vue';
 import PlayerCard from 'components/league/PlayerCard.vue';
 import { useMyLeagueStore } from 'src/composables/myLeague';
 
 const { members } = storeToRefs(useMyLeagueStore());
-
-const isOpened = ref(true);
 </script>
 
 <style scoped lang="scss">

@@ -1,12 +1,10 @@
 <template>
   <ContentSection
     v-if="leagueStatus === 'PLAYING'"
-    title="Report Results"
+    title="Report Match Results"
     color="accent"
     icon="publish"
     v-bind="$attrs"
-    v-model:is-opened="isOpened"
-    expandable
     class="league-section"
   >
     <MatchResultTabs />
@@ -14,23 +12,12 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from 'vue';
 import { storeToRefs } from 'pinia';
 import ContentSection from 'components/base/ContentSection.vue';
 import MatchResultTabs from 'components/league/MatchResultTabs.vue';
 import { useMyLeagueStore } from 'src/composables/myLeague';
 
 const { leagueStatus } = storeToRefs(useMyLeagueStore());
-
-const isOpened = ref(false);
-
-watch(
-  leagueStatus,
-  (status) => {
-    isOpened.value = status === 'PLAYING';
-  },
-  { immediate: true }
-);
 </script>
 
 <style scoped lang="scss">

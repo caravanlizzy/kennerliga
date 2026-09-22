@@ -1,12 +1,9 @@
 <template>
   <ContentSection
-    v-if="leagueStatus === 'PLAYING' || leagueStatus === 'DONE'"
-    title="Results"
+    title="Match Results"
     color="warning"
     icon="emoji_events"
     v-bind="$attrs"
-    v-model:is-opened="isOpened"
-    expandable
     class="league-section"
   >
     <div
@@ -17,7 +14,6 @@
         v-for="game in selectedGamesWithResults"
         :key="game.id"
         class="col-12"
-        :class="{ 'col-md-6': selectedGamesWithResults.length > 1 }"
       >
         <q-card class="result-card" flat>
           <q-card-section class="q-pa-sm">
@@ -26,31 +22,26 @@
         </q-card>
       </div>
     </div>
-    <div v-else class="text-center q-pa-md text-grey">
-      <div class="text-subtitle1">No results recorded yet</div>
-      <div v-if="leagueStatus === 'PLAYING'" class="text-caption">
-        Games that are finished can be reported below.
+    <div v-else class="text-center q-pa-lg text-grey-7">
+      <q-icon name="sports_esports" size="36px" color="grey-5" class="q-mb-xs" />
+      <div class="text-subtitle2 text-weight-bold">No results recorded yet</div>
+      <div v-if="leagueStatus === 'PLAYING'" class="text-caption text-grey-6 q-mt-xs">
+        Report match outcomes in the Report Results section below once games are played.
+      </div>
+      <div v-else class="text-caption text-grey-6 q-mt-xs">
+        Match results will appear here once games have been selected and played.
       </div>
     </div>
   </ContentSection>
 </template>
 
 <script setup lang="ts">
-import { ref, watchEffect } from 'vue';
 import { storeToRefs } from 'pinia';
 import ContentSection from 'components/base/ContentSection.vue';
 import MatchResult from 'components/league/MatchResult.vue';
 import { useMyLeagueStore } from 'src/composables/myLeague';
 
 const { leagueStatus, selectedGamesWithResults } = storeToRefs(useMyLeagueStore());
-
-const isOpened = ref(false);
-
-watchEffect(() => {
-  isOpened.value =
-    ['PLAYING', 'DONE'].includes(leagueStatus.value) &&
-    selectedGamesWithResults.value.length > 0;
-});
 </script>
 
 <style scoped lang="scss">
