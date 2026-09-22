@@ -137,7 +137,7 @@
               <q-icon name="emoji_events" size="16px" />
             </div>
             <div class="text-caption text-grey-8">
-              Matches: <strong class="text-dark">{{ reportedResultsCount }} / {{ totalPlayableGamesCount }}</strong> recorded
+              Matches: <strong class="text-dark">{{ reportedResultsCount }} / {{ totalPlayableGamesCount }}</strong> reported
             </div>
           </div>
           <q-linear-progress

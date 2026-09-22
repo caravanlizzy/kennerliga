@@ -195,35 +195,34 @@ function formatBannerNames(names: string[]) {
 
 <style scoped lang="scss">
 .player-card {
-  padding: 8px 0;
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 20px;
-
-  @media (min-width: 1024px) {
-    grid-template-columns: repeat(2, 1fr);
-  }
+  padding: 0;
+  display: flex;
+  flex-direction: column;
 }
 
 .member-section {
-  background: white;
-  border-radius: var(--kenner-card-radius, 0px);
-  overflow: hidden;
-  border: 1px solid var(--kenner-border-color);
-  box-shadow: var(--kenner-card-shadow);
+  background: transparent;
+  padding: 16px 0;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+
+  &:first-child {
+    padding-top: 0;
+  }
+
+  &:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+  }
 }
 
 .member-header {
   display: flex;
   align-items: center;
-  padding: 16px 20px;
-  background: linear-gradient(to right, rgba(var(--q-primary), 0.03), transparent);
-  border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+  padding: 4px 8px 10px 8px;
 }
 
-
 .player-name {
-  font-size: 1.1rem;
+  font-size: 1.05rem;
   letter-spacing: -0.01em;
   color: var(--q-dark);
 }
@@ -240,13 +239,19 @@ function formatBannerNames(names: string[]) {
 }
 
 .game-item {
-  padding: 12px 20px;
-  min-height: 56px;
+  padding: 8px 8px;
+  min-height: 48px;
+  border-radius: 8px;
+  transition: background-color 0.2s ease;
+
+  &:hover {
+    background: rgba(0, 0, 0, 0.02);
+  }
 }
 
 .game-icon-bg {
-  width: 36px;
-  height: 36px;
+  width: 34px;
+  height: 34px;
   border-radius: 8px;
   background: rgba(var(--q-primary), 0.08);
   display: flex;
@@ -259,7 +264,7 @@ function formatBannerNames(names: string[]) {
 }
 
 .game-name {
-  font-size: 15px;
+  font-size: 14.5px;
   font-weight: 600;
   color: #2c3e50;
   line-height: 1.2;
@@ -275,11 +280,11 @@ function formatBannerNames(names: string[]) {
 }
 
 .ban-action-item {
-  min-height: 44px;
-  padding: 8px 20px;
+  min-height: 40px;
+  padding: 6px 8px;
   background: rgba(var(--q-blue-grey), 0.03);
-  border-top: 1px solid rgba(0, 0, 0, 0.02);
-  border-bottom: 1px solid rgba(0, 0, 0, 0.02);
+  border-radius: 6px;
+  margin: 4px 0;
 }
 
 .ban-text {
@@ -295,7 +300,8 @@ function formatBannerNames(names: string[]) {
 .game-details {
   border-top: 1px dashed rgba(0, 0, 0, 0.06);
   background: rgba(0, 0, 0, 0.01);
-  margin: 0 10px;
+  margin: 0 4px;
+  border-radius: 6px;
 }
 
 .opacity-50 {
@@ -306,5 +312,4 @@ function formatBannerNames(names: string[]) {
   text-decoration: line-through;
   text-decoration-thickness: 1.5px;
 }
-
 </style>
