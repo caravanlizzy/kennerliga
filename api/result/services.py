@@ -1,7 +1,7 @@
 from django.db import transaction
 from django.db.models import Count
 from game.models import SelectedGame
-from game.queries import get_banned_selected_game_ids
+from game.queries import get_playable_selected_games_for_league
 from league.models import LeagueStatus, GameStanding
 from services.standings_snapshot import rebuild_game_snapshot, rebuild_league_snapshot
 from league.serializer import GameStandingSerializer
@@ -70,11 +70,8 @@ def finalize_results(
         # Mark league as DONE when all SelectedGames in this league have results uploaded
         member_count = league.members.count()
         # Get all SelectedGames that belong to this league, excluding successfully banned ones
-        banned_ids = set(get_banned_selected_game_ids(league))
         sg_ids = list(
-            SelectedGame.objects.filter(league=league)
-            .exclude(id__in=banned_ids)
-            .values_list("id", flat=True)
+            get_playable_selected_games_for_league(league).values_list("id", flat=True)
         )
 
         if sg_ids:

@@ -56,6 +56,15 @@ def get_selected_games_for_league(league: League) -> QuerySet:
     return SelectedGame.objects.filter(league=league)
 
 
+def get_playable_selected_games_for_league(league: League) -> QuerySet:
+    """
+    Returns a queryset of SelectedGame objects for a specific league,
+    excluding games that were successfully banned.
+    """
+    banned_ids = set(get_banned_selected_game_ids(league))
+    return SelectedGame.objects.filter(league=league).exclude(id__in=banned_ids)
+
+
 def get_selected_game_ids_for_league_including_related(league: League) -> set[int]:
     """
     Returns a set of all game IDs (including related ones) already selected for the given league.

@@ -89,6 +89,10 @@ export const useLeagueStore = (id: number) => {
       )
     );
 
+    const playableSelectedGames = computed(() =>
+      selectedGames.value.filter((g) => !g.successfully_banned)
+    );
+
     // --- Results keyed by selected_game for fast access ---
     // Using a Record so reactivity stays simple.
     const matchResultsBySelectedGame = ref<Record<number, TMatchResult[]>>({});
@@ -98,14 +102,12 @@ export const useLeagueStore = (id: number) => {
     );
 
     const selectedGamesWithResults = computed(() =>
-      selectedGames.value.filter(g => (matchResultsBySelectedGame.value[g.id]?.length ?? 0) > 0)
+      playableSelectedGames.value.filter(g => (matchResultsBySelectedGame.value[g.id]?.length ?? 0) > 0)
     );
 
     const selectedGamesFetchedEmpty = computed(() =>
-      selectedGames.value.filter(
-        (g) =>
-          (matchResultsBySelectedGame.value[g.id]?.length ?? 0) === 0 &&
-          !g.successfully_banned
+      playableSelectedGames.value.filter(
+        (g) => (matchResultsBySelectedGame.value[g.id]?.length ?? 0) === 0
       )
     );
 
@@ -297,6 +299,7 @@ export const useLeagueStore = (id: number) => {
       isMePickingGame,
       isMeBanningGame,
       myProfileId,
+      playableSelectedGames,
       selectedGamesWithResults,
       selectedGamesFetchedEmpty,
       membersById,

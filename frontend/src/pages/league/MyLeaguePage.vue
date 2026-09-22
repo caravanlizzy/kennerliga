@@ -129,7 +129,7 @@
         </div>
 
         <div
-          v-else-if="leagueStatus === 'PLAYING' && totalPicksCount > 0"
+          v-else-if="leagueStatus === 'PLAYING' && totalPlayableGamesCount > 0"
           class="header-turn-strip header-turn-strip--matches row items-center justify-between q-mt-md"
         >
           <div class="row items-center no-wrap">
@@ -137,11 +137,11 @@
               <q-icon name="emoji_events" size="16px" />
             </div>
             <div class="text-caption text-grey-8">
-              Matches: <strong class="text-dark">{{ reportedResultsCount }} / {{ totalPicksCount }}</strong> recorded
+              Matches: <strong class="text-dark">{{ reportedResultsCount }} / {{ totalPlayableGamesCount }}</strong> recorded
             </div>
           </div>
           <q-linear-progress
-            :value="totalPicksCount > 0 ? reportedResultsCount / totalPicksCount : 0"
+            :value="totalPlayableGamesCount > 0 ? reportedResultsCount / totalPlayableGamesCount : 0"
             color="amber-8"
             track-color="amber-1"
             rounded
@@ -206,7 +206,7 @@ const {
   loading,
   leagueStatus,
   leagueData,
-  members,
+  playableSelectedGames,
   selectedGamesWithResults,
   activePlayer,
   isMeActivePlayer,
@@ -231,11 +231,8 @@ onUnmounted(() => {
   }
 });
 
-const totalPicksCount = computed(() => {
-  return members.value.reduce(
-    (acc, m) => acc + (m.selected_games?.length || 0),
-    0
-  );
+const totalPlayableGamesCount = computed(() => {
+  return playableSelectedGames.value.length;
 });
 
 const reportedResultsCount = computed(() => selectedGamesWithResults.value.length);
