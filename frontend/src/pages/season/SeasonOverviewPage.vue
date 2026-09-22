@@ -1,7 +1,7 @@
 <template>
-  <q-page class="season-overview-page q-pa-md">
+  <q-page class="season-overview-page q-pa-md q-pa-md-lg">
     <!-- Top Bar / Breadcrumb Navigation -->
-    <div class="row items-center justify-between q-mb-md">
+    <div class="row items-center justify-between q-mb-lg">
       <div class="row items-center q-gutter-x-sm">
         <KennerButton
           flat
@@ -55,12 +55,12 @@
     </div>
 
     <!-- Main Content -->
-    <div v-else-if="!error && season" class="overview-content column q-gutter-y-md">
+    <div v-else-if="!error && season" class="overview-content column q-gutter-y-lg">
       <!-- Season KPI Summary Banner -->
       <div class="kpi-grid">
         <div class="kpi-card">
           <div class="kpi-icon-wrapper bg-primary-1 text-primary">
-            <q-icon name="military_tech" size="18px" />
+            <q-icon name="military_tech" size="20px" />
           </div>
           <div class="kpi-info">
             <div class="kpi-value text-primary">{{ sortedLeagues.length }}</div>
@@ -70,7 +70,7 @@
 
         <div class="kpi-card">
           <div class="kpi-icon-wrapper bg-teal-1 text-teal-8">
-            <q-icon name="groups" size="18px" />
+            <q-icon name="groups" size="20px" />
           </div>
           <div class="kpi-info">
             <div class="kpi-value text-teal-8">{{ participants.length }}</div>
@@ -80,7 +80,7 @@
 
         <div class="kpi-card">
           <div class="kpi-icon-wrapper bg-amber-1 text-amber-9">
-            <q-icon name="casino" size="18px" />
+            <q-icon name="casino" size="20px" />
           </div>
           <div class="kpi-info">
             <div class="kpi-value text-amber-9">{{ totalPicks }}</div>
@@ -90,7 +90,7 @@
 
         <div class="kpi-card">
           <div class="kpi-icon-wrapper bg-indigo-1 text-indigo-7">
-            <q-icon name="sports_esports" size="18px" />
+            <q-icon name="sports_esports" size="20px" />
           </div>
           <div class="kpi-info">
             <div class="kpi-value text-indigo-7">{{ totalSelectedGames }}</div>
@@ -100,7 +100,7 @@
       </div>
 
       <!-- Champions Podium Section (Completed Seasons) -->
-      <div v-if="isSeasonCompleted" class="champions-card q-pa-md">
+      <div v-if="isSeasonCompleted" class="champions-card q-pa-lg">
         <div class="row items-center q-gutter-x-sm q-mb-md">
           <div class="champions-icon-wrap">
             <q-icon name="emoji_events" color="amber-8" size="24px" />
@@ -117,7 +117,7 @@
       <div class="league-nav-container sticky-nav">
         <div class="row items-center justify-between no-wrap q-gutter-x-md">
           <!-- League Selection Pills / Tabs -->
-          <div class="league-tabs-scroll row items-center no-wrap q-gutter-x-xs">
+          <div class="league-tabs-scroll row items-center no-wrap">
             <!-- All Leagues Tab -->
             <button
               type="button"
@@ -159,9 +159,9 @@
       </div>
 
       <!-- VIEW A: SPECIFIC LEAGUE VIEW -->
-      <div v-if="activeLeague" class="league-focused-view column q-gutter-y-md">
+      <div v-if="activeLeague" class="league-focused-view column q-gutter-y-lg">
         <!-- League Header Card -->
-        <div class="league-header-card row items-center justify-between q-pa-md">
+        <div class="league-header-card row items-center justify-between q-pa-lg">
           <div class="row items-center q-gutter-x-md">
             <LeagueLevel :level="activeLeague.level" />
             <div>
@@ -201,13 +201,13 @@
               :subtitle="m.profile_name"
               :shape="getMemberShape(activeLeague.id, m.profile, m.username)"
               :color="getMemberColor(activeLeague.id, m.profile, m.username)"
-              size="32px"
+              size="34px"
             />
           </div>
         </div>
 
         <!-- League View Toggle Tabs -->
-        <div class="row items-center justify-between q-px-xs">
+        <div class="row items-center justify-between q-px-xs q-py-xs">
           <div class="text-overline text-grey-7 text-weight-bold">
             League Content
           </div>
@@ -216,7 +216,7 @@
             no-caps
             rounded
             unelevated
-            dense
+            class="season-view-toggle"
             toggle-color="primary"
             color="grey-2"
             text-color="grey-8"
@@ -235,13 +235,13 @@
           v-if="activeLeagueView === 'standings' || activeLeagueView === 'all'"
           class="league-section-card"
         >
-          <div class="section-title-bar row items-center justify-between q-pa-md border-bottom-subtle">
+          <div class="section-title-bar row items-center justify-between q-px-lg q-py-md border-bottom-subtle">
             <div class="row items-center q-gutter-x-sm">
               <q-icon name="grid_view" color="primary" size="20px" />
               <span class="text-subtitle1 text-weight-bold text-dark">Standings Matrix</span>
             </div>
           </div>
-          <div class="q-pa-md">
+          <div class="q-pa-lg">
             <LeagueStandingsMatrix
               :leagueId="activeLeague.id"
               :prefetchedData="standingsMap[activeLeague.id]"
@@ -255,13 +255,13 @@
           v-if="activeLeagueView === 'picks' || activeLeagueView === 'all'"
           class="league-section-card"
         >
-          <div class="section-title-bar row items-center justify-between q-pa-md border-bottom-subtle">
+          <div class="section-title-bar row items-center justify-between q-px-lg q-py-md border-bottom-subtle">
             <div class="row items-center q-gutter-x-sm">
               <q-icon name="casino" color="amber-9" size="20px" />
               <span class="text-subtitle1 text-weight-bold text-dark">Picks &amp; Bans</span>
             </div>
           </div>
-          <div class="q-pa-md">
+          <div class="q-pa-lg">
             <PlayerCard
               v-if="activeLeagueMembers.length > 0"
               :all-members="activeLeagueMembers"
@@ -277,13 +277,13 @@
           v-if="activeLeagueView === 'results' || activeLeagueView === 'all'"
           class="league-section-card"
         >
-          <div class="section-title-bar row items-center justify-between q-pa-md border-bottom-subtle">
+          <div class="section-title-bar row items-center justify-between q-px-lg q-py-md border-bottom-subtle">
             <div class="row items-center q-gutter-x-sm">
               <q-icon name="scoreboard" color="indigo-7" size="20px" />
               <span class="text-subtitle1 text-weight-bold text-dark">Match Results</span>
             </div>
           </div>
-          <div class="q-pa-md">
+          <div class="q-pa-lg">
             <LeagueMatchResults
               :leagueId="activeLeague.id"
               :show-standings="false"
@@ -293,9 +293,9 @@
       </div>
 
       <!-- VIEW B: ALL LEAGUES (OVERVIEW) -->
-      <div v-else class="all-leagues-view column q-gutter-y-md">
+      <div v-else class="all-leagues-view column q-gutter-y-lg">
         <!-- View Toggle for All Leagues -->
-        <div class="row items-center justify-between q-px-xs">
+        <div class="row items-center justify-between q-px-xs q-py-xs">
           <div class="text-overline text-grey-7 text-weight-bold">
             Season Overview Display
           </div>
@@ -304,7 +304,7 @@
             no-caps
             rounded
             unelevated
-            dense
+            class="season-view-toggle"
             toggle-color="primary"
             color="grey-2"
             text-color="grey-8"
@@ -358,24 +358,25 @@
                 color="primary"
                 icon-right="arrow_forward"
                 label="View"
+                class="q-px-sm"
                 @click="selectLeague(league.id)"
               />
             </div>
 
             <!-- League Meta / Stats summary -->
-            <div class="row items-center q-gutter-x-md text-caption text-grey-7 q-py-xs">
+            <div class="row items-center q-gutter-x-lg text-caption text-grey-7 q-py-xs">
               <div class="row items-center q-gutter-x-xs">
-                <q-icon name="groups" size="16px" color="grey-6" />
+                <q-icon name="groups" size="17px" color="grey-6" />
                 <span>{{ getMembersForLeague(league.id).length }} players</span>
               </div>
               <div class="row items-center q-gutter-x-xs">
-                <q-icon name="casino" size="16px" color="grey-6" />
+                <q-icon name="casino" size="17px" color="grey-6" />
                 <span>{{ getLeaguePicksCount(league.id) }} picks</span>
               </div>
             </div>
 
             <!-- Standings Table (Complete list of participants in this league) -->
-            <div v-if="standingsMap[league.id]?.standings?.length" class="column q-gutter-y-xs">
+            <div v-if="standingsMap[league.id]?.standings?.length" class="column q-gutter-y-sm">
               <div
                 v-for="(row, idx) in standingsMap[league.id].standings"
                 :key="row.player_profile_id"
@@ -397,7 +398,7 @@
                     :subtitle="row.profile_name"
                     :shape="getMemberShape(league.id, row.player_profile_id, row.username)"
                     :color="getMemberColor(league.id, row.player_profile_id, row.username)"
-                    size="22px"
+                    size="24px"
                   />
                   <span class="ellipsis text-caption text-weight-medium">
                     {{ row.profile_name || row.username }}
@@ -413,7 +414,7 @@
             </div>
 
             <!-- Fallback: Participants preview if no standings yet -->
-            <div v-else class="column q-gutter-y-xs">
+            <div v-else class="column q-gutter-y-sm">
               <div class="text-caption text-grey-6">Participants</div>
               <div class="row items-center q-gutter-xs">
                 <div
@@ -426,7 +427,7 @@
                     :subtitle="m.profile_name"
                     :shape="getMemberShape(league.id, m.profile, m.username)"
                     :color="getMemberColor(league.id, m.profile, m.username)"
-                    size="20px"
+                    size="24px"
                   />
                   <span class="text-weight-medium text-grey-8 ellipsis" style="max-width: 90px">
                     {{ m.profile_name || m.username }}
@@ -444,7 +445,7 @@
             :key="league.id"
             class="league-section-card"
           >
-            <div class="section-title-bar row items-center justify-between q-pa-md border-bottom-subtle">
+            <div class="section-title-bar row items-center justify-between q-px-lg q-py-md border-bottom-subtle">
               <div class="row items-center q-gutter-x-sm">
                 <LeagueLevel :level="league.level" badge />
                 <span class="text-subtitle1 text-weight-bold text-dark">
@@ -461,7 +462,7 @@
                 @click="selectLeague(league.id)"
               />
             </div>
-            <div class="q-pa-md">
+            <div class="q-pa-lg">
               <LeagueStandingsMatrix
                 :leagueId="league.id"
                 :prefetchedData="standingsMap[league.id]"
@@ -478,7 +479,7 @@
             :key="league.id"
             class="league-section-card"
           >
-            <div class="section-title-bar row items-center justify-between q-pa-md border-bottom-subtle">
+            <div class="section-title-bar row items-center justify-between q-px-lg q-py-md border-bottom-subtle">
               <div class="row items-center q-gutter-x-sm">
                 <LeagueLevel :level="league.level" badge />
                 <span class="text-subtitle1 text-weight-bold text-dark">
@@ -495,7 +496,7 @@
                 @click="selectLeague(league.id)"
               />
             </div>
-            <div class="q-pa-md">
+            <div class="q-pa-lg">
               <PlayerCard
                 v-if="getMembersForLeague(league.id).length > 0"
                 :all-members="getMembersForLeague(league.id)"
@@ -514,7 +515,7 @@
             :key="league.id"
             class="league-section-card"
           >
-            <div class="section-title-bar row items-center justify-between q-pa-md border-bottom-subtle">
+            <div class="section-title-bar row items-center justify-between q-px-lg q-py-md border-bottom-subtle">
               <div class="row items-center q-gutter-x-sm">
                 <LeagueLevel :level="league.level" badge />
                 <span class="text-subtitle1 text-weight-bold text-dark">
@@ -531,7 +532,7 @@
                 @click="selectLeague(league.id)"
               />
             </div>
-            <div class="q-pa-md">
+            <div class="q-pa-lg">
               <LeagueMatchResults
                 :leagueId="league.id"
                 :show-standings="false"
@@ -895,25 +896,25 @@ onUnmounted(() => {
 
 <style scoped lang="scss">
 .season-overview-page {
-  max-width: 1300px;
+  max-width: 1360px;
   margin: 0 auto;
 }
 
 .kpi-grid {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
+  gap: 14px;
 }
 
 .kpi-card {
   background: white;
   border: 1px solid rgba(0, 0, 0, 0.08);
-  border-radius: 10px;
-  padding: 6px 14px;
+  border-radius: 12px;
+  padding: 10px 18px;
   display: flex;
   align-items: center;
-  gap: 10px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+  gap: 14px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
   transition: box-shadow 0.2s ease;
   flex: 0 0 auto;
 
@@ -927,9 +928,9 @@ onUnmounted(() => {
 }
 
 .kpi-icon-wrapper {
-  width: 30px;
-  height: 30px;
-  border-radius: 6px;
+  width: 38px;
+  height: 38px;
+  border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -950,29 +951,29 @@ onUnmounted(() => {
 }
 
 .kpi-value {
-  font-size: 1.1rem;
+  font-size: 1.25rem;
   font-weight: 800;
   line-height: 1.1;
 }
 
 .kpi-label {
-  font-size: 0.68rem;
+  font-size: 0.72rem;
   color: #757575;
   font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.3px;
+  letter-spacing: 0.4px;
 }
 
 .champions-card {
   background: linear-gradient(135deg, #fffbf0 0%, #ffffff 100%);
   border: 1px solid rgba(255, 193, 7, 0.3);
-  border-radius: 14px;
+  border-radius: 16px;
   box-shadow: 0 2px 8px rgba(255, 193, 7, 0.08);
 }
 
 .champions-icon-wrap {
-  width: 36px;
-  height: 36px;
+  width: 38px;
+  height: 38px;
   border-radius: 8px;
   background: rgba(255, 193, 7, 0.2);
   display: flex;
@@ -984,9 +985,9 @@ onUnmounted(() => {
 .league-nav-container {
   background: white;
   border: 1px solid rgba(0, 0, 0, 0.08);
-  border-radius: 14px;
-  padding: 8px 14px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+  border-radius: 16px;
+  padding: 10px 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
 }
 
 .sticky-nav {
@@ -998,7 +999,8 @@ onUnmounted(() => {
 
 .league-tabs-scroll {
   overflow-x: auto;
-  padding-bottom: 2px;
+  gap: 8px;
+  padding-bottom: 4px;
   scrollbar-width: thin;
 
   &::-webkit-scrollbar {
@@ -1015,8 +1017,8 @@ onUnmounted(() => {
   background: #f8f9fa;
   color: #424242;
   border-radius: 20px;
-  padding: 5px 12px;
-  font-size: 0.825rem;
+  padding: 7px 14px;
+  font-size: 0.85rem;
   font-weight: 600;
   cursor: pointer;
   display: inline-flex;
@@ -1049,30 +1051,34 @@ onUnmounted(() => {
 .pill-badge {
   background: rgba(0, 0, 0, 0.06);
   color: #616161;
-  font-size: 0.72rem;
-  padding: 1px 5px;
+  font-size: 0.75rem;
+  padding: 2px 7px;
   border-radius: 10px;
   margin-left: 6px;
   font-weight: 700;
 }
 
+.season-view-toggle {
+  padding: 2px;
+}
+
 /* League Cards Grid */
 .league-cards-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 16px;
+  grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
+  gap: 20px;
   align-content: start;
 }
 
 .league-overview-card {
   background: white;
   border: 1px solid rgba(0, 0, 0, 0.08);
-  border-radius: 14px;
-  padding: 14px 16px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  border-radius: 16px;
+  padding: 18px 20px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 14px;
   height: 100%;
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
 
@@ -1089,7 +1095,9 @@ onUnmounted(() => {
 .standings-mini-row {
   background: #f8f9fa;
   border: 1px solid rgba(0, 0, 0, 0.04);
-  min-height: 30px;
+  min-height: 38px;
+  padding: 6px 12px;
+  border-radius: 8px;
   transition: background-color 0.15s ease;
 
   &--leader {
@@ -1104,7 +1112,8 @@ onUnmounted(() => {
 }
 
 .rank-badge {
-  min-width: 18px;
+  min-width: 22px;
+  font-size: 0.825rem;
 }
 
 /* Focused League View & Section Cards */
