@@ -3,6 +3,8 @@
     title="Match Results"
     color="warning"
     icon="emoji_events"
+    expandable
+    v-model:is-opened="isOpened"
     v-bind="$attrs"
     class="league-section"
   >
@@ -36,12 +38,15 @@
 </template>
 
 <script setup lang="ts">
+import { ref } from 'vue';
 import { storeToRefs } from 'pinia';
 import ContentSection from 'components/base/ContentSection.vue';
 import MatchResult from 'components/league/MatchResult.vue';
 import { useMyLeagueStore } from 'src/composables/myLeague';
 
 const { leagueStatus, selectedGamesWithResults } = storeToRefs(useMyLeagueStore());
+
+const isOpened = ref(true);
 </script>
 
 <style scoped lang="scss">

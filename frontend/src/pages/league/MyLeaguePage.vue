@@ -4,12 +4,7 @@
     <div v-if="loading && !leagueData" class="q-py-lg">
       <LoadingSpinner text="Loading league data...">
         <template #skeleton>
-          <q-skeleton type="rect" height="60px" class="q-mb-md" style="border-radius: 14px" />
-          <div class="row q-col-gutter-md q-mb-lg">
-            <div v-for="n in 4" :key="n" class="col-6 col-md-3">
-              <q-skeleton height="72px" style="border-radius: 10px" />
-            </div>
-          </div>
+          <q-skeleton type="rect" height="60px" class="q-mb-lg" style="border-radius: 14px" />
           <div class="row q-col-gutter-lg">
             <div class="col-12 col-md-6">
               <q-skeleton height="350px" style="border-radius: 16px" class="q-mb-md" />
@@ -54,9 +49,9 @@
 
     <!-- Active League Content -->
     <div v-else class="column q-gutter-y-md">
-      <!-- Top Header Card -->
+      <!-- Consolidated Top Header Box -->
       <div class="league-header-card q-pa-md">
-        <div class="row items-center justify-between q-col-gutter-md">
+        <div class="row items-center justify-between q-col-gutter-sm">
           <div class="row items-center q-gutter-x-sm">
             <KennerButton
               round
@@ -76,20 +71,19 @@
                 class="level-badge"
               />
             </div>
-          </div>
-
-          <!-- Status & Actions -->
-          <div class="row items-center q-gutter-sm">
             <q-chip
               dense
               :color="statusBadgeColor"
               text-color="white"
               :icon="statusBadgeIcon"
-              class="text-weight-bold status-chip"
+              class="text-weight-bold status-chip q-ml-xs"
             >
               {{ statusLabel }}
             </q-chip>
+          </div>
 
+          <!-- Actions -->
+          <div class="row items-center q-gutter-sm">
             <KennerButton
               v-if="leagueData?.season"
               label="Season Overview"
@@ -103,111 +97,57 @@
                 params: { seasonId: leagueData.season },
               }"
             />
-
-            <KennerButton
-              round
-              flat
-              dense
-              icon="refresh"
-              color="grey-8"
-              :loading="refreshing"
-              @click="handleRefresh"
-            >
-              <q-tooltip>Refresh League Data</q-tooltip>
-            </KennerButton>
-          </div>
-        </div>
-      </div>
-
-      <!-- KPI Summary Row -->
-      <div class="kpi-grid">
-        <div class="kpi-card">
-          <div class="kpi-icon-wrapper bg-teal-1">
-            <q-icon name="groups" color="teal" size="18px" />
-          </div>
-          <div>
-            <div class="kpi-value">{{ members.length }}</div>
-            <div class="kpi-label">Players</div>
           </div>
         </div>
 
-        <div class="kpi-card">
-          <div class="kpi-icon-wrapper bg-indigo-1">
-            <q-icon name="casino" color="indigo" size="18px" />
-          </div>
-          <div>
-            <div class="kpi-value">{{ totalPicksCount }}</div>
-            <div class="kpi-label">Picks in Play</div>
-          </div>
-        </div>
-
-        <div class="kpi-card">
-          <div class="kpi-icon-wrapper bg-amber-1">
-            <q-icon name="emoji_events" color="amber-9" size="18px" />
-          </div>
-          <div>
-            <div class="kpi-value">{{ reportedResultsCount }} / {{ totalPicksCount }}</div>
-            <div class="kpi-label">Matches Recorded</div>
-          </div>
-        </div>
-
-        <div class="kpi-card" :class="{ 'kpi-card--active-turn': isMeActivePlayer }">
-          <div
-            class="kpi-icon-wrapper"
-            :class="isMeActivePlayer ? 'bg-primary text-white' : 'bg-primary-1 text-primary'"
-          >
-            <q-icon :name="isMeActivePlayer ? 'bolt' : 'flag'" size="18px" />
-          </div>
-          <div>
-            <div class="kpi-value ellipsis" style="max-width: 140px">
-              <template v-if="isMeActivePlayer">Your Turn</template>
-              <template v-else-if="activePlayer">{{ activePlayer.profile_name || activePlayer.username }}</template>
-              <template v-else-if="leagueStatus === 'PLAYING'">Matches Live</template>
-              <template v-else-if="leagueStatus === 'DONE'">Finished</template>
-              <template v-else>Selection</template>
+        <!-- Integrated Turn & Match Status Strip -->
+        <div
+          v-if="isMeActivePlayer && turnActionText"
+          class="header-turn-strip header-turn-strip--action row items-center justify-between q-mt-md"
+        >
+          <div class="row items-center no-wrap">
+            <div class="turn-strip-icon-wrap bg-warning text-dark q-mr-sm">
+              <q-icon name="bolt" size="18px" />
             </div>
-            <div class="kpi-label">
-              <template v-if="isMeActivePlayer">Action Required</template>
-              <template v-else-if="turnActionText">Turn Phase</template>
-              <template v-else>League Phase</template>
+            <div>
+              <span class="text-weight-bold text-dark">It's your turn to {{ turnActionText }}!</span>
+              <span class="text-caption text-grey-8 q-ml-xs gt-xs">Complete your action in the section below.</span>
             </div>
           </div>
         </div>
-      </div>
 
-      <!-- Contextual Turn & Status Callout Banner -->
-      <div
-        v-if="isMeActivePlayer && turnActionText"
-        class="turn-alert-banner turn-alert-banner--action row items-center justify-between"
-      >
-        <div class="row items-center no-wrap">
-          <div class="turn-alert-icon-wrap q-mr-md bg-warning text-dark">
-            <q-icon name="bolt" size="22px" />
+        <div
+          v-else-if="activePlayer && turnActionText"
+          class="header-turn-strip header-turn-strip--waiting row items-center no-wrap q-mt-md"
+        >
+          <div class="turn-strip-icon-wrap bg-blue-1 text-primary q-mr-sm">
+            <q-icon name="hourglass_empty" size="16px" />
           </div>
-          <div>
-            <div class="text-subtitle1 text-weight-bold text-dark">It's your turn to {{ turnActionText }}!</div>
+          <div class="text-caption text-grey-8">
+            Waiting for <strong class="text-dark">{{ activePlayer.profile_name || activePlayer.username }}</strong> to {{ turnActionText }}.
+          </div>
+        </div>
+
+        <div
+          v-else-if="leagueStatus === 'PLAYING' && totalPicksCount > 0"
+          class="header-turn-strip header-turn-strip--matches row items-center justify-between q-mt-md"
+        >
+          <div class="row items-center no-wrap">
+            <div class="turn-strip-icon-wrap bg-amber-1 text-amber-9 q-mr-sm">
+              <q-icon name="emoji_events" size="16px" />
+            </div>
             <div class="text-caption text-grey-8">
-              Complete your action in the section below to proceed to the next phase.
+              Matches: <strong class="text-dark">{{ reportedResultsCount }} / {{ totalPicksCount }}</strong> recorded
             </div>
           </div>
-        </div>
-      </div>
-      <div
-        v-else-if="activePlayer && turnActionText"
-        class="turn-alert-banner turn-alert-banner--waiting row items-center justify-between"
-      >
-        <div class="row items-center no-wrap">
-          <div class="turn-alert-icon-wrap q-mr-md bg-blue-1 text-primary">
-            <q-icon name="hourglass_empty" size="20px" />
-          </div>
-          <div>
-            <div class="text-subtitle2 text-weight-bold text-dark">
-              Waiting for {{ activePlayer.profile_name || activePlayer.username }} to {{ turnActionText }}
-            </div>
-            <div class="text-caption text-grey-7">
-              You will be notified once it is your turn to act.
-            </div>
-          </div>
+          <q-linear-progress
+            :value="totalPicksCount > 0 ? reportedResultsCount / totalPicksCount : 0"
+            color="amber-8"
+            track-color="amber-1"
+            rounded
+            style="width: 100px; height: 6px"
+            class="gt-xs q-ml-md"
+          />
         </div>
       </div>
 
@@ -264,7 +204,6 @@ const { user } = storeToRefs(useUserStore());
 const myLeagueStore = useMyLeagueStore();
 const {
   loading,
-  refreshing,
   leagueStatus,
   leagueData,
   members,
@@ -291,10 +230,6 @@ onUnmounted(() => {
     unsubscribe();
   }
 });
-
-async function handleRefresh() {
-  await myLeagueStore.refresh();
-}
 
 const totalPicksCount = computed(() => {
   return members.value.reduce(
@@ -390,86 +325,10 @@ const turnActionText = computed(() => {
   letter-spacing: 0.2px;
 }
 
-/* KPI Summary Cards */
-.kpi-grid {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-}
-
-.kpi-card {
-  background: white;
-  border: 1px solid rgba(0, 0, 0, 0.08);
+/* Integrated Header Turn & Status Strip */
+.header-turn-strip {
   border-radius: 10px;
-  padding: 8px 16px;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
-  transition: all 0.2s ease;
-  flex: 1 1 calc(25% - 10px);
-  min-width: 160px;
-
-  @media (max-width: 768px) {
-    flex: 1 1 calc(50% - 10px);
-  }
-
-  &:hover {
-    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.06);
-  }
-
-  &--active-turn {
-    border-color: rgba(var(--q-primary), 0.4);
-    background: linear-gradient(135deg, #fffcf5 0%, #ffffff 100%);
-  }
-}
-
-.kpi-icon-wrapper {
-  width: 32px;
-  height: 32px;
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
-
-.bg-primary-1 {
-  background: rgba(var(--q-primary), 0.1);
-}
-.bg-teal-1 {
-  background: rgba(0, 150, 136, 0.1);
-}
-.bg-amber-1 {
-  background: rgba(255, 193, 7, 0.15);
-}
-.bg-indigo-1 {
-  background: rgba(63, 81, 181, 0.1);
-}
-.bg-blue-1 {
-  background: rgba(33, 150, 243, 0.1);
-}
-
-.kpi-value {
-  font-size: 1.15rem;
-  font-weight: 800;
-  line-height: 1.1;
-  color: #212121;
-}
-
-.kpi-label {
-  font-size: 0.68rem;
-  color: #757575;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.3px;
-  margin-top: 2px;
-}
-
-/* Turn Alert Banners */
-.turn-alert-banner {
-  border-radius: 12px;
-  padding: 12px 18px;
+  padding: 8px 14px;
   border: 1px solid transparent;
 
   &--action {
@@ -481,16 +340,29 @@ const turnActionText = computed(() => {
     background: #f0f7ff;
     border-color: #bbdefb;
   }
+
+  &--matches {
+    background: #fdfbf7;
+    border-color: rgba(255, 193, 7, 0.3);
+  }
 }
 
-.turn-alert-icon-wrap {
-  width: 36px;
-  height: 36px;
+.turn-strip-icon-wrap {
+  width: 28px;
+  height: 28px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+}
+
+.bg-amber-1 {
+  background: rgba(255, 193, 7, 0.15);
+}
+
+.bg-blue-1 {
+  background: rgba(33, 150, 243, 0.1);
 }
 
 /* Empty State */
