@@ -213,7 +213,22 @@
                   />
                 </q-item-section>
                 <q-item-section>
-                  <div class="text-weight-bold text-grey-7 text-uppercase" style="font-size: 0.75rem; letter-spacing: 0.05em;">Match Result</div>
+                  <div class="row items-center q-gutter-x-sm">
+                    <div class="text-weight-bold text-grey-7 text-uppercase" style="font-size: 0.75rem; letter-spacing: 0.05em;">Match Result</div>
+                    <q-badge
+                      v-if="getWinConditionName(selGame.id)"
+                      color="indigo-1"
+                      text-color="indigo-8"
+                      class="stat-badge elegant-badge"
+                    >
+                      <q-icon name="flag_circle" size="14px" class="q-mr-xs shrink-0" />
+                      <span class="ellipsis">{{ getWinConditionName(selGame.id) }}</span>
+                      <KennerTooltip>
+                        <span class="text-weight-bold">Win condition:</span>
+                        {{ getWinConditionName(selGame.id) }}
+                      </KennerTooltip>
+                    </q-badge>
+                  </div>
                 </q-item-section>
                 <q-space />
                 <q-item-section side>
@@ -402,6 +417,11 @@ function hasResult(selGame: any) {
   return Array.isArray(results) && results.length > 0;
 }
 
+function getWinConditionName(selectedGameId: number): string | null {
+  const results = props.matchResultsBySelectedGameId[selectedGameId];
+  return results?.[0]?.win_condition?.name ?? null;
+}
+
 function getOwnerName(profileId: number) {
   const owner = props.league?.members?.find((m: any) => m.profile === profileId);
   return owner?.profile_name || null;
@@ -409,6 +429,20 @@ function getOwnerName(profileId: number) {
 </script>
 
 <style scoped>
+.stat-badge {
+  padding: 4px 8px;
+  font-size: 11px;
+  border-radius: 6px;
+  display: inline-flex;
+  align-items: center;
+  font-weight: 500;
+  max-width: 100%;
+}
+
+.elegant-badge {
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  backdrop-filter: blur(4px);
+}
 .ellipsis {
   white-space: nowrap;
   overflow: hidden;

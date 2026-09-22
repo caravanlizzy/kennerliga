@@ -8,9 +8,24 @@
         {{ selectedGame.game_name }}
       </div>
       <q-space />
-      <q-badge rounded color="grey-3" text-color="grey-7" class="q-px-sm">
-        {{ results.length }} players
-      </q-badge>
+      <div class="row items-center q-gutter-xs">
+        <q-badge
+          v-if="matchWinConditionName"
+          color="indigo-1"
+          text-color="indigo-8"
+          class="stat-badge elegant-badge"
+        >
+          <q-icon name="flag_circle" size="14px" class="q-mr-xs shrink-0" />
+          <span class="ellipsis">{{ matchWinConditionName }}</span>
+          <KennerTooltip>
+            <span class="text-weight-bold">Win condition:</span>
+            {{ matchWinConditionName }}
+          </KennerTooltip>
+        </q-badge>
+        <q-badge rounded color="grey-3" text-color="grey-7" class="q-px-sm">
+          {{ results.length }} players
+        </q-badge>
+      </div>
     </q-card-section>
 
     <q-separator v-if="displayGameName" />
@@ -206,6 +221,11 @@ const rawResults = computed(() => {
   }));
 });
 
+const matchWinConditionName = computed(() => {
+  const item = rawResults.value.find((r) => r.win_condition_name);
+  return item?.win_condition_name ?? null;
+});
+
 const results = computed(() => {
   const mapped = rawResults.value.slice();
 
@@ -229,15 +249,18 @@ type ResultRow = ReturnType<typeof rawResults.value.at> extends infer R
   : never;
 
 function shouldShowWinCondition(result: ResultRow) {
-  const name = result.win_condition_name;
-  if (!name) return !!result.win_condition_option_name;
-  const lowerName = name.toLowerCase().trim();
-  return (
-    lowerName !== 'points' &&
-    lowerName !== 'victory points' &&
-    lowerName !== 'score' &&
-    lowerName !== 'point'
-  );
+  if (result.win_condition_option_name) return true;
+  if (!props.displayGameName && result.win_condition_name) {
+    const lowerName = result.win_condition_name.toLowerCase().trim();
+    return (
+      lowerName !== 'points' &&
+      lowerName !== 'victory points' &&
+      lowerName !== 'score' &&
+      lowerName !== 'point' &&
+      lowerName !== 'punkte'
+    );
+  }
+  return false;
 }
 
 function rankColor(position: number | null) {

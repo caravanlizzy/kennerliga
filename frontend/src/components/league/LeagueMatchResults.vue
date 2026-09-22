@@ -49,7 +49,7 @@
                   <div class="game-icon-box q-mr-sm">
                     <q-icon name="sports_esports" color="primary" size="24px" />
                   </div>
-                  <div class="column">
+                  <div class="column col">
                     <div class="text-subtitle1 text-weight-bolder text-dark line-height-1 ellipsis">
                       {{ game.game_name }}
                     </div>
@@ -57,6 +57,19 @@
                       Selected by {{ game.selected_by }}
                     </div>
                   </div>
+                  <q-badge
+                    v-if="getWinConditionName(game.id)"
+                    color="indigo-1"
+                    text-color="indigo-8"
+                    class="stat-badge elegant-badge q-ml-sm"
+                  >
+                    <q-icon name="flag_circle" size="14px" class="q-mr-xs shrink-0" />
+                    <span class="ellipsis">{{ getWinConditionName(game.id) }}</span>
+                    <KennerTooltip>
+                      <span class="text-weight-bold">Win condition:</span>
+                      {{ getWinConditionName(game.id) }}
+                    </KennerTooltip>
+                  </q-badge>
                 </div>
               </q-card-section>
 
@@ -82,6 +95,7 @@ import { storeToRefs } from 'pinia';
 import LoadingSpinner from 'components/base/LoadingSpinner.vue';
 import MatchResult from 'components/league/MatchResult.vue';
 import LeagueStandings from 'components/league/LeagueStandings.vue';
+import KennerTooltip from 'components/base/KennerTooltip.vue';
 
 const props = defineProps<{
   leagueId: number;
@@ -96,6 +110,11 @@ const {
   initialized
 } = storeToRefs(leagueStore);
 
+function getWinConditionName(selectedGameId: number): string | null {
+  const results = matchResultsBySelectedGame.value?.[selectedGameId];
+  return results?.[0]?.win_condition?.name ?? null;
+}
+
 onMounted(async () => {
   if (!initialized.value) {
     await leagueStore.init();
@@ -104,6 +123,20 @@ onMounted(async () => {
 </script>
 
 <style scoped lang="scss">
+.stat-badge {
+  padding: 4px 8px;
+  font-size: 11px;
+  border-radius: 6px;
+  display: inline-flex;
+  align-items: center;
+  font-weight: 500;
+  max-width: 100%;
+}
+
+.elegant-badge {
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  backdrop-filter: blur(4px);
+}
 .match-game-card {
   border-radius: 12px;
   background: #fff;
