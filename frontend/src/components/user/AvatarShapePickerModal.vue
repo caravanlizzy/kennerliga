@@ -5,15 +5,10 @@
   >
     <q-card class="avatar-customizer-dialog surface-card">
       <q-card-section class="row items-center q-pb-none q-pt-md q-px-md">
-        <div class="column">
-          <div class="row items-center q-gutter-x-sm">
-            <q-icon name="palette" color="primary" size="24px" />
-            <div class="text-h6 text-weight-bolder text-dark">
-              Customize Avatar
-            </div>
-          </div>
-          <div class="text-caption text-grey-7 q-mt-xs">
-            Tap any shape or color to update your avatar.
+        <div class="row items-center q-gutter-x-sm">
+          <q-icon name="palette" color="primary" size="24px" />
+          <div class="text-h6 text-weight-bolder text-dark">
+            Customize Avatar
           </div>
         </div>
         <q-space />
@@ -99,9 +94,6 @@
 
                 <div class="text-subtitle2 text-weight-bold text-dark ellipsis full-width">
                   {{ opt.name }}
-                </div>
-                <div class="text-caption text-grey-7 shape-desc">
-                  {{ opt.description }}
                 </div>
               </q-card>
             </div>
@@ -350,7 +342,6 @@ function getContrastColor(hex: string) {
   border: 2px solid rgba(0, 0, 0, 0.08);
   background: #f8fafc;
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  min-height: 120px;
 
   &:hover {
     border-color: var(--q-primary);
@@ -410,16 +401,5 @@ function getContrastColor(hex: string) {
   background: var(--q-primary);
   border: 2px solid #ffffff;
   z-index: 2;
-}
-
-.shape-desc {
-  font-size: 11px;
-  line-height: 1.2;
-  margin-top: 2px;
-  opacity: 0.8;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
 }
 </style>
