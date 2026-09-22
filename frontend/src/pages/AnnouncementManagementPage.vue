@@ -1,137 +1,168 @@
 <template>
-  <q-page class="q-pa-md">
-    <div class="text-h5 text-weight-bold q-mb-lg">Manage Announcements</div>
-
-    <LoadingSpinner v-if="loading" />
-
-    <template v-else>
-      <!-- Current Announcements -->
-      <q-card flat bordered class="q-mb-lg">
-        <q-card-section>
-          <div class="text-h6 q-mb-md">Current Announcements</div>
-
-          <div v-if="announcements.length === 0" class="text-center text-grey q-pa-lg">
-            No announcements yet
+  <q-page class="q-py-md flex justify-center">
+    <div style="max-width: var(--kenner-max-width-text); width: 100%" class="q-px-sm">
+      <!-- Header -->
+      <div class="management-hero-card q-pa-lg q-mb-lg row items-center justify-between">
+        <div class="column">
+          <div class="row items-center q-gutter-x-sm q-mb-xs">
+            <q-icon name="campaign" color="primary" size="32px" />
+            <div class="text-h5 text-weight-bold text-dark tracking-tight">
+              Manage Announcements
+            </div>
           </div>
-
-          <div v-else class="q-gutter-md">
-            <q-banner
-              v-for="announcement in announcements"
-              :key="announcement.id"
-              :class="bannerClasses[announcement.type]"
-              rounded
-            >
-              <template #avatar>
-                <q-icon
-                  :name="announcementIcons[announcement.type]"
-                  size="md"
-                />
-              </template>
-
-              <template #action>
-                <KennerButton
-                  flat
-                  round
-                  dense
-                  icon="delete"
-                  @click="requestDelete(announcement.id)"
-                />
-              </template>
-
-              <div class="text-subtitle1 text-weight-bold">
-                {{ announcement.title }}
-              </div>
-
-              <div v-if="announcement.content" class="q-mt-xs">
-                {{ announcement.content }}
-              </div>
-
-              <div class="text-caption q-mt-sm text-grey-4">
-                {{ announcement.visible_from }} - {{ announcement.visible_until }}
-              </div>
-            </q-banner>
+          <div class="text-caption text-grey-7">
+            Publish system banners, winner announcements, and registration notices.
           </div>
-        </q-card-section>
-      </q-card>
+        </div>
+      </div>
 
-      <!-- New TAnnouncementDto Form -->
-      <q-card flat bordered>
-        <q-card-section>
-          <div class="text-h6 q-mb-md">Add New Announcement</div>
+      <LoadingSpinner v-if="loading" />
 
-          <q-form @submit.prevent="submitAnnouncement" class="q-gutter-md">
-            <KennerSelect
-              v-model="newAnnouncement.type"
-              :options="announcementTypes"
-              label="Type"
-              emit-value
-              map-options
-            />
+      <template v-else>
+        <!-- Current Announcements -->
+        <q-card flat class="management-card q-mb-lg">
+          <q-card-section class="q-pa-lg">
+            <div class="text-subtitle1 text-weight-bold q-mb-md text-dark row items-center justify-between">
+              <div class="row items-center q-gutter-x-xs">
+                <q-icon name="notifications" color="primary" size="20px" />
+                <span>Active Announcements</span>
+              </div>
+              <q-badge color="primary" rounded class="q-px-sm">
+                {{ announcements.length }}
+              </q-badge>
+            </div>
 
-            <KennerInput
-              v-model="newAnnouncement.title"
-              label="Title"
-              :rules="[(val) => !!val || 'Title is required']"
-            />
+            <div v-if="announcements.length === 0" class="text-center text-grey-6 q-pa-xl column items-center">
+              <q-icon name="campaign" size="48px" class="opacity-30 q-mb-sm" />
+              <span>No announcements currently published</span>
+            </div>
 
-            <KennerInput
-              v-model="newAnnouncement.content"
-              label="Content (optional)"
-              type="textarea"
-              autogrow
-            />
+            <div v-else class="column q-gutter-y-sm">
+              <q-banner
+                v-for="announcement in announcements"
+                :key="announcement.id"
+                :class="bannerClasses[announcement.type]"
+                rounded
+                class="shadow-1"
+              >
+                <template #avatar>
+                  <q-icon
+                    :name="announcementIcons[announcement.type]"
+                    size="md"
+                  />
+                </template>
 
-            <div class="row q-gutter-md">
-              <KennerInput
-                v-model="newAnnouncement.visible_from"
-                label="Visible From"
-                type="date"
-                class="col"
-                :rules="[(val) => !!val || 'Start date is required']"
+                <template #action>
+                  <KennerButton
+                    flat
+                    round
+                    dense
+                    icon="delete"
+                    color="negative"
+                    @click="requestDelete(announcement.id)"
+                  />
+                </template>
+
+                <div class="text-subtitle1 text-weight-bold">
+                  {{ announcement.title }}
+                </div>
+
+                <div v-if="announcement.content" class="q-mt-xs text-body2">
+                  {{ announcement.content }}
+                </div>
+
+                <div class="text-caption q-mt-sm opacity-80">
+                  Visible: {{ announcement.visible_from }} - {{ announcement.visible_until }}
+                </div>
+              </q-banner>
+            </div>
+          </q-card-section>
+        </q-card>
+
+        <!-- New Announcement Form -->
+        <q-card flat class="management-card">
+          <q-card-section class="q-pa-lg">
+            <div class="text-subtitle1 text-weight-bold q-mb-md text-dark row items-center q-gutter-x-xs">
+              <q-icon name="add_circle" color="positive" size="20px" />
+              <span>Add New Announcement</span>
+            </div>
+
+            <q-form @submit.prevent="submitAnnouncement" class="q-gutter-y-md">
+              <KennerSelect
+                v-model="newAnnouncement.type"
+                :options="announcementTypes"
+                label="Type"
+                emit-value
+                map-options
               />
 
               <KennerInput
-                v-model="newAnnouncement.visible_until"
-                label="Visible Until"
-                type="date"
-                class="col"
-                :rules="[(val) => !!val || 'End date is required']"
+                v-model="newAnnouncement.title"
+                label="Title"
+                :rules="[(val) => !!val || 'Title is required']"
               />
-            </div>
 
-            <div class="row justify-end">
-              <KennerButton icon="add" type="submit">
-                Add Announcement
-              </KennerButton>
-            </div>
-          </q-form>
-        </q-card-section>
-      </q-card>
-    </template>
+              <KennerInput
+                v-model="newAnnouncement.content"
+                label="Content (optional)"
+                type="textarea"
+                autogrow
+              />
 
-    <!-- Delete confirmation dialog -->
-    <q-dialog v-model="deleteDialogOpen" persistent>
-      <q-card>
-        <q-card-section class="row items-center q-gutter-sm">
-          <q-icon name="warning" color="negative" size="md" />
-          <div class="text-h6">Delete announcement?</div>
-        </q-card-section>
+              <div class="row q-col-gutter-md">
+                <div class="col-12 col-sm-6">
+                  <KennerInput
+                    v-model="newAnnouncement.visible_from"
+                    label="Visible From"
+                    type="date"
+                    :rules="[(val) => !!val || 'Start date is required']"
+                  />
+                </div>
 
-        <q-card-section>
-          Do you want to remove this announcement?
-        </q-card-section>
+                <div class="col-12 col-sm-6">
+                  <KennerInput
+                    v-model="newAnnouncement.visible_until"
+                    label="Visible Until"
+                    type="date"
+                    :rules="[(val) => !!val || 'End date is required']"
+                  />
+                </div>
+              </div>
 
-        <q-card-actions align="right">
-          <KennerButton flat label="Cancel" color="dark" v-close-popup />
-          <KennerButton
-            flat
-            label="Delete"
-            color="negative"
-            @click="confirmDelete"
-          />
-        </q-card-actions>
-      </q-card>
-    </q-dialog>
+              <div class="row justify-end q-mt-md">
+                <KennerButton icon="add" type="submit" color="primary">
+                  Publish Announcement
+                </KennerButton>
+              </div>
+            </q-form>
+          </q-card-section>
+        </q-card>
+      </template>
+
+      <!-- Delete confirmation dialog -->
+      <q-dialog v-model="deleteDialogOpen" persistent>
+        <q-card class="dialog-card">
+          <q-card-section class="row items-center q-gutter-sm">
+            <q-icon name="warning" color="negative" size="md" />
+            <div class="text-h6 text-weight-bold">Delete announcement?</div>
+          </q-card-section>
+
+          <q-card-section class="text-body2 text-grey-8">
+            Do you want to remove this announcement permanently?
+          </q-card-section>
+
+          <q-card-actions align="right" class="q-pa-md">
+            <KennerButton flat label="Cancel" color="dark" v-close-popup />
+            <KennerButton
+              flat
+              label="Delete"
+              color="negative"
+              @click="confirmDelete"
+            />
+          </q-card-actions>
+        </q-card>
+      </q-dialog>
+    </div>
   </q-page>
 </template>
 
@@ -181,3 +212,28 @@ const { deleteDialogOpen, requestDelete, confirmDelete } = useDeleteConfirm(
   (id) => removeAnnouncement(id)
 );
 </script>
+
+<style scoped lang="scss">
+.management-hero-card {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid var(--kenner-border-color, rgba(0, 0, 0, 0.08));
+  border-radius: var(--kenner-card-radius, 16px);
+}
+
+.management-card {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid var(--kenner-border-color, rgba(0, 0, 0, 0.08));
+  border-radius: var(--kenner-card-radius, 16px);
+}
+
+.dialog-card {
+  min-width: 320px;
+  max-width: 440px;
+  border-radius: var(--kenner-card-radius, 16px);
+  border: 1px solid var(--kenner-border-color, rgba(0, 0, 0, 0.08));
+}
+</style>
