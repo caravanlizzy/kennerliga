@@ -14,12 +14,15 @@ AVATAR_SHAPE_CHOICES = [
     ("circle", "Circle"),
     ("heart", "Heart"),
     ("star", "Star"),
-    ("diamond", "Diamond"),
     ("hexagon", "Hexagon"),
     ("shield", "Shield"),
     ("clover", "Clover"),
-    ("octagon", "Octagon"),
-    ("badge", "Badge"),
+    ("meeple", "Meeple"),
+    ("beetle", "Beetle"),
+    ("fish", "Fish"),
+    ("snake", "Snake"),
+    ("crown", "Crown"),
+    ("cat", "Cat"),
 ]
 
 

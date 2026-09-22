@@ -3,12 +3,15 @@ export type AvatarShape =
   | 'circle'
   | 'heart'
   | 'star'
-  | 'diamond'
   | 'hexagon'
   | 'shield'
   | 'clover'
-  | 'octagon'
-  | 'badge';
+  | 'meeple'
+  | 'beetle'
+  | 'fish'
+  | 'snake'
+  | 'crown'
+  | 'cat';
 
 export interface AvatarShapeOption {
   id: AvatarShape;
@@ -43,12 +46,6 @@ export const AVATAR_SHAPE_OPTIONS: AvatarShapeOption[] = [
     icon: 'star',
   },
   {
-    id: 'diamond',
-    name: 'Diamond',
-    description: 'Sharp diamond rhombus',
-    icon: 'diamond',
-  },
-  {
     id: 'hexagon',
     name: 'Hexagon',
     description: 'Board game style hex tile',
@@ -67,16 +64,40 @@ export const AVATAR_SHAPE_OPTIONS: AvatarShapeOption[] = [
     icon: 'nature',
   },
   {
-    id: 'octagon',
-    name: 'Octagon',
-    description: 'Eight-sided champion ring',
-    icon: 'stop',
+    id: 'meeple',
+    name: 'Meeple',
+    description: 'Classic board game player figure',
+    icon: 'accessibility_new',
   },
   {
-    id: 'badge',
-    name: 'Badge',
-    description: 'Eight-point starburst badge',
-    icon: 'military_tech',
+    id: 'beetle',
+    name: 'Beetle',
+    description: 'Resilient scarab beetle silhouette',
+    icon: 'bug_report',
+  },
+  {
+    id: 'fish',
+    name: 'Fish',
+    description: 'Graceful swimming fish silhouette',
+    icon: 'phishing',
+  },
+  {
+    id: 'snake',
+    name: 'Snake',
+    description: 'Winding serpentine serpent coil',
+    icon: 'gesture',
+  },
+  {
+    id: 'crown',
+    name: 'Crown',
+    description: 'Three-pointed royal winner crown',
+    icon: 'emoji_events',
+  },
+  {
+    id: 'cat',
+    name: 'Cat',
+    description: 'Playful feline head with pointy ears',
+    icon: 'pets',
   },
 ];
 

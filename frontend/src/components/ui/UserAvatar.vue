@@ -195,7 +195,18 @@ const textStyle = computed(() => {
   const numericSize = parseFloat(props.size || '32');
   let factor = 0.42;
   const s = resolvedShape.value;
-  if (s === 'star' || s === 'diamond' || s === 'heart' || s === 'shield' || s === 'clover' || s === 'badge') {
+  if (
+    s === 'star' ||
+    s === 'heart' ||
+    s === 'shield' ||
+    s === 'clover' ||
+    s === 'meeple' ||
+    s === 'beetle' ||
+    s === 'fish' ||
+    s === 'snake' ||
+    s === 'crown' ||
+    s === 'cat'
+  ) {
     factor = 0.35;
   }
   const fontSize = numericSize * factor;
@@ -274,10 +285,6 @@ const textStyle = computed(() => {
   clip-path: url(#avatar-clip-star);
 }
 
-.shape-diamond {
-  clip-path: url(#avatar-clip-diamond);
-}
-
 .shape-hexagon {
   clip-path: url(#avatar-clip-hexagon);
 }
@@ -294,11 +301,35 @@ const textStyle = computed(() => {
   clip-path: url(#avatar-clip-clover);
 }
 
-.shape-octagon {
-  clip-path: url(#avatar-clip-octagon);
+.shape-meeple {
+  clip-path: url(#avatar-clip-meeple);
 }
 
-.shape-badge {
-  clip-path: url(#avatar-clip-badge);
+.shape-beetle {
+  clip-path: url(#avatar-clip-beetle);
+}
+
+.shape-fish {
+  clip-path: url(#avatar-clip-fish);
+}
+
+.shape-snake {
+  clip-path: url(#avatar-clip-snake);
+}
+
+.shape-crown {
+  clip-path: url(#avatar-clip-crown);
+}
+
+.shape-crown .avatar-inner {
+  padding-top: 8%;
+}
+
+.shape-cat {
+  clip-path: url(#avatar-clip-cat);
+}
+
+.shape-cat .avatar-inner {
+  padding-top: 6%;
 }
 </style>

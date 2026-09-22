@@ -576,9 +576,16 @@ class UserAPITests(TestCase):
         self.user.refresh_from_db()
         self.assertEqual(self.user.avatar_shape, "star")
 
-        # Invalid shape should return 400
-        invalid_res = self.client.patch("/api/user/users/avatar-shape/", {"avatar_shape": "non_existent"})
-        self.assertEqual(invalid_res.status_code, 400)
+        # Test new shapes (beetle, fish, snake, meeple, crown, cat)
+        for shape in ["beetle", "fish", "snake", "meeple", "crown", "cat"]:
+            update_res = self.client.patch("/api/user/users/avatar-shape/", {"avatar_shape": shape})
+            self.assertEqual(update_res.status_code, 200)
+            self.assertEqual(update_res.data.get("avatar_shape"), shape)
+
+        # Removed shapes should return 400
+        for invalid in ["diamond", "octagon", "badge", "non_existent"]:
+            invalid_res = self.client.patch("/api/user/users/avatar-shape/", {"avatar_shape": invalid})
+            self.assertEqual(invalid_res.status_code, 400)
 
     def test_avatar_color_default_and_update(self):
         # Default color should be empty string (auto)
