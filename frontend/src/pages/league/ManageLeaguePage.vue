@@ -73,7 +73,7 @@
       v-else-if="!loading && (!league?.members || league.members.length === 0)"
     />
 
-    <!-- Members Grid -->
+    <!-- Members Section -->
     <ContentSection
       v-else-if="!loading && league"
       title="League Users"
@@ -81,14 +81,15 @@
       color="secondary"
       :bordered="false"
     >
-      <div class="row q-col-gutter-xl">
+      <div class="column">
         <MemberGameCard
-          v-for="member in league?.members"
+          v-for="(member, index) in league?.members"
           :key="member.id"
           :member="member"
           :league="league"
           :season="season"
           :matchResultsBySelectedGameId="matchResultsBySelectedGameId"
+          :is-last="index === (league?.members?.length || 0) - 1"
           @add-game="m => (activeForm = { type: 'add', member: m })"
           @ban-game="m => (activeForm = { type: 'ban', member: m })"
           @set-active="profileId => setActivePlayer(profileId)"

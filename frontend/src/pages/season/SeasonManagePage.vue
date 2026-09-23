@@ -117,7 +117,7 @@
           </q-expansion-item>
         </div>
 
-        <!-- Leagues Grid -->
+        <!-- Leagues List -->
         <ContentSection
           title="Leagues"
           icon="groups"
@@ -127,15 +127,13 @@
           <div v-if="leagues.length === 0" class="text-grey-7 q-pa-md bg-grey-1 rounded-borders text-center">
             No leagues found for this season.
           </div>
-          <div v-else class="row q-col-gutter-lg">
-            <div
+          <q-list v-else separator class="league-list-container">
+            <LeagueList
               v-for="league in leagues"
               :key="league.id"
-              class="col-12 col-sm-6 col-md-4"
-            >
-              <LeagueList :league="league"/>
-            </div>
-          </div>
+              :league="league"
+            />
+          </q-list>
         </ContentSection>
       </template>
     </div>

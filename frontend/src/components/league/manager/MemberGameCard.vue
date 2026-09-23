@@ -1,173 +1,165 @@
 <template>
-  <div class="col-12 q-mb-xl">
-    <q-card flat bordered class="rounded-borders-12 shadow-1 bg-grey-1">
-      <!-- Member Group Header -->
-      <q-card-section class="q-pb-none">
-        <div class="row items-center q-gutter-sm">
-          <q-avatar color="primary" text-color="white" size="md">
-            {{ member.profile_name.charAt(0).toUpperCase() }}
-          </q-avatar>
-          <div class="text-h5 text-weight-bolder text-grey-9">
-            {{ member.profile_name }}
-          </div>
+  <div class="user-entry q-py-md">
+    <!-- Member Header -->
+    <div class="row items-center q-gutter-sm q-mb-md">
+      <q-avatar color="primary" text-color="white" size="36px" font-size="14px" class="text-weight-bold">
+        {{ member.profile_name.charAt(0).toUpperCase() }}
+      </q-avatar>
+      <div class="text-subtitle1 text-weight-bolder text-grey-9">
+        {{ member.profile_name }}
+      </div>
 
-          <template v-if="!member.my_banned_game">
-            <q-chip
-              v-if="member.has_banned"
-              unelevated
-              square
-              color="grey-2"
-              text-color="grey-7"
-              icon="skip_next"
-              size="sm"
-              class="q-ml-sm text-weight-bold"
-            >
-              Ban Skipped
+      <template v-if="!member.my_banned_game">
+        <q-chip
+          v-if="member.has_banned"
+          unelevated
+          square
+          color="grey-2"
+          text-color="grey-7"
+          icon="skip_next"
+          size="sm"
+          class="q-ml-sm text-weight-bold"
+        >
+          Ban Skipped
+          <KennerButton
+            flat
+            round
+            dense
+            size="xs"
+            icon="close"
+            class="q-ml-xs"
+          >
+            <KennerTooltip>Remove Skip</KennerTooltip>
+          </KennerButton>
+        </q-chip>
+      </template>
+
+      <div
+        v-if="
+          ['PICKING', 'REPICKING', 'BANNING'].includes(league.status) &&
+          season?.status === 'RUNNING'
+        "
+        class="q-ml-sm"
+      >
+        <q-badge
+          v-if="member.id === league.active_player"
+          color="positive"
+          text-color="white"
+          class="q-py-xs q-px-sm"
+        >
+          <q-icon size="xs" name="star" class="q-mr-xs" />
+          <span class="text-weight-bold uppercase" style="font-size: 0.7rem">Active</span>
+        </q-badge>
+      </div>
+
+      <q-space />
+
+      <!-- Quick Actions Bar integrated in header -->
+      <div class="row q-gutter-xs">
+        <KennerButton
+          v-if="(member.selected_games?.length || 0) < maxGames"
+          outline
+          no-caps
+          color="primary"
+          icon="add_circle"
+          label="Add Game"
+          size="sm"
+          class="text-weight-bold"
+          @click="$emit('add-game', member)"
+        />
+        <KennerButton
+          v-if="!member.my_banned_game && !member.has_banned"
+          outline
+          no-caps
+          color="red-7"
+          icon="block"
+          label="Ban Game"
+          size="sm"
+          class="text-weight-bold"
+          @click="$emit('ban-game', member)"
+        />
+        <KennerButton
+          v-if="
+            member.id !== league.active_player &&
+            ['PICKING', 'REPICKING', 'BANNING'].includes(league.status) &&
+            season?.status === 'RUNNING'
+          "
+          outline
+          no-caps
+          color="secondary"
+          icon="person_outline"
+          label="Set Active"
+          size="sm"
+          class="text-weight-bold"
+          @click="$emit('set-active', member.profile)"
+        />
+      </div>
+    </div>
+
+    <!-- Games + Status Content -->
+    <div class="row q-col-gutter-md items-start">
+      <!-- Slim box per selected game -->
+      <div
+        v-for="selGame in (member.selected_games || [])"
+        :key="`${member.id}-${selGame.id}`"
+        class="col-12 col-md-4"
+      >
+        <div
+          class="slim-game-box"
+          :class="{ 'opacity-60 grayscale': selGame.successfully_banned }"
+        >
+          <!-- Slim Header Section -->
+          <div
+            class="slim-game-header row items-center justify-between no-wrap q-px-sm q-py-xs"
+            :class="selGame.successfully_banned ? 'bg-red-50 text-negative' : 'bg-grey-2 text-grey-9'"
+          >
+            <div class="col row items-center no-wrap ellipsis">
+              <q-icon
+                :name="selGame.successfully_banned ? 'block' : 'sports_esports'"
+                size="18px"
+                :color="selGame.successfully_banned ? 'negative' : 'primary'"
+                class="q-mr-xs shrink-0"
+              />
+              <span
+                class="text-weight-bold ellipsis"
+                :class="{ 'text-strike': selGame.successfully_banned }"
+                style="font-size: 0.85rem;"
+              >
+                {{ selGame?.game_name || 'No Game Selected' }}
+              </span>
+              <q-badge
+                v-if="selGame.successfully_banned"
+                color="negative"
+                class="q-ml-xs text-weight-bolder"
+                style="font-size: 0.65rem;"
+              >
+                BANNED
+              </q-badge>
+            </div>
+            <div class="col-auto">
               <KennerButton
                 flat
-                round
                 dense
+                round
+                color="red-5"
+                icon="delete_outline"
                 size="xs"
-                icon="close"
-                class="q-ml-xs"
+                @click="$emit('delete-game', { member, selGame })"
               >
-                <KennerTooltip>Remove Skip</KennerTooltip>
+                <KennerTooltip>Delete Game</KennerTooltip>
               </KennerButton>
-            </q-chip>
-          </template>
-
-          <q-space />
-
-          <!-- Quick Actions Bar integrated in header -->
-          <div class="row q-gutter-xs">
-            <KennerButton
-              v-if="(member.selected_games?.length || 0) < maxGames"
-              outline
-              no-caps
-              color="primary"
-              icon="add_circle"
-              label="Add Game"
-              size="sm"
-              class="text-weight-bold"
-              @click="$emit('add-game', member)"
-            />
-            <KennerButton
-              v-if="!member.my_banned_game && !member.has_banned"
-              outline
-              no-caps
-              color="red-7"
-              icon="block"
-              label="Ban Game"
-              size="sm"
-              class="text-weight-bold"
-              @click="$emit('ban-game', member)"
-            />
-            <KennerButton
-              v-if="
-                member.id !== league.active_player &&
-                ['PICKING', 'REPICKING', 'BANNING'].includes(league.status) &&
-                season?.status === 'RUNNING'
-              "
-              outline
-              no-caps
-              color="secondary"
-              icon="person_outline"
-              label="Set Active"
-              size="sm"
-              class="text-weight-bold"
-              @click="$emit('set-active', member.profile)"
-            />
-          </div>
-
-          <div
-            v-if="
-              ['PICKING', 'REPICKING', 'BANNING'].includes(league.status) &&
-              season?.status === 'RUNNING'
-            "
-            class="q-ml-sm"
-          >
-            <q-badge
-              v-if="member.id === league.active_player"
-              color="positive"
-              text-color="white"
-              class="q-py-xs q-px-sm"
-            >
-              <q-icon size="xs" name="star" class="q-mr-xs" />
-              <span class="text-weight-bold uppercase" style="font-size: 0.7rem">Active</span>
-            </q-badge>
-          </div>
-        </div>
-      </q-card-section>
-
-      <q-separator inset v-if="member.selected_games?.length > 0" />
-
-      <q-card-section class="q-pt-md">
-        <div class="row q-col-gutter-md">
-          <!-- Card per selected game -->
-          <div
-            v-for="selGame in (member.selected_games || [])"
-            :key="`${member.id}-${selGame.id}`"
-            class="col-12 col-md-4"
-          >
-          <q-card
-            flat
-            bordered
-            class="fit rounded-borders overflow-hidden shadow-sm hover-shadow bg-white"
-            :class="{ 'opacity-60 grayscale': selGame.successfully_banned }"
-          >
-          <!-- Header Section -->
-          <q-card-section
-            class="q-pa-md text-grey-9"
-            :class="selGame.successfully_banned ? 'bg-red-50' : 'bg-grey-1'"
-          >
-            <div class="row items-center justify-between no-wrap">
-              <div class="col">
-                <div
-                  class="text-subtitle1 text-weight-bolder ellipsis"
-                  :class="{ 'text-strike': selGame.successfully_banned }"
-                >
-                  <q-icon
-                    :name="selGame.successfully_banned ? 'block' : 'sports_esports'"
-                    size="sm"
-                    :color="selGame.successfully_banned ? 'negative' : 'primary'"
-                    class="q-mr-sm"
-                  />
-                  {{ selGame?.game_name || 'No Game Selected' }}
-                </div>
-                <div
-                  v-if="selGame.successfully_banned"
-                  class="text-caption text-negative text-weight-bold"
-                >
-                  BANNED
-                </div>
-              </div>
-              <div class="col-auto">
-                <div class="row items-center q-gutter-xs">
-                  <KennerButton
-                    outline
-                    dense
-                    round
-                    color="red-5"
-                    icon="delete_outline"
-                    size="sm"
-                    @click="$emit('delete-game', { member, selGame })"
-                  >
-                    <KennerTooltip>Delete Game</KennerTooltip>
-                  </KennerButton>
-                </div>
-              </div>
             </div>
-          </q-card-section>
+          </div>
 
-          <!-- Game Content Sections (Expandables) -->
-          <q-card-section class="q-pa-none">
+          <!-- Expansion items for Settings and Match Result -->
+          <div class="slim-game-content">
             <q-expansion-item
               dense
               label="Settings"
-              header-class="text-weight-bold text-grey-7 bg-grey-1"
+              header-class="text-weight-bold text-grey-7 bg-grey-1 text-uppercase"
             >
               <template #header>
-                <q-item-section avatar>
+                <q-item-section avatar style="min-width: 24px;">
                   <q-icon
                     name="tune"
                     :color="selGame.selected_options?.length > 0 ? 'primary' : 'grey-7'"
@@ -180,32 +172,34 @@
                 <q-space />
                 <q-item-section side>
                   <KennerButton
-                    outline
+                    flat
                     dense
                     round
                     color="grey-7"
                     icon="settings"
-                    size="sm"
-                    @click="$emit('edit-game', { member, selGame })"
+                    size="xs"
+                    @click.stop="$emit('edit-game', { member, selGame })"
                   >
                     <KennerTooltip>Edit Settings</KennerTooltip>
                   </KennerButton>
                 </q-item-section>
               </template>
-              <q-card-section class="bg-white q-pa-md">
+              <div class="bg-white q-pa-sm border-top">
                 <GameSettingsDisplay
                   :selectedOptions="selGame.selected_options"
                 />
-              </q-card-section>
+              </div>
             </q-expansion-item>
+
             <q-separator />
+
             <q-expansion-item
               dense
               label="Match Result"
-              header-class="text-weight-bold text-grey-7 bg-grey-1"
+              header-class="text-weight-bold text-grey-7 bg-grey-1 text-uppercase"
             >
               <template #header>
-                <q-item-section avatar>
+                <q-item-section avatar style="min-width: 24px;">
                   <q-icon
                     name="emoji_events"
                     :color="hasResult(selGame) ? 'secondary' : 'grey-7'"
@@ -232,26 +226,26 @@
                 </q-item-section>
                 <q-space />
                 <q-item-section side>
-                  <div class="row q-gutter-x-xs no-wrap">
+                  <div class="row q-gutter-x-xs no-wrap" @click.stop>
                     <KennerButton
                       v-if="hasResult(selGame)"
-                      outline
+                      flat
                       dense
                       round
                       color="red-7"
                       icon="delete_outline"
-                      size="sm"
+                      size="xs"
                       @click="$emit('delete-result', selGame)"
                     >
                       <KennerTooltip>Delete Result</KennerTooltip>
                     </KennerButton>
                     <KennerButton
-                      outline
+                      flat
                       dense
                       round
                       :color="hasResult(selGame) ? 'secondary' : 'primary'"
                       :icon="hasResult(selGame) ? 'edit_note' : 'post_add'"
-                      size="sm"
+                      size="xs"
                       @click="() => hasResult(selGame) ? $emit('edit-result', selGame.id) : $emit('post-result', selGame)"
                     >
                       <KennerTooltip>{{ hasResult(selGame) ? 'Edit Result' : 'Post Result' }}</KennerTooltip>
@@ -259,24 +253,24 @@
                   </div>
                 </q-item-section>
               </template>
-              <q-card-section class="bg-white q-pa-md">
+              <div class="bg-white q-pa-sm border-top">
                 <MatchResult
                   v-if="hasResult(selGame)"
                   :displayGameName="false"
                   :selectedGame="selGame"
                   :matchResults="matchResultsBySelectedGameId"
                 />
-                <div v-else class="text-grey-5 text-center q-py-sm">
+                <div v-else class="text-grey-5 text-center q-py-sm text-caption">
                   No results posted
                 </div>
-              </q-card-section>
+              </div>
             </q-expansion-item>
-          </q-card-section>
-        </q-card>
+          </div>
+        </div>
       </div>
 
       <!-- Ban info + Picking / Banning / Reporting status badges -->
-      <div class="col-12 col-md-4 column items-end q-gutter-y-sm">
+      <div class="col-12 col-md-4 column items-start items-md-end q-gutter-y-sm">
         <!-- What this player has banned -->
         <q-chip
           v-if="member.my_banned_game"
@@ -335,9 +329,10 @@
         </q-chip>
       </div>
     </div>
-  </q-card-section>
-</q-card>
-</div>
+
+    <!-- Divider separator between user entries -->
+    <q-separator v-if="!isLast" class="q-mt-lg" />
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -348,12 +343,18 @@ import KennerButton from 'components/base/KennerButton.vue';
 import KennerTooltip from 'components/base/KennerTooltip.vue';
 import type { TSeasonDto } from 'src/types';
 
-const props = defineProps<{
-  member: any;
-  league: any;
-  season: TSeasonDto | null;
-  matchResultsBySelectedGameId: Record<number, any[]>;
-}>();
+const props = withDefaults(
+  defineProps<{
+    member: any;
+    league: any;
+    season: TSeasonDto | null;
+    matchResultsBySelectedGameId: Record<number, any[]>;
+    isLast?: boolean;
+  }>(),
+  {
+    isLast: false,
+  }
+);
 
 const maxGames = computed(() => {
   const memberCount = props.league?.members?.length || 0;
@@ -428,7 +429,27 @@ function getOwnerName(profileId: number) {
 }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
+.user-entry {
+  position: relative;
+}
+
+.slim-game-box {
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 4px;
+  overflow: hidden;
+  background: white;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+
+  &:hover {
+    border-color: rgba(0, 0, 0, 0.25);
+  }
+}
+
+.border-top {
+  border-top: 1px solid rgba(0, 0, 0, 0.06);
+}
+
 .stat-badge {
   padding: 4px 8px;
   font-size: 11px;
@@ -443,18 +464,26 @@ function getOwnerName(profileId: number) {
   border: 1px solid rgba(0, 0, 0, 0.06);
   backdrop-filter: blur(4px);
 }
+
 .ellipsis {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
+
 .opacity-60 {
   opacity: 0.6;
 }
+
 .grayscale {
   filter: grayscale(0.5);
 }
+
 .bg-red-50 {
   background-color: #fef2f2;
+}
+
+.shrink-0 {
+  flex-shrink: 0;
 }
 </style>

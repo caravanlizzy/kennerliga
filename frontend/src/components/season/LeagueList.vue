@@ -1,37 +1,43 @@
 <template>
-  <q-card
-    flat
-    bordered
-    class="q-hoverable full-height column"
+  <q-item
+    :clickable="isAdmin"
+    :v-ripple="isAdmin"
+    class="q-py-md league-item"
     :class="{ 'cursor-pointer': isAdmin, 'bg-grey-1': league.is_completed }"
     @click="isAdmin ? goToLeague(league) : undefined"
   >
-    <div v-if="isAdmin" class="q-focus-helper"></div>
-    <div class="q-pa-md row items-center q-gutter-x-md no-wrap">
+    <q-item-section avatar>
       <LeagueLevel :level="league.level" size="40px" fontSize="16px" />
+    </q-item-section>
 
-      <div class="col column q-gutter-y-xs overflow-hidden">
-        <div class="column">
-          <span class="text-caption text-grey-6 text-weight-bold q-mb-xs">Players:</span>
-          <div v-if="league.members?.length" class="column q-gutter-y-xs q-pl-xs">
-            <div
-              v-for="m in league.members"
-              :key="m.id"
-              class="row items-center q-gutter-x-sm"
-              @click.stop
-            >
-              <div class="player-dot" />
-              <span class="text-caption text-grey-8">{{ m.profile_name }}</span>
-            </div>
-          </div>
-          <div v-else class="text-caption text-grey-5 italic">None</div>
-        </div>
+    <q-item-section>
+      <div class="row items-center q-gutter-x-sm q-mb-xs">
+        <span class="text-subtitle1 text-weight-bold text-dark">League {{ league.level }}</span>
+        <q-badge v-if="league.is_completed" color="positive" class="q-pa-xs">
+          <q-icon name="check_circle" size="12px" class="q-mr-xs" />
+          <span>Complete</span>
+        </q-badge>
       </div>
 
-      <div class="col-auto row items-center q-gutter-x-xs">
-        <q-badge v-if="league.is_completed" color="positive" class="q-pa-xs">
-          <q-icon name="check_circle" size="12px" />
-        </q-badge>
+      <div class="row items-center q-gutter-x-sm wrap">
+        <span class="text-caption text-grey-6 text-weight-bold">Players:</span>
+        <template v-if="league.members?.length">
+          <div
+            v-for="m in league.members"
+            :key="m.id"
+            class="row items-center q-gutter-x-xs q-mr-sm"
+            @click.stop
+          >
+            <div class="player-dot" />
+            <span class="text-caption text-grey-8">{{ m.profile_name }}</span>
+          </div>
+        </template>
+        <span v-else class="text-caption text-grey-5 italic">None</span>
+      </div>
+    </q-item-section>
+
+    <q-item-section side>
+      <div class="row items-center q-gutter-x-sm">
         <q-badge outline color="grey-8" class="q-pa-xs">
           <q-icon name="group" size="14px" class="q-mr-xs" />
           <span>{{ league.members?.length || 0 }}</span>
@@ -47,8 +53,8 @@
           @click.stop="goToLeague(league)"
         />
       </div>
-    </div>
-  </q-card>
+    </q-item-section>
+  </q-item>
 </template>
 
 <script setup lang="ts">
@@ -73,6 +79,14 @@ function goToLeague(league: TLeagueDto) {
 </script>
 
 <style scoped lang="scss">
+.league-item {
+  transition: background-color 0.2s ease;
+
+  &:hover {
+    background: #f8fafc;
+  }
+}
+
 .player-dot {
   width: 4px;
   height: 4px;
