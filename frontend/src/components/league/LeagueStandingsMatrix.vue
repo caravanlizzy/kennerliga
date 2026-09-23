@@ -381,6 +381,7 @@ const props = defineProps<{
 
 const { isMobile } = useResponsive();
 const router = useRouter();
+const userStore = useUserStore();
 
 function goToPlayer(username?: string | null): void {
   if (!username) return;
@@ -492,8 +493,6 @@ const tableColumns = computed<TStandingsColumn[]>(() => {
 
   return cols;
 });
-
-const userStore = useUserStore();
 
 const tableRows = computed(() => {
   if (!standings.value) return [];
