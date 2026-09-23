@@ -11,7 +11,14 @@ export type AvatarShape =
   | 'fish'
   | 'snake'
   | 'crown'
-  | 'cat';
+  | 'cat'
+  | 'bear'
+  | 'fox'
+  | 'rabbit'
+  | 'frog'
+  | 'owl'
+  | 'butterfly'
+  | 'turtle';
 
 export interface AvatarShapeOption {
   id: AvatarShape;
@@ -98,6 +105,48 @@ export const AVATAR_SHAPE_OPTIONS: AvatarShapeOption[] = [
     name: 'Cat',
     description: 'Playful feline head with pointy ears',
     icon: 'pets',
+  },
+  {
+    id: 'bear',
+    name: 'Bear',
+    description: 'Friendly bear silhouette with rounded ears',
+    icon: 'pets',
+  },
+  {
+    id: 'fox',
+    name: 'Fox',
+    description: 'Clever fox head with pointed ears',
+    icon: 'pets',
+  },
+  {
+    id: 'rabbit',
+    name: 'Rabbit',
+    description: 'Playful rabbit with tall ears',
+    icon: 'cruelty_free',
+  },
+  {
+    id: 'frog',
+    name: 'Frog',
+    description: 'Cheerful frog silhouette with round eyes',
+    icon: 'eco',
+  },
+  {
+    id: 'owl',
+    name: 'Owl',
+    description: 'Wise owl silhouette with feather tufts',
+    icon: 'visibility',
+  },
+  {
+    id: 'butterfly',
+    name: 'Butterfly',
+    description: 'Graceful butterfly with symmetrical wings',
+    icon: 'flutter_dash',
+  },
+  {
+    id: 'turtle',
+    name: 'Turtle',
+    description: 'Steadfast sea turtle silhouette',
+    icon: 'shield',
   },
 ];
 

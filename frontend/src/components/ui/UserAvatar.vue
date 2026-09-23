@@ -195,18 +195,7 @@ const textStyle = computed(() => {
   const numericSize = parseFloat(props.size || '32');
   let factor = 0.42;
   const s = resolvedShape.value;
-  if (
-    s === 'star' ||
-    s === 'heart' ||
-    s === 'shield' ||
-    s === 'clover' ||
-    s === 'meeple' ||
-    s === 'beetle' ||
-    s === 'fish' ||
-    s === 'snake' ||
-    s === 'crown' ||
-    s === 'cat'
-  ) {
+  if (s !== 'circle' && s !== 'squircle') {
     factor = 0.35;
   }
   const fontSize = numericSize * factor;
@@ -331,5 +320,53 @@ const textStyle = computed(() => {
 
 .shape-cat .avatar-inner {
   padding-top: 6%;
+}
+
+.shape-bear {
+  clip-path: url(#avatar-clip-bear);
+}
+
+.shape-bear .avatar-inner {
+  padding-top: 4%;
+}
+
+.shape-fox {
+  clip-path: url(#avatar-clip-fox);
+}
+
+.shape-fox .avatar-inner {
+  padding-top: 4%;
+}
+
+.shape-rabbit {
+  clip-path: url(#avatar-clip-rabbit);
+}
+
+.shape-rabbit .avatar-inner {
+  padding-top: 10%;
+}
+
+.shape-frog {
+  clip-path: url(#avatar-clip-frog);
+}
+
+.shape-frog .avatar-inner {
+  padding-top: 4%;
+}
+
+.shape-owl {
+  clip-path: url(#avatar-clip-owl);
+}
+
+.shape-owl .avatar-inner {
+  padding-top: 4%;
+}
+
+.shape-butterfly {
+  clip-path: url(#avatar-clip-butterfly);
+}
+
+.shape-turtle {
+  clip-path: url(#avatar-clip-turtle);
 }
 </style>

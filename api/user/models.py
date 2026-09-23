@@ -23,6 +23,13 @@ AVATAR_SHAPE_CHOICES = [
     ("snake", "Snake"),
     ("crown", "Crown"),
     ("cat", "Cat"),
+    ("bear", "Bear"),
+    ("fox", "Fox"),
+    ("rabbit", "Rabbit"),
+    ("frog", "Frog"),
+    ("owl", "Owl"),
+    ("butterfly", "Butterfly"),
+    ("turtle", "Turtle"),
 ]
 
 

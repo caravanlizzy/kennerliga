@@ -576,8 +576,22 @@ class UserAPITests(TestCase):
         self.user.refresh_from_db()
         self.assertEqual(self.user.avatar_shape, "star")
 
-        # Test new shapes (beetle, fish, snake, meeple, crown, cat)
-        for shape in ["beetle", "fish", "snake", "meeple", "crown", "cat"]:
+        # Test new shapes
+        for shape in [
+            "beetle",
+            "fish",
+            "snake",
+            "meeple",
+            "crown",
+            "cat",
+            "bear",
+            "fox",
+            "rabbit",
+            "frog",
+            "owl",
+            "butterfly",
+            "turtle",
+        ]:
             update_res = self.client.patch("/api/user/users/avatar-shape/", {"avatar_shape": shape})
             self.assertEqual(update_res.status_code, 200)
             self.assertEqual(update_res.data.get("avatar_shape"), shape)
