@@ -94,7 +94,7 @@
               class="q-px-sm"
               :to="{
                 name: 'season-overview',
-                params: { seasonId: leagueData.season },
+                params: { id: leagueData.season },
               }"
             />
           </div>
