@@ -7,30 +7,31 @@
   >
     <q-card
       flat
-      class="registration-card shadow-2xl"
+      class="reset-card shadow-2xl"
       :class="[isMobile ? 'q-pa-lg' : 'q-pa-xl']"
       style="border-radius: 20px; border: 1px solid rgba(54, 64, 88, 0.08)"
     >
-      <q-form ref="formRef" @submit="doRegister" @keyup.enter="doRegister" class="q-gutter-y-lg">
+      <q-form ref="formRef" @submit="doResetPassword" @keyup.enter="doResetPassword" class="q-gutter-y-lg">
         <div class="column items-center q-mb-lg">
           <BrandLogo class="q-mb-md" icon-size="64px" word-size="2rem" />
-          <div class="text-h4 text-weight-bolder text-dark tracking-tighter q-mt-md">Sign Up</div>
+          <div class="text-h4 text-weight-bolder text-dark tracking-tighter q-mt-md">Set New Password</div>
           <div class="text-subtitle2 text-grey-6 q-mt-xs text-center">
-            Join the <span class="text-primary">Kenner</span><span class="text-accent">Liga</span> community
+            Enter your new password below
           </div>
         </div>
 
         <div class="column q-gutter-y-md">
           <KennerInput
-            v-model="username"
-            :rules="[rules.required, rules.usernameLen]"
-            label="Username"
-            autocomplete="username"
-          />
-          <KennerInput
             v-model="password"
             :rules="[rules.required]"
-            label="Password"
+            label="New Password"
+            type="password"
+            autocomplete="new-password"
+          />
+          <KennerInput
+            v-model="repeatPassword"
+            :rules="[rules.required, rules.passwordMatch]"
+            label="Repeat Password"
             type="password"
             autocomplete="new-password"
           />
@@ -41,8 +42,8 @@
             type="submit"
             size="lg"
             class="full-width shadow-4"
-            :label="isSubmitting ? 'Signing Up…' : 'Sign Up'"
-            icon="person_add"
+            :label="isSubmitting ? 'Resetting Password…' : 'Set Password'"
+            icon="lock_reset"
             color="primary"
             :loading="isSubmitting"
             :disable="isSubmitting"
@@ -51,7 +52,7 @@
             flat
             color="grey-7"
             icon="login"
-            label="Already have an account? Login"
+            label="Back to Login"
             @click="goToLogin"
             class="full-width"
             no-caps
@@ -70,7 +71,8 @@ import { useResponsive } from 'src/composables/responsive';
 import { ref, onMounted } from 'vue';
 import { useQuasar } from 'quasar';
 import { useRouter, useRoute } from 'vue-router';
-import { registerUser } from 'src/services/userService';
+import axios from 'axios';
+import { confirmPasswordReset } from 'src/services/userService';
 
 const { isMobile } = useResponsive();
 const $q = useQuasar();
@@ -78,68 +80,65 @@ const router = useRouter();
 const route = useRoute();
 
 const formRef = ref();
-const username = ref('');
 const password = ref('');
-const inviteKey = ref('');
+const repeatPassword = ref('');
+const resetKey = ref('');
 const isSubmitting = ref(false);
 
 const rules = {
   required: (v: string) => !!v || 'This field is required',
-  usernameLen: (v: string) =>
-    v?.length >= 3 || 'At least 3 characters required',
+  passwordMatch: (v: string) =>
+    v === password.value || 'Passwords do not match',
 };
 
 onMounted(() => {
-  // Extract the key from URL query parameters
   const key = route.query.key as string;
   if (!key) {
     $q.notify({
       type: 'negative',
-      message: 'Invalid or missing invitation key.',
+      message: 'Invalid or missing password reset key.',
     });
     goToLogin();
     return;
   }
-  inviteKey.value = key;
+  resetKey.value = key;
 });
 
-async function doRegister(): Promise<void> {
+async function doResetPassword(): Promise<void> {
   const valid = await formRef.value?.validate?.();
   if (!valid) return;
 
-  if (!inviteKey.value) {
+  if (!resetKey.value) {
     $q.notify({
       type: 'negative',
-      message: 'Invitation key is missing.',
+      message: 'Password reset key is missing.',
     });
     return;
   }
 
   isSubmitting.value = true;
   try {
-    const data = await registerUser({
-      username: username.value,
+    const data = await confirmPasswordReset({
+      key: resetKey.value,
       password: password.value,
-      invite_key: inviteKey.value,
     });
 
-    // Axios rejects on 4xx/5xx, so reaching this point means success.
     $q.notify({
       type: 'positive',
-      message: data?.detail || `User ${username.value} created successfully.`,
+      message: data?.detail || 'Password has been reset successfully.',
     });
 
-    // Navigate to login page
     goToLogin();
-
-    // Or auto-login if you prefer:
-    // const { login } = useUserStore();
-    // await login(username.value, password.value);
-    // router.push({ name: 'home' });
-  } catch (err: any) {
+  } catch (err: unknown) {
+    let message = 'Failed to reset password.';
+    if (axios.isAxiosError(err)) {
+      message = (err.response?.data as { detail?: string })?.detail || err.message || message;
+    } else if (err instanceof Error) {
+      message = err.message;
+    }
     $q.notify({
       type: 'negative',
-      message: err?.message || 'Unknown error during sign up.',
+      message,
     });
   } finally {
     isSubmitting.value = false;
@@ -147,12 +146,12 @@ async function doRegister(): Promise<void> {
 }
 
 function goToLogin(): void {
-  router.push({ name: 'login' }); // adjust route if different
+  router.push({ name: 'login' });
 }
 </script>
 
 <style scoped lang="scss">
-.registration-card {
+.reset-card {
   background: rgba(255, 255, 255, 0.8) !important;
   backdrop-filter: blur(12px);
   max-width: 500px;

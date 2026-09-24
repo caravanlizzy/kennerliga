@@ -72,14 +72,16 @@ class PlatformPlayerAdmin(admin.ModelAdmin):
 class UserInviteLinkAdmin(admin.ModelAdmin):
     list_display = (
         "label",
+        "type",
+        "user",
         "created_by",
         "created_at",
         "expires_at",
         "is_expired",
         "key",
     )
-    list_filter = ("created_at", "expires_at", "created_by")
-    search_fields = ("label", "created_by__username", "key")
+    list_filter = ("type", "created_at", "expires_at", "created_by")
+    search_fields = ("label", "user__username", "created_by__username", "key")
     readonly_fields = ("created_at", "key")
     ordering = ("-created_at",)
     date_hierarchy = "created_at"

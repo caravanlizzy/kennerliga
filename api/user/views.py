@@ -6,10 +6,12 @@ from django.db import transaction
 from django.db.models import Count, IntegerField, OuterRef, Subquery
 from django.db.models.functions import Lower
 from django.utils import timezone
+from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.exceptions import NotFound
 from rest_framework.permissions import IsAuthenticated, IsAdminUser, AllowAny
 from rest_framework.response import Response
+from rest_framework.throttling import SimpleRateThrottle
 from rest_framework.viewsets import ModelViewSet, ViewSet
 from api.permissions import IsAdminOrReadOnly
 
@@ -31,6 +33,8 @@ from user.serializers import (
     UserSerializer,
     UserInviteLinkSerializer,
     UserRegistrationSerializer,
+    PasswordResetRequestSerializer,
+    PasswordResetConfirmSerializer,
     PlayerProfileSerializer,
     FeedbackSerializer,
 )
@@ -442,10 +446,10 @@ class MeViewSet(ViewSet):
 
 class UserInviteLinkViewSet(ModelViewSet):
     """
-    API viewset for managing user invite links.
+    API viewset for managing user invite links and password restoration links.
     Restricted to admin users.
     """
-    queryset = UserInviteLink.objects.select_related("created_by").all()
+    queryset = UserInviteLink.objects.select_related("created_by", "user", "player_profile").all()
     serializer_class = UserInviteLinkSerializer
     permission_classes = [IsAdminUser]
     http_method_names = ["get", "post", "delete", "head", "options"]
@@ -470,7 +474,9 @@ class UserRegistrationViewSet(ViewSet):
 
         try:
             with transaction.atomic():
-                invite = UserInviteLink.objects.select_for_update().get(key=invite_key)
+                invite = UserInviteLink.objects.select_for_update().get(
+                    key=invite_key, type=UserInviteLink.TYPE_INVITATION
+                )
 
                 if invite.is_expired():
                     invite.delete()
@@ -502,6 +508,100 @@ class UserRegistrationViewSet(ViewSet):
             return Response({"detail": "Invalid invite key."}, status=400)
         except Exception as e:
             logger.exception("User registration failed.")
+            return Response({"detail": str(e)}, status=400)
+
+
+class PasswordResetRateThrottle(SimpleRateThrottle):
+    """
+    Rate throttle limiting password reset requests to 5 per minute per client IP.
+    """
+    scope = "password_reset"
+    rate = "5/min"
+
+    def get_cache_key(self, request, view):
+        ident = self.get_ident(request)
+        return self.cache_format % {
+            "scope": self.scope,
+            "ident": ident,
+        }
+
+
+class UserPasswordResetViewSet(ViewSet):
+    """
+    API viewset for requesting and confirming password resets.
+    """
+    permission_classes = [AllowAny]
+    throttle_classes = [PasswordResetRateThrottle]
+
+    def create(self, request):
+        """
+        Request a password reset link for a given username.
+        Proceeds normally even if the user does not exist to prevent user enumeration.
+        """
+        serializer = PasswordResetRequestSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        username = serializer.validated_data["username"].strip()
+        user = User.objects.filter(username__iexact=username).first()
+
+        if user:
+            # Delete any previous pending reset links for this user
+            UserInviteLink.objects.filter(
+                user=user, type=UserInviteLink.TYPE_PASSWORD
+            ).delete()
+
+            UserInviteLink.objects.create(
+                type=UserInviteLink.TYPE_PASSWORD,
+                user=user,
+                label=f"Password reset for {user.username}",
+            )
+
+        return Response(
+            {
+                "detail": "Password reset request sent."
+            },
+            status=status.HTTP_200_OK,
+        )
+
+    @action(detail=False, methods=["post"], url_path="confirm")
+    def confirm(self, request):
+        """
+        Set a new password using the one-time token key.
+        """
+        serializer = PasswordResetConfirmSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        key = serializer.validated_data["key"].strip()
+        password = serializer.validated_data["password"]
+
+        try:
+            with transaction.atomic():
+                reset_link = UserInviteLink.objects.select_for_update().get(
+                    key=key, type=UserInviteLink.TYPE_PASSWORD
+                )
+
+                if reset_link.is_expired():
+                    reset_link.delete()
+                    return Response({"detail": "Reset link expired."}, status=400)
+
+                user = reset_link.user
+                if not user:
+                    reset_link.delete()
+                    return Response({"detail": "Invalid reset link."}, status=400)
+
+                user.set_password(password)
+                user.save()
+
+                reset_link.delete()
+
+            return Response(
+                {"detail": "Password has been reset successfully."},
+                status=200,
+            )
+        except UserInviteLink.DoesNotExist:
+            return Response({"detail": "Invalid reset key."}, status=400)
+        except Exception as e:
+            logger.exception("Password reset failed.")
             return Response({"detail": str(e)}, status=400)
 
 

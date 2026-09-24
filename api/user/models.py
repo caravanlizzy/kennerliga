@@ -132,17 +132,40 @@ class PlatformPlayer(models.Model):
 
 class UserInviteLink(models.Model):
     """
-    Model representing a unique invite link used for user registration and profile linking.
+    Model representing a unique invite or password restoration link.
     """
+    TYPE_INVITATION = "invitation"
+    TYPE_PASSWORD = "password"
+    TYPE_CHOICES = [
+        (TYPE_INVITATION, "Invitation"),
+        (TYPE_PASSWORD, "Password"),
+    ]
+
     key = models.CharField(max_length=32, unique=True, db_index=True)
+    type = models.CharField(
+        max_length=32,
+        choices=TYPE_CHOICES,
+        default=TYPE_INVITATION,
+        help_text="Type of link: invitation or password reset.",
+    )
     label = models.CharField(
         max_length=300,
         blank=True,
-        help_text="Admin note to remember who this invite is for.",
+        help_text="Admin note to remember who this invite or reset is for.",
+    )
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name="password_reset_links",
+        help_text="Target user for password reset links.",
     )
     created_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
+        null=True,
+        blank=True,
         related_name="invite_links",
     )
     player_profile = models.ForeignKey(

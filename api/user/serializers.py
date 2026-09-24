@@ -103,19 +103,23 @@ class PlayerProfileSerializer(ModelSerializer):
 class UserInviteLinkSerializer(serializers.ModelSerializer):
     """
     Serializer for the UserInviteLink model.
-    Generates a full invite URL for the frontend.
+    Generates a full invite or password reset URL for the frontend.
     """
     invite_url = serializers.SerializerMethodField()
     player_profile_details = PlayerProfileSerializer(
         source="player_profile", read_only=True
     )
+    username = serializers.CharField(source="user.username", read_only=True)
 
     class Meta:
         model = UserInviteLink
         fields = [
             "id",
             "key",
+            "type",
             "label",
+            "user",
+            "username",
             "player_profile",
             "player_profile_details",
             "created_by",
@@ -126,7 +130,11 @@ class UserInviteLinkSerializer(serializers.ModelSerializer):
         read_only_fields = ["id", "key", "created_by", "created_at", "invite_url"]
 
     def get_invite_url(self, obj):
-        frontend_base = getattr(settings, "FRONTEND_REGISTER_URL", None)
+        if obj.type == UserInviteLink.TYPE_PASSWORD:
+            frontend_base = getattr(settings, "FRONTEND_RESET_PASSWORD_URL", None) or f"{getattr(settings, 'FRONTEND_URL', 'http://localhost:9000')}/#/reset-password"
+        else:
+            frontend_base = getattr(settings, "FRONTEND_REGISTER_URL", None) or f"{getattr(settings, 'FRONTEND_URL', 'http://localhost:9000')}/#/register"
+
         if frontend_base:
             query = urlencode({"key": obj.key})
             sep = "&" if "?" in frontend_base else "?"
@@ -146,6 +154,21 @@ class UserRegistrationSerializer(serializers.Serializer):
         if User.objects.filter(username=value).exists():
             raise serializers.ValidationError("Username already taken.")
         return value
+
+
+class PasswordResetRequestSerializer(serializers.Serializer):
+    """
+    Serializer for requesting a password reset link by username.
+    """
+    username = serializers.CharField(max_length=150)
+
+
+class PasswordResetConfirmSerializer(serializers.Serializer):
+    """
+    Serializer for setting a new password using a one-time token key.
+    """
+    key = serializers.CharField(max_length=64)
+    password = serializers.CharField(write_only=True)
 
 
 class FeedbackSerializer(serializers.ModelSerializer):

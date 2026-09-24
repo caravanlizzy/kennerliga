@@ -5,6 +5,7 @@ from user.views import (
     UserViewSet,
     MeViewSet,
     UserRegistrationViewSet,
+    UserPasswordResetViewSet,
     UserInviteLinkViewSet,
     FeedbackViewSet,
     PlayerProfileViewSet,
@@ -16,6 +17,7 @@ router.register("profiles", PlayerProfileViewSet, basename="profiles")
 router.register("me", MeViewSet, basename="me")
 router.register("invitations", UserInviteLinkViewSet, basename="invitations")
 router.register("register", UserRegistrationViewSet, basename="register")
+router.register("password-reset", UserPasswordResetViewSet, basename="password-reset")
 router.register("feedback", FeedbackViewSet, basename="feedback")
 
 urlpatterns = [

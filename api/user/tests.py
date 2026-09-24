@@ -627,3 +627,155 @@ class UserAPITests(TestCase):
         # Invalid hex color should return 400
         invalid_res = self.client.patch("/api/user/users/avatar-color/", {"avatar_color": "not-a-color"})
         self.assertEqual(invalid_res.status_code, 400)
+
+
+class UserPasswordResetTests(TestCase):
+    def setUp(self):
+        from django.core.cache import cache
+        cache.clear()
+        self.client = APIClient()
+        self.user = User.objects.create_user(username="resettester", password="oldpassword123")
+        self.admin = User.objects.create_superuser(username="adminuser", password="adminpassword")
+
+    def test_request_password_reset_success(self):
+        from user.models import UserInviteLink
+        res = self.client.post("/api/user/password-reset/", {"username": "resettester"})
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(
+            res.data.get("detail"),
+            "Password reset request sent.",
+        )
+
+        link = UserInviteLink.objects.filter(user=self.user, type=UserInviteLink.TYPE_PASSWORD).first()
+        self.assertIsNotNone(link)
+        self.assertEqual(link.type, UserInviteLink.TYPE_PASSWORD)
+        self.assertEqual(link.user, self.user)
+        self.assertFalse(link.is_expired())
+
+    def test_request_password_reset_case_insensitive(self):
+        from user.models import UserInviteLink
+        res = self.client.post("/api/user/password-reset/", {"username": "RESETTESTER"})
+        self.assertEqual(res.status_code, 200)
+        self.assertTrue(UserInviteLink.objects.filter(user=self.user, type=UserInviteLink.TYPE_PASSWORD).exists())
+
+    def test_request_password_reset_nonexistent_user(self):
+        from user.models import UserInviteLink
+        res = self.client.post("/api/user/password-reset/", {"username": "unknown_user"})
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(
+            res.data.get("detail"),
+            "Password reset request sent.",
+        )
+        self.assertFalse(UserInviteLink.objects.filter(label__icontains="unknown_user").exists())
+
+    def test_request_password_reset_throttling(self):
+        for _ in range(5):
+            res = self.client.post("/api/user/password-reset/", {"username": "resettester"})
+            self.assertEqual(res.status_code, 200)
+
+        # 6th request within the same minute should be throttled
+        throttled_res = self.client.post("/api/user/password-reset/", {"username": "resettester"})
+        self.assertEqual(throttled_res.status_code, 429)
+
+    def test_confirm_password_reset_success(self):
+        from user.models import UserInviteLink
+        link = UserInviteLink.objects.create(
+            user=self.user,
+            type=UserInviteLink.TYPE_PASSWORD,
+            label="Reset for resettester",
+        )
+        res = self.client.post("/api/user/password-reset/confirm/", {
+            "key": link.key,
+            "password": "brandnewpassword456",
+        })
+        self.assertEqual(res.status_code, 200)
+
+        # Token should be deleted (one-time use)
+        self.assertFalse(UserInviteLink.objects.filter(id=link.id).exists())
+
+        # Check login with new password
+        self.user.refresh_from_db()
+        self.assertTrue(self.user.check_password("brandnewpassword456"))
+        self.assertFalse(self.user.check_password("oldpassword123"))
+
+    def test_confirm_password_reset_invalid_key(self):
+        res = self.client.post("/api/user/password-reset/confirm/", {
+            "key": "invalid_random_key",
+            "password": "newpassword123",
+        })
+        self.assertEqual(res.status_code, 400)
+
+    def test_cross_type_protection(self):
+        from user.models import UserInviteLink
+        # Invitation token cannot be used for password reset confirm
+        invite = UserInviteLink.objects.create(
+            type=UserInviteLink.TYPE_INVITATION,
+            label="Invite token",
+        )
+        res_reset = self.client.post("/api/user/password-reset/confirm/", {
+            "key": invite.key,
+            "password": "newpassword123",
+        })
+        self.assertEqual(res_reset.status_code, 400)
+
+        # Password reset token cannot be used for user registration
+        reset_link = UserInviteLink.objects.create(
+            user=self.user,
+            type=UserInviteLink.TYPE_PASSWORD,
+            label="Reset token",
+        )
+        res_reg = self.client.post("/api/user/register/", {
+            "username": "newuserfromreset",
+            "password": "password123",
+            "invite_key": reset_link.key,
+        })
+        self.assertEqual(res_reg.status_code, 400)
+
+    def test_admin_invitations_list_contains_type(self):
+        from user.models import UserInviteLink
+        UserInviteLink.objects.create(
+            user=self.user,
+            type=UserInviteLink.TYPE_PASSWORD,
+            label="Reset link for user",
+        )
+        UserInviteLink.objects.create(
+            type=UserInviteLink.TYPE_INVITATION,
+            label="Invite link for player",
+        )
+        self.client.force_authenticate(user=self.admin)
+        res = self.client.get("/api/user/invitations/")
+        self.assertEqual(res.status_code, 200)
+        self.assertGreaterEqual(len(res.data), 2)
+        types = [item["type"] for item in res.data]
+        self.assertIn("password", types)
+        self.assertIn("invitation", types)
+
+    def test_registration_and_reset_short_password(self):
+        from user.models import UserInviteLink
+        # Test registration with 1-character password
+        invite = UserInviteLink.objects.create(
+            type=UserInviteLink.TYPE_INVITATION,
+            label="Short pw test",
+        )
+        res_reg = self.client.post("/api/user/register/", {
+            "username": "shortpwuser",
+            "password": "a",
+            "invite_key": invite.key,
+        })
+        self.assertEqual(res_reg.status_code, 201)
+        created_user = User.objects.get(username="shortpwuser")
+        self.assertTrue(created_user.check_password("a"))
+
+        # Test reset with 1-character password
+        reset_link = UserInviteLink.objects.create(
+            user=created_user,
+            type=UserInviteLink.TYPE_PASSWORD,
+            label="Short pw reset",
+        )
+        res_reset = self.client.post("/api/user/password-reset/confirm/", {
+            "key": reset_link.key,
+            "password": "b",
+        })
+        self.assertEqual(res_reset.status_code, 200)
+        created_user.refresh_from_db()
+        self.assertTrue(created_user.check_password("b"))

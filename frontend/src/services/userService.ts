@@ -89,6 +89,33 @@ export async function registerUser(payload: {
   return data;
 }
 
+/**
+ * Requests a password reset link for a given username.
+ */
+export async function requestPasswordReset(payload: {
+  username: string;
+}): Promise<{ detail: string }> {
+  const { data } = await api.post<{ detail: string }>(
+    '/user/password-reset/',
+    payload
+  );
+  return data;
+}
+
+/**
+ * Confirms a new password using the one-time reset key.
+ */
+export async function confirmPasswordReset(payload: {
+  key: string;
+  password: string;
+}): Promise<{ detail: string }> {
+  const { data } = await api.post<{ detail: string }>(
+    '/user/password-reset/confirm/',
+    payload
+  );
+  return data;
+}
+
 /** Updates the authenticated user's avatar shape. */
 export async function updateAvatarShape(shape: AvatarShape): Promise<TUserDto> {
   const { data } = await api.patch<TUserDto>('/user/users/avatar-shape/', {

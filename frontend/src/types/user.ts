@@ -38,7 +38,10 @@ export type TPlayerProfileDto = {
 export type TUserInviteDto = {
   id: number;
   key: string;
+  type?: 'invitation' | 'password';
   label: string;
+  user?: number | null;
+  username?: string;
   player_profile?: number | null;
   player_profile_details?: TPlayerProfileDto | null;
   created_by?: number | null;

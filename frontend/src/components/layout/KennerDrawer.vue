@@ -24,7 +24,7 @@
         <DrawerSubGroup>Info</DrawerSubGroup>
         <DrawerItem icon="menu_book" icon-color="primary" label="Rules" forward-name="rules" />
         <DrawerItem icon="info" icon-color="primary" label="About" forward-name="about" />
- 
+
         <q-separator class="q-my-sm drawer-separator" />
         <DrawerSubGroup>Contribute</DrawerSubGroup>
         <DrawerItem icon="forum" icon-color="primary" label="Feedback" forward-name="feedback" />
@@ -51,7 +51,7 @@
           <DrawerItem
             icon="mark_email_unread"
             icon-color="primary"
-            label="Invitations"
+            label="Invitations & Passwords"
             forward-name="invitations"
           />
           <DrawerItem
