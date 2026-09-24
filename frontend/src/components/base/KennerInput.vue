@@ -77,6 +77,23 @@ const modelValue = defineModel();
     font-weight: 700;
   }
 
+  &:has(.q-field__native:-webkit-autofill) .q-field__label,
+  &:has(.q-field__input:-webkit-autofill) .q-field__label {
+    transform: translateY(-130%) scale(0.75);
+    background: white;
+    padding: 0 4px;
+    left: 8px !important;
+    z-index: 10;
+    border-radius: 4px;
+    font-weight: 700;
+  }
+
+  .q-field__native:-webkit-autofill,
+  .q-field__input:-webkit-autofill {
+    -webkit-text-fill-color: var(--q-primary);
+    transition: background-color 9999s ease-out;
+  }
+
   &.q-field--error {
     border-color: var(--q-negative) !important;
     background: rgba(255, 0, 0, 0.03);
