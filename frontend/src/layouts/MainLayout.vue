@@ -3,6 +3,7 @@
     <q-header class="no-shadow bg-transparent">
       <NavBar :onToggle="toggleDrawer" />
       <BreadcrumbBar />
+      <AnnouncementDisplay v-if="isMobile && isAuthenticated" no-margins />
     </q-header>
 
     <q-drawer
@@ -47,7 +48,6 @@
         :class="isMobile ? 'q-px-none' : 'q-px-md q-pt-md'"
         style="max-width: var(--kenner-max-width); width: 100%; "
       >
-        <AnnouncementDisplay v-if="isMobile && isAuthenticated" no-margins />
         <router-view v-slot="{ Component }">
           <component :is="Component" />
         </router-view>
