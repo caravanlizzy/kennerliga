@@ -135,15 +135,14 @@
                 </q-item-section>
                 <q-item-section>
                   <q-item-label class="row items-center q-gutter-x-xs">
-                    <span class="text-weight-medium">{{ scope.opt.label }}</span>
-                    <q-badge
+                    <span :class="scope.opt.isUser ? 'text-weight-bold text-primary' : 'text-weight-medium'">{{ scope.opt.label }}</span>
+                    <span
                       v-if="scope.opt.isUser"
-                      color="primary"
-                      rounded
-                      class="text-caption q-px-xs"
+                      class="user-league-pill-sm row items-center no-wrap q-ml-xs"
                     >
-                      You
-                    </q-badge>
+                      <q-icon name="person" size="11px" class="q-mr-xs" />
+                      <span>You</span>
+                    </span>
                   </q-item-label>
                 </q-item-section>
                 <q-item-section side>
@@ -203,6 +202,13 @@
                 <span class="text-subtitle1 text-sm-h6 text-weight-bold text-dark">
                   {{ leagueDisplayName(activeLeague) }}
                 </span>
+                <div
+                  v-if="isUserInLeague(activeLeague.id)"
+                  class="user-league-pill row items-center no-wrap shrink-0"
+                >
+                  <q-icon name="person" size="13px" class="q-mr-xs" />
+                  <span>Your League</span>
+                </div>
                 <q-badge
                   v-if="activeLeague.status"
                   :color="leagueStatusColor(activeLeague.status)"
@@ -210,14 +216,6 @@
                   rounded
                 >
                   {{ activeLeague.status }}
-                </q-badge>
-                <q-badge
-                  v-if="isUserInLeague(activeLeague.id)"
-                  color="primary"
-                  class="text-weight-bold text-caption q-px-xs q-px-sm-sm"
-                  rounded
-                >
-                  Your League
                 </q-badge>
               </div>
               <div class="text-caption text-grey-7 q-mt-xs">
@@ -322,6 +320,7 @@
             :class="{
               'league-overview-card': !isMobile,
               'league-overview-card--user': !isMobile && isUserInLeague(league.id),
+              'league-overview-mobile-item--user': isMobile && isUserInLeague(league.id),
               'q-px-md q-py-sm': isMobile
             }"
           >
@@ -332,14 +331,13 @@
                 <span class="text-subtitle1 text-weight-bold text-dark ellipsis">
                   {{ leagueDisplayName(league) }}
                 </span>
-                <q-badge
+                <div
                   v-if="isUserInLeague(league.id)"
-                  color="primary"
-                  class="text-weight-bold text-caption q-px-xs shrink-0"
-                  rounded
+                  class="user-league-pill row items-center no-wrap shrink-0"
                 >
-                  You
-                </q-badge>
+                  <q-icon name="person" size="13px" class="q-mr-xs" />
+                  <span>Your League</span>
+                </div>
                 <q-badge
                   v-if="league.status"
                   :color="leagueStatusColor(league.status)"
@@ -441,6 +439,7 @@
             v-for="(league, index) in sortedLeagues"
             :key="league.id"
             class="league-standings-section"
+            :class="{ 'league-section--user': isUserInLeague(league.id) }"
           >
             <q-separator v-if="index > 0" class="q-my-lg" />
             <div class="row items-center justify-between q-py-sm" :class="isMobile ? 'q-px-md' : 'q-px-xs'">
@@ -449,14 +448,13 @@
                 <span class="text-subtitle1 text-weight-bold text-dark ellipsis">
                   {{ leagueDisplayName(league) }} Standings Matrix
                 </span>
-                <q-badge
+                <div
                   v-if="isUserInLeague(league.id)"
-                  color="primary"
-                  class="text-weight-bold text-caption q-px-xs shrink-0"
-                  rounded
+                  class="user-league-pill row items-center no-wrap shrink-0"
                 >
-                  You
-                </q-badge>
+                  <q-icon name="person" size="13px" class="q-mr-xs" />
+                  <span>Your League</span>
+                </div>
               </div>
               <KennerButton
                 flat
@@ -485,6 +483,7 @@
             v-for="(league, index) in sortedLeagues"
             :key="league.id"
             class="league-picks-section"
+            :class="{ 'league-section--user': isUserInLeague(league.id) }"
           >
             <q-separator v-if="index > 0" class="q-my-lg" />
             <div class="row items-center justify-between q-py-sm" :class="isMobile ? 'q-px-md' : 'q-px-xs'">
@@ -493,14 +492,13 @@
                 <span class="text-subtitle1 text-weight-bold text-dark ellipsis">
                   {{ leagueDisplayName(league) }} Picks &amp; Bans
                 </span>
-                <q-badge
+                <div
                   v-if="isUserInLeague(league.id)"
-                  color="primary"
-                  class="text-weight-bold text-caption q-px-xs shrink-0"
-                  rounded
+                  class="user-league-pill row items-center no-wrap shrink-0"
                 >
-                  You
-                </q-badge>
+                  <q-icon name="person" size="13px" class="q-mr-xs" />
+                  <span>Your League</span>
+                </div>
               </div>
               <KennerButton
                 flat
@@ -531,6 +529,7 @@
             v-for="(league, index) in sortedLeagues"
             :key="league.id"
             class="league-results-section"
+            :class="{ 'league-section--user': isUserInLeague(league.id) }"
           >
             <q-separator v-if="index > 0" class="q-my-lg" />
             <div class="row items-center justify-between q-py-sm" :class="isMobile ? 'q-px-md' : 'q-px-xs'">
@@ -539,14 +538,13 @@
                 <span class="text-subtitle1 text-weight-bold text-dark ellipsis">
                   {{ leagueDisplayName(league) }} Match Results
                 </span>
-                <q-badge
+                <div
                   v-if="isUserInLeague(league.id)"
-                  color="primary"
-                  class="text-weight-bold text-caption q-px-xs shrink-0"
-                  rounded
+                  class="user-league-pill row items-center no-wrap shrink-0"
                 >
-                  You
-                </q-badge>
+                  <q-icon name="person" size="13px" class="q-mr-xs" />
+                  <span>Your League</span>
+                </div>
               </div>
               <KennerButton
                 flat
@@ -1052,7 +1050,7 @@ onUnmounted(() => {
   min-width: 0;
   width: 100%;
   box-sizing: border-box;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  transition: all 0.2s ease;
 
   @media (min-width: 600px) {
     border-radius: 16px;
@@ -1066,8 +1064,50 @@ onUnmounted(() => {
   }
 
   &--user {
-    border-left: 4px solid var(--q-primary);
+    border-color: rgba(var(--q-primary), 0.35);
+    background: linear-gradient(180deg, rgba(var(--q-primary), 0.035) 0%, #ffffff 100%);
+    box-shadow: 0 3px 12px rgba(var(--q-primary), 0.08);
   }
+}
+
+.league-overview-mobile-item--user {
+  background: rgba(var(--q-primary), 0.04);
+  border-radius: 6px;
+}
+
+.user-league-pill {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--q-primary);
+  background: rgba(var(--q-primary), 0.1);
+  border: 1px solid rgba(var(--q-primary), 0.2);
+  padding: 2px 7px;
+  border-radius: 12px;
+  letter-spacing: 0.01em;
+  line-height: 1.2;
+
+  @media (min-width: 600px) {
+    font-size: 0.72rem;
+    padding: 2px 8px;
+  }
+}
+
+.user-league-pill-sm {
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: var(--q-primary);
+  background: rgba(var(--q-primary), 0.09);
+  border: 1px solid rgba(var(--q-primary), 0.18);
+  padding: 1px 6px;
+  border-radius: 10px;
+  line-height: 1.2;
+}
+
+.league-section--user {
+  position: relative;
+  background: linear-gradient(90deg, rgba(var(--q-primary), 0.03) 0%, transparent 100%);
+  border-radius: 8px;
+  padding: 4px 8px;
 }
 
 .standings-mini-row {
@@ -1089,8 +1129,8 @@ onUnmounted(() => {
   }
 
   &--user {
-    border-color: rgba(var(--q-primary), 0.4);
-    background: rgba(var(--q-primary), 0.05);
+    border-color: rgba(var(--q-primary), 0.35);
+    background: rgba(var(--q-primary), 0.08);
   }
 }
 
