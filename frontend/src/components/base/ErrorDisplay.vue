@@ -21,23 +21,19 @@
       <div v-else class="text-body1">An unexpected error occurred</div>
 
       <div class="text-caption q-mt-sm">
-        If this keeps happening, please write into the chat or use the <span class="text-teal cursor-pointer" @click="router.push({name: 'feedback'})">feedback form</span>.
+        If this keeps happening, please write into the chat.
       </div>
     </q-banner>
   </div>
 </template>
  
 <script setup lang="ts">
-import { useRouter } from 'vue-router';
- 
 defineProps({
   error: {
     type: [String, Error, Object],
     required: true,
   },
 });
- 
-const router = useRouter();
 </script>
 
 <style scoped>

@@ -26,11 +26,6 @@
         <DrawerItem icon="info" icon-color="primary" label="About" forward-name="about" />
 
         <q-separator class="q-my-sm drawer-separator" />
-        <DrawerSubGroup>Contribute</DrawerSubGroup>
-        <DrawerItem icon="forum" icon-color="primary" label="Feedback" forward-name="feedback" />
-        <DrawerItem icon="view_kanban" icon-color="primary" label="Task Board" forward-name="taskboard" />
-
-        <q-separator class="q-my-sm drawer-separator" />
         <DrawerSubGroup>Preferences</DrawerSubGroup>
         <DrawerItem
           :icon="notificationsSubscribed ? 'notifications_active' : 'notifications_off'"

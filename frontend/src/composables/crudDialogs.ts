@@ -27,7 +27,7 @@ export interface UseCrudDialogsOptions<TDto, TForm extends object> {
 /**
  * Encapsulates the boilerplate that shows up any time you have a
  *   "list + create/edit dialog + delete-confirm dialog"
- * pattern (see TaskBoardPage.vue).
+ * pattern (see AnnouncementManagementPage.vue).
  *
  * The composable owns:
  *   - the reactive `form`,

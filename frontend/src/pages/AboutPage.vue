@@ -24,18 +24,6 @@
             </q-card-section>
           </q-card>
         </div>
-
-        <div class="col-12">
-          <q-card flat class="about-section-card q-pa-md">
-            <q-card-section>
-              <div class="text-h6 text-weight-bold q-mb-sm text-dark row items-center q-gutter-x-sm">
-                <q-icon name="campaign" color="primary" size="24px" />
-                <span>What's New</span>
-              </div>
-              <ReleaseNotesSection />
-            </q-card-section>
-          </q-card>
-        </div>
       </div>
     </div>
   </q-page>
@@ -44,7 +32,6 @@
 <script setup lang="ts">
 import BrandLogo from 'components/base/BrandLogo.vue';
 import PurposeSection from 'components/home/PurposeSection.vue';
-import ReleaseNotesSection from 'components/home/ReleaseNotesSection.vue';
 
 defineOptions({ name: 'AboutPage' });
 
