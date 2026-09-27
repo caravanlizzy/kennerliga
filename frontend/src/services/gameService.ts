@@ -472,12 +472,12 @@ export async function updateResultConfigData(
 export async function fetchStartingPointSystems(): Promise<
   TStartingPointSystemDto[]
 > {
-  const { data } = await api.get('game/starting-point-systems');
+  const { data } = await api.get('game/starting-point-systems/');
   return unwrapList<TStartingPointSystemDto>(data);
 }
 
 export async function fetchGame(gameId: number): Promise<TGameDto> {
-  const { data } = await api.get<TGameDto>(`game/games/${gameId}`);
+  const { data } = await api.get<TGameDto>(`game/games/${gameId}/`);
   return data;
 }
 
@@ -485,7 +485,7 @@ export async function fetchSelectedGameById(
   selectedGameId: number
 ): Promise<TSelectedGameDto> {
   const { data } = await api.get<TSelectedGameDto>(
-    `game/selected-games/${selectedGameId}`
+    `game/selected-games/${selectedGameId}/`
   );
   return data;
 }
@@ -507,7 +507,7 @@ export async function deleteSelectedGame(selectedGameId: number): Promise<void> 
  * applies, so unselectable games stay visible.
  */
 export async function fetchGamesForManagement(): Promise<TGameDto[]> {
-  const { data } = await api.get('game/games', {
+  const { data } = await api.get('game/games/', {
     params: { manage_only: true },
   });
   return unwrapList<TGameDto>(data);

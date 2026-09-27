@@ -6,7 +6,7 @@ export async function fetchLeagueDetails(
   leagueId: number
 ): Promise<TLeagueDto> {
   try {
-    const { data } = await api.get(`league/league-details/${leagueId}`);
+    const { data } = await api.get(`league/league-details/${leagueId}/`);
     return data;
   } catch (error) {
     console.error('Error fetching league details:', error);
@@ -16,7 +16,7 @@ export async function fetchLeagueDetails(
 
 export async function fetchMyCurrentLeagueInfo(): Promise<{ id: number; is_my_turn: boolean } | null> {
   try {
-    const response = await api.get('user/me/current-league');
+    const response = await api.get('user/me/current-league/');
     return {
       id: response.data.id,
       is_my_turn: response.data.is_my_turn
@@ -40,7 +40,7 @@ export async function fetchMyCurrentLeagueInfo(): Promise<{ id: number; is_my_tu
 export async function fetchLeaguesForSeason(
   seasonId: number
 ): Promise<TLeagueDto[]> {
-  const { data } = await api.get('league/leagues', {
+  const { data } = await api.get('league/leagues/', {
     params: { season: seasonId },
   });
   return unwrapList<TLeagueDto>(data);
