@@ -83,7 +83,7 @@ function goToLeague(league: TLeagueDto) {
   transition: background-color 0.2s ease;
 
   &:hover {
-    background: #f8fafc;
+    background: var(--kenner-surface-subtle);
   }
 }
 

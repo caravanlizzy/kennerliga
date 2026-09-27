@@ -263,9 +263,9 @@ void resetLeagues;
 
 <style scoped lang="scss">
 .league-card {
-  border: 1px solid rgba(0, 0, 0, 0.08);
+  border: 1px solid var(--kenner-border-color);
   border-radius: 16px;
-  background: #fafafa;
+  background: var(--kenner-surface-subtle);
   padding: 8px;
 }
 

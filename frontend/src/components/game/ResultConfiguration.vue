@@ -176,19 +176,19 @@ const sortedFactions = computed(() => {
 
 <style scoped lang="scss">
 .config-stat-card {
-  background: rgba(255, 255, 255, 0.7);
-  border: 1px solid rgba(0, 0, 0, 0.06);
+  background: var(--kenner-bg-glass-card);
+  border: 1px solid var(--kenner-border-subtle);
   border-radius: 12px;
 }
 
 .config-section-card {
-  background: rgba(255, 255, 255, 0.7);
-  border: 1px solid rgba(0, 0, 0, 0.06);
+  background: var(--kenner-bg-glass-card);
+  border: 1px solid var(--kenner-border-subtle);
   border-radius: 12px;
 }
 
 .win-condition-item {
-  border: 1px solid rgba(0, 0, 0, 0.05);
+  border: 1px solid var(--kenner-border-subtle);
 }
 
 .tracking-wide {

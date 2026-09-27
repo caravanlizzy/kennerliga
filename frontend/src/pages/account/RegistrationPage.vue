@@ -159,6 +159,12 @@ function goToLogin(): void {
   width: 100%;
 }
 
+.body--dark .registration-card {
+  background: var(--kenner-bg-glass-card) !important;
+  // overrides the inline light border
+  border-color: var(--kenner-border-color) !important;
+}
+
 .tracking-tighter {
   letter-spacing: -1.5px;
 }

@@ -47,10 +47,22 @@ const turnAction = computed(() => {
   border-bottom: 1px solid #b9d8f5;
   color: #123b5d;
 
+  .body--dark & {
+    background: var(--kenner-info-bg);
+    border-bottom-color: rgba(59, 130, 246, 0.35);
+    color: #bfdbfe;
+  }
+
   &--my-turn {
     background: #fff3d9;
     border-color: #f0c66c;
     color: #5c3b00;
+
+    .body--dark & {
+      background: var(--kenner-warning-bg);
+      border-bottom-color: rgba(245, 158, 11, 0.4);
+      color: #fde68a;
+    }
   }
 
   &__label {

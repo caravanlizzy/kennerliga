@@ -461,10 +461,10 @@ onMounted(load);
 
 <style scoped lang="scss">
 .season-summary {
-  background: rgba(255, 255, 255, 0.7);
+  background: var(--kenner-bg-glass-card);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(54, 64, 88, 0.08);
+  border: 1px solid var(--kenner-border-color);
   border-radius: 16px;
   box-shadow: 0 4px 20px rgba(54, 64, 88, 0.04);
   overflow: hidden;
@@ -472,11 +472,19 @@ onMounted(load);
 
 .season-summary__header {
   background: linear-gradient(135deg, rgba(255, 255, 255, 0.6) 0%, rgba(255, 255, 255, 0.2) 100%);
+
+  .body--dark & {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.04) 0%, rgba(255, 255, 255, 0.01) 100%);
+  }
 }
 
 .season-summary__divider {
   height: 1px;
   background: linear-gradient(to right, transparent 0%, rgba(54, 64, 88, 0.1) 50%, transparent 100%);
+
+  .body--dark & {
+    background: linear-gradient(to right, transparent 0%, rgba(255, 255, 255, 0.12) 50%, transparent 100%);
+  }
 }
 
 .stat-pill {
@@ -485,9 +493,13 @@ onMounted(load);
   padding: 4px 10px;
   border-radius: 999px;
   background: rgba(54, 64, 88, 0.06);
-  color: #475569;
+  color: var(--kenner-text-secondary);
   font-size: 12px;
   font-weight: 600;
+
+  .body--dark & {
+    background: var(--kenner-hover-bg);
+  }
 }
 
 .status-pill {
@@ -512,13 +524,22 @@ onMounted(load);
   background: linear-gradient(135deg, rgba(0, 150, 136, 0.15) 0%, rgba(0, 150, 136, 0.05) 100%);
   color: #00897b;
   border-color: rgba(0, 150, 136, 0.25);
+
+  .body--dark & {
+    color: #4db6ac;
+  }
 }
 
 .status-pill--grey-7,
 .status-pill--grey-6 {
   background: rgba(54, 64, 88, 0.06);
-  color: #475569;
+  color: var(--kenner-text-secondary);
   border-color: rgba(54, 64, 88, 0.12);
+
+  .body--dark & {
+    background: var(--kenner-hover-bg);
+    border-color: var(--kenner-border-color);
+  }
 }
 
 .player-dot {
@@ -537,6 +558,10 @@ onMounted(load);
 
   &:hover {
     background: rgba(54, 64, 88, 0.04);
+
+    .body--dark & {
+      background: var(--kenner-hover-bg);
+    }
   }
 }
 

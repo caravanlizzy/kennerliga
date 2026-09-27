@@ -159,10 +159,10 @@
   border: 1px solid currentColor;
 }
 .border-light {
-  border: 1px solid #e0e0e0;
+  border: 1px solid var(--kenner-surface-strong);
 }
 .border-bottom {
-  border-bottom: 1px solid #e0e0e0;
+  border-bottom: 1px solid var(--kenner-surface-strong);
 }
 .uppercase-label {
   text-transform: uppercase;
@@ -175,9 +175,12 @@
   padding: 4px 10px;
   border-radius: 999px;
   background: rgba(54, 64, 88, 0.06);
-  color: #475569;
+  color: var(--kenner-text-secondary);
   font-size: 12px;
   font-weight: 600;
+}
+.body--dark .stat-pill {
+  background: var(--kenner-hover-bg);
 }
 </style>
 

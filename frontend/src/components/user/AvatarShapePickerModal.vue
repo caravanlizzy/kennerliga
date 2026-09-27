@@ -149,7 +149,7 @@
                     v-if="selectedColor.toLowerCase() === c.hex.toLowerCase()"
                     name="check"
                     size="16px"
-                    :color="c.hex ? (getContrastColor(c.hex) === '#ffffff' ? 'white' : 'dark') : 'white'"
+                    :style="{ color: c.hex ? getContrastColor(c.hex) : '#ffffff' }"
                   />
                   <q-icon
                     v-else-if="!c.hex"
@@ -315,21 +315,21 @@ function getContrastColor(hex: string) {
   width: 95vw;
   max-width: 680px;
   border-radius: 16px !important;
-  background: #ffffff;
+  background: var(--kenner-card-bg);
   overflow: hidden;
 }
 
 .preview-banner {
-  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  background: linear-gradient(135deg, var(--kenner-surface-subtle) 0%, var(--kenner-surface-muted) 100%);
+  border-bottom: 1px solid var(--kenner-border-color);
 }
 
 .customizer-tabs {
-  background: #ffffff;
+  background: var(--kenner-card-bg);
 }
 
 .customizer-tab-panels {
-  background: #ffffff;
+  background: var(--kenner-card-bg);
 }
 
 .shape-grid-section,
@@ -340,39 +340,55 @@ function getContrastColor(hex: string) {
 
 .shape-option-card {
   border-radius: 12px;
-  border: 2px solid rgba(0, 0, 0, 0.08);
-  background: #f8fafc;
+  border: 2px solid var(--kenner-border-color);
+  background: var(--kenner-surface-subtle);
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 
   &:hover {
     border-color: var(--q-primary);
     background: #f0fdf4;
+
+    .body--dark & {
+      background: rgba(16, 185, 129, 0.1);
+    }
     transform: translateY(-2px);
   }
 
   &--selected {
     border-color: var(--q-primary) !important;
     background: #ecfdf5 !important;
+
+    .body--dark & {
+      background: rgba(16, 185, 129, 0.16) !important;
+    }
     box-shadow: 0 4px 12px rgba(16, 185, 129, 0.15);
   }
 }
 
 .color-option-card {
   border-radius: 10px;
-  border: 2px solid rgba(0, 0, 0, 0.08);
-  background: #f8fafc;
+  border: 2px solid var(--kenner-border-color);
+  background: var(--kenner-surface-subtle);
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   height: 52px;
 
   &:hover {
     border-color: var(--q-primary);
     background: #f0fdf4;
+
+    .body--dark & {
+      background: rgba(16, 185, 129, 0.1);
+    }
     transform: translateY(-1px);
   }
 
   &--selected {
     border-color: var(--q-primary) !important;
     background: #ecfdf5 !important;
+
+    .body--dark & {
+      background: rgba(16, 185, 129, 0.16) !important;
+    }
     box-shadow: 0 2px 8px rgba(16, 185, 129, 0.15);
   }
 }
@@ -383,6 +399,10 @@ function getContrastColor(hex: string) {
   border-radius: 8px;
   flex-shrink: 0;
   box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.1);
+
+  .body--dark & {
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.15);
+  }
 }
 
 .avatar-preview-wrap {
@@ -400,7 +420,7 @@ function getContrastColor(hex: string) {
   height: 20px;
   border-radius: 50%;
   background: var(--q-primary);
-  border: 2px solid #ffffff;
+  border: 2px solid var(--kenner-card-bg);
   z-index: 2;
 }
 </style>

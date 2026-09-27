@@ -727,7 +727,7 @@ async function submitResults() {
 <style scoped>
 .member-card {
   border-radius: 10px;
-  background: #fff;
+  background: var(--kenner-card-bg);
 }
 .ellipsis {
   overflow: hidden;
@@ -741,7 +741,7 @@ async function submitResults() {
   font-size: 15px;
 }
 .wc-card {
-  background: #fafafa;
+  background: var(--kenner-surface-subtle);
   border-radius: 10px;
 }
 </style>

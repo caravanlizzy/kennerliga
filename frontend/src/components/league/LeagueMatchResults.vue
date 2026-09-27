@@ -134,12 +134,12 @@ onMounted(async () => {
 }
 
 .elegant-badge {
-  border: 1px solid rgba(0, 0, 0, 0.06);
+  border: 1px solid var(--kenner-border-subtle);
   backdrop-filter: blur(4px);
 }
 .match-game-card {
   border-radius: 12px;
-  background: #fff;
+  background: var(--kenner-card-bg);
 }
 
 .game-cards-grid {
@@ -173,7 +173,7 @@ onMounted(async () => {
 }
 
 .border-subtle {
-  border: 1px solid rgba(0, 0, 0, 0.05);
+  border: 1px solid var(--kenner-border-subtle);
 }
 
 .opacity-20 {

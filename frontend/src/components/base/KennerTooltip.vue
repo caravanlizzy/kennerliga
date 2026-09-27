@@ -31,18 +31,22 @@ const tooltipStyle = computed(() => {
 
 <style lang="scss">
 .kenner-tooltip {
-  background: #ffffff !important;
-  color: #1f2329 !important;
+  background: var(--kenner-card-bg) !important;
+  color: var(--kenner-text-color) !important;
   font-size: 12.5px;
   font-weight: 500;
   letter-spacing: 0.01em;
   line-height: 1.4;
   padding: 6px 10px !important;
   border-radius: 6px !important;
-  border: 1px solid rgba(0, 0, 0, 0.12);
+  border: 1px solid var(--kenner-border-strong);
   white-space: normal;
   max-width: 320px;
   overflow-wrap: break-word;
+
+  .body--dark & {
+    background: var(--kenner-surface-muted) !important;
+  }
 }
 
 </style>

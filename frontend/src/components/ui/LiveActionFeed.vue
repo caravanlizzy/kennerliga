@@ -102,10 +102,10 @@
               <span v-else-if="event.type === 'GAME_FINISHED'">
                 <strong class="text-primary">{{ event.data.winner }}</strong> wins
                 <strong class="text-primary">{{ event.data.gameName }}</strong>
-                <div v-if="event.data.results" class="q-mt-sm q-pa-xs" :style="{ borderLeft: `1px solid rgba(0,0,0,0.06)` }">
+                <div v-if="event.data.results" class="q-mt-sm q-pa-xs" :style="{ borderLeft: '1px solid var(--kenner-border-subtle)' }">
                   <table class="full-width" style="border-collapse: collapse; font-size: 0.75rem;">
                     <tbody>
-                      <tr v-for="(res, idx) in event.data.results" :key="idx" :style="{ borderBottom: idx === event.data.results.length - 1 ? 'none' : `1px dashed rgba(0,0,0,0.04)` }">
+                      <tr v-for="(res, idx) in event.data.results" :key="idx" :style="{ borderBottom: idx === event.data.results.length - 1 ? 'none' : '1px dashed var(--kenner-border-subtle)' }">
                         <td class="q-pr-sm text-grey-6" style="width: 20px; font-weight: 500;">
                           {{ res.position || idx + 1 }}.
                         </td>
@@ -122,10 +122,10 @@
               </span>
               <span v-else-if="event.type === 'LEAGUE_RUNNING'">
                 League {{ event.data.leagueLevel || event.leagueLevel }} is on! Games:
-                <div v-if="event.data.games && event.data.games.length" class="q-mt-sm q-pa-xs" :style="{ borderLeft: `1px solid rgba(0,0,0,0.06)` }">
+                <div v-if="event.data.games && event.data.games.length" class="q-mt-sm q-pa-xs" :style="{ borderLeft: '1px solid var(--kenner-border-subtle)' }">
                   <table class="full-width" style="border-collapse: collapse; font-size: 0.75rem;">
                     <tbody>
-                      <tr v-for="(g, idx) in event.data.games" :key="idx" :style="{ borderBottom: idx === event.data.games.length - 1 ? 'none' : `1px dashed rgba(0,0,0,0.04)` }">
+                      <tr v-for="(g, idx) in event.data.games" :key="idx" :style="{ borderBottom: idx === event.data.games.length - 1 ? 'none' : '1px dashed var(--kenner-border-subtle)' }">
                         <td class="q-pr-sm text-grey-6" style="width: 20px;">
                           {{ idx + 1 }}.
                         </td>
@@ -163,12 +163,14 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from 'vue';
+import { useQuasar } from 'quasar';
 import { leagueColors } from 'src/composables/leagueColors';
 import { TLiveEvent, TLiveEventType } from 'src/types';
 import { fetchLiveActionEvents } from 'src/services/seasonService';
 import { useUpdateStore } from 'stores/updateStore';
 import { useCachedResource } from 'src/composables/cachedResource';
 
+const $q = useQuasar();
 const updateStore = useUpdateStore();
 const { getLeagueColor } = leagueColors();
 
@@ -271,7 +273,18 @@ onUnmounted(() => {
   if (unsubscribe) unsubscribe();
 });
 
+// Lighter variants so the tinted badge text stays readable on dark surfaces
+const darkColorHex: Partial<Record<TLiveEventType, string>> = {
+  PICK: '#b0bec5',
+  BAN: '#f87171',
+  LEAGUE_RUNNING: '#60a5fa',
+  GAME_FINISHED: '#4ade80',
+  LEAGUE_FINISHED: '#fb923c',
+  SEASON_FINISHED: '#4dd0e1',
+};
+
 function getColorHex(type: TLiveEventType) {
+  if ($q.dark.isActive) return darkColorHex[type] ?? '#bdbdbd';
   switch (type) {
     case 'PICK':
       return '#37474f'; // primary (from quasar.variables.scss)

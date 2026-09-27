@@ -28,7 +28,7 @@ const modelValue = defineModel();
 
 <style lang="scss">
 .kenner-input {
-  background: rgba(0, 0, 0, 0.03);
+  background: var(--kenner-input-bg);
   padding: 0 12px;
   border-radius: 10px;
   transition: all 0.3s ease;
@@ -38,13 +38,18 @@ const modelValue = defineModel();
   border: 1px solid transparent;
 
   &:hover {
-    background: rgba(0, 0, 0, 0.06);
+    background: var(--kenner-input-bg-hover);
   }
 
   &.q-field--focused {
-    background: white;
+    background: var(--kenner-input-bg-focus);
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
     border: 1px solid rgba(54, 64, 88, 0.1);
+
+    .body--dark & {
+      border-color: var(--kenner-border-strong);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    }
   }
 
   .q-field__control {
@@ -55,7 +60,7 @@ const modelValue = defineModel();
 
   .q-field__native, .q-field__prefix, .q-field__suffix, .q-field__input {
     font-weight: 600;
-    color: var(--q-primary);
+    color: var(--kenner-primary-text);
     padding: 0 !important;
   }
 
@@ -69,7 +74,7 @@ const modelValue = defineModel();
 
   &.q-field--float .q-field__label {
     transform: translateY(-130%) scale(0.75);
-    background: white;
+    background: var(--kenner-input-label-bg);
     padding: 0 4px;
     left: 8px !important;
     z-index: 10;
@@ -80,7 +85,7 @@ const modelValue = defineModel();
   &:has(.q-field__native:-webkit-autofill) .q-field__label,
   &:has(.q-field__input:-webkit-autofill) .q-field__label {
     transform: translateY(-130%) scale(0.75);
-    background: white;
+    background: var(--kenner-input-label-bg);
     padding: 0 4px;
     left: 8px !important;
     z-index: 10;
@@ -90,7 +95,7 @@ const modelValue = defineModel();
 
   .q-field__native:-webkit-autofill,
   .q-field__input:-webkit-autofill {
-    -webkit-text-fill-color: var(--q-primary);
+    -webkit-text-fill-color: var(--kenner-primary-text);
     transition: background-color 9999s ease-out;
   }
 

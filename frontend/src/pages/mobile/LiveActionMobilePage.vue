@@ -20,6 +20,6 @@ import LiveActionFeed from 'components/ui/LiveActionFeed.vue';
 
 <style scoped>
 .border-bottom-subtle {
-  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  border-bottom: 1px solid var(--kenner-border-subtle);
 }
 </style>

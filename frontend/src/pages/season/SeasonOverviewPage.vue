@@ -973,6 +973,10 @@ onUnmounted(() => {
   @media (min-width: 600px) {
     border-radius: 16px;
   }
+
+  .body--dark & {
+    background: linear-gradient(135deg, rgba(255, 193, 7, 0.1) 0%, var(--kenner-card-bg) 100%);
+  }
 }
 
 .champions-icon-wrap {
@@ -1038,8 +1042,8 @@ onUnmounted(() => {
 }
 
 .league-overview-card {
-  background: white;
-  border: 1px solid rgba(0, 0, 0, 0.08);
+  background: var(--kenner-card-bg);
+  border: 1px solid var(--kenner-border-color);
   border-radius: 12px;
   padding: 14px 16px;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
@@ -1111,8 +1115,8 @@ onUnmounted(() => {
 }
 
 .standings-mini-row {
-  background: #f8f9fa;
-  border: 1px solid rgba(0, 0, 0, 0.04);
+  background: var(--kenner-surface-subtle);
+  border: 1px solid var(--kenner-border-subtle);
   min-height: 36px;
   padding: 5px 10px;
   border-radius: 8px;
@@ -1145,6 +1149,6 @@ onUnmounted(() => {
 }
 
 .border-bottom-subtle {
-  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  border-bottom: 1px solid var(--kenner-border-subtle);
 }
 </style>

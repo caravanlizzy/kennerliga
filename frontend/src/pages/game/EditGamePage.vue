@@ -538,15 +538,15 @@ const onSubmit = async () => {
 
 <style scoped>
 .border-dashed {
-  border: 2px dashed #e0e0e0;
+  border: 2px dashed var(--kenner-surface-strong);
 }
 .q-border-l {
-  border-left: 2px solid #e0e0e0;
+  border-left: 2px solid var(--kenner-surface-strong);
 }
 .italic {
   font-style: italic;
 }
 .border-light {
-  border: 1px solid #f0f0f0;
+  border: 1px solid var(--kenner-surface-muted);
 }
 </style>

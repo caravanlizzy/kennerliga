@@ -60,7 +60,7 @@
                     color="grey-4"
                     class="q-ml-xs cursor-pointer hover-settings-icon"
                   >
-                    <q-tooltip class="bg-white text-grey-9 shadow-4 q-pa-sm" style="border: 1px solid #ddd; max-width: 200px;">
+                    <q-tooltip class="bg-white text-grey-9 shadow-4 q-pa-sm" style="border: 1px solid var(--kenner-border-strong); max-width: 200px;">
                       <div class="text-weight-bold q-mb-xs text-primary" style="font-size: 0.75rem;">{{ col.gameName || col.label }} Settings</div>
                       <div v-for="s in col.settings" :key="s.name" class="row no-wrap q-gutter-x-sm" style="font-size: 0.7rem; line-height: 1.4;">
                         <span class="text-grey-7">{{ s.name }}:</span>
@@ -93,7 +93,7 @@
                   self="top middle"
                   :offset="[0, 6]"
                   class="bg-white text-grey-9 shadow-6 q-pa-sm rounded-borders"
-                  style="border: 1px solid rgba(0, 0, 0, 0.12); min-width: 190px; max-width: 260px;"
+                  style="border: 1px solid var(--kenner-border-strong); min-width: 190px; max-width: 260px;"
                 >
                   <div class="row items-start justify-between no-wrap q-mb-xs">
                     <div class="text-weight-bold text-primary q-pr-xs" style="font-size: 0.8rem; line-height: 1.25; word-break: break-word;">
@@ -127,7 +127,7 @@
                       v-for="s in col.settings"
                       :key="s.name"
                       class="row no-wrap justify-between q-py-xs"
-                      style="font-size: 0.7rem; line-height: 1.3; border-bottom: 1px dashed #f0f0f0;"
+                      style="font-size: 0.7rem; line-height: 1.3; border-bottom: 1px dashed var(--kenner-border-subtle);"
                     >
                       <span class="text-grey-7 q-pr-sm">{{ s.name }}</span>
                       <span class="text-weight-medium text-right">{{ s.value }}</span>
@@ -292,7 +292,7 @@
         v-if="leagueId && standings?.all_games_finished && standings?.tie_groups?.some(g => g.unresolved)"
         class="q-mt-md q-mb-md"
       >
-        <q-card flat bordered class="bg-orange-1 text-orange-9 q-pa-md relative-position overflow-hidden" style="border-color: #fcd9a8;">
+        <q-card flat bordered class="unresolved-tie-card bg-orange-1 text-orange-9 q-pa-md relative-position overflow-hidden">
           <div class="absolute-left bg-orange-8" style="width: 4px;"></div>
           <div class="row items-center q-gutter-x-sm q-mb-sm">
             <q-icon name="emoji_events" size="18px" color="orange-8" />
@@ -606,5 +606,13 @@ function getRankBgClass(rank: number | undefined) {
 }
 .hover-settings-icon:hover {
   color: var(--q-primary) !important;
+}
+
+.unresolved-tie-card {
+  border-color: #fcd9a8;
+
+  .body--dark & {
+    border-color: rgba(245, 158, 11, 0.4);
+  }
 }
 </style>

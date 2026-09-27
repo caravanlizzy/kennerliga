@@ -11,7 +11,7 @@
         :text-color="
           isPlatformSelected(p.id)?'white':getPlatformColor(p.name).color
         "
-        :style="!isPlatformSelected(p.id) ? 'background-color: white' : ''"
+        :style="!isPlatformSelected(p.id) ? 'background-color: var(--kenner-card-bg)' : ''"
         @click="togglePlatform(p.id)"
         class="platform-chip"
       >

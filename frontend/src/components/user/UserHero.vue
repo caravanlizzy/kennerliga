@@ -27,7 +27,7 @@
         <div class="col-12 col-md column items-center items-md-start">
           <div class="row items-center q-gutter-x-md justify-center justify-md-start">
             <h1 class="text-h3 text-weight-bolder q-ma-none tracking-tighter">{{ user.username }}</h1>
-            <q-badge v-if="user.admin" color="amber-8" class="text-dark text-weight-bolder q-px-sm" label="ADMIN" style="height: 24px; border-radius: 6px;" />
+            <q-badge v-if="user.admin" color="amber-8" class="admin-badge-text text-weight-bolder q-px-sm" label="ADMIN" style="height: 24px; border-radius: 6px;" />
           </div>
           <div v-if="user.profile?.name" class="text-subtitle1 text-white text-opacity-90 text-weight-light q-mt-xs">
             {{ user.profile.name }}
@@ -188,7 +188,7 @@ function onAvatarUpdated(payload: { shape: AvatarShape; color: string }) {
   width: 28px;
   height: 28px;
   border-radius: 50%;
-  background: #ffffff;
+  background: var(--kenner-card-bg);
   border: 2px solid var(--q-primary);
   z-index: 3;
   transition: transform 0.2s ease;
@@ -197,6 +197,9 @@ function onAvatarUpdated(payload: { shape: AvatarShape; color: string }) {
     transform: scale(1.2);
   }
 }
+
+// Dark text on the amber badge in both themes (text-dark is remapped in dark mode)
+.admin-badge-text { color: #1d1d1d !important; }
 
 .text-white-80 { color: rgba(255,255,255,0.8); }
 .text-white-60 { color: rgba(255,255,255,0.6); }

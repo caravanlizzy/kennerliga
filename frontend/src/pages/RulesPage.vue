@@ -167,23 +167,23 @@ import ContentSection from 'src/components/base/ContentSection.vue';
 
 <style scoped lang="scss">
 .rules-hero-card {
-  background: rgba(255, 255, 255, 0.85);
+  background: var(--kenner-surface-overlay);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
-  border: 1px solid var(--kenner-border-color, rgba(0, 0, 0, 0.08));
+  border: 1px solid var(--kenner-border-color);
   border-radius: var(--kenner-card-radius, 16px);
 }
 
 .rules-card {
-  background: rgba(255, 255, 255, 0.85);
+  background: var(--kenner-surface-overlay);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
-  border: 1px solid var(--kenner-border-color, rgba(0, 0, 0, 0.08));
+  border: 1px solid var(--kenner-border-color);
   border-radius: var(--kenner-card-radius, 16px);
 }
 
 .scoring-table {
-  border: 1px solid rgba(0, 0, 0, 0.06);
+  border: 1px solid var(--kenner-border-subtle);
 }
 
 ul, ol {

@@ -90,13 +90,13 @@ function handleTabChange(value: string) {
     flex: 1 1 0;
     min-height: 50px;
     padding: 0;
-    color: #64748b;
+    color: var(--kenner-text-muted);
     transition: all 0.2s ease;
 
     .q-tab__icon {
       font-size: 22px;
       margin-bottom: 2px;
-      color: #64748b;
+      color: var(--kenner-text-muted);
       transition: transform 0.2s ease, color 0.2s ease;
     }
 
@@ -104,7 +104,7 @@ function handleTabChange(value: string) {
       font-size: 10px;
       font-weight: 500;
       margin-top: 1px;
-      color: #64748b;
+      color: var(--kenner-text-muted);
       transition: color 0.2s ease, font-weight 0.2s ease;
     }
 
@@ -121,6 +121,15 @@ function handleTabChange(value: string) {
         color: $dark;
       }
     }
+  }
+}
+
+.body--dark .mobile-bottom-nav :deep(.q-tab.q-tab--active) {
+  color: var(--kenner-text-strong);
+
+  .q-tab__icon,
+  .q-tab__label {
+    color: var(--kenner-text-strong);
   }
 }
 </style>

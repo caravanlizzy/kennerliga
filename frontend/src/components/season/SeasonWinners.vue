@@ -224,9 +224,9 @@ const otherLeagueWinners = computed(() => {
 }
 
 .season-winners__empty {
-  border: 1px dashed rgba(0, 0, 0, 0.12);
+  border: 1px dashed var(--kenner-border-strong);
   border-radius: 10px;
-  background: rgba(0, 0, 0, 0.02);
+  background: var(--kenner-hover-bg);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -289,6 +289,15 @@ const otherLeagueWinners = computed(() => {
     flex-direction: column;
     gap: 10px;
   }
+
+  .body--dark & {
+    background: linear-gradient(135deg, rgba(245, 158, 11, 0.16) 0%, rgba(245, 158, 11, 0.08) 45%, var(--kenner-card-bg) 100%);
+    border-color: var(--kenner-gold-border);
+  }
+
+  .body--dark &--me {
+    border-color: var(--q-primary);
+  }
 }
 
 .champion-tag {
@@ -299,6 +308,12 @@ const otherLeagueWinners = computed(() => {
   padding: 2px 8px;
   border-radius: 20px;
   line-height: 1.2;
+
+  .body--dark & {
+    background: var(--kenner-gold-bg);
+    border-color: var(--kenner-gold-border);
+    color: var(--kenner-gold-text);
+  }
 }
 
 .champion-avatar-wrap {
@@ -320,12 +335,17 @@ const otherLeagueWinners = computed(() => {
   align-items: center;
   justify-content: center;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+
+  .body--dark & {
+    background: #2a2418;
+    border-color: var(--kenner-gold-border);
+  }
 }
 
 .champion-name {
   font-size: 1.05rem;
   line-height: 1.2;
-  color: #1e293b;
+  color: var(--kenner-text-color);
 }
 
 .champion-handle {
@@ -367,16 +387,16 @@ const otherLeagueWinners = computed(() => {
 }
 
 .league-card {
-  background: #ffffff;
-  border: 1px solid rgba(0, 0, 0, 0.08);
+  background: var(--kenner-card-bg);
+  border: 1px solid var(--kenner-border-color);
   border-radius: 8px;
   padding: 6px 10px;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
   transition: background-color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
 
   &:hover {
-    background: #f8fafc;
-    border-color: rgba(0, 0, 0, 0.14);
+    background: var(--kenner-surface-subtle);
+    border-color: var(--kenner-border-strong);
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
   }
 

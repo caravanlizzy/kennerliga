@@ -4,11 +4,265 @@
   --kenner-card-shadow: none;
   --kenner-card-shadow-hover: none;
   --kenner-border-color: rgba(0, 0, 0, 0.08);
+  --kenner-border-subtle: rgba(0, 0, 0, 0.05);
   --kenner-bg-glass: rgba(255, 255, 255, 0.98);
+  --kenner-bg-glass-card: rgba(255, 255, 255, 0.7);
+  --kenner-card-bg: #ffffff;
   --kenner-max-width: 1440px;
   --kenner-max-width-text: 1100px;
   --kenner-bg-page: #f8fafc;
   --kenner-bg-page-accent: #f1f5f9;
+  --kenner-input-bg: rgba(0, 0, 0, 0.03);
+  --kenner-input-bg-hover: rgba(0, 0, 0, 0.06);
+  --kenner-input-bg-focus: #ffffff;
+  --kenner-input-label-bg: #ffffff;
+  --kenner-brand-text: #1a2233;
+  --kenner-text-color: #1e293b;
+  --kenner-text-muted: #64748b;
+  --kenner-hover-bg: rgba(0, 0, 0, 0.04);
+
+  // Surfaces (layered from page → card → nested panels)
+  --kenner-surface-subtle: #f8fafc;
+  --kenner-surface-muted: #f1f5f9;
+  --kenner-surface-strong: #e2e8f0;
+  --kenner-surface-overlay: rgba(255, 255, 255, 0.85);
+  --kenner-border-strong: rgba(0, 0, 0, 0.12);
+
+  // Text scale
+  --kenner-text-strong: #0f172a;
+  --kenner-text-secondary: #475569;
+  --kenner-text-faint: #94a3b8;
+  --kenner-primary-text: #4d4949;
+
+  // Medals
+  --kenner-gold-text: #b45309;
+  --kenner-gold-bg: rgba(245, 158, 11, 0.12);
+  --kenner-gold-border: rgba(245, 158, 11, 0.3);
+  --kenner-silver-text: #475569;
+  --kenner-silver-bg: rgba(148, 163, 184, 0.15);
+  --kenner-silver-border: rgba(148, 163, 184, 0.3);
+  --kenner-bronze-text: #9a3412;
+  --kenner-bronze-bg: rgba(217, 119, 6, 0.12);
+  --kenner-bronze-border: rgba(249, 115, 22, 0.3);
+
+  // Status tints
+  --kenner-success-text: #15803d;
+  --kenner-success-bg: rgba(34, 197, 94, 0.1);
+  --kenner-danger-text: #b91c1c;
+  --kenner-danger-bg: rgba(239, 68, 68, 0.08);
+  --kenner-warning-text: #b45309;
+  --kenner-warning-bg: rgba(245, 158, 11, 0.1);
+  --kenner-info-text: #1d4ed8;
+  --kenner-info-bg: rgba(59, 130, 246, 0.08);
+  --kenner-accent-text: #5e35b1;
+  --kenner-accent-bg: rgba(94, 53, 177, 0.08);
+}
+
+body.body--dark {
+  --kenner-border-color: rgba(255, 255, 255, 0.1);
+  --kenner-border-subtle: rgba(255, 255, 255, 0.06);
+  --kenner-bg-glass: rgba(22, 22, 26, 0.95);
+  --kenner-bg-glass-card: rgba(28, 28, 34, 0.75);
+  --kenner-card-bg: #1a1a20;
+  --kenner-bg-page: #101014;
+  --kenner-bg-page-accent: #17171d;
+  --kenner-input-bg: rgba(255, 255, 255, 0.06);
+  --kenner-input-bg-hover: rgba(255, 255, 255, 0.1);
+  --kenner-input-bg-focus: #24242d;
+  --kenner-input-label-bg: #24242d;
+  --kenner-brand-text: #f8fafc;
+  --kenner-text-color: #f1f5f9;
+  --kenner-text-muted: #94a3b8;
+  --kenner-hover-bg: rgba(255, 255, 255, 0.06);
+
+  --kenner-surface-subtle: #202028;
+  --kenner-surface-muted: #26262f;
+  --kenner-surface-strong: #32323c;
+  --kenner-surface-overlay: rgba(26, 26, 32, 0.85);
+  --kenner-border-strong: rgba(255, 255, 255, 0.16);
+
+  --kenner-text-strong: #f8fafc;
+  --kenner-text-secondary: #cbd5e1;
+  --kenner-text-faint: #64748b;
+  --kenner-primary-text: #e2dede;
+
+  --kenner-gold-text: #fbbf24;
+  --kenner-gold-bg: rgba(245, 158, 11, 0.18);
+  --kenner-gold-border: rgba(245, 158, 11, 0.4);
+  --kenner-silver-text: #cbd5e1;
+  --kenner-silver-bg: rgba(148, 163, 184, 0.18);
+  --kenner-silver-border: rgba(148, 163, 184, 0.35);
+  --kenner-bronze-text: #fdba74;
+  --kenner-bronze-bg: rgba(234, 88, 12, 0.18);
+  --kenner-bronze-border: rgba(249, 115, 22, 0.4);
+
+  --kenner-success-text: #4ade80;
+  --kenner-success-bg: rgba(34, 197, 94, 0.15);
+  --kenner-danger-text: #f87171;
+  --kenner-danger-bg: rgba(239, 68, 68, 0.15);
+  --kenner-warning-text: #fbbf24;
+  --kenner-warning-bg: rgba(245, 158, 11, 0.15);
+  --kenner-info-text: #60a5fa;
+  --kenner-info-bg: rgba(59, 130, 246, 0.15);
+  --kenner-accent-text: #b39ddb;
+  --kenner-accent-bg: rgba(149, 117, 205, 0.18);
+
+  // Quasar's own dark surfaces follow our palette
+  --q-dark: #1a1a20;
+  --q-dark-page: #101014;
+
+  background-color: var(--kenner-bg-page);
+  color: var(--kenner-text-color);
+
+  .main-container {
+    background: var(--kenner-bg-page);
+    background-image:
+      radial-gradient(at 0% 0%, rgba(255, 255, 255, 0.02) 0px, transparent 50%),
+      radial-gradient(at 100% 0%, rgba(255, 255, 255, 0.03) 0px, transparent 50%);
+  }
+
+  .text-dark {
+    color: #f1f5f9 !important;
+  }
+
+  .text-grey-9 {
+    color: #f1f5f9 !important;
+  }
+
+  .text-grey-8 {
+    color: #cbd5e1 !important;
+  }
+
+  .text-grey-7 {
+    color: #94a3b8 !important;
+  }
+
+  .text-grey-6 {
+    color: #94a3b8 !important;
+  }
+
+  .border-subtle {
+    border-color: var(--kenner-border-subtle) !important;
+  }
+
+  .border-bottom-subtle {
+    border-bottom-color: var(--kenner-border-subtle) !important;
+  }
+
+  .border-dark {
+    border-color: rgba(255, 255, 255, 0.15) !important;
+  }
+
+  .bg-drawer-header, .bg-chat-header {
+    background: rgba(26, 26, 32, 0.8) !important;
+  }
+
+  .drawer-separator {
+    background: var(--kenner-border-color);
+  }
+
+  .q-card, .q-dialog__inner > div, .q-menu {
+    background-color: var(--kenner-card-bg);
+    color: var(--kenner-text-color);
+    border-color: var(--kenner-border-color);
+  }
+
+  .q-banner {
+    background-color: var(--kenner-card-bg);
+    color: var(--kenner-text-color);
+  }
+
+  // Muted floating labels on inputs & selects
+  .kenner-input, .kenner-select {
+    &.q-field--float .q-field__label,
+    &:has(.q-field__native:-webkit-autofill) .q-field__label,
+    &:has(.q-field__input:-webkit-autofill) .q-field__label {
+      color: var(--kenner-text-muted);
+    }
+  }
+
+  // Unresolved Tie Card in Standings
+  .unresolved-card {
+    background: #2a1f14 !important;
+    border-color: #6c3b12 !important;
+
+    &__title {
+      color: #fcd34d !important;
+    }
+
+    &__group {
+      background: rgba(0, 0, 0, 0.4) !important;
+      border-color: rgba(245, 158, 11, 0.3) !important;
+    }
+
+    &__player {
+      color: #fed7aa !important;
+    }
+
+    &__vs {
+      color: #fbbf24 !important;
+    }
+
+    &__hint {
+      color: #fde68a !important;
+    }
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Dark mode: remap Quasar palette utility classes (bg-*/text-*) so that
+// light tints become translucent tints and dark text shades become readable.
+// ---------------------------------------------------------------------------
+$kenner-dark-palette: (
+  'red': $red, 'pink': $pink, 'purple': $purple, 'deep-purple': $deep-purple,
+  'indigo': $indigo, 'blue': $blue, 'light-blue': $light-blue, 'cyan': $cyan,
+  'teal': $teal, 'green': $green, 'light-green': $light-green, 'lime': $lime,
+  'yellow': $yellow, 'amber': $amber, 'orange': $orange, 'deep-orange': $deep-orange,
+  'brown': $brown, 'blue-grey': $blue-grey
+);
+
+body.body--dark {
+  --q-primary: #6b6565;
+
+  .text-primary { color: var(--kenner-primary-text) !important; }
+  .text-accent { color: var(--kenner-accent-text) !important; }
+  .text-black { color: var(--kenner-text-strong) !important; }
+  .text-grey-10 { color: #f8fafc !important; }
+  .text-negative { color: var(--kenner-danger-text) !important; }
+
+  // color="dark" buttons/avatars would vanish into dark surfaces
+  .bg-dark { background: var(--kenner-surface-strong) !important; }
+
+  .bg-white { background: var(--kenner-card-bg) !important; }
+  .bg-grey-1 { background: var(--kenner-surface-subtle) !important; }
+  .bg-grey-2 { background: var(--kenner-surface-muted) !important; }
+  .bg-grey-3 { background: var(--kenner-surface-strong) !important; }
+  .bg-grey-4 { background: #3a3a45 !important; }
+  .bg-grey-5 { background: #4a4a56 !important; }
+
+  @each $name, $base in $kenner-dark-palette {
+    .bg-#{$name}-1 { background: rgba($base, 0.14) !important; }
+    .bg-#{$name}-2 { background: rgba($base, 0.18) !important; }
+    .bg-#{$name}-3 { background: rgba($base, 0.24) !important; }
+    .bg-#{$name}-4 { background: rgba($base, 0.3) !important; }
+    .text-#{$name}-7 { color: mix(#fff, $base, 30%) !important; }
+    .text-#{$name}-8,
+    .text-#{$name}-9,
+    .text-#{$name}-10 { color: mix(#fff, $base, 50%) !important; }
+  }
+
+  // Dark text deliberately placed on a solid colored background stays dark
+  @each $name, $base in $kenner-dark-palette {
+    @for $i from 5 through 14 {
+      .bg-#{$name}-#{$i}.text-dark,
+      .bg-#{$name}-#{$i}.text-black { color: $dark !important; }
+    }
+    .bg-#{$name}.text-dark,
+    .bg-#{$name}.text-black { color: $dark !important; }
+  }
+  .bg-warning.text-dark, .bg-warning.text-black,
+  .bg-positive.text-dark, .bg-info.text-dark,
+  .bg-secondary.text-dark, .bg-secondary.text-black { color: $dark !important; }
 }
 
 * {

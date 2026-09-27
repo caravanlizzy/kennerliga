@@ -48,6 +48,16 @@ const unreadCount = computed(() => 0);
   &:hover {
     background: rgba(0, 0, 0, 0.03) !important;
   }
+
+  .body--dark & {
+    &.is-active {
+      background: rgba(255, 255, 255, 0.1) !important;
+    }
+
+    &:hover {
+      background: var(--kenner-hover-bg) !important;
+    }
+  }
 }
 
 .unread-badge {
@@ -55,6 +65,6 @@ const unreadCount = computed(() => 0);
   right: -2px !important;
   padding: 2px 4px;
   font-size: 10px;
-  border: 2px solid white;
+  border: 2px solid var(--kenner-card-bg);
 }
 </style>

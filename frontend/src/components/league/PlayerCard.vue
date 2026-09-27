@@ -228,7 +228,7 @@ function formatBannerNames(names: string[]) {
 .member-section {
   background: transparent;
   padding: 16px 0;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  border-bottom: 1px solid var(--kenner-border-color);
 
   &:first-child {
     padding-top: 0;
@@ -250,6 +250,10 @@ function formatBannerNames(names: string[]) {
   font-size: 1.05rem;
   letter-spacing: -0.01em;
   color: var(--q-dark);
+
+  .body--dark & {
+    color: var(--kenner-text-strong);
+  }
 }
 
 .game-list {
@@ -257,7 +261,7 @@ function formatBannerNames(names: string[]) {
 }
 
 .game-item-container {
-  border-bottom: 1px solid rgba(0, 0, 0, 0.03);
+  border-bottom: 1px solid var(--kenner-border-subtle);
   &:last-child {
     border-bottom: none;
   }
@@ -270,7 +274,7 @@ function formatBannerNames(names: string[]) {
   transition: background-color 0.2s ease;
 
   &:hover {
-    background: rgba(0, 0, 0, 0.02);
+    background: var(--kenner-hover-bg);
   }
 }
 
@@ -291,12 +295,12 @@ function formatBannerNames(names: string[]) {
 .game-name {
   font-size: 14.5px;
   font-weight: 600;
-  color: #2c3e50;
+  color: var(--kenner-text-color);
   line-height: 1.2;
 }
 
 .platform-label {
-  color: #7f8c8d;
+  color: var(--kenner-text-muted);
   font-weight: 500;
   font-size: 11px;
   text-transform: uppercase;
@@ -323,7 +327,7 @@ function formatBannerNames(names: string[]) {
 }
 
 .game-details {
-  border-top: 1px dashed rgba(0, 0, 0, 0.06);
+  border-top: 1px dashed var(--kenner-border-subtle);
   background: rgba(0, 0, 0, 0.01);
   margin: 0 4px;
   border-radius: 6px;

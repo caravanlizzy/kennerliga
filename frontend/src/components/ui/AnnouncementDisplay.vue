@@ -109,8 +109,8 @@ const textColors = {
 <style scoped>
 .announcement-card {
   border-radius: 12px;
-  background: white;
-  border: 1px solid rgba(0, 0, 0, 0.08);
+  background: var(--kenner-card-bg);
+  border: 1px solid var(--kenner-border-color);
   border-top-width: 4px;
   width: 100%;
 }
@@ -135,6 +135,10 @@ const textColors = {
   border-top-color: #424242 !important; /* text-grey-9 */
 }
 
+.body--dark .announcement-card--neutral {
+  border-top-color: #94a3b8 !important;
+}
+
 .announcement-card:hover:not(.no-border-radius-mobile) {
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
 }
@@ -144,7 +148,7 @@ const textColors = {
   height: 48px;
   border-radius: 12px;
   flex-shrink: 0;
-  background: rgba(0, 0, 0, 0.03);
+  background: var(--kenner-input-bg);
 }
 
 .icon-wrapper--mobile {
@@ -159,17 +163,17 @@ const textColors = {
 }
 
 .border-all {
-  border: 1px solid rgba(0, 0, 0, 0.08);
+  border: 1px solid var(--kenner-border-color);
 }
 
 .participant-chip {
   font-size: 12px;
-  background: rgba(248, 249, 250, 0.7);
+  background: var(--kenner-bg-glass-card);
   padding: 4px 12px;
   border-radius: 6px;
-  color: #2c3e50;
+  color: var(--kenner-text-color);
   font-weight: 600;
-  border: 1px solid rgba(0, 0, 0, 0.05);
+  border: 1px solid var(--kenner-border-subtle);
 }
 
 .tracking-widest {

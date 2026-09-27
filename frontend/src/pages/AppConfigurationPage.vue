@@ -167,22 +167,22 @@ onMounted(() => {
 
 <style scoped lang="scss">
 .management-hero-card {
-  background: rgba(255, 255, 255, 0.85);
+  background: var(--kenner-surface-overlay);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
-  border: 1px solid var(--kenner-border-color, rgba(0, 0, 0, 0.08));
+  border: 1px solid var(--kenner-border-color);
   border-radius: var(--kenner-card-radius, 16px);
 }
 
 .management-card {
-  background: rgba(255, 255, 255, 0.85);
+  background: var(--kenner-surface-overlay);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
-  border: 1px solid var(--kenner-border-color, rgba(0, 0, 0, 0.08));
+  border: 1px solid var(--kenner-border-color);
   border-radius: var(--kenner-card-radius, 16px);
 }
 
 .history-item {
-  border: 1px solid rgba(0, 0, 0, 0.05);
+  border: 1px solid var(--kenner-border-subtle);
 }
 </style>

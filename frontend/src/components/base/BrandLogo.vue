@@ -92,7 +92,7 @@ void props;
 }
 
 .brand-text__word {
-  color: #1a2233;
+  color: var(--kenner-brand-text, #1a2233);
 }
 
 </style>

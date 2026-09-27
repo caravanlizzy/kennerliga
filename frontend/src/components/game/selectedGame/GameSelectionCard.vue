@@ -49,9 +49,9 @@
 <style lang="scss" scoped>
 .modern-card {
   border-radius: 16px;
-  background: white;
+  background: var(--kenner-card-bg);
   border: 2px solid transparent;
-  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 0 0 1px var(--kenner-border-color);
   transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
   height: 100px;
   overflow: hidden;
@@ -69,7 +69,7 @@
     background:
       radial-gradient(circle at center, rgba($kenner-red, 0.06) 0%, transparent 70%),
       repeating-conic-gradient(from 0deg, transparent 0deg 20deg, rgba($kenner-red, 0.02) 20deg 40deg),
-      white;
+      var(--kenner-card-bg);
 
     .icon-circle {
       background: rgba($kenner-red, 0.15);
@@ -91,7 +91,7 @@
   line-height: 1.2;
   letter-spacing: -0.01em;
   width: 100%;
-  color: #2d3748;
+  color: var(--kenner-text-color);
 
   @media (max-width: 600px) {
     font-size: 0.7rem;
@@ -109,7 +109,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #e9ecef;
+  background: var(--kenner-surface-strong);
   transition: all 0.3s ease;
 
   @media (max-width: 600px) {

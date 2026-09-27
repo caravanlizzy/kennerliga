@@ -35,4 +35,8 @@ const { isMobile } = useResponsive();
 .square-shape {
   border-radius: 0px !important;
 }
+/* color="dark" (--q-dark) would vanish on dark surfaces */
+.body--dark .q-btn.bg-dark {
+  background: var(--kenner-surface-strong) !important;
+}
 </style>

@@ -106,10 +106,22 @@ onUnmounted(() => {
     transform: rotate(90deg) scale(1.15);
     box-shadow: 0 2px 12px rgba(0, 0, 0, 0.12);
   }
+
+  .body--dark & {
+    background: rgba(255, 255, 255, 0.08);
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.16);
+    }
+  }
 }
 
 .border-top-subtle {
   border-top: 1px solid rgba(54, 64, 88, 0.08);
+
+  .body--dark & {
+    border-top-color: var(--kenner-border-color);
+  }
 }
 
 
@@ -158,7 +170,7 @@ onUnmounted(() => {
   bottom: 0;
   height: 60px;
   pointer-events: none;
-  background: linear-gradient(to bottom, rgba(255, 255, 255, 0) 0%, white 100%);
+  background: linear-gradient(to bottom, transparent 0%, var(--kenner-card-bg) 100%);
 }
 
 
@@ -172,6 +184,10 @@ onUnmounted(() => {
 
 .combined-divider-mobile {
   border-top: 1px solid rgba(54, 64, 88, 0.08);
+
+  .body--dark & {
+    border-top-color: var(--kenner-border-color);
+  }
 }
 
 .combined-divider-desktop {
@@ -187,6 +203,10 @@ onUnmounted(() => {
     bottom: 0;
     width: 1px;
     background: rgba(54, 64, 88, 0.08);
+  }
+
+  .body--dark .combined-divider-desktop::before {
+    background: var(--kenner-border-color);
   }
 }
 </style>

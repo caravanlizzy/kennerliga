@@ -52,15 +52,19 @@ defineProps({
 <style scoped lang="scss">
 .notfound-bg {
   background: radial-gradient(circle at 50% 30%, rgba(54, 64, 88, 0.05) 0%, rgba(245, 245, 247, 1) 100%);
+
+  .body--dark & {
+    background: radial-gradient(circle at 50% 30%, rgba(255, 255, 255, 0.04) 0%, var(--kenner-bg-page) 100%);
+  }
 }
 
 .notfound-card {
   max-width: 480px;
   width: 100%;
-  background: rgba(255, 255, 255, 0.85);
+  background: var(--kenner-surface-overlay);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  border: 1px solid var(--kenner-border-color, rgba(0, 0, 0, 0.08));
+  border: 1px solid var(--kenner-border-color);
   border-radius: var(--kenner-card-radius, 20px);
 }
 

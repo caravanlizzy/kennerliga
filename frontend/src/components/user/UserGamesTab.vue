@@ -52,7 +52,6 @@
             dense
             rounded
             placeholder="Search your library..."
-            bg-color="white"
             class="search-input"
             @update:model-value="$emit('update:gameSearch', $event)"
           >
@@ -112,7 +111,7 @@ defineEmits<{
 
 .top-game-card {
   border-radius: 12px;
-  background: #ffffff;
+  background: var(--kenner-card-bg);
   border: 1px solid var(--surface-border);
 
   .rank-badge {
@@ -126,6 +125,12 @@ defineEmits<{
   &.rank-1 .rank-badge { background: #f6d365; color: #7a5b00; }
   &.rank-2 .rank-badge { background: #d7dde8; color: #4b5563; }
   &.rank-3 .rank-badge { background: #d6a77a; color: #6b3f16; }
+
+  .body--dark & {
+    &.rank-1 .rank-badge { background: var(--kenner-gold-bg); color: var(--kenner-gold-text); }
+    &.rank-2 .rank-badge { background: var(--kenner-silver-bg); color: var(--kenner-silver-text); }
+    &.rank-3 .rank-badge { background: var(--kenner-bronze-bg); color: var(--kenner-bronze-text); }
+  }
 }
 
 .bg-rank-1 { background: #f6d365; }
@@ -161,7 +166,7 @@ defineEmits<{
   transition: all 0.3s ease;
   :deep(.q-field__control) {
     border-color: var(--surface-border) !important;
-    background: #ffffff !important;
+    background: var(--kenner-card-bg) !important;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
     &:hover {
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);

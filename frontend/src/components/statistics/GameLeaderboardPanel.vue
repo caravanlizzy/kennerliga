@@ -96,17 +96,21 @@ defineProps<{
 }
 
 .me-row--unranked {
-  background: rgba(0, 0, 0, 0.03);
-  border: 1px solid rgba(0, 0, 0, 0.06);
+  background: var(--kenner-hover-bg);
+  border: 1px solid var(--kenner-border-subtle);
 }
 
 // Experts: a plain bordered panel matching the app's flat card style
 // (no gradients).
 .fame-card {
-  border: 1px solid rgba(0, 0, 0, 0.08);
+  border: 1px solid var(--kenner-border-color);
   border-radius: 8px;
   padding: 12px;
   background: rgba(0, 0, 0, 0.02);
+
+  .body--dark & {
+    background: rgba(255, 255, 255, 0.02);
+  }
 }
 
 .fame-player {
@@ -114,8 +118,8 @@ defineProps<{
   text-align: center;
   padding: 10px 6px 8px;
   border-radius: 8px;
-  background: #fff;
-  border: 1px solid rgba(0, 0, 0, 0.06);
+  background: var(--kenner-card-bg);
+  border: 1px solid var(--kenner-border-subtle);
 
   &__name {
     font-size: 11.5px;
@@ -140,21 +144,40 @@ defineProps<{
   background: rgba(0, 0, 0, 0.06);
   font-size: 10.5px;
   font-weight: 700;
-  color: #64748b;
+  color: var(--kenner-text-muted);
+
+  .body--dark & {
+    background: rgba(255, 255, 255, 0.08);
+  }
 
   &--0 {
     background: #f6d365; /* gold */
     color: #7a5b00;
+
+    .body--dark & {
+      background: var(--kenner-gold-bg);
+      color: var(--kenner-gold-text);
+    }
   }
 
   &--1 {
     background: #d7dde8; /* silver */
     color: #4b5563;
+
+    .body--dark & {
+      background: var(--kenner-silver-bg);
+      color: var(--kenner-silver-text);
+    }
   }
 
   &--2 {
     background: #d6a77a; /* bronze */
     color: #6b3f16;
+
+    .body--dark & {
+      background: var(--kenner-bronze-bg);
+      color: var(--kenner-bronze-text);
+    }
   }
 }
 </style>

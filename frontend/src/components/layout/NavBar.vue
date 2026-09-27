@@ -32,6 +32,8 @@
 
         <NavMyLeague v-if="user && user.myCurrentLeagueId" />
 
+        <NavThemeToggle />
+
         <NavProfileMenu :onToggle="onToggle" class="q-ml-xs" />
       </div>
     </q-toolbar>
@@ -44,6 +46,7 @@ import { useRoute } from 'vue-router';
 import NavHome from 'components/nav/NavHome.vue';
 import NavMyLeague from 'components/nav/NavMyLeague.vue';
 import NavChat from 'components/nav/NavChat.vue';
+import NavThemeToggle from 'components/nav/NavThemeToggle.vue';
 import NavProfileMenu from 'components/nav/NavProfileMenu.vue';
 import CurrentChampion from 'components/season/CurrentChampion.vue';
 import { useUserStore } from 'stores/userStore';
@@ -103,7 +106,7 @@ const hasAnnouncementBelow = computed(() => {
 }
 
 .border-subtle {
-  border: 1px solid rgba(0, 0, 0, 0.05);
+  border: 1px solid var(--kenner-border-subtle);
 }
 
 

@@ -330,7 +330,7 @@ const gameLeaderboardColumns = [
 .game-preview-list {
   max-height: 320px;
   overflow-y: auto;
-  border: 1px solid rgba(0, 0, 0, 0.08);
+  border: 1px solid var(--kenner-border-color);
   border-radius: 8px;
   transition: max-height 0.2s ease;
 
@@ -349,14 +349,14 @@ const gameLeaderboardColumns = [
 
 .selected-game-header {
   padding-bottom: 8px;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  border-bottom: 1px solid var(--kenner-border-color);
 }
 
 .game-preview-row {
   padding: 8px 12px;
   cursor: pointer;
   gap: 12px;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  border-bottom: 1px solid var(--kenner-border-subtle);
   transition: background-color 0.15s ease;
 
   &:last-child {

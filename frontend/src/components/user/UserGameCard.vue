@@ -38,7 +38,7 @@
               class="mini-result-badge flex flex-center text-weight-bolder"
               :class="[
                 `bg-${getPosColor(p)}`,
-                p === 1 ? 'text-black' : 'text-white'
+                p === 1 ? 'mini-result-badge--dark-text' : 'text-white'
               ]"
             >
               {{ p }}
@@ -92,12 +92,12 @@ function getPosColor(pos: number) {
 
 .metrics-container {
   border-radius: 10px;
-  background: #f8fafc;
+  background: var(--kenner-surface-subtle);
   border: 1px solid var(--surface-border);
 }
 
 .border-right {
-  border-right: 1px solid rgba(0, 0, 0, 0.05);
+  border-right: 1px solid var(--kenner-border-subtle);
 }
 
 .stats-value {
@@ -115,6 +115,11 @@ function getPosColor(pos: number) {
   height: 18px;
   font-size: 0.7rem;
   border-radius: 4px;
+
+  // Dark text on the amber badge in both themes (text-black is remapped in dark mode)
+  &--dark-text {
+    color: #000;
+  }
 }
 
 

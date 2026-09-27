@@ -116,12 +116,12 @@ function updateList() {
 
 <style scoped>
 .item-border {
-  border-left: 1px solid #e8e8e8;
-  border-right: 1px solid #e8e8e8;
+  border-left: 1px solid var(--kenner-border-color);
+  border-right: 1px solid var(--kenner-border-color);
 }
 
 .border-bottom {
-  border-bottom: 1px solid #e8e8e8;
+  border-bottom: 1px solid var(--kenner-border-color);
   border-bottom-right-radius: 5px;
   border-bottom-left-radius: 5px;
 }

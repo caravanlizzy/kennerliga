@@ -53,22 +53,26 @@ function handleClick() {
   transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
   color: #555;
 
+  .body--dark &:not(.drawer-item--active) {
+    color: var(--kenner-text-secondary);
+  }
+
   &.squircle-shape {
     border-radius: var(--kenner-card-radius, 0px) !important;
   }
 
   &:hover {
     background: rgba(var(--q-primary), 0.05);
-    color: var(--q-primary);
+    color: var(--kenner-primary-text);
 
     .q-icon {
-      color: var(--q-primary);
+      color: var(--kenner-primary-text);
     }
   }
 
   &--active {
     background: rgba(var(--q-primary), 0.08);
-    color: var(--q-primary);
+    color: var(--kenner-primary-text);
     font-weight: 600;
   }
 }

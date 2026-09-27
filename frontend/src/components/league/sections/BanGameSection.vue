@@ -115,7 +115,7 @@ async function performBan(selectedGameId?: number, skip = false) {
 .ban-candidate-card {
   border-radius: var(--kenner-card-radius, 16px);
   border: 1px solid var(--kenner-border-color);
-  background: white;
+  background: var(--kenner-card-bg);
 }
 
 .ban-candidate-index {

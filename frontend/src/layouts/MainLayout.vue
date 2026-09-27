@@ -101,6 +101,10 @@ function toggleDrawer(): void {
 }
 .border-bottom-subtle {
   border-bottom: 1px solid rgba(0, 0, 0, 0.03);
+
+  .body--dark & {
+    border-bottom-color: var(--kenner-border-subtle);
+  }
 }
 .chat-drawer {
   border-right: 1px solid var(--kenner-border-color) !important;

@@ -2,7 +2,7 @@
   <q-card flat bordered class="stat-card full-height" :style="{ '--accent': accentColor }">
     <q-card-section class="stat-card__header">
       <div class="row items-center no-wrap">
-        <div class="stat-icon-box q-mr-sm" :style="{ background: accentColor + '14' }">
+        <div class="stat-icon-box q-mr-sm" :style="{ background: accentColor + ($q.dark.isActive ? '29' : '14') }">
           <q-icon :name="icon" :style="{ color: accentColor }" size="19px" />
         </div>
         <div class="column">
@@ -126,6 +126,7 @@
 
 <script setup lang="ts">
 import { computed, ref } from 'vue';
+import { useQuasar } from 'quasar';
 import { TStatCategory } from 'src/types';
 import { formatStatValue } from 'src/composables/statFormat';
 import LeagueLevel from 'components/season/LeagueLevel.vue';
@@ -162,8 +163,27 @@ const ACCENT_COLORS: Record<string, string> = {
 };
 const DEFAULT_ACCENT_COLOR = '#475569';
 
+// Lighter variants of the same hues, readable on dark surfaces.
+const ACCENT_COLORS_DARK: Record<string, string> = {
+  career_performance: '#fbbf24',
+  win_rate: '#2dd4bf',
+  avg_position: '#60a5fa',
+  games_played: '#34d399',
+  iron_will: '#94a3b8',
+  hater: '#f87171',
+  inspirer: '#b39ddb',
+  spammer: '#fb923c',
+};
+const DEFAULT_ACCENT_COLOR_DARK = '#cbd5e1';
+
+const $q = useQuasar();
+
 const icon = computed(() => ICONS[props.category.key] ?? 'insights');
-const accentColor = computed(() => ACCENT_COLORS[props.category.key] ?? DEFAULT_ACCENT_COLOR);
+const accentColor = computed(() =>
+  $q.dark.isActive
+    ? ACCENT_COLORS_DARK[props.category.key] ?? DEFAULT_ACCENT_COLOR_DARK
+    : ACCENT_COLORS[props.category.key] ?? DEFAULT_ACCENT_COLOR
+);
 
 // Only the top 3 are shown as boxes -- mirrors the award podium cards.
 const top3 = computed(() => props.category.top.slice(0, 3));
@@ -241,11 +261,20 @@ const displayedRows = computed(() => (expanded.value ? restOfList.value : visibl
   padding: 8px 6px 6px;
   border-radius: 8px;
   background: rgba(0, 0, 0, 0.02);
-  border: 1px solid rgba(0, 0, 0, 0.06);
+  border: 1px solid var(--kenner-border-subtle);
+
+  .body--dark & {
+    background: rgba(255, 255, 255, 0.02);
+  }
 
   &--me {
     background: color-mix(in srgb, var(--accent) 8%, white);
     border-color: color-mix(in srgb, var(--accent) 20%, transparent);
+
+    .body--dark & {
+      background: color-mix(in srgb, var(--accent) 14%, var(--kenner-card-bg));
+      border-color: color-mix(in srgb, var(--accent) 35%, transparent);
+    }
   }
 
   &__name {
@@ -272,12 +301,12 @@ const displayedRows = computed(() => (expanded.value ? restOfList.value : visibl
   transition: background-color 0.15s ease;
 
   &:hover {
-    background: rgba(0, 0, 0, 0.03);
+    background: var(--kenner-hover-bg);
   }
 }
 
 .rank-row + .rank-row {
-  border-top: 1px solid rgba(0, 0, 0, 0.055);
+  border-top: 1px solid var(--kenner-border-subtle);
 }
 
 .full-list {
@@ -290,6 +319,14 @@ const displayedRows = computed(() => (expanded.value ? restOfList.value : visibl
 
   &:hover {
     background: color-mix(in srgb, var(--accent) 12%, white);
+  }
+
+  .body--dark & {
+    background: color-mix(in srgb, var(--accent) 14%, var(--kenner-card-bg));
+
+    &:hover {
+      background: color-mix(in srgb, var(--accent) 20%, var(--kenner-card-bg));
+    }
   }
 }
 
@@ -309,23 +346,42 @@ const displayedRows = computed(() => (expanded.value ? restOfList.value : visibl
   background: rgba(0, 0, 0, 0.06);
   font-size: 10.5px;
   font-weight: 700;
-  color: #64748b;
+  color: var(--kenner-text-muted);
   flex-shrink: 0;
+
+  .body--dark & {
+    background: rgba(255, 255, 255, 0.08);
+  }
 
   // Podium top 3 get medal colors instead of a flat grey circle.
   &--0 {
     background: #f6d365;
     color: #7a5b00;
+
+    .body--dark & {
+      background: var(--kenner-gold-bg);
+      color: var(--kenner-gold-text);
+    }
   }
 
   &--1 {
     background: #d7dde8;
     color: #4b5563;
+
+    .body--dark & {
+      background: var(--kenner-silver-bg);
+      color: var(--kenner-silver-text);
+    }
   }
 
   &--2 {
     background: #d6a77a;
     color: #6b3f16;
+
+    .body--dark & {
+      background: var(--kenner-bronze-bg);
+      color: var(--kenner-bronze-text);
+    }
   }
 }
 

@@ -109,7 +109,7 @@ function getPosColorClass(pos: number) {
 }
 
 .stat-tile {
-  background: var(--stat-tile-bg, #f8fafc);
+  background: var(--stat-tile-bg, var(--kenner-surface-subtle));
   border: 1px solid var(--surface-border) !important;
   border-radius: 12px;
 }

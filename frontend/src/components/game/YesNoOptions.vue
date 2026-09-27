@@ -29,6 +29,6 @@ defineProps<{
 
 <style scoped lang="scss">
 .border-subtle {
-  border: 1px solid rgba(0, 0, 0, 0.05);
+  border: 1px solid var(--kenner-border-subtle);
 }
 </style>

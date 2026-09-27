@@ -102,7 +102,7 @@ const mostBanned = computed(() => props.popular?.most_banned ?? []);
   transition: background-color 0.15s ease;
 
   & + .popular-row {
-    border-top: 1px solid rgba(0, 0, 0, 0.055);
+    border-top: 1px solid var(--kenner-border-subtle);
   }
 
   &:hover {
@@ -134,22 +134,41 @@ const mostBanned = computed(() => props.popular?.most_banned ?? []);
   background: rgba(0, 0, 0, 0.06);
   font-size: 10.5px;
   font-weight: 700;
-  color: #64748b;
+  color: var(--kenner-text-muted);
   flex-shrink: 0;
+
+  .body--dark & {
+    background: rgba(255, 255, 255, 0.08);
+  }
 
   &--0 {
     background: #f6d365;
     color: #7a5b00;
+
+    .body--dark & {
+      background: var(--kenner-gold-bg);
+      color: var(--kenner-gold-text);
+    }
   }
 
   &--1 {
     background: #d7dde8;
     color: #4b5563;
+
+    .body--dark & {
+      background: var(--kenner-silver-bg);
+      color: var(--kenner-silver-text);
+    }
   }
 
   &--2 {
     background: #d6a77a;
     color: #6b3f16;
+
+    .body--dark & {
+      background: var(--kenner-bronze-bg);
+      color: var(--kenner-bronze-text);
+    }
   }
 }
 </style>

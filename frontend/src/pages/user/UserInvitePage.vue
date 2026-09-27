@@ -143,7 +143,7 @@ const handleInvite = async () => {
 
 <style scoped lang="scss">
 .invite-hero-card {
-  background: rgba(255, 255, 255, 0.85);
+  background: var(--kenner-surface-overlay);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
   border: 1px solid var(--kenner-border-color, rgba(0, 0, 0, 0.08));
@@ -151,7 +151,7 @@ const handleInvite = async () => {
 }
 
 .invite-card {
-  background: rgba(255, 255, 255, 0.85);
+  background: var(--kenner-surface-overlay);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
   border: 1px solid var(--kenner-border-color, rgba(0, 0, 0, 0.08));

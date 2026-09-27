@@ -435,19 +435,23 @@ function getOwnerName(profileId: number) {
 }
 
 .slim-game-box {
-  border: 1px solid rgba(0, 0, 0, 0.1);
+  border: 1px solid var(--kenner-border-strong);
   border-radius: 4px;
   overflow: hidden;
-  background: white;
+  background: var(--kenner-card-bg);
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
 
   &:hover {
     border-color: rgba(0, 0, 0, 0.25);
+
+    .body--dark & {
+      border-color: rgba(255, 255, 255, 0.3);
+    }
   }
 }
 
 .border-top {
-  border-top: 1px solid rgba(0, 0, 0, 0.06);
+  border-top: 1px solid var(--kenner-border-subtle);
 }
 
 .stat-badge {
@@ -461,7 +465,7 @@ function getOwnerName(profileId: number) {
 }
 
 .elegant-badge {
-  border: 1px solid rgba(0, 0, 0, 0.06);
+  border: 1px solid var(--kenner-border-subtle);
   backdrop-filter: blur(4px);
 }
 
@@ -480,7 +484,7 @@ function getOwnerName(profileId: number) {
 }
 
 .bg-red-50 {
-  background-color: #fef2f2;
+  background-color: var(--kenner-danger-bg);
 }
 
 .shrink-0 {

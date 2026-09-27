@@ -409,15 +409,23 @@ onUnmounted(() => {
 <style lang="scss" scoped>
 .chat-body {
   background: rgba(248, 249, 250, 0.6);
+
+  .body--dark & {
+    background: rgba(0, 0, 0, 0.15);
+  }
 }
 
 .chat-footer {
-  background: white;
-  border-top: 1px solid rgba(0, 0, 0, 0.05);
+  background: var(--kenner-card-bg);
+  border-top: 1px solid var(--kenner-border-subtle);
 }
 
 .chat-scroll-area {
   background: radial-gradient(circle at center, rgba(255, 255, 255, 0.1) 0%, rgba(96, 125, 139, 0.05) 100%);
+
+  .body--dark & {
+    background: radial-gradient(circle at center, rgba(255, 255, 255, 0.02) 0%, rgba(96, 125, 139, 0.05) 100%);
+  }
 }
 
 .chat-label-message {
@@ -432,13 +440,13 @@ onUnmounted(() => {
 
   &.chat-label-default {
     :deep(.q-message-label) {
-      color: $accent;
+      color: var(--kenner-accent-text);
     }
   }
 
   &.chat-label-special {
     :deep(.q-message-label) {
-      color: $accent;
+      color: var(--kenner-accent-text);
     }
   }
 }
@@ -462,6 +470,10 @@ onUnmounted(() => {
     margin-bottom: 2px;
     margin-left: 8px;
     margin-right: 8px;
+
+    .body--dark & {
+      color: var(--kenner-text-muted);
+    }
   }
 
   :deep(.q-message-stamp) {
@@ -533,7 +545,7 @@ onUnmounted(() => {
       justify-content: flex-start;
     }
     :deep(.q-message-text) {
-      background: white !important;
+      background: var(--kenner-card-bg) !important;
       color: #263238 !important;
       border-top-left-radius: 4px !important;
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
@@ -544,6 +556,19 @@ onUnmounted(() => {
     :deep(.q-message-name) {
       color: #546e7a !important;
     }
+
+    .body--dark & {
+      :deep(.q-message-text) {
+        background: var(--kenner-surface-muted) !important;
+        color: var(--kenner-text-color) !important;
+      }
+      :deep(.q-message-text-content) {
+        color: var(--kenner-text-color) !important;
+      }
+      :deep(.q-message-name) {
+        color: var(--kenner-text-muted) !important;
+      }
+    }
     &.chat-message-grouped {
       :deep(.q-message-text) {
         border-top-left-radius: 18px !important;
@@ -553,10 +578,10 @@ onUnmounted(() => {
 }
 
 .composer-input {
-  background: white !important;
+  background: var(--kenner-card-bg) !important;
   border-radius: 24px !important;
   padding: 4px 6px 4px 20px !important;
-  border: 1px solid rgba(0, 0, 0, 0.08) !important;
+  border: 1px solid var(--kenner-border-color) !important;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03) !important;
   transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
 
@@ -568,6 +593,22 @@ onUnmounted(() => {
   &.q-field--focused {
     border-color: rgba(0, 0, 0, 0.25) !important;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.06) !important;
+  }
+
+  .body--dark & {
+    background: var(--kenner-input-bg-focus) !important;
+
+    &:hover {
+      border-color: rgba(255, 255, 255, 0.18) !important;
+    }
+
+    &.q-field--focused {
+      border-color: rgba(255, 255, 255, 0.28) !important;
+    }
+
+    :deep(.q-field__native) {
+      color: var(--kenner-text-color);
+    }
   }
 
   :deep(.q-field__control) {

@@ -76,7 +76,7 @@ defineEmits<{
 
 .pick-item {
   &:hover {
-    background: #f8fafc;
+    background: var(--kenner-surface-subtle);
   }
 }
 

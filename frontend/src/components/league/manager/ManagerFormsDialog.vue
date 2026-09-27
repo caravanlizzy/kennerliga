@@ -106,7 +106,7 @@ defineEmits(['close', 'success']);
 <style scoped lang="scss">
 .manager-dialog-container {
   width: 100%;
-  background: #f8fafc;
+  background: var(--kenner-surface-subtle);
   border-radius: 20px;
   overflow-y: auto;
   max-height: 95vh;

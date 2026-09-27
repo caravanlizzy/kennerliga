@@ -28,6 +28,12 @@
         <q-separator class="q-my-sm drawer-separator" />
         <DrawerSubGroup>Preferences</DrawerSubGroup>
         <DrawerItem
+          :icon="themeStore.isDark ? 'light_mode' : 'dark_mode'"
+          icon-color="primary"
+          :label="themeStore.isDark ? 'Switch to light mode' : 'Switch to dark mode'"
+          @click="themeStore.toggleDark"
+        />
+        <DrawerItem
           :icon="notificationsSubscribed ? 'notifications_active' : 'notifications_off'"
           icon-color="primary"
           :label="notificationsSubscribed ? 'Disable notifications' : 'Enable notifications'"
@@ -89,12 +95,14 @@ import {
 } from 'src/services/notificationService';
 import { useUserStore } from 'stores/userStore';
 import { useHomeSeasonStore } from 'stores/homeSeasonStore';
+import { useThemeStore } from 'stores/themeStore';
 import { storeToRefs } from 'pinia';
 import { useRouter } from 'vue-router';
 import { provide, watch, ref } from 'vue';
 
 const drawerState = defineModel();
 
+const themeStore = useThemeStore();
 const { logout } = useUserStore();
 const userStore = useUserStore();
 const { isAdmin } = storeToRefs(userStore);
@@ -192,12 +200,16 @@ async function doLogout(): Promise<void> {
 }
 
 .glass-effect {
-  border-left: 1px solid rgba(0, 0, 0, 0.05);
+  border-left: 1px solid var(--kenner-border-subtle);
   border-bottom: none !important;
 }
 
 .border-bottom-subtle {
   border-bottom: 1px solid rgba(0, 0, 0, 0.03);
+
+  .body--dark & {
+    border-bottom-color: var(--kenner-border-subtle);
+  }
 }
 
 .drawer-separator {
@@ -211,6 +223,10 @@ async function doLogout(): Promise<void> {
   &:hover {
     background: rgba(255, 0, 0, 0.06);
     color: #d32f2f !important;
+
+    .body--dark & {
+      color: var(--kenner-danger-text) !important;
+    }
   }
 }
 

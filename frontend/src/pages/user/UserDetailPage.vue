@@ -267,16 +267,23 @@ onMounted(load);
 <style scoped lang="scss">
 /* ---- Theme tokens (light defaults) ---- */
 .user-detail-page {
-  --page-bg: #f1f5f9;
-  --surface-bg: #ffffff;
-  --surface-header-bg: #f8fafc;
+  --page-bg: var(--kenner-bg-page-accent);
+  --surface-bg: var(--kenner-card-bg);
+  --surface-header-bg: var(--kenner-surface-subtle);
   --surface-header-text: rgba(15, 23, 42, 0.7);
   --surface-border: rgba(15, 23, 42, 0.12);
   --surface-border-strong: rgba(15, 23, 42, 0.2);
   --surface-shadow: 0 1px 3px rgba(0, 0, 0, 0.05), 0 1px 2px rgba(0, 0, 0, 0.03);
-  --stat-tile-bg: #f8fafc;
-  --text-heading: #1e293b;
+  --stat-tile-bg: var(--kenner-surface-subtle);
+  --text-heading: var(--kenner-text-color);
   --divider: rgba(15, 23, 42, 0.08);
+
+  .body--dark & {
+    --surface-header-text: rgba(241, 245, 249, 0.7);
+    --surface-border: var(--kenner-border-strong);
+    --surface-border-strong: rgba(255, 255, 255, 0.24);
+    --divider: var(--kenner-border-color);
+  }
 
   background: var(--page-bg);
   min-height: 100vh;

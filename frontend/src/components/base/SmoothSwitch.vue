@@ -88,6 +88,10 @@ watch(
   user-select: none;
   line-height: 1;
 
+  .body--dark & {
+    background: rgba(255, 255, 255, 0.08);
+  }
+
   &__thumb {
     position: absolute;
     top: 2px;
@@ -114,7 +118,7 @@ watch(
     font-size: 12px;
     font-weight: 600;
     letter-spacing: 0.2px;
-    color: #6b7280;
+    color: var(--kenner-text-muted);
     white-space: nowrap;
     transition: color 200ms ease;
     display: inline-flex;
@@ -123,6 +127,10 @@ watch(
 
     &:hover:not(.is-active) {
       color: #374151;
+
+      .body--dark & {
+        color: var(--kenner-text-color);
+      }
     }
 
     &.is-active {

@@ -83,6 +83,10 @@ function navigateTo(route: Record<string, unknown>) {
   flex-direction: column;
   min-height: 100%;
   flex: 1 1 auto;
+
+  .body--dark & {
+    background: var(--kenner-bg-page);
+  }
 }
 
 .launcher-row {
@@ -105,6 +109,16 @@ function navigateTo(route: Record<string, unknown>) {
   &:active {
     background-color: rgba(0, 0, 0, 0.05);
   }
+
+  .body--dark & {
+    &:hover {
+      background-color: var(--kenner-hover-bg);
+    }
+
+    &:active {
+      background-color: rgba(255, 255, 255, 0.1);
+    }
+  }
 }
 
 .row-icon-box {
@@ -115,12 +129,16 @@ function navigateTo(route: Record<string, unknown>) {
 
 .row-icon {
   color: #607d8b;
+
+  .body--dark & {
+    color: #90a4ae;
+  }
 }
 
 .row-title {
   font-size: 1.2rem;
   font-weight: 600;
-  color: #1a1a1a;
+  color: var(--kenner-text-strong);
   letter-spacing: -0.2px;
   line-height: 1.25;
 }
@@ -130,9 +148,17 @@ function navigateTo(route: Record<string, unknown>) {
   color: #78909c;
   line-height: 1.3;
   margin-top: 4px;
+
+  .body--dark & {
+    color: var(--kenner-text-muted);
+  }
 }
 
 .row-divider {
   background-color: rgba(0, 0, 0, 0.06);
+
+  .body--dark & {
+    background-color: var(--kenner-border-color);
+  }
 }
 </style>

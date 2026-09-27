@@ -117,8 +117,8 @@
 <style lang="scss" scoped>
 .modern-details-card {
   border-radius: 24px;
-  background: white;
-  border: 1px solid rgba(0, 0, 0, 0.06);
+  background: var(--kenner-card-bg);
+  border: 1px solid var(--kenner-border-subtle);
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03);
   position: relative;
   overflow: hidden;
@@ -172,11 +172,11 @@
 }
 
 .border-subtle {
-  border: 1px solid rgba(0, 0, 0, 0.05);
+  border: 1px solid var(--kenner-border-subtle);
 }
 
 .border-bottom-subtle {
-  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  border-bottom: 1px solid var(--kenner-border-subtle);
 }
 </style>
 

@@ -34,7 +34,7 @@
       v-for="(lg, idx) in preparedLeagues"
       :key="idx"
       class="q-pa-sm q-mb-sm"
-      style="border: 1px solid #ddd; border-radius: 8px"
+      style="border: 1px solid var(--kenner-border-strong); border-radius: 8px"
     >
       <div class="row q-col-gutter-sm items-center">
         <div class="col-auto">

@@ -88,12 +88,23 @@ async function doLogin(): Promise<void> {
   width: 100%;
 }
 
+.body--dark .login-card {
+  background: var(--kenner-bg-glass-card) !important;
+  // overrides the inline light border
+  border-color: var(--kenner-border-color) !important;
+}
+
 .bg-negative-soft {
   background: rgba(var(--q-negative), 0.05);
 }
 
 .border-negative-subtle {
   border: 1px solid rgba(var(--q-negative), 0.1);
+}
+
+.body--dark .error-container {
+  background: var(--kenner-danger-bg);
+  color: var(--kenner-danger-text) !important;
 }
 
 .tracking-tighter {

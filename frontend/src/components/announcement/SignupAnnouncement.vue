@@ -404,8 +404,8 @@ onMounted(async () => {
 <style scoped>
 .announcement-card {
   border-radius: 12px;
-  background: white;
-  border: 1px solid rgba(0, 0, 0, 0.08);
+  background: var(--kenner-card-bg);
+  border: 1px solid var(--kenner-border-color);
   width: 100%;
 }
 
@@ -440,7 +440,7 @@ onMounted(async () => {
 }
 
 .announcement-desc {
-  color: #475569;
+  color: var(--kenner-text-secondary);
 }
 
 .signup-ornament {
@@ -513,10 +513,10 @@ onMounted(async () => {
   align-items: center;
   font-size: 12px;
   line-height: 1.3;
-  background: #ffffff;
+  background: var(--kenner-card-bg);
   padding: 4px 10px;
   border-radius: 6px;
-  color: #1e293b;
+  color: var(--kenner-text-color);
   font-weight: 600;
   border: 1px solid rgba(94, 53, 177, 0.16);
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
@@ -530,15 +530,15 @@ onMounted(async () => {
 
 .participant-chip--missing {
   background: rgba(255, 255, 255, 0.75);
-  color: #64748b;
+  color: var(--kenner-text-muted);
   border: 1px dashed #cbd5e1;
   font-weight: 500;
   box-shadow: none;
 }
 
 .participant-chip--missing:hover {
-  background: #f1f5f9;
-  color: #475569;
+  background: var(--kenner-surface-muted);
+  color: var(--kenner-text-secondary);
 }
 
 .participant-chip--newcomer {
@@ -606,7 +606,7 @@ onMounted(async () => {
   position: absolute;
   top: -9px;
   left: 10px;
-  background: white;
+  background: var(--kenner-card-bg);
   border: 1px solid rgba(94, 53, 177, 0.15);
   border-radius: 4px;
   padding: 0 4px;
@@ -619,5 +619,78 @@ onMounted(async () => {
 
 .flex-shrink-0 {
   flex-shrink: 0;
+}
+
+/* Dark mode */
+.body--dark .announcement-card--signup {
+  background:
+    radial-gradient(circle at 100% 0%, rgba(149, 117, 205, 0.16) 0%, transparent 50%),
+    radial-gradient(circle at 0% 100%, rgba(255, 122, 89, 0.08) 0%, transparent 40%),
+    linear-gradient(135deg, #221c2e 0%, #1e1a28 50%, #1a1a20 100%);
+  border-color: rgba(149, 117, 205, 0.3);
+  border-top-color: var(--q-accent);
+}
+
+.body--dark .announcement-pill {
+  color: var(--kenner-accent-text);
+  background: var(--kenner-accent-bg);
+  border-color: rgba(149, 117, 205, 0.35);
+}
+
+.body--dark .announcement-title {
+  color: #e9d5ff;
+}
+
+.body--dark .section-title {
+  color: #d8b4fe;
+}
+
+.body--dark .participant-chip {
+  border-color: rgba(149, 117, 205, 0.25);
+}
+
+.body--dark .participant-chip:hover {
+  background: rgba(149, 117, 205, 0.18);
+  border-color: rgba(149, 117, 205, 0.45);
+}
+
+.body--dark .participant-chip--missing {
+  background: var(--kenner-hover-bg);
+  border-color: var(--kenner-border-strong);
+}
+
+.body--dark .participant-chip--missing:hover {
+  background: var(--kenner-surface-muted);
+}
+
+.body--dark .participant-chip--newcomer {
+  background: var(--kenner-warning-bg);
+  color: var(--kenner-warning-text);
+  border-color: rgba(252, 211, 77, 0.4);
+}
+
+.body--dark .participant-chip--newcomer:hover {
+  background: rgba(245, 158, 11, 0.25);
+}
+
+.body--dark .signup-minimized {
+  background: linear-gradient(90deg, rgba(149, 117, 205, 0.14) 0%, transparent 100%);
+}
+
+.body--dark .signup-minimized:hover {
+  background: linear-gradient(90deg, rgba(149, 117, 205, 0.22) 0%, rgba(149, 117, 205, 0.08) 100%);
+}
+
+.body--dark .announcement-card--minimized {
+  border-color: rgba(149, 117, 205, 0.3);
+}
+
+.body--dark .league-box {
+  background: var(--kenner-surface-overlay);
+  border-color: rgba(149, 117, 205, 0.25);
+}
+
+.body--dark .league-box__label {
+  border-color: rgba(149, 117, 205, 0.25);
 }
 </style>

@@ -76,7 +76,7 @@ function handleSubmit(selectedGameId: number) {
 
 <style scoped lang="scss">
 .game-tab-btn {
-  border: 1px solid rgba(0, 0, 0, 0.08);
+  border: 1px solid var(--kenner-border-color);
   border-radius: 10px;
   font-weight: 600;
   transition: all 0.2s ease;

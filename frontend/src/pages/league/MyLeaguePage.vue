@@ -307,8 +307,8 @@ const turnActionText = computed(() => {
 }
 
 .league-header-card {
-  background: white;
-  border: 1px solid rgba(0, 0, 0, 0.08);
+  background: var(--kenner-card-bg);
+  border: 1px solid var(--kenner-border-color);
   border-radius: 14px;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
 }
@@ -342,6 +342,23 @@ const turnActionText = computed(() => {
     background: #fdfbf7;
     border-color: rgba(255, 193, 7, 0.3);
   }
+
+  .body--dark & {
+    &--action {
+      background: var(--kenner-warning-bg);
+      border-color: rgba(245, 158, 11, 0.4);
+    }
+
+    &--waiting {
+      background: var(--kenner-info-bg);
+      border-color: rgba(59, 130, 246, 0.35);
+    }
+
+    &--matches {
+      background: rgba(255, 193, 7, 0.06);
+      border-color: rgba(255, 193, 7, 0.3);
+    }
+  }
 }
 
 .turn-strip-icon-wrap {
@@ -352,6 +369,11 @@ const turnActionText = computed(() => {
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+
+  // Keep dark icon on the yellow warning disc (global dark .text-dark would turn it light)
+  .body--dark &.bg-warning {
+    color: #1d1d1d !important;
+  }
 }
 
 .bg-amber-1 {
@@ -370,8 +392,8 @@ const turnActionText = computed(() => {
 
 .empty-league-card {
   border-radius: 16px;
-  background: white;
-  border: 1px solid rgba(0, 0, 0, 0.08);
+  background: var(--kenner-card-bg);
+  border: 1px solid var(--kenner-border-color);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
 }
 

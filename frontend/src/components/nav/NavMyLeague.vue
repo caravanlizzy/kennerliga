@@ -41,7 +41,7 @@ const isMeActivePlayer = computed(() => user.value?.isMyTurn ?? false);
   padding: 0;
   top: -2px !important;
   right: -2px !important;
-  border: 2px solid white;
+  border: 2px solid var(--kenner-card-bg);
   border-radius: 50% !important;
 }
 </style>

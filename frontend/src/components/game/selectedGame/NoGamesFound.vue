@@ -11,7 +11,10 @@
   grid-column: 1 / -1;
   background: rgba(0, 0, 0, 0.02);
   border-radius: 12px;
-  border: 1px dashed rgba(0, 0, 0, 0.1);
+  border: 1px dashed var(--kenner-border-strong);
+}
+.body--dark .no-games-container {
+  background: rgba(255, 255, 255, 0.02);
 }
 .font-weight-600 {
   font-weight: 600;

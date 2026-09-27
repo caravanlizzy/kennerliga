@@ -79,34 +79,34 @@ const pagination = ref({
 
 <style scoped lang="scss">
 .kenner-table {
-  background: rgba(255, 255, 255, 0.7);
+  background: var(--kenner-bg-glass-card);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(54, 64, 88, 0.08);
+  border: 1px solid var(--kenner-border-color);
   border-radius: 16px;
   box-shadow: 0 4px 20px rgba(54, 64, 88, 0.04);
   overflow: hidden;
 }
 
 .kenner-table__title {
-  color: #1f2937;
+  color: var(--kenner-text-color);
   letter-spacing: -0.3px;
 }
 
 :deep(.q-table__top) {
   padding: 16px 20px;
   background: linear-gradient(135deg, rgba(255, 255, 255, 0.6) 0%, rgba(255, 255, 255, 0.15) 100%);
-  border-bottom: 1px solid rgba(54, 64, 88, 0.06);
+  border-bottom: 1px solid var(--kenner-border-color);
 }
 
 :deep(.kenner-table__header-row th) {
   background: transparent;
-  color: #64748b;
+  color: var(--kenner-text-muted);
   font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.6px;
   text-transform: uppercase;
-  border-bottom: 1px solid rgba(54, 64, 88, 0.08);
+  border-bottom: 1px solid var(--kenner-border-color);
   padding: 12px 16px;
 }
 
@@ -117,7 +117,7 @@ const pagination = ref({
 :deep(.q-table tbody td) {
   font-size: 13.5px;
   padding: 12px 16px;
-  border-bottom: 1px solid rgba(54, 64, 88, 0.05);
+  border-bottom: 1px solid var(--kenner-border-subtle);
 }
 
 :deep(.q-table tbody tr) {
@@ -133,8 +133,8 @@ const pagination = ref({
 }
 
 :deep(.q-table__bottom) {
-  border-top: 1px solid rgba(54, 64, 88, 0.06);
-  color: #64748b;
+  border-top: 1px solid var(--kenner-border-color);
+  color: var(--kenner-text-muted);
   font-size: 12px;
   padding: 8px 16px;
   min-height: 44px;
@@ -142,6 +142,21 @@ const pagination = ref({
 
 .kenner-table__search :deep(.q-field__control) {
   border-radius: 999px;
+}
+
+// Dark: translucent white header wash and slate body text don't fit tokens
+.body--dark .kenner-table {
+  :deep(.q-table__top) {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.06) 0%, rgba(255, 255, 255, 0.02) 100%);
+  }
+
+  :deep(.kenner-table__body) {
+    color: var(--kenner-text-secondary);
+  }
+
+  :deep(.q-table tbody tr:hover) {
+    background: var(--kenner-hover-bg);
+  }
 }
 
 </style>

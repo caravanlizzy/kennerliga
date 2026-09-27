@@ -34,8 +34,18 @@ function resolveColor(c: string) {
     'primary',
     'warning',
   ].includes(c)
-    ? `var(--q-${c})`
+    ? c === 'dark' ? 'var(--side-accent-dark)' : `var(--q-${c})`
     : c;
 }
 </script>
+
+<style scoped>
+.side-accent-border {
+  --side-accent-dark: var(--q-dark);
+}
+
+.body--dark .side-accent-border {
+  --side-accent-dark: var(--kenner-text-muted);
+}
+</style>
 

@@ -535,10 +535,10 @@ const columns = computed(() => {
 
 <style scoped lang="scss">
 .filter-toolbar {
-  background: rgba(255, 255, 255, 0.7);
+  background: var(--kenner-bg-glass-card);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(54, 64, 88, 0.08);
+  border: 1px solid var(--kenner-border-color);
   border-radius: 12px;
   padding: 10px 16px;
 }

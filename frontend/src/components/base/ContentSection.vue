@@ -110,7 +110,7 @@
   <style scoped lang="scss">
 .content-section-container {
   position: relative;
-  background: white;
+  background: var(--kenner-card-bg, white);
   border-radius: var(--kenner-card-radius, 0px);
   border: 1px solid var(--kenner-border-color);
   box-shadow: var(--kenner-card-shadow);
@@ -157,6 +157,7 @@
   &.indicator-secondary { --separator-color: var(--q-secondary); --accent-color: var(--q-secondary); }
   &.indicator-accent { --separator-color: var(--q-accent); --accent-color: var(--q-accent); }
   &.indicator-dark { --separator-color: var(--q-dark); --accent-color: var(--q-dark); }
+  .body--dark &.indicator-dark { --separator-color: var(--kenner-text-secondary); --accent-color: var(--kenner-text-secondary); }
   &.indicator-info { --separator-color: var(--q-info); --accent-color: var(--q-info); }
   &.indicator-warning { --separator-color: var(--q-warning); --accent-color: var(--q-warning); }
   &.indicator-negative { --separator-color: var(--q-negative); --accent-color: var(--q-negative); }
@@ -165,7 +166,7 @@
 
   .section-header {
     padding: 0 0 10px 0;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+    border-bottom: 1px solid var(--kenner-border-subtle, rgba(0, 0, 0, 0.06));
 
     :deep(.q-item) {
       padding: 0;

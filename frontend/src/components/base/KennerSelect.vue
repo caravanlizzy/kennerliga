@@ -27,7 +27,7 @@ defineProps<{
 
 <style lang="scss">
 .kenner-select {
-  background: rgba(0, 0, 0, 0.03);
+  background: var(--kenner-input-bg);
   padding: 0 12px;
   border-radius: 8px;
   min-height: 36px;
@@ -36,11 +36,11 @@ defineProps<{
   border: 1px solid transparent;
 
   &:hover {
-    background: rgba(0, 0, 0, 0.06);
+    background: var(--kenner-input-bg-hover);
   }
 
   &.q-field--focused {
-    background: white;
+    background: var(--kenner-input-bg-focus);
     border: 1px solid var(--q-primary);
   }
 
@@ -51,7 +51,7 @@ defineProps<{
 
   .q-field__native, .q-field__prefix, .q-field__suffix, .q-field__input {
     font-weight: 600;
-    color: var(--q-primary);
+    color: var(--kenner-primary-text);
     padding: 0 !important;
   }
 
@@ -65,7 +65,7 @@ defineProps<{
 
   &.q-field--float .q-field__label {
     transform: translateY(-130%) scale(0.75);
-    background: white;
+    background: var(--kenner-input-label-bg);
     padding: 0 4px;
     left: 8px !important;
     z-index: 10;
@@ -100,7 +100,7 @@ defineProps<{
     transition: all 0.2s ease;
 
     &.q-manual-focusable--focused, &:hover {
-      background: rgba(54, 64, 88, 0.05) !important;
+      background: var(--kenner-hover-bg) !important;
     }
 
     &.q-item--active {

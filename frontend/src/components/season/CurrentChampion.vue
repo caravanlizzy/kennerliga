@@ -113,7 +113,7 @@ onMounted(() => {
   user-select: none;
 
   &:hover {
-    background: rgba(0, 0, 0, 0.03);
+    background: var(--kenner-hover-bg);
 
     .action-arrow {
       color: var(--q-primary) !important;
@@ -178,6 +178,10 @@ onMounted(() => {
   font-weight: 600;
   color: var(--q-dark);
   line-height: 1.2;
+
+  .body--dark & {
+    color: var(--kenner-text-color);
+  }
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;

@@ -85,7 +85,7 @@ const getChoiceLabel = (selected: TSelectedGameOptionDto): string => {
 .option-name {
   font-weight: 500;
   font-size: 0.9rem;
-  color: var(--q-primary);
+  color: var(--kenner-primary-text);
   flex: 1;
   min-width: 0;
 }
@@ -110,20 +110,20 @@ const getChoiceLabel = (selected: TSelectedGameOptionDto): string => {
 
 .boolean-true {
   background: rgba(var(--q-primary), 0.1);
-  color: var(--q-primary);
+  color: var(--kenner-primary-text);
   border-color: rgba(var(--q-primary), 0.2);
 }
 
 .boolean-false {
-  background: #f1f3f5;
-  color: #6c757d;
-  border-color: #dee2e6;
+  background: var(--kenner-surface-muted);
+  color: var(--kenner-text-muted);
+  border-color: var(--kenner-surface-strong);
 }
 
 .boolean-null {
-  background: #f1f3f5;
-  color: #adb5bd;
-  border-color: #dee2e6;
+  background: var(--kenner-surface-muted);
+  color: var(--kenner-text-faint);
+  border-color: var(--kenner-surface-strong);
 }
 
 /* Badge für Choice-Wert */
@@ -131,8 +131,8 @@ const getChoiceLabel = (selected: TSelectedGameOptionDto): string => {
   padding: 0.1rem 0.6rem;
   border-radius: 6px;
   font-size: 0.75rem;
-  background: white;
-  color: var(--q-dark);
+  background: var(--kenner-card-bg);
+  color: var(--kenner-text-color);
   border: 1px solid var(--q-primary);
   box-shadow: 0 1px 2px rgba(var(--q-primary), 0.05);
 }

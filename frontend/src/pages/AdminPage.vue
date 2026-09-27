@@ -178,18 +178,18 @@ onMounted(() => {
 
 <style scoped lang="scss">
 .admin-hero-card {
-  background: rgba(255, 255, 255, 0.85);
+  background: var(--kenner-surface-overlay);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
-  border: 1px solid var(--kenner-border-color, rgba(0, 0, 0, 0.08));
+  border: 1px solid var(--kenner-border-color);
   border-radius: var(--kenner-card-radius, 16px);
 }
 
 .admin-card {
-  background: rgba(255, 255, 255, 0.85);
+  background: var(--kenner-surface-overlay);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
-  border: 1px solid var(--kenner-border-color, rgba(0, 0, 0, 0.08));
+  border: 1px solid var(--kenner-border-color);
   border-radius: var(--kenner-card-radius, 16px);
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 
@@ -219,4 +219,14 @@ onMounted(() => {
 .bg-warning-subtle { background: rgba(245, 124, 0, 0.12); }
 .bg-info-subtle { background: rgba(2, 136, 209, 0.12); }
 .bg-grey-8-subtle { background: rgba(66, 66, 66, 0.08); }
+
+.body--dark {
+  .bg-primary-subtle { background: rgba(255, 255, 255, 0.08); }
+  .bg-secondary-subtle { background: rgba(235, 126, 44, 0.18); }
+  .bg-accent-subtle { background: rgba(144, 107, 79, 0.22); }
+  .bg-positive-subtle { background: rgba(46, 125, 50, 0.22); }
+  .bg-warning-subtle { background: rgba(245, 124, 0, 0.18); }
+  .bg-info-subtle { background: rgba(2, 136, 209, 0.2); }
+  .bg-grey-8-subtle { background: rgba(255, 255, 255, 0.08); }
+}
 </style>

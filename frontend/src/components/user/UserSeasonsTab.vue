@@ -97,12 +97,12 @@ function getPosColorClass(pos: number) {
 }
 
 .season-avatar {
-  background: #f1f5f9;
+  background: var(--kenner-surface-muted);
 }
 
 .season-item {
   &:hover {
-    background: #f8fafc;
+    background: var(--kenner-surface-subtle);
   }
 }
 

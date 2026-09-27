@@ -54,5 +54,9 @@ const isOpened = ref(true);
   border-radius: var(--kenner-card-radius, 16px);
   border: 1px solid var(--kenner-border-color);
   background: rgba(0, 0, 0, 0.015);
+
+  .body--dark & {
+    background: rgba(255, 255, 255, 0.02);
+  }
 }
 </style>

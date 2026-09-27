@@ -295,8 +295,8 @@ async function randomizeGame() {
 
 .selection-browser-card {
   border-radius: 24px;
-  background: white;
-  border: 1px solid rgba(0, 0, 0, 0.06);
+  background: var(--kenner-card-bg);
+  border: 1px solid var(--kenner-border-subtle);
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03);
   overflow: hidden;
 
@@ -310,19 +310,23 @@ async function randomizeGame() {
 
 .filter-section {
   background: linear-gradient(to bottom, #ffffff, #fcfcfc);
+
+  .body--dark & {
+    background: var(--kenner-card-bg);
+  }
 }
 
 .grid-section {
-  background: #f8fafc;
-  border-top: 1px solid rgba(0, 0, 0, 0.05);
+  background: var(--kenner-surface-subtle);
+  border-top: 1px solid var(--kenner-border-subtle);
 }
 
 .section-icon-box {
   width: 36px;
   height: 36px;
   border-radius: 12px;
-  background: white;
-  border: 1px solid rgba(0, 0, 0, 0.05);
+  background: var(--kenner-card-bg);
+  border: 1px solid var(--kenner-border-subtle);
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
   display: flex;
   align-items: center;
@@ -343,8 +347,8 @@ async function randomizeGame() {
   }
 
   &.incomplete-bg {
-    background: #f8fafc;
-    border: 1px solid rgba(0, 0, 0, 0.05);
+    background: var(--kenner-surface-subtle);
+    border: 1px solid var(--kenner-border-subtle);
     box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.02);
   }
 }
@@ -371,23 +375,31 @@ async function randomizeGame() {
 }
 
 .placeholder-section {
-  border: 2px dashed rgba(0, 0, 0, 0.05);
+  border: 2px dashed var(--kenner-border-subtle);
   border-radius: 24px;
   height: 100%;
   min-height: 400px;
   background: rgba(0, 0, 0, 0.01);
+
+  .body--dark & {
+    background: rgba(255, 255, 255, 0.02);
+  }
 }
 
 .placeholder-icon-container {
   width: 100px;
   height: 100px;
   border-radius: 50%;
-  background: white;
+  background: var(--kenner-card-bg);
   display: inline-flex;
   align-items: center;
   justify-content: center;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
   border: 1px solid rgba(0, 0, 0, 0.02);
+
+  .body--dark & {
+    border-color: var(--kenner-border-subtle);
+  }
 }
 
 .game-grid {
@@ -400,6 +412,10 @@ async function randomizeGame() {
   box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.03);
   border-radius: 12px;
   background: rgba(255, 255, 255, 0.5);
+
+  .body--dark & {
+    background: rgba(0, 0, 0, 0.15);
+  }
 
   @media (max-width: 600px) {
     grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
@@ -462,6 +478,15 @@ async function randomizeGame() {
   }
   &::-webkit-scrollbar-thumb:hover {
     background: rgba(0, 0, 0, 0.2);
+  }
+
+  .body--dark & {
+    &::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.15);
+    }
+    &::-webkit-scrollbar-thumb:hover {
+      background: rgba(255, 255, 255, 0.25);
+    }
   }
 }
 </style>

@@ -41,4 +41,9 @@ defineProps({
   max-width: 600px;
   margin: 0 auto;
 }
+
+.body--dark .error-display .q-banner,
+.body--dark .error-display :deep(.text-negative) {
+  color: var(--kenner-danger-text) !important;
+}
 </style>

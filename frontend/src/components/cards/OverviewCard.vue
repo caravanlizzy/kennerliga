@@ -28,7 +28,7 @@ defineProps<{
 
 <style scoped lang="scss">
 .overview-card {
-  background: rgba(255, 255, 255, 0.85);
+  background: var(--kenner-surface-overlay);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
   border: 1px solid var(--kenner-border-color, rgba(0, 0, 0, 0.08));
@@ -39,6 +39,10 @@ defineProps<{
   &__header {
     background: rgba(0, 0, 0, 0.015);
     min-height: 44px;
+
+    .body--dark & {
+      background: rgba(255, 255, 255, 0.02);
+    }
   }
 
   &__separator {
