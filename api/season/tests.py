@@ -164,6 +164,49 @@ class SeasonAPITests(TestCase):
         self.assertEqual(len(response.data["winners"]), 1)
         self.assertEqual(response.data["winners"][0]["winner"]["username"], "winner_user")
 
+    def test_admin_can_add_and_remove_participant(self):
+        admin = User.objects.create_superuser(username="superadmin", password="password")
+        self.client.force_authenticate(user=admin)
+        new_profile = PlayerProfile.objects.create(profile_name="New Participant")
+
+        # Admin adds participant
+        res = self.client.post(
+            "/api/season/season-participants/",
+            {"season": self.season.id, "profile": new_profile.id},
+        )
+        self.assertEqual(res.status_code, 201)
+        participant_id = res.data["id"]
+        self.assertTrue(
+            SeasonParticipant.objects.filter(id=participant_id, season=self.season, profile=new_profile).exists()
+        )
+
+        # Duplicate addition is rejected
+        res_dup = self.client.post(
+            "/api/season/season-participants/",
+            {"season": self.season.id, "profile": new_profile.id},
+        )
+        self.assertEqual(res_dup.status_code, 400)
+
+        # Admin deletes participant
+        res_del = self.client.delete(f"/api/season/season-participants/{participant_id}/")
+        self.assertEqual(res_del.status_code, 204)
+        self.assertFalse(
+            SeasonParticipant.objects.filter(id=participant_id).exists()
+        )
+
+    def test_non_admin_cannot_add_or_remove_participant(self):
+        # Authenticated non-admin
+        new_profile = PlayerProfile.objects.create(profile_name="Other Profile")
+        res_add = self.client.post(
+            "/api/season/season-participants/",
+            {"season": self.season.id, "profile": new_profile.id},
+        )
+        self.assertEqual(res_add.status_code, 403)
+
+        sp = SeasonParticipant.objects.create(season=self.season, profile=new_profile)
+        res_del = self.client.delete(f"/api/season/season-participants/{sp.id}/")
+        self.assertEqual(res_del.status_code, 403)
+
 
 class ProjectedLeaguesAPITests(TestCase):
     def setUp(self):

@@ -570,7 +570,7 @@ class PlayerProfileViewSet(ModelViewSet):
     """
     API viewset for viewing and managing player profiles.
     """
-    queryset = PlayerProfile.objects.all()
+    queryset = PlayerProfile.objects.select_related("user").all()
     serializer_class = PlayerProfileSerializer
     permission_classes = [IsAdminOrReadOnly]
 
@@ -578,7 +578,7 @@ class PlayerProfileViewSet(ModelViewSet):
         """
         Filters player profiles, optionally by whether they have an associated user.
         """
-        queryset = PlayerProfile.objects.all()
+        queryset = PlayerProfile.objects.select_related("user").all()
 
         # Check for user__isnull query parameter
         user_isnull = self.request.query_params.get("user__isnull", None)

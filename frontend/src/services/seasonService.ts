@@ -337,6 +337,23 @@ export async function fetchParticipantsForProfile(
   return unwrapList<TSeasonParticipantDto & { season_details?: TSeasonDto }>(data);
 }
 
+export async function addSeasonParticipant(
+  seasonId: number,
+  profileId: number
+): Promise<TSeasonParticipantDto> {
+  const { data } = await api.post('/season/season-participants/', {
+    season: seasonId,
+    profile: profileId,
+  });
+  return data;
+}
+
+export async function removeSeasonParticipant(
+  participantId: number
+): Promise<void> {
+  await api.delete(`/season/season-participants/${participantId}/`);
+}
+
 /** Per-league winners of a completed season (`SeasonViewSet.league_winners`). */
 export async function fetchSeasonLeagueWinners(
   seasonId: number

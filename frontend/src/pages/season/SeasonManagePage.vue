@@ -82,6 +82,18 @@
             expand-icon-class="text-grey-7"
           >
             <div class="q-px-md q-pt-sm q-pb-md">
+              <div v-if="isAdmin && season?.status === 'OPEN'" class="row justify-end q-mb-sm">
+                <KennerButton
+                  outline
+                  no-caps
+                  size="sm"
+                  color="primary"
+                  icon="person_add"
+                  label="Add Participant"
+                  @click="openAddParticipantDialog"
+                />
+              </div>
+
               <div v-if="participants.length > 0">
                 <div
                   v-for="group in participantsByLeague"
@@ -103,10 +115,25 @@
                     <div
                       v-for="p in group.members"
                       :key="p.id"
-                      class="row items-center q-gutter-x-sm"
+                      class="row items-center justify-between q-py-xs participant-row"
                     >
-                      <div class="player-dot" />
-                      <span class="text-caption text-grey-8">{{ p.profile_name }}</span>
+                      <div class="row items-center q-gutter-x-sm">
+                        <div class="player-dot" />
+                        <span class="text-caption text-grey-8">{{ p.profile_name }}</span>
+                      </div>
+                      <KennerButton
+                        v-if="isAdmin && season?.status === 'OPEN'"
+                        flat
+                        round
+                        dense
+                        size="xs"
+                        color="negative"
+                        icon="delete"
+                        :loading="removingParticipantId === p.id"
+                        @click="onRemoveParticipant(p)"
+                      >
+                        <KennerTooltip>Remove participant</KennerTooltip>
+                      </KennerButton>
                     </div>
                   </div>
                   <div v-else class="text-caption text-grey-5 italic q-ml-md">No players</div>
@@ -137,21 +164,82 @@
         </ContentSection>
       </template>
     </div>
+
+    <!-- Add Participant Dialog -->
+    <q-dialog v-model="showAddParticipantDialog">
+      <q-card style="min-width: 320px; max-width: 480px; width: 100%; border-radius: 16px" class="q-pa-md">
+        <q-card-section class="row items-center justify-between q-pb-none">
+          <div class="text-subtitle1 text-weight-bold">Add Participant</div>
+          <q-btn v-close-popup icon="close" flat round dense color="grey-6" />
+        </q-card-section>
+
+        <q-card-section class="q-pt-sm">
+          <p class="text-caption text-grey-7 q-mb-md">
+            Select a player to register for {{ season?.name }}.
+          </p>
+
+          <ErrorDisplay v-if="addParticipantError" :error="addParticipantError" class="q-mb-sm" />
+
+          <KennerSelect
+            v-model="selectedProfileId"
+            :options="filteredProfileOptions"
+            label="Select player profile"
+            option-label="label"
+            option-value="value"
+            emit-value
+            map-options
+            use-input
+            input-debounce="0"
+            @filter="filterProfiles"
+          >
+            <template #no-option>
+              <q-item>
+                <q-item-section class="text-grey">
+                  No matching players available
+                </q-item-section>
+              </q-item>
+            </template>
+          </KennerSelect>
+        </q-card-section>
+
+        <q-card-actions align="right" class="q-pt-md">
+          <KennerButton flat no-caps label="Cancel" color="grey-7" v-close-popup />
+          <KennerButton
+            no-caps
+            label="Add Player"
+            color="primary"
+            :loading="addingParticipant"
+            :disable="!selectedProfileId"
+            @click="onAddParticipant"
+          />
+        </q-card-actions>
+      </q-card>
+    </q-dialog>
   </q-page>
 </template>
 
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue';
 import { useRoute } from 'vue-router';
-import { fetchLeaguesBySeason, fetchSeason, fetchSeasonParticipants, fillLeagues, startSeason } from 'src/services/seasonService';
+import {
+  fetchLeaguesBySeason,
+  fetchSeason,
+  fetchSeasonParticipants,
+  fillLeagues,
+  startSeason,
+  addSeasonParticipant,
+  removeSeasonParticipant,
+} from 'src/services/seasonService';
+import { fetchProfiles } from 'src/services/userService';
 import LeagueList from 'components/season/LeagueList.vue';
 import LeagueLevel from 'components/season/LeagueLevel.vue';
 import KennerButton from 'components/base/KennerButton.vue';
 import KennerTooltip from 'components/base/KennerTooltip.vue';
+import KennerSelect from 'components/base/KennerSelect.vue';
 import ContentSection from 'components/base/ContentSection.vue';
 import ErrorDisplay from 'components/base/ErrorDisplay.vue';
 import LoadingSpinner from 'components/base/LoadingSpinner.vue';
-import { TSeasonDto, TLeagueDto, TSeasonParticipantDto } from 'src/types';
+import { TSeasonDto, TLeagueDto, TSeasonParticipantDto, TPlayerProfileDto } from 'src/types';
 import { useUserStore } from 'stores/userStore';
 import { storeToRefs } from 'pinia';
 import { useDialog } from 'src/composables/dialog';
@@ -168,6 +256,98 @@ const loading = ref(true);
 const starting = ref(false);
 const filling = ref(false);
 const error = ref<string | null>(null);
+
+const allProfiles = ref<TPlayerProfileDto[]>([]);
+const showAddParticipantDialog = ref(false);
+const selectedProfileId = ref<number | null>(null);
+const addingParticipant = ref(false);
+const removingParticipantId = ref<number | null>(null);
+const addParticipantError = ref<string | null>(null);
+
+const availableProfiles = computed(() => {
+  const currentParticipantProfileIds = new Set(participants.value.map((p) => p.profile));
+  return allProfiles.value.filter((p) => !currentParticipantProfileIds.has(p.id));
+});
+
+const profileOptions = computed(() => {
+  return availableProfiles.value.map((p) => ({
+    label: p.username && p.username !== p.profile_name
+      ? `${p.profile_name} (@${p.username})`
+      : p.profile_name,
+    value: p.id,
+  }));
+});
+
+const filteredProfileOptions = ref<{ label: string; value: number }[]>([]);
+
+function filterProfiles(val: string, update: (callbackFn: () => void) => void) {
+  update(() => {
+    const needle = val.toLowerCase().trim();
+    if (!needle) {
+      filteredProfileOptions.value = profileOptions.value;
+    } else {
+      filteredProfileOptions.value = profileOptions.value.filter((v) =>
+        v.label.toLowerCase().includes(needle)
+      );
+    }
+  });
+}
+
+async function openAddParticipantDialog() {
+  selectedProfileId.value = null;
+  addParticipantError.value = null;
+  showAddParticipantDialog.value = true;
+  try {
+    const profiles = await fetchProfiles();
+    allProfiles.value = profiles;
+    filteredProfileOptions.value = profileOptions.value;
+  } catch (e: any) {
+    addParticipantError.value = e?.message || 'Failed to load player profiles.';
+  }
+}
+
+async function onAddParticipant() {
+  if (!selectedProfileId.value || !season.value) return;
+  try {
+    addingParticipant.value = true;
+    addParticipantError.value = null;
+    await addSeasonParticipant(seasonId, selectedProfileId.value);
+    showAddParticipantDialog.value = false;
+    selectedProfileId.value = null;
+    await load();
+  } catch (e: any) {
+    addParticipantError.value =
+      e?.response?.data?.detail ||
+      e?.response?.data?.non_field_errors?.[0] ||
+      e?.message ||
+      'Failed to add participant.';
+  } finally {
+    addingParticipant.value = false;
+  }
+}
+
+function onRemoveParticipant(participant: TSeasonParticipantDto) {
+  if (!season.value) return;
+  setDialog(
+    'Confirm Remove Participant',
+    `Are you sure you want to remove ${participant.profile_name} from ${season.value.name}?`,
+    'warning',
+    async () => {
+      try {
+        removingParticipantId.value = participant.id;
+        await removeSeasonParticipant(participant.id);
+        await load();
+      } catch (e: any) {
+        error.value =
+          e?.response?.data?.detail || e?.message || 'Failed to remove participant.';
+      } finally {
+        removingParticipantId.value = null;
+      }
+    },
+    undefined,
+    'Remove'
+  );
+}
 
 const participantsByLeague = computed(() => {
   const groups: { league: TLeagueDto | null; members: TSeasonParticipantDto[] }[] = [];
@@ -347,6 +527,17 @@ onMounted(load);
   border-radius: 50%;
   background: var(--q-primary);
   opacity: 0.6;
+}
+
+.participant-row {
+  border-radius: 8px;
+  padding-left: 8px;
+  padding-right: 8px;
+  transition: background-color 0.2s ease;
+
+  &:hover {
+    background: rgba(54, 64, 88, 0.04);
+  }
 }
 
 </style>

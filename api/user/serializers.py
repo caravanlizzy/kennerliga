@@ -95,9 +95,11 @@ class PlayerProfileSerializer(ModelSerializer):
     """
     Serializer for the PlayerProfile model.
     """
+    username = serializers.CharField(source="user.username", read_only=True, default=None)
+
     class Meta:
         model = PlayerProfile
-        fields = ["id", "user", "profile_name"]
+        fields = ["id", "user", "username", "profile_name"]
 
 
 class UserInviteLinkSerializer(serializers.ModelSerializer):

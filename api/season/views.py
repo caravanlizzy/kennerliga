@@ -468,6 +468,17 @@ class SeasonParticipantViewSet(ModelViewSet):
     serializer_class = SeasonParticipantSerializer
     filterset_fields = ["season", "profile", "profile__profile_name"]
 
+    def get_permissions(self):
+        if self.action in [
+            "list",
+            "retrieve",
+            "projected_leagues",
+            "preview_leagues",
+            "current",
+        ]:
+            return [IsAuthenticated()]
+        return [IsAdminUser()]
+
     def _previous_season_for(self, season: Season):
         if not season:
             return None

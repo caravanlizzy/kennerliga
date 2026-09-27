@@ -32,6 +32,7 @@ export type TPlayerProfileDto = {
   id: number;
   profile_name: string;
   user?: number | null;
+  username?: string | null;
 };
 
 /** Mirrors `UserInviteLinkSerializer`. */
