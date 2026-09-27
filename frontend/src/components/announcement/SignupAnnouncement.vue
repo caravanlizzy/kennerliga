@@ -7,272 +7,95 @@
     <!-- Minimized View -->
     <q-card-section
       v-if="isMinimized"
-      class="q-py-sm row items-center no-wrap signup-minimized"
+      class="q-py-sm q-px-md row items-center no-wrap signup-minimized"
       @click="toggleMinimized"
     >
-      <q-icon name="person_add" size="20px" color="accent" class="q-mr-sm" />
-      <div class="text-subtitle2 text-weight-bolder text-primary col ellipsis">
-        {{ announcement.title }}
+      <div class="row items-center no-wrap col min-width-0 q-mr-sm">
+        <q-icon name="person_add" size="20px" color="accent" class="q-mr-sm flex-shrink-0" />
+        <div class="text-subtitle2 text-weight-bolder text-primary ellipsis">
+          {{ announcement.title }}
+        </div>
       </div>
-      <div
-        v-if="isSignedUpForOpenSeason"
-        class="row items-center q-gutter-x-xs text-positive text-weight-bold text-caption q-mr-sm"
-      >
-        <q-icon name="check_circle" size="14px" />
-        <span>Signed up</span>
+
+      <div class="row items-center no-wrap q-gutter-x-sm flex-shrink-0">
+        <div
+          v-if="isSignedUpForOpenSeason"
+          class="row items-center q-gutter-x-xs text-positive text-weight-bold text-caption"
+        >
+          <q-icon name="check_circle" size="14px" />
+          <span class="gt-xs">Signed up</span>
+        </div>
+        <div
+          v-else
+          class="row items-center q-gutter-x-xs text-negative text-weight-bold text-caption"
+        >
+          <q-icon name="radio_button_unchecked" size="14px" />
+          <span class="gt-xs">Not signed up</span>
+        </div>
+        <q-btn
+          flat
+          dense
+          round
+          icon="expand_more"
+          size="sm"
+          color="grey-7"
+          aria-label="Expand"
+          @click.stop="toggleMinimized"
+        >
+          <q-tooltip>Expand</q-tooltip>
+        </q-btn>
       </div>
-      <div
-        v-else
-        class="row items-center q-gutter-x-xs text-negative text-weight-bold text-caption q-mr-sm"
-      >
-        <q-icon name="radio_button_unchecked" size="14px" />
-        <span>Not signed up</span>
-      </div>
-      <q-btn
-        flat
-        dense
-        round
-        icon="expand_more"
-        size="sm"
-        color="grey-7"
-        @click.stop="toggleMinimized"
-      >
-        <q-tooltip>Expand</q-tooltip>
-      </q-btn>
     </q-card-section>
 
+    <!-- Expanded View -->
     <q-card-section
       v-else
       :class="[
-        isMobile ? 'q-py-md' : 'q-py-lg',
-        'relative-position row items-center no-wrap signup-content',
+        isMobile ? 'q-pa-md' : 'q-pa-lg',
+        'relative-position signup-content',
       ]"
     >
-      <!-- Minimize Button -->
-      <q-btn
-        flat
-        dense
-        round
-        icon="expand_less"
-        size="sm"
-        color="grey-7"
-        class="absolute minimize-btn content-layer"
-        @click="toggleMinimized"
-      >
-        <q-tooltip>Minimize</q-tooltip>
-      </q-btn>
       <!-- Background Ornament -->
       <div class="signup-ornament absolute-right overflow-hidden">
         <q-icon name="campaign" size="180px" color="accent" />
       </div>
 
-      <!-- Content Header (Icon + Text) -->
-      <div class="row items-center no-wrap col q-px-md content-layer">
-              <!-- Icon Circle -->
-              <div
-                class="icon-wrapper flex flex-center q-mr-lg"
-                :class="[isMobile ? 'icon-wrapper--mobile' : '']"
-              >
-                <q-icon
-                  name="person_add"
-                  :size="isMobile ? '32px' : '40px'"
-                  color="white"
-                />
-              </div>
+      <!-- Top Row: Icon + Title & Actions -->
+      <div class="row items-start no-wrap content-layer q-mb-md">
+        <!-- Icon Circle -->
+        <div
+          class="icon-wrapper flex flex-center q-mr-md"
+          :class="[isMobile ? 'icon-wrapper--mobile' : '']"
+        >
+          <q-icon
+            name="person_add"
+            :size="isMobile ? '28px' : '36px'"
+            color="white"
+          />
+        </div>
 
-        <!-- Content -->
-        <div class="col">
-          <!-- Header & Actions -->
-          <div class="row items-center justify-between no-wrap q-mb-xs">
-            <div class="text-h6 text-weight-bolder lh-tight text-primary col">
-              {{ announcement.title }}
-            </div>
-
-            <!-- Mobile Action Button -->
-            <div v-if="isMobile" class="col-auto">
-              <KennerButton
-                v-if="!isSignedUpForOpenSeason"
-                unelevated
-                dense
-                no-caps
-                color="primary"
-                class="q-px-md"
-                @click="signUp"
-              >
-                Sign up
-                <KennerTooltip v-if="!isAuthenticated" class="bg-grey-9">
-                  Login to sign up for upcoming season
-                </KennerTooltip>
-              </KennerButton>
-
-              <div
-                v-else
-                class="row items-center q-gutter-x-xs text-positive text-weight-bold text-caption"
-              >
-                <q-icon name="check_circle" size="16px" />
-                <span>Signed up</span>
-              </div>
-            </div>
+        <!-- Title and Subtitle / Content -->
+        <div class="col min-width-0 q-mr-sm">
+          <div class="text-h6 text-weight-bolder lh-tight text-primary q-mb-xs">
+            {{ announcement.title }}
           </div>
-
           <div
             v-if="announcement.content"
-            class="text-subtitle2 text-grey-8 q-mb-sm"
+            class="text-subtitle2 text-grey-8"
           >
             {{ announcement.content }}
           </div>
-
-          <!-- Integrated Participants List -->
-          <div :class="isMobile ? 'q-mt-sm' : 'q-mt-lg'">
-            <div class="row items-center q-gutter-x-sm" :class="isMobile ? 'q-mb-xs' : 'q-mb-sm'">
-              <div
-                class="text-caption text-weight-bolder text-grey-8 uppercase tracking-widest"
-                :style="isMobile ? 'font-size: 0.6rem' : 'font-size: 0.65rem'"
-              >
-                Signed up
-              </div>
-              <q-badge
-                color="accent"
-                :label="activeParticipants.length"
-                rounded
-                class="text-weight-bold"
-                :style="isMobile ? 'font-size: 9px; padding: 1px 4px' : 'font-size: 10px; padding: 2px 6px'"
-              />
-            </div>
-
-            <div v-if="participantsLoading" class="row q-gutter-xs">
-              <q-skeleton
-                v-for="i in 5"
-                :key="i"
-                type="rect"
-                :width="isMobile ? '40px' : '60px'"
-                :height="isMobile ? '20px' : '28px'"
-                class="rounded-borders"
-              />
-            </div>
-            <template v-else-if="participantsLoaded">
-              <div v-if="activeParticipants.length">
-                <!-- Preliminary leagues notice -->
-                <div
-                  v-if="projectedLeagueGroups.length"
-                  class="text-caption text-grey-6 italic q-mb-sm"
-                  :style="isMobile ? 'font-size: 0.65rem' : 'font-size: 0.7rem'"
-                >
-                  Provisional Leagues
-                </div>
-                <!-- Grouped by projected league -->
-                <div class="league-grid" :class="{ 'league-grid--mobile': isMobile }">
-                <div
-                  v-for="group in projectedLeagueGroups"
-                  :key="`L-${group.level}`"
-                  class="league-box"
-                >
-                  <div class="league-box__label row items-center q-gutter-x-xs">
-                    <LeagueLevel
-                      badge
-                      :level="group.level"
-                      :style="isMobile ? 'font-size: 0.55rem' : 'font-size: 0.6rem'"
-                    />
-                    <q-badge
-                      color="grey-5"
-                      :label="`${group.members.length}/${group.size}`"
-                      rounded
-                      class="text-weight-bold"
-                      :style="isMobile ? 'font-size: 9px; padding: 1px 4px' : 'font-size: 10px; padding: 2px 6px'"
-                    />
-                  </div>
-                  <div class="row q-gutter-xs">
-                    <div v-for="(p, index) in group.members" :key="p.profile || index" class="col-auto">
-                      <div class="participant-chip" :class="{ 'participant-chip--mobile': isMobile }">
-                        {{ p.profile_name || 'Anonymous' }}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                </div>
-
-                <!-- Newcomers -->
-                <div v-if="newcomers.length" :class="isMobile ? 'q-mt-sm' : 'q-mt-md'">
-                  <div class="row items-center q-gutter-x-xs q-mb-xs">
-                    <div
-                      class="text-caption text-weight-bolder text-grey-7 uppercase tracking-widest"
-                      :style="isMobile ? 'font-size: 0.55rem' : 'font-size: 0.6rem'"
-                    >
-                      Newcomers
-                    </div>
-                    <q-badge
-                      color="warning"
-                      :label="newcomers.length"
-                      rounded
-                      class="text-weight-bold"
-                      :style="isMobile ? 'font-size: 9px; padding: 1px 4px' : 'font-size: 10px; padding: 2px 6px'"
-                    />
-                    <q-icon name="person_add" size="12px" class="text-grey-6" />
-                  </div>
-                  <div class="row q-gutter-xs">
-                    <div v-for="(p, index) in newcomers" :key="p.profile || index" class="col-auto">
-                      <div
-                        class="participant-chip participant-chip--newcomer"
-                        :class="{ 'participant-chip--mobile': isMobile }"
-                      >
-                        {{ p.profile_name || 'Anonymous' }}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <!-- Fallback: signed-up users not yet in projection (e.g. just registered) -->
-                <div v-if="unprojectedParticipants.length" :class="isMobile ? 'q-mt-sm' : 'q-mt-md'">
-                  <div class="row q-gutter-xs">
-                    <div v-for="(p, index) in unprojectedParticipants" :key="p.id || index" class="col-auto">
-                      <div class="participant-chip" :class="{ 'participant-chip--mobile': isMobile }">
-                        {{ p.profile_name || 'Anonymous' }}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div v-else class="text-caption text-grey-6 italic">
-                {{ isAuthenticated ? 'Nobody signed up yet. Be the first!' : 'Nobody signed up yet.' }}
-              </div>
-
-              <!-- Missing Participants -->
-              <div v-if="missingParticipants.length" class="q-mt-md">
-                <div class="row items-center q-gutter-x-sm q-mb-xs">
-                  <div
-                    class="text-caption text-weight-bolder text-grey-6 uppercase tracking-widest"
-                    :style="isMobile ? 'font-size: 0.55rem' : 'font-size: 0.6rem'"
-                  >
-                    Missing from previous season
-                  </div>
-                </div>
-                <div class="row q-gutter-xs">
-                  <div v-for="(p, index) in missingParticipants" :key="p.id || index" class="col-auto">
-                    <div
-                      class="participant-chip participant-chip--missing"
-                      :class="{ 'participant-chip--mobile': isMobile }"
-                    >
-                      <q-icon name="history" size="12px" class="q-mr-xs" />
-                      {{ p.profile_name || 'Anonymous' }}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </template>
-          </div>
         </div>
-      </div>
 
-      <!-- Actions (Desktop all) -->
-      <div class="row items-center q-gutter-sm absolute-top-right q-pa-md content-layer">
-        <template v-if="!isMobile">
+        <!-- Top Right Actions: Sign up button / status & minimize toggle -->
+        <div class="row items-center no-wrap q-gutter-x-xs flex-shrink-0">
           <KennerButton
             v-if="!isSignedUpForOpenSeason"
             unelevated
             dense
             no-caps
-            color="primary"
-            class="q-px-md"
+            color="accent"
+            class="q-px-sm text-weight-bold"
             @click="signUp"
           >
             Sign up
@@ -283,10 +106,160 @@
 
           <div
             v-else
-            class="row items-center q-gutter-x-xs text-positive text-weight-bold text-caption q-px-sm"
+            class="row items-center q-gutter-x-xs text-positive text-weight-bold text-caption q-px-xs"
           >
             <q-icon name="check_circle" size="16px" />
-            <span>Signed up</span>
+            <span class="gt-xs">Signed up</span>
+          </div>
+
+          <q-btn
+            flat
+            dense
+            round
+            icon="expand_less"
+            size="sm"
+            color="grey-7"
+            aria-label="Minimize"
+            class="q-ml-xs"
+            @click="toggleMinimized"
+          >
+            <q-tooltip>Minimize</q-tooltip>
+          </q-btn>
+        </div>
+      </div>
+
+      <!-- Integrated Participants & Provisional Leagues List -->
+      <div class="content-layer q-mt-md">
+        <div class="row items-center q-gutter-x-sm q-mb-sm">
+          <div class="text-caption text-weight-bolder text-grey-8 uppercase tracking-widest section-title">
+            Signed up
+          </div>
+          <q-badge
+            color="accent"
+            :label="activeParticipants.length"
+            rounded
+            class="text-weight-bold count-badge"
+          />
+        </div>
+
+        <div v-if="participantsLoading" class="row q-gutter-xs">
+          <q-skeleton
+            v-for="i in 5"
+            :key="i"
+            type="rect"
+            :width="isMobile ? '48px' : '64px'"
+            :height="isMobile ? '24px' : '28px'"
+            class="rounded-borders"
+          />
+        </div>
+
+        <template v-else-if="participantsLoaded">
+          <div v-if="activeParticipants.length">
+            <!-- Preliminary leagues notice -->
+            <div
+              v-if="projectedLeagueGroups.length"
+              class="text-caption text-grey-6 italic q-mb-sm"
+            >
+              Provisional Leagues
+            </div>
+
+            <!-- Grouped by projected league -->
+            <div class="league-grid" :class="{ 'league-grid--mobile': isMobile }">
+              <div
+                v-for="group in projectedLeagueGroups"
+                :key="`L-${group.level}`"
+                class="league-box"
+              >
+                <div class="league-box__label row items-center q-gutter-x-xs">
+                  <LeagueLevel
+                    badge
+                    :level="group.level"
+                    :style="isMobile ? 'font-size: 0.6rem' : 'font-size: 0.65rem'"
+                  />
+                  <q-badge
+                    color="grey-5"
+                    :label="`${group.members.length}/${group.size}`"
+                    rounded
+                    class="text-weight-bold"
+                    style="font-size: 9px; padding: 1px 4px"
+                  />
+                </div>
+                <div class="row q-gutter-xs">
+                  <div v-for="(p, index) in group.members" :key="p.profile || index" class="col-auto">
+                    <div class="participant-chip" :class="{ 'participant-chip--mobile': isMobile }">
+                      {{ p.profile_name || 'Anonymous' }}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Newcomers -->
+            <div v-if="newcomers.length" :class="isMobile ? 'q-mt-sm' : 'q-mt-md'">
+              <div class="row items-center q-gutter-x-xs q-mb-xs">
+                <div class="text-caption text-weight-bolder text-grey-7 uppercase tracking-widest section-title">
+                  Newcomers
+                </div>
+                <q-badge
+                  color="warning"
+                  :label="newcomers.length"
+                  rounded
+                  class="text-weight-bold count-badge"
+                />
+                <q-icon name="person_add" size="12px" class="text-grey-6" />
+              </div>
+              <div class="row q-gutter-xs">
+                <div v-for="(p, index) in newcomers" :key="p.profile || index" class="col-auto">
+                  <div
+                    class="participant-chip participant-chip--newcomer"
+                    :class="{ 'participant-chip--mobile': isMobile }"
+                  >
+                    {{ p.profile_name || 'Anonymous' }}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Fallback: signed-up users not yet in projection -->
+            <div v-if="unprojectedParticipants.length" :class="isMobile ? 'q-mt-sm' : 'q-mt-md'">
+              <div class="row q-gutter-xs">
+                <div v-for="(p, index) in unprojectedParticipants" :key="p.id || index" class="col-auto">
+                  <div class="participant-chip" :class="{ 'participant-chip--mobile': isMobile }">
+                    {{ p.profile_name || 'Anonymous' }}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div v-else class="text-caption text-grey-6 italic">
+            {{ isAuthenticated ? 'Nobody signed up yet. Be the first!' : 'Nobody signed up yet.' }}
+          </div>
+
+          <!-- Missing Participants from previous season -->
+          <div v-if="missingParticipants.length" :class="isMobile ? 'q-mt-md' : 'q-mt-lg'">
+            <div class="row items-center q-gutter-x-xs q-mb-xs">
+              <div class="text-caption text-weight-bolder text-grey-6 uppercase tracking-widest section-title">
+                Missing from previous season
+              </div>
+              <q-badge
+                color="grey-6"
+                :label="missingParticipants.length"
+                rounded
+                class="text-weight-bold count-badge"
+              />
+            </div>
+            <div class="row q-gutter-xs">
+              <div v-for="(p, index) in missingParticipants" :key="p.id || index" class="col-auto">
+                <div
+                  class="participant-chip participant-chip--missing"
+                  :class="{ 'participant-chip--mobile': isMobile }"
+                >
+                  <q-icon name="history" size="12px" class="q-mr-xs text-grey-5 flex-shrink-0" />
+                  <span>{{ p.profile_name || 'Anonymous' }}</span>
+                </div>
+              </div>
+            </div>
           </div>
         </template>
       </div>
@@ -450,71 +423,96 @@ onMounted(async () => {
 }
 
 .icon-wrapper {
-  width: 64px;
-  height: 64px;
-  border-radius: 16px;
+  width: 56px;
+  height: 56px;
+  border-radius: 14px;
   flex-shrink: 0;
   background: var(--q-accent);
 }
 
 .icon-wrapper--mobile {
-  width: 52px;
-  height: 52px;
-  border-radius: 12px;
-  margin-right: 16px !important;
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  margin-right: 12px !important;
 }
 
 .lh-tight {
+  line-height: 1.25;
+}
+
+.section-title {
+  font-size: 0.65rem;
+  letter-spacing: 0.08em;
+}
+
+.count-badge {
+  font-size: 10px;
+  padding: 1px 6px;
   line-height: 1.2;
 }
 
 .participant-chip {
+  display: inline-flex;
+  align-items: center;
   font-size: 12px;
-  background: rgba(248, 249, 250, 0.7);
-  padding: 4px 12px;
+  line-height: 1.3;
+  background: #f8fafc;
+  padding: 4px 10px;
   border-radius: 6px;
-  color: #2c3e50;
+  color: #1e293b;
   font-weight: 600;
-  border: 1px solid rgba($accent, 0.1);
+  border: 1px solid rgba(94, 53, 177, 0.12);
+  transition: all 0.15s ease-in-out;
+}
+
+.participant-chip:hover {
+  background: #f1f5f9;
+  border-color: rgba(94, 53, 177, 0.25);
 }
 
 .participant-chip--missing {
-  background: rgba(0, 0, 0, 0.02);
-  color: #777;
-  border: 1px dashed rgba(0, 0, 0, 0.15);
+  background: #fcfcfc;
+  color: #64748b;
+  border: 1px dashed #cbd5e1;
   font-weight: 500;
   box-shadow: none;
 }
 
+.participant-chip--missing:hover {
+  background: #f1f5f9;
+  color: #475569;
+}
+
 .participant-chip--newcomer {
-  background: rgba(255, 193, 7, 0.08);
-  color: #8a6d00;
-  border: 1px dashed rgba(255, 193, 7, 0.55);
+  background: #fffbeb;
+  color: #b45309;
+  border: 1px dashed #fcd34d;
+  font-weight: 600;
   box-shadow: none;
 }
 
-.opacity-60 {
-  opacity: 0.6;
+.participant-chip--newcomer:hover {
+  background: #fef3c7;
 }
 
 .participant-chip--mobile {
-  font-size: 10px;
-  padding: 2px 8px;
-  border-radius: 4px;
+  font-size: 11px;
+  padding: 2px 7px;
+  border-radius: 5px;
 }
 
 .tracking-widest {
-  letter-spacing: 0.1em;
-}
-
-.minimize-btn {
-  top: 4px;
-  right: 4px;
-  z-index: 2;
+  letter-spacing: 0.08em;
 }
 
 .signup-minimized {
   cursor: pointer;
+  transition: background-color 0.15s ease-in-out;
+}
+
+.signup-minimized:hover {
+  background-color: rgba(0, 0, 0, 0.02);
 }
 
 .announcement-card--minimized {
@@ -525,29 +523,39 @@ onMounted(async () => {
 .league-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 10px;
+  gap: 12px;
   margin-top: 8px;
 }
 
 .league-grid--mobile {
   grid-template-columns: 1fr;
-  gap: 8px;
+  gap: 10px;
 }
 
 .league-box {
   position: relative;
-  border: 1px solid rgba(0, 0, 0, 0.12);
+  background: #fafafa;
+  border: 1px solid rgba(0, 0, 0, 0.08);
   border-radius: 8px;
-  padding: 12px 8px 8px 8px;
+  padding: 14px 10px 10px 10px;
   min-width: 0;
 }
 
 .league-box__label {
   position: absolute;
-  top: -8px;
+  top: -9px;
   left: 10px;
   background: white;
-  padding: 0 6px;
+  border-radius: 4px;
+  padding: 0 4px;
   line-height: 1;
+}
+
+.min-width-0 {
+  min-width: 0;
+}
+
+.flex-shrink-0 {
+  flex-shrink: 0;
 }
 </style>
