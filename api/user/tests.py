@@ -793,3 +793,35 @@ class UserPasswordResetTests(TestCase):
         self.assertEqual(res_reset.status_code, 200)
         created_user.refresh_from_db()
         self.assertTrue(created_user.check_password("b"))
+
+    def test_admin_can_delete_invitation_and_password_reset(self):
+        from user.models import UserInviteLink
+        invite = UserInviteLink.objects.create(
+            type=UserInviteLink.TYPE_INVITATION,
+            label="Pending invitation to delete",
+        )
+        reset_link = UserInviteLink.objects.create(
+            user=self.user,
+            type=UserInviteLink.TYPE_PASSWORD,
+            label="Pending reset to delete",
+        )
+
+        # Unauthenticated cannot delete
+        res_anon = self.client.delete(f"/api/user/invitations/{invite.id}/")
+        self.assertEqual(res_anon.status_code, 401)
+
+        # Non-admin cannot delete
+        self.client.force_authenticate(user=self.user)
+        res_user = self.client.delete(f"/api/user/invitations/{invite.id}/")
+        self.assertEqual(res_user.status_code, 403)
+
+        # Admin can delete invitation
+        self.client.force_authenticate(user=self.admin)
+        res_del_invite = self.client.delete(f"/api/user/invitations/{invite.id}/")
+        self.assertEqual(res_del_invite.status_code, 204)
+        self.assertFalse(UserInviteLink.objects.filter(id=invite.id).exists())
+
+        # Admin can delete password reset link
+        res_del_reset = self.client.delete(f"/api/user/invitations/{reset_link.id}/")
+        self.assertEqual(res_del_reset.status_code, 204)
+        self.assertFalse(UserInviteLink.objects.filter(id=reset_link.id).exists())

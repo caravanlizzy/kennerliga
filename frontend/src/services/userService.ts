@@ -74,6 +74,10 @@ export async function createInvitation(payload: {
   return data;
 }
 
+export async function deleteInvitation(id: number): Promise<void> {
+  await api.delete(`/user/invitations/${id}/`);
+}
+
 /**
  * Signs a new account up against an invite key.
  *
