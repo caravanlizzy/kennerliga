@@ -11,8 +11,10 @@
       @click="toggleMinimized"
     >
       <div class="row items-center no-wrap col min-width-0 q-mr-sm">
-        <q-icon name="person_add" size="20px" color="accent" class="q-mr-sm flex-shrink-0" />
-        <div class="text-subtitle2 text-weight-bolder text-primary ellipsis">
+        <div class="minimized-icon-badge flex flex-center q-mr-sm flex-shrink-0">
+          <q-icon name="campaign" size="16px" color="white" />
+        </div>
+        <div class="text-subtitle2 text-weight-bolder announcement-title ellipsis">
           {{ announcement.title }}
         </div>
       </div>
@@ -38,7 +40,7 @@
           round
           icon="expand_more"
           size="sm"
-          color="grey-7"
+          color="accent"
           aria-label="Expand"
           @click.stop="toggleMinimized"
         >
@@ -57,7 +59,7 @@
     >
       <!-- Background Ornament -->
       <div class="signup-ornament absolute-right overflow-hidden">
-        <q-icon name="campaign" size="180px" color="accent" />
+        <q-icon name="campaign" size="200px" color="accent" />
       </div>
 
       <!-- Top Row: Icon + Title & Actions -->
@@ -68,20 +70,26 @@
           :class="[isMobile ? 'icon-wrapper--mobile' : '']"
         >
           <q-icon
-            name="person_add"
-            :size="isMobile ? '28px' : '36px'"
+            name="campaign"
+            :size="isMobile ? '26px' : '32px'"
             color="white"
           />
         </div>
 
         <!-- Title and Subtitle / Content -->
         <div class="col min-width-0 q-mr-sm">
-          <div class="text-h6 text-weight-bolder lh-tight text-primary q-mb-xs">
+          <div class="row items-center q-mb-xs">
+            <span class="announcement-pill">
+              <q-icon name="campaign" size="12px" class="q-mr-xs" />
+              ANNOUNCEMENT
+            </span>
+          </div>
+          <div class="text-h6 text-weight-bolder lh-tight announcement-title q-mb-xs">
             {{ announcement.title }}
           </div>
           <div
             v-if="announcement.content"
-            class="text-subtitle2 text-grey-8"
+            class="text-subtitle2 announcement-desc"
           >
             {{ announcement.content }}
           </div>
@@ -95,7 +103,7 @@
             dense
             no-caps
             color="accent"
-            class="q-px-sm text-weight-bold"
+            class="q-px-sm text-weight-bold signup-btn"
             @click="signUp"
           >
             Sign up
@@ -402,15 +410,43 @@ onMounted(async () => {
 }
 
 .announcement-card--signup {
+  background:
+    radial-gradient(circle at 100% 0%, rgba(94, 53, 177, 0.09) 0%, transparent 50%),
+    radial-gradient(circle at 0% 100%, rgba(255, 122, 89, 0.06) 0%, transparent 40%),
+    linear-gradient(135deg, #fbf7ff 0%, #f6f0fe 50%, #ffffff 100%);
+  border: 1px solid rgba(94, 53, 177, 0.22);
   border-top: 4px solid var(--q-accent);
-  background: white;
+  box-shadow: 0 4px 20px rgba(94, 53, 177, 0.08), 0 1px 3px rgba(0, 0, 0, 0.03);
   position: relative;
 }
 
+.announcement-pill {
+  display: inline-flex;
+  align-items: center;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--q-accent);
+  background: rgba(94, 53, 177, 0.1);
+  border: 1px solid rgba(94, 53, 177, 0.2);
+  padding: 1px 7px;
+  border-radius: 10px;
+  line-height: 1.4;
+}
+
+.announcement-title {
+  color: #2e1065;
+}
+
+.announcement-desc {
+  color: #475569;
+}
+
 .signup-ornament {
-  opacity: 0.03;
+  opacity: 0.06;
   pointer-events: none;
-  transform: rotate(-15deg) translateY(10%);
+  transform: rotate(-12deg) translateY(5%);
   z-index: 0;
 }
 
@@ -419,22 +455,41 @@ onMounted(async () => {
 }
 
 .announcement-card:hover:not(.no-border-radius-mobile) {
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 8px 25px rgba(94, 53, 177, 0.12), 0 2px 6px rgba(0, 0, 0, 0.04);
 }
 
 .icon-wrapper {
-  width: 56px;
-  height: 56px;
+  width: 52px;
+  height: 52px;
   border-radius: 14px;
   flex-shrink: 0;
-  background: var(--q-accent);
+  background: linear-gradient(135deg, #7e57c2 0%, #5e35b1 100%);
+  box-shadow: 0 4px 14px rgba(94, 53, 177, 0.35);
 }
 
 .icon-wrapper--mobile {
-  width: 44px;
-  height: 44px;
+  width: 42px;
+  height: 42px;
   border-radius: 10px;
   margin-right: 12px !important;
+}
+
+.minimized-icon-badge {
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  background: linear-gradient(135deg, #7e57c2 0%, #5e35b1 100%);
+  box-shadow: 0 2px 6px rgba(94, 53, 177, 0.25);
+}
+
+.signup-btn {
+  box-shadow: 0 3px 10px rgba(94, 53, 177, 0.3);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.signup-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(94, 53, 177, 0.4);
 }
 
 .lh-tight {
@@ -444,6 +499,7 @@ onMounted(async () => {
 .section-title {
   font-size: 0.65rem;
   letter-spacing: 0.08em;
+  color: #581c87;
 }
 
 .count-badge {
@@ -457,22 +513,23 @@ onMounted(async () => {
   align-items: center;
   font-size: 12px;
   line-height: 1.3;
-  background: #f8fafc;
+  background: #ffffff;
   padding: 4px 10px;
   border-radius: 6px;
   color: #1e293b;
   font-weight: 600;
-  border: 1px solid rgba(94, 53, 177, 0.12);
+  border: 1px solid rgba(94, 53, 177, 0.16);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
   transition: all 0.15s ease-in-out;
 }
 
 .participant-chip:hover {
-  background: #f1f5f9;
-  border-color: rgba(94, 53, 177, 0.25);
+  background: #f5f3ff;
+  border-color: rgba(94, 53, 177, 0.35);
 }
 
 .participant-chip--missing {
-  background: #fcfcfc;
+  background: rgba(255, 255, 255, 0.75);
   color: #64748b;
   border: 1px dashed #cbd5e1;
   font-weight: 500;
@@ -508,16 +565,18 @@ onMounted(async () => {
 
 .signup-minimized {
   cursor: pointer;
+  background: linear-gradient(90deg, #faf5ff 0%, #ffffff 100%);
   transition: background-color 0.15s ease-in-out;
 }
 
 .signup-minimized:hover {
-  background-color: rgba(0, 0, 0, 0.02);
+  background: linear-gradient(90deg, #f3e8ff 0%, #faf5ff 100%);
 }
 
 .announcement-card--minimized {
-  border-top-width: 4px;
+  border-top-width: 3px;
   border-top-color: var(--q-accent) !important;
+  border-color: rgba(94, 53, 177, 0.2);
 }
 
 .league-grid {
@@ -534,11 +593,13 @@ onMounted(async () => {
 
 .league-box {
   position: relative;
-  background: #fafafa;
-  border: 1px solid rgba(0, 0, 0, 0.08);
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(4px);
+  border: 1px solid rgba(94, 53, 177, 0.16);
   border-radius: 8px;
   padding: 14px 10px 10px 10px;
   min-width: 0;
+  box-shadow: 0 1px 4px rgba(94, 53, 177, 0.03);
 }
 
 .league-box__label {
@@ -546,6 +607,7 @@ onMounted(async () => {
   top: -9px;
   left: 10px;
   background: white;
+  border: 1px solid rgba(94, 53, 177, 0.15);
   border-radius: 4px;
   padding: 0 4px;
   line-height: 1;
