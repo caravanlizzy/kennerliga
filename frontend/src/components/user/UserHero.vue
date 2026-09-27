@@ -48,13 +48,6 @@
               <div class="text-caption text-uppercase letter-spacing-2 text-white text-opacity-60">Games</div>
             </div>
           </div>
-          <div v-if="isMe" class="q-mt-md">
-            <EnableNotificationsButton
-              outline
-              color="white"
-              custom-class="text-white"
-            />
-          </div>
         </div>
       </div>
     </div>
@@ -80,7 +73,6 @@
 import { ref, computed } from 'vue';
 import UserAvatar from 'components/ui/UserAvatar.vue';
 import AvatarShapePickerModal from 'components/user/AvatarShapePickerModal.vue';
-import EnableNotificationsButton from 'components/notification/EnableNotificationsButton.vue';
 import KennerTooltip from 'components/base/KennerTooltip.vue';
 import { useUserStore } from 'stores/userStore';
 import { AvatarShape, TUserDto } from 'src/types';

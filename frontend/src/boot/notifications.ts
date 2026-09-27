@@ -4,6 +4,7 @@ import { watch } from 'vue';
 
 import {
   isPushNotificationSupported,
+  isPushUserDisabled,
   PushNotConfiguredError,
   subscribeToPushNotifications,
 } from 'src/services/notificationService';
@@ -27,6 +28,10 @@ export default boot(() => {
 
   function offerNotifications(): void {
     if (!userStore.isAuthenticated || !isPushNotificationSupported()) {
+      return;
+    }
+
+    if (isPushUserDisabled()) {
       return;
     }
 

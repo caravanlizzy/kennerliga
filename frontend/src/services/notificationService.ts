@@ -1,5 +1,27 @@
 import { api } from 'boot/axios';
 
+const PUSH_DISABLED_KEY = 'kenner_push_notifications_disabled';
+
+export function isPushUserDisabled(): boolean {
+  try {
+    return localStorage.getItem(PUSH_DISABLED_KEY) === 'true';
+  } catch {
+    return false;
+  }
+}
+
+export function setPushUserDisabled(disabled: boolean): void {
+  try {
+    if (disabled) {
+      localStorage.setItem(PUSH_DISABLED_KEY, 'true');
+    } else {
+      localStorage.removeItem(PUSH_DISABLED_KEY);
+    }
+  } catch {
+    // Ignore storage errors in restricted contexts
+  }
+}
+
 function decodeVapidPublicKey(value: string): Uint8Array {
   const padding = '='.repeat((4 - (value.length % 4)) % 4);
   const base64 = (value + padding).replace(/-/g, '+').replace(/_/g, '/');
@@ -18,6 +40,33 @@ export class PushNotConfiguredError extends Error {
 
 export function isPushNotificationSupported(): boolean {
   return 'Notification' in window && 'serviceWorker' in navigator && 'PushManager' in window;
+}
+
+export async function getExistingPushSubscription(): Promise<PushSubscription | null> {
+  if (!isPushNotificationSupported()) {
+    return null;
+  }
+  try {
+    const registration = await navigator.serviceWorker.ready;
+    return await registration.pushManager.getSubscription();
+  } catch (error) {
+    console.error('Failed to get push subscription:', error);
+    return null;
+  }
+}
+
+export async function isPushNotificationSubscribed(): Promise<boolean> {
+  if (!isPushNotificationSupported()) {
+    return false;
+  }
+  if (isPushUserDisabled()) {
+    return false;
+  }
+  if (Notification.permission !== 'granted') {
+    return false;
+  }
+  const subscription = await getExistingPushSubscription();
+  return subscription !== null;
 }
 
 async function fetchVapidPublicKey(): Promise<string> {
@@ -43,6 +92,10 @@ async function postSubscription(subscription: PushSubscription): Promise<void> {
   await api.post('/notifications/subscriptions/', subscription.toJSON());
 }
 
+async function deleteSubscription(endpoint: string): Promise<void> {
+  await api.delete('/notifications/subscriptions/', { data: { endpoint } });
+}
+
 async function getOrCreateSubscription(
   registration: ServiceWorkerRegistration,
 ): Promise<PushSubscription> {
@@ -57,20 +110,52 @@ async function getOrCreateSubscription(
   });
 }
 
-export async function subscribeToPushNotifications(): Promise<void> {
+export async function subscribeToPushNotifications(): Promise<boolean> {
   if (!isPushNotificationSupported()) {
     throw new Error('Push notifications are not supported by this browser.');
   }
 
+  setPushUserDisabled(false);
+
   const permission = await Notification.requestPermission();
   if (permission !== 'granted') {
-    return;
+    return false;
   }
 
   const registration = await navigator.serviceWorker.ready;
   const subscription = await getOrCreateSubscription(registration);
   await postSubscription(subscription);
   registerSubscriptionChangeHandler(registration);
+  return true;
+}
+
+export async function unsubscribeFromPushNotifications(): Promise<void> {
+  if (!isPushNotificationSupported()) {
+    return;
+  }
+
+  setPushUserDisabled(true);
+
+  try {
+    const registration = await navigator.serviceWorker.ready;
+    const subscription = await registration.pushManager.getSubscription();
+    if (subscription) {
+      const endpoint = subscription.endpoint;
+      try {
+        await subscription.unsubscribe();
+      } catch (err) {
+        console.error('Failed to unsubscribe from browser push service:', err);
+      }
+      try {
+        await deleteSubscription(endpoint);
+      } catch (err) {
+        console.error('Failed to delete subscription on backend:', err);
+      }
+    }
+  } catch (error) {
+    console.error('Error during push unsubscription:', error);
+    throw error;
+  }
 }
 
 // The browser can rotate a push subscription at any time; when it does, the
@@ -91,6 +176,9 @@ function registerSubscriptionChangeHandler(registration: ServiceWorkerRegistrati
   target.addEventListener('pushsubscriptionchange', () => {
     void (async () => {
       try {
+        if (isPushUserDisabled()) {
+          return;
+        }
         const subscription = await getOrCreateSubscription(registration);
         await postSubscription(subscription);
       } catch (error) {

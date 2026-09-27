@@ -63,8 +63,10 @@
           </div>
         </div>
 
-        <!-- Right Column: Tabs for detailed view -->
+        <!-- Right Column: Tabs for detailed view & Settings -->
         <div class="col-12 col-md-8">
+          <UserSettingsCard v-if="isMe" />
+
           <q-tabs
             v-model="tab"
             dense
@@ -128,6 +130,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
+import { useUserStore } from 'stores/userStore';
 import { fetchUser, fetchUserStatistics } from 'src/services/userService';
 import { fetchParticipantsForProfile } from 'src/services/seasonService';
 import UserHero from 'components/user/UserHero.vue';
@@ -135,6 +138,7 @@ import UserPicks from 'components/user/UserPicks.vue';
 import UserPerformance from 'components/user/UserPerformance.vue';
 import UserGamesTab from 'components/user/UserGamesTab.vue';
 import UserSeasonsTab from 'components/user/UserSeasonsTab.vue';
+import UserSettingsCard from 'components/user/UserSettingsCard.vue';
 import KennerButton from 'components/base/KennerButton.vue';
 import type {
   TUserDto,
@@ -146,10 +150,15 @@ import type {
 
 const route = useRoute();
 const router = useRouter();
+const userStore = useUserStore();
 const loadingUser = ref(true);
 const loadingStats = ref(true);
 const loadingSeasons = ref(true);
 const user = ref<TUserDto | null>(null);
+
+const isMe = computed(() => {
+  return userStore.username === user.value?.username;
+});
 const userSeasonList = ref<(TSeasonParticipantDto & { season_details?: TSeasonDto })[]>([]);
 const gameSearch = ref('');
 const tab = ref('games');

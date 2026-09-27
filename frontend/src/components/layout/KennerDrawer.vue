@@ -33,10 +33,10 @@
         <q-separator class="q-my-sm drawer-separator" />
         <DrawerSubGroup>Preferences</DrawerSubGroup>
         <DrawerItem
-          icon="notifications"
+          :icon="notificationsSubscribed ? 'notifications_active' : 'notifications_off'"
           icon-color="primary"
-          label="Enable notifications"
-          @click="enableNotifications"
+          :label="notificationsSubscribed ? 'Disable notifications' : 'Enable notifications'"
+          @click="toggleNotifications"
         />
 
         <template v-if="isAdmin">
@@ -87,14 +87,16 @@ import DrawerItem from 'components/base/DrawerItem.vue';
 import DrawerSubGroup from 'components/base/DrawerSubGroup.vue';
 import {
   isPushNotificationSupported,
+  isPushNotificationSubscribed,
   PushNotConfiguredError,
   subscribeToPushNotifications,
+  unsubscribeFromPushNotifications,
 } from 'src/services/notificationService';
 import { useUserStore } from 'stores/userStore';
 import { useHomeSeasonStore } from 'stores/homeSeasonStore';
 import { storeToRefs } from 'pinia';
 import { useRouter } from 'vue-router';
-import { provide, watch } from 'vue';
+import { provide, watch, ref } from 'vue';
 
 const drawerState = defineModel();
 
@@ -106,6 +108,7 @@ const homeSeasonStore = useHomeSeasonStore();
 const { currentSeasonId } = storeToRefs(homeSeasonStore);
 
 const router = useRouter();
+const notificationsSubscribed = ref(false);
 
 provide('closeDrawer', () => (drawerState.value = false));
 
@@ -115,7 +118,25 @@ watch(isAdmin, (val) => {
   }
 }, { immediate: true });
 
-async function enableNotifications(): Promise<void> {
+async function checkNotificationStatus() {
+  if (!isPushNotificationSupported()) {
+    notificationsSubscribed.value = false;
+    return;
+  }
+  try {
+    notificationsSubscribed.value = await isPushNotificationSubscribed();
+  } catch {
+    notificationsSubscribed.value = false;
+  }
+}
+
+watch(drawerState, (open) => {
+  if (open) {
+    void checkNotificationStatus();
+  }
+}, { immediate: true });
+
+async function toggleNotifications(): Promise<void> {
   if (!isPushNotificationSupported()) {
     Notify.create({
       type: 'negative',
@@ -125,20 +146,38 @@ async function enableNotifications(): Promise<void> {
   }
 
   try {
-    await subscribeToPushNotifications();
-    Notify.create({
-      type: 'positive',
-      message: 'Notifications enabled.',
-    });
+    if (notificationsSubscribed.value) {
+      await unsubscribeFromPushNotifications();
+      notificationsSubscribed.value = false;
+      Notify.create({
+        type: 'info',
+        message: 'Notifications disabled.',
+      });
+    } else {
+      const granted = await subscribeToPushNotifications();
+      if (granted) {
+        notificationsSubscribed.value = true;
+        Notify.create({
+          type: 'positive',
+          message: 'Notifications enabled.',
+        });
+      } else {
+        notificationsSubscribed.value = false;
+        Notify.create({
+          type: 'warning',
+          message: 'Notification permission was denied or dismissed.',
+        });
+      }
+    }
   } catch (error) {
-    console.error('Unable to enable push notifications:', error);
+    console.error('Unable to update push notifications:', error);
 
     Notify.create({
       type: 'negative',
       message:
         error instanceof PushNotConfiguredError
           ? 'Notifications are not configured on the server yet.'
-          : 'Notifications could not be enabled.',
+          : 'Notifications could not be updated.',
     });
   }
 }
