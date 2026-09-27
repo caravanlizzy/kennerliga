@@ -113,18 +113,121 @@
         <span v-else class="text-grey-5">-</span>
       </q-td>
     </template>
+    <template v-if="isAdmin" v-slot:body-cell-actions="props">
+      <q-td :props="props" auto-width>
+        <KennerButton
+          flat
+          round
+          dense
+          icon="lock_reset"
+          color="primary"
+          @click.stop="openResetDialog(props.row)"
+        >
+          <q-tooltip>Reset Password</q-tooltip>
+        </KennerButton>
+      </q-td>
+    </template>
   </KennerTable>
+
+  <q-dialog v-model="showResetDialog" @hide="onResetDialogHide">
+    <q-card style="min-width: 320px; max-width: 480px; width: 100%; border-radius: 16px" class="q-pa-md">
+      <q-card-section>
+        <div class="text-h6 text-weight-bold">Reset Password</div>
+        <div class="text-caption text-grey-7 q-mt-xs">
+          Generate a one-time password reset link for <span class="text-weight-bold text-dark">{{ targetUser?.username }}</span>.
+        </div>
+      </q-card-section>
+
+      <q-card-section v-if="!generatedResetUrl" class="q-pt-none">
+        <KennerInput
+          v-model="resetLabel"
+          label="Label / Note (optional)"
+          placeholder="e.g. Password reset for user"
+          :disable="isGeneratingReset"
+        />
+      </q-card-section>
+
+      <q-card-section v-else class="q-pt-none column q-gutter-y-sm">
+        <div class="row items-center text-positive text-caption text-weight-medium">
+          <q-icon name="check_circle" size="18px" class="q-mr-xs" />
+          <span>Reset link created successfully.</span>
+        </div>
+        <KennerInput
+          :model-value="generatedResetUrl"
+          readonly
+          label="Password Reset Link"
+        >
+          <template v-slot:append>
+            <q-btn
+              flat
+              round
+              dense
+              icon="content_copy"
+              color="primary"
+              @click="copyGeneratedLink"
+            >
+              <q-tooltip>Copy link</q-tooltip>
+            </q-btn>
+          </template>
+        </KennerInput>
+      </q-card-section>
+
+      <q-card-actions align="right" class="q-pt-sm">
+        <template v-if="!generatedResetUrl">
+          <KennerButton
+            flat
+            label="Cancel"
+            color="grey-7"
+            v-close-popup
+            :disable="isGeneratingReset"
+          />
+          <KennerButton
+            label="Generate Link"
+            color="primary"
+            icon="lock_reset"
+            :loading="isGeneratingReset"
+            :disable="isGeneratingReset"
+            @click="doGenerateResetLink"
+          />
+        </template>
+        <template v-else>
+          <KennerButton
+            flat
+            label="Close"
+            color="grey-7"
+            v-close-popup
+          />
+          <KennerButton
+            label="Copy Link"
+            color="primary"
+            icon="content_copy"
+            @click="copyGeneratedLink"
+          />
+        </template>
+      </q-card-actions>
+    </q-card>
+  </q-dialog>
 </template>
 
 <script setup lang="ts">
 import KennerTable from 'components/tables/KennerTable.vue';
+import KennerButton from 'components/base/KennerButton.vue';
+import KennerInput from 'components/base/KennerInput.vue';
 import LeagueLevel from 'components/season/LeagueLevel.vue';
 import { useRouter } from 'vue-router';
 import { TKennerButton, TUserDto } from 'src/types';
 import { computed, onMounted, ref, watch } from 'vue';
 import { useUserStore } from 'stores/userStore';
+import { storeToRefs } from 'pinia';
+import { copyToClipboard, useQuasar } from 'quasar';
+import axios from 'axios';
+import { createPasswordResetLink } from 'src/services/userService';
 
-const { listUsers, getAvailableYears } = useUserStore();
+const $q = useQuasar();
+const userStore = useUserStore();
+const { listUsers, getAvailableYears } = userStore;
+const { isAdmin } = storeToRefs(userStore);
+
 const users = ref<TUserDto[]>([]);
 const availablePlayerCounts = ['2p', '3p', '4p'];
 const selectedPlayerCounts = ref<string[]>(['4p']);
@@ -134,6 +237,63 @@ const isAllPlayerCountsSelected = computed(
 const selectedYears = ref<number[]>([]);
 const availableYears = ref<number[]>([]);
 const loading = ref(false);
+
+const showResetDialog = ref(false);
+const targetUser = ref<TUserDto | null>(null);
+const resetLabel = ref('');
+const generatedResetUrl = ref('');
+const isGeneratingReset = ref(false);
+
+function openResetDialog(user: TUserDto) {
+  targetUser.value = user;
+  resetLabel.value = `Password reset for ${user.username}`;
+  generatedResetUrl.value = '';
+  showResetDialog.value = true;
+}
+
+function onResetDialogHide() {
+  targetUser.value = null;
+  resetLabel.value = '';
+  generatedResetUrl.value = '';
+  isGeneratingReset.value = false;
+}
+
+async function doGenerateResetLink() {
+  if (!targetUser.value || targetUser.value.id === undefined) return;
+
+  isGeneratingReset.value = true;
+  try {
+    const invite = await createPasswordResetLink({
+      user: targetUser.value.id,
+      label: resetLabel.value.trim() || undefined,
+    });
+    generatedResetUrl.value = invite.invite_url;
+    $q.notify({
+      type: 'positive',
+      message: 'Password reset link generated.',
+    });
+  } catch (err: unknown) {
+    let message = 'Failed to generate password reset link.';
+    if (axios.isAxiosError(err)) {
+      message = (err.response?.data as { detail?: string })?.detail || err.message || message;
+    } else if (err instanceof Error) {
+      message = err.message;
+    }
+    $q.notify({
+      type: 'negative',
+      message,
+    });
+  } finally {
+    isGeneratingReset.value = false;
+  }
+}
+
+function copyGeneratedLink() {
+  if (!generatedResetUrl.value) return;
+  copyToClipboard(generatedResetUrl.value)
+    .then(() => $q.notify({ type: 'positive', message: 'Link copied to clipboard!' }))
+    .catch(() => $q.notify({ type: 'negative', message: 'Failed to copy link.' }));
+}
 
 const bestWinRate = computed(() => {
   const validUsers = users.value.filter(
@@ -245,18 +405,18 @@ const sortNullableSmall = (a: number | null | undefined, b: number | null | unde
   return a - b;
 };
 
-const columns = [
+const baseColumns = [
   {
     name: 'user',
     required: true,
-    align: 'left',
+    align: 'left' as const,
     label: 'Name',
     field: (x: TUserDto) => x.username,
     sortable: true,
   },
   {
     name: 'total_games',
-    align: 'right',
+    align: 'right' as const,
     label: 'Games',
     field: (x: TUserDto) => x.total_games,
     format: (val: number | null | undefined) =>
@@ -265,7 +425,7 @@ const columns = [
   },
   {
     name: 'win_rate',
-    align: 'right',
+    align: 'right' as const,
     label: 'Win %',
     field: (x: TUserDto) => x.win_rate,
     format: (val: number | null | undefined) =>
@@ -275,7 +435,7 @@ const columns = [
   },
   {
     name: 'avg_position',
-    align: 'right',
+    align: 'right' as const,
     label: 'Avg Pos',
     field: (x: TUserDto) => x.avg_position,
     format: (val: number | null | undefined) =>
@@ -285,7 +445,7 @@ const columns = [
   },
   {
     name: 'most_participated_league_level',
-    align: 'right',
+    align: 'right' as const,
     label: 'Home League',
     field: (x: TUserDto) => x.most_participated_league_level,
     format: (val: number | null | undefined) =>
@@ -294,6 +454,22 @@ const columns = [
     sortable: true,
   },
 ];
+
+const columns = computed(() => {
+  if (isAdmin.value) {
+    return [
+      ...baseColumns,
+      {
+        name: 'actions',
+        align: 'center' as const,
+        label: 'Actions',
+        field: () => '',
+        sortable: false,
+      },
+    ];
+  }
+  return baseColumns;
+});
 </script>
 
 <style scoped lang="scss">

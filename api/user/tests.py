@@ -637,45 +637,59 @@ class UserPasswordResetTests(TestCase):
         self.user = User.objects.create_user(username="resettester", password="oldpassword123")
         self.admin = User.objects.create_superuser(username="adminuser", password="adminpassword")
 
-    def test_request_password_reset_success(self):
+    def test_admin_create_password_reset_link_success(self):
         from user.models import UserInviteLink
-        res = self.client.post("/api/user/password-reset/", {"username": "resettester"})
-        self.assertEqual(res.status_code, 200)
-        self.assertEqual(
-            res.data.get("detail"),
-            "Password reset request sent.",
-        )
+        self.client.force_authenticate(user=self.admin)
+        res = self.client.post("/api/user/invitations/", {
+            "type": "password",
+            "user": self.user.id,
+        })
+        self.assertEqual(res.status_code, 201)
+        self.assertIn("invite_url", res.data)
+        self.assertIn("key=", res.data["invite_url"])
+        self.assertEqual(res.data.get("type"), "password")
 
         link = UserInviteLink.objects.filter(user=self.user, type=UserInviteLink.TYPE_PASSWORD).first()
         self.assertIsNotNone(link)
         self.assertEqual(link.type, UserInviteLink.TYPE_PASSWORD)
         self.assertEqual(link.user, self.user)
+        self.assertEqual(link.created_by, self.admin)
         self.assertFalse(link.is_expired())
 
-    def test_request_password_reset_case_insensitive(self):
+    def test_admin_create_password_reset_link_replaces_old(self):
         from user.models import UserInviteLink
-        res = self.client.post("/api/user/password-reset/", {"username": "RESETTESTER"})
-        self.assertEqual(res.status_code, 200)
-        self.assertTrue(UserInviteLink.objects.filter(user=self.user, type=UserInviteLink.TYPE_PASSWORD).exists())
-
-    def test_request_password_reset_nonexistent_user(self):
-        from user.models import UserInviteLink
-        res = self.client.post("/api/user/password-reset/", {"username": "unknown_user"})
-        self.assertEqual(res.status_code, 200)
-        self.assertEqual(
-            res.data.get("detail"),
-            "Password reset request sent.",
+        self.client.force_authenticate(user=self.admin)
+        old_link = UserInviteLink.objects.create(
+            user=self.user,
+            type=UserInviteLink.TYPE_PASSWORD,
+            label="Old reset link",
         )
-        self.assertFalse(UserInviteLink.objects.filter(label__icontains="unknown_user").exists())
+        res = self.client.post("/api/user/invitations/", {
+            "type": "password",
+            "user": self.user.id,
+        })
+        self.assertEqual(res.status_code, 201)
+        self.assertFalse(UserInviteLink.objects.filter(id=old_link.id).exists())
+        self.assertEqual(
+            UserInviteLink.objects.filter(user=self.user, type=UserInviteLink.TYPE_PASSWORD).count(),
+            1,
+        )
 
-    def test_request_password_reset_throttling(self):
-        for _ in range(5):
-            res = self.client.post("/api/user/password-reset/", {"username": "resettester"})
-            self.assertEqual(res.status_code, 200)
+    def test_non_admin_cannot_create_password_reset_link(self):
+        # Anonymous user cannot create reset links
+        res_anon = self.client.post("/api/user/invitations/", {
+            "type": "password",
+            "user": self.user.id,
+        })
+        self.assertEqual(res_anon.status_code, 401)
 
-        # 6th request within the same minute should be throttled
-        throttled_res = self.client.post("/api/user/password-reset/", {"username": "resettester"})
-        self.assertEqual(throttled_res.status_code, 429)
+        # Non-admin user cannot create reset links
+        self.client.force_authenticate(user=self.user)
+        res_user = self.client.post("/api/user/invitations/", {
+            "type": "password",
+            "user": self.user.id,
+        })
+        self.assertEqual(res_user.status_code, 403)
 
     def test_confirm_password_reset_success(self):
         from user.models import UserInviteLink

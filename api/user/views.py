@@ -33,7 +33,6 @@ from user.serializers import (
     UserSerializer,
     UserInviteLinkSerializer,
     UserRegistrationSerializer,
-    PasswordResetRequestSerializer,
     PasswordResetConfirmSerializer,
     PlayerProfileSerializer,
     FeedbackSerializer,
@@ -455,6 +454,14 @@ class UserInviteLinkViewSet(ModelViewSet):
     http_method_names = ["get", "post", "delete", "head", "options"]
 
     def perform_create(self, serializer):
+        user = serializer.validated_data.get("user")
+        link_type = serializer.validated_data.get("type", UserInviteLink.TYPE_INVITATION)
+        if link_type == UserInviteLink.TYPE_PASSWORD and user:
+            UserInviteLink.objects.filter(
+                user=user, type=UserInviteLink.TYPE_PASSWORD
+            ).delete()
+            if not serializer.validated_data.get("label"):
+                serializer.validated_data["label"] = f"Password reset for {user.username}"
         serializer.save(created_by=self.request.user)
 
 
@@ -511,57 +518,11 @@ class UserRegistrationViewSet(ViewSet):
             return Response({"detail": str(e)}, status=400)
 
 
-class PasswordResetRateThrottle(SimpleRateThrottle):
-    """
-    Rate throttle limiting password reset requests to 5 per minute per client IP.
-    """
-    scope = "password_reset"
-    rate = "5/min"
-
-    def get_cache_key(self, request, view):
-        ident = self.get_ident(request)
-        return self.cache_format % {
-            "scope": self.scope,
-            "ident": ident,
-        }
-
-
 class UserPasswordResetViewSet(ViewSet):
     """
-    API viewset for requesting and confirming password resets.
+    API viewset for confirming password resets using one-time token keys.
     """
     permission_classes = [AllowAny]
-    throttle_classes = [PasswordResetRateThrottle]
-
-    def create(self, request):
-        """
-        Request a password reset link for a given username.
-        Proceeds normally even if the user does not exist to prevent user enumeration.
-        """
-        serializer = PasswordResetRequestSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-
-        username = serializer.validated_data["username"].strip()
-        user = User.objects.filter(username__iexact=username).first()
-
-        if user:
-            # Delete any previous pending reset links for this user
-            UserInviteLink.objects.filter(
-                user=user, type=UserInviteLink.TYPE_PASSWORD
-            ).delete()
-
-            UserInviteLink.objects.create(
-                type=UserInviteLink.TYPE_PASSWORD,
-                user=user,
-                label=f"Password reset for {user.username}",
-            )
-
-        return Response(
-            {
-                "detail": "Password reset request sent."
-            },
-            status=status.HTTP_200_OK,
-        )
 
     @action(detail=False, methods=["post"], url_path="confirm")
     def confirm(self, request):

@@ -90,15 +90,16 @@ export async function registerUser(payload: {
 }
 
 /**
- * Requests a password reset link for a given username.
+ * Creates a password reset link for a user (admin only).
  */
-export async function requestPasswordReset(payload: {
-  username: string;
-}): Promise<{ detail: string }> {
-  const { data } = await api.post<{ detail: string }>(
-    '/user/password-reset/',
-    payload
-  );
+export async function createPasswordResetLink(payload: {
+  user: number;
+  label?: string;
+}): Promise<TUserInviteDto> {
+  const { data } = await api.post<TUserInviteDto>('/user/invitations/', {
+    type: 'password',
+    ...payload,
+  });
   return data;
 }
 
