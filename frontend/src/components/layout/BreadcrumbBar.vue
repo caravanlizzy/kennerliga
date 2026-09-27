@@ -1,5 +1,9 @@
 <template>
-  <div v-if="show" class="breadcrumb-bar">
+  <div
+    v-if="show"
+    class="breadcrumb-bar"
+    :class="{ 'border-bottom-none': hasAnnouncementBelow }"
+  >
     <div class="breadcrumb-bar__inner q-mx-auto q-px-md row items-center no-wrap">
       <div class="row items-center no-wrap history-nav">
         <KennerButton
@@ -41,12 +45,21 @@
 import { computed } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useResponsive } from 'src/composables/responsive';
+import { useUserStore } from 'stores/userStore';
+import { useAnnouncementStore } from 'stores/announcementStore';
+import { storeToRefs } from 'pinia';
 import KennerButton from 'components/base/KennerButton.vue';
 import KennerTooltip from 'components/base/KennerTooltip.vue';
 
 const route = useRoute();
 const router = useRouter();
 const { isMobile } = useResponsive();
+const { isAuthenticated } = storeToRefs(useUserStore());
+const { announcements } = storeToRefs(useAnnouncementStore());
+
+const hasAnnouncementBelow = computed(() => {
+  return isMobile.value && isAuthenticated.value && announcements.value.length > 0;
+});
 
 const show = computed(() => {
   if (!route.name) return true;

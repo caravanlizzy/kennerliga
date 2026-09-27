@@ -1,5 +1,8 @@
 <template>
-  <div class="column full-width glass-effect">
+  <div
+    class="column full-width glass-effect"
+    :class="{ 'border-bottom-none': hasAnnouncementBelow }"
+  >
     <q-toolbar
       class="navbar text-dark q-py-sm relative-position q-px-md"
     >
@@ -36,18 +39,40 @@
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue';
+import { useRoute } from 'vue-router';
 import NavHome from 'components/nav/NavHome.vue';
 import NavMyLeague from 'components/nav/NavMyLeague.vue';
 import NavChat from 'components/nav/NavChat.vue';
 import NavProfileMenu from 'components/nav/NavProfileMenu.vue';
 import CurrentChampion from 'components/season/CurrentChampion.vue';
 import { useUserStore } from 'stores/userStore';
+import { useAnnouncementStore } from 'stores/announcementStore';
 import { storeToRefs } from 'pinia';
 import { useResponsive } from 'src/composables/responsive';
 
 defineProps<{ onToggle: () => void }>();
 const { user, isAuthenticated } = storeToRefs(useUserStore());
+const { announcements } = storeToRefs(useAnnouncementStore());
 const { isMobile } = useResponsive();
+const route = useRoute();
+
+const showBreadcrumbs = computed(() => {
+  if (!route.name) return true;
+
+  const alwaysExclude = ['home', 'login', 'register'];
+  if (alwaysExclude.includes(route.name as string)) return false;
+
+  // Mobile top-level navigation items
+  const mobileTabs = ['season-standings', 'live', 'leaderboard'];
+  if (isMobile.value && mobileTabs.includes(route.name as string)) return false;
+
+  return true;
+});
+
+const hasAnnouncementBelow = computed(() => {
+  return isMobile.value && isAuthenticated.value && announcements.value.length > 0 && !showBreadcrumbs.value;
+});
 </script>
 
 <style lang="scss">
@@ -57,24 +82,6 @@ const { isMobile } = useResponsive();
   display: flex;
   align-items: center;
   justify-content: space-between;
-
-  &::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    height: 2px;
-    background: linear-gradient(
-      90deg,
-      rgba($primary, 0) 0%,
-      rgba($kenner-red, 0.3) 25%,
-      rgba($kenner-red, 0.8) 50%,
-      rgba($kenner-red, 0.3) 75%,
-      rgba($primary, 0) 100%
-    );
-    z-index: 10;
-  }
 }
 
 .flex-spacer {
