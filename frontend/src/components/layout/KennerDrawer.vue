@@ -30,6 +30,15 @@
         <DrawerItem icon="forum" icon-color="primary" label="Feedback" forward-name="feedback" />
         <DrawerItem icon="view_kanban" icon-color="primary" label="Task Board" forward-name="taskboard" />
 
+        <q-separator class="q-my-sm drawer-separator" />
+        <DrawerSubGroup>Preferences</DrawerSubGroup>
+        <DrawerItem
+          icon="notifications"
+          icon-color="primary"
+          label="Enable notifications"
+          @click="enableNotifications"
+        />
+
         <template v-if="isAdmin">
           <q-separator class="q-my-sm drawer-separator" />
           <DrawerSubGroup>Management</DrawerSubGroup>
@@ -73,8 +82,14 @@
 </template>
 
 <script setup lang="ts">
+import { Notify } from 'quasar';
 import DrawerItem from 'components/base/DrawerItem.vue';
 import DrawerSubGroup from 'components/base/DrawerSubGroup.vue';
+import {
+  isPushNotificationSupported,
+  PushNotConfiguredError,
+  subscribeToPushNotifications,
+} from 'src/services/notificationService';
 import { useUserStore } from 'stores/userStore';
 import { useHomeSeasonStore } from 'stores/homeSeasonStore';
 import { storeToRefs } from 'pinia';
@@ -99,6 +114,34 @@ watch(isAdmin, (val) => {
     void homeSeasonStore.init();
   }
 }, { immediate: true });
+
+async function enableNotifications(): Promise<void> {
+  if (!isPushNotificationSupported()) {
+    Notify.create({
+      type: 'negative',
+      message: 'Push notifications are not supported on this device/browser.',
+    });
+    return;
+  }
+
+  try {
+    await subscribeToPushNotifications();
+    Notify.create({
+      type: 'positive',
+      message: 'Notifications enabled.',
+    });
+  } catch (error) {
+    console.error('Unable to enable push notifications:', error);
+
+    Notify.create({
+      type: 'negative',
+      message:
+        error instanceof PushNotConfiguredError
+          ? 'Notifications are not configured on the server yet.'
+          : 'Notifications could not be enabled.',
+    });
+  }
+}
 
 async function doLogout(): Promise<void> {
   await logout();
