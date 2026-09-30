@@ -101,6 +101,7 @@ class PlayerProfile(models.Model):
         User, on_delete=models.SET_NULL, null=True, blank=True, related_name="profile"
     )
     platforms = models.ManyToManyField(Platform, through="PlatformPlayer")
+    elo_rating = models.FloatField(default=1500.0)
 
     def __str__(self):
         return self.profile_name

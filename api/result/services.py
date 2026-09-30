@@ -64,6 +64,9 @@ def finalize_results(
         rebuild_game_snapshot(selected_game, win_mode="fractional")
         rebuild_league_snapshot(league, win_mode="fractional")
 
+        from services.elo import apply_elo_for_selected_game
+        apply_elo_for_selected_game(selected_game)
+
         from league.services import touch_league
         touch_league(league)
 

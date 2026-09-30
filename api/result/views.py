@@ -426,6 +426,9 @@ class MatchResultViewSet(ViewSet):
                 rebuild_game_snapshot(selected_game, win_mode="fractional")
                 rebuild_league_snapshot(league, win_mode="fractional")
 
+                from services.elo import rebuild_all_elo
+                rebuild_all_elo()
+
             return Response(status=status.HTTP_204_NO_CONTENT)
         except SelectedGame.DoesNotExist:
             return Response(

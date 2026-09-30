@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from game.models import ResultConfig, Faction, TieBreaker, WinCondition, WinConditionOption
-from .models import Result
+from .models import Result, EloChange
 
 
 class ResultSerializer(serializers.ModelSerializer):
@@ -170,3 +170,33 @@ class ResultSerializer(serializers.ModelSerializer):
             instance.factions.set(factions)
 
         return instance
+
+
+class EloChangeSerializer(serializers.ModelSerializer):
+    """
+    Serializer for the EloChange model.
+    """
+    game_name = serializers.CharField(source="selected_game.game.name", read_only=True)
+    player_profile_name = serializers.CharField(
+        source="player_profile.profile_name", read_only=True
+    )
+    season_name = serializers.CharField(source="season.name", read_only=True)
+    league_level = serializers.IntegerField(source="league.level", read_only=True)
+
+    class Meta:
+        model = EloChange
+        fields = [
+            "id",
+            "player_profile",
+            "player_profile_name",
+            "selected_game",
+            "game_name",
+            "season",
+            "season_name",
+            "league",
+            "league_level",
+            "rating_before",
+            "rating_after",
+            "delta",
+            "created_at",
+        ]

@@ -83,11 +83,12 @@ class SeasonParticipantMiniSerializer(ModelSerializer):
     username = SerializerMethodField()
     avatar_shape = SerializerMethodField()
     avatar_color = SerializerMethodField()
+    elo_rating = serializers.FloatField(source="profile.elo_rating", read_only=True)
 
     class Meta:
         model = SeasonParticipant
-        fields = ("id", "profile_name", "username", "avatar_shape", "avatar_color")
-        read_only_fields = ("id", "profile_name", "username", "avatar_shape", "avatar_color")
+        fields = ("id", "profile_name", "username", "avatar_shape", "avatar_color", "elo_rating")
+        read_only_fields = ("id", "profile_name", "username", "avatar_shape", "avatar_color", "elo_rating")
 
     def get_username(self, obj):
         user = getattr(obj.profile, "user", None)
@@ -111,6 +112,7 @@ class SeasonParticipantSerializer(ModelSerializer):
     avatar_shape = SerializerMethodField()
     avatar_color = SerializerMethodField()
     profile_name = CharField(source="profile.profile_name", read_only=True)
+    elo_rating = serializers.FloatField(source="profile.elo_rating", read_only=True)
     season_details = SeasonSerializer(source="season", read_only=True)
     profile = serializers.PrimaryKeyRelatedField(
         queryset=PlayerProfile.objects.all(),
@@ -142,6 +144,7 @@ class SeasonParticipantSerializer(ModelSerializer):
             "avatar_shape",
             "avatar_color",
             "profile_name",
+            "elo_rating",
             "season_details",
             "selected_games",  # read
             "has_banned",

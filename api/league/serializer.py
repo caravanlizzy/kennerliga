@@ -118,6 +118,9 @@ class LeagueStandingSerializer(serializers.ModelSerializer):
     username = serializers.CharField(
         source="player_profile.user.username", read_only=True
     )
+    elo_rating = serializers.FloatField(
+        source="player_profile.elo_rating", read_only=True
+    )
 
     class Meta:
         model = LeagueStanding
@@ -126,6 +129,7 @@ class LeagueStandingSerializer(serializers.ModelSerializer):
             "profile_name",
             "user_id",
             "username",
+            "elo_rating",
             "wins",
             "league_points",
             "unresolved_tie_group",
@@ -144,6 +148,9 @@ class GameStandingSerializer(serializers.ModelSerializer):
     username = serializers.CharField(
         source="player_profile.user.username", read_only=True
     )
+    elo_rating = serializers.FloatField(
+        source="player_profile.elo_rating", read_only=True
+    )
     decisive_tie_breaker_name = serializers.CharField(
         source="decisive_tie_breaker.name", read_only=True
     )
@@ -157,6 +164,7 @@ class GameStandingSerializer(serializers.ModelSerializer):
             "profile_name",
             "user_id",
             "username",
+            "elo_rating",
             "selected_game",
             "points",
             "rank",

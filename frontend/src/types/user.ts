@@ -3,6 +3,8 @@ import type { AvatarShape } from './avatar';
 export type TProfileDto = {
   id: number;
   name: string;
+  elo_rating?: number | null;
+  elo_rank?: number | null;
 };
 
 export type TUserDto = {
@@ -26,6 +28,8 @@ export type TUserDto = {
   win_rate?: number | null;
   avg_position?: number | null;
   most_participated_league_level?: number | null;
+  elo_rating?: number | null;
+  elo_rank?: number | null;
 };
 
 export type TPlayerProfileDto = {
@@ -33,6 +37,8 @@ export type TPlayerProfileDto = {
   profile_name: string;
   user?: number | null;
   username?: string | null;
+  elo_rating?: number | null;
+  elo_rank?: number | null;
 };
 
 /** Mirrors `UserInviteLinkSerializer`. */
@@ -58,6 +64,29 @@ export type TPlayerGameStat = {
   avgPos: number;
   count: number;
   positions: number[];
+};
+
+export type TEloChangeDto = {
+  id: number;
+  player_profile: number;
+  player_profile_name: string;
+  selected_game: number;
+  game_name: string;
+  season: number;
+  season_name: string;
+  league: number;
+  league_level: number;
+  rating_before: number;
+  rating_after: number;
+  delta: number;
+  created_at: string;
+};
+
+export type TUserEloData = {
+  rating: number;
+  rank: number | null;
+  history: TEloChangeDto[];
+  recent_deltas: number[];
 };
 
 /** A game the player picked this year, with the per-year limit applied. */
@@ -88,4 +117,5 @@ export type TUserStatistics = {
   /** Comes from the App Configuration (`max_same_game_per_year`). */
   max_game_limit: number;
   available_years: number[];
+  elo?: TUserEloData;
 };

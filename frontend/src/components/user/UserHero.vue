@@ -13,6 +13,7 @@
               size="100px"
               :shape="effectiveAvatarShape"
               :color="effectiveAvatarColor"
+              :elo-rating="user.elo_rating ?? user.profile?.elo_rating"
             />
             <div
               v-if="isMe"
@@ -46,6 +47,17 @@
               </div>
               <div v-else class="text-h4 text-weight-bolder">{{ gameStatsCount }}</div>
               <div class="text-caption text-uppercase letter-spacing-2 text-white text-opacity-60">Games</div>
+            </div>
+            <q-separator vertical dark color="white" class="opacity-20 q-mx-md gt-xs" style="height: 30px" />
+            <div class="column items-center items-md-start">
+              <div v-if="loading" class="text-h4 text-weight-bolder">
+                <q-skeleton type="text" width="40px" dark />
+              </div>
+              <div v-else class="text-h4 text-weight-bolder">
+                {{ user.elo_rating !== undefined && user.elo_rating !== null ? Math.round(user.elo_rating) : (user.profile?.elo_rating ? Math.round(user.profile.elo_rating) : 1500) }}
+                <span v-if="user.elo_rank" class="text-caption text-weight-bold text-amber-4 q-ml-xs">#{{ user.elo_rank }}</span>
+              </div>
+              <div class="text-caption text-uppercase letter-spacing-2 text-white text-opacity-60">Elo Rating</div>
             </div>
           </div>
         </div>

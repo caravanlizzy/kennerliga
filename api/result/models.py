@@ -70,3 +70,37 @@ class Result(models.Model):
             f"{self.player_profile.profile_name} - "
             f"{self.selected_game} - {self.season} - {self.league}"
         )
+
+
+class EloChange(models.Model):
+    """
+    Model recording Elo rating changes for each player in a match.
+    """
+    player_profile = models.ForeignKey(
+        PlayerProfile, on_delete=models.CASCADE, related_name="elo_changes"
+    )
+    selected_game = models.ForeignKey(
+        SelectedGame, on_delete=models.CASCADE, related_name="elo_changes"
+    )
+    season = models.ForeignKey(
+        Season, on_delete=models.CASCADE, related_name="elo_changes"
+    )
+    league = models.ForeignKey(
+        League, on_delete=models.CASCADE, related_name="elo_changes"
+    )
+
+    rating_before = models.FloatField()
+    rating_after = models.FloatField()
+    delta = models.FloatField()
+
+    created_at = models.DateTimeField(default=timezone.now)
+
+    class Meta:
+        ordering = ["created_at", "id"]
+        indexes = [
+            models.Index(fields=["player_profile", "-created_at"]),
+            models.Index(fields=["selected_game"]),
+        ]
+
+    def __str__(self):
+        return f"{self.player_profile} {self.delta:+.1f} ({self.rating_before:.1f} -> {self.rating_after:.1f})"

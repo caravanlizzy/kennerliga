@@ -35,6 +35,15 @@
           <span class="text-weight-bold text-dark text-body2">{{
             displayUsername
           }}</span>
+          <q-badge
+            v-if="effectiveElo !== undefined && effectiveElo !== null"
+            color="primary"
+            text-color="white"
+            class="q-ml-sm text-weight-bolder"
+            style="border-radius: 4px; font-size: 0.7rem; padding: 2px 6px;"
+          >
+            {{ Math.round(effectiveElo) }} Elo
+          </q-badge>
         </div>
         <div v-if="subtitle" class="text-caption text-grey-7 italic">
           {{ subtitle }}
@@ -64,6 +73,8 @@ const props = withDefaults(
     shape?: AvatarShape | 'rounded' | string;
     color?: string;
     border?: boolean;
+    elo?: number | null;
+    eloRating?: number | null;
   }>(),
   {
     size: '32px',
@@ -71,8 +82,12 @@ const props = withDefaults(
     shape: 'squircle',
     color: '',
     border: false,
+    elo: undefined,
+    eloRating: undefined,
   }
 );
+
+const effectiveElo = computed(() => props.eloRating ?? props.elo);
 
 const navigationUserName = computed(
   () => props.navigationName ?? props.displayUsername

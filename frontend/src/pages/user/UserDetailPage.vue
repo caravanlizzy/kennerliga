@@ -59,7 +59,7 @@
             <div v-if="loadingStats" class="q-mb-lg">
               <q-skeleton type="rect" height="350px" class="rounded-borders" />
             </div>
-            <UserPerformance v-else :overall-stats="overallStats" />
+            <UserPerformance v-else :overall-stats="overallStats" :elo="eloData" />
           </div>
         </div>
 
@@ -146,6 +146,7 @@ import type {
   TSeasonDto,
   TPlayerGameStat,
   TPlayerPickedGame,
+  TUserEloData,
 } from 'src/types';
 
 const route = useRoute();
@@ -173,6 +174,7 @@ const overallStats = ref({
   avg_pos: 0,
   positions: {} as Record<number, number>
 });
+const eloData = ref<TUserEloData | undefined>(undefined);
 const gameStats = ref<TPlayerGameStat[]>([]);
 const topGames = ref<TPlayerGameStat[]>([]);
 const pickedGames = ref<TPlayerPickedGame[]>([]);
@@ -223,6 +225,11 @@ async function fetchStatistics(userId: number) {
     const data = await fetchUserStatistics(userId, { year: selectedYear.value });
     leagueStats.value = data.league_stats;
     overallStats.value = data.overall_stats;
+    eloData.value = data.elo;
+    if (user.value && data.elo) {
+      user.value.elo_rating = data.elo.rating;
+      user.value.elo_rank = data.elo.rank;
+    }
     gameStats.value = data.game_stats;
     topGames.value = data.top_games || [];
     pickedGames.value = data.picked_games || [];

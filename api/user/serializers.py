@@ -18,6 +18,8 @@ class UserSerializer(ModelSerializer):
     win_rate = serializers.SerializerMethodField(read_only=True)
     avg_position = serializers.SerializerMethodField(read_only=True)
     most_participated_league_level = serializers.SerializerMethodField(read_only=True)
+    elo_rating = serializers.SerializerMethodField(read_only=True)
+    elo_rank = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = User
@@ -31,7 +33,18 @@ class UserSerializer(ModelSerializer):
             "win_rate",
             "avg_position",
             "most_participated_league_level",
+            "elo_rating",
+            "elo_rank",
         ]
+
+    def get_elo_rating(self, obj):
+        profile = getattr(obj, "profile", None)
+        return getattr(profile, "elo_rating", 1500.0) if profile else 1500.0
+
+    def get_elo_rank(self, obj):
+        from services.elo import get_elo_rank
+        profile = getattr(obj, "profile", None)
+        return get_elo_rank(profile)
 
     def _get_stats(self, obj):
         request = self.context.get("request") if hasattr(self, "context") and self.context else None
@@ -96,10 +109,16 @@ class PlayerProfileSerializer(ModelSerializer):
     Serializer for the PlayerProfile model.
     """
     username = serializers.CharField(source="user.username", read_only=True, default=None)
+    elo_rating = serializers.FloatField(read_only=True)
+    elo_rank = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = PlayerProfile
-        fields = ["id", "user", "username", "profile_name"]
+        fields = ["id", "user", "username", "profile_name", "elo_rating", "elo_rank"]
+
+    def get_elo_rank(self, obj):
+        from services.elo import get_elo_rank
+        return get_elo_rank(obj)
 
 
 class UserInviteLinkSerializer(serializers.ModelSerializer):

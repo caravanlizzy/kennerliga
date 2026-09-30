@@ -73,6 +73,35 @@
     :columns="columns"
     :loading="loading"
   >
+    <template v-slot:body-cell-user="props">
+      <q-td :props="props">
+        <div class="row items-center no-wrap q-gutter-x-sm cursor-pointer">
+          <UserAvatar
+            :display-username="props.row.username"
+            :shape="props.row.avatar_shape"
+            :color="props.row.avatar_color"
+            :elo-rating="props.row.elo_rating ?? props.row.profile?.elo_rating"
+            size="28px"
+          />
+          <span class="text-weight-medium">{{ props.row.username }}</span>
+        </div>
+      </q-td>
+    </template>
+    <template v-slot:body-cell-elo_rating="props">
+      <q-td :props="props">
+        <div class="row items-center justify-end no-wrap q-gutter-x-xs">
+          <span class="text-weight-bold">{{ props.value }}</span>
+          <q-badge
+            v-if="isBestElo(props.row)"
+            color="amber-9"
+            text-color="white"
+            class="text-weight-bolder"
+            style="font-size: 0.65rem; padding: 2px 5px; border-radius: 4px;"
+            label="best"
+          />
+        </div>
+      </q-td>
+    </template>
     <template v-slot:body-cell-win_rate="props">
       <q-td :props="props">
         <div class="row items-center justify-end no-wrap q-gutter-x-xs">
@@ -214,6 +243,7 @@ import KennerTable from 'components/tables/KennerTable.vue';
 import KennerButton from 'components/base/KennerButton.vue';
 import KennerInput from 'components/base/KennerInput.vue';
 import LeagueLevel from 'components/season/LeagueLevel.vue';
+import UserAvatar from 'components/ui/UserAvatar.vue';
 import { useRouter } from 'vue-router';
 import { TKennerButton, TUserDto } from 'src/types';
 import { computed, onMounted, ref, watch } from 'vue';
@@ -312,6 +342,17 @@ const bestAvgPosition = computed(() => {
   return Math.min(...validUsers.map((u) => u.avg_position as number));
 });
 
+const bestElo = computed(() => {
+  const validUsers = users.value.filter(
+    (u) => (u.elo_rating ?? u.profile?.elo_rating) !== null && (u.elo_rating ?? u.profile?.elo_rating) !== undefined
+  );
+  if (validUsers.length === 0) return null;
+  const max = Math.max(
+    ...validUsers.map((u) => Math.round((u.elo_rating ?? u.profile?.elo_rating) as number))
+  );
+  return max > 1500 ? max : null;
+});
+
 function isBestWinRate(row: TUserDto) {
   return (
     bestWinRate.value !== null &&
@@ -325,6 +366,16 @@ function isBestAvgPosition(row: TUserDto) {
     bestAvgPosition.value !== null &&
     (row.total_games ?? 0) > 0 &&
     row.avg_position === bestAvgPosition.value
+  );
+}
+
+function isBestElo(row: TUserDto) {
+  const val = row.elo_rating ?? row.profile?.elo_rating;
+  return (
+    bestElo.value !== null &&
+    val !== null &&
+    val !== undefined &&
+    Math.round(val) === bestElo.value
   );
 }
 
@@ -412,6 +463,16 @@ const baseColumns = [
     align: 'left' as const,
     label: 'Name',
     field: (x: TUserDto) => x.username,
+    sortable: true,
+  },
+  {
+    name: 'elo_rating',
+    align: 'right' as const,
+    label: 'Elo',
+    field: (x: TUserDto) => x.elo_rating ?? x.profile?.elo_rating,
+    format: (val: number | null | undefined) =>
+      val !== null && val !== undefined ? `${Math.round(val)}` : '1500',
+    sort: sortNullableSmall,
     sortable: true,
   },
   {

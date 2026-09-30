@@ -366,6 +366,12 @@ def get_user_information(user):
     Returns a dictionary containing basic user information and their token.
     """
     token = get_token(user)
+    from services.elo import get_elo_rank
+
+    profile = getattr(user, "profile", None)
+    elo_rating = getattr(profile, "elo_rating", 1500.0) if profile else 1500.0
+    elo_rank = get_elo_rank(profile) if profile else None
+
     user_dict = {
         "id": user.id,
         "username": user.username,
@@ -373,8 +379,15 @@ def get_user_information(user):
         "avatar_shape": getattr(user, "avatar_shape", "squircle"),
         "avatar_color": getattr(user, "avatar_color", ""),
         "token": token,
+        "elo_rating": elo_rating,
+        "elo_rank": elo_rank,
         # "platform_players": get_platform_players(user),
-        "profile": {"id": user.profile.id, "name": user.profile.profile_name}
+        "profile": {
+            "id": user.profile.id,
+            "name": user.profile.profile_name,
+            "elo_rating": elo_rating,
+            "elo_rank": elo_rank,
+        }
         if hasattr(user, "profile") and user.profile
         else None,
     }

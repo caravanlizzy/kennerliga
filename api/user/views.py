@@ -378,6 +378,23 @@ class UserViewSet(ModelViewSet):
         if not available_years:
             available_years = [timezone.now().year]
 
+        from services.elo import get_elo_rank
+        from result.models import EloChange
+        from result.serializers import EloChangeSerializer
+
+        elo_changes_qs = EloChange.objects.filter(player_profile=profile).select_related(
+            "selected_game__game", "season", "league"
+        ).order_by("-created_at", "-id")
+        recent_changes = list(elo_changes_qs[:20])
+        recent_deltas = [c.delta for c in recent_changes[:5]]
+
+        elo_data = {
+            "rating": profile.elo_rating if profile else 1500.0,
+            "rank": get_elo_rank(profile),
+            "history": EloChangeSerializer(recent_changes, many=True).data,
+            "recent_deltas": recent_deltas,
+        }
+
         return Response(
             {
                 "overall_stats": overall_stats,
@@ -389,6 +406,33 @@ class UserViewSet(ModelViewSet):
                 "picked_games": picked_games,
                 "max_game_limit": max_game_limit,
                 "available_years": available_years,
+                "elo": elo_data,
+            }
+        )
+
+    @action(detail=True, methods=["get"], url_path="elo")
+    def elo(self, request, pk=None):
+        user = self.get_object()
+        profile = getattr(user, "profile", None)
+        if not profile:
+            return Response(
+                {"detail": "No profile found for this user."}, status=404
+            )
+
+        from services.elo import get_elo_rank
+        from result.models import EloChange
+        from result.serializers import EloChangeSerializer
+
+        elo_changes = EloChange.objects.filter(
+            player_profile=profile
+        ).select_related("selected_game__game", "season", "league").order_by("-created_at", "-id")
+
+        return Response(
+            {
+                "rating": profile.elo_rating,
+                "rank": get_elo_rank(profile),
+                "history": EloChangeSerializer(elo_changes, many=True).data,
+                "recent_deltas": list(elo_changes.values_list("delta", flat=True)[:5]),
             }
         )
 

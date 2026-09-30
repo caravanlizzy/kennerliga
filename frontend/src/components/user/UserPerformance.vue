@@ -8,17 +8,27 @@
       <div class="text-caption text-weight-bold opacity-60">{{ overallStats.total_games }} Games Total</div>
     </q-card-section>
     <q-card-section class="q-pa-md">
-      <div class="row q-col-gutter-md q-mb-lg">
-        <div class="col-6">
-          <q-card flat bordered class="column items-center q-pa-md stat-tile">
-            <div class="text-h4 text-weight-bolder text-positive">{{ (overallStats.wins / (overallStats.total_games || 1) * 100).toFixed(0) }}<span class="text-caption text-weight-medium">%</span></div>
-            <div class="text-caption text-grey-6 text-uppercase text-weight-bolder letter-spacing-1 q-mt-xs">Win Rate</div>
+      <div class="row q-col-gutter-sm q-mb-lg">
+        <div class="col-4">
+          <q-card flat bordered class="column items-center q-pa-sm stat-tile">
+            <div class="text-h5 text-weight-bolder text-positive">{{ (overallStats.wins / (overallStats.total_games || 1) * 100).toFixed(0) }}<span class="text-caption text-weight-medium">%</span></div>
+            <div class="text-caption text-grey-6 text-uppercase text-weight-bolder letter-spacing-1 q-mt-xs" style="font-size: 0.65rem">Win Rate</div>
           </q-card>
         </div>
-        <div class="col-6">
-          <q-card flat bordered class="column items-center q-pa-md stat-tile">
-            <div class="text-h4 text-weight-bolder text-primary">#{{ (overallStats.avg_pos || 0).toFixed(1) }}</div>
-            <div class="text-caption text-grey-6 text-uppercase text-weight-bolder letter-spacing-1 q-mt-xs">Avg Pos</div>
+        <div class="col-4">
+          <q-card flat bordered class="column items-center q-pa-sm stat-tile">
+            <div class="text-h5 text-weight-bolder text-primary">#{{ (overallStats.avg_pos || 0).toFixed(1) }}</div>
+            <div class="text-caption text-grey-6 text-uppercase text-weight-bolder letter-spacing-1 q-mt-xs" style="font-size: 0.65rem">Avg Pos</div>
+          </q-card>
+        </div>
+        <div class="col-4">
+          <q-card flat bordered class="column items-center q-pa-sm stat-tile">
+            <div class="text-h5 text-weight-bolder text-indigo-7">
+              {{ elo?.rating !== undefined && elo?.rating !== null ? Math.round(elo.rating) : 1500 }}
+            </div>
+            <div class="text-caption text-grey-6 text-uppercase text-weight-bolder letter-spacing-1 q-mt-xs" style="font-size: 0.65rem">
+              {{ elo?.rank ? `#${elo.rank} Elo` : 'Elo' }}
+            </div>
           </q-card>
         </div>
       </div>
@@ -55,6 +65,12 @@ defineProps<{
     podiums: number;
     avg_pos: number;
     positions: Record<number, number>;
+  };
+  elo?: {
+    rating: number;
+    rank: number | null;
+    history?: any[];
+    recent_deltas?: number[];
   };
 }>();
 

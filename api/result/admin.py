@@ -1,6 +1,15 @@
 from django.contrib import admin
-from result.models import Result
+from result.models import Result, EloChange
 from game.models import Faction
+
+
+@admin.action(description="Rebuild all Elo ratings from match history")
+def rebuild_all_elo_action(modeladmin, request, queryset):
+    from services.elo import rebuild_all_elo
+    count = rebuild_all_elo()
+    modeladmin.message_user(
+        request, f"Successfully recalculated Elo ratings across {count} matches."
+    )
 
 
 @admin.register(Result)
@@ -22,6 +31,8 @@ class ResultAdmin(admin.ModelAdmin):
     search_fields = ("player_profile__profile_name", "selected_game__game__name")
 
     readonly_fields = ("tie_breaker_resolved",)
+
+    actions = [rebuild_all_elo_action]
 
     # Hide the legacy single faction field and use a better UI for Many-to-Many
     exclude = ("faction",)
@@ -71,3 +82,39 @@ class ResultAdmin(admin.ModelAdmin):
         return ", ".join([f.name for f in obj.factions.all()])
 
     get_factions.short_description = "Factions"
+
+
+@admin.register(EloChange)
+class EloChangeAdmin(admin.ModelAdmin):
+    list_display = (
+        "player_profile",
+        "selected_game",
+        "season",
+        "league",
+        "rating_before",
+        "rating_after",
+        "delta",
+        "created_at",
+    )
+    list_filter = ("season", "league")
+    search_fields = (
+        "player_profile__profile_name",
+        "selected_game__game__name",
+    )
+    list_select_related = (
+        "player_profile",
+        "selected_game__game",
+        "season",
+        "league",
+    )
+    readonly_fields = (
+        "player_profile",
+        "selected_game",
+        "season",
+        "league",
+        "rating_before",
+        "rating_after",
+        "delta",
+        "created_at",
+    )
+    actions = [rebuild_all_elo_action]

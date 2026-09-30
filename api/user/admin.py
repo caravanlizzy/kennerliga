@@ -34,12 +34,22 @@ class CustomUserAdmin(UserAdmin):
     )
 
 
+@admin.action(description="Rebuild all Elo ratings from match history")
+def rebuild_all_elo_action(modeladmin, request, queryset):
+    from services.elo import rebuild_all_elo
+    count = rebuild_all_elo()
+    modeladmin.message_user(
+        request, f"Successfully recalculated Elo ratings across {count} matches."
+    )
+
+
 @admin.register(PlayerProfile)
 class PlayerProfileAdmin(admin.ModelAdmin):
-    list_display = ("profile_name", "user", "get_platforms")
+    list_display = ("profile_name", "user", "elo_rating", "get_platforms")
     search_fields = ("profile_name", "user__username")
     list_select_related = ("user",)
     raw_id_fields = ("user",)
+    actions = [rebuild_all_elo_action]
 
     def get_platforms(self, obj):
         return ", ".join(
