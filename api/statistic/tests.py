@@ -13,6 +13,7 @@ from statistic.services import (
     _rank_iron_will,
     get_awards,
     get_statistics_overview,
+    get_win_suggestions,
 )
 from user.models import PlayerProfile, Platform, User
 
@@ -352,3 +353,47 @@ class AwardTests(StatisticsServiceTestBase):
             [(entry["profile_id"], entry["value"]) for entry in inspirer["top"]],
             [(a.id, 4), (b.id, 1)],
         )
+
+
+class WinSuggestionsTests(StatisticsServiceTestBase):
+    def setUp(self):
+        super().setUp()
+        self.next_level = 0
+        self.hero = self.make_profile("Hero")
+        self.rival = self.make_profile("Rival")
+        self.catan = Game.objects.create(name="Catan", platform=self.platform)
+        self.chess = Game.objects.create(name="Chess", platform=self.platform)
+
+    def new_league(self):
+        self.next_level += 1
+        return self.make_league(self.next_level)
+
+    def test_ranks_game_hero_beats_rival_at_first(self):
+        for _ in range(3):
+            self.add_match(self.catan, self.new_league(), [(self.hero, 1), (self.rival, 2)])
+            self.add_match(self.chess, self.new_league(), [(self.hero, 2), (self.rival, 1)])
+
+        suggestions = get_win_suggestions(self.hero, [self.rival])
+
+        self.assertEqual([s["game_id"] for s in suggestions], [self.catan.id, self.chess.id])
+        self.assertGreater(suggestions[0]["win_chance"], 50)
+        self.assertLess(suggestions[1]["win_chance"], 50)
+        self.assertEqual(suggestions[0]["wins"], 3)
+        self.assertEqual(suggestions[0]["opponents"][0]["shared_matches"], 3)
+
+    def test_uses_skill_prior_without_head_to_head(self):
+        other = self.make_profile("Other")
+        # Hero wins Catan against someone else; Rival always loses Catan.
+        self.add_match(self.catan, self.new_league(), [(self.hero, 1), (other, 2)])
+        self.add_match(self.catan, self.new_league(), [(self.rival, 2), (other, 1)])
+
+        suggestions = get_win_suggestions(self.hero, [self.rival])
+
+        self.assertEqual(len(suggestions), 1)
+        self.assertEqual(suggestions[0]["opponents"][0]["shared_matches"], 0)
+        self.assertGreater(suggestions[0]["win_chance"], 50)
+
+    def test_skips_games_hero_never_played(self):
+        self.add_match(self.chess, self.new_league(), [(self.rival, 1), (self.make_profile("X"), 2)])
+
+        self.assertEqual(get_win_suggestions(self.hero, [self.rival]), [])

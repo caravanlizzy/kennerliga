@@ -3,6 +3,8 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from game.models import Game
+from league.models import League
+from user.models import PlayerProfile
 from statistic.services import (
     DEFAULT_GAME_MIN_GAMES,
     DEFAULT_MIN_GAMES,
@@ -12,6 +14,7 @@ from statistic.services import (
     get_game_leaderboard,
     get_popular_games,
     get_statistics_overview,
+    get_win_suggestions,
     list_games_with_stats,
     parse_years,
     parse_player_counts,
@@ -107,3 +110,26 @@ class GameLeaderboardView(APIView):
             game, profile, years=years, player_counts=player_counts, min_games=min_games
         )
         return Response(data)
+
+
+class WinSuggestionsView(APIView):
+    """
+    GET /api/statistics/leagues/<league_id>/win-suggestions/?profile=<id>
+
+    Ranks the games `profile` (default: the requesting player) has played by
+    their estimated chance to beat the other members of the league, best
+    first, so the game picker can see where they stand the best chance.
+    """
+
+    def get(self, request, league_id):
+        league = get_object_or_404(League, pk=league_id)
+        profile_id = _int_param(request, "profile", None)
+        hero = (
+            get_object_or_404(PlayerProfile, pk=profile_id)
+            if profile_id
+            else request.user.profile
+        )
+        opponents = PlayerProfile.objects.filter(
+            season_participants__leagues_member=league
+        ).exclude(pk=hero.pk)
+        return Response(get_win_suggestions(hero, opponents))

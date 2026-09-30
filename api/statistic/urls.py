@@ -5,6 +5,7 @@ from statistic.views import (
     GameStatisticsListView,
     PopularGamesView,
     StatisticsOverviewView,
+    WinSuggestionsView,
 )
 
 urlpatterns = [
@@ -15,5 +16,10 @@ urlpatterns = [
         "games/<int:game_id>/leaderboard/",
         GameLeaderboardView.as_view(),
         name="statistics-game-leaderboard",
+    ),
+    path(
+        "leagues/<int:league_id>/win-suggestions/",
+        WinSuggestionsView.as_view(),
+        name="statistics-win-suggestions",
     ),
 ]

@@ -88,6 +88,47 @@
               </q-btn>
             </div>
 
+            <!-- Best odds: games where the picker stands the best chance vs. current league members -->
+            <div v-if="winSuggestions.length > 0" class="best-odds q-mb-sm">
+              <div class="row items-center q-gutter-x-xs q-mb-xs">
+                <q-icon name="emoji_events" size="16px" color="amber-8" />
+                <div class="text-caption text-weight-bold text-uppercase letter-spacing-1 text-grey-7">
+                  Best odds vs. this league
+                </div>
+                <q-icon name="info_outline" size="14px" color="grey-5" class="cursor-pointer">
+                  <q-tooltip max-width="260px">
+                    Estimated share of current league members you finish ahead of,
+                    based on your and their past results in each game and your direct
+                    head-to-head matches.
+                  </q-tooltip>
+                </q-icon>
+              </div>
+              <div class="row q-gutter-sm">
+                <q-btn
+                  v-for="(suggestion, idx) in winSuggestions"
+                  :key="suggestion.game_id"
+                  dense
+                  no-caps
+                  outline
+                  class="best-odds-chip"
+                  :class="{ 'best-odds-chip--selected': suggestion.game_id === gameSelection.game.id }"
+                  @click="pickSuggestion(suggestion.game_id)"
+                >
+                  <span class="best-odds-rank q-mr-xs">{{ idx + 1 }}</span>
+                  <span class="ellipsis best-odds-name">{{ suggestion.name }}</span>
+                  <q-badge color="positive" class="q-ml-xs">{{ Math.round(suggestion.win_chance) }}%</q-badge>
+                  <q-tooltip>
+                    <div class="text-weight-bold">{{ suggestion.name }}</div>
+                    <div>You: {{ suggestion.wins }} win{{ suggestion.wins === 1 ? '' : 's' }} in {{ suggestion.games_played }} game{{ suggestion.games_played === 1 ? '' : 's' }}</div>
+                    <div v-for="opp in suggestion.opponents" :key="opp.profile_id">
+                      vs. {{ opp.profile_name }}: {{ Math.round(opp.chance) }}%
+                      <span class="text-grey-5">({{ opp.shared_matches }} head-to-head)</span>
+                    </div>
+                  </q-tooltip>
+                </q-btn>
+              </div>
+            </div>
+
             <div class="game-grid custom-scrollbar" ref="gridRef">
               <NoGamesFound v-if="availableGames.length === 0" />
               <GameSelectionCard
@@ -158,7 +199,8 @@ import PlatformMultiSelect from 'components/game/selectedGame/PlatformMultiSelec
 import NoGamesFound from 'components/game/selectedGame/NoGamesFound.vue';
 import GameSelectionCard from 'components/game/selectedGame/GameSelectionCard.vue';
 import GameSelectionForm from 'components/game/selectedGame/GameSelectionForm.vue';
-import type { TGameDto } from 'src/types';
+import { fetchWinSuggestions } from 'src/services/statisticsService';
+import type { TGameDto, TWinSuggestion } from 'src/types';
 
 const props = defineProps<{
   leagueId: number;
@@ -185,6 +227,7 @@ const {
   platforms,
   isValid,
   availableGames,
+  gameData,
   visibleOptions,
   initGameInformation,
   togglePlatform,
@@ -206,8 +249,10 @@ provide('platforms', platforms);
 
 // init: load games/platforms and, in edit mode, pre-fill selection
 onMounted(async () => {
+  const suggestionsPromise = fetchWinSuggestions(props.leagueId, props.profileId);
   await loadPlatformsAndGames();
   emit('set-submitter', onSubmit);
+  allWinSuggestions.value = await suggestionsPromise;
 });
 
 watch(() => gameSelection.game.id, (newId) => {
@@ -248,23 +293,45 @@ async function onSubmit() {
   }
 }
 
+// ---- best odds ----
+const allWinSuggestions = ref<TWinSuggestion[]>([]);
+
+// Top 3 suggestions that are still pickable in this league (not already
+// picked/banned, fitting the member count), independent of the search filter
+// so the picker always sees them.
+const winSuggestions = computed<TWinSuggestion[]>(() => {
+  const pickable = new Map((gameData.value ?? []).map((g) => [g.id, g] as const));
+  return allWinSuggestions.value
+    .filter((s) => {
+      const game = pickable.get(s.game_id);
+      return game !== undefined && fitsMemberCount(game);
+    })
+    .slice(0, 3);
+});
+
+async function pickSuggestion(gameId: number) {
+  const game = gameData.value.find((g) => g.id === gameId);
+  if (game) await initGameInformation(game);
+}
+
 // ---- randomize game ----
 const isRandomizing = ref(false);
 
 // Games that match current league member count (falls back to all available
 // games when member count is unknown or game min/max are missing).
+function fitsMemberCount(g: TGameDto): boolean {
+  const count = props.memberCount ?? 0;
+  if (!count) return true;
+  const min = typeof g.min_players === 'number' ? g.min_players : undefined;
+  const max = typeof g.max_players === 'number' ? g.max_players : undefined;
+  if (min !== undefined && count < min) return false;
+  if (max !== undefined && count > max) return false;
+  return true;
+}
+
 const randomizableGames = computed<TGameDto[]>(() => {
   const games = availableGames.value ?? [];
-  const count = props.memberCount ?? 0;
-  if (!count) return games;
-  const matching = games.filter((g) => {
-    const min = typeof g.min_players === 'number' ? g.min_players : undefined;
-    const max = typeof g.max_players === 'number' ? g.max_players : undefined;
-    if (min === undefined && max === undefined) return true;
-    if (min !== undefined && count < min) return false;
-    if (max !== undefined && count > max) return false;
-    return true;
-  });
+  const matching = games.filter(fitsMemberCount);
   return matching.length > 0 ? matching : games;
 });
 
@@ -423,6 +490,33 @@ async function randomizeGame() {
     padding: 8px;
     max-height: none;
   }
+}
+
+.best-odds {
+  padding: 8px 12px;
+  border-radius: 12px;
+  background: var(--kenner-card-bg);
+  border: 1px solid var(--kenner-border-subtle);
+}
+
+.best-odds-chip {
+  border-radius: 999px;
+  max-width: 100%;
+  font-weight: 600;
+
+  &--selected {
+    border-color: $kenner-red;
+    color: $kenner-red;
+  }
+}
+
+.best-odds-rank {
+  font-size: 11px;
+  opacity: 0.6;
+}
+
+.best-odds-name {
+  max-width: 160px;
 }
 
 .random-btn {

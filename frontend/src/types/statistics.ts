@@ -118,3 +118,23 @@ export type TYearLeaderboard = {
   levels: number[];
   standings: TPlayerYearStanding[];
 };
+
+export type TWinSuggestionOpponent = {
+  profile_id: number;
+  profile_name: string | null;
+  chance: number;
+  shared_matches: number;
+  opponent_games: number;
+};
+
+export type TWinSuggestion = {
+  game_id: number;
+  name: string;
+  short_name: string;
+  platform: string;
+  win_chance: number;
+  games_played: number;
+  wins: number;
+  shared_matches: number;
+  opponents: TWinSuggestionOpponent[];
+};

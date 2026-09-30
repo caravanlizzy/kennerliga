@@ -4,6 +4,7 @@ import {
   TGameStatSummary,
   TPopularGames,
   TStatisticsOverview,
+  TWinSuggestion,
   TYearLeaderboard,
 } from 'src/types';
 
@@ -114,6 +115,26 @@ export async function fetchGameLeaderboard(
   } catch (e) {
     console.log(e);
     return null;
+  }
+}
+
+/**
+ * Games `profileId` has played, ranked by their estimated chance to beat the
+ * other members of `leagueId` (best first).
+ */
+export async function fetchWinSuggestions(
+  leagueId: number,
+  profileId: number
+): Promise<TWinSuggestion[]> {
+  try {
+    const { data } = await api.get<TWinSuggestion[]>(
+      `statistics/leagues/${leagueId}/win-suggestions/`,
+      { params: { profile: profileId } }
+    );
+    return data;
+  } catch (e) {
+    console.log(e);
+    return [];
   }
 }
 
