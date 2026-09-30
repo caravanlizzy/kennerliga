@@ -7,7 +7,7 @@ export type ThemeMode = 'auto' | 'dark' | 'light';
 export const useThemeStore = defineStore(
   'themeStore',
   () => {
-    const mode = ref<ThemeMode>('auto');
+    const mode = ref<ThemeMode>('light');
     const isDark = ref<boolean>(false);
 
     function syncQuasarDark(targetMode: ThemeMode) {
