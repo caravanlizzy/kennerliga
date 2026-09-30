@@ -83,6 +83,7 @@
                     :shape="opt.id"
                     :color="selectedColor"
                     size="48px"
+                    :disable-crown="true"
                   />
                   <div
                     v-if="selectedShape === opt.id"

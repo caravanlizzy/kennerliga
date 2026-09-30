@@ -1,67 +1,94 @@
 <template>
-  <q-avatar
-    :size="size"
-    class="user-avatar"
-    :class="[
-      shapeClass,
-      {
-        'user-avatar--bordered': border,
-        'user-avatar--navigable': canNavigate,
-      },
-    ]"
-    :style="avatarStyle"
-    :square="resolvedShape !== 'circle'"
-    :role="canNavigate ? 'link' : 'img'"
-    :tabindex="canNavigate ? 0 : undefined"
-    :aria-label="
-      canNavigate ? `View ${displayUsername}'s profile` : displayUsername
-    "
-    @click="navigate"
-    @keydown.enter.prevent="navigate"
-    @keydown.space.prevent="navigate"
+  <div
+    class="user-avatar-container"
+    :style="{ width: size, height: size }"
   >
-    <div class="avatar-inner full-width full-height flex flex-center">
-      <span class="avatar-text" :style="textStyle">{{ initials }}</span>
-    </div>
-
-    <KennerTooltip v-if="displayUsername" :color="avatarStyle.backgroundColor">
-      <div class="column items-center">
-        <div class="row items-center no-wrap q-mb-xs">
-          <q-icon
-            name="account_circle"
-            size="18px"
-            class="q-mr-xs text-primary opacity-80"
-          />
-          <span class="text-weight-bold text-dark text-body2">{{
-            displayUsername
-          }}</span>
-          <q-badge
-            v-if="effectiveElo !== undefined && effectiveElo !== null"
-            color="primary"
-            text-color="white"
-            class="q-ml-sm text-weight-bolder"
-            style="border-radius: 4px; font-size: 0.7rem; padding: 2px 6px;"
-          >
-            {{ Math.round(effectiveElo) }} Elo
-          </q-badge>
-        </div>
-        <div v-if="subtitle" class="text-caption text-grey-7 italic">
-          {{ subtitle }}
-        </div>
+    <q-avatar
+      :size="size"
+      class="user-avatar"
+      :class="[
+        shapeClass,
+        {
+          'user-avatar--bordered': border,
+          'user-avatar--navigable': canNavigate,
+          'user-avatar--champion': isChampion,
+        },
+      ]"
+      :style="avatarStyle"
+      :square="resolvedShape !== 'circle'"
+      :role="canNavigate ? 'link' : 'img'"
+      :tabindex="canNavigate ? 0 : undefined"
+      :aria-label="
+        canNavigate ? `View ${displayUsername}'s profile` : displayUsername
+      "
+      @click="navigate"
+      @keydown.enter.prevent="navigate"
+      @keydown.space.prevent="navigate"
+    >
+      <div class="avatar-inner full-width full-height flex flex-center">
+        <span class="avatar-text" :style="textStyle">{{ initials }}</span>
       </div>
-    </KennerTooltip>
 
-    <slot />
-  </q-avatar>
+      <KennerTooltip v-if="displayUsername" :color="avatarStyle.backgroundColor">
+        <div class="column items-center">
+          <div class="row items-center no-wrap q-mb-xs">
+            <q-icon
+              name="account_circle"
+              size="18px"
+              class="q-mr-xs text-primary opacity-80"
+            />
+            <span class="text-weight-bold text-dark text-body2">{{
+              displayUsername
+            }}</span>
+            <q-badge
+              v-if="effectiveElo !== undefined && effectiveElo !== null"
+              color="primary"
+              text-color="white"
+              class="q-ml-sm text-weight-bolder"
+              style="border-radius: 4px; font-size: 0.7rem; padding: 2px 6px;"
+            >
+              {{ Math.round(effectiveElo) }} Elo
+            </q-badge>
+            <q-badge
+              v-if="isChampion"
+              color="amber-9"
+              text-color="white"
+              class="q-ml-xs text-weight-bolder"
+              style="border-radius: 4px; font-size: 0.7rem; padding: 2px 6px;"
+            >
+              <q-icon name="emoji_events" size="12px" class="q-mr-xs" />
+              Champion
+            </q-badge>
+          </div>
+          <div v-if="subtitle" class="text-caption text-grey-7 italic">
+            {{ subtitle }}
+          </div>
+        </div>
+      </KennerTooltip>
+
+      <slot />
+    </q-avatar>
+
+    <div
+      v-if="isChampion"
+      class="avatar-crown"
+      aria-hidden="true"
+    >
+      <AvatarCrown />
+    </div>
+  </div>
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import KennerTooltip from 'components/base/KennerTooltip.vue';
+import AvatarCrown from 'components/ui/AvatarCrown.vue';
+import { useChampionStore } from 'src/stores/championStore';
 import { type AvatarShape, getContrastTextColor } from 'src/types/avatar';
 
 const router = useRouter();
+const championStore = useChampionStore();
 
 const props = withDefaults(
   defineProps<{
@@ -75,6 +102,8 @@ const props = withDefaults(
     border?: boolean;
     elo?: number | null;
     eloRating?: number | null;
+    crowned?: boolean;
+    disableCrown?: boolean;
   }>(),
   {
     size: '32px',
@@ -84,8 +113,25 @@ const props = withDefaults(
     border: false,
     elo: undefined,
     eloRating: undefined,
+    crowned: undefined,
+    disableCrown: false,
   }
 );
+
+const isChampion = computed(() => {
+  if (props.disableCrown) return false;
+  if (props.crowned !== undefined) return props.crowned;
+  return championStore.isChampion(
+    props.displayUsername,
+    props.navigationName
+  );
+});
+
+onMounted(() => {
+  if (!championStore.initialized && !championStore.loading) {
+    championStore.fetchChampion();
+  }
+});
 
 const effectiveElo = computed(() => props.eloRating ?? props.elo);
 
@@ -221,6 +267,36 @@ const textStyle = computed(() => {
 </script>
 
 <style scoped>
+.user-avatar-container {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  vertical-align: middle;
+  line-height: normal;
+  flex-shrink: 0;
+}
+
+.avatar-crown {
+  position: absolute;
+  top: -16%;
+  right: -12%;
+  width: 48%;
+  height: 48%;
+  transform: rotate(15deg);
+  transform-origin: center center;
+  pointer-events: none;
+  z-index: 2;
+  filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.35));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.user-avatar--champion {
+  filter: drop-shadow(0 0 2px rgba(245, 158, 11, 0.45));
+}
+
 .user-avatar {
   position: relative;
   display: flex;

@@ -49,20 +49,24 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from 'vue';
+import { computed, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
-import { fetchCurrentChampion } from 'src/services/seasonService';
+import { useChampionStore } from 'src/stores/championStore';
 import { useResponsive } from 'src/composables/responsive';
 
-interface ChampionInfo {
-  username: string;
-  seasonName: string;
-  seasonId: number;
-}
-
-const champion = ref<ChampionInfo | null>(null);
+const championStore = useChampionStore();
 const { isMobile } = useResponsive();
 const router = useRouter();
+
+const champion = computed(() => {
+  const data = championStore.champion;
+  if (!data?.username || !data?.season_id) return null;
+  return {
+    username: data.username,
+    seasonName: data.season_name,
+    seasonId: data.season_id,
+  };
+});
 
 function navigateToSeason() {
   if (champion.value?.seasonId) {
@@ -73,22 +77,9 @@ function navigateToSeason() {
   }
 }
 
-async function loadCurrentChampion() {
-  try {
-    const data = await fetchCurrentChampion();
-    if (data?.username && data?.season_id) {
-      champion.value = {
-        username: data.username,
-        seasonName: data.season_name,
-        seasonId: data.season_id,
-      };
-    }
-  } catch (error) {
-    console.error('Failed to load current champion:', error);
-  }
-}
-
-onMounted(loadCurrentChampion);
+onMounted(() => {
+  championStore.fetchChampion();
+});
 </script>
 
 <style scoped lang="scss">
