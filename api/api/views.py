@@ -249,12 +249,17 @@ class LeaderboardViewSet(APIView):
             level_key = str(level)
 
             if player_id not in players_stats:
+                user = getattr(ls.player_profile, "user", None)
                 players_stats[player_id] = {
                     "player_profile_id": player_id,
                     "profile_name": ls.player_profile.profile_name,
-                    "username": ls.player_profile.user.username
-                    if ls.player_profile.user
-                    else None,
+                    "username": getattr(user, "username", None) if user else None,
+                    "avatar_shape": getattr(user, "avatar_shape", "squircle")
+                    if user
+                    else "squircle",
+                    "avatar_color": getattr(user, "avatar_color", "")
+                    if user
+                    else "",
                     "per_level": defaultdict(
                         lambda: {"first": 0, "second": 0, "third": 0, "fourth": 0}
                     ),
@@ -279,6 +284,8 @@ class LeaderboardViewSet(APIView):
                     "player_profile_id": p["player_profile_id"],
                     "profile_name": p["profile_name"],
                     "username": p["username"],
+                    "avatar_shape": p.get("avatar_shape", "squircle"),
+                    "avatar_color": p.get("avatar_color", ""),
                     "per_level": per_level_clean,
                 }
             )

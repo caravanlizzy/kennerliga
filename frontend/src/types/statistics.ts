@@ -1,3 +1,5 @@
+import type { AvatarShape } from './avatar';
+
 export type TStatBetter = 'higher' | 'lower';
 
 export type TStatEntry = {
@@ -104,6 +106,8 @@ export type TPlayerYearStanding = {
   player_profile_id: number;
   profile_name: string;
   username: string;
+  avatar_shape?: AvatarShape;
+  avatar_color?: string;
   /** Keyed by league level, stringified. */
   per_level: Record<string, TPerLevelCounts>;
 };

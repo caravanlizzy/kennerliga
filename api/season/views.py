@@ -257,6 +257,12 @@ class SeasonViewSet(ModelViewSet):
                             "profile_id": profile.id,
                             "profile_name": profile.profile_name,
                             "username": getattr(user, "username", None),
+                            "avatar_shape": getattr(user, "avatar_shape", "squircle")
+                            if user
+                            else "squircle",
+                            "avatar_color": getattr(user, "avatar_color", "")
+                            if user
+                            else "",
                         }
                         if profile
                         else None

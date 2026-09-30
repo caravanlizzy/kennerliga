@@ -39,6 +39,8 @@
               <UserAvatar
                 :display-username="championWinner.profileName || championWinner.username"
                 :navigation-name="championWinner.username"
+                :shape="getAvatarShape(championWinner)"
+                :color="getAvatarColor(championWinner)"
                 size="52px"
                 border
               />
@@ -93,6 +95,8 @@
               <UserAvatar
                 :display-username="item.profileName || item.username"
                 :navigation-name="item.username"
+                :shape="getAvatarShape(item)"
+                :color="getAvatarColor(item)"
                 size="28px"
                 border
               />
@@ -127,6 +131,7 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, watch } from 'vue';
 import { fetchSeasonLeagueWinners } from 'src/services/seasonService';
+import type { AvatarShape } from 'src/types';
 import LeagueLevel from 'components/season/LeagueLevel.vue';
 import UserAvatar from 'components/ui/UserAvatar.vue';
 import { useUserStore } from 'stores/userStore';
@@ -135,6 +140,8 @@ interface WinnerEntry {
   profileId: number;
   username: string;
   profileName: string;
+  avatarShape?: AvatarShape;
+  avatarColor?: string;
   level: number;
   leagueId: number;
   points: string | number | null;
@@ -152,6 +159,22 @@ function isMe(username: string): boolean {
   return Boolean(username && userStore.isMe(username));
 }
 
+function getAvatarShape(item?: WinnerEntry | null): AvatarShape | undefined {
+  if (!item) return undefined;
+  if (item.username && userStore.user?.username === item.username && userStore.user?.avatar_shape) {
+    return userStore.user.avatar_shape;
+  }
+  return item.avatarShape;
+}
+
+function getAvatarColor(item?: WinnerEntry | null): string | undefined {
+  if (!item) return undefined;
+  if (item.username && userStore.user?.username === item.username && userStore.user?.avatar_color !== undefined) {
+    return userStore.user.avatar_color;
+  }
+  return item.avatarColor;
+}
+
 async function loadWinners() {
   if (!props.seasonId) {
     winners.value = [];
@@ -167,6 +190,8 @@ async function loadWinners() {
         profileId: x.winner?.profile_id ?? 0,
         username: x.winner?.username || '',
         profileName: x.winner?.profile_name || '',
+        avatarShape: x.winner?.avatar_shape,
+        avatarColor: x.winner?.avatar_color,
         level: x.league.level,
         leagueId: x.league.id,
         points: x.league_points ?? null,

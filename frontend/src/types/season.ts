@@ -1,3 +1,5 @@
+import type { AvatarShape } from './avatar';
+
 export type TSeasonDto = {
   id: number;
   year: number;
@@ -16,6 +18,8 @@ export type TSeasonLeagueWinners = {
       profile_id: number;
       profile_name: string;
       username: string | null;
+      avatar_shape?: AvatarShape;
+      avatar_color?: string;
     } | null;
     league_points: string | number | null;
   }>;

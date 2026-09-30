@@ -12,7 +12,7 @@ from season.services import (
     open_registration,
     apply_promotion,
 )
-from league.models import League, LeagueStanding
+from league.models import League, LeagueStanding, LeagueStatus
 from season_manager import start_new_season
 
 
@@ -155,7 +155,12 @@ class SeasonAPITests(TestCase):
             year=2026, month=4, status=Season.SeasonStatus.DONE
         )
         l1 = League.objects.create(season=s_done, level=1)
-        user = User.objects.create_user(username="winner_user", password="password")
+        user = User.objects.create_user(
+            username="winner_user",
+            password="password",
+            avatar_shape="star",
+            avatar_color="#dc2626",
+        )
         p1 = PlayerProfile.objects.create(user=user, profile_name="Winner Profile")
         LeagueStanding.objects.create(league=l1, player_profile=p1, league_points=30)
 
@@ -163,6 +168,30 @@ class SeasonAPITests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data["winners"]), 1)
         self.assertEqual(response.data["winners"][0]["winner"]["username"], "winner_user")
+        self.assertEqual(response.data["winners"][0]["winner"]["avatar_shape"], "star")
+        self.assertEqual(response.data["winners"][0]["winner"]["avatar_color"], "#dc2626")
+
+    def test_leaderboard_custom_avatar(self):
+        s_done = Season.objects.create(
+            year=2026, month=4, status=Season.SeasonStatus.DONE
+        )
+        l1 = League.objects.create(season=s_done, level=1, status=LeagueStatus.DONE)
+        user = User.objects.create_user(
+            username="hall_hero",
+            password="password",
+            avatar_shape="crown",
+            avatar_color="#eab308",
+        )
+        p1 = PlayerProfile.objects.create(user=user, profile_name="Hall Hero")
+        LeagueStanding.objects.create(league=l1, player_profile=p1, league_points=30)
+
+        response = self.client.get("/api/leaderboard/?year=2026")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data["standings"]), 1)
+        standing = response.data["standings"][0]
+        self.assertEqual(standing["username"], "hall_hero")
+        self.assertEqual(standing["avatar_shape"], "crown")
+        self.assertEqual(standing["avatar_color"], "#eab308")
 
     def test_admin_can_add_and_remove_participant(self):
         admin = User.objects.create_superuser(username="superadmin", password="password")
