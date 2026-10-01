@@ -4,15 +4,15 @@
       <q-spinner-puff color="primary" size="2em" />
     </div>
     <div
-      v-else-if="events.length === 0"
+      v-else-if="filteredEvents.length === 0"
       class="text-center q-pa-md text-grey-6 italic"
     >
-      No live actions yet.
+      {{ emptyText }}
     </div>
     <div v-else class="q-pa-sm">
       <!-- League Filters -->
       <div
-        v-if="availableLeagues.length > 1"
+        v-if="!hideFilters && !leagueId && availableLeagues.length > 1"
         class="row q-gutter-xs q-mb-md q-px-xs"
       >
         <q-chip
@@ -56,6 +56,7 @@
             >
               <span class="row items-center q-gutter-x-xs">
                 <q-badge
+                  v-if="!leagueId"
                   :color="getLeagueColor(Number(event.leagueLevel))"
                   class="text-weight-bold"
                   style="font-size: 0.65rem; border-radius: 4px; padding: 2px 6px;"
@@ -65,15 +66,15 @@
 
                 <q-badge
                   :style="{
-                    color: getColorHex(event.type),
-                    backgroundColor: `color-mix(in srgb, ${getColorHex(event.type)} 12%, transparent)`,
+                    color: getColorHex(event),
+                    backgroundColor: `color-mix(in srgb, ${getColorHex(event)} 12%, transparent)`,
                     fontSize: '0.65rem',
                     letterSpacing: '0.08em',
                     borderRadius: '4px'
                   }"
                   class="text-bold q-px-sm q-py-xs text-uppercase"
                 >
-                  <q-icon :name="getEventIcon(event.type)" size="12px" class="q-mr-xs" />
+                  <q-icon :name="getEventIcon(event)" size="12px" class="q-mr-xs" />
                   {{ getEventDisplayType(event) }}
                 </q-badge>
               </span>
@@ -162,7 +163,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted } from 'vue';
+import { ref, computed, watch, onMounted, onUnmounted } from 'vue';
 import { useQuasar } from 'quasar';
 import { leagueColors } from 'src/composables/leagueColors';
 import { TLiveEvent, TLiveEventType } from 'src/types';
@@ -170,9 +171,29 @@ import { fetchLiveActionEvents } from 'src/services/seasonService';
 import { useUpdateStore } from 'stores/updateStore';
 import { useCachedResource } from 'src/composables/cachedResource';
 
+interface Props {
+  leagueId?: number;
+  seasonId?: number;
+  hideFilters?: boolean;
+  emptyText?: string;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  leagueId: undefined,
+  seasonId: undefined,
+  hideFilters: false,
+  emptyText: 'No live actions yet.',
+});
+
 const $q = useQuasar();
 const updateStore = useUpdateStore();
 const { getLeagueColor } = leagueColors();
+
+const cacheKey = computed(() => {
+  if (props.leagueId) return `live-action-league-${props.leagueId}`;
+  if (props.seasonId) return `live-action-season-${props.seasonId}`;
+  return 'live-action-feed';
+});
 
 // Stale-while-revalidate cache with a module-level `cacheKey`, so events
 // survive component unmount/remount (e.g. navigating away and back). Without
@@ -183,8 +204,8 @@ const {
   loading,
   load: loadEvents,
 } = useCachedResource<'live', TLiveEvent[]>(
-  () => fetchLiveActionEvents(),
-  { cacheKey: 'live-action-feed' }
+  () => fetchLiveActionEvents({ seasonId: props.seasonId, leagueId: props.leagueId }),
+  { cacheKey: cacheKey.value }
 );
 const events = computed<TLiveEvent[]>(() => eventsData.value ?? []);
 
@@ -201,7 +222,7 @@ const availableLeagues = computed(() => {
 const isAllSelected = computed(() => selectedLeagues.value.size === 0);
 
 const filteredEvents = computed(() => {
-  if (isAllSelected.value) return events.value;
+  if (props.leagueId || isAllSelected.value) return events.value;
   return events.value.filter(
     (e) =>
       e.leagueLevel !== undefined && selectedLeagues.value.has(e.leagueLevel)
@@ -232,6 +253,13 @@ function fetchEvents() {
   void loadEvents('live');
 }
 
+watch(
+  () => [props.leagueId, props.seasonId],
+  () => {
+    fetchEvents();
+  }
+);
+
 function formatTime(timestamp: string) {
   const date = new Date(timestamp);
   const now = new Date();
@@ -250,23 +278,28 @@ function getEventDisplayType(event: TLiveEvent) {
     case 'PICK':
       return 'PICK';
     case 'BAN':
-      return 'BAN';
+      return data?.skippedBan ? 'SKIP BAN' : 'BAN';
     case 'LEAGUE_RUNNING':
       return 'RUNNING';
     case 'GAME_FINISHED':
       return 'WIN';
     case 'LEAGUE_FINISHED':
-      return data.winners && data.winners.length > 1 ? 'DECIDER' : 'COMPLETE';
+      return data?.winners && data.winners.length > 1 ? 'DECIDER' : 'COMPLETE';
     case 'SEASON_FINISHED':
       return 'SEASON';
     default:
-      return type.replace('_', ' ');
+      return type ? type.replace('_', ' ') : '';
   }
 }
 
 onMounted(() => {
   fetchEvents();
-  unsubscribe = updateStore.subscribe('/season/', fetchEvents);
+  const unsubSeason = updateStore.subscribe('/season/', fetchEvents);
+  const unsubLeague = updateStore.subscribe('/league/', fetchEvents);
+  unsubscribe = () => {
+    unsubSeason();
+    unsubLeague();
+  };
 });
 
 onUnmounted(() => {
@@ -283,9 +316,13 @@ const darkColorHex: Partial<Record<TLiveEventType, string>> = {
   SEASON_FINISHED: '#4dd0e1',
 };
 
-function getColorHex(type: TLiveEventType) {
-  if ($q.dark.isActive) return darkColorHex[type] ?? '#bdbdbd';
-  switch (type) {
+function getColorHex(event: TLiveEvent) {
+  const isDark = $q.dark.isActive;
+  if (event.type === 'BAN' && event.data?.skippedBan) {
+    return isDark ? '#fbbf24' : '#d97706';
+  }
+  if (isDark) return darkColorHex[event.type] ?? '#bdbdbd';
+  switch (event.type) {
     case 'PICK':
       return '#37474f'; // primary (from quasar.variables.scss)
     case 'BAN':
@@ -303,8 +340,11 @@ function getColorHex(type: TLiveEventType) {
   }
 }
 
-function getEventIcon(type: TLiveEventType) {
-  switch (type) {
+function getEventIcon(event: TLiveEvent) {
+  if (event.type === 'BAN' && event.data?.skippedBan) {
+    return 'redo';
+  }
+  switch (event.type) {
     case 'PICK':
       return 'check_circle';
     case 'BAN':

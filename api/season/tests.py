@@ -13,6 +13,7 @@ from season.services import (
     apply_promotion,
 )
 from league.models import League, LeagueStanding, LeagueStatus
+from game.models import Game, SelectedGame, BanDecision, Platform
 from season_manager import start_new_season
 
 
@@ -611,3 +612,71 @@ class ApplyPromotionRulesTest(TestCase):
         result = [r["profile"] for r in apply_promotion(rows, [4, 4])]
         # E promoted above D (the last), D relegated.
         self.assertEqual(result, ["A", "B", "C", "E", "D", "F"])
+
+
+class LiveEventsAPITests(TestCase):
+    def setUp(self):
+        self.client = APIClient()
+        self.user = User.objects.create_user(username="testuser", password="password")
+        self.client.force_authenticate(user=self.user)
+        self.season = Season.objects.create(
+            year=2026, month=3, status=Season.SeasonStatus.RUNNING
+        )
+        self.p1 = PlayerProfile.objects.create(profile_name="Player 1")
+        self.p2 = PlayerProfile.objects.create(profile_name="Player 2")
+        self.p3 = PlayerProfile.objects.create(profile_name="Player 3")
+
+        self.sp1 = SeasonParticipant.objects.create(
+            season=self.season, profile=self.p1
+        )
+        self.sp2 = SeasonParticipant.objects.create(
+            season=self.season, profile=self.p2
+        )
+        self.sp3 = SeasonParticipant.objects.create(
+            season=self.season, profile=self.p3
+        )
+
+        self.league1 = League.objects.create(season=self.season, level=1)
+        self.league1.members.add(self.sp1, self.sp2)
+
+        self.league2 = League.objects.create(season=self.season, level=2)
+        self.league2.members.add(self.sp3)
+
+        self.platform = Platform.objects.create(name="BGA")
+        self.game1 = Game.objects.create(name="Terraforming Mars", platform=self.platform)
+        self.game2 = Game.objects.create(name="Ark Nova", platform=self.platform)
+
+        self.pick1 = SelectedGame.objects.create(
+            league=self.league1, profile=self.p1, game=self.game1
+        )
+        self.pick2 = SelectedGame.objects.create(
+            league=self.league2, profile=self.p3, game=self.game2
+        )
+        self.ban1 = BanDecision.objects.create(
+            league=self.league1, player_banning=self.p2, skipped_ban=True
+        )
+
+    def test_live_events_returns_all_for_season(self):
+        response = self.client.get(
+            f"/api/season/live-events/?season_id={self.season.id}"
+        )
+        self.assertEqual(response.status_code, 200)
+        event_types = [e["type"] for e in response.data]
+        self.assertIn("PICK", event_types)
+        self.assertIn("BAN", event_types)
+        self.assertEqual(len(response.data), 3)
+
+    def test_live_events_filter_by_league_id(self):
+        response = self.client.get(
+            f"/api/season/live-events/?league_id={self.league1.id}"
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 2)
+        for event in response.data:
+            self.assertEqual(event["leagueId"], self.league1.id)
+
+        # Check skip ban event is included in league 1
+        ban_events = [e for e in response.data if e["type"] == "BAN"]
+        self.assertEqual(len(ban_events), 1)
+        self.assertTrue(ban_events[0]["data"]["skippedBan"])
+        self.assertEqual(ban_events[0]["data"]["playerName"], "Player 2")

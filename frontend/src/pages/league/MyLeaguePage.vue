@@ -160,24 +160,27 @@
         <GameSelectionSection />
       </div>
 
-      <!-- Main Two-Column Dashboard Grid: Standings, Matches & Results, Players -->
+      <!-- Main Two-Column Dashboard Grid: Standings, Players, Action Summary, Results -->
       <div class="row q-col-gutter-lg">
-        <!-- Left Column: Standings & Matches -->
+        <!-- Left Column: Standings & Players -->
         <div class="col-12 col-lg-6 column q-gutter-y-lg">
           <!-- Standings Section (Always Visible) -->
           <LeagueStandingsSection />
 
+          <!-- Players, Picks and Bans Section (Directly Below Standings) -->
+          <PlayersSection />
+        </div>
+
+        <!-- Right Column: Action Summary & Match Results & Reporting -->
+        <div class="col-12 col-lg-6 column q-gutter-y-lg">
+          <!-- Action Summary Section (Always Visible) -->
+          <LeagueActionSummarySection />
+
           <!-- Match Results Section (Always Visible) -->
           <ResultsSection />
 
-          <!-- Match Reporting Section (Always Visible during Playing Phase) -->
+          <!-- Match Reporting Section (At the bottom, visible during Playing Phase) -->
           <ReportResultsSection v-if="leagueStatus === 'PLAYING'" />
-        </div>
-
-        <!-- Right Column: Players & Picks -->
-        <div class="col-12 col-lg-6 column q-gutter-y-lg">
-          <!-- Players, Picks and Bans Section (Always Visible) -->
-          <PlayersSection />
         </div>
       </div>
     </div>
@@ -191,6 +194,7 @@ import LoadingSpinner from 'components/base/LoadingSpinner.vue';
 import KennerButton from 'components/base/KennerButton.vue';
 import LeagueLevel from 'components/season/LeagueLevel.vue';
 import LeagueStandingsSection from 'components/league/sections/LeagueStandingsSection.vue';
+import LeagueActionSummarySection from 'components/league/sections/LeagueActionSummarySection.vue';
 import GameSelectionSection from 'components/league/sections/GameSelectionSection.vue';
 import BanGameSection from 'components/league/sections/BanGameSection.vue';
 import ResultsSection from 'components/league/sections/ResultsSection.vue';

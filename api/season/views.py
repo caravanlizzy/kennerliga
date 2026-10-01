@@ -793,24 +793,38 @@ class LiveEventViewSet(ViewSet):
     permission_classes = [IsAuthenticated]
 
     def list(self, request):
+        league_id = request.query_params.get("league_id")
         season_id = request.query_params.get("season_id")
-        if not season_id:
-            season = get_running_season()
-            if not season:
-                season = get_open_season()
-            if not season:
-                # Fallback to most recent season
-                season = Season.objects.order_by("-year", "-month").first()
-            if not season:
+        if league_id:
+            try:
+                leagues = list(
+                    League.objects.filter(id=int(league_id)).annotate(
+                        member_count=Count("members")
+                    )
+                )
+                if not leagues:
+                    return Response([])
+                season_id = leagues[0].season_id
+            except ValueError:
                 return Response([])
-            season_id = season.id
+        else:
+            if not season_id:
+                season = get_running_season()
+                if not season:
+                    season = get_open_season()
+                if not season:
+                    # Fallback to most recent season
+                    season = Season.objects.order_by("-year", "-month").first()
+                if not season:
+                    return Response([])
+                season_id = season.id
 
-        # Annotate member_count once instead of running .count() per league.
-        leagues = list(
-            League.objects.filter(season_id=season_id).annotate(
-                member_count=Count("members")
+            # Annotate member_count once instead of running .count() per league.
+            leagues = list(
+                League.objects.filter(season_id=season_id).annotate(
+                    member_count=Count("members")
+                )
             )
-        )
         events = []
 
         # 1. PICK events
@@ -1119,28 +1133,29 @@ class LiveEventViewSet(ViewSet):
                 )
 
         # 5. SEASON_FINISHED events
-        season = Season.objects.filter(id=season_id).first()
-        if season and season.status == Season.SeasonStatus.DONE:
-            # Find winner of Level 1 league (reuse the bulk standings load)
-            l1 = next((l for l in leagues if l.level == 1), None)
-            winner_name = "Unknown"
-            if l1:
-                l1_standings = standings_by_league.get(l1.id, [])
-                if l1_standings:
-                    winner_name = l1_standings[0].player_profile.profile_name
+        if not league_id:
+            season = Season.objects.filter(id=season_id).first()
+            if season and season.status == Season.SeasonStatus.DONE:
+                # Find winner of Level 1 league (reuse the bulk standings load)
+                l1 = next((l for l in leagues if l.level == 1), None)
+                winner_name = "Unknown"
+                if l1:
+                    l1_standings = standings_by_league.get(l1.id, [])
+                    if l1_standings:
+                        winner_name = l1_standings[0].player_profile.profile_name
 
-            events.append(
-                {
-                    "id": f"season-done-{season.id}",
-                    "type": "SEASON_FINISHED",
-                    "timestamp": season.updated_at,
-                    "leagueId": None,
-                    "data": {
-                        "seasonName": f"{season.year}-{season.month:02d}",
-                        "seasonWinner": winner_name,
-                    },
-                }
-            )
+                events.append(
+                    {
+                        "id": f"season-done-{season.id}",
+                        "type": "SEASON_FINISHED",
+                        "timestamp": season.updated_at,
+                        "leagueId": None,
+                        "data": {
+                            "seasonName": f"{season.year}-{season.month:02d}",
+                            "seasonWinner": winner_name,
+                        },
+                    }
+                )
 
         # Sort
         # Secondary key: when timestamps tie, ensure LEAGUE_RUNNING summaries

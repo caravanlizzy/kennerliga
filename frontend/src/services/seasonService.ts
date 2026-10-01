@@ -277,10 +277,18 @@ export async function ensureParticipants(
   return await fetchSeasonParticipants(seasonId);
 }
 
-export async function fetchLiveActionEvents(seasonId?: number): Promise<TLiveEvent[]> {
+export async function fetchLiveActionEvents(
+  params?: number | { seasonId?: number; leagueId?: number }
+): Promise<TLiveEvent[]> {
   try {
-    const params = seasonId ? { season_id: seasonId } : {};
-    const { data } = await api.get('/season/live-events/', { params });
+    let queryParams: Record<string, number> = {};
+    if (typeof params === 'number') {
+      queryParams = { season_id: params };
+    } else if (params) {
+      if (params.seasonId) queryParams.season_id = params.seasonId;
+      if (params.leagueId) queryParams.league_id = params.leagueId;
+    }
+    const { data } = await api.get('/season/live-events/', { params: queryParams });
     return unwrapList<TLiveEvent>(data);
   } catch (error) {
     console.error('Error fetching live action events:', error);
