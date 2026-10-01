@@ -9,7 +9,7 @@
     >
       {{ emptyText }}
     </div>
-    <div v-else class="q-pa-sm">
+    <div v-else :class="compact ? 'q-pa-none' : 'q-pa-sm'">
       <!-- League Filters -->
       <div
         v-if="!hideFilters && !leagueId && availableLeagues.length > 1"
@@ -48,10 +48,11 @@
       <div class="column">
         <template v-for="(event, index) in filteredEvents" :key="event.id">
           <div
-            class="q-py-md q-px-sm column justify-center"
+            :class="compact ? 'q-py-xs q-px-none column justify-center' : 'q-py-md q-px-sm column justify-center'"
           >
             <div
-              class="flex justify-between items-center q-mb-xs text-grey-7"
+              class="flex justify-between items-center text-grey-7"
+              :class="compact ? 'q-mb-none' : 'q-mb-xs'"
               style="font-size: 0.65rem;"
             >
               <span class="row items-center q-gutter-x-xs">
@@ -68,23 +69,24 @@
                   :style="{
                     color: getColorHex(event),
                     backgroundColor: `color-mix(in srgb, ${getColorHex(event)} 12%, transparent)`,
-                    fontSize: '0.65rem',
+                    fontSize: compact ? '0.6rem' : '0.65rem',
                     letterSpacing: '0.08em',
                     borderRadius: '4px'
                   }"
-                  class="text-bold q-px-sm q-py-xs text-uppercase"
+                  class="text-bold text-uppercase"
+                  :class="compact ? 'q-px-xs q-py-none' : 'q-px-sm q-py-xs'"
                 >
-                  <q-icon :name="getEventIcon(event)" size="12px" class="q-mr-xs" />
+                  <q-icon :name="getEventIcon(event)" :size="compact ? '10px' : '12px'" class="q-mr-xs" />
                   {{ getEventDisplayType(event) }}
                 </q-badge>
               </span>
-              <span style="opacity: 0.85;">{{
+              <span v-if="!hideTimestamp" style="opacity: 0.85;">{{
                 formatTime(event.timestamp)
               }}</span>
             </div>
             <div
-              class="q-mt-xs text-grey-9"
-              style="font-size: 0.9rem; line-height: 1.45;"
+              :class="compact ? 'q-mt-none text-grey-9' : 'q-mt-xs text-grey-9'"
+              :style="{ fontSize: compact ? '0.78rem' : '0.9rem', lineHeight: compact ? '1.3' : '1.45' }"
             >
               <span v-if="event.type === 'PICK'">
                 <strong class="text-primary">{{ event.data.playerName }}</strong> picks
@@ -103,11 +105,11 @@
               <span v-else-if="event.type === 'GAME_FINISHED'">
                 <strong class="text-primary">{{ event.data.winner }}</strong> wins
                 <strong class="text-primary">{{ event.data.gameName }}</strong>
-                <div v-if="event.data.results" class="q-mt-sm q-pa-xs" :style="{ borderLeft: '1px solid var(--kenner-border-subtle)' }">
-                  <table class="full-width" style="border-collapse: collapse; font-size: 0.75rem;">
+                <div v-if="event.data.results" :class="compact ? 'q-mt-xs q-pa-none' : 'q-mt-sm q-pa-xs'" :style="{ borderLeft: '1px solid var(--kenner-border-subtle)' }">
+                  <table class="full-width" style="border-collapse: collapse; font-size: 0.72rem;">
                     <tbody>
                       <tr v-for="(res, idx) in event.data.results" :key="idx" :style="{ borderBottom: idx === event.data.results.length - 1 ? 'none' : '1px dashed var(--kenner-border-subtle)' }">
-                        <td class="q-pr-sm text-grey-6" style="width: 20px; font-weight: 500;">
+                        <td class="q-pr-xs text-grey-6" style="width: 18px; font-weight: 500;">
                           {{ res.position || idx + 1 }}.
                         </td>
                         <td class="ellipsis" style="max-width: 120px;">
@@ -123,11 +125,11 @@
               </span>
               <span v-else-if="event.type === 'LEAGUE_RUNNING'">
                 League {{ event.data.leagueLevel || event.leagueLevel }} is on! Games:
-                <div v-if="event.data.games && event.data.games.length" class="q-mt-sm q-pa-xs" :style="{ borderLeft: '1px solid var(--kenner-border-subtle)' }">
-                  <table class="full-width" style="border-collapse: collapse; font-size: 0.75rem;">
+                <div v-if="event.data.games && event.data.games.length" :class="compact ? 'q-mt-xs q-pa-none' : 'q-mt-sm q-pa-xs'" :style="{ borderLeft: '1px solid var(--kenner-border-subtle)' }">
+                  <table class="full-width" style="border-collapse: collapse; font-size: 0.72rem;">
                     <tbody>
                       <tr v-for="(g, idx) in event.data.games" :key="idx" :style="{ borderBottom: idx === event.data.games.length - 1 ? 'none' : '1px dashed var(--kenner-border-subtle)' }">
-                        <td class="q-pr-sm text-grey-6" style="width: 20px;">
+                        <td class="q-pr-xs text-grey-6" style="width: 18px;">
                           {{ idx + 1 }}.
                         </td>
                         <td class="ellipsis" style="max-width: 120px;">
@@ -155,7 +157,7 @@
               </span>
             </div>
           </div>
-          <q-separator v-if="index < filteredEvents.length - 1" />
+          <q-separator v-if="index < filteredEvents.length - 1" class="q-my-xs" />
         </template>
       </div>
     </div>
@@ -175,6 +177,8 @@ interface Props {
   leagueId?: number;
   seasonId?: number;
   hideFilters?: boolean;
+  hideTimestamp?: boolean;
+  compact?: boolean;
   emptyText?: string;
 }
 
@@ -182,6 +186,8 @@ const props = withDefaults(defineProps<Props>(), {
   leagueId: undefined,
   seasonId: undefined,
   hideFilters: false,
+  hideTimestamp: false,
+  compact: false,
   emptyText: 'No live actions yet.',
 });
 

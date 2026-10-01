@@ -162,25 +162,25 @@
 
       <!-- Main Two-Column Dashboard Grid: Standings, Players, Action Summary, Results -->
       <div class="row q-col-gutter-lg">
-        <!-- Left Column: Standings & Players -->
-        <div class="col-12 col-lg-6 column q-gutter-y-lg">
+        <!-- Left Column: Standings, Players, Match Results & Reporting -->
+        <div class="col-12 col-sm-7 col-md-8 column q-gutter-y-lg">
           <!-- Standings Section (Always Visible) -->
           <LeagueStandingsSection />
 
           <!-- Players, Picks and Bans Section (Directly Below Standings) -->
           <PlayersSection />
-        </div>
-
-        <!-- Right Column: Action Summary & Match Results & Reporting -->
-        <div class="col-12 col-lg-6 column q-gutter-y-lg">
-          <!-- Action Summary Section (Always Visible) -->
-          <LeagueActionSummarySection />
 
           <!-- Match Results Section (Always Visible) -->
           <ResultsSection />
 
           <!-- Match Reporting Section (At the bottom, visible during Playing Phase) -->
           <ReportResultsSection v-if="leagueStatus === 'PLAYING'" />
+        </div>
+
+        <!-- Right Column: Compact Action Summary Feed (Right aligned until very small screens) -->
+        <div class="col-12 col-sm-5 col-md-4 column q-gutter-y-lg">
+          <!-- Action Summary Section (Always Visible) -->
+          <LeagueActionSummarySection />
         </div>
       </div>
     </div>
