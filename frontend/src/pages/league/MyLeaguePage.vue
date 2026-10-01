@@ -149,6 +149,29 @@
             class="gt-xs q-ml-md"
           />
         </div>
+
+        <!-- Collapsible Action Summary inside My League Bar (Open by default) -->
+        <q-expansion-item
+          v-model="isActionSummaryExpanded"
+          dense
+          dense-toggle
+          class="header-action-summary q-mt-sm"
+          header-class="header-action-summary__header text-grey-8 q-px-xs"
+          expand-icon-class="text-grey-7"
+        >
+          <template #header>
+            <div class="row items-center q-gutter-x-xs full-width">
+              <q-icon name="history" size="18px" color="primary" />
+              <span class="text-subtitle2 text-weight-bold text-primary">
+                Action Summary
+              </span>
+              <q-space />
+            </div>
+          </template>
+          <div class="header-action-summary__content q-pt-xs q-px-xs">
+            <LeagueActionSummary :league-id="leagueData?.id || user?.myCurrentLeagueId" hide-title />
+          </div>
+        </q-expansion-item>
       </div>
 
       <!-- Prominent Active Action Card (Pick Game / Ban Game) -->
@@ -160,41 +183,32 @@
         <GameSelectionSection />
       </div>
 
-      <!-- Main Two-Column Dashboard Grid: Standings, Players, Action Summary, Results -->
-      <div class="row q-col-gutter-lg">
-        <!-- Left Column: Standings, Players, Match Results & Reporting -->
-        <div class="col-12 col-sm-7 col-md-8 column q-gutter-y-lg">
-          <!-- Standings Section (Always Visible) -->
-          <LeagueStandingsSection />
+      <!-- Main Dashboard Sections: Standings, Players, Results, Reporting -->
+      <div class="column q-gutter-y-lg">
+        <!-- Standings Section (Always Visible) -->
+        <LeagueStandingsSection />
 
-          <!-- Players, Picks and Bans Section (Directly Below Standings) -->
-          <PlayersSection />
+        <!-- Players, Picks and Bans Section (Directly Below Standings) -->
+        <PlayersSection />
 
-          <!-- Match Results Section (Always Visible) -->
-          <ResultsSection />
+        <!-- Match Results Section (Always Visible) -->
+        <ResultsSection />
 
-          <!-- Match Reporting Section (At the bottom, visible during Playing Phase) -->
-          <ReportResultsSection v-if="leagueStatus === 'PLAYING'" />
-        </div>
-
-        <!-- Right Column: Compact Action Summary Feed (Right aligned until very small screens) -->
-        <div class="col-12 col-sm-5 col-md-4 column q-gutter-y-lg">
-          <!-- Action Summary Section (Always Visible) -->
-          <LeagueActionSummarySection />
-        </div>
+        <!-- Match Reporting Section (At the bottom, visible during Playing Phase) -->
+        <ReportResultsSection v-if="leagueStatus === 'PLAYING'" />
       </div>
     </div>
   </q-page>
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, onUnmounted } from 'vue';
+import { ref, computed, onMounted, onUnmounted } from 'vue';
 import { storeToRefs } from 'pinia';
 import LoadingSpinner from 'components/base/LoadingSpinner.vue';
 import KennerButton from 'components/base/KennerButton.vue';
 import LeagueLevel from 'components/season/LeagueLevel.vue';
 import LeagueStandingsSection from 'components/league/sections/LeagueStandingsSection.vue';
-import LeagueActionSummarySection from 'components/league/sections/LeagueActionSummarySection.vue';
+import LeagueActionSummary from 'components/league/LeagueActionSummary.vue';
 import GameSelectionSection from 'components/league/sections/GameSelectionSection.vue';
 import BanGameSection from 'components/league/sections/BanGameSection.vue';
 import ResultsSection from 'components/league/sections/ResultsSection.vue';
@@ -206,6 +220,7 @@ import { useMyLeagueStore } from 'src/composables/myLeague';
 
 const { user } = storeToRefs(useUserStore());
 const myLeagueStore = useMyLeagueStore();
+const isActionSummaryExpanded = ref(true);
 const {
   loading,
   leagueStatus,
@@ -415,5 +430,22 @@ const turnActionText = computed(() => {
   max-width: 440px;
   margin: 0 auto;
   line-height: 1.5;
+}
+
+/* Header Action Summary (collapsible in My League bar) */
+.header-action-summary {
+  border-top: 1px solid var(--kenner-border-subtle, rgba(0, 0, 0, 0.08));
+  border-radius: 8px;
+
+  &__header {
+    min-height: 32px;
+    padding: 4px 6px;
+    border-radius: 6px;
+  }
+
+  &__content {
+    max-height: 300px;
+    overflow-y: auto;
+  }
 }
 </style>
