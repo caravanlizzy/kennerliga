@@ -78,6 +78,22 @@ class LeagueViewSet(ModelViewSet):
             return LeagueListSerializer
         return super().get_serializer_class()
 
+    def destroy(self, request, *args, **kwargs):
+        """
+        Deletes a league only if no match results exist for it.
+        """
+        instance = self.get_object()
+        from result.models import Result
+
+        if Result.objects.filter(league=instance).exists():
+            return Response(
+                {
+                    "detail": "Cannot remove league because match results already exist for this league."
+                },
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        return super().destroy(request, *args, **kwargs)
+
     def get_permissions(self):
         """
         Ensures admin-only actions are protected.

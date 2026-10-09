@@ -372,6 +372,14 @@ class SeasonViewSet(ModelViewSet):
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
+        if Result.objects.filter(season=season).exists():
+            return Response(
+                {
+                    "detail": "Cannot fill leagues because match results already exist for this season."
+                },
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
         participants = list(get_registered_participants(season))
         if not participants:
             return Response(
@@ -484,6 +492,24 @@ class SeasonParticipantViewSet(ModelViewSet):
         ]:
             return [IsAuthenticated()]
         return [IsAdminUser()]
+
+    def destroy(self, request, *args, **kwargs):
+        """
+        Deletes a season participant only if no match results exist for them in this season.
+        """
+        instance = self.get_object()
+        from result.models import Result
+
+        if Result.objects.filter(
+            season_id=instance.season_id, player_profile_id=instance.profile_id
+        ).exists():
+            return Response(
+                {
+                    "detail": "Cannot remove participant because match results already exist for this player in this season."
+                },
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        return super().destroy(request, *args, **kwargs)
 
     def _previous_season_for(self, season: Season):
         if not season:

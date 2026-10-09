@@ -27,6 +27,7 @@ export type TSeasonParticipantDto = {
   league_position_display?: string;
   banned_by: string[];
   league?: { id: number; level: number };
+  has_results?: boolean;
 };
 
 export type TLeagueDto = {
@@ -36,6 +37,7 @@ export type TLeagueDto = {
   members?: TSeasonParticipantDto[];
   status?: TLeagueStatus;
   is_completed?: boolean;
+  has_results?: boolean;
 };
 
 export type TBannedGameFull = {

@@ -106,6 +106,60 @@ class SeasonAPITests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertIsNone(response.data)
 
+    def test_season_participant_has_results_and_deletion(self):
+        admin = User.objects.create_superuser(username="admin_p", password="pw")
+        self.client.force_authenticate(user=admin)
+
+        sp = SeasonParticipant.objects.create(
+            season=self.season, profile=self.profile
+        )
+        league = League.objects.create(season=self.season, level=1)
+        league.members.add(sp)
+
+        # Before results
+        resp = self.client.get(f"/api/season/season-participants/{sp.id}/")
+        self.assertEqual(resp.status_code, 200)
+        self.assertFalse(resp.data["has_results"])
+
+        from result.models import Result
+        from game.models import SelectedGame, Game, Platform
+
+        platform = Platform.objects.create(name="BGA_test")
+        game = Game.objects.create(name="Game1", platform=platform)
+        sg = SelectedGame.objects.create(
+            league=league, profile=self.profile, game=game
+        )
+        res = Result.objects.create(
+            season=self.season,
+            league=league,
+            selected_game=sg,
+            player_profile=self.profile,
+            points=10,
+            position=1,
+        )
+
+        # After results
+        resp = self.client.get(f"/api/season/season-participants/{sp.id}/")
+        self.assertEqual(resp.status_code, 200)
+        self.assertTrue(resp.data["has_results"])
+
+        # Try deleting participant with results -> 400
+        del_resp = self.client.delete(f"/api/season/season-participants/{sp.id}/")
+        self.assertEqual(del_resp.status_code, 400)
+        self.assertIn("results already exist", del_resp.data["detail"])
+        self.assertTrue(SeasonParticipant.objects.filter(id=sp.id).exists())
+
+        # Try fill-leagues on season with results -> 400
+        fill_resp = self.client.post(f"/api/season/seasons/{self.season.id}/fill-leagues/")
+        self.assertEqual(fill_resp.status_code, 400)
+        self.assertIn("results already exist", fill_resp.data["detail"])
+
+        # Remove result and delete participant -> 204
+        res.delete()
+        del_resp = self.client.delete(f"/api/season/season-participants/{sp.id}/")
+        self.assertEqual(del_resp.status_code, 204)
+        self.assertFalse(SeasonParticipant.objects.filter(id=sp.id).exists())
+
     def test_current_champion_returns_latest_done_season_winner(self):
         s1 = Season.objects.create(
             year=2025, month=11, status=Season.SeasonStatus.DONE

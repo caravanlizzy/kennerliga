@@ -10,6 +10,9 @@
       <div class="text-body1 text-grey-6 q-mt-sm">
         Add users to start selecting games.
       </div>
+      <div class="q-mt-md">
+        <slot />
+      </div>
     </div>
   </q-card>
 </template>

@@ -84,11 +84,19 @@ class SeasonParticipantMiniSerializer(ModelSerializer):
     avatar_shape = SerializerMethodField()
     avatar_color = SerializerMethodField()
     elo_rating = serializers.FloatField(source="profile.elo_rating", read_only=True)
+    has_results = SerializerMethodField()
 
     class Meta:
         model = SeasonParticipant
-        fields = ("id", "profile_name", "username", "avatar_shape", "avatar_color", "elo_rating")
-        read_only_fields = ("id", "profile_name", "username", "avatar_shape", "avatar_color", "elo_rating")
+        fields = ("id", "profile_name", "username", "avatar_shape", "avatar_color", "elo_rating", "has_results")
+        read_only_fields = ("id", "profile_name", "username", "avatar_shape", "avatar_color", "elo_rating", "has_results")
+
+    def get_has_results(self, obj):
+        from result.models import Result
+
+        return Result.objects.filter(
+            season_id=obj.season_id, player_profile_id=obj.profile_id
+        ).exists()
 
     def get_username(self, obj):
         user = getattr(obj.profile, "user", None)
@@ -125,6 +133,7 @@ class SeasonParticipantSerializer(ModelSerializer):
     selected_games = SerializerMethodField()
     my_banned_game = SerializerMethodField()
     has_banned = BooleanField(read_only=True)
+    has_results = SerializerMethodField()
     is_active_player = SerializerMethodField()
     league_position = SerializerMethodField()
     league_position_display = SerializerMethodField()
@@ -148,6 +157,7 @@ class SeasonParticipantSerializer(ModelSerializer):
             "season_details",
             "selected_games",  # read
             "has_banned",
+            "has_results",
             "is_active_player",
             "is_prev_unregistered",
             "my_banned_game",
@@ -155,6 +165,13 @@ class SeasonParticipantSerializer(ModelSerializer):
             "league_position_display",
             "league",
         ]
+
+    def get_has_results(self, obj):
+        from result.models import Result
+
+        return Result.objects.filter(
+            season_id=obj.season_id, player_profile_id=obj.profile_id
+        ).exists()
 
     def get_avatar_shape(self, obj):
         user = getattr(obj.profile, "user", None)

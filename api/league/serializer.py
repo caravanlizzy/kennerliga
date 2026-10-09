@@ -19,6 +19,7 @@ class LeagueSerializer(serializers.ModelSerializer):
     # read: return mini objects
     members = SerializerMethodField()
     is_completed = SerializerMethodField()
+    has_results = SerializerMethodField()
 
     class Meta:
         model = League
@@ -31,7 +32,13 @@ class LeagueSerializer(serializers.ModelSerializer):
             "members",
             "member_ids",
             "is_completed",
+            "has_results",
         ]
+
+    def get_has_results(self, obj):
+        from result.models import Result
+
+        return Result.objects.filter(league=obj).exists()
 
     def get_is_completed(self, obj):
         from league.queries import is_league_finished
@@ -61,6 +68,21 @@ class LeagueSerializer(serializers.ModelSerializer):
                         "member_ids": f"All members must belong to season {season.id}. Offenders: {invalid}"
                     }
                 )
+        if self.instance and "member_ids" in attrs:
+            from result.models import Result
+
+            new_member_pks = {sp.id for sp in members}
+            current_members = self.instance.members.all()
+            for sp in current_members:
+                if sp.id not in new_member_pks:
+                    if Result.objects.filter(
+                        league=self.instance, player_profile=sp.profile
+                    ).exists():
+                        raise serializers.ValidationError(
+                            {
+                                "member_ids": f"Cannot remove player '{sp.profile.profile_name}' because they have results in this league."
+                            }
+                        )
         return attrs
 
     def create(self, validated_data):
@@ -82,6 +104,7 @@ class LeagueListSerializer(serializers.ModelSerializer):
     Lightweight serializer for listing leagues with minimal member information.
     """
     is_completed = SerializerMethodField()
+    has_results = SerializerMethodField()
     members = SerializerMethodField()
 
     class Meta:
@@ -93,8 +116,14 @@ class LeagueListSerializer(serializers.ModelSerializer):
             "status",
             "active_player",
             "is_completed",
+            "has_results",
             "members",
         ]
+
+    def get_has_results(self, obj):
+        from result.models import Result
+
+        return Result.objects.filter(league=obj).exists()
 
     def get_is_completed(self, obj):
         from league.queries import is_league_finished

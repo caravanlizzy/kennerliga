@@ -71,7 +71,16 @@
     <!-- Empty state -->
     <EmptyUsersState
       v-else-if="!loading && (!league?.members || league.members.length === 0)"
-    />
+    >
+      <KennerButton
+        v-if="isAdmin"
+        no-caps
+        color="secondary"
+        icon="person_add"
+        label="Manage League Members"
+        @click="openManageMembersDialog"
+      />
+    </EmptyUsersState>
 
     <!-- Members Section -->
     <ContentSection
@@ -81,6 +90,19 @@
       color="secondary"
       :bordered="false"
     >
+      <template #header-extra>
+        <KennerButton
+          v-if="isAdmin"
+          outline
+          no-caps
+          size="sm"
+          color="secondary"
+          icon="manage_accounts"
+          label="Manage Members"
+          class="q-ml-md"
+          @click="openManageMembersDialog"
+        />
+      </template>
       <div class="column">
         <MemberGameCard
           v-for="(member, index) in league?.members"
@@ -110,22 +132,73 @@
       @close="activeForm = null"
       @success="onSuccess"
     />
+
+    <!-- Manage Members Dialog -->
+    <q-dialog v-model="showManageMembersDialog">
+      <q-card style="min-width: 320px; max-width: 480px; width: 100%; border-radius: 16px" class="q-pa-md">
+        <q-card-section class="row items-center justify-between q-pb-none">
+          <div class="text-subtitle1 text-weight-bold">Manage League Members</div>
+          <q-btn v-close-popup icon="close" flat round dense color="grey-6" />
+        </q-card-section>
+
+        <q-card-section class="q-pt-sm">
+          <p class="text-caption text-grey-7 q-mb-md">
+            Select participants for League {{ league?.level }}.
+          </p>
+
+          <ErrorDisplay v-if="manageMembersError" :error="manageMembersError" class="q-mb-sm" />
+
+          <KennerSelect
+            v-model="selectedLeagueMemberIds"
+            :options="seasonParticipantOptions"
+            label="League Members"
+            option-label="label"
+            option-value="value"
+            emit-value
+            map-options
+            multiple
+            use-chips
+          >
+            <template #no-option>
+              <q-item>
+                <q-item-section class="text-grey">
+                  No participants available for this season
+                </q-item-section>
+              </q-item>
+            </template>
+          </KennerSelect>
+        </q-card-section>
+
+        <q-card-actions align="right" class="q-pt-md">
+          <KennerButton flat no-caps label="Cancel" color="grey-7" v-close-popup />
+          <KennerButton
+            no-caps
+            label="Save Members"
+            color="secondary"
+            :loading="savingMembers"
+            @click="onSaveLeagueMembers"
+          />
+        </q-card-actions>
+      </q-card>
+    </q-dialog>
   </q-page>
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 import { useRoute } from 'vue-router';
 import { useQuasar } from 'quasar';
 import {
   fetchLeagueDetails,
   setLeagueActivePlayer,
   setLeagueStatus,
+  updateLeague,
 } from 'src/services/leagueService';
 import { deleteSelectedGame } from 'src/services/gameService';
 import { deleteMatchResults } from 'src/services/resultService';
-import { fetchSeason } from 'src/services/seasonService';
+import { fetchSeason, fetchSeasonParticipants } from 'src/services/seasonService';
 import ContentSection from 'components/base/ContentSection.vue';
+import KennerButton from 'components/base/KennerButton.vue';
 import KennerSelect from 'components/base/KennerSelect.vue';
 import ErrorDisplay from 'components/base/ErrorDisplay.vue';
 import LoadingSpinner from 'components/base/LoadingSpinner.vue';
@@ -161,6 +234,55 @@ const loading = ref(false);
 const error = ref<string | null>(null);
 
 const activeForm = ref<TActiveForm | null>(null);
+
+const showManageMembersDialog = ref(false);
+const selectedLeagueMemberIds = ref<number[]>([]);
+const seasonParticipants = ref<TSeasonParticipantDto[]>([]);
+const savingMembers = ref(false);
+const manageMembersError = ref<string | null>(null);
+
+const seasonParticipantOptions = computed(() => {
+  return seasonParticipants.value.map((p) => ({
+    label: p.username && p.username !== p.profile_name
+      ? `${p.profile_name} (@${p.username})`
+      : p.profile_name,
+    value: p.id,
+  }));
+});
+
+async function openManageMembersDialog() {
+  if (!league.value) return;
+  manageMembersError.value = null;
+  selectedLeagueMemberIds.value = (league.value.members || []).map((m) => m.id);
+  showManageMembersDialog.value = true;
+  try {
+    seasonParticipants.value = await fetchSeasonParticipants(league.value.season);
+  } catch (e: any) {
+    manageMembersError.value = e?.message || 'Failed to load season participants.';
+  }
+}
+
+async function onSaveLeagueMembers() {
+  if (!league.value) return;
+  try {
+    savingMembers.value = true;
+    manageMembersError.value = null;
+    await updateLeague(league.value.id, {
+      member_ids: selectedLeagueMemberIds.value,
+    });
+    showManageMembersDialog.value = false;
+    await load();
+    $q.notify({ type: 'positive', message: 'League members updated successfully' });
+  } catch (e: any) {
+    manageMembersError.value =
+      e?.response?.data?.member_ids?.[0] ||
+      e?.response?.data?.detail ||
+      e?.message ||
+      'Failed to update league members.';
+  } finally {
+    savingMembers.value = false;
+  }
+}
 
 async function load() {
   loading.value = true;

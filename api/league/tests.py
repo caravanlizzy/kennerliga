@@ -149,3 +149,73 @@ class LeagueServiceTests(TestCase):
         self.assertEqual(p0_row["games"][str(sg2.id)]["display_value"], "1st")
         self.assertEqual(p0_row["games"][str(sg2.id)]["display_rank"], "1st")
         self.assertEqual(p0_row["games"][str(sg2.id)]["rank"], 1)
+
+    def test_cannot_delete_league_with_results(self):
+        client = APIClient()
+        admin_user = User.objects.create_superuser(username="admin_del", password="pw")
+        client.force_authenticate(user=admin_user)
+
+        from result.models import Result
+        sg = SelectedGame.objects.create(
+            league=self.league, profile=self.profiles[0], game=self.games[0]
+        )
+        Result.objects.create(
+            season=self.season,
+            league=self.league,
+            selected_game=sg,
+            player_profile=self.profiles[0],
+            points=10,
+            position=1,
+        )
+
+        # League has_results should be True
+        response = client.get(f"/api/league/leagues/{self.league.id}/")
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(response.data["has_results"])
+
+        # Deleting league should fail with 400
+        del_response = client.delete(f"/api/league/leagues/{self.league.id}/")
+        self.assertEqual(del_response.status_code, 400)
+        self.assertIn("results already exist", del_response.data["detail"])
+        self.assertTrue(League.objects.filter(id=self.league.id).exists())
+
+    def test_can_delete_league_without_results(self):
+        client = APIClient()
+        admin_user = User.objects.create_superuser(username="admin_del2", password="pw")
+        client.force_authenticate(user=admin_user)
+
+        response = client.get(f"/api/league/leagues/{self.league.id}/")
+        self.assertEqual(response.status_code, 200)
+        self.assertFalse(response.data["has_results"])
+
+        del_response = client.delete(f"/api/league/leagues/{self.league.id}/")
+        self.assertEqual(del_response.status_code, 204)
+        self.assertFalse(League.objects.filter(id=self.league.id).exists())
+
+    def test_cannot_remove_member_with_results_from_league(self):
+        client = APIClient()
+        admin_user = User.objects.create_superuser(username="admin_mem", password="pw")
+        client.force_authenticate(user=admin_user)
+
+        from result.models import Result
+        sg = SelectedGame.objects.create(
+            league=self.league, profile=self.profiles[0], game=self.games[0]
+        )
+        Result.objects.create(
+            season=self.season,
+            league=self.league,
+            selected_game=sg,
+            player_profile=self.profiles[0],
+            points=10,
+            position=1,
+        )
+
+        # Try to update league members to exclude profile[0] (self.participants[0])
+        remaining_ids = [self.participants[1].id, self.participants[2].id]
+        response = client.patch(
+            f"/api/league/leagues/{self.league.id}/",
+            {"member_ids": remaining_ids},
+            format="json",
+        )
+        self.assertEqual(response.status_code, 400)
+        self.assertIn("member_ids", response.data)

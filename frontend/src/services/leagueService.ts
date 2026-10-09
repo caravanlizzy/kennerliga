@@ -97,3 +97,29 @@ export async function setLeagueActivePlayer(
   );
   return data;
 }
+
+export async function deleteLeague(leagueId: number): Promise<void> {
+  await api.delete(`league/leagues/${leagueId}/`);
+}
+
+export async function createLeague(payload: {
+  season: number;
+  level: number | string;
+  member_ids?: number[];
+  status?: string;
+}): Promise<TLeagueDto> {
+  const { data } = await api.post('league/leagues/', payload);
+  return data;
+}
+
+export async function updateLeague(
+  leagueId: number,
+  payload: Partial<{
+    level: number | string;
+    member_ids: number[];
+    status: string;
+  }>
+): Promise<TLeagueDto> {
+  const { data } = await api.patch(`league/leagues/${leagueId}/`, payload);
+  return data;
+}

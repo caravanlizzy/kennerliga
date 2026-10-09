@@ -52,6 +52,21 @@
           label="Manage"
           @click.stop="goToLeague(league)"
         />
+        <KennerButton
+          v-if="isAdmin"
+          dense
+          round
+          flat
+          size="sm"
+          color="negative"
+          icon="delete"
+          :disable="league.has_results"
+          @click.stop="onDelete"
+        >
+          <KennerTooltip>
+            {{ league.has_results ? 'Cannot remove: match results exist in this league' : 'Remove league' }}
+          </KennerTooltip>
+        </KennerButton>
       </div>
     </q-item-section>
   </q-item>
@@ -63,9 +78,13 @@ import { useRouter } from 'vue-router';
 import { useUserStore } from 'stores/userStore';
 import { storeToRefs } from 'pinia';
 import KennerButton from 'components/base/KennerButton.vue';
+import KennerTooltip from 'components/base/KennerTooltip.vue';
 import LeagueLevel from './LeagueLevel.vue';
 
-defineProps<{ league: TLeagueDto }>();
+const props = defineProps<{ league: TLeagueDto }>();
+const emit = defineEmits<{
+  (e: 'delete', league: TLeagueDto): void;
+}>();
 
 const router = useRouter();
 const { isAdmin } = storeToRefs(useUserStore());
@@ -75,6 +94,11 @@ function goToLeague(league: TLeagueDto) {
     name: 'league-manager',
     params: { id: league.season, leagueId: league.id },
   });
+}
+
+function onDelete() {
+  if (props.league.has_results) return;
+  emit('delete', props.league);
 }
 </script>
 
