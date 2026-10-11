@@ -27,23 +27,27 @@
       </div>
     </div>
 
-    <div>Then select which users to put in which league</div>
-    <div v-if="previewLoading" class="text-caption text-grey">Loading league preview…</div>
+    <div>
+      <div class="text-subtitle1 text-weight-bold">Leagues (Optional)</div>
+      <div class="text-caption text-grey-7">
+        Assign players to specific leagues and order their positions. You can also create the season without leagues and manage them later.
+      </div>
+    </div>
 
     <div
       v-for="(lg, idx) in preparedLeagues"
       :key="idx"
-      class="q-pa-sm q-mb-sm"
+      class="q-pa-md q-mb-sm column q-gutter-sm"
       style="border: 1px solid var(--kenner-border-strong); border-radius: 8px"
     >
       <div class="row q-col-gutter-sm items-center">
-        <div class="col-auto">
+        <div class="col-auto" style="min-width: 140px">
           <KennerInput v-model.number="lg.level" type="number" label="Level (1 = L1)" />
         </div>
 
         <div class="col">
           <KennerSelect
-            v-model="lg.memberProfileIds"
+            :model-value="lg.memberProfileIds"
             :options="optionsForLeague(idx)"
             option-label="label"
             option-value="value"
@@ -57,19 +61,70 @@
         </div>
 
         <div class="col-auto">
-          <KennerButton flat color="negative" label="Remove" @click="removeLeague(idx)" />
+          <KennerButton flat color="negative" label="Remove League" @click="removeLeague(idx)" />
+        </div>
+      </div>
+
+      <!-- Player positions inside this league -->
+      <div v-if="lg.memberProfileIds.length > 0" class="column q-gutter-xs q-mt-xs">
+        <div class="text-caption text-weight-medium text-grey-8">Player Order &amp; Positions:</div>
+        <div
+          v-for="(pid, mIdx) in lg.memberProfileIds"
+          :key="pid"
+          class="row items-center q-py-xs q-px-sm bg-grey-2 text-dark rounded-borders"
+        >
+          <div class="text-weight-bold q-mr-sm" style="min-width: 28px">#{{ mIdx + 1 }}</div>
+          <div class="col ellipsis">{{ getProfileName(pid) }}</div>
+          <div class="row q-gutter-xs items-center">
+            <q-btn
+              flat
+              dense
+              round
+              size="sm"
+              icon="arrow_upward"
+              :disable="mIdx === 0"
+              @click="movePlayerUp(idx, mIdx)"
+            >
+              <q-tooltip>Move Up</q-tooltip>
+            </q-btn>
+            <q-btn
+              flat
+              dense
+              round
+              size="sm"
+              icon="arrow_downward"
+              :disable="mIdx === lg.memberProfileIds.length - 1"
+              @click="movePlayerDown(idx, mIdx)"
+            >
+              <q-tooltip>Move Down</q-tooltip>
+            </q-btn>
+            <q-btn
+              flat
+              dense
+              round
+              size="sm"
+              icon="close"
+              color="negative"
+              @click="removePlayerFromLeague(idx, mIdx)"
+            >
+              <q-tooltip>Remove from League</q-tooltip>
+            </q-btn>
+          </div>
         </div>
       </div>
     </div>
 
-    <KennerButton flat color="dark" label="+ Add League" @click="addLeague" />
+    <div>
+      <KennerButton flat color="dark" label="+ Add League" @click="addLeague" />
+    </div>
 
     <div class="row q-col-gutter-sm q-mt-md">
       <div class="col-auto">
         <KennerButton
           color="dark"
-          label="Create Season & Leagues"
+          :label="preparedLeagues.length > 0 ? 'Create Season & Leagues' : 'Create Season'"
           :disable="!canSubmit"
+          :loading="isSubmitting"
           @click="createAll"
         />
       </div>
@@ -90,8 +145,8 @@ import {
   createLeagueForSeason,
   createSeason,
   ensureParticipants,
-  previewLeagues,
 } from 'src/services/seasonService';
+import type { TSeasonParticipantDto } from 'src/types';
 
 /* -------------------- State -------------------- */
 const year = ref<number | null>(null);
@@ -102,19 +157,24 @@ type RawProfile = { id: number | string; profile_name?: string; username?: strin
 const availableMembers = ref<RawProfile[]>([]);
 
 type PreparedLeague = { level: number | null; memberProfileIds: number[] };
-const preparedLeagues = ref<PreparedLeague[]>([{ level: 1, memberProfileIds: [] }]);
-const previewLoading = ref(false);
+const preparedLeagues = ref<PreparedLeague[]>([]);
+const isSubmitting = ref(false);
 
 /* -------------------- Options (normalized) -------------------- */
 const profileOptions = computed(() =>
   availableMembers.value.map((p) => {
     const idNum = Number(p.id);
     return {
-      label: p.profile_name ?? p.username,
+      label: p.profile_name ?? p.username ?? `Profile ${idNum}`,
       value: idNum,
     };
   })
 );
+
+function getProfileName(pid: number): string {
+  const p = availableMembers.value.find((m) => Number(m.id) === Number(pid));
+  return p?.profile_name ?? p?.username ?? `Profile ${pid}`;
+}
 
 // Only allow assigning profiles chosen in the top select
 const selectedProfileOptions = computed(() => {
@@ -130,8 +190,7 @@ function optionsForLeague(leagueIndex: number) {
     lg.memberProfileIds.forEach((pid) => otherAssigned.add(Number(pid)));
   });
 
-  // Keep this league's own picks visible even if they appear in otherAssigned (shouldn't normally)
-  const own = new Set(preparedLeagues.value[leagueIndex].memberProfileIds.map(Number));
+  const own = new Set(preparedLeagues.value[leagueIndex]?.memberProfileIds.map(Number) ?? []);
   return selectedProfileOptions.value.filter(
     (opt) => own.has(Number(opt.value)) || !otherAssigned.has(Number(opt.value))
   );
@@ -141,17 +200,14 @@ function optionsForLeague(leagueIndex: number) {
 onMounted(loadMembers);
 
 async function loadMembers() {
-  // The service already unwraps paginated vs. plain-array responses.
   const profiles = await fetchProfiles();
-  // Normalize ids to numbers immediately
   availableMembers.value = profiles.map((p) => ({ ...p, id: Number(p.id) }));
 }
 
-/* -------------------- Event-driven uniqueness (no deep watchers) -------------------- */
+/* -------------------- Event-driven uniqueness -------------------- */
 
 // When the top member list changes, drop any assignments that are no longer allowed.
 function onMemberListChange(newList: any) {
-  // Quasar may emit arrays of numbers already; normalize just in case
   memberList.value = (newList ?? []).map((v: any) => Number(v));
   const allowed = new Set(memberList.value);
 
@@ -159,72 +215,47 @@ function onMemberListChange(newList: any) {
     lg.memberProfileIds = lg.memberProfileIds.map(Number).filter((pid) => allowed.has(pid));
   });
 
-  // Also remove duplicates across leagues (keep earlier leagues’ picks)
   dedupeAcrossLeagues();
-
-  void applyLeaguePreview();
 }
 
-/**
- * Fetches a read-only preview of how the currently selected members would be
- * distributed into leagues (reusing the same promotion/relegation logic used
- * by start_new_season / Fill Leagues), and pre-fills preparedLeagues with it.
- * Nothing is persisted here - it's only stored in the backend once the form
- * is actually submitted via createAll().
- */
-async function applyLeaguePreview() {
-  if (memberList.value.length === 0) {
-    preparedLeagues.value = [{ level: 1, memberProfileIds: [] }];
-    return;
-  }
-
-  previewLoading.value = true;
-  try {
-    const preview = await previewLeagues(memberList.value);
-
-    const leagues: PreparedLeague[] = preview.leagues.map((lg) => ({
-      level: lg.level,
-      memberProfileIds: lg.members.map((m) => Number(m.profile)),
-    }));
-
-    // Newcomers have no projected league yet (their final spot is decided by
-    // a random shuffle at season start) - distribute them into the open slots
-    // of the existing leagues, adding extra leagues if needed.
-    const newcomerIds = preview.newcomers.map((n) => Number(n.profile));
-    let leagueIdx = 0;
-    for (const pid of newcomerIds) {
-      while (
-        leagueIdx < leagues.length &&
-        leagues[leagueIdx].memberProfileIds.length >=
-          (preview.leagues[leagueIdx]?.size ?? 4)
-      ) {
-        leagueIdx++;
-      }
-      if (leagueIdx >= leagues.length) {
-        leagues.push({ level: leagues.length + 1, memberProfileIds: [] });
-      }
-      leagues[leagueIdx].memberProfileIds.push(pid);
-    }
-
-    preparedLeagues.value = leagues.length > 0 ? leagues : [{ level: 1, memberProfileIds: [] }];
-  } catch (e) {
-    console.error('Failed to load league preview:', e);
-  } finally {
-    previewLoading.value = false;
-  }
-}
-
-// When a league's selection changes, normalize and enforce cross-league uniqueness
+// When a league's selection changes, preserve order and enforce cross-league uniqueness
 function onLeaguePickChange(idx: number, newIds: any) {
   const normalized = (newIds ?? []).map((v: any) => Number(v));
-  preparedLeagues.value[idx].memberProfileIds = normalized;
+  const newSet = new Set<number>(normalized);
+  const current = preparedLeagues.value[idx].memberProfileIds.filter((pid) => newSet.has(pid));
+  for (const id of normalized) {
+    if (!current.includes(id)) {
+      current.push(id);
+    }
+  }
+  preparedLeagues.value[idx].memberProfileIds = current;
 
   // Remove any of these IDs from *other* leagues to keep uniqueness
-  const chosen = new Set(normalized);
+  const chosen = new Set(current);
   preparedLeagues.value.forEach((lg, i) => {
     if (i === idx) return;
     lg.memberProfileIds = lg.memberProfileIds.filter((pid) => !chosen.has(Number(pid)));
   });
+}
+
+function movePlayerUp(leagueIdx: number, playerIdx: number) {
+  if (playerIdx <= 0) return;
+  const list = preparedLeagues.value[leagueIdx].memberProfileIds;
+  const temp = list[playerIdx];
+  list[playerIdx] = list[playerIdx - 1];
+  list[playerIdx - 1] = temp;
+}
+
+function movePlayerDown(leagueIdx: number, playerIdx: number) {
+  const list = preparedLeagues.value[leagueIdx].memberProfileIds;
+  if (playerIdx >= list.length - 1) return;
+  const temp = list[playerIdx];
+  list[playerIdx] = list[playerIdx + 1];
+  list[playerIdx + 1] = temp;
+}
+
+function removePlayerFromLeague(leagueIdx: number, playerIdx: number) {
+  preparedLeagues.value[leagueIdx].memberProfileIds.splice(playerIdx, 1);
 }
 
 /** Keep uniqueness across leagues by walking in order and dropping duplicates in later leagues. */
@@ -248,39 +279,76 @@ function addLeague() {
     memberProfileIds: [],
   });
 }
+
 function removeLeague(idx: number) {
   preparedLeagues.value.splice(idx, 1);
-  // After removal, ensure there are no lingering duplicates (shouldn’t be, but cheap to ensure)
   dedupeAcrossLeagues();
 }
 
 /* -------------------- Submit -------------------- */
 const canSubmit = computed(() => {
-  const okDate = !!year.value && !!month.value;
-  const okMembers = memberList.value.length > 0;
-  const okLeagues =
-    preparedLeagues.value.length > 0 &&
-    preparedLeagues.value.every((l) => !!l.level && l.memberProfileIds.length > 0);
-  return okDate && okMembers && okLeagues;
+  const okDate =
+    year.value != null &&
+    month.value != null &&
+    year.value > 0 &&
+    month.value >= 1 &&
+    month.value <= 12;
+  const okLeagues = preparedLeagues.value.every((l) => l.level != null && Number(l.level) > 0);
+  return okDate && okLeagues;
 });
 
 async function createAll() {
-  if (!canSubmit.value) return;
+  if (!canSubmit.value || isSubmitting.value) return;
 
-  const s = await createSeason(year.value!, month.value!);
-  const seasonId = s.id;
-  const seasonParticipants = await ensureParticipants(seasonId, memberList.value.map(Number));
+  isSubmitting.value = true;
+  try {
+    const s = await createSeason(year.value!, month.value!);
+    const seasonId = s.id;
 
-  for (const lg of preparedLeagues.value) {
-    await createLeagueForSeason(
-      seasonId,
-      Number(lg.level),
-      seasonParticipants,
-      lg.memberProfileIds.map(Number)
-    );
+    // Order participants: all players in league 1 (in order), league 2 (in order), etc.
+    // followed by any participants in memberList who were not assigned to any league.
+    const orderedProfileIds: number[] = [];
+    const addedSet = new Set<number>();
+
+    for (const lg of preparedLeagues.value) {
+      for (const pid of lg.memberProfileIds) {
+        const numId = Number(pid);
+        if (!addedSet.has(numId)) {
+          orderedProfileIds.push(numId);
+          addedSet.add(numId);
+        }
+      }
+    }
+
+    for (const pid of memberList.value) {
+      const numId = Number(pid);
+      if (!addedSet.has(numId)) {
+        orderedProfileIds.push(numId);
+        addedSet.add(numId);
+      }
+    }
+
+    let seasonParticipants: TSeasonParticipantDto[] = [];
+    if (orderedProfileIds.length > 0) {
+      seasonParticipants = await ensureParticipants(seasonId, orderedProfileIds);
+    }
+
+    for (const lg of preparedLeagues.value) {
+      if (lg.level == null) continue;
+      await createLeagueForSeason(
+        seasonId,
+        Number(lg.level),
+        seasonParticipants,
+        lg.memberProfileIds.map(Number)
+      );
+    }
+
+    resetForm();
+  } catch (e) {
+    console.error('Failed to create season & leagues:', e);
+  } finally {
+    isSubmitting.value = false;
   }
-
-  resetForm();
 }
 
 /* -------------------- Reset -------------------- */
@@ -288,6 +356,6 @@ function resetForm() {
   year.value = null;
   month.value = null;
   memberList.value = [];
-  preparedLeagues.value = [{ level: 1, memberProfileIds: [] }];
+  preparedLeagues.value = [];
 }
 </script>

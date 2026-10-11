@@ -264,13 +264,17 @@ export async function ensureParticipants(
     if (pid != null) byProfile[pid] = sp;
   }
 
-  // Compute which incoming profiles are missing from this season
-  const missing = incomingIds.filter((pid) => !byProfile[pid]);
-
-  // Create SeasonParticipant for any missing profiles with rank based on position
-  for (const pid of missing) {
-    const rank = incomingIds.indexOf(pid) + 1; // 1-based rank
-    await api.post('/season/season-participants/', { season: seasonId, profile: pid, rank });
+  // Set rank for each participant based on order in incomingIds
+  for (let i = 0; i < incomingIds.length; i++) {
+    const pid = incomingIds[i];
+    const rank = i + 1;
+    if (byProfile[pid]) {
+      if (byProfile[pid].rank !== rank) {
+        await api.patch(`/season/season-participants/${byProfile[pid].id}/`, { rank });
+      }
+    } else {
+      await api.post('/season/season-participants/', { season: seasonId, profile: pid, rank });
+    }
   }
 
   // Return the updated list
@@ -317,17 +321,32 @@ export async function createLeagueForSeason(
   seasonParticipants: TSeasonParticipantDto[],
   memberProfileIds: number[]
 ): Promise<TLeagueDto> {
-  // map chosen PlayerProfile IDs -> SeasonParticipant IDs
-  const spIds = seasonParticipants
-    .filter((sp: TSeasonParticipantDto) => memberProfileIds.includes(sp.profile))
-    .map((sp: TSeasonParticipantDto) => sp.id);
+  // map chosen PlayerProfile IDs -> SeasonParticipant IDs preserving memberProfileIds order
+  const spByProfile = new Map<number, number>();
+  for (const sp of seasonParticipants) {
+    if (sp.profile != null) {
+      spByProfile.set(sp.profile, sp.id);
+    }
+  }
+  const spIds = memberProfileIds
+    .map((pid) => spByProfile.get(pid))
+    .filter((id): id is number => id != null);
 
-  const { data } = await api.post('/league/leagues/', {
+  const payload: {
+    season: number;
+    level: number;
+    member_ids: number[];
+    active_player?: number;
+  } = {
     season: seasonId,
     level,
     member_ids: spIds,
-    status: 'PLAYING',
-  });
+  };
+  if (spIds.length > 0) {
+    payload.active_player = spIds[0];
+  }
+
+  const { data } = await api.post('/league/leagues/', payload);
   return data;
 }
 
