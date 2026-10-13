@@ -7,7 +7,9 @@
         <div class="col-12 col-sm-auto">
           <!-- Player-count filter, mirroring the chips on the players list. -->
           <div class="row items-center q-gutter-x-sm">
-            <div class="row items-center text-caption text-weight-bold text-grey-8">
+            <div
+              class="row items-center text-caption text-weight-bold text-grey-8"
+            >
               <q-icon name="groups" size="18px" class="q-mr-xs text-primary" />
               <span>Players:</span>
             </div>
@@ -31,7 +33,9 @@
                 clickable
                 dense
                 :outline="!selectedPlayerCounts.includes(pc)"
-                :color="selectedPlayerCounts.includes(pc) ? 'primary' : 'grey-7'"
+                :color="
+                  selectedPlayerCounts.includes(pc) ? 'primary' : 'grey-7'
+                "
                 text-color="white"
                 size="sm"
                 class="text-weight-bold"
@@ -63,11 +67,17 @@
          ranking categories on the right. -->
     <div class="row q-col-gutter-lg">
       <div class="col-12 col-md-5">
-        <GameStatistics :years="selectedYears" :player-counts="playerCountsParam" />
+        <GameStatistics
+          :years="selectedYears"
+          :player-counts="playerCountsParam"
+        />
       </div>
 
       <div class="col-12 col-md-7">
-        <PlayerStatistics :years="selectedYears" :player-counts="playerCountsParam" />
+        <PlayerStatistics
+          :years="selectedYears"
+          :player-counts="playerCountsParam"
+        />
       </div>
     </div>
   </q-page>
@@ -89,14 +99,19 @@ const yearOptions = ref<number[]>([]);
 const yearsDisplayValue = computed(() =>
   selectedYears.value.length === 0
     ? 'All Time'
-    : selectedYears.value.slice().sort((a, b) => b - a).join(', ')
+    : selectedYears.value
+        .slice()
+        .sort((a, b) => b - a)
+        .join(', ')
 );
 
 // Player-count filter, mirroring UsersListPage: default to 4P, empty means
 // "All". A backend-friendly value (undefined when All) is derived below.
 const availablePlayerCounts = ['2p', '3p', '4p'];
 const selectedPlayerCounts = ref<string[]>(['4p']);
-const isAllPlayerCountsSelected = computed(() => selectedPlayerCounts.value.length === 0);
+const isAllPlayerCountsSelected = computed(
+  () => selectedPlayerCounts.value.length === 0
+);
 const playerCountsParam = computed(() =>
   selectedPlayerCounts.value.length > 0 ? selectedPlayerCounts.value : undefined
 );

@@ -1,8 +1,13 @@
 <template>
   <q-page class="q-py-md flex justify-center">
-    <div style="max-width: var(--kenner-max-width-text); width: 100%" class="q-px-sm">
+    <div
+      style="max-width: var(--kenner-max-width-text); width: 100%"
+      class="q-px-sm"
+    >
       <!-- Header / Hero -->
-      <div class="about-hero-card q-pa-lg q-mb-lg row items-center justify-between">
+      <div
+        class="about-hero-card q-pa-lg q-mb-lg row items-center justify-between"
+      >
         <div class="column">
           <div class="row items-center q-gutter-x-sm q-mb-xs">
             <BrandLogo icon-size="32px" word-size="1.5rem" />
@@ -11,7 +16,12 @@
             The competitive board game league platform.
           </div>
         </div>
-        <q-chip outline color="primary" icon="verified" class="text-weight-bold">
+        <q-chip
+          outline
+          color="primary"
+          icon="verified"
+          class="text-weight-bold"
+        >
           v{{ appVersion }}
         </q-chip>
       </div>

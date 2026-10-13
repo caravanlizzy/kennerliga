@@ -16,7 +16,7 @@
       color="grey-7"
       icon="menu"
       class="nav-section-btn"
-      style="height: 40px; min-width: 40px;"
+      style="height: 40px; min-width: 40px"
       @click="onToggle"
     />
 
@@ -28,7 +28,7 @@
       color="primary"
       icon="login"
       class="nav-section-btn"
-      style="height: 40px; min-width: 40px;"
+      style="height: 40px; min-width: 40px"
       :to="{ name: 'login' }"
     />
   </div>

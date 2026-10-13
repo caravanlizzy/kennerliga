@@ -20,5 +20,4 @@ import ContentSection from 'components/base/ContentSection.vue';
 const isOpened = ref(true);
 </script>
 
-<style scoped lang="scss">
-</style>
+<style scoped lang="scss"></style>

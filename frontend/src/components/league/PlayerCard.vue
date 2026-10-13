@@ -14,7 +14,10 @@
           <div class="text-subtitle1 text-weight-bold player-name">
             {{ m.profile_name }}
           </div>
-          <div v-if="m.has_banned && !m.my_banned_game?.game" class="text-caption text-grey-6 italic">
+          <div
+            v-if="m.has_banned && !m.my_banned_game?.game"
+            class="text-caption text-grey-6 italic"
+          >
             Skipped ban
           </div>
         </div>
@@ -41,7 +44,11 @@
                   {{ game.game_name }}
                 </KennerTooltip>
               </q-item-label>
-              <q-item-label v-if="game.platform_name" caption class="platform-label">
+              <q-item-label
+                v-if="game.platform_name"
+                caption
+                class="platform-label"
+              >
                 {{ game.platform_name }}
               </q-item-label>
             </q-item-section>
@@ -59,7 +66,10 @@
           </q-item>
 
           <q-slide-transition>
-            <div v-if="isExpanded(game.id)" class="game-details q-px-md q-pb-md">
+            <div
+              v-if="isExpanded(game.id)"
+              class="game-details q-px-md q-pb-md"
+            >
               <GameSettingsDisplay :selectedOptions="game.selected_options" />
             </div>
           </q-slide-transition>
@@ -73,7 +83,9 @@
           <q-item-section>
             <q-item-label class="row items-center ban-text">
               <span class="text-blue-grey-6 q-mr-xs">Banned</span>
-              <span class="text-weight-medium text-blue-grey-8">{{ m.my_banned_game.game_name }}</span>
+              <span class="text-weight-medium text-blue-grey-8">{{
+                m.my_banned_game.game_name
+              }}</span>
               <KennerTooltip v-if="getOwnerName(m.my_banned_game.profile)">
                 Picked by {{ getOwnerName(m.my_banned_game.profile) }}
               </KennerTooltip>
@@ -119,7 +131,10 @@
           </q-item>
 
           <q-slide-transition>
-            <div v-if="isExpanded(game.id)" class="game-details q-px-md q-pb-md opacity-50">
+            <div
+              v-if="isExpanded(game.id)"
+              class="game-details q-px-md q-pb-md opacity-50"
+            >
               <GameSettingsDisplay :selectedOptions="game.selected_options" />
             </div>
           </q-slide-transition>
@@ -128,7 +143,10 @@
     </div>
 
     <!-- Empty State -->
-    <div v-if="allMembers.length === 0" class="no-game-selected row items-center justify-center q-pa-xl">
+    <div
+      v-if="allMembers.length === 0"
+      class="no-game-selected row items-center justify-center q-pa-xl"
+    >
       <q-icon name="videogame_asset_off" size="48px" color="grey-4" />
       <div class="text-h6 text-grey-5 q-mt-md full-width text-center">
         No players in league

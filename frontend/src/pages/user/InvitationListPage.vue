@@ -129,13 +129,16 @@ function onDelete(row: TUserInviteDto) {
         await deleteInvitation(row.id);
         $q.notify({
           type: 'positive',
-          message: `${isPassword ? 'Password reset' : 'Invitation'} deleted successfully.`,
+          message: `${
+            isPassword ? 'Password reset' : 'Invitation'
+          } deleted successfully.`,
         });
         await reload();
       } catch (e: any) {
         $q.notify({
           type: 'negative',
-          message: e?.response?.data?.detail || e?.message || 'Failed to delete.',
+          message:
+            e?.response?.data?.detail || e?.message || 'Failed to delete.',
         });
       }
     },

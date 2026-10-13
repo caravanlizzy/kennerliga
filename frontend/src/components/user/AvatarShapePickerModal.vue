@@ -12,14 +12,7 @@
           </div>
         </div>
         <q-space />
-        <q-btn
-          v-close-popup
-          icon="close"
-          flat
-          round
-          dense
-          color="grey-7"
-        />
+        <q-btn v-close-popup icon="close" flat round dense color="grey-7" />
       </q-card-section>
 
       <!-- Live Preview Banner -->
@@ -35,8 +28,12 @@
             <div class="text-subtitle1 text-weight-bolder text-dark">
               {{ username }}
             </div>
-            <div class="row items-center q-gutter-x-xs text-caption text-grey-7">
-              <span class="text-weight-medium text-capitalize">{{ selectedShape }}</span>
+            <div
+              class="row items-center q-gutter-x-xs text-caption text-grey-7"
+            >
+              <span class="text-weight-medium text-capitalize">{{
+                selectedShape
+              }}</span>
               <span>•</span>
               <span class="text-weight-medium">{{ currentColorName }}</span>
             </div>
@@ -54,8 +51,18 @@
         align="justify"
         narrow-indicator
       >
-        <q-tab name="shape" icon="interests" label="Shape" class="text-weight-medium" />
-        <q-tab name="color" icon="palette" label="Color" class="text-weight-medium" />
+        <q-tab
+          name="shape"
+          icon="interests"
+          label="Shape"
+          class="text-weight-medium"
+        />
+        <q-tab
+          name="color"
+          icon="palette"
+          label="Color"
+          class="text-weight-medium"
+        />
       </q-tabs>
 
       <q-separator />
@@ -93,7 +100,9 @@
                   </div>
                 </div>
 
-                <div class="text-subtitle2 text-weight-bold text-dark ellipsis full-width">
+                <div
+                  class="text-subtitle2 text-weight-bold text-dark ellipsis full-width"
+                >
                   {{ opt.name }}
                 </div>
               </q-card>
@@ -118,7 +127,11 @@
                 label="Custom Hex"
                 class="custom-hex-btn"
               >
-                <q-popup-proxy cover transition-show="scale" transition-hide="scale">
+                <q-popup-proxy
+                  cover
+                  transition-show="scale"
+                  transition-hide="scale"
+                >
                   <q-color
                     v-model="customColorInput"
                     no-header
@@ -140,16 +153,22 @@
                 flat
                 class="color-option-card cursor-pointer row items-center q-pa-xs"
                 :class="{
-                  'color-option-card--selected': selectedColor.toLowerCase() === c.hex.toLowerCase(),
+                  'color-option-card--selected':
+                    selectedColor.toLowerCase() === c.hex.toLowerCase(),
                 }"
                 @click="selectColor(c.hex)"
               >
-                <div class="color-swatch flex flex-center q-mr-sm" :style="getSwatchStyle(c.hex)">
+                <div
+                  class="color-swatch flex flex-center q-mr-sm"
+                  :style="getSwatchStyle(c.hex)"
+                >
                   <q-icon
                     v-if="selectedColor.toLowerCase() === c.hex.toLowerCase()"
                     name="check"
                     size="16px"
-                    :style="{ color: c.hex ? getContrastColor(c.hex) : '#ffffff' }"
+                    :style="{
+                      color: c.hex ? getContrastColor(c.hex) : '#ffffff',
+                    }"
                   />
                   <q-icon
                     v-else-if="!c.hex"
@@ -158,9 +177,16 @@
                     color="white"
                   />
                 </div>
-                <div class="column ellipsis" style="min-width: 0; flex: 1;">
-                  <span class="text-caption text-weight-bold text-dark ellipsis">{{ c.name }}</span>
-                  <span class="text-caption text-grey-6 text-uppercase" style="font-size: 10px;">{{ c.hex || 'Auto' }}</span>
+                <div class="column ellipsis" style="min-width: 0; flex: 1">
+                  <span
+                    class="text-caption text-weight-bold text-dark ellipsis"
+                    >{{ c.name }}</span
+                  >
+                  <span
+                    class="text-caption text-grey-6 text-uppercase"
+                    style="font-size: 10px"
+                    >{{ c.hex || 'Auto' }}</span
+                  >
                 </div>
               </q-card>
             </div>
@@ -248,9 +274,7 @@ watch(
         (userStore.user?.avatar_shape as AvatarShape) ||
         'squircle';
       selectedColor.value =
-        props.currentColor ??
-        userStore.user?.avatar_color ??
-        '';
+        props.currentColor ?? userStore.user?.avatar_color ?? '';
       customColorInput.value = selectedColor.value || '#2563eb';
     }
   }
@@ -276,7 +300,8 @@ async function selectShape(shape: AvatarShape) {
 
 async function selectColor(color: string) {
   const normalizedColor = color || '';
-  if (selectedColor.value.toLowerCase() === normalizedColor.toLowerCase()) return;
+  if (selectedColor.value.toLowerCase() === normalizedColor.toLowerCase())
+    return;
   selectedColor.value = normalizedColor;
   customColorInput.value = normalizedColor || '#2563eb';
   emit('color-updated', normalizedColor);
@@ -320,7 +345,11 @@ function getContrastColor(hex: string) {
 }
 
 .preview-banner {
-  background: linear-gradient(135deg, var(--kenner-surface-subtle) 0%, var(--kenner-surface-muted) 100%);
+  background: linear-gradient(
+    135deg,
+    var(--kenner-surface-subtle) 0%,
+    var(--kenner-surface-muted) 100%
+  );
   border-bottom: 1px solid var(--kenner-border-color);
 }
 

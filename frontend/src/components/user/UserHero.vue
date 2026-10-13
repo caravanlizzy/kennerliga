@@ -1,7 +1,12 @@
 <template>
-  <div v-if="user" class="profile-hero bg-primary text-white q-pa-md relative-position overflow-hidden">
+  <div
+    v-if="user"
+    class="profile-hero bg-primary text-white q-pa-md relative-position overflow-hidden"
+  >
     <div class="max-width-container q-mx-auto">
-      <div class="hero-content row items-center q-col-gutter-md relative-position z-index-1">
+      <div
+        class="hero-content row items-center q-col-gutter-md relative-position z-index-1"
+      >
         <div class="col-12 col-md-auto flex justify-center">
           <div
             class="avatar-wrapper shadow-24 rounded-borders bg-white q-pa-xs relative-position"
@@ -14,50 +19,101 @@
               :shape="effectiveAvatarShape"
               :color="effectiveAvatarColor"
               :elo-rating="user.elo_rating ?? user.profile?.elo_rating"
+              :elo-rank="user.elo_rank ?? user.profile?.elo_rank"
             />
-            <div
-              v-if="isMe"
-              class="edit-shape-badge flex flex-center shadow-3"
-            >
+            <div v-if="isMe" class="edit-shape-badge flex flex-center shadow-3">
               <q-icon name="edit" size="14px" color="dark" />
               <KennerTooltip>Customize Avatar</KennerTooltip>
             </div>
           </div>
         </div>
         <div class="col-12 col-md column items-center items-md-start">
-          <div class="row items-center q-gutter-x-md justify-center justify-md-start">
-            <h1 class="text-h3 text-weight-bolder q-ma-none tracking-tighter">{{ user.username }}</h1>
-            <q-badge v-if="user.admin" color="amber-8" class="admin-badge-text text-weight-bolder q-px-sm" label="ADMIN" style="height: 24px; border-radius: 6px;" />
+          <div
+            class="row items-center q-gutter-x-md justify-center justify-md-start"
+          >
+            <h1 class="text-h3 text-weight-bolder q-ma-none tracking-tighter">
+              {{ user.username }}
+            </h1>
+            <q-badge
+              v-if="user.admin"
+              color="amber-8"
+              class="admin-badge-text text-weight-bolder q-px-sm"
+              label="ADMIN"
+              style="height: 24px; border-radius: 6px"
+            />
           </div>
-          <div v-if="user.profile?.name" class="text-subtitle1 text-white text-opacity-90 text-weight-light q-mt-xs">
+          <div
+            v-if="user.profile?.name"
+            class="text-subtitle1 text-white text-opacity-90 text-weight-light q-mt-xs"
+          >
             {{ user.profile.name }}
           </div>
-          <div class="row q-gutter-x-xl q-mt-sm justify-center justify-md-start">
-            <div class="column items-center items-md-start">
-              <div v-if="loading" class="text-h4 text-weight-bolder">
-                <q-skeleton type="text" width="40px" dark />
-              </div>
-              <div v-else class="text-h4 text-weight-bolder">{{ leagueStats.totalLeagues }}</div>
-              <div class="text-caption text-uppercase letter-spacing-2 text-white text-opacity-60">Leagues</div>
-            </div>
-            <q-separator vertical dark color="white" class="opacity-20 q-mx-md gt-xs" style="height: 30px" />
-            <div class="column items-center items-md-start">
-              <div v-if="loading" class="text-h4 text-weight-bolder">
-                <q-skeleton type="text" width="40px" dark />
-              </div>
-              <div v-else class="text-h4 text-weight-bolder">{{ gameStatsCount }}</div>
-              <div class="text-caption text-uppercase letter-spacing-2 text-white text-opacity-60">Games</div>
-            </div>
-            <q-separator vertical dark color="white" class="opacity-20 q-mx-md gt-xs" style="height: 30px" />
+          <div
+            class="row q-gutter-x-xl q-mt-sm justify-center justify-md-start"
+          >
             <div class="column items-center items-md-start">
               <div v-if="loading" class="text-h4 text-weight-bolder">
                 <q-skeleton type="text" width="40px" dark />
               </div>
               <div v-else class="text-h4 text-weight-bolder">
-                {{ user.elo_rating !== undefined && user.elo_rating !== null ? Math.round(user.elo_rating) : (user.profile?.elo_rating ? Math.round(user.profile.elo_rating) : 1500) }}
-                <span v-if="user.elo_rank" class="text-caption text-weight-bold text-amber-4 q-ml-xs">#{{ user.elo_rank }}</span>
+                {{ leagueStats.totalLeagues }}
               </div>
-              <div class="text-caption text-uppercase letter-spacing-2 text-white text-opacity-60">Elo Rating</div>
+              <div
+                class="text-caption text-uppercase letter-spacing-2 text-white text-opacity-60"
+              >
+                Leagues
+              </div>
+            </div>
+            <q-separator
+              vertical
+              dark
+              color="white"
+              class="opacity-20 q-mx-md gt-xs"
+              style="height: 30px"
+            />
+            <div class="column items-center items-md-start">
+              <div v-if="loading" class="text-h4 text-weight-bolder">
+                <q-skeleton type="text" width="40px" dark />
+              </div>
+              <div v-else class="text-h4 text-weight-bolder">
+                {{ gameStatsCount }}
+              </div>
+              <div
+                class="text-caption text-uppercase letter-spacing-2 text-white text-opacity-60"
+              >
+                Games
+              </div>
+            </div>
+            <q-separator
+              vertical
+              dark
+              color="white"
+              class="opacity-20 q-mx-md gt-xs"
+              style="height: 30px"
+            />
+            <div class="column items-center items-md-start">
+              <div v-if="loading" class="text-h4 text-weight-bolder">
+                <q-skeleton type="text" width="40px" dark />
+              </div>
+              <div v-else class="text-h4 text-weight-bolder">
+                {{
+                  user.elo_rating !== undefined && user.elo_rating !== null
+                    ? Math.round(user.elo_rating)
+                    : user.profile?.elo_rating
+                    ? Math.round(user.profile.elo_rating)
+                    : 1500
+                }}
+                <span
+                  v-if="user.elo_rank"
+                  class="text-caption text-weight-bold text-amber-4 q-ml-xs"
+                  >#{{ user.elo_rank }}</span
+                >
+              </div>
+              <div
+                class="text-caption text-uppercase letter-spacing-2 text-white text-opacity-60"
+              >
+                Elo Rating
+              </div>
             </div>
           </div>
         </div>
@@ -65,7 +121,11 @@
     </div>
     <!-- Decorative background elements -->
     <div class="hero-bg-overlay absolute-full" />
-    <q-icon name="sports_esports" class="hero-watermark absolute-bottom-right text-white" size="300px" />
+    <q-icon
+      name="sports_esports"
+      class="hero-watermark absolute-bottom-right text-white"
+      size="300px"
+    />
 
     <!-- Avatar Style Picker Modal -->
     <AvatarShapePickerModal
@@ -156,7 +216,11 @@ function onAvatarUpdated(payload: { shape: AvatarShape; color: string }) {
 }
 
 .hero-bg-overlay {
-  background-image: radial-gradient(circle at 20% 50%, rgba(255,255,255,0.1) 0%, transparent 50%);
+  background-image: radial-gradient(
+    circle at 20% 50%,
+    rgba(255, 255, 255, 0.1) 0%,
+    transparent 50%
+  );
   pointer-events: none;
 }
 
@@ -173,7 +237,7 @@ function onAvatarUpdated(payload: { shape: AvatarShape; color: string }) {
   transition: box-shadow 0.3s ease;
 
   &:hover {
-    box-shadow: 0 12px 30px rgba(0,0,0,0.3);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.3);
   }
 
   &--editable:hover .edit-shape-badge {
@@ -199,22 +263,45 @@ function onAvatarUpdated(payload: { shape: AvatarShape; color: string }) {
 }
 
 // Dark text on the amber badge in both themes (text-dark is remapped in dark mode)
-.admin-badge-text { color: #1d1d1d !important; }
-
-.text-white-80 { color: rgba(255,255,255,0.8); }
-.text-white-60 { color: rgba(255,255,255,0.6); }
-
-.text-opacity-80 { opacity: 0.8; }
-.text-opacity-60 { opacity: 0.6; }
-
-.tracking-tighter { letter-spacing: -1.5px; }
-.letter-spacing-2 { letter-spacing: 2px; }
-
-@media (max-width: 599px) {
-  .profile-hero { padding: 16px 16px !important; min-height: 140px; }
-  .text-h3 { font-size: 2.2rem; }
-  .text-h4 { font-size: 1.6rem; }
+.admin-badge-text {
+  color: #1d1d1d !important;
 }
 
-.z-index-1 { z-index: 1; }
+.text-white-80 {
+  color: rgba(255, 255, 255, 0.8);
+}
+.text-white-60 {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.text-opacity-80 {
+  opacity: 0.8;
+}
+.text-opacity-60 {
+  opacity: 0.6;
+}
+
+.tracking-tighter {
+  letter-spacing: -1.5px;
+}
+.letter-spacing-2 {
+  letter-spacing: 2px;
+}
+
+@media (max-width: 599px) {
+  .profile-hero {
+    padding: 16px 16px !important;
+    min-height: 140px;
+  }
+  .text-h3 {
+    font-size: 2.2rem;
+  }
+  .text-h4 {
+    font-size: 1.6rem;
+  }
+}
+
+.z-index-1 {
+  z-index: 1;
+}
 </style>

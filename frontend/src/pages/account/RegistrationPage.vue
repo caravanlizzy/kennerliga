@@ -2,7 +2,9 @@
   <div
     class="column items-center justify-center full-height"
     :style="[
-      isMobile ? 'min-width: 280px; max-width: 500px; width: 100%' : 'min-width: 450px',
+      isMobile
+        ? 'min-width: 280px; max-width: 500px; width: 100%'
+        : 'min-width: 450px',
     ]"
   >
     <q-card
@@ -11,12 +13,22 @@
       :class="[isMobile ? 'q-pa-lg' : 'q-pa-xl']"
       style="border-radius: 20px; border: 1px solid rgba(54, 64, 88, 0.08)"
     >
-      <q-form ref="formRef" @submit="doRegister" @keyup.enter="doRegister" class="q-gutter-y-lg">
+      <q-form
+        ref="formRef"
+        @submit="doRegister"
+        @keyup.enter="doRegister"
+        class="q-gutter-y-lg"
+      >
         <div class="column items-center q-mb-lg">
           <BrandLogo class="q-mb-md" icon-size="64px" word-size="2rem" />
-          <div class="text-h4 text-weight-bolder text-dark tracking-tighter q-mt-md">Sign Up</div>
+          <div
+            class="text-h4 text-weight-bolder text-dark tracking-tighter q-mt-md"
+          >
+            Sign Up
+          </div>
           <div class="text-subtitle2 text-grey-6 q-mt-xs text-center">
-            Join the <span class="text-primary">Kenner</span><span class="text-accent">Liga</span> community
+            Join the <span class="text-primary">Kenner</span
+            ><span class="text-accent">Liga</span> community
           </div>
         </div>
 

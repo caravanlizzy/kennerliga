@@ -15,18 +15,18 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed } from 'vue';
 
 const props = defineProps<{
-  color?: string
-}>()
+  color?: string;
+}>();
 
 const tooltipStyle = computed(() => {
-  if (!props.color) return {}
+  if (!props.color) return {};
   return {
     borderColor: props.color,
-  }
-})
+  };
+});
 </script>
 
 <style lang="scss">
@@ -48,6 +48,4 @@ const tooltipStyle = computed(() => {
     background: var(--kenner-surface-muted) !important;
   }
 }
-
 </style>
-

@@ -1,7 +1,7 @@
 <template>
   <div class="relative-position col">
     <q-scroll-area class="absolute-full">
-      <slot/>
+      <slot />
     </q-scroll-area>
   </div>
 </template>

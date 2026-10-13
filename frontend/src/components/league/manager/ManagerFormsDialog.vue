@@ -50,7 +50,10 @@
       </FormLayout>
 
       <!-- Post Result -->
-      <FormLayout v-if="activeForm.type === 'post-result'" @onClose="$emit('close')">
+      <FormLayout
+        v-if="activeForm.type === 'post-result'"
+        @onClose="$emit('close')"
+      >
         <template #head>
           Post Result for
           <span class="text-primary">{{ activeForm.selGame.game_name }}</span>
@@ -64,10 +67,11 @@
       </FormLayout>
 
       <!-- Resolve Tie -->
-      <FormLayout v-if="activeForm.type === 'resolve-tie'" @onClose="$emit('close')">
-        <template #head>
-          Resolve Tie Group
-        </template>
+      <FormLayout
+        v-if="activeForm.type === 'resolve-tie'"
+        @onClose="$emit('close')"
+      >
+        <template #head> Resolve Tie Group </template>
         <ResolveTieForm
           :leagueId="league.id"
           :groupKey="activeForm.groupKey"
@@ -85,7 +89,11 @@ import GameSelectionView from 'components/game/selectedGame/GameSelectionView.vu
 import GameSettingsEditor from 'components/game/selectedGame/GameSettingsEditor.vue';
 import MatchResultForm from 'components/league/MatchResultForm.vue';
 import BanGameForm from 'components/game/selectedGame/BanGameForm.vue';
-import type { TLeagueDto, TSeasonParticipantDto, TSelectedGameDto } from 'src/types';
+import type {
+  TLeagueDto,
+  TSeasonParticipantDto,
+  TSelectedGameDto,
+} from 'src/types';
 import ResolveTieForm from 'components/league/manager/ResolveTieForm.vue';
 
 export type TActiveForm =

@@ -1,4 +1,3 @@
-
 <template>
   <div
     class="q-mt-xs side-accent-border"
@@ -34,7 +33,9 @@ function resolveColor(c: string) {
     'primary',
     'warning',
   ].includes(c)
-    ? c === 'dark' ? 'var(--side-accent-dark)' : `var(--q-${c})`
+    ? c === 'dark'
+      ? 'var(--side-accent-dark)'
+      : `var(--q-${c})`
     : c;
 }
 </script>
@@ -48,4 +49,3 @@ function resolveColor(c: string) {
   --side-accent-dark: var(--kenner-text-muted);
 }
 </style>
-

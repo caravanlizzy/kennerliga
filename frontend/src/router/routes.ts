@@ -12,7 +12,8 @@ import ResponsivePage from 'src/components/layout/ResponsivePage.vue';
 const LiveMobile = () => import('src/pages/mobile/LiveActionMobilePage.vue');
 // Chat feature temporarily disabled
 // const ChatMobile = () => import('src/pages/mobile/ChatMobilePage.vue');
-const LeaderboardMobile = () => import('src/pages/mobile/LeaderboardMobilePage.vue');
+const LeaderboardMobile = () =>
+  import('src/pages/mobile/LeaderboardMobilePage.vue');
 
 // To ensure it is treated as a module, add at least one `export` statement
 export {};
@@ -132,7 +133,8 @@ const routes: RouteRecordRaw[] = [
       },
       {
         path: 'users/:rest(.*)*',
-        redirect: (to) => '/players/' + ((to.params.rest as string[]) ?? []).join('/'),
+        redirect: (to) =>
+          '/players/' + ((to.params.rest as string[]) ?? []).join('/'),
       },
       gameRoutes,
       seasonRoutes,
@@ -140,19 +142,19 @@ const routes: RouteRecordRaw[] = [
         path: 'my',
         name: 'my-league',
         component: () => import('pages/league/MyLeaguePage.vue'),
-        meta: { label: 'My League', icon: 'military_tech' }
+        meta: { label: 'My League', icon: 'military_tech' },
       },
       {
         path: 'rules',
         name: 'rules',
         component: () => import('pages/RulesPage.vue'),
-        meta: { icon: 'gavel', label: 'Rules' }
+        meta: { icon: 'gavel', label: 'Rules' },
       },
       {
         path: 'about',
         name: 'about',
         component: () => import('pages/AboutPage.vue'),
-        meta: { icon: 'info', label: 'About' }
+        meta: { icon: 'info', label: 'About' },
       },
       {
         path: 'live',

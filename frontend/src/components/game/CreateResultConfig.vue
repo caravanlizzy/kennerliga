@@ -66,10 +66,15 @@
           </div>
 
           <div v-if="isAsymmetric" class="q-pl-sm q-pr-sm q-mt-sm">
-            <div v-for="(levelData, index) in factionLevels" :key="levelData.id" class="q-mb-md">
+            <div
+              v-for="(levelData, index) in factionLevels"
+              :key="levelData.id"
+              class="q-mb-md"
+            >
               <div class="row items-center justify-between q-mb-xs">
                 <div class="text-subtitle2">
-                  {{ index === 0 ? 'Primary' : 'Secondary' }} Factions (Level {{ index }})
+                  {{ index === 0 ? 'Primary' : 'Secondary' }} Factions (Level
+                  {{ index }})
                 </div>
                 <KennerButton
                   v-if="index > 0"
@@ -103,7 +108,7 @@
             </div>
 
             <div
-              v-if="!factionLevels.some(l => l.factions.length)"
+              v-if="!factionLevels.some((l) => l.factions.length)"
               class="text-caption text-grey-7 q-mt-xs"
             >
               No factions added yet.
@@ -118,7 +123,8 @@
               <div>
                 <div class="text-body2">Win conditions</div>
                 <div class="text-caption text-grey-7">
-                  Each win condition carries its own tie-breakers and (for option-based wins) selectable options.
+                  Each win condition carries its own tie-breakers and (for
+                  option-based wins) selectable options.
                 </div>
               </div>
               <KennerButton
@@ -209,7 +215,10 @@
                 </div>
 
                 <!-- Options (only for OPTION type) -->
-                <div v-if="wc.condition_type === 'OPTION'" class="q-mt-md q-pl-md">
+                <div
+                  v-if="wc.condition_type === 'OPTION'"
+                  class="q-mt-md q-pl-md"
+                >
                   <div class="row items-center justify-between q-mb-xs">
                     <div class="text-subtitle2">Options</div>
                     <KennerButton
@@ -286,7 +295,8 @@
                     <div>
                       <div class="text-subtitle2">Tie-breakers</div>
                       <div class="text-caption text-grey-7">
-                        Applied in order (top is checked first) when this win condition produces a tie.
+                        Applied in order (top is checked first) when this win
+                        condition produces a tie.
                       </div>
                     </div>
                     <KennerButton
@@ -364,7 +374,11 @@
                         </div>
                       </div>
                       <div class="text-caption text-grey-7 q-mt-xs q-ml-xl">
-                        {{ tb.lowerWins ? 'Lower numbers win' : 'Higher numbers win' }}
+                        {{
+                          tb.lowerWins
+                            ? 'Lower numbers win'
+                            : 'Higher numbers win'
+                        }}
                       </div>
                     </div>
                   </div>

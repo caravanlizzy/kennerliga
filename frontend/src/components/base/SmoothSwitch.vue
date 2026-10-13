@@ -1,9 +1,6 @@
 <template>
   <div class="smooth-switch" role="tablist">
-    <div
-      class="smooth-switch__thumb"
-      :style="thumbStyle"
-    />
+    <div class="smooth-switch__thumb" :style="thumbStyle" />
     <button
       v-for="opt in options"
       :key="String(opt.value)"
@@ -100,8 +97,7 @@ watch(
     border-radius: 6px;
     background: var(--q-primary);
     transition: transform 180ms cubic-bezier(0.4, 0, 0.2, 1),
-                width 180ms cubic-bezier(0.4, 0, 0.2, 1),
-                opacity 150ms ease;
+      width 180ms cubic-bezier(0.4, 0, 0.2, 1), opacity 150ms ease;
     z-index: 0;
     will-change: transform, width;
   }

@@ -52,9 +52,9 @@ export async function fetchUserStatistics(
 }
 
 /** Player profiles. `unlinkedOnly` returns those not yet tied to a user. */
-export async function fetchProfiles(
-  { unlinkedOnly = false } = {}
-): Promise<TPlayerProfileDto[]> {
+export async function fetchProfiles({ unlinkedOnly = false } = {}): Promise<
+  TPlayerProfileDto[]
+> {
   const { data } = await api.get('/user/profiles/', {
     params: unlinkedOnly ? { user__isnull: true } : undefined,
   });
@@ -70,7 +70,10 @@ export async function createInvitation(payload: {
   label: string;
   player_profile?: number | null;
 }): Promise<TUserInviteDto> {
-  const { data } = await api.post<TUserInviteDto>('/user/invitations/', payload);
+  const { data } = await api.post<TUserInviteDto>(
+    '/user/invitations/',
+    payload
+  );
   return data;
 }
 
@@ -89,7 +92,10 @@ export async function registerUser(payload: {
   password: string;
   invite_key: string;
 }): Promise<{ detail: string }> {
-  const { data } = await api.post<{ detail: string }>('/user/register/', payload);
+  const { data } = await api.post<{ detail: string }>(
+    '/user/register/',
+    payload
+  );
   return data;
 }
 

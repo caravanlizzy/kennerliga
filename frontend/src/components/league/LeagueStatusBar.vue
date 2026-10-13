@@ -8,9 +8,13 @@
     <div>
       <div class="league-status-bar__label">Current turn</div>
       <div class="league-status-bar__message">
-        <template v-if="isMeActivePlayer">Your turn to {{ turnAction }}</template>
+        <template v-if="isMeActivePlayer"
+          >Your turn to {{ turnAction }}</template
+        >
         <template v-else>
-          <strong>{{ activePlayer.profile_name || activePlayer.username }}</strong>
+          <strong>{{
+            activePlayer.profile_name || activePlayer.username
+          }}</strong>
           's turn to {{ turnAction }}
         </template>
       </div>
@@ -23,7 +27,9 @@ import { computed } from 'vue';
 import { storeToRefs } from 'pinia';
 import { useMyLeagueStore } from 'src/composables/myLeague';
 
-const { activePlayer, isMeActivePlayer, leagueStatus } = storeToRefs(useMyLeagueStore());
+const { activePlayer, isMeActivePlayer, leagueStatus } = storeToRefs(
+  useMyLeagueStore()
+);
 
 const turnAction = computed(() => {
   switch (leagueStatus.value) {

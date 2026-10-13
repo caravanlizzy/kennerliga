@@ -11,7 +11,11 @@
         {{ message }}
       </div>
 
-      <div v-if="description" class="text-body2 text-grey-6 q-mt-sm" style="max-width: 360px">
+      <div
+        v-if="description"
+        class="text-body2 text-grey-6 q-mt-sm"
+        style="max-width: 360px"
+      >
         {{ description }}
       </div>
 
@@ -51,10 +55,18 @@ defineProps({
 
 <style scoped lang="scss">
 .notfound-bg {
-  background: radial-gradient(circle at 50% 30%, rgba(54, 64, 88, 0.05) 0%, rgba(245, 245, 247, 1) 100%);
+  background: radial-gradient(
+    circle at 50% 30%,
+    rgba(54, 64, 88, 0.05) 0%,
+    rgba(245, 245, 247, 1) 100%
+  );
 
   .body--dark & {
-    background: radial-gradient(circle at 50% 30%, rgba(255, 255, 255, 0.04) 0%, var(--kenner-bg-page) 100%);
+    background: radial-gradient(
+      circle at 50% 30%,
+      rgba(255, 255, 255, 0.04) 0%,
+      var(--kenner-bg-page) 100%
+    );
   }
 }
 

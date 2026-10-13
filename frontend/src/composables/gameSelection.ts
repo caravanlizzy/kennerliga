@@ -1,5 +1,12 @@
 import { ref, reactive, computed, watch, Ref } from 'vue';
-import { TGameDto, TGameOptionDto, TSelectedGameDtoPayload, TPlatform, TFullGameDto, TGameOptionChoiceDto } from 'src/types';
+import {
+  TGameDto,
+  TGameOptionDto,
+  TSelectedGameDtoPayload,
+  TPlatform,
+  TFullGameDto,
+  TGameOptionChoiceDto,
+} from 'src/types';
 import { api } from 'boot/axios';
 import { createSelectedGame, fetchFullGame } from 'src/services/gameService';
 import type { TGameSelection } from 'src/types';
@@ -43,7 +50,11 @@ function asId(v: unknown): number | undefined {
   return undefined;
 }
 
-export function useGameSelection(leagueId: number, profileId: number, manage_only = false) {
+export function useGameSelection(
+  leagueId: number,
+  profileId: number,
+  manage_only = false
+) {
   // --- state ---
   const gameInformation = reactive<{
     game: TGameDto | undefined;
@@ -72,7 +83,8 @@ export function useGameSelection(leagueId: number, profileId: number, manage_onl
     return gameData.value.filter((game) => {
       return (
         (!platform.value || game.platform === platform.value.id) &&
-        (!filter.value || game.name.toLowerCase().includes(filter.value.toLowerCase()))
+        (!filter.value ||
+          game.name.toLowerCase().includes(filter.value.toLowerCase()))
       );
     });
   });
@@ -80,7 +92,9 @@ export function useGameSelection(leagueId: number, profileId: number, manage_onl
   const availableGames = computed(() => {
     const base = filteredGames.value || [];
     if (selectedPlatforms.value.size === 0) return base;
-    return base.filter((g: TGameDto) => selectedPlatforms.value.has(g.platform));
+    return base.filter((g: TGameDto) =>
+      selectedPlatforms.value.has(g.platform)
+    );
   });
 
   // --- selection helpers ---
@@ -137,8 +151,12 @@ export function useGameSelection(leagueId: number, profileId: number, manage_onl
       // resolve depends_on option id (support object/id, *_id, then ref)
       const dependsOnId =
         asId(cond.depends_on_option) ??
-        (typeof cond.depends_on_option_id === 'number' ? cond.depends_on_option_id : undefined) ??
-        (cond.depends_on_option_ref ? optionIdByRef.get(cond.depends_on_option_ref) : undefined);
+        (typeof cond.depends_on_option_id === 'number'
+          ? cond.depends_on_option_id
+          : undefined) ??
+        (cond.depends_on_option_ref
+          ? optionIdByRef.get(cond.depends_on_option_ref)
+          : undefined);
 
       // If we can't resolve, default to "not satisfied" (safer than showing restricted options)
       if (!dependsOnId) return false;
@@ -146,7 +164,9 @@ export function useGameSelection(leagueId: number, profileId: number, manage_onl
       // Resolve expected choice id if present (support object/id and *_id)
       const expectedChoiceId =
         asId(cond.expected_choice) ??
-        (typeof cond.expected_choice_id === 'number' ? cond.expected_choice_id : undefined);
+        (typeof cond.expected_choice_id === 'number'
+          ? cond.expected_choice_id
+          : undefined);
 
       // Determine whether condition is "choice match" or "value match"
       let satisfied = false;
@@ -240,7 +260,9 @@ export function useGameSelection(leagueId: number, profileId: number, manage_onl
   }
 
   async function fetchGames() {
-    const { data } = await api(`game/games/?league=${leagueId}&manage_only=${manage_only}`);
+    const { data } = await api(
+      `game/games/?league=${leagueId}&manage_only=${manage_only}`
+    );
     gameData.value = data;
   }
 
@@ -259,13 +281,19 @@ export function useGameSelection(leagueId: number, profileId: number, manage_onl
     try {
       const full: TFullGameDto = await fetchFullGame(game.id);
 
-      gameInformation.game = { id: full.id, name: full.name, short_name: full.short_name, platform: full.platform };
+      gameInformation.game = {
+        id: full.id,
+        name: full.name,
+        short_name: full.short_name,
+        platform: full.platform,
+      };
       // ensure arrays exist
       gameInformation.options = (full.options ?? []).map((o) => ({
         ...o,
         game: full.id,
         choices: (o.choices ?? []) as TGameOptionChoiceDto[],
-        availability_groups: (o.availability_groups ?? []) as AvailabilityGroupLike[],
+        availability_groups: (o.availability_groups ??
+          []) as AvailabilityGroupLike[],
       }));
 
       initGameSelection(gameInformation.options);
@@ -289,7 +317,9 @@ export function useGameSelection(leagueId: number, profileId: number, manage_onl
   const isPlatformSelected = (id: number) => selectedPlatforms.value.has(id);
 
   // --- payload + submit ---
-  function toSelectedGamePayload(selection: TGameSelection): TSelectedGameDtoPayload {
+  function toSelectedGamePayload(
+    selection: TGameSelection
+  ): TSelectedGameDtoPayload {
     // Only submit selections for currently visible options
     const visible = new Set(visibleOptions.value.map((o) => o.id));
 

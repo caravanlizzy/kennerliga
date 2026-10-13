@@ -1,10 +1,5 @@
 <template>
-    <q-table
-      title="Yearly Standings"
-      flat
-      hide-bottom
-      :rows="rows"
-    />
+  <q-table title="Yearly Standings" flat hide-bottom :rows="rows" />
 </template>
 
 <script setup lang="ts">

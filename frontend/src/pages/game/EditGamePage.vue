@@ -49,7 +49,11 @@
                     label="Min Players"
                     v-model.number="minPlayers"
                     type="number"
-                    :rules="[val => val !== null && val !== undefined || 'Required', val => val >= 1 || 'Min 1 player']"
+                    :rules="[
+                      (val) =>
+                        (val !== null && val !== undefined) || 'Required',
+                      (val) => val >= 1 || 'Min 1 player',
+                    ]"
                   />
                 </div>
                 <div class="col-12 col-sm-4">
@@ -57,7 +61,12 @@
                     label="Max Players"
                     v-model.number="maxPlayers"
                     type="number"
-                    :rules="[val => val !== null && val !== undefined || 'Required', val => val >= (minPlayers || 1) || 'Must be >= min players']"
+                    :rules="[
+                      (val) =>
+                        (val !== null && val !== undefined) || 'Required',
+                      (val) =>
+                        val >= (minPlayers || 1) || 'Must be >= min players',
+                    ]"
                   />
                 </div>
               </div>
@@ -67,7 +76,9 @@
 
             <!-- Game options -->
             <section>
-              <div class="row items-center justify-between q-mb-md sticky-options-header">
+              <div
+                class="row items-center justify-between q-mb-md sticky-options-header"
+              >
                 <div class="text-h6 text-grey-8">Game Options</div>
                 <KennerButton
                   color="primary"
@@ -89,9 +100,13 @@
               <div v-else class="column q-gutter-y-md">
                 <div v-for="(opt, optIdx) in gameOptions" :key="opt.ref">
                   <q-card flat bordered class="option-card overflow-hidden">
-                    <q-card-section class="bg-grey-1 row items-center justify-between q-py-sm">
+                    <q-card-section
+                      class="bg-grey-1 row items-center justify-between q-py-sm"
+                    >
                       <div class="row items-center q-gutter-x-sm">
-                        <div class="text-subtitle1 text-weight-bold">#{{ optIdx + 1 }}</div>
+                        <div class="text-subtitle1 text-weight-bold">
+                          #{{ optIdx + 1 }}
+                        </div>
                         <KennerInput
                           v-model="opt.name"
                           placeholder="Option Name"
@@ -118,7 +133,14 @@
                           :disable="optIdx === gameOptions.length - 1"
                           @click="moveOption(optIdx, 'down')"
                         />
-                        <KennerButton flat round dense icon="delete" color="negative" @click="removeOption(opt.ref)" />
+                        <KennerButton
+                          flat
+                          round
+                          dense
+                          icon="delete"
+                          color="negative"
+                          @click="removeOption(opt.ref)"
+                        />
                       </div>
                     </q-card-section>
 
@@ -128,10 +150,20 @@
                           v-model="opt.has_choices"
                           label="Has choices"
                           color="primary"
-                          @update:model-value="() => ensureMinimumChoices(opt.ref)"
+                          @update:model-value="
+                            () => ensureMinimumChoices(opt.ref)
+                          "
                         />
-                        <q-icon name="help_outline" size="xs" color="grey-5" class="q-ml-xs">
-                          <KennerTooltip>If enabled, players can choose from a list. If disabled, it's a simple toggle.</KennerTooltip>
+                        <q-icon
+                          name="help_outline"
+                          size="xs"
+                          color="grey-5"
+                          class="q-ml-xs"
+                        >
+                          <KennerTooltip
+                            >If enabled, players can choose from a list. If
+                            disabled, it's a simple toggle.</KennerTooltip
+                          >
                         </q-icon>
                       </div>
 
@@ -150,10 +182,17 @@
                           />
                         </div>
 
-                        <div v-if="!opt.choices.length" class="text-caption text-grey-5 q-mb-md">
+                        <div
+                          v-if="!opt.choices.length"
+                          class="text-caption text-grey-5 q-mb-md"
+                        >
                           No choices defined.
                         </div>
-                        <div v-for="(ch, chIdx) in opt.choices" :key="ch.ref" class="row items-center q-col-gutter-x-sm q-mb-xs">
+                        <div
+                          v-for="(ch, chIdx) in opt.choices"
+                          :key="ch.ref"
+                          class="row items-center q-col-gutter-x-sm q-mb-xs"
+                        >
                           <div class="col-auto">
                             <div class="column">
                               <KennerButton
@@ -183,7 +222,15 @@
                             />
                           </div>
                           <div class="col-auto">
-                            <KennerButton flat round dense icon="delete" size="sm" color="negative" @click="removeChoice(opt.ref, ch.ref)" />
+                            <KennerButton
+                              flat
+                              round
+                              dense
+                              icon="delete"
+                              size="sm"
+                              color="negative"
+                              @click="removeChoice(opt.ref, ch.ref)"
+                            />
                           </div>
                         </div>
                       </div>
@@ -193,7 +240,9 @@
                       <!-- Availability rules -->
                       <div>
                         <div class="row items-center justify-between q-mb-sm">
-                          <div class="text-subtitle2 text-grey-7">Availability Rules</div>
+                          <div class="text-subtitle2 text-grey-7">
+                            Availability Rules
+                          </div>
                           <KennerButton
                             flat
                             dense
@@ -218,8 +267,12 @@
                             :key="grp.id"
                             class="q-pa-md bg-grey-1 rounded-borders border-light relative-position"
                           >
-                            <div class="row items-center justify-between q-mb-sm">
-                              <div class="text-overline text-grey-7">Group #{{ grpIndex + 1 }} (OR)</div>
+                            <div
+                              class="row items-center justify-between q-mb-sm"
+                            >
+                              <div class="text-overline text-grey-7">
+                                Group #{{ grpIndex + 1 }} (OR)
+                              </div>
                               <div class="row items-center q-gutter-x-sm">
                                 <KennerButton
                                   flat
@@ -237,12 +290,17 @@
                                   size="xs"
                                   icon="delete"
                                   color="negative"
-                                  @click="removeAvailabilityGroup(opt.ref, grp.id)"
+                                  @click="
+                                    removeAvailabilityGroup(opt.ref, grp.id)
+                                  "
                                 />
                               </div>
                             </div>
 
-                            <div v-if="!grp.conditions.length" class="text-caption text-grey-5">
+                            <div
+                              v-if="!grp.conditions.length"
+                              class="text-caption text-grey-5"
+                            >
                               No conditions in this group.
                             </div>
 
@@ -279,7 +337,9 @@
                                     emit-value
                                     map-options
                                     label="Type"
-                                    @update:model-value="onConditionKindChanged(cond)"
+                                    @update:model-value="
+                                      onConditionKindChanged(cond)
+                                    "
                                   />
                                 </div>
                                 <div class="col-6 col-md-4">
@@ -304,7 +364,11 @@
                                       dense
                                       outlined
                                       v-model="cond.expected_choice_ref"
-                                      :options="choiceRefOptions(cond.depends_on_option_ref)"
+                                      :options="
+                                        choiceRefOptions(
+                                          cond.depends_on_option_ref
+                                        )
+                                      "
                                       option-value="value"
                                       option-label="label"
                                       emit-value
@@ -322,11 +386,19 @@
                                     size="sm"
                                     icon="delete"
                                     color="grey-7"
-                                    @click="removeCondition(opt.ref, grp.id, cond.id)"
+                                    @click="
+                                      removeCondition(opt.ref, grp.id, cond.id)
+                                    "
                                   />
                                 </div>
                                 <div class="col-12 row items-center no-wrap">
-                                  <q-toggle v-model="cond.negate" label="Negate (NOT)" dense color="red" class="text-caption" />
+                                  <q-toggle
+                                    v-model="cond.negate"
+                                    label="Negate (NOT)"
+                                    dense
+                                    color="red"
+                                    class="text-caption"
+                                  />
                                 </div>
                               </div>
                             </div>
@@ -353,7 +425,9 @@
 
             <!-- Scoring Configuration -->
             <section>
-              <div class="text-h6 q-mb-md text-grey-8">Scoring Configuration</div>
+              <div class="text-h6 q-mb-md text-grey-8">
+                Scoring Configuration
+              </div>
               <CreateResultConfig
                 v-if="initialResultConfig"
                 class="bg-grey-1 rounded-borders q-pa-sm"
@@ -390,7 +464,11 @@ import KennerTooltip from 'components/base/KennerTooltip.vue';
 import LoadingSpinner from 'components/base/LoadingSpinner.vue';
 import { useRoute, useRouter } from 'vue-router';
 import { TResultConfig } from 'src/types';
-import { fetchGameEditBundle, updateGameFull, updateResultConfigData } from 'src/services/gameService';
+import {
+  fetchGameEditBundle,
+  updateGameFull,
+  updateResultConfigData,
+} from 'src/services/gameService';
 import CreateResultConfig from 'components/game/CreateResultConfig.vue';
 import { useGameForm } from 'src/composables/gameForm';
 
@@ -468,18 +546,19 @@ onMounted(async () => {
       initialResultConfig.value = {
         isAsymmetric: rc.is_asymmetric,
         hasPoints: rc.has_points,
-        startingPointSystem: rc.starting_points_system_id || rc.starting_points_system || null,
+        startingPointSystem:
+          rc.starting_points_system_id || rc.starting_points_system || null,
         hasStartingPlayerOrder: rc.has_starting_player_order,
-        factions: factions.map(f => ({ name: f.name, level: f.level })),
-        winConditions: sortedWinConditions.map(wc => ({
+        factions: factions.map((f) => ({ name: f.name, level: f.level })),
+        winConditions: sortedWinConditions.map((wc) => ({
           name: wc.name,
           condition_type: wc.condition_type,
           options: [...(wc.options || [])]
             .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
-            .map(o => ({ name: o.name })),
+            .map((o) => ({ name: o.name })),
           tieBreakers: [...(wc.tie_breakers || [])]
             .sort((a, b) => (b.order ?? 0) - (a.order ?? 0))
-            .map(tb => ({ name: tb.name, higher_wins: tb.higher_wins })),
+            .map((tb) => ({ name: tb.name, higher_wins: tb.higher_wins })),
         })),
       };
     } else {
@@ -490,7 +569,7 @@ onMounted(async () => {
         startingPointSystem: null,
         hasStartingPlayerOrder: true,
         factions: [],
-        winConditions: []
+        winConditions: [],
       };
     }
 
@@ -501,7 +580,7 @@ onMounted(async () => {
   } catch (e) {
     $q.notify({
       color: 'negative',
-      message: 'Error loading game data'
+      message: 'Error loading game data',
     });
     console.error(e);
   }

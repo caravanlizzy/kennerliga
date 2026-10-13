@@ -17,13 +17,15 @@
 </template>
 
 <script setup lang="ts">
-withDefaults(defineProps<{
-  rules?: any[],
-  label?: string,
-}>(), {});
+withDefaults(
+  defineProps<{
+    rules?: any[];
+    label?: string;
+  }>(),
+  {}
+);
 
 const modelValue = defineModel();
-
 </script>
 
 <style lang="scss">
@@ -58,7 +60,10 @@ const modelValue = defineModel();
     width: 100%;
   }
 
-  .q-field__native, .q-field__prefix, .q-field__suffix, .q-field__input {
+  .q-field__native,
+  .q-field__prefix,
+  .q-field__suffix,
+  .q-field__input {
     font-weight: 600;
     color: var(--kenner-primary-text);
     padding: 0 !important;

@@ -44,7 +44,8 @@ export function leagueColors() {
 
   const getLeagueThemeDark = (league: number): LeagueTheme => {
     if (league <= 1) return { bg: 'rgba(245, 158, 11, 0.18)', text: '#fbbf24' };
-    if (league === 2) return { bg: 'rgba(148, 163, 184, 0.18)', text: '#cbd5e1' };
+    if (league === 2)
+      return { bg: 'rgba(148, 163, 184, 0.18)', text: '#cbd5e1' };
     if (league === 3) return { bg: 'rgba(234, 88, 12, 0.18)', text: '#fdba74' };
     if (league === 4) return { bg: 'rgba(244, 63, 94, 0.18)', text: '#fda4af' };
     if (league <= 6) return { bg: 'rgba(139, 92, 246, 0.2)', text: '#c4b5fd' };

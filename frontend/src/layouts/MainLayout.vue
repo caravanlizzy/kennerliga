@@ -26,13 +26,23 @@
       class="chat-drawer glass-effect shadow-10"
     >
       <div class="column full-height kenner-drawer-container">
-        <div class="q-pa-lg q-mb-sm row items-center border-bottom-subtle bg-chat-header">
+        <div
+          class="q-pa-lg q-mb-sm row items-center border-bottom-subtle bg-chat-header"
+        >
           <div class="row items-center">
             <q-icon name="chat" color="grey-8" size="28px" class="q-mr-sm" />
             <span class="text-h6 text-weight-medium text-grey-9">Chat</span>
           </div>
           <q-space />
-          <q-btn flat round dense icon="close" color="grey-7" class="hover-scale" @click="toggleChat">
+          <q-btn
+            flat
+            round
+            dense
+            icon="close"
+            color="grey-7"
+            class="hover-scale"
+            @click="toggleChat"
+          >
             <q-tooltip>Close Chat</q-tooltip>
           </q-btn>
         </div>
@@ -46,7 +56,7 @@
       <div
         class="q-mx-auto"
         :class="isMobile ? 'q-px-none' : 'q-px-md q-pt-md'"
-        style="max-width: var(--kenner-max-width); width: 100%; "
+        style="max-width: var(--kenner-max-width); width: 100%"
       >
         <router-view v-slot="{ Component }">
           <component :is="Component" />

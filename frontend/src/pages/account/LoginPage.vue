@@ -2,7 +2,9 @@
   <div
     class="column items-center justify-center full-height"
     :style="[
-      isMobile ? 'min-width: 280px; max-width:500px; width: 100%' : 'min-width: 450px',
+      isMobile
+        ? 'min-width: 280px; max-width:500px; width: 100%'
+        : 'min-width: 450px',
     ]"
   >
     <q-card
@@ -14,14 +16,21 @@
       <q-form @submit="doLogin" @keyup.enter="doLogin" class="q-gutter-y-lg">
         <div class="column items-center q-mb-lg">
           <BrandLogo class="q-mb-md" icon-size="64px" word-size="2rem" />
-          <div class="text-h4 text-weight-bolder text-dark tracking-tighter q-mt-md">Login</div>
+          <div
+            class="text-h4 text-weight-bolder text-dark tracking-tighter q-mt-md"
+          >
+            Login
+          </div>
           <div class="text-subtitle2 text-grey-6 q-mt-xs text-center">
             Welcome back
           </div>
         </div>
 
         <!-- Inline error message -->
-        <div v-if="errorMessage" class="error-container q-pa-md rounded-borders bg-negative-soft text-negative text-center text-weight-bold border-negative-subtle">
+        <div
+          v-if="errorMessage"
+          class="error-container q-pa-md rounded-borders bg-negative-soft text-negative text-center text-weight-bold border-negative-subtle"
+        >
           {{ errorMessage }}
         </div>
 

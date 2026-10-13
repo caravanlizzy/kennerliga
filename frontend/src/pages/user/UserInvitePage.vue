@@ -1,8 +1,13 @@
 <template>
   <q-page class="q-py-md flex justify-center">
-    <div style="max-width: var(--kenner-max-width-text); width: 100%" class="q-px-sm">
+    <div
+      style="max-width: var(--kenner-max-width-text); width: 100%"
+      class="q-px-sm"
+    >
       <!-- Header -->
-      <div class="invite-hero-card q-pa-lg q-mb-lg row items-center justify-between">
+      <div
+        class="invite-hero-card q-pa-lg q-mb-lg row items-center justify-between"
+      >
         <div class="column">
           <div class="row items-center q-gutter-x-sm q-mb-xs">
             <q-icon name="mark_email_unread" color="primary" size="32px" />
@@ -11,7 +16,8 @@
             </div>
           </div>
           <div class="text-caption text-grey-7">
-            Generate an invitation link for a new member or link to an existing unlinked player profile.
+            Generate an invitation link for a new member or link to an existing
+            unlinked player profile.
           </div>
         </div>
       </div>
@@ -104,8 +110,8 @@ const filterProfiles = (val: string, update: (fn: () => void) => void) => {
       profileOptions.value = allProfiles.value;
     } else {
       const needle = val.toLowerCase();
-      profileOptions.value = allProfiles.value.filter(
-        (profile) => profile.profile_name?.toLowerCase().includes(needle)
+      profileOptions.value = allProfiles.value.filter((profile) =>
+        profile.profile_name?.toLowerCase().includes(needle)
       );
     }
   });

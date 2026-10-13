@@ -3,7 +3,12 @@
 </template>
 
 <script setup lang="ts">
-import { computed, defineAsyncComponent, type Component, type AsyncComponentLoader } from 'vue';
+import {
+  computed,
+  defineAsyncComponent,
+  type Component,
+  type AsyncComponentLoader,
+} from 'vue';
 import { useResponsive } from 'src/composables/responsive';
 
 const props = defineProps<{

@@ -9,9 +9,13 @@
         :outline="!isPlatformSelected(p.id)"
         :color="getPlatformColor(p.name).color"
         :text-color="
-          isPlatformSelected(p.id)?'white':getPlatformColor(p.name).color
+          isPlatformSelected(p.id) ? 'white' : getPlatformColor(p.name).color
         "
-        :style="!isPlatformSelected(p.id) ? 'background-color: var(--kenner-card-bg)' : ''"
+        :style="
+          !isPlatformSelected(p.id)
+            ? 'background-color: var(--kenner-card-bg)'
+            : ''
+        "
         @click="togglePlatform(p.id)"
         class="platform-chip"
       >
@@ -23,7 +27,6 @@
 </template>
 
 <script setup lang="ts">
-
 import { getPlatformColor } from 'src/composables/gameSelection';
 import { inject } from 'vue';
 import { TPlatform } from 'src/types';

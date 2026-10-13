@@ -1,23 +1,36 @@
 <template>
-  <div class="column season-standings" :class="isMobile ? 'q-pa-none' : 'q-pa-md'">
+  <div
+    class="column season-standings"
+    :class="isMobile ? 'q-pa-none' : 'q-pa-md'"
+  >
     <!-- State primary -->
     <LoadingSpinner v-if="loadingLeagues" text="Loading standings..." />
 
     <!-- Leagues + matrices -->
-    <div v-else-if="!seasonId && !loadingLeagues" class="empty-state column items-center q-pa-xl">
+    <div
+      v-else-if="!seasonId && !loadingLeagues"
+      class="empty-state column items-center q-pa-xl"
+    >
       <div class="empty-state__icon-wrap q-mb-md">
         <q-icon name="info_outline" size="32px" />
       </div>
       <div class="text-h6 text-weight-bold">No season selected</div>
-      <div class="text-caption text-grey-6">Please select year and month that contain a league.</div>
+      <div class="text-caption text-grey-6">
+        Please select year and month that contain a league.
+      </div>
     </div>
 
-    <div v-else-if="leagues.length === 0 && seasonId" class="empty-state column items-center q-pa-xl">
+    <div
+      v-else-if="leagues.length === 0 && seasonId"
+      class="empty-state column items-center q-pa-xl"
+    >
       <div class="empty-state__icon-wrap q-mb-md">
         <q-icon name="upcoming" size="32px" />
       </div>
       <div class="text-h6 text-weight-bold">No leagues found</div>
-      <div class="text-caption text-grey-6 q-mb-lg">This season hasn't been set up with any leagues yet.</div>
+      <div class="text-caption text-grey-6 q-mb-lg">
+        This season hasn't been set up with any leagues yet.
+      </div>
       <KennerButton
         v-if="!isOverviewPage"
         outline
@@ -59,18 +72,27 @@
               class="row items-center q-gutter-x-sm q-mb-md q-px-sm q-pt-sm"
             >
               <LeagueLevel :level="league.level" />
-              <span class="text-subtitle1 text-weight-bold">{{ leagueName(league) }}</span>
+              <span class="text-subtitle1 text-weight-bold">{{
+                leagueName(league)
+              }}</span>
             </div>
             <LeagueMatchResults
               v-if="mode === 'results'"
               :leagueId="league.id"
               :show-standings="isOverviewPage"
             />
-            <LeagueStandings v-else-if="mode === 'standings-simple'" :leagueId="league.id" />
+            <LeagueStandings
+              v-else-if="mode === 'standings-simple'"
+              :leagueId="league.id"
+            />
             <div v-else-if="mode === 'picks'" class="q-pa-sm">
-              <div class="row items-center q-gutter-x-sm q-mb-md q-px-sm q-pt-sm">
+              <div
+                class="row items-center q-gutter-x-sm q-mb-md q-px-sm q-pt-sm"
+              >
                 <LeagueLevel :level="league.level" />
-                <span class="text-subtitle1 text-weight-bold">{{ leagueName(league) }} Picks &amp; Bans</span>
+                <span class="text-subtitle1 text-weight-bold"
+                  >{{ leagueName(league) }} Picks &amp; Bans</span
+                >
               </div>
               <PlayerCard
                 v-if="getMembersForLeague(league.id).length > 0"
@@ -132,26 +154,37 @@ interface SeasonPayload {
   standingsMap: Record<number, TSeasonLeagueStandings>;
 }
 
-const props = withDefaults(defineProps<{
-  seasonId?: number | null;
-  mode?: 'standings' | 'results' | 'standings-simple' | 'picks';
-  participants?: TSeasonParticipantDto[];
-}>(), {
-  mode: 'standings'
-});
+const props = withDefaults(
+  defineProps<{
+    seasonId?: number | null;
+    mode?: 'standings' | 'results' | 'standings-simple' | 'picks';
+    participants?: TSeasonParticipantDto[];
+  }>(),
+  {
+    mode: 'standings',
+  }
+);
 
 const isOverviewPage = computed(() => route.name === 'season-overview');
 
 const participantsList = ref<TSeasonParticipantDto[]>(props.participants || []);
 
-watch(() => props.participants, (newVal) => {
-  if (newVal && newVal.length > 0) {
-    participantsList.value = newVal;
-  }
-}, { immediate: true });
+watch(
+  () => props.participants,
+  (newVal) => {
+    if (newVal && newVal.length > 0) {
+      participantsList.value = newVal;
+    }
+  },
+  { immediate: true }
+);
 
 async function ensureParticipantsLoaded() {
-  if (props.mode === 'picks' && participantsList.value.length === 0 && props.seasonId) {
+  if (
+    props.mode === 'picks' &&
+    participantsList.value.length === 0 &&
+    props.seasonId
+  ) {
     try {
       participantsList.value = await fetchSeasonParticipants(props.seasonId);
     } catch (e) {
@@ -160,9 +193,13 @@ async function ensureParticipantsLoaded() {
   }
 }
 
-watch(() => [props.seasonId, props.mode], () => {
-  ensureParticipantsLoaded();
-}, { immediate: true });
+watch(
+  () => [props.seasonId, props.mode],
+  () => {
+    ensureParticipantsLoaded();
+  },
+  { immediate: true }
+);
 
 /** Heading for a league, tolerating payloads that omit `name`. */
 function leagueName(league: LeagueRef): string {
@@ -186,38 +223,41 @@ const {
   loading: loadingLeagues,
   load: loadLeaguesForSeason,
   reset: resetLeagues,
-} = useCachedResource<number, SeasonPayload>(async (seasonId) => {
-  // Note: `cacheKey` below persists the SWR state across component
-  // unmount/remount so navigating back to a season keeps the standings
-  // cached instead of showing the blocking spinner.
-  if (props.mode === 'standings') {
-    // Batched: single request returns all leagues + their full standings.
-    const data = await fetchSeasonFullStandings(seasonId);
-    const leaguesPayload = data?.leagues ?? [];
-    const leaguesOut: LeagueRef[] = leaguesPayload.map((l) => ({
-      id: l.id,
-      name: l.name,
-      level: l.level,
-    }));
-    const standingsMap: Record<number, TSeasonLeagueStandings> = {};
-    leaguesPayload.forEach((l) => {
-      standingsMap[l.id] = l;
-    });
-    return { leagues: leaguesOut, standingsMap };
-  }
+} = useCachedResource<number, SeasonPayload>(
+  async (seasonId) => {
+    // Note: `cacheKey` below persists the SWR state across component
+    // unmount/remount so navigating back to a season keeps the standings
+    // cached instead of showing the blocking spinner.
+    if (props.mode === 'standings') {
+      // Batched: single request returns all leagues + their full standings.
+      const data = await fetchSeasonFullStandings(seasonId);
+      const leaguesPayload = data?.leagues ?? [];
+      const leaguesOut: LeagueRef[] = leaguesPayload.map((l) => ({
+        id: l.id,
+        name: l.name,
+        level: l.level,
+      }));
+      const standingsMap: Record<number, TSeasonLeagueStandings> = {};
+      leaguesPayload.forEach((l) => {
+        standingsMap[l.id] = l;
+      });
+      return { leagues: leaguesOut, standingsMap };
+    }
 
-  const leaguesData = await fetchLeaguesForSeason(seasonId);
+    const leaguesData = await fetchLeaguesForSeason(seasonId);
 
-  if (leaguesData.length > 0 && props.mode === 'results') {
-    // In results mode, initialize all league stores in parallel
-    const storePromises = leaguesData.map(l => {
-      const store = useLeagueStore(l.id)();
-      return store.init();
-    });
-    await Promise.all(storePromises);
-  }
-  return { leagues: leaguesData, standingsMap: {} };
-}, { cacheKey: `season-standings:${props.mode}` });
+    if (leaguesData.length > 0 && props.mode === 'results') {
+      // In results mode, initialize all league stores in parallel
+      const storePromises = leaguesData.map((l) => {
+        const store = useLeagueStore(l.id)();
+        return store.init();
+      });
+      await Promise.all(storePromises);
+    }
+    return { leagues: leaguesData, standingsMap: {} };
+  },
+  { cacheKey: `season-standings:${props.mode}` }
+);
 
 const leagues = computed<LeagueRef[]>(() => payload.value?.leagues ?? []);
 const allStandingsData = computed<Record<number, TSeasonLeagueStandings>>(
@@ -229,10 +269,14 @@ const allStandingsData = computed<Record<number, TSeasonLeagueStandings>>(
 // cache for every other mount of this component. When a valid id becomes
 // available we just load it; the previous key's data stays around until it
 // is naturally overwritten.
-watch(() => props.seasonId, (id) => {
-  if (!id) return;
-  loadLeaguesForSeason(id);
-}, { immediate: true });
+watch(
+  () => props.seasonId,
+  (id) => {
+    if (!id) return;
+    loadLeaguesForSeason(id);
+  },
+  { immediate: true }
+);
 
 async function refreshData() {
   if (props.seasonId) {
@@ -278,4 +322,3 @@ void resetLeagues;
   }
 }
 </style>
-

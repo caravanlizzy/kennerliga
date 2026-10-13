@@ -8,21 +8,40 @@
         <!-- Background Watermark -->
         <div
           class="absolute-top-right q-ma-lg"
-          style="opacity: 0.04; pointer-events: none; transform: rotate(-15deg); z-index: 0"
+          style="
+            opacity: 0.04;
+            pointer-events: none;
+            transform: rotate(-15deg);
+            z-index: 0;
+          "
         >
-          <q-icon name="img:icons/favicon.svg" :size="isMobile ? '120px' : '200px'" />
+          <q-icon
+            name="img:icons/favicon.svg"
+            :size="isMobile ? '120px' : '200px'"
+          />
         </div>
 
         <div class="full-width relative-position" style="z-index: 1">
           <!-- Hero Section -->
-          <div class="column items-center text-center" :class="isMobile ? 'q-mb-lg' : 'q-mb-xl'">
+          <div
+            class="column items-center text-center"
+            :class="isMobile ? 'q-mb-lg' : 'q-mb-xl'"
+          >
             <BrandLogo
               class="q-my-none"
               :icon-size="isMobile ? '80px' : '120px'"
               :word-size="isMobile ? '2.125rem' : '3.75rem'"
             />
-            <p :class="[isMobile ? 'text-subtitle1' : 'text-h5', 'text-grey-8 q-mt-md q-mb-xl']">
-              A private space for our boardgame league. We manage everything from season registration and auto league assignment to game picking, banning, and results. Stay connected via community chat and keep an eye on past season stats and overviews.
+            <p
+              :class="[
+                isMobile ? 'text-subtitle1' : 'text-h5',
+                'text-grey-8 q-mt-md q-mb-xl',
+              ]"
+            >
+              A private space for our boardgame league. We manage everything
+              from season registration and auto league assignment to game
+              picking, banning, and results. Stay connected via community chat
+              and keep an eye on past season stats and overviews.
             </p>
             <div class="row q-gutter-md justify-center">
               <KennerButton
@@ -52,13 +71,17 @@
           </div>
 
           <!-- Private Note -->
-          <div :class="[isMobile ? 'q-mt-lg q-pa-md' : 'q-mt-xl q-pa-lg', 'text-center border-top-subtle']">
+          <div
+            :class="[
+              isMobile ? 'q-mt-lg q-pa-md' : 'q-mt-xl q-pa-lg',
+              'text-center border-top-subtle',
+            ]"
+          >
             <q-icon name="lock" size="xs" color="grey-6" class="q-mr-sm" />
             <span class="text-body2 text-grey-6">
               An account is required to view league details and participate.
             </span>
           </div>
-
         </div>
       </div>
     </template>
@@ -77,7 +100,7 @@ withDefaults(
     id?: string;
   }>(),
   {
-    id: 'welcome'
+    id: 'welcome',
   }
 );
 
@@ -124,7 +147,6 @@ onUnmounted(() => {
   }
 }
 
-
 .welcome-section-root {
   display: flex;
   flex-direction: column;
@@ -170,9 +192,12 @@ onUnmounted(() => {
   bottom: 0;
   height: 60px;
   pointer-events: none;
-  background: linear-gradient(to bottom, transparent 0%, var(--kenner-card-bg) 100%);
+  background: linear-gradient(
+    to bottom,
+    transparent 0%,
+    var(--kenner-card-bg) 100%
+  );
 }
-
 
 .combined-card--mobile {
   margin: 0;

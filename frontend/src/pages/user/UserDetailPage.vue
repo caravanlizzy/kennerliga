@@ -8,8 +8,13 @@
       :game-stats-count="gameStats.length"
       :loading="loadingStats"
     />
-    <div v-else-if="loadingUser" class="profile-hero-skeleton bg-primary q-pa-md">
-      <div class="max-width-container q-mx-auto row items-center q-col-gutter-md">
+    <div
+      v-else-if="loadingUser"
+      class="profile-hero-skeleton bg-primary q-pa-md"
+    >
+      <div
+        class="max-width-container q-mx-auto row items-center q-col-gutter-md"
+      >
         <div class="col-12 col-md-auto flex justify-center">
           <q-skeleton type="QAvatar" size="100px" />
         </div>
@@ -20,14 +25,25 @@
       </div>
     </div>
 
-    <div v-if="loadingUser && !user" class="q-px-md q-py-lg max-width-container q-mx-auto">
+    <div
+      v-if="loadingUser && !user"
+      class="q-px-md q-py-lg max-width-container q-mx-auto"
+    >
       <div class="row q-col-gutter-lg">
         <div class="col-12 col-md-4">
-          <q-skeleton type="rect" height="200px" class="q-mb-lg rounded-borders" />
+          <q-skeleton
+            type="rect"
+            height="200px"
+            class="q-mb-lg rounded-borders"
+          />
           <q-skeleton type="rect" height="300px" class="rounded-borders" />
         </div>
         <div class="col-12 col-md-8">
-          <q-skeleton type="rect" height="48px" class="q-mb-lg rounded-borders" />
+          <q-skeleton
+            type="rect"
+            height="48px"
+            class="q-mb-lg rounded-borders"
+          />
           <div class="row q-col-gutter-md">
             <div v-for="i in 6" :key="i" class="col-12 col-sm-6 col-md-4">
               <q-skeleton type="rect" height="100px" class="rounded-borders" />
@@ -59,7 +75,11 @@
             <div v-if="loadingStats" class="q-mb-lg">
               <q-skeleton type="rect" height="350px" class="rounded-borders" />
             </div>
-            <UserPerformance v-else :overall-stats="overallStats" :elo="eloData" />
+            <UserPerformance
+              v-else
+              :overall-stats="overallStats"
+              :elo="eloData"
+            />
           </div>
         </div>
 
@@ -86,7 +106,11 @@
               <div v-if="loadingStats">
                 <div class="row q-col-gutter-md">
                   <div v-for="i in 6" :key="i" class="col-12 col-sm-6 col-md-4">
-                    <q-skeleton type="rect" height="150px" class="rounded-borders" />
+                    <q-skeleton
+                      type="rect"
+                      height="150px"
+                      class="rounded-borders"
+                    />
                   </div>
                 </div>
               </div>
@@ -101,7 +125,13 @@
             <!-- Seasons Tab -->
             <q-tab-panel name="seasons" class="q-pa-none">
               <div v-if="loadingSeasons">
-                <q-skeleton v-for="i in 3" :key="i" type="rect" height="80px" class="q-mb-md rounded-borders" />
+                <q-skeleton
+                  v-for="i in 3"
+                  :key="i"
+                  type="rect"
+                  height="80px"
+                  class="q-mb-md rounded-borders"
+                />
               </div>
               <UserSeasonsTab v-else :user-season-list="userSeasonList" />
             </q-tab-panel>
@@ -160,7 +190,9 @@ const user = ref<TUserDto | null>(null);
 const isMe = computed(() => {
   return userStore.username === user.value?.username;
 });
-const userSeasonList = ref<(TSeasonParticipantDto & { season_details?: TSeasonDto })[]>([]);
+const userSeasonList = ref<
+  (TSeasonParticipantDto & { season_details?: TSeasonDto })[]
+>([]);
 const gameSearch = ref('');
 const tab = ref('games');
 
@@ -172,7 +204,7 @@ const overallStats = ref({
   wins: 0,
   podiums: 0,
   avg_pos: 0,
-  positions: {} as Record<number, number>
+  positions: {} as Record<number, number>,
 });
 const eloData = ref<TUserEloData | undefined>(undefined);
 const gameStats = ref<TPlayerGameStat[]>([]);
@@ -222,7 +254,9 @@ async function load() {
 async function fetchStatistics(userId: number) {
   loadingStats.value = true;
   try {
-    const data = await fetchUserStatistics(userId, { year: selectedYear.value });
+    const data = await fetchUserStatistics(userId, {
+      year: selectedYear.value,
+    });
     leagueStats.value = data.league_stats;
     overallStats.value = data.overall_stats;
     eloData.value = data.elo;
@@ -253,12 +287,10 @@ async function fetchSeasonParticipation(profileId: number) {
   }
 }
 
-
-
 const filteredGameStats = computed(() => {
   if (!gameSearch.value) return gameStats.value;
   const search = gameSearch.value.toLowerCase();
-  return gameStats.value.filter(g => g.name.toLowerCase().includes(search));
+  return gameStats.value.filter((g) => g.name.toLowerCase().includes(search));
 });
 
 onMounted(load);
@@ -294,7 +326,6 @@ onMounted(load);
   background: linear-gradient(135deg, var(--q-primary) 0%, #1e293b 100%);
 }
 
-
 /* ---- Shared surface utilities ---- */
 .sticky-top {
   @media (min-width: 1024px) {
@@ -324,7 +355,10 @@ onMounted(load);
 }
 
 @media (max-width: 599px) {
-  .profile-hero-skeleton { padding: 16px 16px !important; min-height: 140px; }
+  .profile-hero-skeleton {
+    padding: 16px 16px !important;
+    min-height: 140px;
+  }
 }
 
 .max-width-container {
@@ -335,6 +369,10 @@ onMounted(load);
   border: 1px dashed var(--surface-border-strong);
 }
 
-.z-index-1 { z-index: 1; }
-.z-index-2 { z-index: 2; }
+.z-index-1 {
+  z-index: 1;
+}
+.z-index-2 {
+  z-index: 2;
+}
 </style>

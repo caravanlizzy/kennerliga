@@ -26,7 +26,7 @@ export const useUiStore = defineStore('ui', () => {
   }
 
   function unregisterSection(id: string) {
-    navSections.value = navSections.value.filter(s => s.id !== id);
+    navSections.value = navSections.value.filter((s) => s.id !== id);
   }
 
   function clearSections() {
@@ -40,6 +40,6 @@ export const useUiStore = defineStore('ui', () => {
     unregisterSection,
     clearSections,
     chatDrawerOpen,
-    toggleChat
+    toggleChat,
   };
 });

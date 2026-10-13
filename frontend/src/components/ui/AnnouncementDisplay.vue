@@ -1,16 +1,20 @@
 <template>
-  <div v-if="isVisible" :class="noMargins ? '' : (isMobile ? 'q-mb-sm' : 'q-mt-md q-mb-md')">
+  <div
+    v-if="isVisible"
+    :class="noMargins ? '' : isMobile ? 'q-mb-sm' : 'q-mt-md q-mb-md'"
+  >
     <transition-group
       appear
       enter-active-class="animated fadeInDown"
       leave-active-class="animated fadeOutUp"
     >
-      <div v-for="a in visibleAnnouncements" :key="a.id" :class="noMargins ? '' : 'q-mb-sm'">
+      <div
+        v-for="a in visibleAnnouncements"
+        :key="a.id"
+        :class="noMargins ? '' : 'q-mb-sm'"
+      >
         <!-- Special Handling for Registration -->
-        <SignupAnnouncement
-          v-if="a.type === 'REGISTER'"
-          :announcement="a"
-        />
+        <SignupAnnouncement v-if="a.type === 'REGISTER'" :announcement="a" />
 
         <!-- General TAnnouncementDto Card -->
         <q-card
@@ -19,13 +23,13 @@
           class="announcement-card overflow-hidden"
           :class="[
             { 'no-border-radius-mobile': shouldRemoveBorders },
-            `announcement-card--${a.type.toLowerCase()}`
+            `announcement-card--${a.type.toLowerCase()}`,
           ]"
         >
           <q-card-section
             :class="[
               isMobile ? 'q-py-sm' : 'q-py-md',
-              'relative-position row items-center no-wrap'
+              'relative-position row items-center no-wrap',
             ]"
           >
             <!-- Content Header (Icon + Text) -->
@@ -57,7 +61,6 @@
                 </div>
               </div>
             </div>
-
           </q-card-section>
         </q-card>
       </div>
@@ -103,7 +106,6 @@ const textColors = {
   WARNING: 'text-negative',
   NEUTRAL: 'text-grey-9',
 };
-
 </script>
 
 <style scoped>

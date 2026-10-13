@@ -5,7 +5,9 @@
         <q-icon name="groups" color="primary" size="20px" />
       </div>
       <div class="column">
-        <div class="text-h6 text-weight-bolder text-dark line-height-1">Players</div>
+        <div class="text-h6 text-weight-bolder text-dark line-height-1">
+          Players
+        </div>
         <div class="text-caption text-grey-6">
           Rankings, records &amp; superlatives across every player.
         </div>
@@ -19,7 +21,11 @@
     </div>
 
     <div v-else class="row q-col-gutter-lg">
-      <div v-for="award in overview?.awards ?? []" :key="award.key" class="col-12 col-lg-6">
+      <div
+        v-for="award in overview?.awards ?? []"
+        :key="award.key"
+        class="col-12 col-lg-6"
+      >
         <StatCategoryCard :category="award" />
       </div>
       <div

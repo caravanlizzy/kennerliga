@@ -7,14 +7,20 @@
       shape="squircle"
       class="chat-btn"
       :class="{ 'is-active': chatDrawerOpen }"
-      style="height: 36px; min-width: 36px;"
+      style="height: 36px; min-width: 36px"
       @click="toggleChat"
     >
       <div class="row items-center no-wrap">
         <q-icon name="chat" class="q-mr-xs" />
         <span class="text-weight-bold">CHAT</span>
       </div>
-      <q-badge v-if="unreadCount > 0" floating rounded color="red" class="unread-badge">
+      <q-badge
+        v-if="unreadCount > 0"
+        floating
+        rounded
+        color="red"
+        class="unread-badge"
+      >
         {{ unreadCount }}
       </q-badge>
     </KennerButton>

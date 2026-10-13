@@ -1,12 +1,24 @@
 <template>
-  <q-card flat bordered class="stat-card full-height" :style="{ '--accent': accentColor }">
+  <q-card
+    flat
+    bordered
+    class="stat-card full-height"
+    :style="{ '--accent': accentColor }"
+  >
     <q-card-section class="stat-card__header">
       <div class="row items-center no-wrap">
-        <div class="stat-icon-box q-mr-sm" :style="{ background: accentColor + ($q.dark.isActive ? '29' : '14') }">
+        <div
+          class="stat-icon-box q-mr-sm"
+          :style="{
+            background: accentColor + ($q.dark.isActive ? '29' : '14'),
+          }"
+        >
           <q-icon :name="icon" :style="{ color: accentColor }" size="19px" />
         </div>
         <div class="column">
-          <div class="text-subtitle2 text-weight-bolder text-dark line-height-1">
+          <div
+            class="text-subtitle2 text-weight-bolder text-dark line-height-1"
+          >
             {{ category.label }}
           </div>
           <div class="text-caption text-grey-6">{{ category.description }}</div>
@@ -25,8 +37,13 @@
         <!-- Top 3, as small boxes -- mirrors the award podium cards. -->
         <div class="row q-col-gutter-sm">
           <div v-for="(entry, idx) in top3" :key="entry.profile_id" class="col">
-            <div class="podium-player" :class="{ 'podium-player--me': entry.is_me }">
-              <span class="rank-badge" :class="`rank-badge--${idx}`">{{ idx + 1 }}</span>
+            <div
+              class="podium-player"
+              :class="{ 'podium-player--me': entry.is_me }"
+            >
+              <span class="rank-badge" :class="`rank-badge--${idx}`">{{
+                idx + 1
+              }}</span>
               <div
                 class="podium-player__name ellipsis"
                 :class="{ 'text-weight-bolder text-primary': entry.is_me }"
@@ -36,10 +53,17 @@
               <div class="podium-player__score text-primary">
                 <template v-if="entry.best_level != null">
                   <LeagueLevel badge :level="entry.best_level" />
-                  <div>{{ formatStatValue(category.key, category.unit, entry.value) }}</div>
+                  <div>
+                    {{
+                      formatStatValue(category.key, category.unit, entry.value)
+                    }}
+                  </div>
                 </template>
                 <template v-else>
-                  {{ entry.display ?? formatStatValue(category.key, category.unit, entry.value) }}
+                  {{
+                    entry.display ??
+                    formatStatValue(category.key, category.unit, entry.value)
+                  }}
                 </template>
               </div>
             </div>
@@ -49,7 +73,10 @@
         <!-- Collapsed: a short list around the requesting player (one rank
              above/below). Expanded: every remaining ranked player. -->
         <div v-if="displayedRows.length > 0" class="q-mt-md">
-          <div v-if="!expanded && hasGap" class="gap-separator row items-center q-mb-sm">
+          <div
+            v-if="!expanded && hasGap"
+            class="gap-separator row items-center q-mb-sm"
+          >
             <q-separator class="col" />
             <span class="gap-separator__label text-caption text-grey-6">
               <q-icon name="more_vert" size="14px" />
@@ -66,17 +93,24 @@
               >
                 <div class="row items-center no-wrap q-gutter-x-sm">
                   <span class="rank-badge">{{ entry.rank }}</span>
-                  <span :class="{ 'text-weight-bolder': entry.is_me }">{{ entry.profile_name }}</span>
+                  <span :class="{ 'text-weight-bolder': entry.is_me }">{{
+                    entry.profile_name
+                  }}</span>
                 </div>
                 <span
                   class="row items-center no-wrap q-gutter-x-xs rank-row__value text-primary"
                 >
                   <template v-if="entry.best_level != null">
                     <LeagueLevel badge :level="entry.best_level" />
-                    <span>{{ formatStatValue(category.key, category.unit, entry.value) }}</span>
+                    <span>{{
+                      formatStatValue(category.key, category.unit, entry.value)
+                    }}</span>
                   </template>
                   <template v-else>
-                    {{ entry.display ?? formatStatValue(category.key, category.unit, entry.value) }}
+                    {{
+                      entry.display ??
+                      formatStatValue(category.key, category.unit, entry.value)
+                    }}
                   </template>
                 </span>
               </div>
@@ -108,14 +142,26 @@
           <span class="rank-badge">{{ category.me.rank ?? '–' }}</span>
           <span class="text-weight-bolder">{{ category.me.profile_name }}</span>
         </div>
-        <div class="text-caption text-grey-6 text-right row items-center no-wrap q-gutter-x-xs justify-end">
+        <div
+          class="text-caption text-grey-6 text-right row items-center no-wrap q-gutter-x-xs justify-end"
+        >
           <template v-if="category.me.best_level != null">
             <LeagueLevel badge :level="category.me.best_level" />
-            <span>{{ formatStatValue(category.key, category.unit, category.me.value) }} so far</span>
+            <span
+              >{{
+                formatStatValue(category.key, category.unit, category.me.value)
+              }}
+              so far</span
+            >
           </template>
-          <template v-else-if="category.me.display">{{ category.me.display }} so far</template>
+          <template v-else-if="category.me.display"
+            >{{ category.me.display }} so far</template
+          >
           <template v-else-if="category.me.value !== null">
-            {{ formatStatValue(category.key, category.unit, category.me.value) }} so far
+            {{
+              formatStatValue(category.key, category.unit, category.me.value)
+            }}
+            so far
           </template>
           <template v-else>No data yet</template>
         </div>
@@ -214,11 +260,15 @@ const aroundFirstRank = computed(() => {
 });
 
 const hasGap = computed(
-  () => aroundFirstRank.value !== null && aroundFirstRank.value > topLastRank.value + 1
+  () =>
+    aroundFirstRank.value !== null &&
+    aroundFirstRank.value > topLastRank.value + 1
 );
 
 const gapCount = computed(() =>
-  aroundFirstRank.value !== null ? aroundFirstRank.value - topLastRank.value - 1 : 0
+  aroundFirstRank.value !== null
+    ? aroundFirstRank.value - topLastRank.value - 1
+    : 0
 );
 
 // Everyone below the top 3 -- the "show all" expansion just reveals the
@@ -226,9 +276,13 @@ const gapCount = computed(() =>
 // top_n), no extra request needed.
 const restOfList = computed(() => props.category.top.slice(3));
 const canExpand = computed(() => restOfList.value.length > 0);
-const totalRankedLabel = computed(() => props.category.total_ranked || props.category.top.length);
+const totalRankedLabel = computed(
+  () => props.category.total_ranked || props.category.top.length
+);
 
-const displayedRows = computed(() => (expanded.value ? restOfList.value : visibleAroundMe.value));
+const displayedRows = computed(() =>
+  expanded.value ? restOfList.value : visibleAroundMe.value
+);
 </script>
 
 <style scoped lang="scss">

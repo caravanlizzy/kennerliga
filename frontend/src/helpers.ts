@@ -11,14 +11,14 @@ export function formatDateTime(dateTime: string): string {
     day: 'numeric',
     hour: 'numeric',
     minute: 'numeric',
-    hour12: false,  // Use 12-hour format. Set to false for 24-hour format
-  })
+    hour12: false, // Use 12-hour format. Set to false for 24-hour format
+  });
 }
 
 export function loadToken(): void {
   const userStore = JSON.parse(<string>localStorage.getItem('userStore'));
-  if(!userStore) return;
-  if(userStore.isAuthenticated){
+  if (!userStore) return;
+  if (userStore.isAuthenticated) {
     const token = userStore.user?.token;
     if (token) {
       setAuthToken(token);

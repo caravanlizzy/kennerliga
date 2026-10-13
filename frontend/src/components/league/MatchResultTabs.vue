@@ -9,8 +9,12 @@
         v-for="selectedGame in selectedGamesFetchedEmpty"
         :key="selectedGame.id"
         :label="selectedGame.game_name"
-        :color="currentFormSelectedGameId === selectedGame.id ? 'primary' : 'grey-3'"
-        :text-color="currentFormSelectedGameId === selectedGame.id ? 'white' : 'dark'"
+        :color="
+          currentFormSelectedGameId === selectedGame.id ? 'primary' : 'grey-3'
+        "
+        :text-color="
+          currentFormSelectedGameId === selectedGame.id ? 'white' : 'dark'
+        "
         :unelevated="currentFormSelectedGameId === selectedGame.id"
         :flat="currentFormSelectedGameId !== selectedGame.id"
         icon="sports_esports"
@@ -34,9 +38,12 @@
   </div>
   <div v-else class="text-center q-pa-md text-grey-7">
     <q-icon name="check_circle" size="32px" color="positive" class="q-mb-xs" />
-    <div class="text-subtitle2 text-weight-bold">All matches have been reported!</div>
+    <div class="text-subtitle2 text-weight-bold">
+      All matches have been reported!
+    </div>
     <div class="text-caption text-grey-6 q-mt-xs">
-      All results for this league are submitted and reflected in the standings above.
+      All results for this league are submitted and reflected in the standings
+      above.
     </div>
   </div>
 </template>
@@ -58,7 +65,10 @@ watch(
   selectedGamesFetchedEmpty,
   (emptyGames) => {
     if (emptyGames.length > 0) {
-      if (!currentFormSelectedGameId.value || !emptyGames.some((g) => g.id === currentFormSelectedGameId.value)) {
+      if (
+        !currentFormSelectedGameId.value ||
+        !emptyGames.some((g) => g.id === currentFormSelectedGameId.value)
+      ) {
         currentFormSelectedGameId.value = emptyGames[0]?.id ?? null;
       }
     } else {

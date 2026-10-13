@@ -131,7 +131,9 @@ export function useCrudDialogs<TDto, TForm extends object>(
 // ReleaseNote management pages).
 // ---------------------------------------------------------------------------
 
-export function useDeleteConfirm(remove: (id: number) => Promise<unknown> | unknown) {
+export function useDeleteConfirm(
+  remove: (id: number) => Promise<unknown> | unknown
+) {
   const deleteDialogOpen = ref(false);
   const pendingDeleteId = ref<number | null>(null);
 

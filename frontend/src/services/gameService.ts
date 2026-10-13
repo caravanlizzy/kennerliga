@@ -13,11 +13,7 @@ import {
   TWinConditionDto,
 } from 'src/types';
 import { api } from 'boot/axios';
-import {
-  TGameOption,
-  TGameOptionChoice,
-  TResultConfig,
-} from 'src/types';
+import { TGameOption, TGameOptionChoice, TResultConfig } from 'src/types';
 import { unwrapList } from 'src/services/httpTypes';
 
 import { useIDStorage } from 'src/composables/IDStorage';
@@ -71,7 +67,12 @@ export async function addRestrictions(option: TGameOption): Promise<void> {
     return;
   }
 
-  const { only_if_option, only_if_choice, only_if_value } = option as unknown as { only_if_option: number; only_if_choice: number; only_if_value: boolean };
+  const { only_if_option, only_if_choice, only_if_value } =
+    option as unknown as {
+      only_if_option: number;
+      only_if_choice: number;
+      only_if_value: boolean;
+    };
   const optionId = getStorageItem(only_if_option);
 
   if (optionId === undefined) {
@@ -168,10 +169,7 @@ export async function createOptions(
   }
 }
 
-function buildResultConfigPayload(
-  gameId: number,
-  resultConfig: TResultConfig
-) {
+function buildResultConfigPayload(gameId: number, resultConfig: TResultConfig) {
   return {
     game: gameId,
     is_asymmetric: resultConfig?.isAsymmetric,
@@ -231,7 +229,10 @@ export async function createFactions(
   }
 }
 
-export async function createWinConditions(resultConfigId: number, resultConfig: TResultConfig): Promise<void> {
+export async function createWinConditions(
+  resultConfigId: number,
+  resultConfig: TResultConfig
+): Promise<void> {
   if (!resultConfig?.winConditions?.length) return;
 
   for (const [wcIndex, winCondition] of resultConfig.winConditions.entries()) {
@@ -249,7 +250,10 @@ export async function createWinConditions(resultConfigId: number, resultConfig: 
       continue;
     }
 
-    if (winCondition.condition_type === 'OPTION' && winCondition.options?.length) {
+    if (
+      winCondition.condition_type === 'OPTION' &&
+      winCondition.options?.length
+    ) {
       for (const [optIndex, opt] of winCondition.options.entries()) {
         try {
           await api.post('/game/win-condition-options/', {
@@ -280,7 +284,6 @@ export async function createWinConditions(resultConfigId: number, resultConfig: 
     }
   }
 }
-
 
 export async function createSelectedGame(
   selectedGame: TSelectedGameDtoPayload,
@@ -316,7 +319,9 @@ export async function editSelectedGame(
   }
 }
 
-export async function fetchGameOptions(gameId: number): Promise<TGameOptionDto[]> {
+export async function fetchGameOptions(
+  gameId: number
+): Promise<TGameOptionDto[]> {
   try {
     const { data } = await api.get<TGameOptionDto[]>('/game/options/', {
       params: { game: gameId },
@@ -329,11 +334,16 @@ export async function fetchGameOptions(gameId: number): Promise<TGameOptionDto[]
   }
 }
 
-export async function fetchGameOptionChoices(optionId: number): Promise<TGameOptionChoiceDto[]> {
+export async function fetchGameOptionChoices(
+  optionId: number
+): Promise<TGameOptionChoiceDto[]> {
   try {
-    const { data } = await api.get<TGameOptionChoiceDto[]>('/game/option-choices/', {
-      params: { option: optionId },
-    });
+    const { data } = await api.get<TGameOptionChoiceDto[]>(
+      '/game/option-choices/',
+      {
+        params: { option: optionId },
+      }
+    );
     return unwrapList(data);
   } catch (error) {
     throw new Error(
@@ -354,9 +364,12 @@ export async function fetchPlatform(platformId: number): Promise<TPlatform> {
 
 export async function fetchFullGame(gameId: number): Promise<TFullGameDto> {
   try {
-    const { data } = await api.get<TFullGameDto>(`/game/games-full/${gameId}/`, {
-      params: { manage_only: true },
-    });
+    const { data } = await api.get<TFullGameDto>(
+      `/game/games-full/${gameId}/`,
+      {
+        params: { manage_only: true },
+      }
+    );
     return data;
   } catch (error) {
     throw new Error(`Error fetching full game with id ${gameId}: ${error}`);
@@ -382,14 +395,19 @@ export async function fetchWinConditionsForResultConfig(
   return unwrapList(data);
 }
 
-export async function fetchFactionsForGame(gameId: number): Promise<TFactionDto[]> {
+export async function fetchFactionsForGame(
+  gameId: number
+): Promise<TFactionDto[]> {
   const { data } = await api.get<TFactionDto[]>('/game/factions/', {
     params: { game: gameId },
   });
   return unwrapList(data);
 }
 
-export async function updateGameFull(gameId: number, payload: unknown): Promise<void> {
+export async function updateGameFull(
+  gameId: number,
+  payload: unknown
+): Promise<void> {
   await api.put(`/game/games-full/${gameId}/`, payload);
 }
 
@@ -405,7 +423,9 @@ export type TGameDetailBundle = {
  * Loads everything GameDetailPage needs in one call, instead of the page
  * hitting the API client directly for five separate endpoints.
  */
-export async function fetchGameDetailBundle(gameId: number): Promise<TGameDetailBundle> {
+export async function fetchGameDetailBundle(
+  gameId: number
+): Promise<TGameDetailBundle> {
   const game = await fetchFullGame(gameId);
   const resultConfig = await fetchResultConfigForGame(gameId);
   if (!resultConfig) {
@@ -431,7 +451,9 @@ export type TGameEditBundle = {
  * Loads everything EditGamePage needs in one call, instead of the page
  * hitting the API client directly for platforms/result-config/win-conditions/factions.
  */
-export async function fetchGameEditBundle(gameId: number): Promise<TGameEditBundle> {
+export async function fetchGameEditBundle(
+  gameId: number
+): Promise<TGameEditBundle> {
   const [platforms, game, resultConfig] = await Promise.all([
     fetchPlatforms(),
     fetchFullGame(gameId),
@@ -497,7 +519,9 @@ export async function createFullGame(payload: unknown): Promise<TFullGameDto> {
 }
 
 /** Deletes a game selection and everything hanging off it (admin only). */
-export async function deleteSelectedGame(selectedGameId: number): Promise<void> {
+export async function deleteSelectedGame(
+  selectedGameId: number
+): Promise<void> {
   await api.delete(`game/selected-games/${selectedGameId}/`);
 }
 

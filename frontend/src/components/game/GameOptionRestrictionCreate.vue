@@ -4,7 +4,11 @@
     <div class="row items-center justify-between q-mb-xs">
       <div class="text-subtitle2 text-weight-medium">Condition</div>
       <KennerButton
-        flat dense size="sm" icon="restart_alt" label="Clear"
+        flat
+        dense
+        size="sm"
+        icon="restart_alt"
+        label="Clear"
         :disable="!restrictToOption"
         @click="clearRestriction"
       />
@@ -28,7 +32,10 @@
       :rules="[(val: string) => !!val || 'Selection required']"
     />
 
-    <div v-if="restrictToOption" class="row items-center q-gutter-xs q-pl-xs q-mb-sm">
+    <div
+      v-if="restrictToOption"
+      class="row items-center q-gutter-xs q-pl-xs q-mb-sm"
+    >
       <q-badge outline class="text-caption text-dark">
         {{ restrictToOption.hasChoices ? 'Choice-based' : 'Boolean' }}
       </q-badge>
@@ -55,14 +62,19 @@
     <!-- Boolean condition -->
     <div v-else-if="restrictToOption">
       <q-toggle
-        color="accent" dense
+        color="accent"
+        dense
         :model-value="restrictionChoice.booleanActive"
-        @update:model-value="restrictionChoice.booleanActive = !restrictionChoice.booleanActive; updateRestriction()"
+        @update:model-value="
+          restrictionChoice.booleanActive = !restrictionChoice.booleanActive;
+          updateRestriction();
+        "
         :label="conditionalLabel"
         class="q-mt-xs"
       />
       <div class="text-caption text-grey-7 q-pl-xs q-mt-xs">
-        Applies only if the selected option is {{ restrictionChoice.booleanActive ? 'active' : 'inactive' }}.
+        Applies only if the selected option is
+        {{ restrictionChoice.booleanActive ? 'active' : 'inactive' }}.
       </div>
     </div>
 
@@ -88,7 +100,7 @@ const { updateItem, items } = inject('useGameOptions') as {
 const restrictToOption: Ref<TGameOption | null> = ref(null);
 const restrictionChoice = ref({
   booleanActive: true,
-  choiceSelection: { name: null as string | null, id: null as any }
+  choiceSelection: { name: null as string | null, id: null as any },
 });
 
 const conditionalLabel = computed(() =>
@@ -98,24 +110,35 @@ const conditionalLabel = computed(() =>
 );
 
 const filteredItems = computed(() =>
-  items.value.filter(item => item.title !== props.gameOption.title)
+  items.value.filter((item) => item.title !== props.gameOption.title)
 );
 
 function updateRestriction() {
   updateItem(props.gameOption, 'onlyIfOption', restrictToOption.value?.id);
   if (restrictToOption.value?.hasChoices) {
     updateItem(props.gameOption, 'onlyIfValue', undefined);
-    updateItem(props.gameOption, 'onlyIfChoice', restrictionChoice.value?.choiceSelection.id);
+    updateItem(
+      props.gameOption,
+      'onlyIfChoice',
+      restrictionChoice.value?.choiceSelection.id
+    );
   } else {
     updateItem(props.gameOption, 'onlyIfChoice', undefined);
-    updateItem(props.gameOption, 'onlyIfValue', restrictionChoice.value?.booleanActive);
+    updateItem(
+      props.gameOption,
+      'onlyIfValue',
+      restrictionChoice.value?.booleanActive
+    );
   }
 }
 
 // Quick reset (UI sugar only; logic unchanged)
 function clearRestriction() {
   restrictToOption.value = null;
-  restrictionChoice.value = { booleanActive: true, choiceSelection: { name: null, id: null } };
+  restrictionChoice.value = {
+    booleanActive: true,
+    choiceSelection: { name: null, id: null },
+  };
   updateItem(props.gameOption, 'onlyIfOption', undefined);
   updateItem(props.gameOption, 'onlyIfChoice', undefined);
   updateItem(props.gameOption, 'onlyIfValue', undefined);

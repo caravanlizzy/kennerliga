@@ -57,7 +57,8 @@ const computedStyle = computed(() => {
   const sizeVal = props.size || '36px';
   const numericSize = parseFloat(sizeVal);
   const calculatedFontSize =
-    props.fontSize || (numericSize ? `${Math.round(numericSize * 0.48)}px` : '15px');
+    props.fontSize ||
+    (numericSize ? `${Math.round(numericSize * 0.48)}px` : '15px');
   const calculatedRadius = numericSize
     ? `${Math.max(4, Math.min(8, Math.round(numericSize * 0.22)))}px`
     : '6px';

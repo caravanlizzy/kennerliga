@@ -17,12 +17,12 @@
 </template>
 
 <script setup lang="ts">
-const modelValue = defineModel()
+const modelValue = defineModel();
 
 defineProps<{
-  options: any[]
-  label?: string
-}>()
+  options: any[];
+  label?: string;
+}>();
 </script>
 
 <style lang="scss">
@@ -49,7 +49,10 @@ defineProps<{
     min-height: 36px !important;
   }
 
-  .q-field__native, .q-field__prefix, .q-field__suffix, .q-field__input {
+  .q-field__native,
+  .q-field__prefix,
+  .q-field__suffix,
+  .q-field__input {
     font-weight: 600;
     color: var(--kenner-primary-text);
     padding: 0 !important;
@@ -99,7 +102,8 @@ defineProps<{
     border-radius: 4px;
     transition: all 0.2s ease;
 
-    &.q-manual-focusable--focused, &:hover {
+    &.q-manual-focusable--focused,
+    &:hover {
       background: var(--kenner-hover-bg) !important;
     }
 

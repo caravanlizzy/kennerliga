@@ -1,5 +1,5 @@
 <template>
-  <div class="row ">
+  <div class="row">
     <q-chip
       v-for="user in users"
       :key="user"
@@ -29,7 +29,7 @@ const router = useRouter();
 async function impersonate(user: string) {
   try {
     await login(user, 'test', { ignorePermission: true });
-    await router.push({ name: 'my-league'})
+    await router.push({ name: 'my-league' });
   } catch (error) {
     console.error('Failed to impersonate user:', error);
   }
@@ -42,5 +42,4 @@ void fetchUsers()
   .catch((error) => {
     console.error('Failed to fetch users:', error);
   });
-
 </script>

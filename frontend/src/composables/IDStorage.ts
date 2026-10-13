@@ -7,7 +7,7 @@ export function useIDStorage() {
     IDStorage[itemId.toString()] = id;
   }
 
-  function getStorageItem(itemId: number): number  {
+  function getStorageItem(itemId: number): number {
     const item = IDStorage[itemId.toString()];
     return item;
   }
@@ -16,5 +16,5 @@ export function useIDStorage() {
     delete IDStorage[itemId.toString()];
   }
 
-  return { IDStorage, addStorageItem, getStorageItem, removeStorageItem }
+  return { IDStorage, addStorageItem, getStorageItem, removeStorageItem };
 }

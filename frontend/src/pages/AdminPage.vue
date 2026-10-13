@@ -1,8 +1,13 @@
 <template>
   <q-page class="q-py-md flex justify-center">
-    <div style="max-width: var(--kenner-max-width-text); width: 100%" class="q-px-sm">
+    <div
+      style="max-width: var(--kenner-max-width-text); width: 100%"
+      class="q-px-sm"
+    >
       <!-- Admin Hero Header -->
-      <div class="admin-hero-card q-pa-lg q-mb-lg row items-center justify-between">
+      <div
+        class="admin-hero-card q-pa-lg q-mb-lg row items-center justify-between"
+      >
         <div class="column">
           <div class="row items-center q-gutter-x-sm q-mb-xs">
             <q-icon name="admin_panel_settings" color="primary" size="32px" />
@@ -11,13 +16,16 @@
             </div>
           </div>
           <div class="text-caption text-grey-7">
-            Manage seasons, league assignments, games, announcements, and configuration.
+            Manage seasons, league assignments, games, announcements, and
+            configuration.
           </div>
         </div>
       </div>
 
       <div v-for="group in groups" :key="group.title" class="q-mb-xl">
-        <div class="text-subtitle1 text-weight-bold q-mb-sm text-dark row items-center q-gutter-x-xs">
+        <div
+          class="text-subtitle1 text-weight-bold q-mb-sm text-dark row items-center q-gutter-x-xs"
+        >
           <q-icon :name="group.icon" color="primary" size="18px" />
           <span>{{ group.title }}</span>
         </div>
@@ -36,14 +44,30 @@
               @click="!item.disabled && go(item)"
             >
               <q-card-section class="row items-center no-wrap q-pa-md">
-                <div class="admin-icon-box q-mr-md flex flex-center" :class="`bg-${item.color || 'primary'}-subtle`">
-                  <q-icon :name="item.icon" size="24px" :color="item.color || 'primary'" />
+                <div
+                  class="admin-icon-box q-mr-md flex flex-center"
+                  :class="`bg-${item.color || 'primary'}-subtle`"
+                >
+                  <q-icon
+                    :name="item.icon"
+                    size="24px"
+                    :color="item.color || 'primary'"
+                  />
                 </div>
                 <div class="col">
-                  <div class="text-subtitle2 text-weight-bold text-dark">{{ item.label }}</div>
-                  <div class="text-caption text-grey-6 ellipsis-2-lines">{{ item.description }}</div>
+                  <div class="text-subtitle2 text-weight-bold text-dark">
+                    {{ item.label }}
+                  </div>
+                  <div class="text-caption text-grey-6 ellipsis-2-lines">
+                    {{ item.description }}
+                  </div>
                 </div>
-                <q-icon name="chevron_right" color="grey-5" size="20px" class="q-ml-xs" />
+                <q-icon
+                  name="chevron_right"
+                  color="grey-5"
+                  size="20px"
+                  class="q-ml-xs"
+                />
               </q-card-section>
             </q-card>
           </div>
@@ -93,7 +117,9 @@ const groups = computed<AdminGroup[]>(() => [
         icon: 'settings_applications',
         color: 'primary',
         name: 'season-manage',
-        params: currentSeasonId.value ? { id: currentSeasonId.value } : undefined,
+        params: currentSeasonId.value
+          ? { id: currentSeasonId.value }
+          : undefined,
         disabled: !currentSeasonId.value,
       },
       {
@@ -212,21 +238,49 @@ onMounted(() => {
   flex-shrink: 0;
 }
 
-.bg-primary-subtle { background: rgba(54, 64, 88, 0.08); }
-.bg-secondary-subtle { background: rgba(235, 126, 44, 0.12); }
-.bg-accent-subtle { background: rgba(144, 107, 79, 0.12); }
-.bg-positive-subtle { background: rgba(46, 125, 50, 0.12); }
-.bg-warning-subtle { background: rgba(245, 124, 0, 0.12); }
-.bg-info-subtle { background: rgba(2, 136, 209, 0.12); }
-.bg-grey-8-subtle { background: rgba(66, 66, 66, 0.08); }
+.bg-primary-subtle {
+  background: rgba(54, 64, 88, 0.08);
+}
+.bg-secondary-subtle {
+  background: rgba(235, 126, 44, 0.12);
+}
+.bg-accent-subtle {
+  background: rgba(144, 107, 79, 0.12);
+}
+.bg-positive-subtle {
+  background: rgba(46, 125, 50, 0.12);
+}
+.bg-warning-subtle {
+  background: rgba(245, 124, 0, 0.12);
+}
+.bg-info-subtle {
+  background: rgba(2, 136, 209, 0.12);
+}
+.bg-grey-8-subtle {
+  background: rgba(66, 66, 66, 0.08);
+}
 
 .body--dark {
-  .bg-primary-subtle { background: rgba(255, 255, 255, 0.08); }
-  .bg-secondary-subtle { background: rgba(235, 126, 44, 0.18); }
-  .bg-accent-subtle { background: rgba(144, 107, 79, 0.22); }
-  .bg-positive-subtle { background: rgba(46, 125, 50, 0.22); }
-  .bg-warning-subtle { background: rgba(245, 124, 0, 0.18); }
-  .bg-info-subtle { background: rgba(2, 136, 209, 0.2); }
-  .bg-grey-8-subtle { background: rgba(255, 255, 255, 0.08); }
+  .bg-primary-subtle {
+    background: rgba(255, 255, 255, 0.08);
+  }
+  .bg-secondary-subtle {
+    background: rgba(235, 126, 44, 0.18);
+  }
+  .bg-accent-subtle {
+    background: rgba(144, 107, 79, 0.22);
+  }
+  .bg-positive-subtle {
+    background: rgba(46, 125, 50, 0.22);
+  }
+  .bg-warning-subtle {
+    background: rgba(245, 124, 0, 0.18);
+  }
+  .bg-info-subtle {
+    background: rgba(2, 136, 209, 0.2);
+  }
+  .bg-grey-8-subtle {
+    background: rgba(255, 255, 255, 0.08);
+  }
 }
 </style>

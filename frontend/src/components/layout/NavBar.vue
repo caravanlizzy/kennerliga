@@ -3,9 +3,7 @@
     class="column full-width glass-effect"
     :class="{ 'border-bottom-none': hasAnnouncementBelow }"
   >
-    <q-toolbar
-      class="navbar text-dark q-py-sm relative-position q-px-md"
-    >
+    <q-toolbar class="navbar text-dark q-py-sm relative-position q-px-md">
       <div class="row no-wrap items-center flex-shrink-0">
         <NavHome />
       </div>
@@ -13,22 +11,24 @@
       <div class="flex-spacer" />
 
       <!-- Center: Current Champion -->
-      <div
-        v-if="!isMobile"
-        class="row no-wrap items-center champion-container"
-      >
+      <div v-if="!isMobile" class="row no-wrap items-center champion-container">
         <CurrentChampion />
       </div>
 
       <div class="flex-spacer" />
 
       <!-- Right: Controls -->
-      <div class="row no-wrap items-center flex-shrink-0" :class="isMobile ? 'q-gutter-x-xs' : 'q-gutter-x-sm'">
+      <div
+        class="row no-wrap items-center flex-shrink-0"
+        :class="isMobile ? 'q-gutter-x-xs' : 'q-gutter-x-sm'"
+      >
         <div v-if="isMobile" class="q-mr-xs">
           <CurrentChampion />
         </div>
 
-        <!-- Chat feature temporarily disabled --><NavChat v-if="false && isAuthenticated" />
+        <!-- Chat feature temporarily disabled --><NavChat
+          v-if="false && isAuthenticated"
+        />
 
         <NavMyLeague v-if="user && user.myCurrentLeagueId" />
 
@@ -74,7 +74,12 @@ const showBreadcrumbs = computed(() => {
 });
 
 const hasAnnouncementBelow = computed(() => {
-  return isMobile.value && isAuthenticated.value && announcements.value.length > 0 && !showBreadcrumbs.value;
+  return (
+    isMobile.value &&
+    isAuthenticated.value &&
+    announcements.value.length > 0 &&
+    !showBreadcrumbs.value
+  );
 });
 </script>
 
@@ -108,6 +113,4 @@ const hasAnnouncementBelow = computed(() => {
 .border-subtle {
   border: 1px solid var(--kenner-border-subtle);
 }
-
-
 </style>

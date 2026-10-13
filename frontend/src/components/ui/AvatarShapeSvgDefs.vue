@@ -3,7 +3,13 @@
     class="avatar-shape-svg-defs"
     width="0"
     height="0"
-    style="position: absolute; width: 0; height: 0; pointer-events: none; overflow: hidden;"
+    style="
+      position: absolute;
+      width: 0;
+      height: 0;
+      pointer-events: none;
+      overflow: hidden;
+    "
     aria-hidden="true"
   >
     <defs>
@@ -37,7 +43,9 @@
 
       <!-- Hexagon -->
       <clipPath id="avatar-clip-hexagon" clipPathUnits="objectBoundingBox">
-        <polygon points="0.5,0.02 0.95,0.25 0.95,0.75 0.5,0.98 0.05,0.75 0.05,0.25" />
+        <polygon
+          points="0.5,0.02 0.95,0.25 0.95,0.75 0.5,0.98 0.05,0.75 0.05,0.25"
+        />
       </clipPath>
 
       <!-- Meeple -->

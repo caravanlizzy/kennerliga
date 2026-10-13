@@ -15,7 +15,11 @@
     </div>
 
     <!-- Winners content -->
-    <div v-else class="winners-container" :class="{ 'has-other-leagues': otherLeagueWinners.length > 0 }">
+    <div
+      v-else
+      class="winners-container"
+      :class="{ 'has-other-leagues': otherLeagueWinners.length > 0 }"
+    >
       <!-- Season Champion (League 1 Winner) Hero Card -->
       <div
         v-if="championWinner"
@@ -25,19 +29,31 @@
         <div class="champion-hero__glow"></div>
         <div class="champion-hero__content">
           <!-- Top Tag -->
-          <div class="champion-hero__top row items-center justify-between no-wrap">
+          <div
+            class="champion-hero__top row items-center justify-between no-wrap"
+          >
             <div class="champion-tag row items-center no-wrap">
-              <q-icon name="emoji_events" size="15px" class="q-mr-xs text-amber-9" />
-              <span class="text-weight-bolder letter-spacing-1">SEASON CHAMPION</span>
+              <q-icon
+                name="emoji_events"
+                size="15px"
+                class="q-mr-xs text-amber-9"
+              />
+              <span class="text-weight-bolder letter-spacing-1"
+                >SEASON CHAMPION</span
+              >
             </div>
             <LeagueLevel badge :level="championWinner.level" />
           </div>
 
           <!-- Champion Profile Section -->
-          <div class="champion-hero__body row items-center q-gutter-x-md no-wrap">
+          <div
+            class="champion-hero__body row items-center q-gutter-x-md no-wrap"
+          >
             <div class="champion-avatar-wrap">
               <UserAvatar
-                :display-username="championWinner.profileName || championWinner.username"
+                :display-username="
+                  championWinner.profileName || championWinner.username
+                "
                 :navigation-name="championWinner.username"
                 :shape="getAvatarShape(championWinner)"
                 :color="getAvatarColor(championWinner)"
@@ -58,7 +74,11 @@
                 {{ championWinner.profileName || championWinner.username }}
               </div>
               <div
-                v-if="championWinner.profileName && championWinner.username && championWinner.profileName !== championWinner.username"
+                v-if="
+                  championWinner.profileName &&
+                  championWinner.username &&
+                  championWinner.profileName !== championWinner.username
+                "
                 class="champion-handle ellipsis text-caption text-grey-7"
               >
                 @{{ championWinner.username }}
@@ -67,7 +87,8 @@
                 v-if="championWinner.points != null"
                 class="champion-score text-caption text-weight-bold text-amber-10 q-mt-xs"
               >
-                {{ championWinner.points }} {{ Number(championWinner.points) === 1 ? 'pt' : 'pts' }}
+                {{ championWinner.points }}
+                {{ Number(championWinner.points) === 1 ? 'pt' : 'pts' }}
               </div>
             </div>
           </div>
@@ -76,9 +97,13 @@
 
       <!-- Other League Champions (L2, L3, L4, ...) -->
       <div v-if="otherLeagueWinners.length > 0" class="other-leagues-panel">
-        <div class="other-leagues-panel__header row items-center q-gutter-x-xs q-mb-sm">
+        <div
+          class="other-leagues-panel__header row items-center q-gutter-x-xs q-mb-sm"
+        >
           <q-icon name="military_tech" size="15px" color="grey-7" />
-          <span class="text-caption text-weight-bold text-grey-8 uppercase letter-spacing-1">
+          <span
+            class="text-caption text-weight-bold text-grey-8 uppercase letter-spacing-1"
+          >
             League Champions
           </span>
         </div>
@@ -108,7 +133,11 @@
                   {{ item.profileName || item.username }}
                 </span>
                 <span
-                  v-if="item.profileName && item.username && item.profileName !== item.username"
+                  v-if="
+                    item.profileName &&
+                    item.username &&
+                    item.profileName !== item.username
+                  "
                   class="league-card__handle text-caption text-grey-6 ellipsis"
                 >
                   @{{ item.username }}
@@ -161,7 +190,11 @@ function isMe(username: string): boolean {
 
 function getAvatarShape(item?: WinnerEntry | null): AvatarShape | undefined {
   if (!item) return undefined;
-  if (item.username && userStore.user?.username === item.username && userStore.user?.avatar_shape) {
+  if (
+    item.username &&
+    userStore.user?.username === item.username &&
+    userStore.user?.avatar_shape
+  ) {
     return userStore.user.avatar_shape;
   }
   return item.avatarShape;
@@ -169,7 +202,11 @@ function getAvatarShape(item?: WinnerEntry | null): AvatarShape | undefined {
 
 function getAvatarColor(item?: WinnerEntry | null): string | undefined {
   if (!item) return undefined;
-  if (item.username && userStore.user?.username === item.username && userStore.user?.avatar_color !== undefined) {
+  if (
+    item.username &&
+    userStore.user?.username === item.username &&
+    userStore.user?.avatar_color !== undefined
+  ) {
     return userStore.user.avatar_color;
   }
   return item.avatarColor;
@@ -278,7 +315,11 @@ const otherLeagueWinners = computed(() => {
     right: -20px;
     width: 100px;
     height: 100px;
-    background: radial-gradient(circle, rgba(251, 191, 36, 0.25) 0%, rgba(251, 191, 36, 0) 70%);
+    background: radial-gradient(
+      circle,
+      rgba(251, 191, 36, 0.25) 0%,
+      rgba(251, 191, 36, 0) 70%
+    );
     pointer-events: none;
   }
 
@@ -291,7 +332,12 @@ const otherLeagueWinners = computed(() => {
   }
 
   .body--dark & {
-    background: linear-gradient(135deg, rgba(245, 158, 11, 0.16) 0%, rgba(245, 158, 11, 0.08) 45%, var(--kenner-card-bg) 100%);
+    background: linear-gradient(
+      135deg,
+      rgba(245, 158, 11, 0.16) 0%,
+      rgba(245, 158, 11, 0.08) 45%,
+      var(--kenner-card-bg) 100%
+    );
     border-color: var(--kenner-gold-border);
   }
 
@@ -392,7 +438,8 @@ const otherLeagueWinners = computed(() => {
   border-radius: 8px;
   padding: 6px 10px;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
-  transition: background-color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+  transition: background-color 0.15s ease, border-color 0.15s ease,
+    box-shadow 0.15s ease;
 
   &:hover {
     background: var(--kenner-surface-subtle);

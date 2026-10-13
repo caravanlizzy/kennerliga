@@ -6,7 +6,10 @@
     :round="shape === 'circle'"
     :dense="isMobile"
     class="q-mx-xs"
-    :class="{ 'squircle-shape': shape === 'squircle', 'square-shape': shape === 'square' || !shape }"
+    :class="{
+      'squircle-shape': shape === 'squircle',
+      'square-shape': shape === 'square' || !shape,
+    }"
     :color="color"
     :icon="icon"
     size="md"

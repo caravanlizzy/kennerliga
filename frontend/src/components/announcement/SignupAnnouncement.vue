@@ -2,7 +2,10 @@
   <q-card
     flat
     class="announcement-card overflow-hidden announcement-card--signup"
-    :class="{ 'no-border-radius-mobile': shouldRemoveBorders, 'announcement-card--minimized': isMinimized }"
+    :class="{
+      'no-border-radius-mobile': shouldRemoveBorders,
+      'announcement-card--minimized': isMinimized,
+    }"
   >
     <!-- Minimized View -->
     <q-card-section
@@ -11,10 +14,14 @@
       @click="toggleMinimized"
     >
       <div class="row items-center no-wrap col min-width-0 q-mr-sm">
-        <div class="minimized-icon-badge flex flex-center q-mr-sm flex-shrink-0">
+        <div
+          class="minimized-icon-badge flex flex-center q-mr-sm flex-shrink-0"
+        >
           <q-icon name="campaign" size="16px" color="white" />
         </div>
-        <div class="text-subtitle2 text-weight-bolder announcement-title ellipsis">
+        <div
+          class="text-subtitle2 text-weight-bolder announcement-title ellipsis"
+        >
           {{ announcement.title }}
         </div>
       </div>
@@ -84,7 +91,9 @@
               ANNOUNCEMENT
             </span>
           </div>
-          <div class="text-h6 text-weight-bolder lh-tight announcement-title q-mb-xs">
+          <div
+            class="text-h6 text-weight-bolder lh-tight announcement-title q-mb-xs"
+          >
             {{ announcement.title }}
           </div>
           <div
@@ -139,7 +148,9 @@
       <!-- Integrated Participants & Provisional Leagues List -->
       <div class="content-layer q-mt-md">
         <div class="row items-center q-gutter-x-sm q-mb-sm">
-          <div class="text-caption text-weight-bolder text-grey-8 uppercase tracking-widest section-title">
+          <div
+            class="text-caption text-weight-bolder text-grey-8 uppercase tracking-widest section-title"
+          >
             Signed up
           </div>
           <q-badge
@@ -172,7 +183,10 @@
             </div>
 
             <!-- Grouped by projected league -->
-            <div class="league-grid" :class="{ 'league-grid--mobile': isMobile }">
+            <div
+              class="league-grid"
+              :class="{ 'league-grid--mobile': isMobile }"
+            >
               <div
                 v-for="group in projectedLeagueGroups"
                 :key="`L-${group.level}`"
@@ -182,7 +196,9 @@
                   <LeagueLevel
                     badge
                     :level="group.level"
-                    :style="isMobile ? 'font-size: 0.6rem' : 'font-size: 0.65rem'"
+                    :style="
+                      isMobile ? 'font-size: 0.6rem' : 'font-size: 0.65rem'
+                    "
                   />
                   <q-badge
                     color="grey-5"
@@ -193,8 +209,15 @@
                   />
                 </div>
                 <div class="row q-gutter-xs">
-                  <div v-for="(p, index) in group.members" :key="p.profile || index" class="col-auto">
-                    <div class="participant-chip" :class="{ 'participant-chip--mobile': isMobile }">
+                  <div
+                    v-for="(p, index) in group.members"
+                    :key="p.profile || index"
+                    class="col-auto"
+                  >
+                    <div
+                      class="participant-chip"
+                      :class="{ 'participant-chip--mobile': isMobile }"
+                    >
                       {{ p.profile_name || 'Anonymous' }}
                     </div>
                   </div>
@@ -203,9 +226,14 @@
             </div>
 
             <!-- Newcomers -->
-            <div v-if="newcomers.length" :class="isMobile ? 'q-mt-sm' : 'q-mt-md'">
+            <div
+              v-if="newcomers.length"
+              :class="isMobile ? 'q-mt-sm' : 'q-mt-md'"
+            >
               <div class="row items-center q-gutter-x-xs q-mb-xs">
-                <div class="text-caption text-weight-bolder text-grey-7 uppercase tracking-widest section-title">
+                <div
+                  class="text-caption text-weight-bolder text-grey-7 uppercase tracking-widest section-title"
+                >
                   Newcomers
                 </div>
                 <q-badge
@@ -217,7 +245,11 @@
                 <q-icon name="person_add" size="12px" class="text-grey-6" />
               </div>
               <div class="row q-gutter-xs">
-                <div v-for="(p, index) in newcomers" :key="p.profile || index" class="col-auto">
+                <div
+                  v-for="(p, index) in newcomers"
+                  :key="p.profile || index"
+                  class="col-auto"
+                >
                   <div
                     class="participant-chip participant-chip--newcomer"
                     :class="{ 'participant-chip--mobile': isMobile }"
@@ -229,10 +261,20 @@
             </div>
 
             <!-- Fallback: signed-up users not yet in projection -->
-            <div v-if="unprojectedParticipants.length" :class="isMobile ? 'q-mt-sm' : 'q-mt-md'">
+            <div
+              v-if="unprojectedParticipants.length"
+              :class="isMobile ? 'q-mt-sm' : 'q-mt-md'"
+            >
               <div class="row q-gutter-xs">
-                <div v-for="(p, index) in unprojectedParticipants" :key="p.id || index" class="col-auto">
-                  <div class="participant-chip" :class="{ 'participant-chip--mobile': isMobile }">
+                <div
+                  v-for="(p, index) in unprojectedParticipants"
+                  :key="p.id || index"
+                  class="col-auto"
+                >
+                  <div
+                    class="participant-chip"
+                    :class="{ 'participant-chip--mobile': isMobile }"
+                  >
                     {{ p.profile_name || 'Anonymous' }}
                   </div>
                 </div>
@@ -241,13 +283,22 @@
           </div>
 
           <div v-else class="text-caption text-grey-6 italic">
-            {{ isAuthenticated ? 'Nobody signed up yet. Be the first!' : 'Nobody signed up yet.' }}
+            {{
+              isAuthenticated
+                ? 'Nobody signed up yet. Be the first!'
+                : 'Nobody signed up yet.'
+            }}
           </div>
 
           <!-- Missing Participants from previous season -->
-          <div v-if="missingParticipants.length" :class="isMobile ? 'q-mt-md' : 'q-mt-lg'">
+          <div
+            v-if="missingParticipants.length"
+            :class="isMobile ? 'q-mt-md' : 'q-mt-lg'"
+          >
             <div class="row items-center q-gutter-x-xs q-mb-xs">
-              <div class="text-caption text-weight-bolder text-grey-6 uppercase tracking-widest section-title">
+              <div
+                class="text-caption text-weight-bolder text-grey-6 uppercase tracking-widest section-title"
+              >
                 Missing from previous season
               </div>
               <q-badge
@@ -258,12 +309,20 @@
               />
             </div>
             <div class="row q-gutter-xs">
-              <div v-for="(p, index) in missingParticipants" :key="p.id || index" class="col-auto">
+              <div
+                v-for="(p, index) in missingParticipants"
+                :key="p.id || index"
+                class="col-auto"
+              >
                 <div
                   class="participant-chip participant-chip--missing"
                   :class="{ 'participant-chip--mobile': isMobile }"
                 >
-                  <q-icon name="history" size="12px" class="q-mr-xs text-grey-5 flex-shrink-0" />
+                  <q-icon
+                    name="history"
+                    size="12px"
+                    class="q-mr-xs text-grey-5 flex-shrink-0"
+                  />
                   <span>{{ p.profile_name || 'Anonymous' }}</span>
                 </div>
               </div>
@@ -343,7 +402,9 @@ function toggleMinimized() {
 }
 
 const projectedLeagueGroups = computed<TProjectedLeague[]>(() => {
-  return (projectedLeagues.value || []).filter((g) => g.members && g.members.length > 0);
+  return (projectedLeagues.value || []).filter(
+    (g) => g.members && g.members.length > 0
+  );
 });
 
 async function loadParticipants() {
@@ -410,9 +471,16 @@ onMounted(async () => {
 }
 
 .announcement-card--signup {
-  background:
-    radial-gradient(circle at 100% 0%, rgba(94, 53, 177, 0.09) 0%, transparent 50%),
-    radial-gradient(circle at 0% 100%, rgba(255, 122, 89, 0.06) 0%, transparent 40%),
+  background: radial-gradient(
+      circle at 100% 0%,
+      rgba(94, 53, 177, 0.09) 0%,
+      transparent 50%
+    ),
+    radial-gradient(
+      circle at 0% 100%,
+      rgba(255, 122, 89, 0.06) 0%,
+      transparent 40%
+    ),
     linear-gradient(135deg, #fbf7ff 0%, #f6f0fe 50%, #ffffff 100%);
   border: 1px solid rgba(94, 53, 177, 0.22);
   border-top: 4px solid var(--q-accent);
@@ -623,9 +691,16 @@ onMounted(async () => {
 
 /* Dark mode */
 .body--dark .announcement-card--signup {
-  background:
-    radial-gradient(circle at 100% 0%, rgba(149, 117, 205, 0.16) 0%, transparent 50%),
-    radial-gradient(circle at 0% 100%, rgba(255, 122, 89, 0.08) 0%, transparent 40%),
+  background: radial-gradient(
+      circle at 100% 0%,
+      rgba(149, 117, 205, 0.16) 0%,
+      transparent 50%
+    ),
+    radial-gradient(
+      circle at 0% 100%,
+      rgba(255, 122, 89, 0.08) 0%,
+      transparent 40%
+    ),
     linear-gradient(135deg, #221c2e 0%, #1e1a28 50%, #1a1a20 100%);
   border-color: rgba(149, 117, 205, 0.3);
   border-top-color: var(--q-accent);
@@ -674,11 +749,19 @@ onMounted(async () => {
 }
 
 .body--dark .signup-minimized {
-  background: linear-gradient(90deg, rgba(149, 117, 205, 0.14) 0%, transparent 100%);
+  background: linear-gradient(
+    90deg,
+    rgba(149, 117, 205, 0.14) 0%,
+    transparent 100%
+  );
 }
 
 .body--dark .signup-minimized:hover {
-  background: linear-gradient(90deg, rgba(149, 117, 205, 0.22) 0%, rgba(149, 117, 205, 0.08) 100%);
+  background: linear-gradient(
+    90deg,
+    rgba(149, 117, 205, 0.22) 0%,
+    rgba(149, 117, 205, 0.08) 100%
+  );
 }
 
 .body--dark .announcement-card--minimized {

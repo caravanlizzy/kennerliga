@@ -65,6 +65,8 @@ export function submitMatchResults(
 }
 
 /** Deletes every result of a selected game (admin only). */
-export function deleteMatchResults(selectedGameId: number): Promise<AxiosResponse> {
+export function deleteMatchResults(
+  selectedGameId: number
+): Promise<AxiosResponse> {
   return api.delete(`result/match-results/${selectedGameId}/`);
 }

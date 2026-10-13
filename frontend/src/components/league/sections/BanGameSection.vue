@@ -23,17 +23,26 @@
         @click="performBan(c.id, false)"
       >
         <q-card-section class="row items-center no-wrap q-pa-sm">
-          <div class="ban-candidate-index text-caption text-weight-bold text-grey-6 q-mr-sm">
+          <div
+            class="ban-candidate-index text-caption text-weight-bold text-grey-6 q-mr-sm"
+          >
             {{ String(idx + 1).padStart(2, '0') }}
           </div>
           <div class="col">
-            <div class="text-weight-bold text-dark ellipsis">{{ c.game_name }}</div>
+            <div class="text-weight-bold text-dark ellipsis">
+              {{ c.game_name }}
+            </div>
             <div class="text-caption text-grey-7 ellipsis">
               <q-icon name="person" size="14px" class="q-mr-xs" />
               Picked by {{ c.owner_name }}
             </div>
           </div>
-          <q-icon name="block" size="sm" color="negative" class="q-ml-sm ban-candidate-icon" />
+          <q-icon
+            name="block"
+            size="sm"
+            color="negative"
+            class="q-ml-sm ban-candidate-icon"
+          />
         </q-card-section>
       </q-card>
     </div>

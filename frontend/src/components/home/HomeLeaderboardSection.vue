@@ -7,12 +7,14 @@
     color="secondary"
   >
     <template #header-extra>
-      <div class="row items-center justify-end no-wrap q-gutter-x-sm q-ml-md col">
+      <div
+        class="row items-center justify-end no-wrap q-gutter-x-sm q-ml-md col"
+      >
         <SmoothSwitch
           v-model="showAllLeagues"
           :options="[
             { label: 'Highest', value: false },
-            { label: 'All', value: true }
+            { label: 'All', value: true },
           ]"
         />
         <div style="min-width: 120px">

@@ -253,7 +253,9 @@ export function useGameForm() {
       const choiceRefs = new Set<string>();
       for (const ch of opt.choices) {
         if (choiceRefs.has(ch.ref))
-          errors.push(`Duplicate choice ref in option "${opt.name}": ${ch.ref}`);
+          errors.push(
+            `Duplicate choice ref in option "${opt.name}": ${ch.ref}`
+          );
         choiceRefs.add(ch.ref);
       }
     }
@@ -263,7 +265,9 @@ export function useGameForm() {
         for (const cond of grp.conditions) {
           if (!cond.depends_on_option_ref) {
             errors.push(
-              `Option "${opt.name || '(unnamed)'}" has a condition missing "Depends on option".`
+              `Option "${
+                opt.name || '(unnamed)'
+              }" has a condition missing "Depends on option".`
             );
             continue;
           }

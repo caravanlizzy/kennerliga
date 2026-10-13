@@ -1,7 +1,10 @@
 <template>
   <!-- Loading -->
   <LoadingSpinner v-if="loading" />
-  <ErrorDisplay v-if="error" :error="error ? 'Failed to load leaderboard' : ''" />
+  <ErrorDisplay
+    v-if="error"
+    :error="error ? 'Failed to load leaderboard' : ''"
+  />
 
   <!-- Content -->
   <div
@@ -10,223 +13,289 @@
   >
     <!-- Table -->
     <div class="table-responsive-wrapper">
-      <q-markup-table flat dense separator="none" class="leaderboard-table bg-transparent">
+      <q-markup-table
+        flat
+        dense
+        separator="none"
+        class="leaderboard-table bg-transparent"
+      >
         <thead>
-        <tr class="header-row">
-          <th class="rank-col text-center">Rank</th>
-          <th class="text-left player-col">Player</th>
-
-          <template v-if="!showAllLeagues">
-            <th class="text-center stat-col">
-              <div class="column items-center">
-                <span class="pos-badge pos-badge--1st">1st</span>
-              </div>
-            </th>
-
-            <th class="text-center stat-col">
-              <div class="column items-center">
-                <span class="pos-badge pos-badge--2nd">2nd</span>
-              </div>
-            </th>
-
-            <th class="text-center stat-col">
-              <div class="column items-center">
-                <span class="pos-badge pos-badge--3rd">3rd</span>
-              </div>
-            </th>
-
-            <th class="text-center stat-col">
-              <div class="column items-center">
-                <span class="pos-badge pos-badge--4th">4th</span>
-              </div>
-            </th>
-          </template>
-
-          <template v-else>
-            <template v-for="level in standings.levels" :key="level">
-              <th class="text-center level-group-header">
-                <div class="column items-center">
-                  <LeagueLevel badge :level="level" class="q-mb-xs" />
-                  <div class="row justify-center items-center no-wrap pos-mini-header">
-                    <span class="pos-mini-label pos-mini-label--1">1st</span>
-                    <div class="pos-sep"></div>
-                    <span class="pos-mini-label pos-mini-label--2">2nd</span>
-                    <div class="pos-sep"></div>
-                    <span class="pos-mini-label pos-mini-label--3">3rd</span>
-                    <div class="pos-sep"></div>
-                    <span class="pos-mini-label pos-mini-label--4">4th</span>
-                  </div>
-                </div>
-              </th>
-            </template>
-          </template>
-        </tr>
-        </thead>
-
-        <tbody class="divide-y">
-        <template
-          v-for="(row, index) in standings.standings"
-          :key="row.player_profile_id"
-        >
-          <!-- League level header (e.g. League 1) -->
-          <tr v-if="index === 0 || bestLeague(row) !== bestLeague(standings.standings[index-1])" class="league-header-row">
-            <td :colspan="showAllLeagues ? 2 + standings.levels.length : 6" class="q-pa-none">
-              <div class="row items-center q-gutter-x-sm q-mt-md q-mb-xs q-px-sm">
-                <div
-                  v-if="bestLeague(row)"
-                  class="league-header-badge"
-                  :style="{
-                    backgroundColor: getHexLeagueColor(bestLeague(row)!),
-                  }"
-                >
-                  L{{ bestLeague(row) }}
-                </div>
-                <span v-if="bestLeague(row)" class="text-weight-bolder text-grey-8 text-uppercase tracking-wider" style="font-size: 0.75rem">
-                  League {{ bestLeague(row) }}
-                </span>
-                <q-separator class="col q-ml-sm opacity-40" horizontal />
-              </div>
-            </td>
-          </tr>
-
-          <tr
-            class="leaderboard-row"
-            :class="{
-              'leaderboard-row--leader': index === 0,
-              'leaderboard-row--podium': index < 3
-            }"
-          >
-            <!-- Rank -->
-            <td class="text-center rank-col">
-              <div class="flex flex-center">
-                <span
-                  class="rank-badge"
-                  :class="`rank-badge--${index}`"
-                >
-                  <q-icon v-if="index === 0" name="emoji_events" size="13px" class="q-mr-xs" />
-                  {{ index + 1 }}
-                </span>
-              </div>
-            </td>
-
-            <!-- Player -->
-            <td class="text-left player-col q-py-sm">
-              <div class="row items-center q-gutter-x-sm no-wrap">
-                <UserAvatar
-                  :display-username="row.profile_name || row.username"
-                  :navigation-name="row.username"
-                  :shape="getAvatarShape(row)"
-                  :color="getAvatarColor(row)"
-                  size="30px"
-                  border
-                />
-                <div class="column ellipsis">
-                  <span
-                    class="text-body2 text-weight-bolder leaderboard-player-name cursor-pointer username-link ellipsis"
-                    @click="$router.push({ name: 'user-detail', params: { username: row.username } })"
-                  >{{ row.profile_name }}</span>
-                  <span
-                    v-if="row.profile_name && row.username && row.profile_name !== row.username"
-                    class="text-caption text-grey-6 ellipsis"
-                    style="font-size: 0.7rem; line-height: 1.1;"
-                  >
-                    @{{ row.username }}
-                  </span>
-                </div>
-              </div>
-            </td>
+          <tr class="header-row">
+            <th class="rank-col text-center">Rank</th>
+            <th class="text-left player-col">Player</th>
 
             <template v-if="!showAllLeagues">
-              <!-- 1st -->
-              <td class="text-center stat-col">
-                <span
-                  v-if="getHighestLeagueCounts(row).first > 0"
-                  class="count-badge count-badge--first"
-                >
-                  {{ getHighestLeagueCounts(row).first }}
-                </span>
-                <span v-else class="text-grey-4 text-weight-medium">·</span>
-              </td>
+              <th class="text-center stat-col">
+                <div class="column items-center">
+                  <span class="pos-badge pos-badge--1st">1st</span>
+                </div>
+              </th>
 
-              <!-- 2nd -->
-              <td class="text-center stat-col">
-                <span
-                  v-if="getHighestLeagueCounts(row).second > 0"
-                  class="count-badge count-badge--second"
-                >
-                  {{ getHighestLeagueCounts(row).second }}
-                </span>
-                <span v-else class="text-grey-4 text-weight-medium">·</span>
-              </td>
+              <th class="text-center stat-col">
+                <div class="column items-center">
+                  <span class="pos-badge pos-badge--2nd">2nd</span>
+                </div>
+              </th>
 
-              <!-- 3rd -->
-              <td class="text-center stat-col">
-                <span
-                  v-if="getHighestLeagueCounts(row).third > 0"
-                  class="count-badge count-badge--third"
-                >
-                  {{ getHighestLeagueCounts(row).third }}
-                </span>
-                <span v-else class="text-grey-4 text-weight-medium">·</span>
-              </td>
+              <th class="text-center stat-col">
+                <div class="column items-center">
+                  <span class="pos-badge pos-badge--3rd">3rd</span>
+                </div>
+              </th>
 
-              <!-- 4th -->
-              <td class="text-center stat-col">
-                <span
-                  v-if="getHighestLeagueCounts(row).fourth > 0"
-                  class="count-badge count-badge--fourth"
-                >
-                  {{ getHighestLeagueCounts(row).fourth }}
-                </span>
-                <span v-else class="text-grey-4 text-weight-medium">·</span>
-              </td>
+              <th class="text-center stat-col">
+                <div class="column items-center">
+                  <span class="pos-badge pos-badge--4th">4th</span>
+                </div>
+              </th>
             </template>
 
             <template v-else>
               <template v-for="level in standings.levels" :key="level">
-                <td class="text-center q-px-xs stat-col-multi">
-                  <div class="row justify-center items-center no-wrap level-counts-row">
-                    <div class="column items-center pos-num">
-                      <span :class="row.per_level[level]?.first ? 'text-weight-bolder text-amber-9' : 'text-grey-4'">
-                        {{ row.per_level[level]?.first || '·' }}
-                      </span>
-                    </div>
-                    <div class="pos-sep"></div>
-                    <div class="column items-center pos-num">
-                      <span :class="row.per_level[level]?.second ? 'text-weight-bold text-blue-grey-7' : 'text-grey-4'">
-                        {{ row.per_level[level]?.second || '·' }}
-                      </span>
-                    </div>
-                    <div class="pos-sep"></div>
-                    <div class="column items-center pos-num">
-                      <span :class="row.per_level[level]?.third ? 'text-weight-bold text-brown-6' : 'text-grey-4'">
-                        {{ row.per_level[level]?.third || '·' }}
-                      </span>
-                    </div>
-                    <div class="pos-sep"></div>
-                    <div class="column items-center pos-num">
-                      <span :class="row.per_level[level]?.fourth ? 'text-weight-medium text-grey-7' : 'text-grey-4'">
-                        {{ row.per_level[level]?.fourth || '·' }}
-                      </span>
+                <th class="text-center level-group-header">
+                  <div class="column items-center">
+                    <LeagueLevel badge :level="level" class="q-mb-xs" />
+                    <div
+                      class="row justify-center items-center no-wrap pos-mini-header"
+                    >
+                      <span class="pos-mini-label pos-mini-label--1">1st</span>
+                      <div class="pos-sep"></div>
+                      <span class="pos-mini-label pos-mini-label--2">2nd</span>
+                      <div class="pos-sep"></div>
+                      <span class="pos-mini-label pos-mini-label--3">3rd</span>
+                      <div class="pos-sep"></div>
+                      <span class="pos-mini-label pos-mini-label--4">4th</span>
                     </div>
                   </div>
-                </td>
+                </th>
               </template>
             </template>
           </tr>
-        </template>
+        </thead>
+
+        <tbody class="divide-y">
+          <template
+            v-for="(row, index) in standings.standings"
+            :key="row.player_profile_id"
+          >
+            <!-- League level header (e.g. League 1) -->
+            <tr
+              v-if="
+                index === 0 ||
+                bestLeague(row) !== bestLeague(standings.standings[index - 1])
+              "
+              class="league-header-row"
+            >
+              <td
+                :colspan="showAllLeagues ? 2 + standings.levels.length : 6"
+                class="q-pa-none"
+              >
+                <div
+                  class="row items-center q-gutter-x-sm q-mt-md q-mb-xs q-px-sm"
+                >
+                  <div
+                    v-if="bestLeague(row)"
+                    class="league-header-badge"
+                    :style="{
+                    backgroundColor: getHexLeagueColor(bestLeague(row)!),
+                  }"
+                  >
+                    L{{ bestLeague(row) }}
+                  </div>
+                  <span
+                    v-if="bestLeague(row)"
+                    class="text-weight-bolder text-grey-8 text-uppercase tracking-wider"
+                    style="font-size: 0.75rem"
+                  >
+                    League {{ bestLeague(row) }}
+                  </span>
+                  <q-separator class="col q-ml-sm opacity-40" horizontal />
+                </div>
+              </td>
+            </tr>
+
+            <tr
+              class="leaderboard-row"
+              :class="{
+                'leaderboard-row--leader': index === 0,
+                'leaderboard-row--podium': index < 3,
+              }"
+            >
+              <!-- Rank -->
+              <td class="text-center rank-col">
+                <div class="flex flex-center">
+                  <span class="rank-badge" :class="`rank-badge--${index}`">
+                    <q-icon
+                      v-if="index === 0"
+                      name="emoji_events"
+                      size="13px"
+                      class="q-mr-xs"
+                    />
+                    {{ index + 1 }}
+                  </span>
+                </div>
+              </td>
+
+              <!-- Player -->
+              <td class="text-left player-col q-py-sm">
+                <div class="row items-center q-gutter-x-sm no-wrap">
+                  <UserAvatar
+                    :display-username="row.profile_name || row.username"
+                    :navigation-name="row.username"
+                    :shape="getAvatarShape(row)"
+                    :color="getAvatarColor(row)"
+                    size="30px"
+                    border
+                  />
+                  <div class="column ellipsis">
+                    <span
+                      class="text-body2 text-weight-bolder leaderboard-player-name cursor-pointer username-link ellipsis"
+                      @click="
+                        $router.push({
+                          name: 'user-detail',
+                          params: { username: row.username },
+                        })
+                      "
+                      >{{ row.profile_name }}</span
+                    >
+                    <span
+                      v-if="
+                        row.profile_name &&
+                        row.username &&
+                        row.profile_name !== row.username
+                      "
+                      class="text-caption text-grey-6 ellipsis"
+                      style="font-size: 0.7rem; line-height: 1.1"
+                    >
+                      @{{ row.username }}
+                    </span>
+                  </div>
+                </div>
+              </td>
+
+              <template v-if="!showAllLeagues">
+                <!-- 1st -->
+                <td class="text-center stat-col">
+                  <span
+                    v-if="getHighestLeagueCounts(row).first > 0"
+                    class="count-badge count-badge--first"
+                  >
+                    {{ getHighestLeagueCounts(row).first }}
+                  </span>
+                  <span v-else class="text-grey-4 text-weight-medium">·</span>
+                </td>
+
+                <!-- 2nd -->
+                <td class="text-center stat-col">
+                  <span
+                    v-if="getHighestLeagueCounts(row).second > 0"
+                    class="count-badge count-badge--second"
+                  >
+                    {{ getHighestLeagueCounts(row).second }}
+                  </span>
+                  <span v-else class="text-grey-4 text-weight-medium">·</span>
+                </td>
+
+                <!-- 3rd -->
+                <td class="text-center stat-col">
+                  <span
+                    v-if="getHighestLeagueCounts(row).third > 0"
+                    class="count-badge count-badge--third"
+                  >
+                    {{ getHighestLeagueCounts(row).third }}
+                  </span>
+                  <span v-else class="text-grey-4 text-weight-medium">·</span>
+                </td>
+
+                <!-- 4th -->
+                <td class="text-center stat-col">
+                  <span
+                    v-if="getHighestLeagueCounts(row).fourth > 0"
+                    class="count-badge count-badge--fourth"
+                  >
+                    {{ getHighestLeagueCounts(row).fourth }}
+                  </span>
+                  <span v-else class="text-grey-4 text-weight-medium">·</span>
+                </td>
+              </template>
+
+              <template v-else>
+                <template v-for="level in standings.levels" :key="level">
+                  <td class="text-center q-px-xs stat-col-multi">
+                    <div
+                      class="row justify-center items-center no-wrap level-counts-row"
+                    >
+                      <div class="column items-center pos-num">
+                        <span
+                          :class="
+                            row.per_level[level]?.first
+                              ? 'text-weight-bolder text-amber-9'
+                              : 'text-grey-4'
+                          "
+                        >
+                          {{ row.per_level[level]?.first || '·' }}
+                        </span>
+                      </div>
+                      <div class="pos-sep"></div>
+                      <div class="column items-center pos-num">
+                        <span
+                          :class="
+                            row.per_level[level]?.second
+                              ? 'text-weight-bold text-blue-grey-7'
+                              : 'text-grey-4'
+                          "
+                        >
+                          {{ row.per_level[level]?.second || '·' }}
+                        </span>
+                      </div>
+                      <div class="pos-sep"></div>
+                      <div class="column items-center pos-num">
+                        <span
+                          :class="
+                            row.per_level[level]?.third
+                              ? 'text-weight-bold text-brown-6'
+                              : 'text-grey-4'
+                          "
+                        >
+                          {{ row.per_level[level]?.third || '·' }}
+                        </span>
+                      </div>
+                      <div class="pos-sep"></div>
+                      <div class="column items-center pos-num">
+                        <span
+                          :class="
+                            row.per_level[level]?.fourth
+                              ? 'text-weight-medium text-grey-7'
+                              : 'text-grey-4'
+                          "
+                        >
+                          {{ row.per_level[level]?.fourth || '·' }}
+                        </span>
+                      </div>
+                    </div>
+                  </td>
+                </template>
+              </template>
+            </tr>
+          </template>
         </tbody>
       </q-markup-table>
     </div>
 
     <!-- Note footer -->
-    <div class="leaderboard-footer q-px-md q-py-sm text-caption text-grey-6 row items-center justify-between wrap q-gutter-y-xs">
+    <div
+      class="leaderboard-footer q-px-md q-py-sm text-caption text-grey-6 row items-center justify-between wrap q-gutter-y-xs"
+    >
       <div class="row items-center q-gutter-x-xs">
         <q-icon name="info" size="14px" color="grey-6" />
-        <span>Ranked by highest league achieved (L1 top) and season placements.</span>
+        <span
+          >Ranked by highest league achieved (L1 top) and season
+          placements.</span
+        >
       </div>
       <div class="text-caption text-grey-5">
-        {{ standings.standings.length }} {{ standings.standings.length === 1 ? 'player' : 'players' }}
+        {{ standings.standings.length }}
+        {{ standings.standings.length === 1 ? 'player' : 'players' }}
       </div>
     </div>
   </div>
@@ -235,7 +304,9 @@
   <div v-else class="column items-center q-pa-xl text-grey-6 leaderboard-empty">
     <q-icon name="stars" size="48px" class="q-mb-sm opacity-20" />
     <div class="text-subtitle1 text-weight-bold">No Leaderboard Data</div>
-    <div class="text-caption">Leaderboard statistics will appear here after the seasons conclude.</div>
+    <div class="text-caption">
+      Leaderboard statistics will appear here after the seasons conclude.
+    </div>
   </div>
 </template>
 
@@ -260,21 +331,31 @@ const { getHexLeagueColor } = leagueColors();
 const userStore = useUserStore();
 
 function getAvatarShape(row: TPlayerYearStanding) {
-  if (row.username && userStore.user?.username === row.username && userStore.user?.avatar_shape) {
+  if (
+    row.username &&
+    userStore.user?.username === row.username &&
+    userStore.user?.avatar_shape
+  ) {
     return userStore.user.avatar_shape;
   }
   return row.avatar_shape;
 }
 
 function getAvatarColor(row: TPlayerYearStanding) {
-  if (row.username && userStore.user?.username === row.username && userStore.user?.avatar_color !== undefined) {
+  if (
+    row.username &&
+    userStore.user?.username === row.username &&
+    userStore.user?.avatar_color !== undefined
+  ) {
     return userStore.user.avatar_color;
   }
   return row.avatar_color;
 }
 
 const error = ref(false);
-const showAllLeagues = defineModel<boolean>('showAllLeagues', { default: false });
+const showAllLeagues = defineModel<boolean>('showAllLeagues', {
+  default: false,
+});
 
 // Stale-while-revalidate cache with a module-level `cacheKey`, so the
 // leaderboard survives component unmount/remount (Hall of Fame section on
@@ -313,7 +394,14 @@ function bestLeague(row: TPlayerYearStanding): number | null {
 function getHighestLeagueCounts(row: TPlayerYearStanding): TPerLevelCounts {
   const highestLvl = bestLeague(row);
   if (highestLvl === null) return { first: 0, second: 0, third: 0, fourth: 0 };
-  return row.per_level[String(highestLvl)] || { first: 0, second: 0, third: 0, fourth: 0 };
+  return (
+    row.per_level[String(highestLvl)] || {
+      first: 0,
+      second: 0,
+      third: 0,
+      fourth: 0,
+    }
+  );
 }
 
 watch(
@@ -410,10 +498,18 @@ watch(
   font-size: 0.65rem;
   font-weight: 700;
 
-  &--1 { color: var(--kenner-gold-text); }
-  &--2 { color: var(--kenner-text-muted); }
-  &--3 { color: var(--kenner-bronze-text); }
-  &--4 { color: #94a3b8; }
+  &--1 {
+    color: var(--kenner-gold-text);
+  }
+  &--2 {
+    color: var(--kenner-text-muted);
+  }
+  &--3 {
+    color: var(--kenner-bronze-text);
+  }
+  &--4 {
+    color: #94a3b8;
+  }
 }
 
 .rank-badge {

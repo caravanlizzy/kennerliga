@@ -4,10 +4,15 @@
       <LoadingSpinner text="Loading match results..." />
     </div>
 
-    <div v-else-if="selectedGamesWithResults.length === 0" class="column items-center q-pa-xl text-grey-6 bg-white rounded-borders border-subtle">
+    <div
+      v-else-if="selectedGamesWithResults.length === 0"
+      class="column items-center q-pa-xl text-grey-6 bg-white rounded-borders border-subtle"
+    >
       <q-icon name="history" size="48px" class="q-mb-md opacity-20" />
       <div class="text-subtitle1">No match results yet</div>
-      <div class="text-caption">The results will appear here once games are played and recorded.</div>
+      <div class="text-caption">
+        The results will appear here once games are played and recorded.
+      </div>
     </div>
 
     <div v-else class="row q-col-gutter-md items-start">
@@ -20,10 +25,14 @@
                 <q-icon name="leaderboard" color="primary" size="24px" />
               </div>
               <div class="column">
-                <div class="text-subtitle1 text-weight-bolder text-dark line-height-1 ellipsis">
+                <div
+                  class="text-subtitle1 text-weight-bolder text-dark line-height-1 ellipsis"
+                >
                   League Standings
                 </div>
-                <div class="text-caption text-grey-6 text-uppercase letter-spacing-1">
+                <div
+                  class="text-caption text-grey-6 text-uppercase letter-spacing-1"
+                >
                   Current overview
                 </div>
               </div>
@@ -39,10 +48,7 @@
       <!-- Results: grouped together in their own grid, next to the standings box -->
       <div :class="showStandings ? 'col-12 col-md-8 col-lg-9' : 'col-12'">
         <div class="game-cards-grid">
-          <div
-            v-for="game in selectedGamesWithResults"
-            :key="game.id"
-          >
+          <div v-for="game in selectedGamesWithResults" :key="game.id">
             <q-card flat bordered class="match-game-card">
               <q-card-section class="q-pb-none">
                 <div class="row items-center no-wrap">
@@ -50,10 +56,14 @@
                     <q-icon name="sports_esports" color="primary" size="24px" />
                   </div>
                   <div class="column col">
-                    <div class="text-subtitle1 text-weight-bolder text-dark line-height-1 ellipsis">
+                    <div
+                      class="text-subtitle1 text-weight-bolder text-dark line-height-1 ellipsis"
+                    >
                       {{ game.game_name }}
                     </div>
-                    <div class="text-caption text-grey-6 text-uppercase letter-spacing-1">
+                    <div
+                      class="text-caption text-grey-6 text-uppercase letter-spacing-1"
+                    >
                       Selected by {{ game.selected_by }}
                     </div>
                   </div>
@@ -63,8 +73,14 @@
                     text-color="indigo-8"
                     class="stat-badge elegant-badge q-ml-sm"
                   >
-                    <q-icon name="flag_circle" size="14px" class="q-mr-xs shrink-0" />
-                    <span class="ellipsis">{{ getWinConditionName(game.id) }}</span>
+                    <q-icon
+                      name="flag_circle"
+                      size="14px"
+                      class="q-mr-xs shrink-0"
+                    />
+                    <span class="ellipsis">{{
+                      getWinConditionName(game.id)
+                    }}</span>
                     <KennerTooltip>
                       <span class="text-weight-bold">Win condition:</span>
                       {{ getWinConditionName(game.id) }}
@@ -74,11 +90,11 @@
               </q-card-section>
 
               <q-card-section class="q-pt-sm">
-                 <MatchResult
-                   :selected-game="game"
-                   :display-game-name="false"
-                   :match-results="matchResultsBySelectedGame"
-                 />
+                <MatchResult
+                  :selected-game="game"
+                  :display-game-name="false"
+                  :match-results="matchResultsBySelectedGame"
+                />
               </q-card-section>
             </q-card>
           </div>
@@ -107,7 +123,7 @@ const {
   loading,
   selectedGamesWithResults,
   matchResultsBySelectedGame,
-  initialized
+  initialized,
 } = storeToRefs(leagueStore);
 
 function getWinConditionName(selectedGameId: number): string | null {

@@ -12,7 +12,6 @@ import {
   TMatchResult,
 } from 'src/types';
 
-
 /**
  * Represents a Vue Store for managing league-related data and state.
  *
@@ -38,7 +37,7 @@ export const useLeagueStore = (id: number) => {
 
     // leagueData
     const leagueId = ref(id);
-    const leagueData = shallowRef<TLeagueDto|null>(null);
+    const leagueData = shallowRef<TLeagueDto | null>(null);
     const members = ref<TSeasonParticipantDto[]>([]);
     const leagueStatus = ref<TLeagueStatus>('PICKING'); // states: PICKING, BANNING, REPICKING, PLAYING, DONE
 
@@ -53,14 +52,19 @@ export const useLeagueStore = (id: number) => {
     const statusNoun = computed(
       () => statusMap[leagueStatus.value]?.noun ?? ''
     );
-    const statusVerb = computed(() => statusMap[leagueStatus.value]?.verb ?? '');
+    const statusVerb = computed(
+      () => statusMap[leagueStatus.value]?.verb ?? ''
+    );
 
     // --- Derived maps for O(1) lookups ---
     const membersById = computed<{ [key: number]: TSeasonParticipantDto }>(() =>
-      members.value.reduce((acc: { [key: number]: TSeasonParticipantDto }, m) => {
-        acc[m.id] = m;
-        return acc;
-      }, {})
+      members.value.reduce(
+        (acc: { [key: number]: TSeasonParticipantDto }, m) => {
+          acc[m.id] = m;
+          return acc;
+        },
+        {}
+      )
     );
 
     const selectedGames = computed(() => {
@@ -80,13 +84,10 @@ export const useLeagueStore = (id: number) => {
     const selectedGamesById = computed<
       Record<number, TSelectedGameDto & { selected_by: string }>
     >(() =>
-      selectedGames.value.reduce(
-        (acc, g) => {
-          acc[g.id] = g;
-          return acc;
-        },
-        {} as Record<number, TSelectedGameDto & { selected_by: string }>
-      )
+      selectedGames.value.reduce((acc, g) => {
+        acc[g.id] = g;
+        return acc;
+      }, {} as Record<number, TSelectedGameDto & { selected_by: string }>)
     );
 
     const playableSelectedGames = computed(() =>
@@ -102,7 +103,9 @@ export const useLeagueStore = (id: number) => {
     );
 
     const selectedGamesWithResults = computed(() =>
-      playableSelectedGames.value.filter(g => (matchResultsBySelectedGame.value[g.id]?.length ?? 0) > 0)
+      playableSelectedGames.value.filter(
+        (g) => (matchResultsBySelectedGame.value[g.id]?.length ?? 0) > 0
+      )
     );
 
     const selectedGamesFetchedEmpty = computed(() =>
@@ -110,7 +113,6 @@ export const useLeagueStore = (id: number) => {
         (g) => (matchResultsBySelectedGame.value[g.id]?.length ?? 0) === 0
       )
     );
-
 
     const initialized = ref(false);
     // Background refresh indicator (does not block UI, unlike `loading`).
@@ -139,8 +141,8 @@ export const useLeagueStore = (id: number) => {
         leagueStatus.value = data.status || 'PICKING';
 
         // Populate matchResultsBySelectedGame from the prefetched data
-        (data.members || []).forEach(member => {
-          (member.selected_games || []).forEach(selGame => {
+        (data.members || []).forEach((member) => {
+          (member.selected_games || []).forEach((selGame) => {
             if (selGame.results) {
               setResultsForGame(selGame.id, selGame.results);
             }
@@ -161,12 +163,17 @@ export const useLeagueStore = (id: number) => {
     }
 
     // Helper to set results atomically & dedup on id
-    function setResultsForGame(selectedGameId: number, results: TMatchResult[]) {
+    function setResultsForGame(
+      selectedGameId: number,
+      results: TMatchResult[]
+    ) {
       const uniq = new Map<number, TMatchResult>();
-      results.forEach(r => uniq.set(r.id, r));
+      results.forEach((r) => uniq.set(r.id, r));
       matchResultsBySelectedGame.value = {
         ...matchResultsBySelectedGame.value,
-        [selectedGameId]: Array.from(uniq.values()).sort((a, b) => (b.points ?? 0) - (a.points ?? 0)),
+        [selectedGameId]: Array.from(uniq.values()).sort(
+          (a, b) => (b.points ?? 0) - (a.points ?? 0)
+        ),
       };
     }
 
@@ -178,7 +185,8 @@ export const useLeagueStore = (id: number) => {
       loading.value = true;
       try {
         const promises = ids.map((id) =>
-          api.get<TMatchResult[]>(`/result/results/?selected_game=${id}`)
+          api
+            .get<TMatchResult[]>(`/result/results/?selected_game=${id}`)
             .then(({ data }) => setResultsForGame(id, data))
             .catch(() => setResultsForGame(id, []))
         );
@@ -191,7 +199,9 @@ export const useLeagueStore = (id: number) => {
     async function refreshResultsForGame(selectedGameId: number) {
       loading.value = true;
       try {
-        const { data } = await api.get<TMatchResult[]>(`/result/results/?selected_game=${selectedGameId}`);
+        const { data } = await api.get<TMatchResult[]>(
+          `/result/results/?selected_game=${selectedGameId}`
+        );
         setResultsForGame(selectedGameId, data);
       } finally {
         loading.value = false;
@@ -268,7 +278,10 @@ export const useLeagueStore = (id: number) => {
     );
 
     const isMePickingGame = computed(
-      () => (leagueStatus.value === 'PICKING' || leagueStatus.value === 'REPICKING') && isMeActivePlayer.value
+      () =>
+        (leagueStatus.value === 'PICKING' ||
+          leagueStatus.value === 'REPICKING') &&
+        isMeActivePlayer.value
     );
     const isMeBanningGame = computed(() => {
       const me = members.value.find((m) => isMe(m.username));
@@ -307,7 +320,6 @@ export const useLeagueStore = (id: number) => {
       statusNoun,
       statusVerb,
 
-
       // actions
       init,
       updateLeagueData,
@@ -317,4 +329,4 @@ export const useLeagueStore = (id: number) => {
       refresh,
     };
   });
-}
+};

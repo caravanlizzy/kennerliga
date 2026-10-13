@@ -1,8 +1,13 @@
 <template>
   <q-page class="q-py-md flex justify-center">
-    <div style="max-width: var(--kenner-max-width-text); width: 100%" class="q-px-sm">
+    <div
+      style="max-width: var(--kenner-max-width-text); width: 100%"
+      class="q-px-sm"
+    >
       <!-- Header -->
-      <div class="management-hero-card q-pa-lg q-mb-lg row items-center justify-between">
+      <div
+        class="management-hero-card q-pa-lg q-mb-lg row items-center justify-between"
+      >
         <div class="column">
           <div class="row items-center q-gutter-x-sm q-mb-xs">
             <q-icon name="tune" color="primary" size="32px" />
@@ -22,7 +27,9 @@
         <!-- Edit current configuration -->
         <q-card flat class="management-card q-mb-lg">
           <q-card-section class="q-pa-lg">
-            <div class="text-subtitle1 text-weight-bold q-mb-md text-dark row items-center q-gutter-x-xs">
+            <div
+              class="text-subtitle1 text-weight-bold q-mb-md text-dark row items-center q-gutter-x-xs"
+            >
               <q-icon name="settings_suggest" color="primary" size="20px" />
               <span>Current Settings</span>
             </div>
@@ -33,7 +40,8 @@
                 label="Max same game per year"
                 type="number"
                 :rules="[
-                  (val) => (val !== null && val !== '') || 'A limit is required',
+                  (val) =>
+                    (val !== null && val !== '') || 'A limit is required',
                   (val) => Number(val) >= 1 || 'Must be at least 1',
                 ]"
               />
@@ -48,7 +56,8 @@
                   clearable
                 />
                 <div class="text-caption text-grey-6 q-mt-xs">
-                  The game played to decide a league when a tie has to be broken.
+                  The game played to decide a league when a tie has to be
+                  broken.
                 </div>
               </div>
 
@@ -64,7 +73,9 @@
         <!-- Change history -->
         <q-card flat class="management-card">
           <q-card-section class="q-pa-lg">
-            <div class="text-subtitle1 text-weight-bold q-mb-md text-dark row items-center justify-between">
+            <div
+              class="text-subtitle1 text-weight-bold q-mb-md text-dark row items-center justify-between"
+            >
               <div class="row items-center q-gutter-x-xs">
                 <q-icon name="manage_history" color="primary" size="20px" />
                 <span>Change History</span>
@@ -74,8 +85,15 @@
               </q-badge>
             </div>
 
-            <div v-if="history.length === 0" class="text-center text-grey-6 q-pa-xl column items-center">
-              <q-icon name="manage_history" size="48px" class="opacity-30 q-mb-sm" />
+            <div
+              v-if="history.length === 0"
+              class="text-center text-grey-6 q-pa-xl column items-center"
+            >
+              <q-icon
+                name="manage_history"
+                size="48px"
+                class="opacity-30 q-mb-sm"
+              />
               <span>No configuration history recorded yet</span>
             </div>
 
@@ -89,14 +107,23 @@
                   <span class="text-body2 text-weight-bold text-dark">
                     Max same game / year: {{ entry.max_same_game_per_year }}
                   </span>
-                  <q-chip dense outline color="primary" icon="sports_esports" size="sm">
+                  <q-chip
+                    dense
+                    outline
+                    color="primary"
+                    icon="sports_esports"
+                    size="sm"
+                  >
                     Tie-decider: {{ entry.tie_decider_game_name ?? 'None' }}
                   </q-chip>
                 </div>
                 <div class="text-caption text-grey-6 q-mt-xs">
                   {{ formatDate(entry.created_at) }}
                   <template v-if="entry.created_by_username">
-                    · by <span class="text-weight-medium">{{ entry.created_by_username }}</span>
+                    · by
+                    <span class="text-weight-medium">{{
+                      entry.created_by_username
+                    }}</span>
                   </template>
                 </div>
               </div>
@@ -133,7 +160,7 @@ const form = reactive<AppConfigurationCreate>({
 });
 
 const gameOptions = computed(() =>
-  games.value.map((game) => ({ label: game.name, value: game.id })),
+  games.value.map((game) => ({ label: game.name, value: game.id }))
 );
 
 function applyCurrent() {

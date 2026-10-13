@@ -9,7 +9,9 @@ import {
 } from 'src/types';
 import { unwrapList } from 'src/services/httpTypes';
 
-export async function registerForSeason(seasonId: number): Promise<AxiosResponse | undefined> {
+export async function registerForSeason(
+  seasonId: number
+): Promise<AxiosResponse | undefined> {
   try {
     return await api.post('/season/register/', { season_id: seasonId });
   } catch (error) {
@@ -31,10 +33,14 @@ export async function fetchRegistrationStatus(): Promise<{
   }
 }
 
-export async function fetchIsRegisteredForSeason(seasonId?: number): Promise<boolean> {
+export async function fetchIsRegisteredForSeason(
+  seasonId?: number
+): Promise<boolean> {
   try {
     const params = seasonId ? { season: seasonId } : {};
-    const { data } = await api.get('/season/seasons/registration-status/', { params });
+    const { data } = await api.get('/season/seasons/registration-status/', {
+      params,
+    });
     return data.registered;
   } catch (error) {
     console.log(error);
@@ -42,10 +48,14 @@ export async function fetchIsRegisteredForSeason(seasonId?: number): Promise<boo
   }
 }
 
-export async function fetchOpenSeasonParticipants(includePrevUnregistered = false): Promise<TSeasonParticipantDto[]> {
+export async function fetchOpenSeasonParticipants(
+  includePrevUnregistered = false
+): Promise<TSeasonParticipantDto[]> {
   try {
     // 1. Find the season that is currently 'OPEN' (registration phase)
-    const { data } = await api.get('/season/seasons/', { params: { status: 'OPEN' } });
+    const { data } = await api.get('/season/seasons/', {
+      params: { status: 'OPEN' },
+    });
     const seasons = unwrapList<TSeasonDto>(data);
     const openSeason = seasons.length > 0 ? seasons[0] : null;
 
@@ -55,14 +65,18 @@ export async function fetchOpenSeasonParticipants(includePrevUnregistered = fals
     }
 
     // 2. Fetch participants for that specific season
-    return await fetchSeasonParticipants(openSeason.id, { includePrevUnregistered });
+    return await fetchSeasonParticipants(openSeason.id, {
+      includePrevUnregistered,
+    });
   } catch (error) {
     console.error('Failed to fetch open season participants:', error);
     return []; // safe fallback
   }
 }
 
-export async function fetchSeason(seasonId: number): Promise<TSeasonDto | undefined> {
+export async function fetchSeason(
+  seasonId: number
+): Promise<TSeasonDto | undefined> {
   try {
     const { data } = await api.get(`/season/seasons/${seasonId}/`);
     return data;
@@ -89,7 +103,11 @@ export type TLeaguePreviewMember = {
 
 export type TLeaguePreview = {
   leagues: { level: number; size: number; members: TLeaguePreviewMember[] }[];
-  newcomers: { profile: number; profile_name: string; username: string | null }[];
+  newcomers: {
+    profile: number;
+    profile_name: string;
+    username: string | null;
+  }[];
 };
 
 /**
@@ -97,10 +115,15 @@ export type TLeaguePreview = {
  * distributed into leagues, without persisting anything. Used to pre-fill the
  * "Create Season" form before it is actually submitted.
  */
-export async function previewLeagues(profileIds: number[]): Promise<TLeaguePreview> {
-  const { data } = await api.post('/season/season-participants/preview-leagues/', {
-    profile_ids: profileIds,
-  });
+export async function previewLeagues(
+  profileIds: number[]
+): Promise<TLeaguePreview> {
+  const { data } = await api.post(
+    '/season/season-participants/preview-leagues/',
+    {
+      profile_ids: profileIds,
+    }
+  );
   return data;
 }
 
@@ -136,10 +159,15 @@ export async function fetchCurrentChampion(): Promise<TCurrentChampionResponse |
 }
 /** Backend helpers */
 // find-or-create season
-export async function createSeason(targetYear: number, targetMonth: number): Promise<TSeasonDto> {
+export async function createSeason(
+  targetYear: number,
+  targetMonth: number
+): Promise<TSeasonDto> {
   const { data: seasons } = await api.get<TSeasonDto[]>('/season/seasons/');
   let season = Array.isArray(seasons)
-    ? seasons.find((s: TSeasonDto) => s.year === targetYear && s.month === targetMonth)
+    ? seasons.find(
+        (s: TSeasonDto) => s.year === targetYear && s.month === targetMonth
+      )
     : null;
 
   if (!season) {
@@ -195,16 +223,25 @@ export async function fetchProjectedLeagues(
   seasonId?: number
 ): Promise<TProjectedLeaguesResponse> {
   try {
-    const { data } = await api.get('/season/season-participants/projected-leagues/', {
-      params: { season: seasonId || undefined },
-    });
+    const { data } = await api.get(
+      '/season/season-participants/projected-leagues/',
+      {
+        params: { season: seasonId || undefined },
+      }
+    );
     return {
       season: data?.season ?? null,
       leagues: unwrapList<TProjectedLeague>(data?.leagues),
       newcomers: unwrapList<TProjectedLeagueMember>(data?.newcomers),
-      active_participants: unwrapList<TProjectedLeagueMember>(data?.active_participants),
-      missing_participants: unwrapList<TProjectedLeagueMember>(data?.missing_participants),
-      unprojected_participants: unwrapList<TProjectedLeagueMember>(data?.unprojected_participants),
+      active_participants: unwrapList<TProjectedLeagueMember>(
+        data?.active_participants
+      ),
+      missing_participants: unwrapList<TProjectedLeagueMember>(
+        data?.missing_participants
+      ),
+      unprojected_participants: unwrapList<TProjectedLeagueMember>(
+        data?.unprojected_participants
+      ),
     };
   } catch (error) {
     console.error('Failed to fetch projected leagues:', error);
@@ -219,9 +256,13 @@ export async function fetchProjectedLeagues(
   }
 }
 
-export async function fetchLeaguesBySeason(seasonId: number): Promise<TLeagueDto[]> {
+export async function fetchLeaguesBySeason(
+  seasonId: number
+): Promise<TLeagueDto[]> {
   try {
-    const { data } = await api.get('/league/leagues/', { params: { season: seasonId } });
+    const { data } = await api.get('/league/leagues/', {
+      params: { season: seasonId },
+    });
     return unwrapList<TLeagueDto>(data);
   } catch (error) {
     console.error('Error fetching leagues by season:', error);
@@ -234,7 +275,9 @@ export async function fetchAvailableYears(): Promise<number[]> {
     const { data } = await api.get('/season/seasons/');
     const seasons = unwrapList<TSeasonDto>(data);
     const years = seasons.map((s) => s.year);
-    return Array.from(new Set(years)).sort((a, b) => (b as number) - (a as number));
+    return Array.from(new Set(years)).sort(
+      (a, b) => (b as number) - (a as number)
+    );
   } catch (error) {
     console.error('Error fetching available years:', error);
     return [new Date().getFullYear()];
@@ -270,10 +313,16 @@ export async function ensureParticipants(
     const rank = i + 1;
     if (byProfile[pid]) {
       if (byProfile[pid].rank !== rank) {
-        await api.patch(`/season/season-participants/${byProfile[pid].id}/`, { rank });
+        await api.patch(`/season/season-participants/${byProfile[pid].id}/`, {
+          rank,
+        });
       }
     } else {
-      await api.post('/season/season-participants/', { season: seasonId, profile: pid, rank });
+      await api.post('/season/season-participants/', {
+        season: seasonId,
+        profile: pid,
+        rank,
+      });
     }
   }
 
@@ -292,7 +341,9 @@ export async function fetchLiveActionEvents(
       if (params.seasonId) queryParams.season_id = params.seasonId;
       if (params.leagueId) queryParams.league_id = params.leagueId;
     }
-    const { data } = await api.get('/season/live-events/', { params: queryParams });
+    const { data } = await api.get('/season/live-events/', {
+      params: queryParams,
+    });
     return unwrapList<TLiveEvent>(data);
   } catch (error) {
     console.error('Error fetching live action events:', error);
@@ -361,7 +412,9 @@ export async function fetchParticipantsForProfile(
   const { data } = await api.get('season/season-participants/', {
     params: { profile: profileId },
   });
-  return unwrapList<TSeasonParticipantDto & { season_details?: TSeasonDto }>(data);
+  return unwrapList<TSeasonParticipantDto & { season_details?: TSeasonDto }>(
+    data
+  );
 }
 
 export async function addSeasonParticipant(

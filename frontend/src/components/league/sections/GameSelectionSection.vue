@@ -23,11 +23,11 @@ import GameSelectionView from 'components/game/selectedGame/GameSelectionView.vu
 import { useMyLeagueStore } from 'src/composables/myLeague';
 
 const myLeagueStore = useMyLeagueStore();
-const { isMePickingGame, myProfileId, leagueId, members } = storeToRefs(myLeagueStore);
+const { isMePickingGame, myProfileId, leagueId, members } =
+  storeToRefs(myLeagueStore);
 const { updateLeagueData } = myLeagueStore;
 
 const memberCount = computed(() => (members.value ?? []).length);
 </script>
 
-<style scoped lang="scss">
-</style>
+<style scoped lang="scss"></style>

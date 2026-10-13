@@ -1,12 +1,10 @@
 <template>
-  <div
-    class="q-pa-xl flex flex-center column q-gutter-md"
-  >
+  <div class="q-pa-xl flex flex-center column q-gutter-md">
     <q-linear-progress v-if="$slots.skeleton" indeterminate class="q-mb-md" />
     <q-spinner-puff v-else size="4em" color="primary" />
 
     <div class="text-subtitle1 text-dark">
-      <span v-if="text"> {{text}}</span>
+      <span v-if="text"> {{ text }}</span>
       <span v-else> Loading...</span>
     </div>
 

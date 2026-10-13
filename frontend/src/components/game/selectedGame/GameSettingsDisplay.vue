@@ -27,7 +27,7 @@
             :class="{
               'boolean-true': selected.value === true,
               'boolean-false': selected.value === false,
-              'boolean-null': selected.value === null
+              'boolean-null': selected.value === null,
             }"
           >
             <!-- Text kannst du natürlich anpassen -->
@@ -42,27 +42,27 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
-import type { TSelectedGameOptionDto } from 'src/types'
+import { computed } from 'vue';
+import type { TSelectedGameOptionDto } from 'src/types';
 
 const props = defineProps<{
-  selectedOptions: TSelectedGameOptionDto[]
-}>()
+  selectedOptions: TSelectedGameOptionDto[];
+}>();
 
 const orderedOptions = computed(() => {
-  return [...props.selectedOptions].reverse()
-})
+  return [...props.selectedOptions].reverse();
+});
 
 /**
  * Liefert den anzuzeigenden Text für eine Choice-Option
  */
 const getChoiceLabel = (selected: TSelectedGameOptionDto): string => {
   if (!selected.choice) {
-    return 'Keine Auswahl'
+    return 'Keine Auswahl';
   }
 
-  return selected.choice.name ?? `Choice #${selected.choice.id}`
-}
+  return selected.choice.name ?? `Choice #${selected.choice.id}`;
+};
 </script>
 
 <style scoped>

@@ -1,5 +1,8 @@
 <template>
-  <q-page class="season-overview-page" :class="isMobile ? 'q-pa-none' : 'q-pa-md-lg q-pa-sm-md'">
+  <q-page
+    class="season-overview-page"
+    :class="isMobile ? 'q-pa-none' : 'q-pa-md-lg q-pa-sm-md'"
+  >
     <!-- Top Bar / Breadcrumb Navigation -->
     <div
       class="row items-center justify-between"
@@ -18,7 +21,9 @@
         </KennerButton>
         <div class="column col ellipsis">
           <div class="row items-center q-gutter-x-sm no-wrap">
-            <h1 class="text-h6 text-sm-h5 text-weight-bolder text-dark tracking-tight q-my-none ellipsis">
+            <h1
+              class="text-h6 text-sm-h5 text-weight-bolder text-dark tracking-tight q-my-none ellipsis"
+            >
               {{ seasonTitle }}
             </h1>
             <q-badge
@@ -30,15 +35,21 @@
               {{ seasonStatusLabel }}
             </q-badge>
           </div>
-          <div class="row items-center q-gutter-x-xs text-caption text-grey-6 ellipsis wrap q-mt-xs">
+          <div
+            class="row items-center q-gutter-x-xs text-caption text-grey-6 ellipsis wrap q-mt-xs"
+          >
             <span v-if="seasonSubtitle">{{ seasonSubtitle }}</span>
             <span v-if="seasonSubtitle && sortedLeagues.length > 0">·</span>
             <span v-if="sortedLeagues.length > 0">
-              {{ sortedLeagues.length }} {{ sortedLeagues.length === 1 ? 'League' : 'Leagues' }}
+              {{ sortedLeagues.length }}
+              {{ sortedLeagues.length === 1 ? 'League' : 'Leagues' }}
             </span>
-            <span v-if="sortedLeagues.length > 0 && participants.length > 0">·</span>
+            <span v-if="sortedLeagues.length > 0 && participants.length > 0"
+              >·</span
+            >
             <span v-if="participants.length > 0">
-              {{ participants.length }} {{ participants.length === 1 ? 'Participant' : 'Participants' }}
+              {{ participants.length }}
+              {{ participants.length === 1 ? 'Participant' : 'Participants' }}
             </span>
           </div>
         </div>
@@ -60,7 +71,11 @@
     </div>
 
     <!-- Error State -->
-    <ErrorDisplay v-if="error && !loading" :error="error" class="q-mb-md q-px-md" />
+    <ErrorDisplay
+      v-if="error && !loading"
+      :error="error"
+      class="q-mb-md q-px-md"
+    />
 
     <!-- Loading State -->
     <div v-if="loading" class="flex justify-center q-my-xl">
@@ -68,16 +83,28 @@
     </div>
 
     <!-- Main Content -->
-    <div v-else-if="!error && season" class="overview-content column q-gutter-y-md q-gutter-y-sm-lg" :class="isMobile ? 'q-pt-sm' : ''">
+    <div
+      v-else-if="!error && season"
+      class="overview-content column q-gutter-y-md q-gutter-y-sm-lg"
+      :class="isMobile ? 'q-pt-sm' : ''"
+    >
       <!-- Champions Podium Section (Completed Seasons) -->
-      <div v-if="isSeasonCompleted" class="champions-card" :class="isMobile ? 'q-mx-md q-pa-md' : 'q-pa-md q-pa-sm-lg'">
+      <div
+        v-if="isSeasonCompleted"
+        class="champions-card"
+        :class="isMobile ? 'q-mx-md q-pa-md' : 'q-pa-md q-pa-sm-lg'"
+      >
         <div class="row items-center q-gutter-x-sm q-mb-md">
           <div class="champions-icon-wrap">
             <q-icon name="emoji_events" color="amber-8" size="24px" />
           </div>
           <div>
-            <div class="text-subtitle1 text-weight-bold text-dark">Season Champions</div>
-            <div class="text-caption text-grey-6">Podium winners and league champions</div>
+            <div class="text-subtitle1 text-weight-bold text-dark">
+              Season Champions
+            </div>
+            <div class="text-caption text-grey-6">
+              Podium winners and league champions
+            </div>
           </div>
         </div>
         <SeasonWinners :season-id="seasonId" />
@@ -89,7 +116,10 @@
         :class="isMobile ? 'q-px-md' : ''"
       >
         <!-- League Selector Dropdown -->
-        <div class="league-select-container" :class="isMobile ? 'full-width' : ''">
+        <div
+          class="league-select-container"
+          :class="isMobile ? 'full-width' : ''"
+        >
           <KennerSelect
             v-model="selectedLeagueId"
             :options="leagueOptions"
@@ -115,7 +145,9 @@
                   color="primary"
                   class="q-mr-xs"
                 />
-                <span class="ellipsis text-weight-bold">{{ scope.opt.label }}</span>
+                <span class="ellipsis text-weight-bold">{{
+                  scope.opt.label
+                }}</span>
               </div>
             </template>
             <template #option="scope">
@@ -126,16 +158,18 @@
                     :level="scope.opt.level"
                     badge
                   />
-                  <q-icon
-                    v-else
-                    name="grid_view"
-                    size="18px"
-                    color="primary"
-                  />
+                  <q-icon v-else name="grid_view" size="18px" color="primary" />
                 </q-item-section>
                 <q-item-section>
                   <q-item-label class="row items-center q-gutter-x-xs">
-                    <span :class="scope.opt.isUser ? 'text-weight-bold text-primary' : 'text-weight-medium'">{{ scope.opt.label }}</span>
+                    <span
+                      :class="
+                        scope.opt.isUser
+                          ? 'text-weight-bold text-primary'
+                          : 'text-weight-medium'
+                      "
+                      >{{ scope.opt.label }}</span
+                    >
                     <span
                       v-if="scope.opt.isUser"
                       class="user-league-pill-sm row items-center no-wrap q-ml-xs"
@@ -147,7 +181,11 @@
                 </q-item-section>
                 <q-item-section side>
                   <span class="text-caption text-grey-6">
-                    {{ scope.opt.value === 'all' ? `${scope.opt.memberCount} leagues` : `${scope.opt.memberCount} players` }}
+                    {{
+                      scope.opt.value === 'all'
+                        ? `${scope.opt.memberCount} leagues`
+                        : `${scope.opt.memberCount} players`
+                    }}
                   </span>
                 </q-item-section>
               </q-item>
@@ -156,7 +194,10 @@
         </div>
 
         <!-- View Switcher Toggle -->
-        <div class="view-toggle-container" :class="isMobile ? 'full-width' : ''">
+        <div
+          class="view-toggle-container"
+          :class="isMobile ? 'full-width' : ''"
+        >
           <q-btn-toggle
             v-if="selectedLeagueId === 'all'"
             v-model="activeAllView"
@@ -199,7 +240,9 @@
             <LeagueLevel :level="activeLeague.level" />
             <div>
               <div class="row items-center q-gutter-xs wrap">
-                <span class="text-subtitle1 text-sm-h6 text-weight-bold text-dark">
+                <span
+                  class="text-subtitle1 text-sm-h6 text-weight-bold text-dark"
+                >
                   {{ leagueDisplayName(activeLeague) }}
                 </span>
                 <div
@@ -225,7 +268,9 @@
           </div>
 
           <!-- Member Avatars Preview -->
-          <div class="row items-center wrap q-gutter-xs q-mt-xs-sm q-mt-sm-none">
+          <div
+            class="row items-center wrap q-gutter-xs q-mt-xs-sm q-mt-sm-none"
+          >
             <UserAvatar
               v-for="m in activeLeagueMembers"
               :key="m.id"
@@ -249,7 +294,9 @@
             :class="isMobile ? 'q-px-md' : 'q-px-xs'"
           >
             <q-icon name="grid_view" color="primary" size="20px" />
-            <span class="text-subtitle1 text-weight-bold text-dark">Standings Matrix</span>
+            <span class="text-subtitle1 text-weight-bold text-dark"
+              >Standings Matrix</span
+            >
           </div>
           <div :class="isMobile ? 'q-px-none' : 'q-px-xs'">
             <LeagueStandingsMatrix
@@ -273,7 +320,9 @@
             :class="isMobile ? 'q-px-md' : 'q-px-xs'"
           >
             <q-icon name="casino" color="amber-9" size="20px" />
-            <span class="text-subtitle1 text-weight-bold text-dark">Picks &amp; Bans</span>
+            <span class="text-subtitle1 text-weight-bold text-dark"
+              >Picks &amp; Bans</span
+            >
           </div>
           <div :class="isMobile ? 'q-px-none' : 'q-px-xs'">
             <PlayerCard
@@ -299,7 +348,9 @@
             :class="isMobile ? 'q-px-md' : 'q-px-xs'"
           >
             <q-icon name="scoreboard" color="indigo-7" size="20px" />
-            <span class="text-subtitle1 text-weight-bold text-dark">Match Results</span>
+            <span class="text-subtitle1 text-weight-bold text-dark"
+              >Match Results</span
+            >
           </div>
           <div :class="isMobile ? 'q-px-none' : 'q-px-xs'">
             <LeagueMatchResults
@@ -313,22 +364,29 @@
       <!-- VIEW B: ALL LEAGUES (OVERVIEW) -->
       <div v-else class="all-leagues-view column q-gutter-y-md">
         <!-- 1. League Cards Grid / List Overview -->
-        <div v-if="activeAllView === 'cards'" :class="isMobile ? 'column' : 'league-cards-grid'">
+        <div
+          v-if="activeAllView === 'cards'"
+          :class="isMobile ? 'column' : 'league-cards-grid'"
+        >
           <div
             v-for="(league, idx) in sortedLeagues"
             :key="league.id"
             :class="{
               'league-overview-card': !isMobile,
-              'league-overview-card--user': !isMobile && isUserInLeague(league.id),
-              'league-overview-mobile-item--user': isMobile && isUserInLeague(league.id),
-              'q-px-md q-py-sm': isMobile
+              'league-overview-card--user':
+                !isMobile && isUserInLeague(league.id),
+              'league-overview-mobile-item--user':
+                isMobile && isUserInLeague(league.id),
+              'q-px-md q-py-sm': isMobile,
             }"
           >
             <!-- Card Header -->
             <div class="row items-center justify-between no-wrap q-gutter-x-sm">
               <div class="row items-center q-gutter-x-xs no-wrap ellipsis col">
                 <LeagueLevel :level="league.level" badge />
-                <span class="text-subtitle1 text-weight-bold text-dark ellipsis">
+                <span
+                  class="text-subtitle1 text-weight-bold text-dark ellipsis"
+                >
                   {{ leagueDisplayName(league) }}
                 </span>
                 <div
@@ -361,7 +419,9 @@
             </div>
 
             <!-- League Meta -->
-            <div class="row items-center q-gutter-x-md text-caption text-grey-7 q-py-xs">
+            <div
+              class="row items-center q-gutter-x-md text-caption text-grey-7 q-py-xs"
+            >
               <div class="row items-center q-gutter-x-xs">
                 <q-icon name="groups" size="17px" color="grey-6" />
                 <span>{{ getMembersForLeague(league.id).length }} players</span>
@@ -369,17 +429,25 @@
             </div>
 
             <!-- Standings Table -->
-            <div v-if="standingsMap[league.id]?.standings?.length" class="column q-gutter-y-xs q-mt-xs">
+            <div
+              v-if="standingsMap[league.id]?.standings?.length"
+              class="column q-gutter-y-xs q-mt-xs"
+            >
               <div
                 v-for="(row, rIdx) in standingsMap[league.id].standings"
                 :key="row.player_profile_id"
                 class="standings-mini-row row items-center justify-between no-wrap q-py-xs q-px-sm rounded-borders"
                 :class="{
                   'standings-mini-row--leader': rIdx === 0,
-                  'standings-mini-row--user': isCurrentUser(row.player_profile_id, row.username)
+                  'standings-mini-row--user': isCurrentUser(
+                    row.player_profile_id,
+                    row.username
+                  ),
                 }"
               >
-                <div class="row items-center q-gutter-x-xs no-wrap ellipsis col q-mr-xs">
+                <div
+                  class="row items-center q-gutter-x-xs no-wrap ellipsis col q-mr-xs"
+                >
                   <span
                     class="rank-badge text-caption text-weight-bold shrink-0"
                     :class="rIdx === 0 ? 'text-amber-9' : 'text-grey-7'"
@@ -389,8 +457,20 @@
                   <UserAvatar
                     :display-username="row.username"
                     :subtitle="row.profile_name"
-                    :shape="getMemberShape(league.id, row.player_profile_id, row.username)"
-                    :color="getMemberColor(league.id, row.player_profile_id, row.username)"
+                    :shape="
+                      getMemberShape(
+                        league.id,
+                        row.player_profile_id,
+                        row.username
+                      )
+                    "
+                    :color="
+                      getMemberColor(
+                        league.id,
+                        row.player_profile_id,
+                        row.username
+                      )
+                    "
                     size="22px"
                   />
                   <span class="ellipsis text-caption text-weight-medium">
@@ -422,14 +502,20 @@
                     :color="getMemberColor(league.id, m.profile, m.username)"
                     size="22px"
                   />
-                  <span class="text-weight-medium text-grey-8 ellipsis" style="max-width: 90px">
+                  <span
+                    class="text-weight-medium text-grey-8 ellipsis"
+                    style="max-width: 90px"
+                  >
                     {{ m.profile_name || m.username }}
                   </span>
                 </div>
               </div>
             </div>
 
-            <q-separator v-if="isMobile && idx < sortedLeagues.length - 1" class="q-mt-md" />
+            <q-separator
+              v-if="isMobile && idx < sortedLeagues.length - 1"
+              class="q-mt-md"
+            />
           </div>
         </div>
 
@@ -442,10 +528,15 @@
             :class="{ 'league-section--user': isUserInLeague(league.id) }"
           >
             <q-separator v-if="index > 0" class="q-my-lg" />
-            <div class="row items-center justify-between q-py-sm" :class="isMobile ? 'q-px-md' : 'q-px-xs'">
+            <div
+              class="row items-center justify-between q-py-sm"
+              :class="isMobile ? 'q-px-md' : 'q-px-xs'"
+            >
               <div class="row items-center q-gutter-x-sm ellipsis col">
                 <LeagueLevel :level="league.level" badge />
-                <span class="text-subtitle1 text-weight-bold text-dark ellipsis">
+                <span
+                  class="text-subtitle1 text-weight-bold text-dark ellipsis"
+                >
                   {{ leagueDisplayName(league) }} Standings Matrix
                 </span>
                 <div
@@ -486,10 +577,15 @@
             :class="{ 'league-section--user': isUserInLeague(league.id) }"
           >
             <q-separator v-if="index > 0" class="q-my-lg" />
-            <div class="row items-center justify-between q-py-sm" :class="isMobile ? 'q-px-md' : 'q-px-xs'">
+            <div
+              class="row items-center justify-between q-py-sm"
+              :class="isMobile ? 'q-px-md' : 'q-px-xs'"
+            >
               <div class="row items-center q-gutter-x-sm ellipsis col">
                 <LeagueLevel :level="league.level" badge />
-                <span class="text-subtitle1 text-weight-bold text-dark ellipsis">
+                <span
+                  class="text-subtitle1 text-weight-bold text-dark ellipsis"
+                >
                   {{ leagueDisplayName(league) }} Picks &amp; Bans
                 </span>
                 <div
@@ -532,10 +628,15 @@
             :class="{ 'league-section--user': isUserInLeague(league.id) }"
           >
             <q-separator v-if="index > 0" class="q-my-lg" />
-            <div class="row items-center justify-between q-py-sm" :class="isMobile ? 'q-px-md' : 'q-px-xs'">
+            <div
+              class="row items-center justify-between q-py-sm"
+              :class="isMobile ? 'q-px-md' : 'q-px-xs'"
+            >
               <div class="row items-center q-gutter-x-sm ellipsis col">
                 <LeagueLevel :level="league.level" badge />
-                <span class="text-subtitle1 text-weight-bold text-dark ellipsis">
+                <span
+                  class="text-subtitle1 text-weight-bold text-dark ellipsis"
+                >
                   {{ leagueDisplayName(league) }} Match Results
                 </span>
                 <div
@@ -778,7 +879,8 @@ function findParticipant(
   const members = getMembersForLeague(leagueId);
   return members.find(
     (m) =>
-      (playerProfileId !== undefined && (m.profile === playerProfileId || m.id === playerProfileId)) ||
+      (playerProfileId !== undefined &&
+        (m.profile === playerProfileId || m.id === playerProfileId)) ||
       (username && m.username === username)
   );
 }
@@ -800,7 +902,10 @@ function getMemberColor(
   playerProfileId?: number,
   username?: string
 ): string | undefined {
-  if (isCurrentUser(playerProfileId, username) && user.value?.avatar_color !== undefined) {
+  if (
+    isCurrentUser(playerProfileId, username) &&
+    user.value?.avatar_color !== undefined
+  ) {
     return user.value.avatar_color;
   }
   const p = findParticipant(leagueId, playerProfileId, username);
@@ -809,7 +914,11 @@ function getMemberColor(
 
 function isCurrentUser(playerProfileId?: number, username?: string): boolean {
   if (!user.value) return false;
-  if (playerProfileId !== undefined && user.value.profile_id === playerProfileId) return true;
+  if (
+    playerProfileId !== undefined &&
+    user.value.profile_id === playerProfileId
+  )
+    return true;
   if (username && user.value.username === username) return true;
   return false;
 }
@@ -846,7 +955,10 @@ function onViewChanged() {
 }
 
 function updateUrlQuery() {
-  const query: Record<string, string> = { ...route.query } as Record<string, string>;
+  const query: Record<string, string> = { ...route.query } as Record<
+    string,
+    string
+  >;
   if (selectedLeagueId.value === 'all') {
     query.league = 'all';
     query.view = activeAllView.value;
@@ -927,7 +1039,8 @@ async function load() {
       }
     }
   } catch (e: unknown) {
-    error.value = e instanceof Error ? e.message : 'Failed to load season details.';
+    error.value =
+      e instanceof Error ? e.message : 'Failed to load season details.';
   } finally {
     loading.value = false;
   }
@@ -975,7 +1088,11 @@ onUnmounted(() => {
   }
 
   .body--dark & {
-    background: linear-gradient(135deg, rgba(255, 193, 7, 0.1) 0%, var(--kenner-card-bg) 100%);
+    background: linear-gradient(
+      135deg,
+      rgba(255, 193, 7, 0.1) 0%,
+      var(--kenner-card-bg) 100%
+    );
   }
 }
 
@@ -1069,7 +1186,11 @@ onUnmounted(() => {
 
   &--user {
     border-color: rgba(var(--q-primary), 0.35);
-    background: linear-gradient(180deg, rgba(var(--q-primary), 0.035) 0%, #ffffff 100%);
+    background: linear-gradient(
+      180deg,
+      rgba(var(--q-primary), 0.035) 0%,
+      #ffffff 100%
+    );
     box-shadow: 0 3px 12px rgba(var(--q-primary), 0.08);
   }
 }
@@ -1109,7 +1230,11 @@ onUnmounted(() => {
 
 .league-section--user {
   position: relative;
-  background: linear-gradient(90deg, rgba(var(--q-primary), 0.03) 0%, transparent 100%);
+  background: linear-gradient(
+    90deg,
+    rgba(var(--q-primary), 0.03) 0%,
+    transparent 100%
+  );
   border-radius: 8px;
   padding: 4px 8px;
 }

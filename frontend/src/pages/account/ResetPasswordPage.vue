@@ -2,7 +2,9 @@
   <div
     class="column items-center justify-center full-height"
     :style="[
-      isMobile ? 'min-width: 280px; max-width: 500px; width: 100%' : 'min-width: 450px',
+      isMobile
+        ? 'min-width: 280px; max-width: 500px; width: 100%'
+        : 'min-width: 450px',
     ]"
   >
     <q-card
@@ -11,10 +13,19 @@
       :class="[isMobile ? 'q-pa-lg' : 'q-pa-xl']"
       style="border-radius: 20px; border: 1px solid rgba(54, 64, 88, 0.08)"
     >
-      <q-form ref="formRef" @submit="doResetPassword" @keyup.enter="doResetPassword" class="q-gutter-y-lg">
+      <q-form
+        ref="formRef"
+        @submit="doResetPassword"
+        @keyup.enter="doResetPassword"
+        class="q-gutter-y-lg"
+      >
         <div class="column items-center q-mb-lg">
           <BrandLogo class="q-mb-md" icon-size="64px" word-size="2rem" />
-          <div class="text-h4 text-weight-bolder text-dark tracking-tighter q-mt-md">Set New Password</div>
+          <div
+            class="text-h4 text-weight-bolder text-dark tracking-tighter q-mt-md"
+          >
+            Set New Password
+          </div>
           <div class="text-subtitle2 text-grey-6 q-mt-xs text-center">
             Enter your new password below
           </div>
@@ -132,7 +143,10 @@ async function doResetPassword(): Promise<void> {
   } catch (err: unknown) {
     let message = 'Failed to reset password.';
     if (axios.isAxiosError(err)) {
-      message = (err.response?.data as { detail?: string })?.detail || err.message || message;
+      message =
+        (err.response?.data as { detail?: string })?.detail ||
+        err.message ||
+        message;
     } else if (err instanceof Error) {
       message = err.message;
     }

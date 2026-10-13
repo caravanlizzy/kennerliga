@@ -3,7 +3,11 @@
     <!-- Table / states -->
     <div class="overflow-auto">
       <q-table
-        v-if="standings && (standings.standings.length > 0 || (standings.selected_games && standings.selected_games.length > 0))"
+        v-if="
+          standings &&
+          (standings.standings.length > 0 ||
+            (standings.selected_games && standings.selected_games.length > 0))
+        "
         :rows="tableRows"
         :columns="tableColumns"
         row-key="player_profile_id"
@@ -30,15 +34,18 @@
               ]"
               :style="
                 col.name.startsWith('game_')
-                  ? (isMobile
+                  ? isMobile
                     ? 'max-width: 68px; white-space: normal; line-height: 1.2; padding: 8px 4px;'
-                    : 'min-width: 80px; white-space: normal; line-height: 1.2; padding: 12px 8px;')
+                    : 'min-width: 80px; white-space: normal; line-height: 1.2; padding: 12px 8px;'
                   : 'padding: 12px 8px;'
               "
             >
-              <div v-if="col.name === 'total'" class="row items-center justify-end q-gutter-x-xs">
-                 <q-icon name="stars" color="primary" size="14px" />
-                 <span>{{ col.label }}</span>
+              <div
+                v-if="col.name === 'total'"
+                class="row items-center justify-end q-gutter-x-xs"
+              >
+                <q-icon name="stars" color="primary" size="14px" />
+                <span>{{ col.label }}</span>
               </div>
               <div
                 v-else-if="col.name.startsWith('game_')"
@@ -49,7 +56,11 @@
                   <span
                     class="text-center"
                     :class="{ ellipsis: isMobile }"
-                    :style="isMobile ? { maxWidth: '56px', display: 'inline-block' } : undefined"
+                    :style="
+                      isMobile
+                        ? { maxWidth: '56px', display: 'inline-block' }
+                        : undefined
+                    "
                   >
                     {{ col.label }}
                   </span>
@@ -60,9 +71,25 @@
                     color="grey-4"
                     class="q-ml-xs cursor-pointer hover-settings-icon"
                   >
-                    <q-tooltip class="bg-white text-grey-9 shadow-4 q-pa-sm" style="border: 1px solid var(--kenner-border-strong); max-width: 200px;">
-                      <div class="text-weight-bold q-mb-xs text-primary" style="font-size: 0.75rem;">{{ col.gameName || col.label }} Settings</div>
-                      <div v-for="s in col.settings" :key="s.name" class="row no-wrap q-gutter-x-sm" style="font-size: 0.7rem; line-height: 1.4;">
+                    <q-tooltip
+                      class="bg-white text-grey-9 shadow-4 q-pa-sm"
+                      style="
+                        border: 1px solid var(--kenner-border-strong);
+                        max-width: 200px;
+                      "
+                    >
+                      <div
+                        class="text-weight-bold q-mb-xs text-primary"
+                        style="font-size: 0.75rem"
+                      >
+                        {{ col.gameName || col.label }} Settings
+                      </div>
+                      <div
+                        v-for="s in col.settings"
+                        :key="s.name"
+                        class="row no-wrap q-gutter-x-sm"
+                        style="font-size: 0.7rem; line-height: 1.4"
+                      >
                         <span class="text-grey-7">{{ s.name }}:</span>
                         <span class="text-weight-medium">{{ s.value }}</span>
                       </div>
@@ -73,7 +100,12 @@
                   v-if="col.platformName"
                   class="text-grey-7 text-weight-medium"
                   :class="{ ellipsis: isMobile }"
-                  :style="{ fontSize: '0.55rem', lineHeight: 1, marginTop: '1px', ...(isMobile ? { maxWidth: '56px' } : {}) }"
+                  :style="{
+                    fontSize: '0.55rem',
+                    lineHeight: 1,
+                    marginTop: '1px',
+                    ...(isMobile ? { maxWidth: '56px' } : {}),
+                  }"
                 >
                   {{ col.platformName }}
                 </div>
@@ -81,7 +113,12 @@
                   v-if="col.selectedByName"
                   class="text-grey-6"
                   :class="{ ellipsis: isMobile }"
-                  :style="{ fontSize: '0.6rem', fontWeight: 'normal', marginTop: '2px', ...(isMobile ? { maxWidth: '56px' } : {}) }"
+                  :style="{
+                    fontSize: '0.6rem',
+                    fontWeight: 'normal',
+                    marginTop: '2px',
+                    ...(isMobile ? { maxWidth: '56px' } : {}),
+                  }"
                 >
                   <span class="text-grey-5">by </span>{{ col.selectedByName }}
                 </div>
@@ -93,10 +130,21 @@
                   self="top middle"
                   :offset="[0, 6]"
                   class="bg-white text-grey-9 shadow-6 q-pa-sm rounded-borders"
-                  style="border: 1px solid var(--kenner-border-strong); min-width: 190px; max-width: 260px;"
+                  style="
+                    border: 1px solid var(--kenner-border-strong);
+                    min-width: 190px;
+                    max-width: 260px;
+                  "
                 >
                   <div class="row items-start justify-between no-wrap q-mb-xs">
-                    <div class="text-weight-bold text-primary q-pr-xs" style="font-size: 0.8rem; line-height: 1.25; word-break: break-word;">
+                    <div
+                      class="text-weight-bold text-primary q-pr-xs"
+                      style="
+                        font-size: 0.8rem;
+                        line-height: 1.25;
+                        word-break: break-word;
+                      "
+                    >
                       {{ col.gameName || col.label }}
                     </div>
                     <q-btn
@@ -111,32 +159,58 @@
                     />
                   </div>
 
-                  <div v-if="col.platformName || col.selectedByName" class="q-mb-xs text-caption text-grey-7" style="font-size: 0.7rem; line-height: 1.3;">
+                  <div
+                    v-if="col.platformName || col.selectedByName"
+                    class="q-mb-xs text-caption text-grey-7"
+                    style="font-size: 0.7rem; line-height: 1.3"
+                  >
                     <div v-if="col.platformName">
-                      <span class="text-grey-5">Platform:</span> {{ col.platformName }}
+                      <span class="text-grey-5">Platform:</span>
+                      {{ col.platformName }}
                     </div>
                     <div v-if="col.selectedByName">
-                      <span class="text-grey-5">Selected by:</span> {{ col.selectedByName }}
+                      <span class="text-grey-5">Selected by:</span>
+                      {{ col.selectedByName }}
                     </div>
                   </div>
 
                   <template v-if="col.settings && col.settings.length > 0">
                     <q-separator class="q-my-xs" />
-                    <div class="text-weight-bold text-grey-8 q-mb-xs" style="font-size: 0.72rem;">Settings</div>
+                    <div
+                      class="text-weight-bold text-grey-8 q-mb-xs"
+                      style="font-size: 0.72rem"
+                    >
+                      Settings
+                    </div>
                     <div
                       v-for="s in col.settings"
                       :key="s.name"
                       class="row no-wrap justify-between q-py-xs"
-                      style="font-size: 0.7rem; line-height: 1.3; border-bottom: 1px dashed var(--kenner-border-subtle);"
+                      style="
+                        font-size: 0.7rem;
+                        line-height: 1.3;
+                        border-bottom: 1px dashed var(--kenner-border-subtle);
+                      "
                     >
                       <span class="text-grey-7 q-pr-sm">{{ s.name }}</span>
-                      <span class="text-weight-medium text-right">{{ s.value }}</span>
+                      <span class="text-weight-medium text-right">{{
+                        s.value
+                      }}</span>
                     </div>
                   </template>
                 </q-menu>
               </div>
-              <div v-else-if="col.name === 'profile_name'" class="row items-center">
-                <LeagueLevel :level="level" shape size="26px" fontSize="11px" v-if="level" />
+              <div
+                v-else-if="col.name === 'profile_name'"
+                class="row items-center"
+              >
+                <LeagueLevel
+                  :level="level"
+                  shape
+                  size="26px"
+                  fontSize="11px"
+                  v-if="level"
+                />
                 <span v-else>{{ col.label }}</span>
               </div>
               <span v-else>{{ col.label }}</span>
@@ -145,13 +219,22 @@
         </template>
 
         <template #body-cell-profile_name="props">
-          <q-td :props="props" class="text-left" :class="isMobile ? 'q-py-xs q-px-xs' : 'q-py-sm q-px-md'">
+          <q-td
+            :props="props"
+            class="text-left"
+            :class="isMobile ? 'q-py-xs q-px-xs' : 'q-py-sm q-px-md'"
+          >
             <div class="row items-center no-wrap">
               <template v-if="props.row.username">
                 <div class="row items-center no-wrap q-gutter-x-sm">
                   <UserAvatar
                     :display-username="props.row.username"
-                    :subtitle="props.row.profile_name && props.row.profile_name !== props.row.username ? props.row.profile_name : undefined"
+                    :subtitle="
+                      props.row.profile_name &&
+                      props.row.profile_name !== props.row.username
+                        ? props.row.profile_name
+                        : undefined
+                    "
                     :size="isMobile ? '26px' : '28px'"
                     :shape="props.row.avatar_shape"
                     :color="props.row.avatar_color"
@@ -164,7 +247,10 @@
                       {{ props.row.username }}
                     </span>
                     <span
-                      v-if="props.row.profile_name && props.row.profile_name !== props.row.username"
+                      v-if="
+                        props.row.profile_name &&
+                        props.row.profile_name !== props.row.username
+                      "
                       class="text-caption text-grey-6"
                       style="font-size: 0.7rem; line-height: 1"
                     >
@@ -181,31 +267,46 @@
                     :shape="props.row.avatar_shape"
                     :color="props.row.avatar_color"
                   />
-                  <span v-if="!isMobile" class="text-weight-bold">{{ props.value }}</span>
+                  <span v-if="!isMobile" class="text-weight-bold">{{
+                    props.value
+                  }}</span>
                 </div>
               </template>
 
               <!-- League Leader Celebration (First Row - only when season is completed) -->
-              <div v-if="!isMobile && props.rowIndex === 0 && standings?.is_season_completed && (standings?.selected_games && standings.selected_games.length > 0)" class="leader-crown q-ml-sm">
-                <q-icon
-                  name="emoji_events"
-                  color="amber-8"
-                  size="18px"
-                />
+              <div
+                v-if="
+                  !isMobile &&
+                  props.rowIndex === 0 &&
+                  standings?.is_season_completed &&
+                  standings?.selected_games &&
+                  standings.selected_games.length > 0
+                "
+                class="leader-crown q-ml-sm"
+              >
+                <q-icon name="emoji_events" color="amber-8" size="18px" />
                 <KennerTooltip>League Winner</KennerTooltip>
               </div>
 
               <!-- Tie Group Indicator -->
               <template v-if="props.row.unresolved_tie_group">
-                <span class="text-orange q-ml-xs cursor-pointer" style="font-size: 1.1rem; line-height: 1;">
+                <span
+                  class="text-orange q-ml-xs cursor-pointer"
+                  style="font-size: 1.1rem; line-height: 1"
+                >
                   *
                   <KennerTooltip>unresolved tie</KennerTooltip>
                 </span>
               </template>
               <template v-else-if="props.row.resolved_tie_reason">
-                <span class="text-green q-ml-xs cursor-pointer" style="font-size: 1.1rem; line-height: 1;">
+                <span
+                  class="text-green q-ml-xs cursor-pointer"
+                  style="font-size: 1.1rem; line-height: 1"
+                >
                   *
-                  <KennerTooltip>{{ props.row.resolved_tie_reason }}</KennerTooltip>
+                  <KennerTooltip>{{
+                    props.row.resolved_tie_reason
+                  }}</KennerTooltip>
                 </span>
               </template>
             </div>
@@ -234,19 +335,25 @@
           >
             <!-- Tie Breaker Info Tooltip -->
             <KennerTooltip v-if="props.value?.decisive_tie_breaker_name">
-              Resolved by {{ props.value.decisive_tie_breaker_name }}: {{ props.value.tie_breaker_value }}
+              Resolved by {{ props.value.decisive_tie_breaker_name }}:
+              {{ props.value.tie_breaker_value }}
             </KennerTooltip>
-
 
             <div
               v-if="
-                props.value && (props.value.display_value != null || props.value.points != null || props.value.league_points != null)
+                props.value &&
+                (props.value.display_value != null ||
+                  props.value.points != null ||
+                  props.value.league_points != null)
               "
               class="column items-center"
               style="line-height: 1.1"
             >
               <div
-                v-if="props.value.display_value != null || props.value.points != null"
+                v-if="
+                  props.value.display_value != null ||
+                  props.value.points != null
+                "
                 class="text-weight-bold row items-baseline"
                 style="font-size: 0.9rem"
               >
@@ -281,83 +388,111 @@
       <LoadingSpinner v-else-if="loading" text="Loading standings..." />
 
       <!-- Empty state -->
-      <div v-else-if="standings && standings.standings.length === 0 && standings.selected_games.length === 0" class="column items-center q-pa-xl text-grey-6 bg-grey-1">
+      <div
+        v-else-if="
+          standings &&
+          standings.standings.length === 0 &&
+          standings.selected_games.length === 0
+        "
+        class="column items-center q-pa-xl text-grey-6 bg-grey-1"
+      >
         <q-icon name="upcoming" size="40px" class="q-mb-sm opacity-50" />
         <div class="text-subtitle2">No participants yet</div>
-        <div class="text-caption">The standings will appear here once the season starts.</div>
+        <div class="text-caption">
+          The standings will appear here once the season starts.
+        </div>
       </div>
 
       <!-- Unresolved Tie Info (only when the league is fully played) -->
       <div
-        v-if="leagueId && standings?.all_games_finished && standings?.tie_groups?.some(g => g.unresolved)"
+        v-if="
+          leagueId &&
+          standings?.all_games_finished &&
+          standings?.tie_groups?.some((g) => g.unresolved)
+        "
         class="q-mt-md q-mb-md"
       >
-        <q-card flat bordered class="unresolved-tie-card bg-orange-1 text-orange-9 q-pa-md relative-position overflow-hidden">
-          <div class="absolute-left bg-orange-8" style="width: 4px;"></div>
+        <q-card
+          flat
+          bordered
+          class="unresolved-tie-card bg-orange-1 text-orange-9 q-pa-md relative-position overflow-hidden"
+        >
+          <div class="absolute-left bg-orange-8" style="width: 4px"></div>
           <div class="row items-center q-gutter-x-sm q-mb-sm">
             <q-icon name="emoji_events" size="18px" color="orange-8" />
-            <div class="text-subtitle2 text-weight-bold text-uppercase" style="letter-spacing: 0.3px;">Unresolved tie</div>
+            <div
+              class="text-subtitle2 text-weight-bold text-uppercase"
+              style="letter-spacing: 0.3px"
+            >
+              Unresolved tie
+            </div>
             <q-badge color="orange-8">
-              {{ standings.tie_groups.filter(g => g.unresolved).length }}
+              {{ standings.tie_groups.filter((g) => g.unresolved).length }}
             </q-badge>
           </div>
           <div class="row wrap q-gutter-sm">
             <q-chip
-              v-for="grp in standings.tie_groups.filter(g => g.unresolved)"
+              v-for="grp in standings.tie_groups.filter((g) => g.unresolved)"
               :key="grp.group_key"
               color="orange-2"
               text-color="orange-10"
               class="q-ma-none"
             >
-              <template v-for="(m, idx) in grp.members" :key="m.player_profile_id">
+              <template
+                v-for="(m, idx) in grp.members"
+                :key="m.player_profile_id"
+              >
                 <span class="text-weight-bold">{{ m.profile_name }}</span>
                 <span
                   v-if="idx < grp.members.length - 1"
                   class="q-mx-xs text-weight-light opacity-70"
-                >vs</span>
+                  >vs</span
+                >
               </template>
             </q-chip>
           </div>
-          <div class="text-orange-9 q-mt-sm text-italic opacity-80" style="font-size: 0.7rem;">
+          <div
+            class="text-orange-9 q-mt-sm text-italic opacity-80"
+            style="font-size: 0.7rem"
+          >
             Awaiting tie-break decision.
           </div>
         </q-card>
       </div>
 
       <!-- Footer Actions -->
-<!--      <div v-if="standings && standings.season_id" class="row justify-end q-mt-md">-->
-<!--        <KennerButton-->
-<!--          flat-->
-<!--          color="primary"-->
-<!--          icon="visibility"-->
-<!--          label="View Season Overview"-->
-<!--          size="sm"-->
-<!--          :to="{ name: 'season-overview', params: { id: standings.season_id } }"-->
-<!--        />-->
-<!--      </div>-->
+      <!--      <div v-if="standings && standings.season_id" class="row justify-end q-mt-md">-->
+      <!--        <KennerButton-->
+      <!--          flat-->
+      <!--          color="primary"-->
+      <!--          icon="visibility"-->
+      <!--          label="View Season Overview"-->
+      <!--          size="sm"-->
+      <!--          :to="{ name: 'season-overview', params: { id: standings.season_id } }"-->
+      <!--        />-->
+      <!--      </div>-->
 
-<!--      &lt;!&ndash; Error state &ndash;&gt;-->
-<!--      <div-->
-<!--        v-else-if="error"-->
-<!--        class="column items-center q-pa-md bg-standings-table rounded-borders"-->
-<!--      >-->
-<!--        <q-icon name="error_outline" size="24px" color="negative" />-->
-<!--        <span class="q-mt-xs text-negative text-caption">-->
-<!--          Error loading standings-->
-<!--        </span>-->
-<!--        <KennerButton-->
-<!--          outline-->
-<!--          color="dark"-->
-<!--          label="Retry"-->
-<!--          size="sm"-->
-<!--          class="q-mt-sm"-->
-<!--          @click="fetchStandings"-->
-<!--        />-->
-<!--      </div>-->
+      <!--      &lt;!&ndash; Error state &ndash;&gt;-->
+      <!--      <div-->
+      <!--        v-else-if="error"-->
+      <!--        class="column items-center q-pa-md bg-standings-table rounded-borders"-->
+      <!--      >-->
+      <!--        <q-icon name="error_outline" size="24px" color="negative" />-->
+      <!--        <span class="q-mt-xs text-negative text-caption">-->
+      <!--          Error loading standings-->
+      <!--        </span>-->
+      <!--        <KennerButton-->
+      <!--          outline-->
+      <!--          color="dark"-->
+      <!--          label="Retry"-->
+      <!--          size="sm"-->
+      <!--          class="q-mt-sm"-->
+      <!--          @click="fetchStandings"-->
+      <!--        />-->
+      <!--      </div>-->
     </div>
   </div>
 </template>
-
 
 <script setup lang="ts">
 import { ref, computed, watch, onMounted, onUnmounted } from 'vue';
@@ -418,12 +553,16 @@ const fetchStandings = async () => {
   }
 };
 
-watch(() => props.prefetchedData, (newVal) => {
-  if (newVal) {
-    standings.value = newVal;
-    loading.value = false;
-  }
-}, { immediate: true });
+watch(
+  () => props.prefetchedData,
+  (newVal) => {
+    if (newVal) {
+      standings.value = newVal;
+      loading.value = false;
+    }
+  },
+  { immediate: true }
+);
 
 const updateStore = useUpdateStore();
 let unsubSeason: (() => void) | null = null;
@@ -500,7 +639,8 @@ const tableRows = computed(() => {
   return standings.value.standings.map((standing) => {
     const isCurrentUser =
       (standing.username && userStore.isMe(standing.username)) ||
-      (standing.player_profile_id && userStore.user?.profile_id === standing.player_profile_id);
+      (standing.player_profile_id &&
+        userStore.user?.profile_id === standing.player_profile_id);
 
     const shape =
       isCurrentUser && userStore.user?.avatar_shape
@@ -521,9 +661,13 @@ const tableRows = computed(() => {
       total: standing.total_league_points,
       unresolved_tie_group: standing.unresolved_tie_group,
       resolved_tie_reason: (() => {
-        const group = standings.value?.tie_groups?.find(g => g.group_key === standing.unresolved_tie_group);
-        return (group && !group.unresolved) ? group.resolution?.reason_display : undefined;
-      })()
+        const group = standings.value?.tie_groups?.find(
+          (g) => g.group_key === standing.unresolved_tie_group
+        );
+        return group && !group.unresolved
+          ? group.resolution?.reason_display
+          : undefined;
+      })(),
     };
 
     standings.value.selected_games?.forEach((game) => {
@@ -541,7 +685,9 @@ const rowClass = (_row: unknown, index: number) => {
   // The user said "just headers with profile names", so maybe don't highlight yet?
   // But if we use index === 0, it will highlight the first person.
   // Let's check if there are any games.
-  const hasGames = standings.value?.selected_games && standings.value.selected_games.length > 0;
+  const hasGames =
+    standings.value?.selected_games &&
+    standings.value.selected_games.length > 0;
   if (!hasGames) return '';
   return index === 0 ? 'bg-orange-1' : '';
 };
@@ -577,11 +723,9 @@ function getRankBgClass(rank: number | undefined) {
       return '';
   }
 }
-
 </script>
 
 <style scoped lang="scss">
-
 .standings-matrix-wrapper {
   width: 100%;
 }

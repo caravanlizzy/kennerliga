@@ -1,10 +1,19 @@
 <template>
   <div class="column full-height kenner-drawer-container glass-effect">
     <!-- Drawer Header -->
-    <div class="q-pa-lg q-mb-sm row items-center border-bottom-subtle bg-drawer-header">
+    <div
+      class="q-pa-lg q-mb-sm row items-center border-bottom-subtle bg-drawer-header"
+    >
       <q-icon name="img:icons/favicon.svg" size="36px" class="q-mr-sm" />
       <q-space />
-      <q-btn flat round dense icon="close" color="grey-7" @click="drawerState = false" />
+      <q-btn
+        flat
+        round
+        dense
+        icon="close"
+        color="grey-7"
+        @click="drawerState = false"
+      />
     </div>
 
     <!-- Drawer Content -->
@@ -17,26 +26,56 @@
           label="Seasons"
           forward-name="seasons"
         />
-        <DrawerItem icon="people_alt" icon-color="primary" label="Players" forward-name="players" />
-        <DrawerItem icon="query_stats" icon-color="primary" label="Statistics" forward-name="statistics" />
+        <DrawerItem
+          icon="people_alt"
+          icon-color="primary"
+          label="Players"
+          forward-name="players"
+        />
+        <DrawerItem
+          icon="query_stats"
+          icon-color="primary"
+          label="Statistics"
+          forward-name="statistics"
+        />
 
         <q-separator class="q-my-sm drawer-separator" />
         <DrawerSubGroup>Info</DrawerSubGroup>
-        <DrawerItem icon="menu_book" icon-color="primary" label="Rules" forward-name="rules" />
-        <DrawerItem icon="info" icon-color="primary" label="About" forward-name="about" />
+        <DrawerItem
+          icon="menu_book"
+          icon-color="primary"
+          label="Rules"
+          forward-name="rules"
+        />
+        <DrawerItem
+          icon="info"
+          icon-color="primary"
+          label="About"
+          forward-name="about"
+        />
 
         <q-separator class="q-my-sm drawer-separator" />
         <DrawerSubGroup>Preferences</DrawerSubGroup>
         <DrawerItem
           :icon="themeStore.isDark ? 'light_mode' : 'dark_mode'"
           icon-color="primary"
-          :label="themeStore.isDark ? 'Switch to light mode' : 'Switch to dark mode'"
+          :label="
+            themeStore.isDark ? 'Switch to light mode' : 'Switch to dark mode'
+          "
           @click="themeStore.toggleDark"
         />
         <DrawerItem
-          :icon="notificationsSubscribed ? 'notifications_active' : 'notifications_off'"
+          :icon="
+            notificationsSubscribed
+              ? 'notifications_active'
+              : 'notifications_off'
+          "
           icon-color="primary"
-          :label="notificationsSubscribed ? 'Disable notifications' : 'Enable notifications'"
+          :label="
+            notificationsSubscribed
+              ? 'Disable notifications'
+              : 'Enable notifications'
+          "
           @click="toggleNotifications"
         />
 
@@ -57,7 +96,12 @@
             :forward-params="{ id: currentSeasonId }"
             forward-name="season-manage"
           />
-          <DrawerItem icon="sports_esports" icon-color="primary" label="Games" forward-name="games" />
+          <DrawerItem
+            icon="sports_esports"
+            icon-color="primary"
+            label="Games"
+            forward-name="games"
+          />
           <DrawerItem
             icon="mark_email_unread"
             icon-color="primary"
@@ -71,13 +115,18 @@
             forward-name="configuration"
           />
         </template>
-
       </q-list>
     </div>
 
     <div class="q-pa-md q-pb-xl">
       <q-separator class="q-mb-md drawer-separator" />
-      <DrawerItem icon="exit_to_app" icon-color="red-7" label="Logout" class="logout-item" @click="doLogout" />
+      <DrawerItem
+        icon="exit_to_app"
+        icon-color="red-7"
+        label="Logout"
+        class="logout-item"
+        @click="doLogout"
+      />
     </div>
   </div>
 </template>
@@ -115,11 +164,15 @@ const notificationsSubscribed = ref(false);
 
 provide('closeDrawer', () => (drawerState.value = false));
 
-watch(isAdmin, (val) => {
-  if (val) {
-    void homeSeasonStore.init();
-  }
-}, { immediate: true });
+watch(
+  isAdmin,
+  (val) => {
+    if (val) {
+      void homeSeasonStore.init();
+    }
+  },
+  { immediate: true }
+);
 
 async function checkNotificationStatus() {
   if (!isPushNotificationSupported()) {
@@ -133,11 +186,15 @@ async function checkNotificationStatus() {
   }
 }
 
-watch(drawerState, (open) => {
-  if (open) {
-    void checkNotificationStatus();
-  }
-}, { immediate: true });
+watch(
+  drawerState,
+  (open) => {
+    if (open) {
+      void checkNotificationStatus();
+    }
+  },
+  { immediate: true }
+);
 
 async function toggleNotifications(): Promise<void> {
   if (!isPushNotificationSupported()) {

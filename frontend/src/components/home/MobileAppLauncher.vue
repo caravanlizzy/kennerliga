@@ -1,11 +1,7 @@
 <template>
   <div class="launcher-container">
     <template v-for="(tile, idx) in visibleTiles" :key="tile.title">
-      <div
-        v-ripple
-        class="launcher-row"
-        @click="navigateTo(tile.route)"
-      >
+      <div v-ripple class="launcher-row" @click="navigateTo(tile.route)">
         <div class="row no-wrap items-center q-px-md q-py-md">
           <div class="row-icon-box flex flex-center">
             <q-icon :name="tile.icon" size="36px" class="row-icon" />
@@ -68,7 +64,7 @@ const tiles = computed(() => [
   },
 ]);
 
-const visibleTiles = computed(() => tiles.value.filter(t => t.visible));
+const visibleTiles = computed(() => tiles.value.filter((t) => t.visible));
 
 function navigateTo(route: Record<string, unknown>) {
   router.push(route as any);

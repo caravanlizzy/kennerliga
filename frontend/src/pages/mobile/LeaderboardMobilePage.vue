@@ -1,13 +1,15 @@
 <template>
   <q-page class="bg-white">
-    <div class="q-pa-md row items-center justify-between no-wrap border-bottom-subtle">
+    <div
+      class="q-pa-md row items-center justify-between no-wrap border-bottom-subtle"
+    >
       <div class="row items-center no-wrap q-gutter-x-sm">
         <q-icon name="stars" size="sm" color="primary" />
         <SmoothSwitch
           v-model="showAllLeagues"
           :options="[
             { label: 'Highest', value: false },
-            { label: 'All', value: true }
+            { label: 'All', value: true },
           ]"
         />
       </div>
@@ -25,7 +27,10 @@
         </div>
       </div>
     </div>
-    <LeaderBoard v-model:show-all-leagues="showAllLeagues" :year="selectedYear" />
+    <LeaderBoard
+      v-model:show-all-leagues="showAllLeagues"
+      :year="selectedYear"
+    />
   </q-page>
 </template>
 
@@ -35,7 +40,11 @@ import { ref, onMounted } from 'vue';
 import LeaderBoard from 'components/season/LeaderBoard.vue';
 import KennerSelect from 'components/base/KennerSelect.vue';
 import SmoothSwitch from 'components/base/SmoothSwitch.vue';
-import { fetchAvailableYears, fetchCurrentSeasonId, fetchSeason } from 'src/services/seasonService';
+import {
+  fetchAvailableYears,
+  fetchCurrentSeasonId,
+  fetchSeason,
+} from 'src/services/seasonService';
 
 const selectedYear = ref(new Date().getFullYear());
 const showAllLeagues = ref(false);

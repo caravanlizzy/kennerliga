@@ -5,7 +5,7 @@
     :class="[
       `indicator-${color}`,
       isMobile ? 'q-pa-md no-border-radius-mobile' : 'q-pa-lg',
-      { 'q-mt-xl': !noMargin, 'content-section--flat': flat }
+      { 'q-mt-xl': !noMargin, 'content-section--flat': flat },
     ]"
   >
     <div
@@ -15,7 +15,6 @@
     >
       <q-icon :name="icon" size="120px" />
     </div>
-
 
     <template v-if="expandable">
       <q-expansion-item
@@ -31,7 +30,11 @@
         <template #header>
           <div class="full-width row items-center no-wrap">
             <slot name="title">
-              <span class="text-h5 text-weight-bold tracking-tight" :class="`text-${color}`">{{ title }}</span>
+              <span
+                class="text-h5 text-weight-bold tracking-tight"
+                :class="`text-${color}`"
+                >{{ title }}</span
+              >
             </slot>
             <slot name="header-extra" />
             <q-space />
@@ -47,7 +50,11 @@
         class="section-header full-width row items-center no-wrap relative-position"
       >
         <slot name="title">
-          <span class="text-h5 text-weight-bold tracking-tight" :class="`text-${color}`">{{ title }}</span>
+          <span
+            class="text-h5 text-weight-bold tracking-tight"
+            :class="`text-${color}`"
+            >{{ title }}</span
+          >
         </slot>
         <slot name="header-extra" />
         <q-space />
@@ -57,57 +64,59 @@
       </div>
     </template>
   </div>
-  </template>
+</template>
 
-  <script setup lang="ts">
-  import { computed, onMounted, onUnmounted } from 'vue';
-  import { useUiStore } from 'src/stores/uiStore';
-  import { useResponsive } from 'src/composables/responsive';
+<script setup lang="ts">
+import { computed, onMounted, onUnmounted } from 'vue';
+import { useUiStore } from 'src/stores/uiStore';
+import { useResponsive } from 'src/composables/responsive';
 
-  const uiStore = useUiStore();
-  const { isMobile } = useResponsive();
+const uiStore = useUiStore();
+const { isMobile } = useResponsive();
 
-  const isOpened = defineModel<boolean>('isOpened', { default: true });
+const isOpened = defineModel<boolean>('isOpened', { default: true });
 
-  const props = withDefaults(
-    defineProps<{
-      id?: string;
-      title: string;
-      color: string;
-      icon?: string;
-      titleEnd?: boolean;
-      expandable?: boolean;
-      flat?: boolean;
-      noMargin?: boolean;
-    }>(),
-    {
-      titleEnd: false,
-      expandable: false,
-      icon: 'article',
-      flat: false,
-      noMargin: false
-    }
-  );
+const props = withDefaults(
+  defineProps<{
+    id?: string;
+    title: string;
+    color: string;
+    icon?: string;
+    titleEnd?: boolean;
+    expandable?: boolean;
+    flat?: boolean;
+    noMargin?: boolean;
+  }>(),
+  {
+    titleEnd: false,
+    expandable: false,
+    icon: 'article',
+    flat: false,
+    noMargin: false,
+  }
+);
 
-  const sectionId = computed(() => props.id || props.title.toLowerCase().replace(/\s+/g, '-'));
+const sectionId = computed(
+  () => props.id || props.title.toLowerCase().replace(/\s+/g, '-')
+);
 
-  const register = () => {
-    uiStore.registerSection({
-      id: sectionId.value,
-      title: props.title,
-      icon: props.icon || 'article',
-      color: props.color
-    });
-  };
-
-  onMounted(register);
-
-  onUnmounted(() => {
-    uiStore.unregisterSection(sectionId.value);
+const register = () => {
+  uiStore.registerSection({
+    id: sectionId.value,
+    title: props.title,
+    icon: props.icon || 'article',
+    color: props.color,
   });
-  </script>
+};
 
-  <style scoped lang="scss">
+onMounted(register);
+
+onUnmounted(() => {
+  uiStore.unregisterSection(sectionId.value);
+});
+</script>
+
+<style scoped lang="scss">
 .content-section-container {
   position: relative;
   background: var(--kenner-card-bg, white);
@@ -117,19 +126,19 @@
   overflow: hidden;
 
   &.content-section--flat {
-      border: none !important;
-      box-shadow: none !important;
-      background: transparent !important;
-      border-radius: 0 !important;
-      padding-left: 0 !important;
-      padding-right: 0 !important;
-      padding-top: 32px !important;
-      padding-bottom: 32px !important;
-  
-      @media (max-width: 599px) {
-        padding-top: 24px !important;
-        padding-bottom: 24px !important;
-      }
+    border: none !important;
+    box-shadow: none !important;
+    background: transparent !important;
+    border-radius: 0 !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    padding-top: 32px !important;
+    padding-bottom: 32px !important;
+
+    @media (max-width: 599px) {
+      padding-top: 24px !important;
+      padding-bottom: 24px !important;
+    }
 
     &::before {
       display: none;
@@ -153,33 +162,60 @@
     z-index: 2;
   }
 
-  &.indicator-primary { --separator-color: var(--q-primary); --accent-color: var(--q-primary); }
-  &.indicator-secondary { --separator-color: var(--q-secondary); --accent-color: var(--q-secondary); }
-  &.indicator-accent { --separator-color: var(--q-accent); --accent-color: var(--q-accent); }
-  &.indicator-dark { --separator-color: var(--q-dark); --accent-color: var(--q-dark); }
-  .body--dark &.indicator-dark { --separator-color: var(--kenner-text-secondary); --accent-color: var(--kenner-text-secondary); }
-  &.indicator-info { --separator-color: var(--q-info); --accent-color: var(--q-info); }
-  &.indicator-warning { --separator-color: var(--q-warning); --accent-color: var(--q-warning); }
-  &.indicator-negative { --separator-color: var(--q-negative); --accent-color: var(--q-negative); }
-  &.indicator-positive { --separator-color: var(--q-positive); --accent-color: var(--q-positive); }
+  &.indicator-primary {
+    --separator-color: var(--q-primary);
+    --accent-color: var(--q-primary);
+  }
+  &.indicator-secondary {
+    --separator-color: var(--q-secondary);
+    --accent-color: var(--q-secondary);
+  }
+  &.indicator-accent {
+    --separator-color: var(--q-accent);
+    --accent-color: var(--q-accent);
+  }
+  &.indicator-dark {
+    --separator-color: var(--q-dark);
+    --accent-color: var(--q-dark);
+  }
+  .body--dark &.indicator-dark {
+    --separator-color: var(--kenner-text-secondary);
+    --accent-color: var(--kenner-text-secondary);
+  }
+  &.indicator-info {
+    --separator-color: var(--q-info);
+    --accent-color: var(--q-info);
+  }
+  &.indicator-warning {
+    --separator-color: var(--q-warning);
+    --accent-color: var(--q-warning);
+  }
+  &.indicator-negative {
+    --separator-color: var(--q-negative);
+    --accent-color: var(--q-negative);
+  }
+  &.indicator-positive {
+    --separator-color: var(--q-positive);
+    --accent-color: var(--q-positive);
+  }
 }
 
-  .section-header {
-    padding: 0 0 10px 0;
-    border-bottom: 1px solid var(--kenner-border-subtle, rgba(0, 0, 0, 0.06));
+.section-header {
+  padding: 0 0 10px 0;
+  border-bottom: 1px solid var(--kenner-border-subtle, rgba(0, 0, 0, 0.06));
 
-    :deep(.q-item) {
-      padding: 0;
-      min-height: unset;
-    }
+  :deep(.q-item) {
+    padding: 0;
+    min-height: unset;
   }
+}
 
-  .section-content {
-    z-index: 1;
-  }
+.section-content {
+  z-index: 1;
+}
 
-  .section-watermark {
-    z-index: 0;
-    pointer-events: none;
-  }
-  </style>
+.section-watermark {
+  z-index: 0;
+  pointer-events: none;
+}
+</style>

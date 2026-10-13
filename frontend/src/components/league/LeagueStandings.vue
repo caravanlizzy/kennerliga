@@ -2,15 +2,19 @@
   <div>
     <!-- Unresolved Tie Info (only when all league games are finished) -->
     <div
-      v-if="leagueId && allGamesFinished && tieGroups.some(g => g.unresolved)"
+      v-if="leagueId && allGamesFinished && tieGroups.some((g) => g.unresolved)"
       class="q-mb-md"
     >
       <div class="unresolved-card">
         <div class="unresolved-card__header">
-          <q-icon name="emoji_events" size="18px" class="unresolved-card__icon" />
+          <q-icon
+            name="emoji_events"
+            size="18px"
+            class="unresolved-card__icon"
+          />
           <div class="unresolved-card__title">Unresolved tie</div>
           <q-badge class="unresolved-card__badge">
-            {{ tieGroups.filter(g => g.unresolved).length }}
+            {{ tieGroups.filter((g) => g.unresolved).length }}
           </q-badge>
           <KennerButton
             v-if="adminMode"
@@ -20,27 +24,34 @@
             outline
             no-caps
             class="q-ml-auto"
-            @click="emit('resolve-tie', tieGroups.find(g => g.unresolved))"
+            @click="
+              emit(
+                'resolve-tie',
+                tieGroups.find((g) => g.unresolved)
+              )
+            "
           />
         </div>
         <div class="unresolved-card__body">
           <div
-            v-for="grp in tieGroups.filter(g => g.unresolved)"
+            v-for="grp in tieGroups.filter((g) => g.unresolved)"
             :key="grp.group_key"
             class="unresolved-card__group"
           >
-            <template v-for="(m, idx) in grp.members" :key="m.player_profile_id">
+            <template
+              v-for="(m, idx) in grp.members"
+              :key="m.player_profile_id"
+            >
               <span class="unresolved-card__player">{{ m.profile_name }}</span>
               <span
                 v-if="idx < grp.members.length - 1"
                 class="unresolved-card__vs"
-              >vs</span>
+                >vs</span
+              >
             </template>
           </div>
         </div>
-        <div class="unresolved-card__hint">
-          Awaiting tie-break decision.
-        </div>
+        <div class="unresolved-card__hint">Awaiting tie-break decision.</div>
       </div>
     </div>
 
@@ -59,15 +70,25 @@
           <div class="row items-center no-wrap q-gutter-x-sm">
             <UserAvatar
               :display-username="props.row.username || props.value"
-              :subtitle="props.row.username && props.row.profile_name !== props.row.username ? props.row.profile_name : undefined"
+              :subtitle="
+                props.row.username &&
+                props.row.profile_name !== props.row.username
+                  ? props.row.profile_name
+                  : undefined
+              "
               :size="isMobile ? '24px' : '28px'"
               :shape="props.row.avatar_shape"
               :color="props.row.avatar_color"
             />
             <div class="column">
-              <span class="text-weight-medium">{{ props.row.username || props.value }}</span>
+              <span class="text-weight-medium">{{
+                props.row.username || props.value
+              }}</span>
               <span
-                v-if="props.row.username && props.row.profile_name !== props.row.username"
+                v-if="
+                  props.row.username &&
+                  props.row.profile_name !== props.row.username
+                "
                 class="text-caption text-grey-6"
                 style="font-size: 0.7rem; line-height: 1"
               >
@@ -75,13 +96,19 @@
               </span>
             </div>
             <template v-if="props.row.unresolved_tie_group">
-              <span class="text-orange q-ml-xs cursor-pointer" style="font-size: 1.1rem; line-height: 1;">
+              <span
+                class="text-orange q-ml-xs cursor-pointer"
+                style="font-size: 1.1rem; line-height: 1"
+              >
                 *
                 <q-tooltip>unresolved tie</q-tooltip>
               </span>
             </template>
             <template v-else-if="props.row.resolved_tie_reason">
-              <span class="text-green q-ml-xs cursor-pointer" style="font-size: 1.1rem; line-height: 1;">
+              <span
+                class="text-green q-ml-xs cursor-pointer"
+                style="font-size: 1.1rem; line-height: 1"
+              >
                 *
                 <q-tooltip>{{ props.row.resolved_tie_reason }}</q-tooltip>
               </span>
@@ -98,17 +125,28 @@
     </div>
 
     <!-- Tie Groups Info (Shown at bottom for resolved groups or standalone) -->
-    <div v-if="tieGroups.some(g => !g.unresolved) || !leagueId" class="q-mt-md q-px-md">
-      <div v-if="tieGroups.some(g => !g.unresolved)" class="text-caption text-grey-8 q-mb-xs text-weight-bold">Resolved Ties</div>
+    <div
+      v-if="tieGroups.some((g) => !g.unresolved) || !leagueId"
+      class="q-mt-md q-px-md"
+    >
+      <div
+        v-if="tieGroups.some((g) => !g.unresolved)"
+        class="text-caption text-grey-8 q-mb-xs text-weight-bold"
+      >
+        Resolved Ties
+      </div>
       <div v-for="group in tieGroups" :key="group.group_key" class="q-mb-sm">
         <q-card flat bordered class="bg-grey-1">
           <q-card-section class="q-pa-xs">
             <div class="row items-center q-gutter-x-sm">
-              <q-badge :color="group.unresolved ? 'orange' : 'green'" style="font-size: 0.5rem">
+              <q-badge
+                :color="group.unresolved ? 'orange' : 'green'"
+                style="font-size: 0.5rem"
+              >
                 {{ group.unresolved ? 'UNRESOLVED' : 'RESOLVED' }}
               </q-badge>
               <div class="text-caption" style="font-size: 0.7rem">
-                {{ group.members.map(m => m.profile_name).join(' vs ') }}
+                {{ group.members.map((m) => m.profile_name).join(' vs ') }}
               </div>
               <KennerButton
                 v-if="adminMode && group.unresolved"
@@ -122,7 +160,11 @@
                 @click="emit('resolve-tie', group)"
               />
             </div>
-            <div v-if="group.resolution" class="text-grey-7 q-ml-sm" style="font-size: 0.65rem">
+            <div
+              v-if="group.resolution"
+              class="text-grey-7 q-ml-sm"
+              style="font-size: 0.65rem"
+            >
               Reason: {{ group.resolution.reason_display }}
             </div>
           </q-card-section>
@@ -189,15 +231,15 @@
   }
 
   &__group {
-  display: inline-flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 6px;
-  padding: 6px 10px;
-  background: rgba(255, 255, 255, 0.75);
-  border: 1px solid rgba(217, 119, 6, 0.25);
-  border-radius: 6px;
-}
+    display: inline-flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 6px;
+    padding: 6px 10px;
+    background: rgba(255, 255, 255, 0.75);
+    border: 1px solid rgba(217, 119, 6, 0.25);
+    border-radius: 6px;
+  }
 
   &__player {
     font-size: 0.8rem;
@@ -222,7 +264,6 @@
     font-style: italic;
   }
 }
-
 </style>
 
 <script setup lang="ts">
@@ -270,8 +311,10 @@ const fetchStandings = async () => {
   try {
     const data = await fetchLeagueFullStandings(idToUse);
     // Transform full-standings to LeagueStanding format
-    standings.value = data.standings.map(s => {
-      const group = data.tie_groups?.find(g => g.group_key === s.unresolved_tie_group);
+    standings.value = data.standings.map((s) => {
+      const group = data.tie_groups?.find(
+        (g) => g.group_key === s.unresolved_tie_group
+      );
       return {
         player_profile: s.player_profile_id,
         profile_name: s.profile_name,
@@ -281,7 +324,10 @@ const fetchStandings = async () => {
         wins: parseFloat(s.total_wins || '0'),
         league_points: parseFloat(s.total_league_points || '0'),
         unresolved_tie_group: s.unresolved_tie_group,
-        resolved_tie_reason: (group && !group.unresolved) ? group.resolution?.reason_display : undefined
+        resolved_tie_reason:
+          group && !group.unresolved
+            ? group.resolution?.reason_display
+            : undefined,
       };
     });
     tieGroups.value = data.tie_groups || [];

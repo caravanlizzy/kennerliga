@@ -8,9 +8,11 @@
               <q-icon name="sports_esports" />
             </q-avatar>
 
-            <div class="text-subtitle1 text-weight-medium ellipsis" >
+            <div class="text-subtitle1 text-weight-medium ellipsis">
               {{ truncateString(member.selected_game.game_name || '') }}
-              <KennerTooltip v-if="(member.selected_game.game_name || '').length > 28">
+              <KennerTooltip
+                v-if="(member.selected_game.game_name || '').length > 28"
+              >
                 {{ member.selected_game.game_name }}
               </KennerTooltip>
             </div>
@@ -37,10 +39,15 @@
               >
                 <!-- You can keep line-through, or just dim it; here we just dim -->
                 <span class="text-grey-7">{{ bannedGameName }}</span>
-                <KennerTooltip>Not active anymore (banned by others)</KennerTooltip>
+                <KennerTooltip
+                  >Not active anymore (banned by others)</KennerTooltip
+                >
               </q-chip>
 
-              <div v-else-if="banners.length" class="row items-center q-gutter-xs">
+              <div
+                v-else-if="banners.length"
+                class="row items-center q-gutter-xs"
+              >
                 <UserAvatar
                   v-for="(name, idx) in banners"
                   :key="idx"
@@ -52,8 +59,6 @@
               <div v-else class="text-grey-6 text-caption">No bans yet</div>
             </div>
           </q-banner>
-
-
         </div>
 
         <KennerButton
@@ -69,7 +74,9 @@
       </div>
 
       <q-card-section v-if="isExpanded" class="card-body">
-        <GameSettingsDisplay :selectedOptions="member.selected_game.selected_options" />
+        <GameSettingsDisplay
+          :selectedOptions="member.selected_game.selected_options"
+        />
       </q-card-section>
     </div>
   </div>
@@ -100,7 +107,7 @@ type Member = {
   profile_name: string;
   selected_game: SelectedGameRef | null;
   banned_selected_game: SelectedGameRef | null;
-  banned_by: string[];           // array of display names (e.g., profile_name or username)
+  banned_by: string[]; // array of display names (e.g., profile_name or username)
   selected_game_id?: number | null; // optional convenience
   is_active_player: boolean;
   rank: number;
@@ -116,7 +123,6 @@ const isExpanded = ref(false);
 
 // Directly use backend-provided banned_by
 const banners = computed(() => props.member.banned_by ?? []);
-
 
 const bannedGameName = computed(() => {
   // `game` is the game's id on this payload, so the game's display name only

@@ -15,10 +15,19 @@
       <div class="column items-center q-pa-sm">
         <div class="row items-center q-gutter-x-sm q-mb-xs">
           <q-icon name="emoji_events" color="amber-8" size="20px" />
-          <div class="text-subtitle2 text-weight-bold uppercase letter-spacing-1">Current Champion</div>
+          <div
+            class="text-subtitle2 text-weight-bold uppercase letter-spacing-1"
+          >
+            Current Champion
+          </div>
         </div>
         <div class="text-h6 text-amber-2 q-mb-xs">{{ champion.username }}</div>
-        <q-separator color="white" dark inset class="full-width q-my-xs opacity-30" />
+        <q-separator
+          color="white"
+          dark
+          inset
+          class="full-width q-my-xs opacity-30"
+        />
         <div class="text-caption text-grey-4 italic">
           Click to view {{ champion.seasonName }} results
         </div>
@@ -168,7 +177,6 @@ onMounted(() => {
   z-index: 2;
 }
 
-
 .champion-info-section {
   min-width: 0;
 }
@@ -190,5 +198,4 @@ onMounted(() => {
 .action-arrow {
   transition: all 0.2s ease;
 }
-
 </style>

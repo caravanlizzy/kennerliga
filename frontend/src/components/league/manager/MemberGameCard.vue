@@ -2,7 +2,13 @@
   <div class="user-entry q-py-md">
     <!-- Member Header -->
     <div class="row items-center q-gutter-sm q-mb-md">
-      <q-avatar color="primary" text-color="white" size="36px" font-size="14px" class="text-weight-bold">
+      <q-avatar
+        color="primary"
+        text-color="white"
+        size="36px"
+        font-size="14px"
+        class="text-weight-bold"
+      >
         {{ member.profile_name.charAt(0).toUpperCase() }}
       </q-avatar>
       <div class="text-subtitle1 text-weight-bolder text-grey-9">
@@ -49,7 +55,9 @@
           class="q-py-xs q-px-sm"
         >
           <q-icon size="xs" name="star" class="q-mr-xs" />
-          <span class="text-weight-bold uppercase" style="font-size: 0.7rem">Active</span>
+          <span class="text-weight-bold uppercase" style="font-size: 0.7rem"
+            >Active</span
+          >
         </q-badge>
       </div>
 
@@ -101,7 +109,7 @@
     <div class="row q-col-gutter-md items-start">
       <!-- Slim box per selected game -->
       <div
-        v-for="selGame in (member.selected_games || [])"
+        v-for="selGame in member.selected_games || []"
         :key="`${member.id}-${selGame.id}`"
         class="col-12 col-md-4"
       >
@@ -112,7 +120,11 @@
           <!-- Slim Header Section -->
           <div
             class="slim-game-header row items-center justify-between no-wrap q-px-sm q-py-xs"
-            :class="selGame.successfully_banned ? 'bg-red-50 text-negative' : 'bg-grey-2 text-grey-9'"
+            :class="
+              selGame.successfully_banned
+                ? 'bg-red-50 text-negative'
+                : 'bg-grey-2 text-grey-9'
+            "
           >
             <div class="col row items-center no-wrap ellipsis">
               <q-icon
@@ -124,7 +136,7 @@
               <span
                 class="text-weight-bold ellipsis"
                 :class="{ 'text-strike': selGame.successfully_banned }"
-                style="font-size: 0.85rem;"
+                style="font-size: 0.85rem"
               >
                 {{ selGame?.game_name || 'No Game Selected' }}
               </span>
@@ -132,7 +144,7 @@
                 v-if="selGame.successfully_banned"
                 color="negative"
                 class="q-ml-xs text-weight-bolder"
-                style="font-size: 0.65rem;"
+                style="font-size: 0.65rem"
               >
                 BANNED
               </q-badge>
@@ -160,15 +172,24 @@
               header-class="text-weight-bold text-grey-7 bg-grey-1 text-uppercase"
             >
               <template #header>
-                <q-item-section avatar style="min-width: 24px;">
+                <q-item-section avatar style="min-width: 24px">
                   <q-icon
                     name="tune"
-                    :color="selGame.selected_options?.length > 0 ? 'primary' : 'grey-7'"
+                    :color="
+                      selGame.selected_options?.length > 0
+                        ? 'primary'
+                        : 'grey-7'
+                    "
                     size="xs"
                   />
                 </q-item-section>
                 <q-item-section>
-                  <div class="text-weight-bold text-grey-7 text-uppercase" style="font-size: 0.75rem; letter-spacing: 0.05em;">Settings</div>
+                  <div
+                    class="text-weight-bold text-grey-7 text-uppercase"
+                    style="font-size: 0.75rem; letter-spacing: 0.05em"
+                  >
+                    Settings
+                  </div>
                 </q-item-section>
                 <q-space />
                 <q-item-section side>
@@ -200,7 +221,7 @@
               header-class="text-weight-bold text-grey-7 bg-grey-1 text-uppercase"
             >
               <template #header>
-                <q-item-section avatar style="min-width: 24px;">
+                <q-item-section avatar style="min-width: 24px">
                   <q-icon
                     name="emoji_events"
                     :color="hasResult(selGame) ? 'secondary' : 'grey-7'"
@@ -209,15 +230,26 @@
                 </q-item-section>
                 <q-item-section>
                   <div class="row items-center q-gutter-x-sm">
-                    <div class="text-weight-bold text-grey-7 text-uppercase" style="font-size: 0.75rem; letter-spacing: 0.05em;">Match Result</div>
+                    <div
+                      class="text-weight-bold text-grey-7 text-uppercase"
+                      style="font-size: 0.75rem; letter-spacing: 0.05em"
+                    >
+                      Match Result
+                    </div>
                     <q-badge
                       v-if="getWinConditionName(selGame.id)"
                       color="indigo-1"
                       text-color="indigo-8"
                       class="stat-badge elegant-badge"
                     >
-                      <q-icon name="flag_circle" size="14px" class="q-mr-xs shrink-0" />
-                      <span class="ellipsis">{{ getWinConditionName(selGame.id) }}</span>
+                      <q-icon
+                        name="flag_circle"
+                        size="14px"
+                        class="q-mr-xs shrink-0"
+                      />
+                      <span class="ellipsis">{{
+                        getWinConditionName(selGame.id)
+                      }}</span>
                       <KennerTooltip>
                         <span class="text-weight-bold">Win condition:</span>
                         {{ getWinConditionName(selGame.id) }}
@@ -247,9 +279,16 @@
                       :color="hasResult(selGame) ? 'secondary' : 'primary'"
                       :icon="hasResult(selGame) ? 'edit_note' : 'post_add'"
                       size="xs"
-                      @click="() => hasResult(selGame) ? $emit('edit-result', selGame.id) : $emit('post-result', selGame)"
+                      @click="
+                        () =>
+                          hasResult(selGame)
+                            ? $emit('edit-result', selGame.id)
+                            : $emit('post-result', selGame)
+                      "
                     >
-                      <KennerTooltip>{{ hasResult(selGame) ? 'Edit Result' : 'Post Result' }}</KennerTooltip>
+                      <KennerTooltip>{{
+                        hasResult(selGame) ? 'Edit Result' : 'Post Result'
+                      }}</KennerTooltip>
                     </KennerButton>
                   </div>
                 </q-item-section>
@@ -261,7 +300,10 @@
                   :selectedGame="selGame"
                   :matchResults="matchResultsBySelectedGameId"
                 />
-                <div v-else class="text-grey-5 text-center q-py-sm text-caption">
+                <div
+                  v-else
+                  class="text-grey-5 text-center q-py-sm text-caption"
+                >
                   No results posted
                 </div>
               </div>
@@ -271,7 +313,9 @@
       </div>
 
       <!-- Ban info + Picking / Banning / Reporting status badges -->
-      <div class="col-12 col-md-4 column items-start items-md-end q-gutter-y-sm">
+      <div
+        class="col-12 col-md-4 column items-start items-md-end q-gutter-y-sm"
+      >
         <!-- What this player has banned -->
         <q-chip
           v-if="member.my_banned_game"
@@ -325,7 +369,11 @@
           class="text-weight-bold"
         >
           {{ isBanningDone(member) ? 'Banned' : 'Ban Pending' }}
-          <KennerTooltip>{{ isBanningDone(member) ? 'Banning completed' : 'Banning not completed yet' }}</KennerTooltip>
+          <KennerTooltip>{{
+            isBanningDone(member)
+              ? 'Banning completed'
+              : 'Banning not completed yet'
+          }}</KennerTooltip>
         </q-chip>
         <q-chip
           square
@@ -337,7 +385,11 @@
           class="text-weight-bold"
         >
           {{ isReportingDone(member) ? 'Reported' : 'Report Pending' }}
-          <KennerTooltip>{{ isReportingDone(member) ? 'All results reported' : 'Results not fully reported yet' }}</KennerTooltip>
+          <KennerTooltip>{{
+            isReportingDone(member)
+              ? 'All results reported'
+              : 'Results not fully reported yet'
+          }}</KennerTooltip>
         </q-chip>
       </div>
     </div>
@@ -378,7 +430,9 @@ const requiredReportableGames = computed(() => maxGames.value - 1);
 
 // A player's own pick got banned by an opponent, so they are allowed to pick a replacement.
 function hasOwnGameBanned(member: any): boolean {
-  return (member.selected_games || []).some((sg: any) => sg.successfully_banned);
+  return (member.selected_games || []).some(
+    (sg: any) => sg.successfully_banned
+  );
 }
 
 // Base picks allowed before any of the player's own picks gets banned (1 normal, 2 in
@@ -387,7 +441,9 @@ function hasOwnGameBanned(member: any): boolean {
 // can pick a replacement. Note: this is independent of whether the player themself has
 // already made their own ban decision against an opponent (see `isBanningDone`).
 function requiredPicks(member: any): number {
-  return hasOwnGameBanned(member) ? maxGames.value : requiredReportableGames.value;
+  return hasOwnGameBanned(member)
+    ? maxGames.value
+    : requiredReportableGames.value;
 }
 
 function isPickingDone(member: any): boolean {
@@ -401,7 +457,9 @@ function pickingTooltip(member: any): string {
 
 function pickingBadgeText(member: any): string {
   const picked = member.selected_games?.length || 0;
-  return isPickingDone(member) ? 'Picked' : `Picking ${picked}/${requiredPicks(member)}`;
+  return isPickingDone(member)
+    ? 'Picked'
+    : `Picking ${picked}/${requiredPicks(member)}`;
 }
 
 function isBanningDone(member: any): boolean {
@@ -409,7 +467,9 @@ function isBanningDone(member: any): boolean {
 }
 
 function isReportingDone(member: any): boolean {
-  const reportableGames = (member.selected_games || []).filter((sg: any) => !sg.successfully_banned);
+  const reportableGames = (member.selected_games || []).filter(
+    (sg: any) => !sg.successfully_banned
+  );
   if (reportableGames.length < requiredReportableGames.value) return false;
   return reportableGames.every((sg: any) => hasResult(sg));
 }
@@ -423,7 +483,7 @@ defineEmits([
   'edit-result',
   'delete-result',
   'post-result',
-  'delete-game'
+  'delete-game',
 ]);
 
 function hasResult(selGame: any) {
@@ -437,7 +497,9 @@ function getWinConditionName(selectedGameId: number): string | null {
 }
 
 function getOwnerName(profileId: number) {
-  const owner = props.league?.members?.find((m: any) => m.profile === profileId);
+  const owner = props.league?.members?.find(
+    (m: any) => m.profile === profileId
+  );
   return owner?.profile_name || null;
 }
 </script>

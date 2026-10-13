@@ -21,7 +21,6 @@
   </div>
 </template>
 
-
 <script setup lang="ts">
 import { inject, computed } from 'vue';
 import ListCreator from 'components/lists/ListCreator.vue';

@@ -1,10 +1,16 @@
 <template>
   <div class="game-selection-container">
-    <div class="row" :class="isMobile ? 'q-col-gutter-y-md' : 'q-col-gutter-lg'">
+    <div
+      class="row"
+      :class="isMobile ? 'q-col-gutter-y-md' : 'q-col-gutter-lg'"
+    >
       <!-- LEFT SIDE: Filter & Grid -->
       <div class="col-12 col-md-7">
         <!-- 1. FIND & FILTER & AVAILABLE GAMES SECTION -->
-        <div class="selection-browser-card" :class="{ 'no-shadow no-border': isMobile }">
+        <div
+          class="selection-browser-card"
+          :class="{ 'no-shadow no-border': isMobile }"
+        >
           <!-- Find & Filter -->
           <div class="section-container filter-section q-pa-sm q-px-md">
             <div
@@ -12,18 +18,27 @@
               :class="{ 'cursor-pointer': isMobile }"
               @click="isMobile && (showFilters = !showFilters)"
             >
-              <div class="row items-center q-gutter-x-sm" :class="{ 'q-mb-sm': !isMobile }">
+              <div
+                class="row items-center q-gutter-x-sm"
+                :class="{ 'q-mb-sm': !isMobile }"
+              >
                 <div class="section-icon-box small">
-                  <q-icon :name="isMobile ? 'filter_list' : 'search'" size="16px" color="primary" />
+                  <q-icon
+                    :name="isMobile ? 'filter_list' : 'search'"
+                    size="16px"
+                    color="primary"
+                  />
                 </div>
-                <div class="text-caption text-weight-bold text-primary text-uppercase letter-spacing-1 relative-position">
+                <div
+                  class="text-caption text-weight-bold text-primary text-uppercase letter-spacing-1 relative-position"
+                >
                   {{ isMobile ? 'Filter' : 'Find & Filter' }}
                   <q-badge
                     v-if="isMobile && hasActiveFilters"
                     color="primary"
                     rounded
                     class="q-ml-xs"
-                    style="width: 8px; height: 8px; min-height: 8px; padding: 0;"
+                    style="width: 8px; height: 8px; min-height: 8px; padding: 0"
                   />
                 </div>
               </div>
@@ -61,9 +76,17 @@
                 <div class="section-icon-box small">
                   <q-icon name="grid_view" size="16px" color="primary" />
                 </div>
-                <div class="text-caption text-weight-bold text-primary text-uppercase letter-spacing-1">
+                <div
+                  class="text-caption text-weight-bold text-primary text-uppercase letter-spacing-1"
+                >
                   {{ isMobile ? 'Games' : 'Available Games' }}
-                  <q-badge color="primary" outline class="q-ml-xs" style="font-size: 10px; padding: 2px 4px;">{{ availableGames.length }}</q-badge>
+                  <q-badge
+                    color="primary"
+                    outline
+                    class="q-ml-xs"
+                    style="font-size: 10px; padding: 2px 4px"
+                    >{{ availableGames.length }}</q-badge
+                  >
                 </div>
               </div>
 
@@ -73,14 +96,25 @@
                 no-caps
                 color="primary"
                 :icon="isRandomizing ? 'casino' : 'shuffle'"
-                :label="isMobile ? '' : (isRandomizing ? 'Rolling…' : 'Pick a random game for me')"
+                :label="
+                  isMobile
+                    ? ''
+                    : isRandomizing
+                    ? 'Rolling…'
+                    : 'Pick a random game for me'
+                "
                 :disable="isRandomizing || randomizableGames.length === 0"
                 class="random-btn"
-                :class="{ 'random-btn--rolling': isRandomizing, 'q-px-sm': isMobile }"
+                :class="{
+                  'random-btn--rolling': isRandomizing,
+                  'q-px-sm': isMobile,
+                }"
                 @click="randomizeGame"
               >
                 <q-tooltip v-if="memberCount">
-                  Chooses a random game that fits {{ memberCount }} player{{ memberCount === 1 ? '' : 's' }}.
+                  Chooses a random game that fits {{ memberCount }} player{{
+                    memberCount === 1 ? '' : 's'
+                  }}.
                 </q-tooltip>
                 <q-tooltip v-else>
                   Chooses a random game from the currently available list.
@@ -92,14 +126,21 @@
             <div v-if="winSuggestions.length > 0" class="best-odds q-mb-sm">
               <div class="row items-center q-gutter-x-xs q-mb-xs">
                 <q-icon name="emoji_events" size="16px" color="amber-8" />
-                <div class="text-caption text-weight-bold text-uppercase letter-spacing-1 text-grey-7">
+                <div
+                  class="text-caption text-weight-bold text-uppercase letter-spacing-1 text-grey-7"
+                >
                   Best odds vs. this league
                 </div>
-                <q-icon name="info_outline" size="14px" color="grey-5" class="cursor-pointer">
+                <q-icon
+                  name="info_outline"
+                  size="14px"
+                  color="grey-5"
+                  class="cursor-pointer"
+                >
                   <q-tooltip max-width="260px">
-                    Estimated share of current league members you finish ahead of,
-                    based on your and their past results in each game and your direct
-                    head-to-head matches.
+                    Estimated share of current league members you finish ahead
+                    of, based on your and their past results in each game and
+                    your direct head-to-head matches.
                   </q-tooltip>
                 </q-icon>
               </div>
@@ -111,18 +152,37 @@
                   no-caps
                   outline
                   class="best-odds-chip"
-                  :class="{ 'best-odds-chip--selected': suggestion.game_id === gameSelection.game.id }"
+                  :class="{
+                    'best-odds-chip--selected':
+                      suggestion.game_id === gameSelection.game.id,
+                  }"
                   @click="pickSuggestion(suggestion.game_id)"
                 >
                   <span class="best-odds-rank q-mr-xs">{{ idx + 1 }}</span>
-                  <span class="ellipsis best-odds-name">{{ suggestion.name }}</span>
-                  <q-badge color="positive" class="q-ml-xs">{{ Math.round(suggestion.win_chance) }}%</q-badge>
+                  <span class="ellipsis best-odds-name">{{
+                    suggestion.name
+                  }}</span>
+                  <q-badge color="positive" class="q-ml-xs"
+                    >{{ Math.round(suggestion.win_chance) }}%</q-badge
+                  >
                   <q-tooltip>
                     <div class="text-weight-bold">{{ suggestion.name }}</div>
-                    <div>You: {{ suggestion.wins }} win{{ suggestion.wins === 1 ? '' : 's' }} in {{ suggestion.games_played }} game{{ suggestion.games_played === 1 ? '' : 's' }}</div>
-                    <div v-for="opp in suggestion.opponents" :key="opp.profile_id">
+                    <div>
+                      You: {{ suggestion.wins }} win{{
+                        suggestion.wins === 1 ? '' : 's'
+                      }}
+                      in {{ suggestion.games_played }} game{{
+                        suggestion.games_played === 1 ? '' : 's'
+                      }}
+                    </div>
+                    <div
+                      v-for="opp in suggestion.opponents"
+                      :key="opp.profile_id"
+                    >
                       vs. {{ opp.profile_name }}: {{ Math.round(opp.chance) }}%
-                      <span class="text-grey-5">({{ opp.shared_matches }} head-to-head)</span>
+                      <span class="text-grey-5"
+                        >({{ opp.shared_matches }} head-to-head)</span
+                      >
                     </div>
                   </q-tooltip>
                 </q-btn>
@@ -160,7 +220,11 @@
                   class="section-icon-box"
                   :class="isValid ? 'selected-bg' : 'incomplete-bg'"
                 >
-                  <q-icon :name="isValid ? 'check_circle' : 'edit_note'" size="20px" :color="isValid ? 'white' : 'grey-7'" />
+                  <q-icon
+                    :name="isValid ? 'check_circle' : 'edit_note'"
+                    size="20px"
+                    :color="isValid ? 'white' : 'grey-7'"
+                  />
                 </div>
                 <div
                   class="text-subtitle1 text-weight-bold transition-all ellipsis"
@@ -179,9 +243,11 @@
             <div class="placeholder-icon-container q-mb-lg">
               <q-icon name="ads_click" size="64px" color="grey-3" />
             </div>
-            <div class="text-h6 text-grey-4 text-weight-bold tracking-tight">Select a Game</div>
+            <div class="text-h6 text-grey-4 text-weight-bold tracking-tight">
+              Select a Game
+            </div>
             <div class="text-caption text-grey-5 q-mt-sm">
-              Pick a game from the list<br>to configure your selection
+              Pick a game from the list<br />to configure your selection
             </div>
           </div>
         </div>
@@ -241,41 +307,49 @@ const showFilters = ref(false);
 const gridRef = ref<HTMLElement | null>(null);
 
 const hasActiveFilters = computed(() => {
-  return (filter.value && filter.value.length > 0) ||
-    (platforms.value && platforms.value.some(p => isPlatformSelected(p.id)));
+  return (
+    (filter.value && filter.value.length > 0) ||
+    (platforms.value && platforms.value.some((p) => isPlatformSelected(p.id)))
+  );
 });
 
 provide('platforms', platforms);
 
 // init: load games/platforms and, in edit mode, pre-fill selection
 onMounted(async () => {
-  const suggestionsPromise = fetchWinSuggestions(props.leagueId, props.profileId);
+  const suggestionsPromise = fetchWinSuggestions(
+    props.leagueId,
+    props.profileId
+  );
   await loadPlatformsAndGames();
   emit('set-submitter', onSubmit);
   allWinSuggestions.value = await suggestionsPromise;
 });
 
-watch(() => gameSelection.game.id, (newId) => {
-  if (newId > 0) {
-    // 1. Scroll the card into view (especially useful for the scrollable grid on desktop)
-    setTimeout(() => {
-      const cardElement = gridRef.value?.querySelector('.game-card.selected');
-      if (cardElement) {
-        cardElement.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-      }
-    }, 50);
-
-    // 2. Scroll to form on mobile
-    if (isMobile.value) {
+watch(
+  () => gameSelection.game.id,
+  (newId) => {
+    if (newId > 0) {
+      // 1. Scroll the card into view (especially useful for the scrollable grid on desktop)
       setTimeout(() => {
-        const formElement = document.querySelector('.sticky-form');
-        if (formElement) {
-          formElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        const cardElement = gridRef.value?.querySelector('.game-card.selected');
+        if (cardElement) {
+          cardElement.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         }
-      }, 150);
+      }, 50);
+
+      // 2. Scroll to form on mobile
+      if (isMobile.value) {
+        setTimeout(() => {
+          const formElement = document.querySelector('.sticky-form');
+          if (formElement) {
+            formElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }
+        }, 150);
+      }
     }
   }
-});
+);
 
 watch(gameSelection, (newVal) => {
   emit('selection-updated', newVal);
@@ -300,7 +374,9 @@ const allWinSuggestions = ref<TWinSuggestion[]>([]);
 // picked/banned, fitting the member count), independent of the search filter
 // so the picker always sees them.
 const winSuggestions = computed<TWinSuggestion[]>(() => {
-  const pickable = new Map((gameData.value ?? []).map((g) => [g.id, g] as const));
+  const pickable = new Map(
+    (gameData.value ?? []).map((g) => [g.id, g] as const)
+  );
   return allWinSuggestions.value
     .filter((s) => {
       const game = pickable.get(s.game_id);
@@ -408,7 +484,11 @@ async function randomizeGame() {
   }
 
   &.selected-bg {
-    background: linear-gradient(135deg, $kenner-red 0%, darken($kenner-red, 10%) 100%);
+    background: linear-gradient(
+      135deg,
+      $kenner-red 0%,
+      darken($kenner-red, 10%) 100%
+    );
     border: 1px solid rgba(255, 255, 255, 0.1);
     box-shadow: 0 4px 12px rgba($kenner-red, 0.15);
   }
@@ -431,7 +511,6 @@ async function randomizeGame() {
 .letter-spacing-1 {
   letter-spacing: 0.05em;
 }
-
 
 .sticky-form {
   @media (min-width: 1024px) {
@@ -543,9 +622,15 @@ async function randomizeGame() {
 }
 
 @keyframes dice-roll {
-  0%   { transform: rotate(0deg)   scale(1);   }
-  50%  { transform: rotate(180deg) scale(1.15); }
-  100% { transform: rotate(360deg) scale(1);   }
+  0% {
+    transform: rotate(0deg) scale(1);
+  }
+  50% {
+    transform: rotate(180deg) scale(1.15);
+  }
+  100% {
+    transform: rotate(360deg) scale(1);
+  }
 }
 
 .game-grid :deep(.game-card.selected) {
@@ -554,9 +639,15 @@ async function randomizeGame() {
 }
 
 @keyframes pick-pop {
-  0%   { transform: scale(1);    }
-  60%  { transform: scale(1.06); }
-  100% { transform: scale(1);    }
+  0% {
+    transform: scale(1);
+  }
+  60% {
+    transform: scale(1.06);
+  }
+  100% {
+    transform: scale(1);
+  }
 }
 
 .custom-scrollbar {

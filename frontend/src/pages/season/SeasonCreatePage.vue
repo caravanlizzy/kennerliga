@@ -23,14 +23,19 @@
         />
       </div>
       <div class="col-auto">
-        <KennerButton color="secondary" label="Reload Profiles" @click="loadMembers" />
+        <KennerButton
+          color="secondary"
+          label="Reload Profiles"
+          @click="loadMembers"
+        />
       </div>
     </div>
 
     <div>
       <div class="text-subtitle1 text-weight-bold">Leagues (Optional)</div>
       <div class="text-caption text-grey-7">
-        Assign players to specific leagues and order their positions. You can also create the season without leagues and manage them later.
+        Assign players to specific leagues and order their positions. You can
+        also create the season without leagues and manage them later.
       </div>
     </div>
 
@@ -42,7 +47,11 @@
     >
       <div class="row q-col-gutter-sm items-center">
         <div class="col-auto" style="min-width: 140px">
-          <KennerInput v-model.number="lg.level" type="number" label="Level (1 = L1)" />
+          <KennerInput
+            v-model.number="lg.level"
+            type="number"
+            label="Level (1 = L1)"
+          />
         </div>
 
         <div class="col">
@@ -61,19 +70,31 @@
         </div>
 
         <div class="col-auto">
-          <KennerButton flat color="negative" label="Remove League" @click="removeLeague(idx)" />
+          <KennerButton
+            flat
+            color="negative"
+            label="Remove League"
+            @click="removeLeague(idx)"
+          />
         </div>
       </div>
 
       <!-- Player positions inside this league -->
-      <div v-if="lg.memberProfileIds.length > 0" class="column q-gutter-xs q-mt-xs">
-        <div class="text-caption text-weight-medium text-grey-8">Player Order &amp; Positions:</div>
+      <div
+        v-if="lg.memberProfileIds.length > 0"
+        class="column q-gutter-xs q-mt-xs"
+      >
+        <div class="text-caption text-weight-medium text-grey-8">
+          Player Order &amp; Positions:
+        </div>
         <div
           v-for="(pid, mIdx) in lg.memberProfileIds"
           :key="pid"
           class="row items-center q-py-xs q-px-sm bg-grey-2 text-dark rounded-borders"
         >
-          <div class="text-weight-bold q-mr-sm" style="min-width: 28px">#{{ mIdx + 1 }}</div>
+          <div class="text-weight-bold q-mr-sm" style="min-width: 28px">
+            #{{ mIdx + 1 }}
+          </div>
           <div class="col ellipsis">{{ getProfileName(pid) }}</div>
           <div class="row q-gutter-xs items-center">
             <q-btn
@@ -122,7 +143,11 @@
       <div class="col-auto">
         <KennerButton
           color="dark"
-          :label="preparedLeagues.length > 0 ? 'Create Season & Leagues' : 'Create Season'"
+          :label="
+            preparedLeagues.length > 0
+              ? 'Create Season & Leagues'
+              : 'Create Season'
+          "
           :disable="!canSubmit"
           :loading="isSubmitting"
           @click="createAll"
@@ -153,7 +178,11 @@ const year = ref<number | null>(null);
 const month = ref<number | null>(null);
 const memberList = ref<number[]>([]); // PlayerProfile IDs as numbers
 
-type RawProfile = { id: number | string; profile_name?: string; username?: string };
+type RawProfile = {
+  id: number | string;
+  profile_name?: string;
+  username?: string;
+};
 const availableMembers = ref<RawProfile[]>([]);
 
 type PreparedLeague = { level: number | null; memberProfileIds: number[] };
@@ -190,7 +219,9 @@ function optionsForLeague(leagueIndex: number) {
     lg.memberProfileIds.forEach((pid) => otherAssigned.add(Number(pid)));
   });
 
-  const own = new Set(preparedLeagues.value[leagueIndex]?.memberProfileIds.map(Number) ?? []);
+  const own = new Set(
+    preparedLeagues.value[leagueIndex]?.memberProfileIds.map(Number) ?? []
+  );
   return selectedProfileOptions.value.filter(
     (opt) => own.has(Number(opt.value)) || !otherAssigned.has(Number(opt.value))
   );
@@ -212,7 +243,9 @@ function onMemberListChange(newList: any) {
   const allowed = new Set(memberList.value);
 
   preparedLeagues.value.forEach((lg) => {
-    lg.memberProfileIds = lg.memberProfileIds.map(Number).filter((pid) => allowed.has(pid));
+    lg.memberProfileIds = lg.memberProfileIds
+      .map(Number)
+      .filter((pid) => allowed.has(pid));
   });
 
   dedupeAcrossLeagues();
@@ -222,7 +255,9 @@ function onMemberListChange(newList: any) {
 function onLeaguePickChange(idx: number, newIds: any) {
   const normalized = (newIds ?? []).map((v: any) => Number(v));
   const newSet = new Set<number>(normalized);
-  const current = preparedLeagues.value[idx].memberProfileIds.filter((pid) => newSet.has(pid));
+  const current = preparedLeagues.value[idx].memberProfileIds.filter((pid) =>
+    newSet.has(pid)
+  );
   for (const id of normalized) {
     if (!current.includes(id)) {
       current.push(id);
@@ -234,7 +269,9 @@ function onLeaguePickChange(idx: number, newIds: any) {
   const chosen = new Set(current);
   preparedLeagues.value.forEach((lg, i) => {
     if (i === idx) return;
-    lg.memberProfileIds = lg.memberProfileIds.filter((pid) => !chosen.has(Number(pid)));
+    lg.memberProfileIds = lg.memberProfileIds.filter(
+      (pid) => !chosen.has(Number(pid))
+    );
   });
 }
 
@@ -262,13 +299,11 @@ function removePlayerFromLeague(leagueIdx: number, playerIdx: number) {
 function dedupeAcrossLeagues() {
   const seen = new Set<number>();
   preparedLeagues.value.forEach((lg) => {
-    lg.memberProfileIds = lg.memberProfileIds
-      .map(Number)
-      .filter((pid) => {
-        if (seen.has(pid)) return false;
-        seen.add(pid);
-        return true;
-      });
+    lg.memberProfileIds = lg.memberProfileIds.map(Number).filter((pid) => {
+      if (seen.has(pid)) return false;
+      seen.add(pid);
+      return true;
+    });
   });
 }
 
@@ -293,7 +328,9 @@ const canSubmit = computed(() => {
     year.value > 0 &&
     month.value >= 1 &&
     month.value <= 12;
-  const okLeagues = preparedLeagues.value.every((l) => l.level != null && Number(l.level) > 0);
+  const okLeagues = preparedLeagues.value.every(
+    (l) => l.level != null && Number(l.level) > 0
+  );
   return okDate && okLeagues;
 });
 
@@ -330,7 +367,10 @@ async function createAll() {
 
     let seasonParticipants: TSeasonParticipantDto[] = [];
     if (orderedProfileIds.length > 0) {
-      seasonParticipants = await ensureParticipants(seasonId, orderedProfileIds);
+      seasonParticipants = await ensureParticipants(
+        seasonId,
+        orderedProfileIds
+      );
     }
 
     for (const lg of preparedLeagues.value) {

@@ -1,25 +1,25 @@
 // src/composables/dialog.ts
-import { ref } from 'vue'
+import { ref } from 'vue';
 
-export type DialogType = 'primary' | 'warning' | 'error' | 'success' | 'dark'
+export type DialogType = 'primary' | 'warning' | 'error' | 'success' | 'dark';
 
-const showDialog = ref(false)
-const dialogTitle = ref('')
-const dialogMessage = ref('')
-const dialogType = ref<DialogType>('primary')
-const confirmLabel = ref('OK')
+const showDialog = ref(false);
+const dialogTitle = ref('');
+const dialogMessage = ref('');
+const dialogType = ref<DialogType>('primary');
+const confirmLabel = ref('OK');
 
-const onConfirm = ref<null | (() => void | Promise<void>)>(null)
-const onCancel = ref<null | (() => void | Promise<void>)>(null)
+const onConfirm = ref<null | (() => void | Promise<void>)>(null);
+const onCancel = ref<null | (() => void | Promise<void>)>(null);
 
 function resetDialog() {
-  showDialog.value = false
-  dialogTitle.value = ''
-  dialogMessage.value = ''
-  dialogType.value = 'primary'
-  confirmLabel.value = 'OK'
-  onConfirm.value = null
-  onCancel.value = null
+  showDialog.value = false;
+  dialogTitle.value = '';
+  dialogMessage.value = '';
+  dialogType.value = 'primary';
+  confirmLabel.value = 'OK';
+  onConfirm.value = null;
+  onCancel.value = null;
 }
 
 export function useDialog() {
@@ -31,13 +31,13 @@ export function useDialog() {
     _onCancel?: () => void | Promise<void>,
     _confirmLabel = 'OK'
   ) {
-    showDialog.value = true
-    dialogTitle.value = title
-    dialogMessage.value = message
-    dialogType.value = type
-    confirmLabel.value = _confirmLabel
-    onConfirm.value = _onConfirm ?? null
-    onCancel.value = _onCancel ?? null
+    showDialog.value = true;
+    dialogTitle.value = title;
+    dialogMessage.value = message;
+    dialogType.value = type;
+    confirmLabel.value = _confirmLabel;
+    onConfirm.value = _onConfirm ?? null;
+    onCancel.value = _onCancel ?? null;
   }
 
   return {
@@ -50,5 +50,5 @@ export function useDialog() {
     onCancel,
     setDialog,
     resetDialog,
-  }
+  };
 }

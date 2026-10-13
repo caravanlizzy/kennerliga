@@ -6,7 +6,7 @@
       flat
       color="dark"
       :class="[isMobile ? 'q-px-xs' : 'q-px-md', 'text-weight-bold']"
-      style="height: 44px; min-width: 44px;"
+      style="height: 44px; min-width: 44px"
     >
       <BrandLogo :compact="isMobile" />
     </KennerButton>

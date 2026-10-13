@@ -1,15 +1,26 @@
 <template>
   <q-card flat class="overview-card full-width">
-    <q-card-section v-if="$slots.title || title" class="overview-card__header row items-center justify-between q-py-sm q-px-md">
+    <q-card-section
+      v-if="$slots.title || title"
+      class="overview-card__header row items-center justify-between q-py-sm q-px-md"
+    >
       <div class="row items-center q-gutter-x-sm no-wrap">
-        <q-icon v-if="icon" :name="icon" :color="iconColor || 'primary'" size="20px" />
+        <q-icon
+          v-if="icon"
+          :name="icon"
+          :color="iconColor || 'primary'"
+          size="20px"
+        />
         <div class="text-subtitle2 text-weight-bold text-dark">
           <slot name="title">{{ title }}</slot>
         </div>
       </div>
       <slot name="header-extra" />
     </q-card-section>
-    <q-separator v-if="$slots.title || title" class="overview-card__separator" />
+    <q-separator
+      v-if="$slots.title || title"
+      class="overview-card__separator"
+    />
     <q-card-section class="overview-card__content q-pa-md">
       <slot name="content">
         <slot />

@@ -3,7 +3,9 @@
     <div class="filter-controls row items-center q-col-gutter-md">
       <!-- Player Count Filter -->
       <div class="filter-item row items-center q-gutter-x-sm">
-        <div class="row items-center text-caption text-weight-bold text-grey-8 filter-label">
+        <div
+          class="row items-center text-caption text-weight-bold text-grey-8 filter-label"
+        >
           <q-icon name="groups" size="18px" class="q-mr-xs text-primary" />
           <span>Players:</span>
         </div>
@@ -41,8 +43,14 @@
 
       <!-- Years Multi-select Filter -->
       <div class="filter-item row items-center q-gutter-x-sm">
-        <div class="row items-center text-caption text-weight-bold text-grey-8 filter-label">
-          <q-icon name="calendar_today" size="16px" class="q-mr-xs text-primary" />
+        <div
+          class="row items-center text-caption text-weight-bold text-grey-8 filter-label"
+        >
+          <q-icon
+            name="calendar_today"
+            size="16px"
+            class="q-mr-xs text-primary"
+          />
           <span>Years:</span>
         </div>
         <q-select
@@ -54,7 +62,14 @@
           outlined
           options-dense
           placeholder="All Years"
-          :display-value="!selectedYears || selectedYears.length === 0 ? 'All Years' : selectedYears.slice().sort((a, b) => b - a).join(', ')"
+          :display-value="
+            !selectedYears || selectedYears.length === 0
+              ? 'All Years'
+              : selectedYears
+                  .slice()
+                  .sort((a, b) => b - a)
+                  .join(', ')
+          "
           class="bg-white rounded-borders years-select"
         >
           <template v-slot:prepend>
@@ -81,6 +96,7 @@
             :shape="props.row.avatar_shape"
             :color="props.row.avatar_color"
             :elo-rating="props.row.elo_rating ?? props.row.profile?.elo_rating"
+            :elo-rank="props.row.elo_rank ?? props.row.profile?.elo_rank"
             size="28px"
           />
           <span class="text-weight-medium">{{ props.row.username }}</span>
@@ -96,7 +112,7 @@
             color="amber-9"
             text-color="white"
             class="text-weight-bolder"
-            style="font-size: 0.65rem; padding: 2px 5px; border-radius: 4px;"
+            style="font-size: 0.65rem; padding: 2px 5px; border-radius: 4px"
             label="best"
           />
         </div>
@@ -111,7 +127,7 @@
             color="positive"
             text-color="white"
             class="text-weight-bolder"
-            style="font-size: 0.65rem; padding: 2px 5px; border-radius: 4px;"
+            style="font-size: 0.65rem; padding: 2px 5px; border-radius: 4px"
             label="best"
           />
         </div>
@@ -126,7 +142,7 @@
             color="primary"
             text-color="white"
             class="text-weight-bolder"
-            style="font-size: 0.65rem; padding: 2px 5px; border-radius: 4px;"
+            style="font-size: 0.65rem; padding: 2px 5px; border-radius: 4px"
             label="best"
           />
         </div>
@@ -159,11 +175,23 @@
   </KennerTable>
 
   <q-dialog v-model="showResetDialog" @hide="onResetDialogHide">
-    <q-card style="min-width: 320px; max-width: 480px; width: 100%; border-radius: 16px" class="q-pa-md">
+    <q-card
+      style="
+        min-width: 320px;
+        max-width: 480px;
+        width: 100%;
+        border-radius: 16px;
+      "
+      class="q-pa-md"
+    >
       <q-card-section>
         <div class="text-h6 text-weight-bold">Reset Password</div>
         <div class="text-caption text-grey-7 q-mt-xs">
-          Generate a one-time password reset link for <span class="text-weight-bold text-dark">{{ targetUser?.username }}</span>.
+          Generate a one-time password reset link for
+          <span class="text-weight-bold text-dark">{{
+            targetUser?.username
+          }}</span
+          >.
         </div>
       </q-card-section>
 
@@ -177,7 +205,9 @@
       </q-card-section>
 
       <q-card-section v-else class="q-pt-none column q-gutter-y-sm">
-        <div class="row items-center text-positive text-caption text-weight-medium">
+        <div
+          class="row items-center text-positive text-caption text-weight-medium"
+        >
           <q-icon name="check_circle" size="18px" class="q-mr-xs" />
           <span>Reset link created successfully.</span>
         </div>
@@ -220,12 +250,7 @@
           />
         </template>
         <template v-else>
-          <KennerButton
-            flat
-            label="Close"
-            color="grey-7"
-            v-close-popup
-          />
+          <KennerButton flat label="Close" color="grey-7" v-close-popup />
           <KennerButton
             label="Copy Link"
             color="primary"
@@ -305,7 +330,10 @@ async function doGenerateResetLink() {
   } catch (err: unknown) {
     let message = 'Failed to generate password reset link.';
     if (axios.isAxiosError(err)) {
-      message = (err.response?.data as { detail?: string })?.detail || err.message || message;
+      message =
+        (err.response?.data as { detail?: string })?.detail ||
+        err.message ||
+        message;
     } else if (err instanceof Error) {
       message = err.message;
     }
@@ -321,13 +349,20 @@ async function doGenerateResetLink() {
 function copyGeneratedLink() {
   if (!generatedResetUrl.value) return;
   copyToClipboard(generatedResetUrl.value)
-    .then(() => $q.notify({ type: 'positive', message: 'Link copied to clipboard!' }))
-    .catch(() => $q.notify({ type: 'negative', message: 'Failed to copy link.' }));
+    .then(() =>
+      $q.notify({ type: 'positive', message: 'Link copied to clipboard!' })
+    )
+    .catch(() =>
+      $q.notify({ type: 'negative', message: 'Failed to copy link.' })
+    );
 }
 
 const bestWinRate = computed(() => {
   const validUsers = users.value.filter(
-    (u) => (u.total_games ?? 0) > 0 && u.win_rate !== null && u.win_rate !== undefined
+    (u) =>
+      (u.total_games ?? 0) > 0 &&
+      u.win_rate !== null &&
+      u.win_rate !== undefined
   );
   if (validUsers.length === 0) return null;
   const max = Math.max(...validUsers.map((u) => u.win_rate as number));
@@ -336,7 +371,10 @@ const bestWinRate = computed(() => {
 
 const bestAvgPosition = computed(() => {
   const validUsers = users.value.filter(
-    (u) => (u.total_games ?? 0) > 0 && u.avg_position !== null && u.avg_position !== undefined
+    (u) =>
+      (u.total_games ?? 0) > 0 &&
+      u.avg_position !== null &&
+      u.avg_position !== undefined
   );
   if (validUsers.length === 0) return null;
   return Math.min(...validUsers.map((u) => u.avg_position as number));
@@ -344,11 +382,15 @@ const bestAvgPosition = computed(() => {
 
 const bestElo = computed(() => {
   const validUsers = users.value.filter(
-    (u) => (u.elo_rating ?? u.profile?.elo_rating) !== null && (u.elo_rating ?? u.profile?.elo_rating) !== undefined
+    (u) =>
+      (u.elo_rating ?? u.profile?.elo_rating) !== null &&
+      (u.elo_rating ?? u.profile?.elo_rating) !== undefined
   );
   if (validUsers.length === 0) return null;
   const max = Math.max(
-    ...validUsers.map((u) => Math.round((u.elo_rating ?? u.profile?.elo_rating) as number))
+    ...validUsers.map((u) =>
+      Math.round((u.elo_rating ?? u.profile?.elo_rating) as number)
+    )
   );
   return max > 1500 ? max : null;
 });
@@ -417,9 +459,13 @@ async function loadUsers() {
   }
 }
 
-watch([selectedPlayerCounts, selectedYears], () => {
-  loadUsers();
-}, { deep: true });
+watch(
+  [selectedPlayerCounts, selectedYears],
+  () => {
+    loadUsers();
+  },
+  { deep: true }
+);
 
 onMounted(async () => {
   const years = await getAvailableYears();
@@ -442,14 +488,20 @@ const createButton: TKennerButton = {
   forwardName: 'invite-user',
 };
 
-const sortNullableLarge = (a: number | null | undefined, b: number | null | undefined) => {
+const sortNullableLarge = (
+  a: number | null | undefined,
+  b: number | null | undefined
+) => {
   if (a === b) return 0;
   if (a === null || a === undefined) return 1;
   if (b === null || b === undefined) return -1;
   return a - b;
 };
 
-const sortNullableSmall = (a: number | null | undefined, b: number | null | undefined) => {
+const sortNullableSmall = (
+  a: number | null | undefined,
+  b: number | null | undefined
+) => {
   if (a === b) return 0;
   if (a === null || a === undefined) return -1;
   if (b === null || b === undefined) return 1;

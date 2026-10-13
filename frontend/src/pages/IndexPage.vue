@@ -2,15 +2,13 @@
   <q-page class="column col q-pa-none">
     <HomeAnnouncements v-if="!isMobile" :is-mobile="isMobile" />
 
-    <div class="q-mx-auto home-page-container" :class="[{ 'q-pa-md': !isMobile }, isMobile ? 'col column' : '']">
-      <WelcomeSection
-        v-if="showWelcome"
-        :is-authenticated="isAuthenticated"
-      />
+    <div
+      class="q-mx-auto home-page-container"
+      :class="[{ 'q-pa-md': !isMobile }, isMobile ? 'col column' : '']"
+    >
+      <WelcomeSection v-if="showWelcome" :is-authenticated="isAuthenticated" />
 
-      <AuthenticatedHomeDashboard
-        v-if="isAuthenticated && !isMobile"
-      />
+      <AuthenticatedHomeDashboard v-if="isAuthenticated && !isMobile" />
     </div>
   </q-page>
 </template>
@@ -30,9 +28,7 @@ const { isMobile } = useResponsive();
 const { isAuthenticated } = storeToRefs(useUserStore());
 const route = useRoute();
 
-const showWelcome = computed(
-  () => isMobile.value || route.name === 'home'
-);
+const showWelcome = computed(() => isMobile.value || route.name === 'home');
 </script>
 
 <style scoped>

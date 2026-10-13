@@ -14,15 +14,26 @@
            podium styling used for season winners. -->
       <div v-if="fameLeaders.length > 0" class="fame-card q-mb-md">
         <div class="fame-card__header row items-center no-wrap q-mb-sm">
-          <q-icon name="emoji_events" size="18px" color="primary" class="q-mr-xs" />
+          <q-icon
+            name="emoji_events"
+            size="18px"
+            color="primary"
+            class="q-mr-xs"
+          />
           <span class="text-weight-bolder text-dark">Experts</span>
           <q-space />
           <span class="text-caption text-grey-6">Win %</span>
         </div>
         <div class="row q-col-gutter-sm">
-          <div v-for="(leader, idx) in fameLeaders" :key="leader.profile_id" class="col">
+          <div
+            v-for="(leader, idx) in fameLeaders"
+            :key="leader.profile_id"
+            class="col"
+          >
             <div class="fame-player">
-              <span class="rank-badge" :class="`rank-badge--${idx}`">{{ idx + 1 }}</span>
+              <span class="rank-badge" :class="`rank-badge--${idx}`">{{
+                idx + 1
+              }}</span>
               <div
                 class="fame-player__name ellipsis"
                 :class="{ 'text-weight-bolder text-primary': leader.is_me }"
@@ -43,7 +54,8 @@
       >
         <span class="text-weight-bold">You</span>
         <span class="text-caption text-grey-6">
-          {{ leaderboard.me.games_played }} game(s) played &middot; no ranking yet
+          {{ leaderboard.me.games_played }} game(s) played &middot; no ranking
+          yet
         </span>
       </div>
 
@@ -56,7 +68,9 @@
       >
         <template v-slot:body-cell-profile_name="props">
           <q-td :props="props">
-            <span :class="{ 'text-weight-bolder text-primary': props.row.is_me }">
+            <span
+              :class="{ 'text-weight-bolder text-primary': props.row.is_me }"
+            >
               {{ props.row.profile_name }}
               <q-badge
                 v-if="props.row.is_me"
@@ -83,7 +97,12 @@ import { TGameLeaderboard } from 'src/types';
 defineProps<{
   loading: boolean;
   leaderboard: TGameLeaderboard | null;
-  fameLeaders: Array<{ profile_id: number; profile_name: string; is_me: boolean; fameScore: number }>;
+  fameLeaders: Array<{
+    profile_id: number;
+    profile_name: string;
+    is_me: boolean;
+    fameScore: number;
+  }>;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   columns: any[];
 }>();

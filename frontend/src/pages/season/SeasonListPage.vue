@@ -17,7 +17,9 @@
         </div>
         <div v-else-if="props.value.isCompleted">
           <q-icon name="check_circle" color="positive" size="xs">
-            <q-tooltip>Complete (all games selected and results reported)</q-tooltip>
+            <q-tooltip
+              >Complete (all games selected and results reported)</q-tooltip
+            >
           </q-icon>
         </div>
         <div v-else-if="props.value.isIncomplete">
@@ -104,7 +106,7 @@ const getSeasonStats = (s: SeasonExtra) => {
   return {
     isEmpty: s.is_empty,
     isCompleted: s.is_completed,
-    isIncomplete: s.is_incomplete
+    isIncomplete: s.is_incomplete,
   };
 };
 
@@ -115,13 +117,28 @@ function onRowClick(_evt: unknown, row: SeasonExtra) {
 }
 
 // display helpers
-const monthNames = ['', 'January','February','March','April','May','June','July','August','September','October','November','December'];
-const monthLabel = (m?: number) => (m ? (monthNames[m] || `M${m}`) : 'Unknown');
-const fallbackName = (s: SeasonExtra) => `${s.year} · S${s.month} (${monthLabel(s.month)})`;
-const displayName  = (s: SeasonExtra) => s.name || fallbackName(s);
+const monthNames = [
+  '',
+  'January',
+  'February',
+  'March',
+  'April',
+  'May',
+  'June',
+  'July',
+  'August',
+  'September',
+  'October',
+  'November',
+  'December',
+];
+const monthLabel = (m?: number) => (m ? monthNames[m] || `M${m}` : 'Unknown');
+const fallbackName = (s: SeasonExtra) =>
+  `${s.year} · S${s.month} (${monthLabel(s.month)})`;
+const displayName = (s: SeasonExtra) => s.name || fallbackName(s);
 
 // columns for KennerTable
-const columns = computed<QTableProps['columns']>(() => ([
+const columns = computed<QTableProps['columns']>(() => [
   {
     name: 'details',
     label: '',
@@ -155,7 +172,7 @@ const columns = computed<QTableProps['columns']>(() => ([
     align: 'right',
     headerStyle: 'white-space: nowrap',
   },
-]));
+]);
 
 // create button shown by KennerTable header
 const createBtn: TKennerButton = {

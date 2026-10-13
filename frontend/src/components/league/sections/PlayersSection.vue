@@ -24,5 +24,4 @@ const { members } = storeToRefs(useMyLeagueStore());
 const isOpened = ref(true);
 </script>
 
-<style scoped lang="scss">
-</style>
+<style scoped lang="scss"></style>

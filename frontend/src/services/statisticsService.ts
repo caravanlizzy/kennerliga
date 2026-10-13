@@ -16,7 +16,9 @@ export type TStatisticsFilters = {
   topN?: number;
 };
 
-function toQueryParams(filters?: TStatisticsFilters): Record<string, string | number> {
+function toQueryParams(
+  filters?: TStatisticsFilters
+): Record<string, string | number> {
   const params: Record<string, string | number> = {};
   if (filters?.years && filters.years.length > 0) {
     params.years = filters.years.join(',');
@@ -40,9 +42,12 @@ export async function fetchStatisticsOverview(
   filters?: TStatisticsFilters
 ): Promise<TStatisticsOverview | null> {
   try {
-    const { data } = await api.get<TStatisticsOverview>('statistics/overview/', {
-      params: toQueryParams(filters),
-    });
+    const { data } = await api.get<TStatisticsOverview>(
+      'statistics/overview/',
+      {
+        params: toQueryParams(filters),
+      }
+    );
     return data;
   } catch (e) {
     console.log(e);
@@ -62,7 +67,9 @@ export async function fetchGameStatsList(
     if (playerCounts && playerCounts.length > 0) {
       params.player_count = playerCounts.join(',');
     }
-    const { data } = await api.get<TGameStatSummary[]>('statistics/games/', { params });
+    const { data } = await api.get<TGameStatSummary[]>('statistics/games/', {
+      params,
+    });
     return data;
   } catch (e) {
     console.log(e);
@@ -82,7 +89,9 @@ export async function fetchPopularGames(
     if (playerCounts && playerCounts.length > 0) {
       params.player_count = playerCounts.join(',');
     }
-    const { data } = await api.get<TPopularGames>('statistics/games/popular/', { params });
+    const { data } = await api.get<TPopularGames>('statistics/games/popular/', {
+      params,
+    });
     return data;
   } catch (e) {
     console.log(e);

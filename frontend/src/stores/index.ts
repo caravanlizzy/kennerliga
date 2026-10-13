@@ -1,6 +1,6 @@
-import { store } from 'quasar/wrappers'
-import { createPinia } from 'pinia'
-import piniaPluginPersistedstate from 'pinia-plugin-persistedstate'
+import { store } from 'quasar/wrappers';
+import { createPinia } from 'pinia';
+import piniaPluginPersistedstate from 'pinia-plugin-persistedstate';
 import { Router } from 'vue-router';
 
 /*
@@ -24,10 +24,10 @@ declare module 'pinia' {
  */
 
 export default store((/* { ssrContext } */) => {
-  const pinia = createPinia()
+  const pinia = createPinia();
 
   // You can add Pinia plugins here
-  pinia.use(piniaPluginPersistedstate)
+  pinia.use(piniaPluginPersistedstate);
 
-  return pinia
-})
+  return pinia;
+});

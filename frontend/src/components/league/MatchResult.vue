@@ -59,7 +59,9 @@
                   size="20px"
                   class="q-mr-xs shrink-0 podium-icon"
                 />
-                <span class="text-subtitle2 text-weight-bold ellipsis name-text">
+                <span
+                  class="text-subtitle2 text-weight-bold ellipsis name-text"
+                >
                   {{ result.profile_name }}
                 </span>
               </div>
@@ -79,14 +81,22 @@
                 >
                 <template v-if="result.decisive_tie_breaker">
                   <q-icon name="balance" size="14px" class="q-mr-xs shrink-0" />
-                  <span class="text-weight-medium text-grey-8 shrink-0">TB:</span>
-                  <span class="q-ml-xs text-grey-7 note-text">{{ result.decisive_tie_breaker }} ({{ result.tie_breaker_value }})</span>
+                  <span class="text-weight-medium text-grey-8 shrink-0"
+                    >TB:</span
+                  >
+                  <span class="q-ml-xs text-grey-7 note-text"
+                    >{{ result.decisive_tie_breaker }} ({{
+                      result.tie_breaker_value
+                    }})</span
+                  >
                 </template>
               </div>
             </div>
 
             <!-- Stats -->
-            <div class="stats-col-new row items-center wrap justify-end q-gutter-sm">
+            <div
+              class="stats-col-new row items-center wrap justify-end q-gutter-sm"
+            >
               <!-- Win Condition / Option badge -->
               <q-badge
                 v-if="shouldShowWinCondition(result)"
@@ -94,23 +104,36 @@
                 text-color="indigo-8"
                 class="stat-badge elegant-badge"
               >
-                <q-icon name="flag_circle" size="14px" class="q-mr-xs shrink-0" />
+                <q-icon
+                  name="flag_circle"
+                  size="14px"
+                  class="q-mr-xs shrink-0"
+                />
                 <span
                   class="ellipsis win-condition-text"
-                  :title="result.win_condition_option_name || result.win_condition_name"
+                  :title="
+                    result.win_condition_option_name ||
+                    result.win_condition_name
+                  "
                 >
-                  {{ result.win_condition_option_name || result.win_condition_name }}
+                  {{
+                    result.win_condition_option_name ||
+                    result.win_condition_name
+                  }}
                 </span>
                 <KennerTooltip v-if="result.win_condition_name">
                   <span class="text-weight-bold">Win condition:</span>
-                  {{ result.win_condition_name }}<template
-                    v-if="result.win_condition_option_name"
-                  > — {{ result.win_condition_option_name }}</template>
+                  {{ result.win_condition_name
+                  }}<template v-if="result.win_condition_option_name">
+                    — {{ result.win_condition_option_name }}</template
+                  >
                 </KennerTooltip>
               </q-badge>
 
               <q-badge
-                v-if="result.points != null && selectedGame.has_points !== false"
+                v-if="
+                  result.points != null && selectedGame.has_points !== false
+                "
                 :color="result.position === 1 ? 'amber-1' : 'grey-2'"
                 :text-color="result.position === 1 ? 'amber-9' : 'grey-8'"
                 class="stat-badge elegant-badge"

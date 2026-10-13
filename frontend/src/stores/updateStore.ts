@@ -7,7 +7,9 @@ const pollInterval = 20000;
 export const useUpdateStore = defineStore('update', () => {
   const lastUpdateCheck = ref(new Date().toISOString());
   const topics = ref<Set<string>>(new Set());
-  const listeners = ref<Map<string, Array<() => void | Promise<void>>>>(new Map());
+  const listeners = ref<Map<string, Array<() => void | Promise<void>>>>(
+    new Map()
+  );
   let pollTimer: number | undefined;
 
   async function checkUpdates() {
@@ -23,14 +25,17 @@ export const useUpdateStore = defineStore('update', () => {
 
       if (receivedUpdates.length > 0) {
         for (const topic of topics.value) {
-          if (receivedUpdates.some(u => u.includes(topic))) {
+          if (receivedUpdates.some((u) => u.includes(topic))) {
             const topicListeners = listeners.value.get(topic);
             if (topicListeners) {
               for (const listener of topicListeners) {
                 try {
                   await listener();
                 } catch (e) {
-                  console.error(`Error in update listener for topic ${topic}:`, e);
+                  console.error(
+                    `Error in update listener for topic ${topic}:`,
+                    e
+                  );
                 }
               }
             }
@@ -90,6 +95,6 @@ export const useUpdateStore = defineStore('update', () => {
 
   return {
     subscribe,
-    unsubscribe
+    unsubscribe,
   };
 });

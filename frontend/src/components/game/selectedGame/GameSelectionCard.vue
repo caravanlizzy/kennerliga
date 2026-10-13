@@ -6,7 +6,7 @@
     v-ripple="{ color: 'primary' }"
     class="game-card modern-card cursor-pointer relative-position"
     :class="{
-      selected: game.id === gameSelection.game.id
+      selected: game.id === gameSelection.game.id,
     }"
     role="button"
     tabindex="0"
@@ -16,21 +16,32 @@
     <q-badge
       class="platform-badge absolute-top-right q-ma-xs shadow-1"
       :color="getPlatformColor(getPlatformName(platforms, game.platform)).color"
-      :text-color="getPlatformColor(getPlatformName(platforms, game.platform)).text"
-      style="z-index: 1; border-radius: 4px; font-size: 9px; padding: 1px 4px;"
+      :text-color="
+        getPlatformColor(getPlatformName(platforms, game.platform)).text
+      "
+      style="z-index: 1; border-radius: 4px; font-size: 9px; padding: 1px 4px"
     >
       {{ getPlatformName(platforms, game.platform).split('.')[0] }}
     </q-badge>
 
-    <q-card-section class="q-pa-xs column items-center justify-center text-center full-height">
+    <q-card-section
+      class="q-pa-xs column items-center justify-center text-center full-height"
+    >
       <div class="icon-container q-mb-xs">
-        <div class="icon-circle" :class="{
-          'bg-selected-soft': game.id === gameSelection.game.id
-        }">
+        <div
+          class="icon-circle"
+          :class="{
+            'bg-selected-soft': game.id === gameSelection.game.id,
+          }"
+        >
           <q-icon
             name="sports_esports"
             size="20px"
-            :class="(game.id === gameSelection.game.id) ? 'text-selected' : 'text-grey-6'"
+            :class="
+              game.id === gameSelection.game.id
+                ? 'text-selected'
+                : 'text-grey-6'
+            "
             class="transition-all"
           />
         </div>
@@ -63,12 +74,18 @@
 
   &.selected {
     border: 2px solid $kenner-red;
-    box-shadow:
-      0 12px 28px rgba($kenner-red, 0.2),
+    box-shadow: 0 12px 28px rgba($kenner-red, 0.2),
       inset 0 0 20px rgba($kenner-red, 0.1);
-    background:
-      radial-gradient(circle at center, rgba($kenner-red, 0.06) 0%, transparent 70%),
-      repeating-conic-gradient(from 0deg, transparent 0deg 20deg, rgba($kenner-red, 0.02) 20deg 40deg),
+    background: radial-gradient(
+        circle at center,
+        rgba($kenner-red, 0.06) 0%,
+        transparent 70%
+      ),
+      repeating-conic-gradient(
+        from 0deg,
+        transparent 0deg 20deg,
+        rgba($kenner-red, 0.02) 20deg 40deg
+      ),
       var(--kenner-card-bg);
 
     .icon-circle {
@@ -116,16 +133,18 @@
     width: 24px;
     height: 24px;
     border-radius: 8px;
-    
+
     .q-icon {
       font-size: 16px !important;
     }
   }
 }
-
 </style>
 <script setup lang="ts">
-import { getPlatformColor, getPlatformName } from 'src/composables/gameSelection';
+import {
+  getPlatformColor,
+  getPlatformName,
+} from 'src/composables/gameSelection';
 import { TPlatform, TGameDto, TGameSelection } from 'src/types';
 import { inject } from 'vue';
 

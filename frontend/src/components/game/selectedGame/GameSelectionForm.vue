@@ -1,6 +1,10 @@
 <template>
   <q-card flat class="modern-details-card">
-    <q-inner-loading v-if="isLoading" :showing="isLoading" class="rounded-borders">
+    <q-inner-loading
+      v-if="isLoading"
+      :showing="isLoading"
+      class="rounded-borders"
+    >
       <q-spinner-puff size="4em" color="primary" />
     </q-inner-loading>
 
@@ -17,16 +21,29 @@
           <div class="row items-center q-gutter-x-sm q-mb-xs">
             <q-badge
               rounded
-              :color="getPlatformColor(getPlatformName(platforms, gameInformation.game.platform)).color"
+              :color="
+                getPlatformColor(
+                  getPlatformName(platforms, gameInformation.game.platform)
+                ).color
+              "
               style="width: 10px; height: 10px; padding: 0"
             />
-            <span class="text-overline text-grey-7 font-weight-700 letter-spacing-1">
-              {{ getPlatformName(platforms, gameInformation.game.platform).split('.')[0] }}
+            <span
+              class="text-overline text-grey-7 font-weight-700 letter-spacing-1"
+            >
+              {{
+                getPlatformName(platforms, gameInformation.game.platform).split(
+                  '.'
+                )[0]
+              }}
             </span>
           </div>
 
           <!-- Title and Button Row -->
-          <div class="row items-center justify-between no-wrap" :class="isMobile ? 'q-gutter-x-sm' : 'q-gutter-x-lg'">
+          <div
+            class="row items-center justify-between no-wrap"
+            :class="isMobile ? 'q-gutter-x-sm' : 'q-gutter-x-lg'"
+          >
             <div
               class="text-weight-bolder text-dark line-height-1 ellipsis"
               :class="isMobile ? 'text-subtitle1' : 'text-h6'"
@@ -52,7 +69,10 @@
         <q-separator class="q-mb-md opacity-10" />
 
         <!-- No settings (use conditional visibility) -->
-        <div v-if="!visibleOptionsSafe.length" class="text-center q-pa-md bg-blue-grey-1 rounded-borders border-subtle">
+        <div
+          v-if="!visibleOptionsSafe.length"
+          class="text-center q-pa-md bg-blue-grey-1 rounded-borders border-subtle"
+        >
           <q-icon name="info" size="xs" color="grey-5" class="q-mb-xs" />
           <div class="text-caption text-grey-7 font-weight-500">
             No additional settings for this game.
@@ -63,7 +83,11 @@
         <template v-else>
           <div class="row items-center q-gutter-x-sm q-mb-md">
             <q-icon name="settings" size="18px" class="text-selected" />
-            <div class="text-subtitle2 text-weight-bold text-uppercase letter-spacing-1 text-selected">Game Settings</div>
+            <div
+              class="text-subtitle2 text-weight-bold text-uppercase letter-spacing-1 text-selected"
+            >
+              Game Settings
+            </div>
           </div>
 
           <!-- Choices -->
@@ -73,7 +97,9 @@
           >
             <div class="row q-col-gutter-md">
               <div
-                v-for="option in visibleOptionsSafe.filter((o) => o.has_choices)"
+                v-for="option in visibleOptionsSafe.filter(
+                  (o) => o.has_choices
+                )"
                 :key="option.id"
                 class="col-12 col-sm-6"
               >
@@ -90,11 +116,20 @@
           </div>
 
           <!-- Toggles -->
-          <div v-if="visibleOptionsSafe.some((o) => !o.has_choices)" class="bg-blue-grey-1 q-pa-md rounded-borders border-subtle">
-            <div class="text-caption text-weight-bold text-grey-7 text-uppercase q-mb-sm letter-spacing-1">Toggles</div>
+          <div
+            v-if="visibleOptionsSafe.some((o) => !o.has_choices)"
+            class="bg-blue-grey-1 q-pa-md rounded-borders border-subtle"
+          >
+            <div
+              class="text-caption text-weight-bold text-grey-7 text-uppercase q-mb-sm letter-spacing-1"
+            >
+              Toggles
+            </div>
             <div class="row q-col-gutter-sm">
               <div
-                v-for="option in visibleOptionsSafe.filter((o) => !o.has_choices)"
+                v-for="option in visibleOptionsSafe.filter(
+                  (o) => !o.has_choices
+                )"
                 :key="option.id"
                 class="col-auto"
               >
@@ -136,7 +171,11 @@
   transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   &:not(.q-btn--disabled) {
     animation: pulse-btn 2.5s infinite;
-    background: linear-gradient(135deg, $kenner-red 0%, darken($kenner-red, 10%) 100%) !important;
+    background: linear-gradient(
+      135deg,
+      $kenner-red 0%,
+      darken($kenner-red, 10%) 100%
+    ) !important;
     color: white !important;
   }
 }
@@ -146,9 +185,15 @@
 }
 
 @keyframes pulse-btn {
-  0% { box-shadow: 0 0 0 0 rgba($kenner-red, 0.5); }
-  70% { box-shadow: 0 0 0 12px rgba($kenner-red, 0); }
-  100% { box-shadow: 0 0 0 0 rgba($kenner-red, 0); }
+  0% {
+    box-shadow: 0 0 0 0 rgba($kenner-red, 0.5);
+  }
+  70% {
+    box-shadow: 0 0 0 12px rgba($kenner-red, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba($kenner-red, 0);
+  }
 }
 
 .text-selected {
@@ -184,7 +229,10 @@
 import KennerSelect from 'components/base/KennerSelect.vue';
 import KennerButton from 'components/base/KennerButton.vue';
 import { useResponsive } from 'src/composables/responsive';
-import { getPlatformColor, getPlatformName } from 'src/composables/gameSelection';
+import {
+  getPlatformColor,
+  getPlatformName,
+} from 'src/composables/gameSelection';
 import {
   TPlatform,
   TGameInformation,

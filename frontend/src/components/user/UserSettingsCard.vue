@@ -1,6 +1,8 @@
 <template>
   <q-card flat bordered class="q-mb-lg surface-card">
-    <q-card-section class="surface-card-header text-weight-bold text-uppercase letter-spacing-1 row items-center justify-between q-py-sm">
+    <q-card-section
+      class="surface-card-header text-weight-bold text-uppercase letter-spacing-1 row items-center justify-between q-py-sm"
+    >
       <div class="row items-center q-gutter-x-sm">
         <q-icon name="settings" size="xs" />
         <div class="text-caption text-weight-bolder">Settings</div>
@@ -14,7 +16,11 @@
             size="36px"
             :color="notificationsEnabled ? 'primary' : 'grey-4'"
             :text-color="notificationsEnabled ? 'white' : 'grey-8'"
-            :icon="notificationsEnabled ? 'notifications_active' : 'notifications_off'"
+            :icon="
+              notificationsEnabled
+                ? 'notifications_active'
+                : 'notifications_off'
+            "
             class="shadow-1 transition-all"
           />
         </q-item-section>
@@ -76,7 +82,9 @@ import {
 } from 'src/services/notificationService';
 
 const supported = ref(isPushNotificationSupported());
-const permissionDenied = ref(typeof Notification !== 'undefined' && Notification.permission === 'denied');
+const permissionDenied = ref(
+  typeof Notification !== 'undefined' && Notification.permission === 'denied'
+);
 const notificationsEnabled = ref(false);
 const loading = ref(false);
 
@@ -120,7 +128,8 @@ async function onToggleNotifications(enable: boolean) {
         if (permissionDenied.value) {
           Notify.create({
             type: 'warning',
-            message: 'Notification permission was denied in your browser settings.',
+            message:
+              'Notification permission was denied in your browser settings.',
           });
         }
       }

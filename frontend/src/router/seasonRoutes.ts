@@ -30,7 +30,11 @@ export default {
           path: 'league/:leagueId/manage',
           name: 'league-manager',
           component: () => import('pages/league/ManageLeaguePage.vue'),
-          meta: { requiresAdmin: true, label: 'Manage League', icon: 'settings' },
+          meta: {
+            requiresAdmin: true,
+            label: 'Manage League',
+            icon: 'settings',
+          },
         },
       ],
     },

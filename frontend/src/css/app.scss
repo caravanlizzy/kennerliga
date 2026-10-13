@@ -116,9 +116,16 @@ body.body--dark {
 
   .main-container {
     background: var(--kenner-bg-page);
-    background-image:
-      radial-gradient(at 0% 0%, rgba(255, 255, 255, 0.02) 0px, transparent 50%),
-      radial-gradient(at 100% 0%, rgba(255, 255, 255, 0.03) 0px, transparent 50%);
+    background-image: radial-gradient(
+        at 0% 0%,
+        rgba(255, 255, 255, 0.02) 0px,
+        transparent 50%
+      ),
+      radial-gradient(
+        at 100% 0%,
+        rgba(255, 255, 255, 0.03) 0px,
+        transparent 50%
+      );
   }
 
   .text-dark {
@@ -153,7 +160,8 @@ body.body--dark {
     border-color: rgba(255, 255, 255, 0.15) !important;
   }
 
-  .bg-drawer-header, .bg-chat-header {
+  .bg-drawer-header,
+  .bg-chat-header {
     background: rgba(26, 26, 32, 0.8) !important;
   }
 
@@ -161,7 +169,9 @@ body.body--dark {
     background: var(--kenner-border-color);
   }
 
-  .q-card, .q-dialog__inner > div, .q-menu {
+  .q-card,
+  .q-dialog__inner > div,
+  .q-menu {
     background-color: var(--kenner-card-bg);
     color: var(--kenner-text-color);
     border-color: var(--kenner-border-color);
@@ -173,7 +183,8 @@ body.body--dark {
   }
 
   // Muted floating labels on inputs & selects
-  .kenner-input, .kenner-select {
+  .kenner-input,
+  .kenner-select {
     &.q-field--float .q-field__label,
     &:has(.q-field__native:-webkit-autofill) .q-field__label,
     &:has(.q-field__input:-webkit-autofill) .q-field__label {
@@ -214,55 +225,113 @@ body.body--dark {
 // light tints become translucent tints and dark text shades become readable.
 // ---------------------------------------------------------------------------
 $kenner-dark-palette: (
-  'red': $red, 'pink': $pink, 'purple': $purple, 'deep-purple': $deep-purple,
-  'indigo': $indigo, 'blue': $blue, 'light-blue': $light-blue, 'cyan': $cyan,
-  'teal': $teal, 'green': $green, 'light-green': $light-green, 'lime': $lime,
-  'yellow': $yellow, 'amber': $amber, 'orange': $orange, 'deep-orange': $deep-orange,
-  'brown': $brown, 'blue-grey': $blue-grey
+  'red': $red,
+  'pink': $pink,
+  'purple': $purple,
+  'deep-purple': $deep-purple,
+  'indigo': $indigo,
+  'blue': $blue,
+  'light-blue': $light-blue,
+  'cyan': $cyan,
+  'teal': $teal,
+  'green': $green,
+  'light-green': $light-green,
+  'lime': $lime,
+  'yellow': $yellow,
+  'amber': $amber,
+  'orange': $orange,
+  'deep-orange': $deep-orange,
+  'brown': $brown,
+  'blue-grey': $blue-grey,
 );
 
 body.body--dark {
   --q-primary: #6b6565;
 
-  .text-primary { color: var(--kenner-primary-text) !important; }
-  .text-accent { color: var(--kenner-accent-text) !important; }
-  .text-black { color: var(--kenner-text-strong) !important; }
-  .text-grey-10 { color: #f8fafc !important; }
-  .text-negative { color: var(--kenner-danger-text) !important; }
+  .text-primary {
+    color: var(--kenner-primary-text) !important;
+  }
+  .text-accent {
+    color: var(--kenner-accent-text) !important;
+  }
+  .text-black {
+    color: var(--kenner-text-strong) !important;
+  }
+  .text-grey-10 {
+    color: #f8fafc !important;
+  }
+  .text-negative {
+    color: var(--kenner-danger-text) !important;
+  }
 
   // color="dark" buttons/avatars would vanish into dark surfaces
-  .bg-dark { background: var(--kenner-surface-strong) !important; }
+  .bg-dark {
+    background: var(--kenner-surface-strong) !important;
+  }
 
-  .bg-white { background: var(--kenner-card-bg) !important; }
-  .bg-grey-1 { background: var(--kenner-surface-subtle) !important; }
-  .bg-grey-2 { background: var(--kenner-surface-muted) !important; }
-  .bg-grey-3 { background: var(--kenner-surface-strong) !important; }
-  .bg-grey-4 { background: #3a3a45 !important; }
-  .bg-grey-5 { background: #4a4a56 !important; }
+  .bg-white {
+    background: var(--kenner-card-bg) !important;
+  }
+  .bg-grey-1 {
+    background: var(--kenner-surface-subtle) !important;
+  }
+  .bg-grey-2 {
+    background: var(--kenner-surface-muted) !important;
+  }
+  .bg-grey-3 {
+    background: var(--kenner-surface-strong) !important;
+  }
+  .bg-grey-4 {
+    background: #3a3a45 !important;
+  }
+  .bg-grey-5 {
+    background: #4a4a56 !important;
+  }
 
   @each $name, $base in $kenner-dark-palette {
-    .bg-#{$name}-1 { background: rgba($base, 0.14) !important; }
-    .bg-#{$name}-2 { background: rgba($base, 0.18) !important; }
-    .bg-#{$name}-3 { background: rgba($base, 0.24) !important; }
-    .bg-#{$name}-4 { background: rgba($base, 0.3) !important; }
-    .text-#{$name}-7 { color: mix(#fff, $base, 30%) !important; }
+    .bg-#{$name}-1 {
+      background: rgba($base, 0.14) !important;
+    }
+    .bg-#{$name}-2 {
+      background: rgba($base, 0.18) !important;
+    }
+    .bg-#{$name}-3 {
+      background: rgba($base, 0.24) !important;
+    }
+    .bg-#{$name}-4 {
+      background: rgba($base, 0.3) !important;
+    }
+    .text-#{$name}-7 {
+      color: mix(#fff, $base, 30%) !important;
+    }
     .text-#{$name}-8,
     .text-#{$name}-9,
-    .text-#{$name}-10 { color: mix(#fff, $base, 50%) !important; }
+    .text-#{$name}-10 {
+      color: mix(#fff, $base, 50%) !important;
+    }
   }
 
   // Dark text deliberately placed on a solid colored background stays dark
   @each $name, $base in $kenner-dark-palette {
     @for $i from 5 through 14 {
       .bg-#{$name}-#{$i}.text-dark,
-      .bg-#{$name}-#{$i}.text-black { color: $dark !important; }
+      .bg-#{$name}-#{$i}.text-black {
+        color: $dark !important;
+      }
     }
     .bg-#{$name}.text-dark,
-    .bg-#{$name}.text-black { color: $dark !important; }
+    .bg-#{$name}.text-black {
+      color: $dark !important;
+    }
   }
-  .bg-warning.text-dark, .bg-warning.text-black,
-  .bg-positive.text-dark, .bg-info.text-dark,
-  .bg-secondary.text-dark, .bg-secondary.text-black { color: $dark !important; }
+  .bg-warning.text-dark,
+  .bg-warning.text-black,
+  .bg-positive.text-dark,
+  .bg-info.text-dark,
+  .bg-secondary.text-dark,
+  .bg-secondary.text-black {
+    color: $dark !important;
+  }
 }
 
 * {
@@ -305,24 +374,20 @@ body.body--dark {
   border-color: $warning !important;
 }
 
-
 .border-1 {
   border-style: solid;
   border-width: 1px;
 }
-
 
 .border-2 {
   border-style: solid;
   border-width: 1px;
 }
 
-
 .border-3 {
   border-style: solid;
   border-width: 1px;
 }
-
 
 .border-4 {
   border-style: solid;
@@ -344,7 +409,14 @@ body.body--dark {
 }
 
 // Global Rounded but Flat
-.q-card, .q-dialog__inner > div, .q-menu, .q-banner, .q-item, .q-chip, .q-badge, .q-field--outlined:not(.q-field--rounded) .q-field__control {
+.q-card,
+.q-dialog__inner > div,
+.q-menu,
+.q-banner,
+.q-item,
+.q-chip,
+.q-badge,
+.q-field--outlined:not(.q-field--rounded) .q-field__control {
   border-radius: var(--kenner-card-radius, 16px) !important;
 }
 
@@ -375,13 +447,17 @@ body.body--dark {
 .main-container {
   // Distinct background with a subtle gradient and radial depth
   background: var(--kenner-bg-page);
-  background-image:
-    radial-gradient(at 0% 0%, rgba(77, 73, 73, 0.03) 0px, transparent 50%),
+  background-image: radial-gradient(
+      at 0% 0%,
+      rgba(77, 73, 73, 0.03) 0px,
+      transparent 50%
+    ),
     radial-gradient(at 100% 0%, rgba(148, 163, 184, 0.05) 0px, transparent 50%);
   min-height: 100vh;
 }
 
-.bg-chat-header, .bg-drawer-header {
+.bg-chat-header,
+.bg-drawer-header {
   background: rgba(255, 255, 255, 0.5) !important;
 }
 
@@ -396,4 +472,3 @@ body.body--dark {
     border-right: none !important;
   }
 }
-

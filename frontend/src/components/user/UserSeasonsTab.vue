@@ -3,9 +3,15 @@
     <div class="row items-center justify-between q-mb-md">
       <div class="row items-center">
         <q-icon name="history" color="teal-7" size="24px" class="q-mr-sm" />
-        <div class="text-h5 text-weight-bolder text-heading tracking-tighter">Season Participation</div>
+        <div class="text-h5 text-weight-bolder text-heading tracking-tighter">
+          Season Participation
+        </div>
       </div>
-      <div class="text-caption text-grey-6 text-uppercase text-weight-bold letter-spacing-1">{{ userSeasonList.length }} Seasons Joined</div>
+      <div
+        class="text-caption text-grey-6 text-uppercase text-weight-bold letter-spacing-1"
+      >
+        {{ userSeasonList.length }} Seasons Joined
+      </div>
     </div>
     <q-card flat bordered class="surface-card overflow-hidden">
       <q-list separator>
@@ -14,14 +20,22 @@
           :key="sp.id"
           clickable
           v-ripple
-          @click="router.push({ name: 'season-overview', params: { id: sp.season } })"
+          @click="
+            router.push({ name: 'season-overview', params: { id: sp.season } })
+          "
           class="q-py-lg transition-all season-item"
         >
           <q-item-section avatar>
-            <q-avatar class="season-avatar shadow-1" text-color="primary" icon="emoji_events" />
+            <q-avatar
+              class="season-avatar shadow-1"
+              text-color="primary"
+              icon="emoji_events"
+            />
           </q-item-section>
           <q-item-section>
-            <q-item-label class="text-h6 text-weight-bold text-heading">{{ sp.season_details?.name || `Season ${sp.season}` }}</q-item-label>
+            <q-item-label class="text-h6 text-weight-bold text-heading">{{
+              sp.season_details?.name || `Season ${sp.season}`
+            }}</q-item-label>
             <div v-if="sp.league" class="q-mt-xs">
               <LeagueLevel badge :level="sp.league.level" />
             </div>
@@ -29,17 +43,33 @@
           <q-item-section side>
             <div class="row items-center q-gutter-x-lg">
               <div class="column items-end">
-                <div class="text-caption text-grey-5 text-uppercase text-weight-bolder letter-spacing-1" style="font-size: 0.6rem">
+                <div
+                  class="text-caption text-grey-5 text-uppercase text-weight-bolder letter-spacing-1"
+                  style="font-size: 0.6rem"
+                >
                   {{ sp.league_position_display || 'Final Rank' }}
                 </div>
                 <div class="row items-center">
-                  <span class="text-h4 text-weight-bolder q-mr-xs" :class="getPosColorClass(sp.league_position || 0)">
+                  <span
+                    class="text-h4 text-weight-bolder q-mr-xs"
+                    :class="getPosColorClass(sp.league_position || 0)"
+                  >
                     #{{ sp.league_position || '-' }}
                   </span>
-                  <q-icon v-if="sp.league_position && sp.league_position <= 3" name="workspace_premium" :color="getPosBadgeColor(sp.league_position)" size="sm" />
+                  <q-icon
+                    v-if="sp.league_position && sp.league_position <= 3"
+                    name="workspace_premium"
+                    :color="getPosBadgeColor(sp.league_position)"
+                    size="sm"
+                  />
                 </div>
               </div>
-              <q-icon name="chevron_right" color="grey-3" size="md" class="gt-xs" />
+              <q-icon
+                name="chevron_right"
+                color="grey-3"
+                size="md"
+                class="gt-xs"
+              />
             </div>
           </q-item-section>
         </q-item>
@@ -47,7 +77,9 @@
           <q-item-section class="text-grey-5 text-italic text-center q-pa-xl">
             <q-icon name="event_busy" size="64px" class="q-mb-md opacity-20" />
             <div class="text-h6">No seasons joined yet</div>
-            <div class="text-caption">Join a league to see your history here</div>
+            <div class="text-caption">
+              Join a league to see your history here
+            </div>
           </q-item-section>
         </q-item>
       </q-list>
@@ -68,11 +100,16 @@ const router = useRouter();
 
 function getPosColor(pos: number) {
   switch (pos) {
-    case 1: return 'amber-8';
-    case 2: return 'blue-grey-4';
-    case 3: return 'orange-9';
-    case 4: return 'brown-5';
-    default: return 'grey-6';
+    case 1:
+      return 'amber-8';
+    case 2:
+      return 'blue-grey-4';
+    case 3:
+      return 'orange-9';
+    case 4:
+      return 'brown-5';
+    default:
+      return 'grey-6';
   }
 }
 
@@ -86,8 +123,12 @@ function getPosColorClass(pos: number) {
 </script>
 
 <style scoped lang="scss">
-.tracking-tighter { letter-spacing: -1px; }
-.letter-spacing-1 { letter-spacing: 1px; }
+.tracking-tighter {
+  letter-spacing: -1px;
+}
+.letter-spacing-1 {
+  letter-spacing: 1px;
+}
 
 .surface-card {
   background: var(--surface-bg) !important;
@@ -106,7 +147,9 @@ function getPosColorClass(pos: number) {
   }
 }
 
-.text-heading { color: var(--text-heading) !important; }
+.text-heading {
+  color: var(--text-heading) !important;
+}
 
 .transition-all {
   transition: all 0.2s ease;

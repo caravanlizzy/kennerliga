@@ -1,5 +1,8 @@
 <template>
-  <q-footer v-if="isMobile && isAuthenticated" class="text-dark mobile-bottom-nav">
+  <q-footer
+    v-if="isMobile && isAuthenticated"
+    class="text-dark mobile-bottom-nav"
+  >
     <q-tabs
       :model-value="activeTab"
       class="full-width"
@@ -33,12 +36,18 @@ const { isAuthenticated } = storeToRefs(useUserStore());
 
 const activeTab = computed(() => {
   switch (route.name) {
-    case 'season-standings': return 'seasons';
-    case 'live': return 'live';
-    case 'chat': return 'chat';
-    case 'leaderboard': return 'leaderboard';
-    case 'statistics': return 'stats';
-    default: return null;
+    case 'season-standings':
+      return 'seasons';
+    case 'live':
+      return 'live';
+    case 'chat':
+      return 'chat';
+    case 'leaderboard':
+      return 'leaderboard';
+    case 'statistics':
+      return 'stats';
+    default:
+      return null;
   }
 });
 

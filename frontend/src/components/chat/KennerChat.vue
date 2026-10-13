@@ -24,31 +24,41 @@
               @click="loadOlderMessages"
             />
           </div>
-          <div v-else-if="messages.length > 0" class="text-center text-caption text-grey q-mb-md">
+          <div
+            v-else-if="messages.length > 0"
+            class="text-center text-caption text-grey q-mb-md"
+          >
             No more messages
           </div>
 
           <template v-for="(m, index) in messages" :key="m.id">
             <q-chat-message
-            v-if="m.label"
-            :label="m.label"
-            class="chat-label-message"
-            :class="[
+              v-if="m.label"
+              :label="m.label"
+              class="chat-label-message"
+              :class="[
                 m.label.includes('open for registration')
-                ? 'chat-label-special'
-                : 'chat-label-default'
-            ]"
+                  ? 'chat-label-special'
+                  : 'chat-label-default',
+              ]"
             />
             <q-chat-message
               v-else
               :sent="isMine(m)"
               :text="[decodeHtmlEntities(m.text)]"
-              :name="isMine(m) || (index > 0 && messages[index-1].sender === m.sender) ? undefined : decodeHtmlEntities(m.sender)"
+              :name="
+                isMine(m) ||
+                (index > 0 && messages[index - 1].sender === m.sender)
+                  ? undefined
+                  : decodeHtmlEntities(m.sender)
+              "
               :stamp="timeAgo(m.datetime)"
               class="chat-message"
               :class="[
                 isMine(m) ? 'chat-message-sent' : 'chat-message-received',
-                index > 0 && messages[index-1].sender === m.sender ? 'chat-message-grouped' : ''
+                index > 0 && messages[index - 1].sender === m.sender
+                  ? 'chat-message-grouped'
+                  : '',
               ]"
             />
           </template>
@@ -73,7 +83,10 @@
     </q-card-section>
 
     <!-- Composer -->
-    <q-card-section class="col-auto q-pa-md border-top-subtle bg-white chat-footer" v-if="isAuthenticated">
+    <q-card-section
+      class="col-auto q-pa-md border-top-subtle bg-white chat-footer"
+      v-if="isAuthenticated"
+    >
       <KennerInput
         ref="inputRef"
         v-model="newMessage"
@@ -85,8 +98,16 @@
       >
         <template #prepend>
           <q-btn flat round dense icon="sentiment_satisfied_alt" color="grey-7">
-            <q-menu anchor="top left" self="bottom left" class="q-pa-sm" :offset="[0, 8]">
-              <div class="row q-gutter-xs justify-center" style="width: 360px; max-height: 300px; overflow-y: auto">
+            <q-menu
+              anchor="top left"
+              self="bottom left"
+              class="q-pa-sm"
+              :offset="[0, 8]"
+            >
+              <div
+                class="row q-gutter-xs justify-center"
+                style="width: 360px; max-height: 300px; overflow-y: auto"
+              >
                 <q-btn
                   v-for="emoji in emojiList"
                   :key="emoji"
@@ -146,29 +167,169 @@ const newMessage = ref('');
 const sending = ref(false);
 
 const emojiList = [
-  '😀', '😃', '😄', '😁', '😆', '😅', '😂', '🤣', '😊', '😇',
-  '🙂', '🙃', '😉', '😌', '😍', '🥰', '😘', '😗', '😙', '😚',
-  '😋', '😛', '😝', '😜', '🤪', '🤨', '🧐', '🤓', '😎', '🤩',
-  '🥳', '😏', '😒', '😞', '😔', '😟', '😕', '🙁', '☹️', '😣',
-  '😖', '😫', '😩', '🥺', '😢', '😭', '😤', '😠', '😡', '🤬',
-  '🤯', '😳', '🥵', '🥶', '😱', '😨', '😰', '😥', '😓', '🤔',
-  '🤭', '🤫', '🤥', '😶', '😐', '😑', '😬', '🙄', '😯', '😦',
-  '😧', '😮', '😲', '🥱', '😴', '🤤', '😪', '😵', '🤐', '🥴',
-  '🤢', '🤮', '🤧', '👍', '👎', '👌', '✌️', '🤞', '🤟', '🤘',
-  '🤙', '🖐', '✋', '🖖', '👋', '🤚', '✍️', '👏', '👐', '🙌',
-  '🤲', '🙏', '🤝', '💅', '👂', '👃', '🦶', '🦵', '🧠', '🦷',
-  '🦴', '👀', '👅', '👄', '👶', '🧒', '👦', '👧', '🧑', '👨',
-  '👩', '👴', '👵', '🔥', '✨', '⭐', '🌟', '💥', '💯', '💢',
-  '💨', '💦', '💤', '🎉', '🎊', '🎈', '🎁', '🎂', '🥂', '🍻',
-  '🍺', '🍹', '🍷', '🎲', '🎮', '🕹️', '🎰', '🎯', '🎳', '🧩',
-  '♟️', '🃏', '🀄', '❤️'
+  '😀',
+  '😃',
+  '😄',
+  '😁',
+  '😆',
+  '😅',
+  '😂',
+  '🤣',
+  '😊',
+  '😇',
+  '🙂',
+  '🙃',
+  '😉',
+  '😌',
+  '😍',
+  '🥰',
+  '😘',
+  '😗',
+  '😙',
+  '😚',
+  '😋',
+  '😛',
+  '😝',
+  '😜',
+  '🤪',
+  '🤨',
+  '🧐',
+  '🤓',
+  '😎',
+  '🤩',
+  '🥳',
+  '😏',
+  '😒',
+  '😞',
+  '😔',
+  '😟',
+  '😕',
+  '🙁',
+  '☹️',
+  '😣',
+  '😖',
+  '😫',
+  '😩',
+  '🥺',
+  '😢',
+  '😭',
+  '😤',
+  '😠',
+  '😡',
+  '🤬',
+  '🤯',
+  '😳',
+  '🥵',
+  '🥶',
+  '😱',
+  '😨',
+  '😰',
+  '😥',
+  '😓',
+  '🤔',
+  '🤭',
+  '🤫',
+  '🤥',
+  '😶',
+  '😐',
+  '😑',
+  '😬',
+  '🙄',
+  '😯',
+  '😦',
+  '😧',
+  '😮',
+  '😲',
+  '🥱',
+  '😴',
+  '🤤',
+  '😪',
+  '😵',
+  '🤐',
+  '🥴',
+  '🤢',
+  '🤮',
+  '🤧',
+  '👍',
+  '👎',
+  '👌',
+  '✌️',
+  '🤞',
+  '🤟',
+  '🤘',
+  '🤙',
+  '🖐',
+  '✋',
+  '🖖',
+  '👋',
+  '🤚',
+  '✍️',
+  '👏',
+  '👐',
+  '🙌',
+  '🤲',
+  '🙏',
+  '🤝',
+  '💅',
+  '👂',
+  '👃',
+  '🦶',
+  '🦵',
+  '🧠',
+  '🦷',
+  '🦴',
+  '👀',
+  '👅',
+  '👄',
+  '👶',
+  '🧒',
+  '👦',
+  '👧',
+  '🧑',
+  '👨',
+  '👩',
+  '👴',
+  '👵',
+  '🔥',
+  '✨',
+  '⭐',
+  '🌟',
+  '💥',
+  '💯',
+  '💢',
+  '💨',
+  '💦',
+  '💤',
+  '🎉',
+  '🎊',
+  '🎈',
+  '🎁',
+  '🎂',
+  '🥂',
+  '🍻',
+  '🍺',
+  '🍹',
+  '🍷',
+  '🎲',
+  '🎮',
+  '🕹️',
+  '🎰',
+  '🎯',
+  '🎳',
+  '🧩',
+  '♟️',
+  '🃏',
+  '🀄',
+  '❤️',
 ];
 
 function addEmoji(emoji: string) {
   newMessage.value += emoji;
   nextTick(() => {
     if (inputRef.value?.$el) {
-      const input = inputRef.value.$el.querySelector('input') || inputRef.value.$el.querySelector('textarea');
+      const input =
+        inputRef.value.$el.querySelector('input') ||
+        inputRef.value.$el.querySelector('textarea');
       if (input) {
         input.focus();
       }
@@ -193,7 +354,12 @@ async function onScroll(info: {
   showScrollDown.value = diff > 200;
 
   // Auto-load older messages when near top
-  if (info.verticalPosition < 100 && !loadingOlder.value && hasMoreOlder.value && messages.value.length > 0) {
+  if (
+    info.verticalPosition < 100 &&
+    !loadingOlder.value &&
+    hasMoreOlder.value &&
+    messages.value.length > 0
+  ) {
     await loadOlderMessages();
   }
 }
@@ -272,7 +438,7 @@ async function send() {
   try {
     const { data: sentMsg } = await postMessage(text);
     // Replace the optimistic message with the real one from the server
-    const index = messages.value.findIndex(m => m.id === tempId);
+    const index = messages.value.findIndex((m) => m.id === tempId);
     if (index !== -1) {
       messages.value[index] = sentMsg;
     } else {
@@ -287,7 +453,7 @@ async function send() {
     scrollToBottom();
   } catch (e) {
     // If it fails, remove the optimistic message
-    messages.value = messages.value.filter(m => m.id !== tempId);
+    messages.value = messages.value.filter((m) => m.id !== tempId);
     console.error('Failed to send message', e);
   } finally {
     sending.value = false;
@@ -296,7 +462,10 @@ async function send() {
 }
 
 async function loadMessages() {
-  const { data } = await fetchMessages({ last_datetime: lastDateTime, limit: 20 });
+  const { data } = await fetchMessages({
+    last_datetime: lastDateTime,
+    limit: 20,
+  });
   if (!data) return;
 
   if (!lastDateTime) {
@@ -311,13 +480,13 @@ async function loadMessages() {
   const newMessages = data.reverse();
 
   // De-duplicate: only add messages that aren't already in the list
-  const existingIds = new Set(messages.value.map(m => m.id));
-  const uniqueNewMessages = newMessages.filter(m => !existingIds.has(m.id));
+  const existingIds = new Set(messages.value.map((m) => m.id));
+  const uniqueNewMessages = newMessages.filter((m) => !existingIds.has(m.id));
 
   if (uniqueNewMessages.length === 0) return;
 
   messages.value = [...messages.value, ...uniqueNewMessages];
-  const lastRealMessage = [...messages.value].reverse().find(m => {
+  const lastRealMessage = [...messages.value].reverse().find((m) => {
     // Optimistic messages have a Date.now() id, which is > 10^12.
     // Database IDs are usually smaller.
     return m.id < 1000000000000;
@@ -337,7 +506,7 @@ async function loadOlderMessages() {
   try {
     const { data } = await fetchMessages({
       before_datetime: firstMsg.datetime,
-      limit: 20
+      limit: 20,
     });
 
     if (!data || data.length === 0) {
@@ -356,8 +525,10 @@ async function loadOlderMessages() {
     const olderMessages = data.reverse();
 
     // De-duplicate: only add messages that aren't already in the list
-    const existingIds = new Set(messages.value.map(m => m.id));
-    const uniqueOlderMessages = olderMessages.filter(m => !existingIds.has(m.id));
+    const existingIds = new Set(messages.value.map((m) => m.id));
+    const uniqueOlderMessages = olderMessages.filter(
+      (m) => !existingIds.has(m.id)
+    );
 
     if (uniqueOlderMessages.length > 0) {
       messages.value = [...uniqueOlderMessages, ...messages.value];
@@ -374,7 +545,11 @@ async function loadOlderMessages() {
       const newScrollHeight = scrollTarget.scrollHeight;
       const heightDiff = newScrollHeight - oldScrollHeight;
       const currentPos = scrollAreaRef.value.getScroll().verticalPosition;
-      scrollAreaRef.value.setScrollPosition('vertical', currentPos + heightDiff, 0);
+      scrollAreaRef.value.setScrollPosition(
+        'vertical',
+        currentPos + heightDiff,
+        0
+      );
     }
   } catch (err) {
     console.error('Failed to load older messages', err);
@@ -421,10 +596,18 @@ onUnmounted(() => {
 }
 
 .chat-scroll-area {
-  background: radial-gradient(circle at center, rgba(255, 255, 255, 0.1) 0%, rgba(96, 125, 139, 0.05) 100%);
+  background: radial-gradient(
+    circle at center,
+    rgba(255, 255, 255, 0.1) 0%,
+    rgba(96, 125, 139, 0.05) 100%
+  );
 
   .body--dark & {
-    background: radial-gradient(circle at center, rgba(255, 255, 255, 0.02) 0%, rgba(96, 125, 139, 0.05) 100%);
+    background: radial-gradient(
+      circle at center,
+      rgba(255, 255, 255, 0.02) 0%,
+      rgba(96, 125, 139, 0.05) 100%
+    );
   }
 }
 
@@ -517,7 +700,11 @@ onUnmounted(() => {
       justify-content: flex-end;
     }
     :deep(.q-message-text) {
-      background: linear-gradient(135deg, $primary 0%, darken($primary, 10%) 100%) !important;
+      background: linear-gradient(
+        135deg,
+        $primary 0%,
+        darken($primary, 10%) 100%
+      ) !important;
       color: white !important;
       border-top-right-radius: 4px !important;
       box-shadow: 0 2px 8px rgba($primary, 0.15);

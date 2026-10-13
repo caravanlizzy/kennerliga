@@ -1,6 +1,8 @@
 <template>
-    <q-page class="column col bg-white">
-    <div class="q-pa-md row items-center justify-end no-wrap border-bottom-subtle bg-white">
+  <q-page class="column col bg-white">
+    <div
+      class="q-pa-md row items-center justify-end no-wrap border-bottom-subtle bg-white"
+    >
       <q-icon name="chat" color="teal" size="sm" />
     </div>
     <KennerChat class="col bg-white" />
@@ -17,4 +19,3 @@ import KennerChat from 'components/chat/KennerChat.vue';
   border-bottom: 1px solid var(--kenner-border-subtle);
 }
 </style>
-

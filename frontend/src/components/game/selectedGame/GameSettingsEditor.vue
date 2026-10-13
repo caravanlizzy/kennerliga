@@ -73,9 +73,7 @@ async function onSubmit() {
 }
 
 function apiToGameSelectionOptions(apiOptions, allGameOptions) {
-  const apiOptionsMap = new Map(
-    apiOptions.map((o) => [o.game_option.id, o])
-  );
+  const apiOptionsMap = new Map(apiOptions.map((o) => [o.game_option.id, o]));
 
   return allGameOptions.map((gameOpt) => {
     const apiOpt = apiOptionsMap.get(gameOpt.id);

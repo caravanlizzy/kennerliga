@@ -16,7 +16,9 @@ export const useConfigurationStore = defineStore('configuration', () => {
   const loading = ref(false);
 
   async function fetchCurrent(): Promise<TAppConfigurationDto | null> {
-    const { data } = await api.get<TAppConfigurationDto | null>(`${BASE_URL}current/`);
+    const { data } = await api.get<TAppConfigurationDto | null>(
+      `${BASE_URL}current/`
+    );
     current.value = data;
     return data;
   }
@@ -38,7 +40,7 @@ export const useConfigurationStore = defineStore('configuration', () => {
   // Saving always creates a new immutable configuration version on the
   // backend, keeping the full change history.
   async function saveConfiguration(
-    payload: AppConfigurationCreate,
+    payload: AppConfigurationCreate
   ): Promise<TAppConfigurationDto> {
     loading.value = true;
     try {

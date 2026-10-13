@@ -3,10 +3,16 @@
     <q-card-section class="q-pa-md">
       <!-- Title & Plays Count -->
       <div class="row items-center justify-between no-wrap q-mb-sm">
-        <div class="text-subtitle1 text-weight-bolder text-heading ellipsis q-pr-sm">
+        <div
+          class="text-subtitle1 text-weight-bolder text-heading ellipsis q-pr-sm"
+        >
           {{ game.name }}
         </div>
-        <q-badge color="grey-2" text-color="grey-7" class="text-weight-bolder plays-badge px-sm">
+        <q-badge
+          color="grey-2"
+          text-color="grey-7"
+          class="text-weight-bolder plays-badge px-sm"
+        >
           {{ game.count }} plays
         </q-badge>
       </div>
@@ -16,9 +22,12 @@
         <!-- Win Rate -->
         <div class="col-auto q-px-md text-center border-right">
           <div class="text-h6 text-weight-bolder text-positive stats-value">
-            {{ game.winRate.toFixed(0) }}<span class="text-caption text-weight-medium">%</span>
+            {{ game.winRate.toFixed(0)
+            }}<span class="text-caption text-weight-medium">%</span>
           </div>
-          <div class="text-caption text-grey-6 text-weight-bolder stats-label">WIN</div>
+          <div class="text-caption text-grey-6 text-weight-bolder stats-label">
+            WIN
+          </div>
         </div>
 
         <!-- Avg Pos -->
@@ -26,7 +35,9 @@
           <div class="text-h6 text-weight-bolder text-primary stats-value">
             #{{ game.avgPos.toFixed(1) }}
           </div>
-          <div class="text-caption text-grey-6 text-weight-bolder stats-label">AVG</div>
+          <div class="text-caption text-grey-6 text-weight-bolder stats-label">
+            AVG
+          </div>
         </div>
 
         <!-- Last 5 -->
@@ -38,14 +49,18 @@
               class="mini-result-badge flex flex-center text-weight-bolder"
               :class="[
                 `bg-${getPosColor(p)}`,
-                p === 1 ? 'mini-result-badge--dark-text' : 'text-white'
+                p === 1 ? 'mini-result-badge--dark-text' : 'text-white',
               ]"
             >
               {{ p }}
             </div>
           </div>
           <div class="text-right">
-            <div class="text-caption text-grey-6 text-weight-bolder stats-label">LAST 5</div>
+            <div
+              class="text-caption text-grey-6 text-weight-bolder stats-label"
+            >
+              LAST 5
+            </div>
           </div>
         </div>
       </div>
@@ -66,11 +81,16 @@ defineProps<{
 
 function getPosColor(pos: number) {
   switch (pos) {
-    case 1: return 'amber-8';
-    case 2: return 'blue-grey-4';
-    case 3: return 'orange-9';
-    case 4: return 'brown-5';
-    default: return 'grey-6';
+    case 1:
+      return 'amber-8';
+    case 2:
+      return 'blue-grey-4';
+    case 3:
+      return 'orange-9';
+    case 4:
+      return 'brown-5';
+    default:
+      return 'grey-6';
   }
 }
 </script>
@@ -122,6 +142,7 @@ function getPosColor(pos: number) {
   }
 }
 
-
-.text-heading { color: var(--text-heading) !important; }
+.text-heading {
+  color: var(--text-heading) !important;
+}
 </style>

@@ -11,7 +11,7 @@
       <q-icon
         :name="icon"
         size="20px"
-        :color="active ? (iconColor || 'primary') : (iconColor || 'grey-7')"
+        :color="active ? iconColor || 'primary' : iconColor || 'grey-7'"
       />
     </q-item-section>
     <q-item-section v-else class="drawer-item__icon-section-empty" />
@@ -33,7 +33,7 @@ type TKennerItem = {
   forwardName?: string;
   forwardParams?: Record<string, any>;
   active?: boolean;
-}
+};
 defineProps<TKennerItem>();
 const emit = defineEmits(['click']);
 

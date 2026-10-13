@@ -48,19 +48,27 @@
       <div class="column">
         <template v-for="(event, index) in filteredEvents" :key="event.id">
           <div
-            :class="compact ? 'q-py-xs q-px-none column justify-center' : 'q-py-md q-px-sm column justify-center'"
+            :class="
+              compact
+                ? 'q-py-xs q-px-none column justify-center'
+                : 'q-py-md q-px-sm column justify-center'
+            "
           >
             <div
               class="flex justify-between items-center text-grey-7"
               :class="compact ? 'q-mb-none' : 'q-mb-xs'"
-              style="font-size: 0.65rem;"
+              style="font-size: 0.65rem"
             >
               <span class="row items-center q-gutter-x-xs">
                 <q-badge
                   v-if="!leagueId"
                   :color="getLeagueColor(Number(event.leagueLevel))"
                   class="text-weight-bold"
-                  style="font-size: 0.65rem; border-radius: 4px; padding: 2px 6px;"
+                  style="
+                    font-size: 0.65rem;
+                    border-radius: 4px;
+                    padding: 2px 6px;
+                  "
                 >
                   L{{ event.leagueLevel }}
                 </q-badge>
@@ -68,54 +76,98 @@
                 <q-badge
                   :style="{
                     color: getColorHex(event),
-                    backgroundColor: `color-mix(in srgb, ${getColorHex(event)} 12%, transparent)`,
+                    backgroundColor: `color-mix(in srgb, ${getColorHex(
+                      event
+                    )} 12%, transparent)`,
                     fontSize: compact ? '0.6rem' : '0.65rem',
                     letterSpacing: '0.08em',
-                    borderRadius: '4px'
+                    borderRadius: '4px',
                   }"
                   class="text-bold text-uppercase"
                   :class="compact ? 'q-px-xs q-py-none' : 'q-px-sm q-py-xs'"
                 >
-                  <q-icon :name="getEventIcon(event)" :size="compact ? '10px' : '12px'" class="q-mr-xs" />
+                  <q-icon
+                    :name="getEventIcon(event)"
+                    :size="compact ? '10px' : '12px'"
+                    class="q-mr-xs"
+                  />
                   {{ getEventDisplayType(event) }}
                 </q-badge>
               </span>
-              <span v-if="!hideTimestamp" style="opacity: 0.85;">{{
+              <span v-if="!hideTimestamp" style="opacity: 0.85">{{
                 formatTime(event.timestamp)
               }}</span>
             </div>
             <div
               :class="compact ? 'q-mt-none text-grey-9' : 'q-mt-xs text-grey-9'"
-              :style="{ fontSize: compact ? '0.78rem' : '0.9rem', lineHeight: compact ? '1.3' : '1.45' }"
+              :style="{
+                fontSize: compact ? '0.78rem' : '0.9rem',
+                lineHeight: compact ? '1.3' : '1.45',
+              }"
             >
               <span v-if="event.type === 'PICK'">
-                <strong class="text-primary">{{ event.data.playerName }}</strong> picks
+                <strong class="text-primary">{{
+                  event.data.playerName
+                }}</strong>
+                picks
                 <strong class="text-primary">{{ event.data.gameName }}</strong>
               </span>
               <span v-else-if="event.type === 'BAN'">
                 <template v-if="!event.data.skippedBan && event.data.gameName">
-                  <strong class="text-primary">{{ event.data.playerName }}</strong> bans
-                  <strong class="text-primary">{{ event.data.gameName }}</strong>
+                  <strong class="text-primary">{{
+                    event.data.playerName
+                  }}</strong>
+                  bans
+                  <strong class="text-primary">{{
+                    event.data.gameName
+                  }}</strong>
                 </template>
                 <template v-else>
-                  <strong class="text-primary">{{ event.data.playerName }}</strong> skips their
-                  ban
+                  <strong class="text-primary">{{
+                    event.data.playerName
+                  }}</strong>
+                  skips their ban
                 </template>
               </span>
               <span v-else-if="event.type === 'GAME_FINISHED'">
-                <strong class="text-primary">{{ event.data.winner }}</strong> wins
+                <strong class="text-primary">{{ event.data.winner }}</strong>
+                wins
                 <strong class="text-primary">{{ event.data.gameName }}</strong>
-                <div v-if="event.data.results" :class="compact ? 'q-mt-xs q-pa-none' : 'q-mt-sm q-pa-xs'" :style="{ borderLeft: '1px solid var(--kenner-border-subtle)' }">
-                  <table class="full-width" style="border-collapse: collapse; font-size: 0.72rem;">
+                <div
+                  v-if="event.data.results"
+                  :class="compact ? 'q-mt-xs q-pa-none' : 'q-mt-sm q-pa-xs'"
+                  :style="{
+                    borderLeft: '1px solid var(--kenner-border-subtle)',
+                  }"
+                >
+                  <table
+                    class="full-width"
+                    style="border-collapse: collapse; font-size: 0.72rem"
+                  >
                     <tbody>
-                      <tr v-for="(res, idx) in event.data.results" :key="idx" :style="{ borderBottom: idx === event.data.results.length - 1 ? 'none' : '1px dashed var(--kenner-border-subtle)' }">
-                        <td class="q-pr-xs text-grey-6" style="width: 18px; font-weight: 500;">
+                      <tr
+                        v-for="(res, idx) in event.data.results"
+                        :key="idx"
+                        :style="{
+                          borderBottom:
+                            idx === event.data.results.length - 1
+                              ? 'none'
+                              : '1px dashed var(--kenner-border-subtle)',
+                        }"
+                      >
+                        <td
+                          class="q-pr-xs text-grey-6"
+                          style="width: 18px; font-weight: 500"
+                        >
                           {{ res.position || idx + 1 }}.
                         </td>
-                        <td class="ellipsis" style="max-width: 120px;">
+                        <td class="ellipsis" style="max-width: 120px">
                           {{ res.playerName }}
                         </td>
-                        <td class="text-right text-grey-6 q-pl-xs" v-if="res.points">
+                        <td
+                          class="text-right text-grey-6 q-pl-xs"
+                          v-if="res.points"
+                        >
                           {{ res.points }} VP
                         </td>
                       </tr>
@@ -124,17 +176,38 @@
                 </div>
               </span>
               <span v-else-if="event.type === 'LEAGUE_RUNNING'">
-                League {{ event.data.leagueLevel || event.leagueLevel }} is on! Games:
-                <div v-if="event.data.games && event.data.games.length" :class="compact ? 'q-mt-xs q-pa-none' : 'q-mt-sm q-pa-xs'" :style="{ borderLeft: '1px solid var(--kenner-border-subtle)' }">
-                  <table class="full-width" style="border-collapse: collapse; font-size: 0.72rem;">
+                League {{ event.data.leagueLevel || event.leagueLevel }} is on!
+                Games:
+                <div
+                  v-if="event.data.games && event.data.games.length"
+                  :class="compact ? 'q-mt-xs q-pa-none' : 'q-mt-sm q-pa-xs'"
+                  :style="{
+                    borderLeft: '1px solid var(--kenner-border-subtle)',
+                  }"
+                >
+                  <table
+                    class="full-width"
+                    style="border-collapse: collapse; font-size: 0.72rem"
+                  >
                     <tbody>
-                      <tr v-for="(g, idx) in event.data.games" :key="idx" :style="{ borderBottom: idx === event.data.games.length - 1 ? 'none' : '1px dashed var(--kenner-border-subtle)' }">
-                        <td class="q-pr-xs text-grey-6" style="width: 18px;">
+                      <tr
+                        v-for="(g, idx) in event.data.games"
+                        :key="idx"
+                        :style="{
+                          borderBottom:
+                            idx === event.data.games.length - 1
+                              ? 'none'
+                              : '1px dashed var(--kenner-border-subtle)',
+                        }"
+                      >
+                        <td class="q-pr-xs text-grey-6" style="width: 18px">
                           {{ idx + 1 }}.
                         </td>
-                        <td class="ellipsis" style="max-width: 120px;">
+                        <td class="ellipsis" style="max-width: 120px">
                           <strong class="text-primary">{{ g.gameName }}</strong>
-                          <span class="text-grey-6"> &mdash; {{ g.playerName }}</span>
+                          <span class="text-grey-6">
+                            &mdash; {{ g.playerName }}</span
+                          >
                         </td>
                       </tr>
                     </tbody>
@@ -142,22 +215,36 @@
                 </div>
               </span>
               <span v-else-if="event.type === 'LEAGUE_FINISHED'">
-                <template v-if="event.data.winners && event.data.winners.length > 1">
+                <template
+                  v-if="event.data.winners && event.data.winners.length > 1"
+                >
                   Decider game:
-                  <strong class="text-primary">{{ event.data.winners?.join(' vs ') }}</strong>
+                  <strong class="text-primary">{{
+                    event.data.winners?.join(' vs ')
+                  }}</strong>
                 </template>
                 <template v-else>
-                  League {{ event.data.leagueLevel || event.leagueLevel }} finishes! Winner:
-                  <strong class="text-primary">{{ event.data.winners?.[0] }}</strong>
+                  League
+                  {{ event.data.leagueLevel || event.leagueLevel }} finishes!
+                  Winner:
+                  <strong class="text-primary">{{
+                    event.data.winners?.[0]
+                  }}</strong>
                 </template>
               </span>
               <span v-else-if="event.type === 'SEASON_FINISHED'">
                 Season {{ event.data.seasonName }} finishes! Shout out to
-                <strong class="text-primary">{{ event.data.seasonWinner }}</strong>!
+                <strong class="text-primary">{{
+                  event.data.seasonWinner
+                }}</strong
+                >!
               </span>
             </div>
           </div>
-          <q-separator v-if="index < filteredEvents.length - 1" class="q-my-xs" />
+          <q-separator
+            v-if="index < filteredEvents.length - 1"
+            class="q-my-xs"
+          />
         </template>
       </div>
     </div>
@@ -210,7 +297,11 @@ const {
   loading,
   load: loadEvents,
 } = useCachedResource<'live', TLiveEvent[]>(
-  () => fetchLiveActionEvents({ seasonId: props.seasonId, leagueId: props.leagueId }),
+  () =>
+    fetchLiveActionEvents({
+      seasonId: props.seasonId,
+      leagueId: props.leagueId,
+    }),
   { cacheKey: cacheKey.value }
 );
 const events = computed<TLiveEvent[]>(() => eventsData.value ?? []);
@@ -368,4 +459,3 @@ function getEventIcon(event: TLiveEvent) {
   }
 }
 </script>
-

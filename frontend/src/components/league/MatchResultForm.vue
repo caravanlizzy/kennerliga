@@ -6,14 +6,13 @@
           <q-icon name="emoji_events" color="primary" class="q-mr-sm" />
           Match Result
         </div>
-        <div class="text-subtitle2 text-grey-6">{{ members.length }} Players Participating</div>
+        <div class="text-subtitle2 text-grey-6">
+          {{ members.length }} Players Participating
+        </div>
       </div>
 
       <!-- Win Condition selector -->
-      <div
-        v-if="winConditions.length > 0"
-        class="col-12 col-md-auto"
-      >
+      <div v-if="winConditions.length > 0" class="col-12 col-md-auto">
         <q-card flat bordered class="q-pa-sm wc-card">
           <div class="row items-center q-gutter-x-md">
             <div class="text-subtitle2 text-weight-bold q-ml-sm">
@@ -22,7 +21,9 @@
             </div>
             <q-option-group
               v-model="selectedWinConditionId"
-              :options="winConditions.map((wc) => ({ label: wc.name, value: wc.id }))"
+              :options="
+                winConditions.map((wc) => ({ label: wc.name, value: wc.id }))
+              "
               color="primary"
               type="radio"
               inline
@@ -60,7 +61,6 @@
         v-if="!isLoading && formData.length"
         @submit.prevent="submitResults"
       >
-
         <div class="row q-col-gutter-md q-mb-md">
           <div
             v-for="member in members"
@@ -70,7 +70,12 @@
             <q-card flat bordered class="member-card shadow-1">
               <q-card-section class="q-pa-md">
                 <div class="row items-center q-mb-md">
-                  <q-avatar size="sm" color="primary" text-color="white" class="q-mr-sm">
+                  <q-avatar
+                    size="sm"
+                    color="primary"
+                    text-color="white"
+                    class="q-mr-sm"
+                  >
                     {{ member.profile_name.charAt(0).toUpperCase() }}
                   </q-avatar>
                   <div class="text-subtitle1 text-weight-bold ellipsis">
@@ -91,24 +96,34 @@
                   />
 
                   <!-- Position (for non-points games) -->
-                  <div v-else-if="!winConditionIsOption && !winConditionIsPoints">
+                  <div
+                    v-else-if="!winConditionIsOption && !winConditionIsPoints"
+                  >
                     <div class="text-caption text-grey-7 q-mb-xs">
                       Final Position
                     </div>
-                      <div class="row q-gutter-xs justify-center">
-                        <KennerButton
-                          v-for="pos in members.length"
-                          :key="pos"
-                          size="sm"
-                          round
-                          unelevated
-                          :color="getEntry(member.profile).position === pos ? 'primary' : 'grey-2'"
-                          :text-color="getEntry(member.profile).position === pos ? 'white' : 'grey-9'"
-                          :label="String(pos)"
-                          class="position-btn shadow-1"
-                          @click="setPosition(member.id, pos)"
-                        />
-                      </div>
+                    <div class="row q-gutter-xs justify-center">
+                      <KennerButton
+                        v-for="pos in members.length"
+                        :key="pos"
+                        size="sm"
+                        round
+                        unelevated
+                        :color="
+                          getEntry(member.profile).position === pos
+                            ? 'primary'
+                            : 'grey-2'
+                        "
+                        :text-color="
+                          getEntry(member.profile).position === pos
+                            ? 'white'
+                            : 'grey-9'
+                        "
+                        :label="String(pos)"
+                        class="position-btn shadow-1"
+                        @click="setPosition(member.id, pos)"
+                      />
+                    </div>
                     <!-- Notes for position -->
                     <KennerInput
                       v-model="getEntry(member.profile).notes"
@@ -196,7 +211,10 @@
 
                   <!-- Win Condition Option (only for OPTION-type WCs) -->
                   <div
-                    v-if="winConditionIsOption && selectedWinCondition?.options?.length"
+                    v-if="
+                      winConditionIsOption &&
+                      selectedWinCondition?.options?.length
+                    "
                     class="q-mt-xs"
                   >
                     <div class="text-caption text-grey-7 q-mb-xs">
@@ -287,7 +305,15 @@ import KennerSelect from 'components/base/KennerSelect.vue';
 import KennerInput from 'components/base/KennerInput.vue';
 import KennerButton from 'components/base/KennerButton.vue';
 import LoadingSpinner from 'components/base/LoadingSpinner.vue';
-import { TLeagueDto, TResultConfigDto, TTieBreakerDto, TMatchResultPayload, TMatchResultSubmitPayload, TMatchResult, TWinConditionDto } from 'src/types';
+import {
+  TLeagueDto,
+  TResultConfigDto,
+  TTieBreakerDto,
+  TMatchResultPayload,
+  TMatchResultSubmitPayload,
+  TMatchResult,
+  TWinConditionDto,
+} from 'src/types';
 
 type Faction = { id: number; name: string; level: number };
 
@@ -674,7 +700,10 @@ async function submitResults() {
       player_profile: entry.player_profile,
       selected_game: entry.selected_game,
       points: winConditionIsPoints.value ? entry.points : null,
-      position: (!winConditionIsPoints.value && !winConditionIsOption.value) ? entry.position : null,
+      position:
+        !winConditionIsPoints.value && !winConditionIsOption.value
+          ? entry.position
+          : null,
       notes: entry.notes || null,
       starting_position: resultConfig.value?.has_starting_player_order
         ? entry.starting_position

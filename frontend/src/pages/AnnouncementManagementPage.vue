@@ -1,8 +1,13 @@
 <template>
   <q-page class="q-py-md flex justify-center">
-    <div style="max-width: var(--kenner-max-width-text); width: 100%" class="q-px-sm">
+    <div
+      style="max-width: var(--kenner-max-width-text); width: 100%"
+      class="q-px-sm"
+    >
       <!-- Header -->
-      <div class="management-hero-card q-pa-lg q-mb-lg row items-center justify-between">
+      <div
+        class="management-hero-card q-pa-lg q-mb-lg row items-center justify-between"
+      >
         <div class="column">
           <div class="row items-center q-gutter-x-sm q-mb-xs">
             <q-icon name="campaign" color="primary" size="32px" />
@@ -11,7 +16,8 @@
             </div>
           </div>
           <div class="text-caption text-grey-7">
-            Publish system banners, winner announcements, and registration notices.
+            Publish system banners, winner announcements, and registration
+            notices.
           </div>
         </div>
       </div>
@@ -22,7 +28,9 @@
         <!-- Current Announcements -->
         <q-card flat class="management-card q-mb-lg">
           <q-card-section class="q-pa-lg">
-            <div class="text-subtitle1 text-weight-bold q-mb-md text-dark row items-center justify-between">
+            <div
+              class="text-subtitle1 text-weight-bold q-mb-md text-dark row items-center justify-between"
+            >
               <div class="row items-center q-gutter-x-xs">
                 <q-icon name="notifications" color="primary" size="20px" />
                 <span>Active Announcements</span>
@@ -32,7 +40,10 @@
               </q-badge>
             </div>
 
-            <div v-if="announcements.length === 0" class="text-center text-grey-6 q-pa-xl column items-center">
+            <div
+              v-if="announcements.length === 0"
+              class="text-center text-grey-6 q-pa-xl column items-center"
+            >
               <q-icon name="campaign" size="48px" class="opacity-30 q-mb-sm" />
               <span>No announcements currently published</span>
             </div>
@@ -72,7 +83,8 @@
                 </div>
 
                 <div class="text-caption q-mt-sm opacity-80">
-                  Visible: {{ announcement.visible_from }} - {{ announcement.visible_until }}
+                  Visible: {{ announcement.visible_from }} -
+                  {{ announcement.visible_until }}
                 </div>
               </q-banner>
             </div>
@@ -82,7 +94,9 @@
         <!-- New Announcement Form -->
         <q-card flat class="management-card">
           <q-card-section class="q-pa-lg">
-            <div class="text-subtitle1 text-weight-bold q-mb-md text-dark row items-center q-gutter-x-xs">
+            <div
+              class="text-subtitle1 text-weight-bold q-mb-md text-dark row items-center q-gutter-x-xs"
+            >
               <q-icon name="add_circle" color="positive" size="20px" />
               <span>Add New Announcement</span>
             </div>
@@ -179,7 +193,12 @@ import { AnnouncementType, type AnnouncementCreate } from 'src/types';
 
 const announcementStore = useAnnouncementStore();
 const { announcements, loading } = storeToRefs(announcementStore);
-const { addAnnouncement, removeAnnouncement, bannerClasses, announcementIcons } = announcementStore;
+const {
+  addAnnouncement,
+  removeAnnouncement,
+  bannerClasses,
+  announcementIcons,
+} = announcementStore;
 
 const announcementTypes = [
   { label: 'Info', value: AnnouncementType.INFO },
@@ -197,7 +216,9 @@ const defaultAnnouncement: AnnouncementCreate = {
   visible_until: '',
 };
 
-const newAnnouncement = reactive<AnnouncementCreate>({ ...defaultAnnouncement });
+const newAnnouncement = reactive<AnnouncementCreate>({
+  ...defaultAnnouncement,
+});
 
 function resetForm() {
   Object.assign(newAnnouncement, defaultAnnouncement);

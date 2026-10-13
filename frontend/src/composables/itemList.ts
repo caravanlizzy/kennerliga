@@ -15,11 +15,15 @@ export function useItemList<TItem extends BaseItem>(initialItems?: TItem[]) {
   }
 
   function deleteItem(itemToRemove: TItem) {
-    items.value = items.value.filter(item => item.id !== itemToRemove.id);
+    items.value = items.value.filter((item) => item.id !== itemToRemove.id);
   }
 
-  function updateItem(updateItem: TItem, propertyToChange: keyof TItem, newValue: TItem[keyof TItem]) {
-    const item = items.value.find(item => item.id === updateItem.id);
+  function updateItem(
+    updateItem: TItem,
+    propertyToChange: keyof TItem,
+    newValue: TItem[keyof TItem]
+  ) {
+    const item = items.value.find((item) => item.id === updateItem.id);
     if (item) {
       item[propertyToChange] = newValue;
     }

@@ -14,12 +14,15 @@ export async function fetchLeagueDetails(
   }
 }
 
-export async function fetchMyCurrentLeagueInfo(): Promise<{ id: number; is_my_turn: boolean } | null> {
+export async function fetchMyCurrentLeagueInfo(): Promise<{
+  id: number;
+  is_my_turn: boolean;
+} | null> {
   try {
     const response = await api.get('user/me/current-league/');
     return {
       id: response.data.id,
-      is_my_turn: response.data.is_my_turn
+      is_my_turn: response.data.is_my_turn,
     };
   } catch (error: unknown) {
     const err = error as { response?: { status?: number } };

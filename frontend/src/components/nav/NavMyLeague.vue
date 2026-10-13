@@ -8,14 +8,24 @@
       shape="squircle"
       class="league-btn text-weight-bold"
       :class="{ 'is-active': isMeActivePlayer }"
-      style="height: 36px; min-width: 36px;"
+      style="height: 36px; min-width: 36px"
       no-caps
     >
       <div class="row items-center no-wrap">
-        <q-icon name="ads_click" :color="isMeActivePlayer ? 'warning' : 'primary'" :class="{ 'q-mr-xs': !isMobile }" />
+        <q-icon
+          name="ads_click"
+          :color="isMeActivePlayer ? 'warning' : 'primary'"
+          :class="{ 'q-mr-xs': !isMobile }"
+        />
         <span v-if="!isMobile" class="text-primary">My League</span>
       </div>
-      <q-badge v-if="isMeActivePlayer" floating rounded class="notification-dot" color="warning" />
+      <q-badge
+        v-if="isMeActivePlayer"
+        floating
+        rounded
+        class="notification-dot"
+        color="warning"
+      />
     </KennerButton>
   </div>
 </template>
@@ -29,8 +39,6 @@ import { computed } from 'vue';
 const { isMobile } = useResponsive();
 const { isAuthenticated, user } = storeToRefs(useUserStore());
 const isMeActivePlayer = computed(() => user.value?.isMyTurn ?? false);
-
-
 </script>
 
 <style scoped>

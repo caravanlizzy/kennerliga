@@ -4,10 +4,19 @@
     <div v-if="loading && !leagueData" class="q-py-lg">
       <LoadingSpinner text="Loading league data...">
         <template #skeleton>
-          <q-skeleton type="rect" height="60px" class="q-mb-lg" style="border-radius: 14px" />
+          <q-skeleton
+            type="rect"
+            height="60px"
+            class="q-mb-lg"
+            style="border-radius: 14px"
+          />
           <div class="row q-col-gutter-lg">
             <div class="col-12 col-md-6">
-              <q-skeleton height="350px" style="border-radius: 16px" class="q-mb-md" />
+              <q-skeleton
+                height="350px"
+                style="border-radius: 16px"
+                class="q-mb-md"
+              />
               <q-skeleton height="250px" style="border-radius: 16px" />
             </div>
             <div class="col-12 col-md-6">
@@ -19,14 +28,20 @@
     </div>
 
     <!-- Empty State: User has no active league -->
-    <div v-else-if="!user?.myCurrentLeagueId" class="empty-state-wrapper q-py-xl">
+    <div
+      v-else-if="!user?.myCurrentLeagueId"
+      class="empty-state-wrapper q-py-xl"
+    >
       <q-card flat bordered class="empty-league-card q-pa-xl text-center">
         <div class="empty-icon-wrap q-mx-auto q-mb-md">
           <q-icon name="military_tech" size="48px" color="primary" />
         </div>
-        <div class="text-h5 text-weight-bold text-dark q-mb-xs">No Active League</div>
+        <div class="text-h5 text-weight-bold text-dark q-mb-xs">
+          No Active League
+        </div>
         <div class="text-body2 text-grey-7 q-mb-lg empty-desc">
-          You are not currently enrolled in an active league for this season. You can browse seasons or check back when new leagues are created.
+          You are not currently enrolled in an active league for this season.
+          You can browse seasons or check back when new leagues are created.
         </div>
         <div class="row justify-center q-gutter-sm">
           <KennerButton
@@ -110,8 +125,12 @@
               <q-icon name="bolt" size="18px" />
             </div>
             <div>
-              <span class="text-weight-bold text-dark">It's your turn to {{ turnActionText }}!</span>
-              <span class="text-caption text-grey-8 q-ml-xs gt-xs">Complete your action in the section below.</span>
+              <span class="text-weight-bold text-dark"
+                >It's your turn to {{ turnActionText }}!</span
+              >
+              <span class="text-caption text-grey-8 q-ml-xs gt-xs"
+                >Complete your action in the section below.</span
+              >
             </div>
           </div>
         </div>
@@ -124,7 +143,11 @@
             <q-icon name="hourglass_empty" size="16px" />
           </div>
           <div class="text-caption text-grey-8">
-            Waiting for <strong class="text-dark">{{ activePlayer.profile_name || activePlayer.username }}</strong> to {{ turnActionText }}.
+            Waiting for
+            <strong class="text-dark">{{
+              activePlayer.profile_name || activePlayer.username
+            }}</strong>
+            to {{ turnActionText }}.
           </div>
         </div>
 
@@ -137,11 +160,20 @@
               <q-icon name="emoji_events" size="16px" />
             </div>
             <div class="text-caption text-grey-8">
-              Matches: <strong class="text-dark">{{ reportedResultsCount }} / {{ totalPlayableGamesCount }}</strong> reported
+              Matches:
+              <strong class="text-dark"
+                >{{ reportedResultsCount }} /
+                {{ totalPlayableGamesCount }}</strong
+              >
+              reported
             </div>
           </div>
           <q-linear-progress
-            :value="totalPlayableGamesCount > 0 ? reportedResultsCount / totalPlayableGamesCount : 0"
+            :value="
+              totalPlayableGamesCount > 0
+                ? reportedResultsCount / totalPlayableGamesCount
+                : 0
+            "
             color="amber-8"
             track-color="amber-1"
             rounded
@@ -169,7 +201,10 @@
             </div>
           </template>
           <div class="header-action-summary__content q-pt-xs q-px-xs">
-            <LeagueActionSummary :league-id="leagueData?.id || user?.myCurrentLeagueId" hide-title />
+            <LeagueActionSummary
+              :league-id="leagueData?.id || user?.myCurrentLeagueId"
+              hide-title
+            />
           </div>
         </q-expansion-item>
       </div>
@@ -254,7 +289,9 @@ const totalPlayableGamesCount = computed(() => {
   return playableSelectedGames.value.length;
 });
 
-const reportedResultsCount = computed(() => selectedGamesWithResults.value.length);
+const reportedResultsCount = computed(
+  () => selectedGamesWithResults.value.length
+);
 
 const statusBadgeColor = computed(() => {
   switch (leagueStatus.value) {

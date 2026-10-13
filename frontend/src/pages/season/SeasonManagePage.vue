@@ -1,7 +1,10 @@
 <template>
   <q-page class="q-pa-md">
     <!-- Header Area -->
-    <div v-if="route.name !== 'league-manager'" class="row items-center justify-between q-mb-md">
+    <div
+      v-if="route.name !== 'league-manager'"
+      class="row items-center justify-between q-mb-md"
+    >
       <div class="text-h5 text-weight-bold text-dark tracking-tight">
         {{ season?.name || '…' }}
       </div>
@@ -30,7 +33,11 @@
           @click="onFillLeagues"
         >
           <KennerTooltip>
-            {{ seasonHasResults ? 'Cannot refill leagues: match results already exist in this season' : 'Fill Leagues from current participants' }}
+            {{
+              seasonHasResults
+                ? 'Cannot refill leagues: match results already exist in this season'
+                : 'Fill Leagues from current participants'
+            }}
           </KennerTooltip>
         </KennerButton>
         <KennerButton
@@ -64,7 +71,9 @@
       <template v-else>
         <!-- Season Info & Members -->
         <div class="season-summary q-mb-lg">
-          <div class="season-summary__header row items-center q-gutter-x-sm q-px-md q-py-sm">
+          <div
+            class="season-summary__header row items-center q-gutter-x-sm q-px-md q-py-sm"
+          >
             <div class="stat-pill">{{ leagues.length }} leagues</div>
             <div class="stat-pill">{{ participants.length }} players</div>
             <div
@@ -105,16 +114,29 @@
                 >
                   <div class="row items-center q-gutter-x-sm q-mb-xs">
                     <template v-if="group.league">
-                      <LeagueLevel :level="group.league.level" size="20px" font-size="10px" />
-                      <span class="text-caption text-weight-bold">League {{ group.league.level }}</span>
+                      <LeagueLevel
+                        :level="group.league.level"
+                        size="20px"
+                        font-size="10px"
+                      />
+                      <span class="text-caption text-weight-bold"
+                        >League {{ group.league.level }}</span
+                      >
                     </template>
                     <template v-else>
                       <q-icon name="help_outline" size="16px" color="grey-6" />
-                      <span class="text-caption text-weight-bold text-grey-6">Unassigned</span>
+                      <span class="text-caption text-weight-bold text-grey-6"
+                        >Unassigned</span
+                      >
                     </template>
-                    <div class="text-caption text-grey-6">({{ group.members.length }})</div>
+                    <div class="text-caption text-grey-6">
+                      ({{ group.members.length }})
+                    </div>
                   </div>
-                  <div v-if="group.members.length > 0" class="column q-gutter-y-xs q-pl-md q-mt-xs">
+                  <div
+                    v-if="group.members.length > 0"
+                    class="column q-gutter-y-xs q-pl-md q-mt-xs"
+                  >
                     <div
                       v-for="p in group.members"
                       :key="p.id"
@@ -122,7 +144,9 @@
                     >
                       <div class="row items-center q-gutter-x-sm">
                         <div class="player-dot" />
-                        <span class="text-caption text-grey-8">{{ p.profile_name }}</span>
+                        <span class="text-caption text-grey-8">{{
+                          p.profile_name
+                        }}</span>
                       </div>
                       <KennerButton
                         v-if="isAdmin"
@@ -137,15 +161,23 @@
                         @click="onRemoveParticipant(p)"
                       >
                         <KennerTooltip>
-                          {{ p.has_results ? 'Cannot remove: player has match results in this season' : 'Remove participant' }}
+                          {{
+                            p.has_results
+                              ? 'Cannot remove: player has match results in this season'
+                              : 'Remove participant'
+                          }}
                         </KennerTooltip>
                       </KennerButton>
                     </div>
                   </div>
-                  <div v-else class="text-caption text-grey-5 italic q-ml-md">No players</div>
+                  <div v-else class="text-caption text-grey-5 italic q-ml-md">
+                    No players
+                  </div>
                 </div>
               </div>
-              <div v-else class="text-caption text-grey-6 italic">No registered players for this season.</div>
+              <div v-else class="text-caption text-grey-6 italic">
+                No registered players for this season.
+              </div>
             </div>
           </q-expansion-item>
         </div>
@@ -171,7 +203,10 @@
             />
           </template>
 
-          <div v-if="leagues.length === 0" class="text-grey-7 q-pa-md bg-grey-1 rounded-borders text-center column items-center q-gutter-y-sm">
+          <div
+            v-if="leagues.length === 0"
+            class="text-grey-7 q-pa-md bg-grey-1 rounded-borders text-center column items-center q-gutter-y-sm"
+          >
             <div>No leagues found for this season.</div>
             <KennerButton
               v-if="isAdmin"
@@ -197,7 +232,15 @@
 
     <!-- Add Participant Dialog -->
     <q-dialog v-model="showAddParticipantDialog">
-      <q-card style="min-width: 320px; max-width: 480px; width: 100%; border-radius: 16px" class="q-pa-md">
+      <q-card
+        style="
+          min-width: 320px;
+          max-width: 480px;
+          width: 100%;
+          border-radius: 16px;
+        "
+        class="q-pa-md"
+      >
         <q-card-section class="row items-center justify-between q-pb-none">
           <div class="text-subtitle1 text-weight-bold">Add Participant</div>
           <q-btn v-close-popup icon="close" flat round dense color="grey-6" />
@@ -208,7 +251,11 @@
             Select a player to register for {{ season?.name }}.
           </p>
 
-          <ErrorDisplay v-if="addParticipantError" :error="addParticipantError" class="q-mb-sm" />
+          <ErrorDisplay
+            v-if="addParticipantError"
+            :error="addParticipantError"
+            class="q-mb-sm"
+          />
 
           <KennerSelect
             v-model="selectedProfileId"
@@ -233,7 +280,13 @@
         </q-card-section>
 
         <q-card-actions align="right" class="q-pt-md">
-          <KennerButton flat no-caps label="Cancel" color="grey-7" v-close-popup />
+          <KennerButton
+            flat
+            no-caps
+            label="Cancel"
+            color="grey-7"
+            v-close-popup
+          />
           <KennerButton
             no-caps
             label="Add Player"
@@ -248,7 +301,15 @@
 
     <!-- Add League Dialog -->
     <q-dialog v-model="showAddLeagueDialog">
-      <q-card style="min-width: 320px; max-width: 480px; width: 100%; border-radius: 16px" class="q-pa-md">
+      <q-card
+        style="
+          min-width: 320px;
+          max-width: 480px;
+          width: 100%;
+          border-radius: 16px;
+        "
+        class="q-pa-md"
+      >
         <q-card-section class="row items-center justify-between q-pb-none">
           <div class="text-subtitle1 text-weight-bold">Add League</div>
           <q-btn v-close-popup icon="close" flat round dense color="grey-6" />
@@ -259,7 +320,11 @@
             Create a new league for {{ season?.name }}.
           </p>
 
-          <ErrorDisplay v-if="addLeagueError" :error="addLeagueError" class="q-mb-sm" />
+          <ErrorDisplay
+            v-if="addLeagueError"
+            :error="addLeagueError"
+            class="q-mb-sm"
+          />
 
           <KennerInput
             v-model.number="newLeagueLevel"
@@ -289,7 +354,13 @@
         </q-card-section>
 
         <q-card-actions align="right" class="q-pt-md">
-          <KennerButton flat no-caps label="Cancel" color="grey-7" v-close-popup />
+          <KennerButton
+            flat
+            no-caps
+            label="Cancel"
+            color="grey-7"
+            v-close-popup
+          />
           <KennerButton
             no-caps
             label="Create League"
@@ -316,10 +387,7 @@ import {
   addSeasonParticipant,
   removeSeasonParticipant,
 } from 'src/services/seasonService';
-import {
-  createLeague,
-  deleteLeague,
-} from 'src/services/leagueService';
+import { createLeague, deleteLeague } from 'src/services/leagueService';
 import { fetchProfiles } from 'src/services/userService';
 import LeagueList from 'components/season/LeagueList.vue';
 import LeagueLevel from 'components/season/LeagueLevel.vue';
@@ -330,7 +398,12 @@ import KennerSelect from 'components/base/KennerSelect.vue';
 import ContentSection from 'components/base/ContentSection.vue';
 import ErrorDisplay from 'components/base/ErrorDisplay.vue';
 import LoadingSpinner from 'components/base/LoadingSpinner.vue';
-import { TSeasonDto, TLeagueDto, TSeasonParticipantDto, TPlayerProfileDto } from 'src/types';
+import {
+  TSeasonDto,
+  TLeagueDto,
+  TSeasonParticipantDto,
+  TPlayerProfileDto,
+} from 'src/types';
 import { useUserStore } from 'stores/userStore';
 import { storeToRefs } from 'pinia';
 import { useDialog } from 'src/composables/dialog';
@@ -363,9 +436,10 @@ const addLeagueError = ref<string | null>(null);
 
 const participantOptions = computed(() => {
   return participants.value.map((p) => ({
-    label: p.username && p.username !== p.profile_name
-      ? `${p.profile_name} (@${p.username})`
-      : p.profile_name,
+    label:
+      p.username && p.username !== p.profile_name
+        ? `${p.profile_name} (@${p.username})`
+        : p.profile_name,
     value: p.id,
   }));
 });
@@ -378,15 +452,20 @@ const seasonHasResults = computed(() => {
 });
 
 const availableProfiles = computed(() => {
-  const currentParticipantProfileIds = new Set(participants.value.map((p) => p.profile));
-  return allProfiles.value.filter((p) => !currentParticipantProfileIds.has(p.id));
+  const currentParticipantProfileIds = new Set(
+    participants.value.map((p) => p.profile)
+  );
+  return allProfiles.value.filter(
+    (p) => !currentParticipantProfileIds.has(p.id)
+  );
 });
 
 const profileOptions = computed(() => {
   return availableProfiles.value.map((p) => ({
-    label: p.username && p.username !== p.profile_name
-      ? `${p.profile_name} (@${p.username})`
-      : p.profile_name,
+    label:
+      p.username && p.username !== p.profile_name
+        ? `${p.profile_name} (@${p.username})`
+        : p.profile_name,
     value: p.id,
   }));
 });
@@ -442,7 +521,8 @@ async function onAddParticipant() {
 function onRemoveParticipant(participant: TSeasonParticipantDto) {
   if (!season.value) return;
   if (participant.has_results) {
-    error.value = 'Cannot remove participant because match results already exist for this player in this season.';
+    error.value =
+      'Cannot remove participant because match results already exist for this player in this season.';
     return;
   }
   setDialog(
@@ -456,7 +536,9 @@ function onRemoveParticipant(participant: TSeasonParticipantDto) {
         await load();
       } catch (e: any) {
         error.value =
-          e?.response?.data?.detail || e?.message || 'Failed to remove participant.';
+          e?.response?.data?.detail ||
+          e?.message ||
+          'Failed to remove participant.';
       } finally {
         removingParticipantId.value = null;
       }
@@ -468,7 +550,9 @@ function onRemoveParticipant(participant: TSeasonParticipantDto) {
 
 function openAddLeagueDialog() {
   const levels = leagues.value
-    .map((l) => (typeof l.level === 'number' ? l.level : parseInt(String(l.level), 10)))
+    .map((l) =>
+      typeof l.level === 'number' ? l.level : parseInt(String(l.level), 10)
+    )
     .filter((n) => !isNaN(n));
   newLeagueLevel.value = levels.length ? Math.max(...levels) + 1 : 1;
   newLeagueMemberIds.value = [];
@@ -525,7 +609,10 @@ function onDeleteLeague(league: TLeagueDto) {
 }
 
 const participantsByLeague = computed(() => {
-  const groups: { league: TLeagueDto | null; members: TSeasonParticipantDto[] }[] = [];
+  const groups: {
+    league: TLeagueDto | null;
+    members: TSeasonParticipantDto[];
+  }[] = [];
 
   const sortedLeagues = [...leagues.value].sort((a, b) => {
     const levelA = typeof a.level === 'string' ? parseInt(a.level) : a.level;
@@ -541,7 +628,9 @@ const participantsByLeague = computed(() => {
     groups.push({ league: l, members });
   });
 
-  const unassigned = participants.value.filter((p) => !assignedParticipantIds.has(p.id));
+  const unassigned = participants.value.filter(
+    (p) => !assignedParticipantIds.has(p.id)
+  );
   if (unassigned.length > 0) {
     groups.push({ league: null, members: unassigned });
   }
@@ -552,10 +641,14 @@ const participantsByLeague = computed(() => {
 const statusColor = computed(() => {
   if (isSeasonCompleted.value) return 'grey-7';
   switch (season.value?.status) {
-    case 'OPEN': return 'teal-6';
-    case 'RUNNING': return 'primary';
-    case 'DONE': return 'grey-7';
-    default: return 'grey-6';
+    case 'OPEN':
+      return 'teal-6';
+    case 'RUNNING':
+      return 'primary';
+    case 'DONE':
+      return 'grey-7';
+    default:
+      return 'grey-6';
   }
 });
 
@@ -573,7 +666,7 @@ async function load() {
     const [seasonData, leagueData, participantData] = await Promise.all([
       fetchSeason(seasonId),
       fetchLeaguesBySeason(seasonId),
-      fetchSeasonParticipants(seasonId)
+      fetchSeasonParticipants(seasonId),
     ]);
     season.value = seasonData || null;
     leagues.value = leagueData;
@@ -598,7 +691,8 @@ async function onFillLeagues() {
         await fillLeagues(seasonId);
         await load();
       } catch (e: any) {
-        error.value = e?.response?.data?.detail || e?.message || 'Failed to fill leagues.';
+        error.value =
+          e?.response?.data?.detail || e?.message || 'Failed to fill leagues.';
       } finally {
         filling.value = false;
       }
@@ -621,7 +715,8 @@ async function onStartSeason() {
         await startSeason(seasonId);
         await load();
       } catch (e: any) {
-        error.value = e?.response?.data?.detail || e?.message || 'Failed to start season.';
+        error.value =
+          e?.response?.data?.detail || e?.message || 'Failed to start season.';
       } finally {
         starting.value = false;
       }
@@ -646,19 +741,37 @@ onMounted(load);
 }
 
 .season-summary__header {
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.6) 0%, rgba(255, 255, 255, 0.2) 100%);
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.6) 0%,
+    rgba(255, 255, 255, 0.2) 100%
+  );
 
   .body--dark & {
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.04) 0%, rgba(255, 255, 255, 0.01) 100%);
+    background: linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.04) 0%,
+      rgba(255, 255, 255, 0.01) 100%
+    );
   }
 }
 
 .season-summary__divider {
   height: 1px;
-  background: linear-gradient(to right, transparent 0%, rgba(54, 64, 88, 0.1) 50%, transparent 100%);
+  background: linear-gradient(
+    to right,
+    transparent 0%,
+    rgba(54, 64, 88, 0.1) 50%,
+    transparent 100%
+  );
 
   .body--dark & {
-    background: linear-gradient(to right, transparent 0%, rgba(255, 255, 255, 0.12) 50%, transparent 100%);
+    background: linear-gradient(
+      to right,
+      transparent 0%,
+      rgba(255, 255, 255, 0.12) 50%,
+      transparent 100%
+    );
   }
 }
 
@@ -690,13 +803,21 @@ onMounted(load);
 }
 
 .status-pill--primary {
-  background: linear-gradient(135deg, rgba(99, 102, 241, 0.15) 0%, rgba(99, 102, 241, 0.05) 100%);
+  background: linear-gradient(
+    135deg,
+    rgba(99, 102, 241, 0.15) 0%,
+    rgba(99, 102, 241, 0.05) 100%
+  );
   color: var(--q-primary);
   border-color: rgba(99, 102, 241, 0.25);
 }
 
 .status-pill--teal-6 {
-  background: linear-gradient(135deg, rgba(0, 150, 136, 0.15) 0%, rgba(0, 150, 136, 0.05) 100%);
+  background: linear-gradient(
+    135deg,
+    rgba(0, 150, 136, 0.15) 0%,
+    rgba(0, 150, 136, 0.05) 100%
+  );
   color: #00897b;
   border-color: rgba(0, 150, 136, 0.25);
 
@@ -739,5 +860,4 @@ onMounted(load);
     }
   }
 }
-
 </style>

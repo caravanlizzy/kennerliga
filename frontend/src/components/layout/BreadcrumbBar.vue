@@ -4,7 +4,9 @@
     class="breadcrumb-bar"
     :class="{ 'border-bottom-none': hasAnnouncementBelow }"
   >
-    <div class="breadcrumb-bar__inner q-mx-auto q-px-md row items-center no-wrap">
+    <div
+      class="breadcrumb-bar__inner q-mx-auto q-px-md row items-center no-wrap"
+    >
       <div class="row items-center no-wrap history-nav">
         <KennerButton
           flat
@@ -58,7 +60,9 @@ const { isAuthenticated } = storeToRefs(useUserStore());
 const { announcements } = storeToRefs(useAnnouncementStore());
 
 const hasAnnouncementBelow = computed(() => {
-  return isMobile.value && isAuthenticated.value && announcements.value.length > 0;
+  return (
+    isMobile.value && isAuthenticated.value && announcements.value.length > 0
+  );
 });
 
 const show = computed(() => {
@@ -79,7 +83,10 @@ const crumbs = computed(() => {
 
   route.matched.forEach((record) => {
     if (record.meta && record.meta.label && record.path !== '/') {
-      if (result.length > 0 && result[result.length - 1].label === record.meta.label) {
+      if (
+        result.length > 0 &&
+        result[result.length - 1].label === record.meta.label
+      ) {
         return;
       }
 
@@ -89,7 +96,10 @@ const crumbs = computed(() => {
           path = route.path;
         } else {
           Object.entries(route.params).forEach(([key, value]) => {
-            path = path.replace(`:${key}`, Array.isArray(value) ? value[0] : value);
+            path = path.replace(
+              `:${key}`,
+              Array.isArray(value) ? value[0] : value
+            );
           });
         }
       }
@@ -116,8 +126,7 @@ const crumbs = computed(() => {
   // opaque surface -- reuse the same near-solid "glass" white as the navbar
   // above it so content never bleeds through, with a faint grey overlay to
   // keep the strip subtly distinct from the navbar.
-  background:
-    linear-gradient(rgba(0, 0, 0, 0.02), rgba(0, 0, 0, 0.02)),
+  background: linear-gradient(rgba(0, 0, 0, 0.02), rgba(0, 0, 0, 0.02)),
     var(--kenner-bg-glass, rgba(255, 255, 255, 0.98));
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);

@@ -4,35 +4,91 @@
     <div v-if="topGames.length > 0" class="q-mb-xl">
       <div class="row items-center q-mb-md">
         <q-icon name="stars" color="amber-8" size="24px" class="q-mr-sm" />
-        <div class="text-h5 text-weight-bolder text-heading tracking-tighter">Hall of Fame</div>
+        <div class="text-h5 text-weight-bolder text-heading tracking-tighter">
+          Hall of Fame
+        </div>
         <q-space />
-        <div class="text-caption text-grey-6 text-uppercase text-weight-bold letter-spacing-1">Best Winrates</div>
+        <div
+          class="text-caption text-grey-6 text-uppercase text-weight-bold letter-spacing-1"
+        >
+          Best Winrates
+        </div>
       </div>
       <div class="row q-col-gutter-md">
-        <div v-for="(game, idx) in topGames" :key="'top-'+game.name" class="col-12 col-sm-4">
-          <q-card flat class="top-game-card relative-position overflow-hidden" :class="`rank-${idx+1}`">
-            <div class="rank-badge absolute-top-left q-pa-sm text-weight-bolder shadow-2">
-              <q-icon v-if="idx === 0" name="emoji_events" size="14px" class="q-mr-xs" />
+        <div
+          v-for="(game, idx) in topGames"
+          :key="'top-' + game.name"
+          class="col-12 col-sm-4"
+        >
+          <q-card
+            flat
+            class="top-game-card relative-position overflow-hidden"
+            :class="`rank-${idx + 1}`"
+          >
+            <div
+              class="rank-badge absolute-top-left q-pa-sm text-weight-bolder shadow-2"
+            >
+              <q-icon
+                v-if="idx === 0"
+                name="emoji_events"
+                size="14px"
+                class="q-mr-xs"
+              />
               #{{ idx + 1 }}
             </div>
             <q-card-section class="q-pt-xl q-pb-md text-center">
-              <div class="text-subtitle1 text-weight-bolder text-heading ellipsis q-mb-xs">{{ game.name }}</div>
+              <div
+                class="text-subtitle1 text-weight-bolder text-heading ellipsis q-mb-xs"
+              >
+                {{ game.name }}
+              </div>
               <div class="row justify-center q-gutter-x-md q-mt-sm">
                 <div class="column">
-                  <div class="text-h5 text-weight-bolder" :class="idx === 0 ? 'text-positive' : 'text-grey-9'">{{ game.winRate.toFixed(0) }}%</div>
-                  <div class="text-caption text-grey-6 text-uppercase text-weight-bolder" style="font-size: 0.55rem">Winrate</div>
+                  <div
+                    class="text-h5 text-weight-bolder"
+                    :class="idx === 0 ? 'text-positive' : 'text-grey-9'"
+                  >
+                    {{ game.winRate.toFixed(0) }}%
+                  </div>
+                  <div
+                    class="text-caption text-grey-6 text-uppercase text-weight-bolder"
+                    style="font-size: 0.55rem"
+                  >
+                    Winrate
+                  </div>
                 </div>
-                <q-separator vertical class="q-my-xs opacity-30" style="height: 30px" />
+                <q-separator
+                  vertical
+                  class="q-my-xs opacity-30"
+                  style="height: 30px"
+                />
                 <div class="column">
-                  <div class="text-h5 text-weight-bolder" :class="idx === 0 ? 'text-primary' : 'text-grey-9'">#{{ game.avgPos.toFixed(1) }}</div>
-                  <div class="text-caption text-grey-6 text-uppercase text-weight-bolder" style="font-size: 0.55rem">Avg Pos</div>
+                  <div
+                    class="text-h5 text-weight-bolder"
+                    :class="idx === 0 ? 'text-primary' : 'text-grey-9'"
+                  >
+                    #{{ game.avgPos.toFixed(1) }}
+                  </div>
+                  <div
+                    class="text-caption text-grey-6 text-uppercase text-weight-bolder"
+                    style="font-size: 0.55rem"
+                  >
+                    Avg Pos
+                  </div>
                 </div>
               </div>
-              <q-chip dense outline color="grey-4" text-color="grey-7" class="q-mt-md text-weight-bold" style="font-size: 0.65rem">
+              <q-chip
+                dense
+                outline
+                color="grey-4"
+                text-color="grey-7"
+                class="q-mt-md text-weight-bold"
+                style="font-size: 0.65rem"
+              >
                 {{ game.count }} {{ game.count === 1 ? 'PLAY' : 'TOTAL PLAYS' }}
               </q-chip>
             </q-card-section>
-            <div class="card-footer-accent" :class="`bg-rank-${idx+1}`" />
+            <div class="card-footer-accent" :class="`bg-rank-${idx + 1}`" />
           </q-card>
         </div>
       </div>
@@ -42,8 +98,15 @@
     <div>
       <div class="row items-center justify-between q-mb-md q-gutter-y-sm">
         <div class="row items-center">
-          <q-icon name="grid_view" color="primary" size="24px" class="q-mr-sm" />
-          <div class="text-h5 text-weight-bolder text-heading tracking-tighter">Games Library</div>
+          <q-icon
+            name="grid_view"
+            color="primary"
+            size="24px"
+            class="q-mr-sm"
+          />
+          <div class="text-h5 text-weight-bolder text-heading tracking-tighter">
+            Games Library
+          </div>
         </div>
         <div class="search-input-wrapper">
           <q-input
@@ -59,17 +122,29 @@
               <q-icon name="search" size="xs" color="grey-5" />
             </template>
             <template v-if="gameSearch" #append>
-              <q-icon name="close" size="xs" class="cursor-pointer" @click="$emit('update:gameSearch', '')" />
+              <q-icon
+                name="close"
+                size="xs"
+                class="cursor-pointer"
+                @click="$emit('update:gameSearch', '')"
+              />
             </template>
           </q-input>
         </div>
       </div>
 
-      <div v-if="filteredGameStats.length === 0" class="text-center q-pa-xl surface-card rounded-borders-12 empty-state-container">
+      <div
+        v-if="filteredGameStats.length === 0"
+        class="text-center q-pa-xl surface-card rounded-borders-12 empty-state-container"
+      >
         <div class="column items-center">
           <q-icon name="search_off" size="64px" class="q-mb-md text-grey-3" />
-          <div class="text-h6 text-weight-bold text-grey-8">No matching games</div>
-          <div class="text-caption text-grey-6">Try adjusting your search terms</div>
+          <div class="text-h6 text-weight-bold text-grey-8">
+            No matching games
+          </div>
+          <div class="text-caption text-grey-6">
+            Try adjusting your search terms
+          </div>
           <q-btn
             v-if="gameSearch"
             flat
@@ -82,7 +157,11 @@
       </div>
 
       <div v-else class="row q-col-gutter-md">
-        <div v-for="game in filteredGameStats" :key="game.name" class="col-12 col-sm-6 col-md-4">
+        <div
+          v-for="game in filteredGameStats"
+          :key="game.name"
+          class="col-12 col-sm-6 col-md-4"
+        >
           <UserGameCard :game="game" />
         </div>
       </div>
@@ -106,8 +185,12 @@ defineEmits<{
 </script>
 
 <style scoped lang="scss">
-.tracking-tighter { letter-spacing: -1px; }
-.letter-spacing-1 { letter-spacing: 1px; }
+.tracking-tighter {
+  letter-spacing: -1px;
+}
+.letter-spacing-1 {
+  letter-spacing: 1px;
+}
 
 .top-game-card {
   border-radius: 12px;
@@ -122,20 +205,44 @@ defineEmits<{
     font-weight: 900;
   }
   // Shared gold/silver/bronze palette with the statistics page.
-  &.rank-1 .rank-badge { background: #f6d365; color: #7a5b00; }
-  &.rank-2 .rank-badge { background: #d7dde8; color: #4b5563; }
-  &.rank-3 .rank-badge { background: #d6a77a; color: #6b3f16; }
+  &.rank-1 .rank-badge {
+    background: #f6d365;
+    color: #7a5b00;
+  }
+  &.rank-2 .rank-badge {
+    background: #d7dde8;
+    color: #4b5563;
+  }
+  &.rank-3 .rank-badge {
+    background: #d6a77a;
+    color: #6b3f16;
+  }
 
   .body--dark & {
-    &.rank-1 .rank-badge { background: var(--kenner-gold-bg); color: var(--kenner-gold-text); }
-    &.rank-2 .rank-badge { background: var(--kenner-silver-bg); color: var(--kenner-silver-text); }
-    &.rank-3 .rank-badge { background: var(--kenner-bronze-bg); color: var(--kenner-bronze-text); }
+    &.rank-1 .rank-badge {
+      background: var(--kenner-gold-bg);
+      color: var(--kenner-gold-text);
+    }
+    &.rank-2 .rank-badge {
+      background: var(--kenner-silver-bg);
+      color: var(--kenner-silver-text);
+    }
+    &.rank-3 .rank-badge {
+      background: var(--kenner-bronze-bg);
+      color: var(--kenner-bronze-text);
+    }
   }
 }
 
-.bg-rank-1 { background: #f6d365; }
-.bg-rank-2 { background: #d7dde8; }
-.bg-rank-3 { background: #d6a77a; }
+.bg-rank-1 {
+  background: #f6d365;
+}
+.bg-rank-2 {
+  background: #d7dde8;
+}
+.bg-rank-3 {
+  background: #d6a77a;
+}
 
 .card-footer-accent {
   height: 4px;
@@ -177,5 +284,7 @@ defineEmits<{
   }
 }
 
-.text-heading { color: var(--text-heading) !important; }
+.text-heading {
+  color: var(--text-heading) !important;
+}
 </style>

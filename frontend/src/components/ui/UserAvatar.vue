@@ -1,8 +1,5 @@
 <template>
-  <div
-    class="user-avatar-container"
-    :style="{ width: size, height: size }"
-  >
+  <div class="user-avatar-container" :style="{ width: size, height: size }">
     <q-avatar
       :size="size"
       class="user-avatar"
@@ -29,7 +26,10 @@
         <span class="avatar-text" :style="textStyle">{{ initials }}</span>
       </div>
 
-      <KennerTooltip v-if="displayUsername" :color="avatarStyle.backgroundColor">
+      <KennerTooltip
+        v-if="displayUsername"
+        :color="avatarStyle.backgroundColor"
+      >
         <div class="column items-center">
           <div class="row items-center no-wrap q-mb-xs">
             <q-icon
@@ -45,16 +45,35 @@
               color="primary"
               text-color="white"
               class="q-ml-sm text-weight-bolder"
-              style="border-radius: 4px; font-size: 0.7rem; padding: 2px 6px;"
+              style="border-radius: 4px; font-size: 0.7rem; padding: 2px 6px"
             >
               {{ Math.round(effectiveElo) }} Elo
+              <span
+                v-if="
+                  effectiveEloRank !== undefined && effectiveEloRank !== null
+                "
+                class="q-ml-xs text-amber-3"
+              >
+                #{{ effectiveEloRank }}
+              </span>
+            </q-badge>
+            <q-badge
+              v-else-if="
+                effectiveEloRank !== undefined && effectiveEloRank !== null
+              "
+              color="primary"
+              text-color="white"
+              class="q-ml-sm text-weight-bolder"
+              style="border-radius: 4px; font-size: 0.7rem; padding: 2px 6px"
+            >
+              #{{ effectiveEloRank }}
             </q-badge>
             <q-badge
               v-if="isChampion"
               color="amber-9"
               text-color="white"
               class="q-ml-xs text-weight-bolder"
-              style="border-radius: 4px; font-size: 0.7rem; padding: 2px 6px;"
+              style="border-radius: 4px; font-size: 0.7rem; padding: 2px 6px"
             >
               <q-icon name="emoji_events" size="12px" class="q-mr-xs" />
               Champion
@@ -69,11 +88,7 @@
       <slot />
     </q-avatar>
 
-    <div
-      v-if="isChampion"
-      class="avatar-crown"
-      aria-hidden="true"
-    >
+    <div v-if="isChampion" class="avatar-crown" aria-hidden="true">
       <AvatarCrown />
     </div>
   </div>
@@ -85,10 +100,12 @@ import { useRouter } from 'vue-router';
 import KennerTooltip from 'components/base/KennerTooltip.vue';
 import AvatarCrown from 'components/ui/AvatarCrown.vue';
 import { useChampionStore } from 'src/stores/championStore';
+import { useEloStore } from 'src/stores/eloStore';
 import { type AvatarShape, getContrastTextColor } from 'src/types/avatar';
 
 const router = useRouter();
 const championStore = useChampionStore();
+const eloStore = useEloStore();
 
 const props = withDefaults(
   defineProps<{
@@ -102,6 +119,8 @@ const props = withDefaults(
     border?: boolean;
     elo?: number | null;
     eloRating?: number | null;
+    eloRank?: number | null;
+    rank?: number | null;
     crowned?: boolean;
     disableCrown?: boolean;
   }>(),
@@ -113,6 +132,8 @@ const props = withDefaults(
     border: false,
     elo: undefined,
     eloRating: undefined,
+    eloRank: undefined,
+    rank: undefined,
     crowned: undefined,
     disableCrown: false,
   }
@@ -121,19 +142,42 @@ const props = withDefaults(
 const isChampion = computed(() => {
   if (props.disableCrown) return false;
   if (props.crowned !== undefined) return props.crowned;
-  return championStore.isChampion(
-    props.displayUsername,
-    props.navigationName
-  );
+  return championStore.isChampion(props.displayUsername, props.navigationName);
 });
 
 onMounted(() => {
   if (!championStore.initialized && !championStore.loading) {
     championStore.fetchChampion();
   }
+  if (!eloStore.initialized && !eloStore.loading) {
+    eloStore.fetchProfiles();
+  }
+  eloStore.initUpdateSubscription();
 });
 
-const effectiveElo = computed(() => props.eloRating ?? props.elo);
+const profileElo = computed(() =>
+  eloStore.getElo(props.displayUsername, props.navigationName)
+);
+
+const effectiveElo = computed(() => {
+  if (props.eloRating !== undefined && props.eloRating !== null) {
+    return props.eloRating;
+  }
+  if (props.elo !== undefined && props.elo !== null) {
+    return props.elo;
+  }
+  return profileElo.value?.eloRating;
+});
+
+const effectiveEloRank = computed(() => {
+  if (props.eloRank !== undefined && props.eloRank !== null) {
+    return props.eloRank;
+  }
+  if (props.rank !== undefined && props.rank !== null) {
+    return props.rank;
+  }
+  return profileElo.value?.eloRank;
+});
 
 const navigationUserName = computed(
   () => props.navigationName ?? props.displayUsername
@@ -307,7 +351,8 @@ const textStyle = computed(() => {
   color: var(--avatar-text-color);
   background-color: var(--avatar-bg-color);
   box-shadow: none;
-  transition: background-color 0.15s ease, border-color 0.15s ease, transform 0.15s ease;
+  transition: background-color 0.15s ease, border-color 0.15s ease,
+    transform 0.15s ease;
 }
 
 .user-avatar--bordered {

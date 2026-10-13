@@ -1,8 +1,13 @@
 <template>
   <q-page class="q-py-md flex justify-center">
-    <div style="max-width: var(--kenner-max-width-text); width: 100%" class="q-px-sm">
+    <div
+      style="max-width: var(--kenner-max-width-text); width: 100%"
+      class="q-px-sm"
+    >
       <!-- Header -->
-      <div class="management-hero-card q-pa-lg q-mb-lg row items-center justify-between">
+      <div
+        class="management-hero-card q-pa-lg q-mb-lg row items-center justify-between"
+      >
         <div class="column">
           <div class="row items-center q-gutter-x-sm q-mb-xs">
             <q-icon name="history" color="primary" size="32px" />
@@ -22,7 +27,9 @@
         <!-- New Release Note Form -->
         <q-card flat class="management-card q-mb-lg">
           <q-card-section class="q-pa-lg">
-            <div class="text-subtitle1 text-weight-bold q-mb-md text-dark row items-center q-gutter-x-xs">
+            <div
+              class="text-subtitle1 text-weight-bold q-mb-md text-dark row items-center q-gutter-x-xs"
+            >
               <q-icon name="post_add" color="positive" size="20px" />
               <span>Add New Release Note</span>
             </div>
@@ -54,7 +61,9 @@
         <!-- Current Release Notes -->
         <q-card flat class="management-card">
           <q-card-section class="q-pa-lg">
-            <div class="text-subtitle1 text-weight-bold q-mb-md text-dark row items-center justify-between">
+            <div
+              class="text-subtitle1 text-weight-bold q-mb-md text-dark row items-center justify-between"
+            >
               <div class="row items-center q-gutter-x-xs">
                 <q-icon name="list_alt" color="primary" size="20px" />
                 <span>Published Release Notes</span>
@@ -64,7 +73,10 @@
               </q-badge>
             </div>
 
-            <div v-if="releaseNotes.length === 0" class="text-center text-grey-6 q-pa-xl column items-center">
+            <div
+              v-if="releaseNotes.length === 0"
+              class="text-center text-grey-6 q-pa-xl column items-center"
+            >
               <q-icon name="history" size="48px" class="opacity-30 q-mb-sm" />
               <span>No release notes published yet</span>
             </div>
@@ -82,7 +94,9 @@
             >
               <template #body-cell-text="props">
                 <q-td :props="props">
-                  <div class="release-note-text text-body2 text-grey-8">{{ props.row.text }}</div>
+                  <div class="release-note-text text-body2 text-grey-8">
+                    {{ props.row.text }}
+                  </div>
                 </q-td>
               </template>
               <template #body-cell-actions="props">
@@ -158,8 +172,22 @@ function formatDate(value: string): string {
 }
 
 const columns = [
-  { name: 'title', label: 'Title', field: 'title', align: 'left' as const, classes: 'text-weight-bold', style: 'min-width: 140px' },
-  { name: 'created_at', label: 'Date', field: 'created_at', align: 'left' as const, format: (v: string) => formatDate(v), style: 'width: 110px' },
+  {
+    name: 'title',
+    label: 'Title',
+    field: 'title',
+    align: 'left' as const,
+    classes: 'text-weight-bold',
+    style: 'min-width: 140px',
+  },
+  {
+    name: 'created_at',
+    label: 'Date',
+    field: 'created_at',
+    align: 'left' as const,
+    format: (v: string) => formatDate(v),
+    style: 'width: 110px',
+  },
   { name: 'text', label: 'Text', field: 'text', align: 'left' as const },
   { name: 'actions', label: '', field: 'id', align: 'right' as const },
 ];

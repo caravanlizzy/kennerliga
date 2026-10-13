@@ -1,9 +1,13 @@
 <template>
   <div v-bind="$attrs" class="league-action-summary-section">
-    <div class="summary-header row items-center justify-between q-pb-xs q-mb-xs">
+    <div
+      class="summary-header row items-center justify-between q-pb-xs q-mb-xs"
+    >
       <div class="row items-center q-gutter-x-xs text-grey-8">
         <q-icon name="history" size="18px" color="primary" />
-        <span class="text-subtitle2 text-weight-bold tracking-tight text-primary">
+        <span
+          class="text-subtitle2 text-weight-bold tracking-tight text-primary"
+        >
           Action Summary
         </span>
       </div>

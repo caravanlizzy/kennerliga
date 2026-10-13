@@ -39,7 +39,11 @@ export class PushNotConfiguredError extends Error {
 }
 
 export function isPushNotificationSupported(): boolean {
-  return 'Notification' in window && 'serviceWorker' in navigator && 'PushManager' in window;
+  return (
+    'Notification' in window &&
+    'serviceWorker' in navigator &&
+    'PushManager' in window
+  );
 }
 
 export async function getExistingPushSubscription(): Promise<PushSubscription | null> {
@@ -71,7 +75,9 @@ export async function isPushNotificationSubscribed(): Promise<boolean> {
 
 async function fetchVapidPublicKey(): Promise<string> {
   try {
-    const { data } = await api.get<{ public_key: string }>('/notifications/vapid-public-key/');
+    const { data } = await api.get<{ public_key: string }>(
+      '/notifications/vapid-public-key/'
+    );
     return data.public_key;
   } catch (error) {
     if (
@@ -97,7 +103,7 @@ async function deleteSubscription(endpoint: string): Promise<void> {
 }
 
 async function getOrCreateSubscription(
-  registration: ServiceWorkerRegistration,
+  registration: ServiceWorkerRegistration
 ): Promise<PushSubscription> {
   const existing = await registration.pushManager.getSubscription();
   if (existing) {
@@ -162,7 +168,9 @@ export async function unsubscribeFromPushNotifications(): Promise<void> {
 // old endpoint stops working. Re-subscribe and re-POST so delivery self-heals.
 let subscriptionChangeHandlerRegistered = false;
 
-function registerSubscriptionChangeHandler(registration: ServiceWorkerRegistration): void {
+function registerSubscriptionChangeHandler(
+  registration: ServiceWorkerRegistration
+): void {
   if (subscriptionChangeHandlerRegistered) {
     return;
   }

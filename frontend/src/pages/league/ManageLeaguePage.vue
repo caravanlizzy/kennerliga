@@ -40,7 +40,12 @@
             >
               {{ league?.status }}
             </q-chip>
-            <LeagueLevel v-if="league" badge :level="league.level" class="q-pa-sm" />
+            <LeagueLevel
+              v-if="league"
+              badge
+              :level="league.level"
+              class="q-pa-sm"
+            />
           </div>
         </ContentSection>
       </div>
@@ -112,15 +117,30 @@
           :season="season"
           :matchResultsBySelectedGameId="matchResultsBySelectedGameId"
           :is-last="index === (league?.members?.length || 0) - 1"
-          @add-game="m => (activeForm = { type: 'add', member: m })"
-          @ban-game="m => (activeForm = { type: 'ban', member: m })"
-          @set-active="profileId => setActivePlayer(profileId)"
-          @edit-game="data => (activeForm = { type: 'edit', member: data.member, selGame: data.selGame })"
-          @post-result="selGame => (activeForm = { type: 'post-result', selGame })"
-          @edit-result="selGameId => (activeForm = { type: 'post-result', selGame: findSelGame(selGameId) })"
-          @delete-result="selGame => onDeleteResult(selGame)"
-          @delete-game="data => onDeleteSelectedGame(data.selGame)"
-          @delete-ban="member => onDeleteBan(member)"
+          @add-game="(m) => (activeForm = { type: 'add', member: m })"
+          @ban-game="(m) => (activeForm = { type: 'ban', member: m })"
+          @set-active="(profileId) => setActivePlayer(profileId)"
+          @edit-game="
+            (data) =>
+              (activeForm = {
+                type: 'edit',
+                member: data.member,
+                selGame: data.selGame,
+              })
+          "
+          @post-result="
+            (selGame) => (activeForm = { type: 'post-result', selGame })
+          "
+          @edit-result="
+            (selGameId) =>
+              (activeForm = {
+                type: 'post-result',
+                selGame: findSelGame(selGameId),
+              })
+          "
+          @delete-result="(selGame) => onDeleteResult(selGame)"
+          @delete-game="(data) => onDeleteSelectedGame(data.selGame)"
+          @delete-ban="(member) => onDeleteBan(member)"
         />
       </div>
     </ContentSection>
@@ -136,9 +156,19 @@
 
     <!-- Manage Members Dialog -->
     <q-dialog v-model="showManageMembersDialog">
-      <q-card style="min-width: 320px; max-width: 480px; width: 100%; border-radius: 16px" class="q-pa-md">
+      <q-card
+        style="
+          min-width: 320px;
+          max-width: 480px;
+          width: 100%;
+          border-radius: 16px;
+        "
+        class="q-pa-md"
+      >
         <q-card-section class="row items-center justify-between q-pb-none">
-          <div class="text-subtitle1 text-weight-bold">Manage League Members</div>
+          <div class="text-subtitle1 text-weight-bold">
+            Manage League Members
+          </div>
           <q-btn v-close-popup icon="close" flat round dense color="grey-6" />
         </q-card-section>
 
@@ -147,7 +177,11 @@
             Select participants for League {{ league?.level }}.
           </p>
 
-          <ErrorDisplay v-if="manageMembersError" :error="manageMembersError" class="q-mb-sm" />
+          <ErrorDisplay
+            v-if="manageMembersError"
+            :error="manageMembersError"
+            class="q-mb-sm"
+          />
 
           <KennerSelect
             v-model="selectedLeagueMemberIds"
@@ -171,7 +205,13 @@
         </q-card-section>
 
         <q-card-actions align="right" class="q-pt-md">
-          <KennerButton flat no-caps label="Cancel" color="grey-7" v-close-popup />
+          <KennerButton
+            flat
+            no-caps
+            label="Cancel"
+            color="grey-7"
+            v-close-popup
+          />
           <KennerButton
             no-caps
             label="Save Members"
@@ -195,9 +235,15 @@ import {
   setLeagueStatus,
   updateLeague,
 } from 'src/services/leagueService';
-import { deleteSelectedGame, deleteBanDecision } from 'src/services/gameService';
+import {
+  deleteSelectedGame,
+  deleteBanDecision,
+} from 'src/services/gameService';
 import { deleteMatchResults } from 'src/services/resultService';
-import { fetchSeason, fetchSeasonParticipants } from 'src/services/seasonService';
+import {
+  fetchSeason,
+  fetchSeasonParticipants,
+} from 'src/services/seasonService';
 import ContentSection from 'components/base/ContentSection.vue';
 import KennerButton from 'components/base/KennerButton.vue';
 import KennerSelect from 'components/base/KennerSelect.vue';
@@ -206,12 +252,20 @@ import LoadingSpinner from 'components/base/LoadingSpinner.vue';
 import MemberGameCard from 'components/league/manager/MemberGameCard.vue';
 import EmptyUsersState from 'components/league/manager/EmptyUsersState.vue';
 import LeagueStandings from 'components/league/LeagueStandings.vue';
-import ManagerFormsDialog, { TActiveForm } from 'components/league/manager/ManagerFormsDialog.vue';
+import ManagerFormsDialog, {
+  TActiveForm,
+} from 'components/league/manager/ManagerFormsDialog.vue';
 import LeagueLevel from 'components/season/LeagueLevel.vue';
 import { useDialog } from 'src/composables/dialog';
 import { storeToRefs } from 'pinia';
 import { useUserStore } from 'src/stores/userStore';
-import type { TSeasonDto, TLeagueDto, TSelectedGameDto, TMatchResult, TSeasonParticipantDto } from 'src/types';
+import type {
+  TSeasonDto,
+  TLeagueDto,
+  TSelectedGameDto,
+  TMatchResult,
+  TSeasonParticipantDto,
+} from 'src/types';
 
 const route = useRoute();
 const $q = useQuasar();
@@ -244,9 +298,10 @@ const manageMembersError = ref<string | null>(null);
 
 const seasonParticipantOptions = computed(() => {
   return seasonParticipants.value.map((p) => ({
-    label: p.username && p.username !== p.profile_name
-      ? `${p.profile_name} (@${p.username})`
-      : p.profile_name,
+    label:
+      p.username && p.username !== p.profile_name
+        ? `${p.profile_name} (@${p.username})`
+        : p.profile_name,
     value: p.id,
   }));
 });
@@ -257,9 +312,12 @@ async function openManageMembersDialog() {
   selectedLeagueMemberIds.value = (league.value.members || []).map((m) => m.id);
   showManageMembersDialog.value = true;
   try {
-    seasonParticipants.value = await fetchSeasonParticipants(league.value.season);
+    seasonParticipants.value = await fetchSeasonParticipants(
+      league.value.season
+    );
   } catch (e: any) {
-    manageMembersError.value = e?.message || 'Failed to load season participants.';
+    manageMembersError.value =
+      e?.message || 'Failed to load season participants.';
   }
 }
 
@@ -273,7 +331,10 @@ async function onSaveLeagueMembers() {
     });
     showManageMembersDialog.value = false;
     await load();
-    $q.notify({ type: 'positive', message: 'League members updated successfully' });
+    $q.notify({
+      type: 'positive',
+      message: 'League members updated successfully',
+    });
   } catch (e: any) {
     manageMembersError.value =
       e?.response?.data?.member_ids?.[0] ||
@@ -297,8 +358,8 @@ async function load() {
     // Results are now included in league.value.members[].selected_games[].results
     // Populate matchResultsBySelectedGameId from the prefetched data
     const newResults: Record<number, TMatchResult[]> = {};
-    (league.value.members || []).forEach(member => {
-      (member.selected_games || []).forEach(selGame => {
+    (league.value.members || []).forEach((member) => {
+      (member.selected_games || []).forEach((selGame) => {
         if (selGame.results) {
           newResults[selGame.id] = selGame.results;
         }
@@ -373,7 +434,10 @@ async function onDeleteBan(member: TSeasonParticipantDto) {
         await load();
         $q.notify({ type: 'positive', message: 'Ban decision removed' });
       } catch (err) {
-        $q.notify({ type: 'negative', message: 'Failed to remove ban decision' });
+        $q.notify({
+          type: 'negative',
+          message: 'Failed to remove ban decision',
+        });
       }
     },
     undefined,
@@ -402,7 +466,7 @@ async function onDeleteResult(selGame: TSelectedGameDto) {
 
 function findSelGame(id: number): TSelectedGameDto | undefined {
   for (const m of league.value?.members || []) {
-    const found = m.selected_games?.find(g => g.id === id);
+    const found = m.selected_games?.find((g) => g.id === id);
     if (found) return found;
   }
   return undefined;
@@ -411,16 +475,18 @@ function findSelGame(id: number): TSelectedGameDto | undefined {
 function onResolveTie(group: any) {
   if (!league.value) return;
   // Map tie group members to full participant objects
-  const members = group.members.map((m: any) => {
-    return (league.value?.members || []).find(
-      (p: TSeasonParticipantDto) => p.profile === m.player_profile_id
-    );
-  }).filter(Boolean);
+  const members = group.members
+    .map((m: any) => {
+      return (league.value?.members || []).find(
+        (p: TSeasonParticipantDto) => p.profile === m.player_profile_id
+      );
+    })
+    .filter(Boolean);
 
   activeForm.value = {
     type: 'resolve-tie',
     groupKey: group.group_key,
-    members: members
+    members: members,
   };
 }
 

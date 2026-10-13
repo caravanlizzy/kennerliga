@@ -40,5 +40,7 @@ export default boot(() => {
     }
   }
 
-  watch(() => userStore.isAuthenticated, offerNotifications, { immediate: true });
+  watch(() => userStore.isAuthenticated, offerNotifications, {
+    immediate: true,
+  });
 });

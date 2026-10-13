@@ -1,6 +1,11 @@
 export default {
   path: 'players/',
-  meta: { requiresAuth: true, requiresAdmin: false, label: 'Players', icon: 'people_alt' },
+  meta: {
+    requiresAuth: true,
+    requiresAdmin: false,
+    label: 'Players',
+    icon: 'people_alt',
+  },
   children: [
     {
       path: '',

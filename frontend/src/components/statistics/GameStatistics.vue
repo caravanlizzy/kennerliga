@@ -5,7 +5,9 @@
         <q-icon name="sports_esports" color="primary" size="20px" />
       </div>
       <div class="column">
-        <div class="text-h6 text-weight-bolder text-dark line-height-1">Games</div>
+        <div class="text-h6 text-weight-bolder text-dark line-height-1">
+          Games
+        </div>
         <div class="text-caption text-grey-6">
           Which games get played, picked, banned &amp; who masters them.
         </div>
@@ -32,8 +34,14 @@
             <q-icon name="sports_esports" color="primary" size="22px" />
           </div>
           <div class="column">
-            <div class="text-subtitle1 text-weight-bolder text-dark line-height-1">Game Stats</div>
-            <div class="text-caption text-grey-6">Search for a game to see who performs best at it.</div>
+            <div
+              class="text-subtitle1 text-weight-bolder text-dark line-height-1"
+            >
+              Game Stats
+            </div>
+            <div class="text-caption text-grey-6">
+              Search for a game to see who performs best at it.
+            </div>
           </div>
         </div>
       </q-card-section>
@@ -62,20 +70,40 @@
             v-for="game in filteredGames"
             :key="game.game_id"
             class="game-preview-row row items-center justify-between no-wrap"
-            :class="{ 'game-preview-row--active': game.game_id === selectedGameId }"
-            @click="selectedGameId = selectedGameId === game.game_id ? null : game.game_id"
+            :class="{
+              'game-preview-row--active': game.game_id === selectedGameId,
+            }"
+            @click="
+              selectedGameId =
+                selectedGameId === game.game_id ? null : game.game_id
+            "
           >
-            <div class="game-preview-row__name ellipsis text-weight-bold">{{ game.name }}</div>
-            <div v-if="game.best_player" class="game-preview-row__best text-caption ellipsis">
-              <q-icon name="emoji_events" size="14px" class="text-amber-8 q-mr-xs" />
+            <div class="game-preview-row__name ellipsis text-weight-bold">
+              {{ game.name }}
+            </div>
+            <div
+              v-if="game.best_player"
+              class="game-preview-row__best text-caption ellipsis"
+            >
+              <q-icon
+                name="emoji_events"
+                size="14px"
+                class="text-amber-8 q-mr-xs"
+              />
               {{ game.best_player.profile_name }}
-              <span v-if="game.best_player.win_rate !== null" class="text-grey-6">
+              <span
+                v-if="game.best_player.win_rate !== null"
+                class="text-grey-6"
+              >
                 &middot; {{ game.best_player.win_rate }}%
               </span>
             </div>
             <div v-else class="text-caption text-grey-5">No ranked player</div>
           </div>
-          <div v-if="filteredGames.length === 0" class="text-caption text-grey-6 q-pa-sm">
+          <div
+            v-if="filteredGames.length === 0"
+            class="text-caption text-grey-6 q-pa-sm"
+          >
             No games match that search.
           </div>
         </div>
@@ -84,8 +112,12 @@
              game list, since the sticky column gives it room to breathe. -->
         <template v-if="!smallScreen">
           <template v-if="selectedGameId !== null">
-            <div class="selected-game-header row items-center justify-between q-mb-sm">
-              <div class="text-weight-bolder text-dark ellipsis">{{ selectedGame?.name }}</div>
+            <div
+              class="selected-game-header row items-center justify-between q-mb-sm"
+            >
+              <div class="text-weight-bolder text-dark ellipsis">
+                {{ selectedGame?.name }}
+              </div>
               <q-btn
                 flat
                 round
@@ -121,7 +153,12 @@
     >
       <q-card class="mobile-leaderboard-card">
         <div class="mobile-leaderboard-header row items-center no-wrap">
-          <q-icon name="emoji_events" size="22px" color="white" class="q-mr-sm" />
+          <q-icon
+            name="emoji_events"
+            size="22px"
+            color="white"
+            class="q-mr-sm"
+          />
           <div class="text-subtitle1 text-weight-bolder text-white ellipsis">
             {{ selectedGame?.name ?? 'Leaderboard' }}
           </div>
@@ -172,12 +209,15 @@ const gameSearch = ref('');
 const filteredGames = computed(() => {
   const needle = gameSearch.value.trim().toLowerCase();
   if (!needle) return allGames.value;
-  return allGames.value.filter((game) => game.name.toLowerCase().includes(needle));
+  return allGames.value.filter((game) =>
+    game.name.toLowerCase().includes(needle)
+  );
 });
 
 const selectedGameId = ref<number | null>(null);
 const selectedGame = computed(
-  () => allGames.value.find((game) => game.game_id === selectedGameId.value) ?? null
+  () =>
+    allGames.value.find((game) => game.game_id === selectedGameId.value) ?? null
 );
 const leaderboard = ref<TGameLeaderboard | null>(null);
 const loadingLeaderboard = ref(false);

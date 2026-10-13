@@ -2,7 +2,6 @@
   <GameOptionCard>
     <template #content>
       <div class="column q-gutter-sm">
-
         <!-- Header: title + delete -->
         <div class="row items-start justify-between">
           <KennerInput
@@ -13,11 +12,17 @@
             :rules="[(val: string) => !!val || 'Title required']"
           />
           <KennerButton
-            flat round size="sm" color="negative" icon="delete"
+            flat
+            round
+            size="sm"
+            color="negative"
+            icon="delete"
             class="q-mt-xs"
             @click="confirmDelete = true"
           />
-          <q-tooltip anchor="bottom middle" self="top middle">Delete option</q-tooltip>
+          <q-tooltip anchor="bottom middle" self="top middle"
+            >Delete option</q-tooltip
+          >
         </div>
 
         <q-separator spaced />
@@ -25,13 +30,16 @@
         <!-- Toggles -->
         <div class="row q-col-gutter-md">
           <div class="col-12 col-sm-6">
-              <q-toggle
-                :model-value="gameOption.hasChoices"
-                @update:model-value="updateHasChoices"
-                label="Choices"
-                dense
-              />
-            <div v-if="gameOption.hasChoices" class="text-caption text-grey-7 q-pl-xs q-mt-xs">
+            <q-toggle
+              :model-value="gameOption.hasChoices"
+              @update:model-value="updateHasChoices"
+              label="Choices"
+              dense
+            />
+            <div
+              v-if="gameOption.hasChoices"
+              class="text-caption text-grey-7 q-pl-xs q-mt-xs"
+            >
               Add selectable values for this option.
             </div>
           </div>
@@ -40,7 +48,10 @@
             <q-toggle
               label="Conditions"
               :model-value="hasRestrictions"
-              @update:model-value="hasRestrictions = !hasRestrictions; deleteRestriction()"
+              @update:model-value="
+                hasRestrictions = !hasRestrictions;
+                deleteRestriction();
+              "
               dense
             />
             <div class="text-caption text-grey-7 q-pl-xs q-mt-xs">
@@ -69,8 +80,10 @@
           v-if="!gameOption.hasChoices && !hasRestrictions"
           class="bg-grey-2 text-grey-8 text-caption q-pa-md rounded-borders"
         >
-          Tip: Enable <span class="text-weight-medium">Choices</span> if the option has multiple values,
-          and enable <span class="text-weight-medium">Conditions</span> to make this option depend on another.
+          Tip: Enable <span class="text-weight-medium">Choices</span> if the
+          option has multiple values, and enable
+          <span class="text-weight-medium">Conditions</span> to make this option
+          depend on another.
         </div>
       </div>
 
@@ -78,10 +91,16 @@
       <q-dialog v-model="confirmDelete">
         <q-card class="q-pa-md rounded-borders">
           <div class="text-subtitle1 q-mb-sm">Delete option?</div>
-          <div class="text-caption text-grey-7 q-mb-md">This cannot be undone.</div>
+          <div class="text-caption text-grey-7 q-mb-md">
+            This cannot be undone.
+          </div>
           <div class="row justify-end q-gutter-sm">
             <KennerButton flat label="Cancel" v-close-popup />
-            <KennerButton color="negative" label="Delete" @click="onConfirmDelete" />
+            <KennerButton
+              color="negative"
+              label="Delete"
+              @click="onConfirmDelete"
+            />
           </div>
         </q-card>
       </q-dialog>
@@ -105,9 +124,13 @@ const { gameOption } = props;
 const { updateItem, deleteItem } = inject('useGameOptions') as any;
 
 // initialize from existing restriction fields if present
-const hasRestrictions = ref(Boolean(
-  gameOption.onlyIfOption || gameOption.onlyIfChoice || gameOption.onlyIfValue !== undefined
-));
+const hasRestrictions = ref(
+  Boolean(
+    gameOption.onlyIfOption ||
+      gameOption.onlyIfChoice ||
+      gameOption.onlyIfValue !== undefined
+  )
+);
 
 const confirmDelete = ref(false);
 

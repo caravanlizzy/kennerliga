@@ -2,10 +2,7 @@
   <q-dialog v-model="showDialog">
     <q-card class="q-pa-sm confirm-card">
       <!-- Header with color -->
-      <q-card-section
-        class="text-h6 text-white"
-        :class="`bg-${dialogType}`"
-      >
+      <q-card-section class="text-h6 text-white" :class="`bg-${dialogType}`">
         {{ dialogTitle }}
       </q-card-section>
 
@@ -34,8 +31,8 @@
 </template>
 
 <script setup lang="ts">
-import { useDialog } from 'src/composables/dialog'
-import KennerButton from 'components/base/KennerButton.vue'
+import { useDialog } from 'src/composables/dialog';
+import KennerButton from 'components/base/KennerButton.vue';
 
 const {
   showDialog,
@@ -45,22 +42,22 @@ const {
   confirmLabel,
   onConfirm,
   onCancel,
-  resetDialog
-} = useDialog()
+  resetDialog,
+} = useDialog();
 
 async function handleConfirm() {
   try {
-    await onConfirm?.value?.()
+    await onConfirm?.value?.();
   } finally {
-    resetDialog()
+    resetDialog();
   }
 }
 
 async function handleCancel() {
   try {
-    await onCancel?.value?.()
+    await onCancel?.value?.();
   } finally {
-    resetDialog()
+    resetDialog();
   }
 }
 </script>

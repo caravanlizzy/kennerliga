@@ -50,9 +50,11 @@ module.exports = configure(function (ctx) {
     build: {
       // env: require('dotenv').config().parsed,
       env: {
-        API_URL: process.env.API_URL || (ctx.dev
-          ? 'http://localhost:8000/api'
-          : 'https://www.kennerliga.de/api'),
+        API_URL:
+          process.env.API_URL ||
+          (ctx.dev
+            ? 'http://localhost:8000/api'
+            : 'https://www.kennerliga.de/api'),
       },
       target: {
         browser: ['es2019', 'edge88', 'firefox78', 'chrome87', 'safari13.1'],
@@ -91,8 +93,7 @@ module.exports = configure(function (ctx) {
 
     // https://v2.quasar.dev/quasar-cli-vite/quasar-config-js#framework
     framework: {
-      config: {
-      },
+      config: {},
 
       // iconSet: 'material-icons', // Quasar icon set
       lang: 'en-US', // Quasar language pack

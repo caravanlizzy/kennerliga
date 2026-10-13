@@ -6,7 +6,7 @@
     :icon="themeIcon"
     color="grey-7"
     class="nav-section-btn"
-    style="height: 40px; min-width: 40px;"
+    style="height: 40px; min-width: 40px"
     @click="themeStore.toggleDark()"
   >
     <KennerTooltip>{{ tooltipText }}</KennerTooltip>

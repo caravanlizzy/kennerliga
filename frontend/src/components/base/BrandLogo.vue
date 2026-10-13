@@ -1,5 +1,8 @@
 <template>
-  <div class="row items-center no-wrap brand-wrap" :class="{ 'brand-wrap--compact': compact }">
+  <div
+    class="row items-center no-wrap brand-wrap"
+    :class="{ 'brand-wrap--compact': compact }"
+  >
     <svg
       class="brand-k-icon"
       :class="{ 'brand-k-icon--compact': compact }"
@@ -35,11 +38,10 @@
         fill="none"
       />
     </svg>
-    <span
-      v-if="!compact"
-      class="brand-text"
-      :style="{ fontSize: wordSize }"
-    ><span class="brand-text__word">enner</span><span class="brand-text__word">Liga</span></span>
+    <span v-if="!compact" class="brand-text" :style="{ fontSize: wordSize }"
+      ><span class="brand-text__word">enner</span
+      ><span class="brand-text__word">Liga</span></span
+    >
   </div>
 </template>
 
@@ -94,5 +96,4 @@ void props;
 .brand-text__word {
   color: var(--kenner-brand-text, #1a2233);
 }
-
 </style>

@@ -10,7 +10,10 @@
   >
     <template v-slot:body-cell-selectable="props">
       <q-td :props="props">
-        <div v-if="!props.row.selectable" class="row items-center text-negative">
+        <div
+          v-if="!props.row.selectable"
+          class="row items-center text-negative"
+        >
           <span class="text-caption text-weight-bold">NOT SELECTABLE</span>
         </div>
         <div v-else class="row items-center text-grey-6">
@@ -32,7 +35,10 @@
 <script setup lang="ts">
 import KennerTable from 'components/tables/KennerTable.vue';
 import { useAsyncData } from 'src/composables/asyncData';
-import { fetchGamesForManagement, fetchPlatforms } from 'src/services/gameService';
+import {
+  fetchGamesForManagement,
+  fetchPlatforms,
+} from 'src/services/gameService';
 import { useRouter } from 'vue-router';
 import { TGameDto, TKennerButton, TPlatform } from 'src/types';
 import { computed } from 'vue';
@@ -55,7 +61,9 @@ const {
 
 // Unified loading/error
 const loading = computed(() => !isFinished.value || !isPlatformFinished.value);
-const error = computed(() => gamesError?.value?.message || platformError?.value?.message || null);
+const error = computed(
+  () => gamesError?.value?.message || platformError?.value?.message || null
+);
 
 // Build a map id->name from platformData (reactive, no manual watch needed)
 const platformMap = computed<Record<string, string>>(() => {

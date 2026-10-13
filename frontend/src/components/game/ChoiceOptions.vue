@@ -1,7 +1,12 @@
 <template>
   <div class="column q-gutter-y-md">
     <template v-for="option in options" :key="option.id">
-      <OverviewCard v-if="option.has_choices" icon="list" icon-color="primary" v-bind="$attrs">
+      <OverviewCard
+        v-if="option.has_choices"
+        icon="list"
+        icon-color="primary"
+        v-bind="$attrs"
+      >
         <template #title>
           {{ option.name }}
         </template>
@@ -17,9 +22,17 @@
               :key="JSON.stringify(choice)"
               class="col-12 col-sm-6"
             >
-              <div class="row items-center q-pa-sm rounded-borders bg-grey-1 border-subtle q-gutter-x-sm">
-                <q-icon name="radio_button_checked" color="primary" size="16px" />
-                <span class="text-body2 text-weight-medium text-dark">{{ choice.name }}</span>
+              <div
+                class="row items-center q-pa-sm rounded-borders bg-grey-1 border-subtle q-gutter-x-sm"
+              >
+                <q-icon
+                  name="radio_button_checked"
+                  color="primary"
+                  size="16px"
+                />
+                <span class="text-body2 text-weight-medium text-dark">{{
+                  choice.name
+                }}</span>
               </div>
             </div>
           </div>

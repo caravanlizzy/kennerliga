@@ -21,7 +21,7 @@ export const useReleaseNoteStore = defineStore('releaseNote', () => {
   }
 
   async function addReleaseNote(
-    note: ReleaseNoteCreate,
+    note: ReleaseNoteCreate
   ): Promise<TReleaseNoteDto> {
     loading.value = true;
     try {
@@ -35,12 +35,15 @@ export const useReleaseNoteStore = defineStore('releaseNote', () => {
 
   async function updateReleaseNote(
     id: number,
-    note: ReleaseNoteCreate,
+    note: ReleaseNoteCreate
   ): Promise<TReleaseNoteDto> {
     loading.value = true;
     try {
-      const response = await api.put<TReleaseNoteDto>(`${BASE_URL}${id}/`, note);
-      const idx = releaseNotes.value.findIndex(n => n.id === id);
+      const response = await api.put<TReleaseNoteDto>(
+        `${BASE_URL}${id}/`,
+        note
+      );
+      const idx = releaseNotes.value.findIndex((n) => n.id === id);
       if (idx !== -1) releaseNotes.value[idx] = response.data;
       return response.data;
     } finally {
@@ -52,7 +55,7 @@ export const useReleaseNoteStore = defineStore('releaseNote', () => {
     loading.value = true;
     try {
       await api.delete(`${BASE_URL}${id}/`);
-      releaseNotes.value = releaseNotes.value.filter(n => n.id !== id);
+      releaseNotes.value = releaseNotes.value.filter((n) => n.id !== id);
     } finally {
       loading.value = false;
     }

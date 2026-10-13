@@ -4,7 +4,9 @@
       <q-spinner-puff size="30px" color="primary" />
     </div>
     <q-form v-else @submit="submit">
-      <div class="text-subtitle2 q-mb-sm">Players in Tie Group (Order determines rank)</div>
+      <div class="text-subtitle2 q-mb-sm">
+        Players in Tie Group (Order determines rank)
+      </div>
       <q-list bordered separator class="rounded-borders q-mb-md bg-white">
         <q-item v-for="(member, index) in sortedMembers" :key="member.profile">
           <q-item-section avatar>
@@ -45,7 +47,7 @@
         map-options
         required
         class="q-mb-md"
-        :rules="[val => !!val || 'Reason is required']"
+        :rules="[(val) => !!val || 'Reason is required']"
       />
 
       <q-input
@@ -105,7 +107,10 @@ const fetchReasons = async () => {
     }
   } catch (e) {
     console.error('Error fetching reasons:', e);
-    $q.notify({ type: 'negative', message: 'Failed to load tie resolution reasons' });
+    $q.notify({
+      type: 'negative',
+      message: 'Failed to load tie resolution reasons',
+    });
   } finally {
     loadingReasons.value = false;
   }
@@ -126,8 +131,8 @@ const submit = async () => {
     await resolveTie(props.leagueId, {
       group_key: props.groupKey,
       reason: reason.value,
-      player_order: sortedMembers.value.map(m => m.profile),
-      note: note.value
+      player_order: sortedMembers.value.map((m) => m.profile),
+      note: note.value,
     });
     $q.notify({ type: 'positive', message: 'Tie group resolved successfully' });
     emit('onSuccess');

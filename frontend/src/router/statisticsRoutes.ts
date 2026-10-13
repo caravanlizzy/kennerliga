@@ -1,6 +1,11 @@
 export default {
   path: 'statistics/',
-  meta: { requiresAuth: true, requiresAdmin: false, label: 'Statistics', icon: 'query_stats' },
+  meta: {
+    requiresAuth: true,
+    requiresAdmin: false,
+    label: 'Statistics',
+    icon: 'query_stats',
+  },
   children: [
     {
       path: '',

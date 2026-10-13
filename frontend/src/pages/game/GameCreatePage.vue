@@ -3,7 +3,11 @@
     <div class="row justify-center">
       <div class="col-12 col-md-10 col-lg-8">
         <q-card flat bordered class="q-pa-lg shadow-2">
-          <h1 class="text-h5 q-my-none q-mb-lg text-weight-bold text-dark tracking-tight">New Game</h1>
+          <h1
+            class="text-h5 q-my-none q-mb-lg text-weight-bold text-dark tracking-tight"
+          >
+            New Game
+          </h1>
 
           <q-form
             @submit.prevent="onSubmit"
@@ -46,7 +50,11 @@
                     label="Min Players"
                     v-model.number="minPlayers"
                     type="number"
-                    :rules="[val => val !== null && val !== undefined || 'Required', val => val >= 1 || 'Min 1 player']"
+                    :rules="[
+                      (val) =>
+                        (val !== null && val !== undefined) || 'Required',
+                      (val) => val >= 1 || 'Min 1 player',
+                    ]"
                   />
                 </div>
                 <div class="col-12 col-sm-4">
@@ -54,7 +62,12 @@
                     label="Max Players"
                     v-model.number="maxPlayers"
                     type="number"
-                    :rules="[val => val !== null && val !== undefined || 'Required', val => val >= (minPlayers || 1) || 'Must be >= min players']"
+                    :rules="[
+                      (val) =>
+                        (val !== null && val !== undefined) || 'Required',
+                      (val) =>
+                        val >= (minPlayers || 1) || 'Must be >= min players',
+                    ]"
                   />
                 </div>
               </div>
@@ -64,7 +77,9 @@
 
             <!-- Game options -->
             <section>
-              <div class="row items-center justify-between q-mb-md sticky-options-header">
+              <div
+                class="row items-center justify-between q-mb-md sticky-options-header"
+              >
                 <div class="text-h6 text-grey-8">Game Options</div>
                 <KennerButton
                   color="primary"
@@ -137,7 +152,9 @@
                           v-model="opt.has_choices"
                           label="Has choices"
                           color="primary"
-                          @update:model-value="() => ensureMinimumChoices(opt.ref)"
+                          @update:model-value="
+                            () => ensureMinimumChoices(opt.ref)
+                          "
                         />
                         <q-icon
                           name="help_outline"

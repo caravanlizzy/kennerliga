@@ -1,8 +1,14 @@
 <template>
   <div class="league-action-summary">
-    <div v-if="!hideTitle" class="row items-center q-gutter-x-xs q-mb-xs text-grey-8">
+    <div
+      v-if="!hideTitle"
+      class="row items-center q-gutter-x-xs q-mb-xs text-grey-8"
+    >
       <q-icon name="history" size="16px" color="primary" />
-      <span class="text-caption text-weight-bold text-uppercase" style="letter-spacing: 0.05em">
+      <span
+        class="text-caption text-weight-bold text-uppercase"
+        style="letter-spacing: 0.05em"
+      >
         Action Summary
       </span>
     </div>

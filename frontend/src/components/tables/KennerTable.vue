@@ -9,14 +9,27 @@
     table-class="kenner-table__body"
   >
     <template v-slot:top-left>
-      <div v-if="title" class="row items-center no-wrap kenner-table__title-wrap">
+      <div
+        v-if="title"
+        class="row items-center no-wrap kenner-table__title-wrap"
+      >
         <template v-if="title.includes('KennerLiga')">
-          <span v-if="title.split('KennerLiga')[0].trim()" class="text-h6 text-weight-bolder kenner-table__title q-mr-sm">{{ title.split('KennerLiga')[0] }}</span>
+          <span
+            v-if="title.split('KennerLiga')[0].trim()"
+            class="text-h6 text-weight-bolder kenner-table__title q-mr-sm"
+            >{{ title.split('KennerLiga')[0] }}</span
+          >
           <BrandLogo icon-size="32px" word-size="1.25rem" />
-          <span v-if="title.split('KennerLiga')[1].trim()" class="text-h6 text-weight-bolder kenner-table__title q-ml-sm">{{ title.split('KennerLiga')[1] }}</span>
+          <span
+            v-if="title.split('KennerLiga')[1].trim()"
+            class="text-h6 text-weight-bolder kenner-table__title q-ml-sm"
+            >{{ title.split('KennerLiga')[1] }}</span
+          >
         </template>
         <template v-else>
-          <span class="text-h6 text-weight-bolder kenner-table__title">{{ title }}</span>
+          <span class="text-h6 text-weight-bolder kenner-table__title">{{
+            title
+          }}</span>
         </template>
       </div>
     </template>
@@ -95,7 +108,11 @@ const pagination = ref({
 
 :deep(.q-table__top) {
   padding: 16px 20px;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.6) 0%, rgba(255, 255, 255, 0.15) 100%);
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.6) 0%,
+    rgba(255, 255, 255, 0.15) 100%
+  );
   border-bottom: 1px solid var(--kenner-border-color);
 }
 
@@ -147,7 +164,11 @@ const pagination = ref({
 // Dark: translucent white header wash and slate body text don't fit tokens
 .body--dark .kenner-table {
   :deep(.q-table__top) {
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.06) 0%, rgba(255, 255, 255, 0.02) 100%);
+    background: linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.06) 0%,
+      rgba(255, 255, 255, 0.02) 100%
+    );
   }
 
   :deep(.kenner-table__body) {
@@ -158,5 +179,4 @@ const pagination = ref({
     background: var(--kenner-hover-bg);
   }
 }
-
 </style>

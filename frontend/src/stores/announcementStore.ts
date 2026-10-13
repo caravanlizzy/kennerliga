@@ -42,7 +42,7 @@ export const useAnnouncementStore = defineStore('announcement', () => {
   }
 
   async function addAnnouncement(
-    announcement: AnnouncementCreate,
+    announcement: AnnouncementCreate
   ): Promise<TAnnouncementDto> {
     loading.value = true;
     try {
@@ -58,7 +58,7 @@ export const useAnnouncementStore = defineStore('announcement', () => {
     loading.value = true;
     try {
       await api.delete(`${BASE_URL}${id}/`);
-      announcements.value = announcements.value.filter(a => a.id !== id);
+      announcements.value = announcements.value.filter((a) => a.id !== id);
     } finally {
       loading.value = false;
     }

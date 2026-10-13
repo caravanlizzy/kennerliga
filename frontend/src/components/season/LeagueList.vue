@@ -12,7 +12,9 @@
 
     <q-item-section>
       <div class="row items-center q-gutter-x-sm q-mb-xs">
-        <span class="text-subtitle1 text-weight-bold text-dark">League {{ league.level }}</span>
+        <span class="text-subtitle1 text-weight-bold text-dark"
+          >League {{ league.level }}</span
+        >
         <q-badge v-if="league.is_completed" color="positive" class="q-pa-xs">
           <q-icon name="check_circle" size="12px" class="q-mr-xs" />
           <span>Complete</span>
@@ -64,7 +66,11 @@
           @click.stop="onDelete"
         >
           <KennerTooltip>
-            {{ league.has_results ? 'Cannot remove: match results exist in this league' : 'Remove league' }}
+            {{
+              league.has_results
+                ? 'Cannot remove: match results exist in this league'
+                : 'Remove league'
+            }}
           </KennerTooltip>
         </KennerButton>
       </div>

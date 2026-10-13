@@ -1,45 +1,88 @@
 <template>
   <q-card flat bordered class="rounded-borders overflow-hidden surface-card">
-    <q-card-section class="surface-card-header text-weight-bold text-uppercase letter-spacing-1 q-py-sm row items-center justify-between">
+    <q-card-section
+      class="surface-card-header text-weight-bold text-uppercase letter-spacing-1 q-py-sm row items-center justify-between"
+    >
       <div class="row items-center q-gutter-x-sm">
         <q-icon name="insights" size="xs" />
         <div class="text-caption text-weight-bolder">Performance</div>
       </div>
-      <div class="text-caption text-weight-bold opacity-60">{{ overallStats.total_games }} Games Total</div>
+      <div class="text-caption text-weight-bold opacity-60">
+        {{ overallStats.total_games }} Games Total
+      </div>
     </q-card-section>
     <q-card-section class="q-pa-md">
       <div class="row q-col-gutter-sm q-mb-lg">
         <div class="col-4">
           <q-card flat bordered class="column items-center q-pa-sm stat-tile">
-            <div class="text-h5 text-weight-bolder text-positive">{{ (overallStats.wins / (overallStats.total_games || 1) * 100).toFixed(0) }}<span class="text-caption text-weight-medium">%</span></div>
-            <div class="text-caption text-grey-6 text-uppercase text-weight-bolder letter-spacing-1 q-mt-xs" style="font-size: 0.65rem">Win Rate</div>
+            <div class="text-h5 text-weight-bolder text-positive">
+              {{
+                (
+                  (overallStats.wins / (overallStats.total_games || 1)) *
+                  100
+                ).toFixed(0)
+              }}<span class="text-caption text-weight-medium">%</span>
+            </div>
+            <div
+              class="text-caption text-grey-6 text-uppercase text-weight-bolder letter-spacing-1 q-mt-xs"
+              style="font-size: 0.65rem"
+            >
+              Win Rate
+            </div>
           </q-card>
         </div>
         <div class="col-4">
           <q-card flat bordered class="column items-center q-pa-sm stat-tile">
-            <div class="text-h5 text-weight-bolder text-primary">#{{ (overallStats.avg_pos || 0).toFixed(1) }}</div>
-            <div class="text-caption text-grey-6 text-uppercase text-weight-bolder letter-spacing-1 q-mt-xs" style="font-size: 0.65rem">Avg Pos</div>
+            <div class="text-h5 text-weight-bolder text-primary">
+              #{{ (overallStats.avg_pos || 0).toFixed(1) }}
+            </div>
+            <div
+              class="text-caption text-grey-6 text-uppercase text-weight-bolder letter-spacing-1 q-mt-xs"
+              style="font-size: 0.65rem"
+            >
+              Avg Pos
+            </div>
           </q-card>
         </div>
         <div class="col-4">
           <q-card flat bordered class="column items-center q-pa-sm stat-tile">
             <div class="text-h5 text-weight-bolder text-indigo-7">
-              {{ elo?.rating !== undefined && elo?.rating !== null ? Math.round(elo.rating) : 1500 }}
+              {{
+                elo?.rating !== undefined && elo?.rating !== null
+                  ? Math.round(elo.rating)
+                  : 1500
+              }}
             </div>
-            <div class="text-caption text-grey-6 text-uppercase text-weight-bolder letter-spacing-1 q-mt-xs" style="font-size: 0.65rem">
+            <div
+              class="text-caption text-grey-6 text-uppercase text-weight-bolder letter-spacing-1 q-mt-xs"
+              style="font-size: 0.65rem"
+            >
               {{ elo?.rank ? `#${elo.rank} Elo` : 'Elo' }}
             </div>
           </q-card>
         </div>
       </div>
 
-      <div class="text-caption text-uppercase text-weight-bolder text-grey-6 q-mb-sm letter-spacing-1">Rank Distribution</div>
+      <div
+        class="text-caption text-uppercase text-weight-bolder text-grey-6 q-mb-sm letter-spacing-1"
+      >
+        Rank Distribution
+      </div>
       <div class="column q-gutter-y-xs">
-        <div v-for="pos in [1, 2, 3, 4]" :key="pos" class="distribution-row row items-center q-col-gutter-sm q-py-xs">
-          <div class="col-2 text-weight-bold text-grey-7">{{ pos }}{{ getOrdinal(pos) }}</div>
+        <div
+          v-for="pos in [1, 2, 3, 4]"
+          :key="pos"
+          class="distribution-row row items-center q-col-gutter-sm q-py-xs"
+        >
+          <div class="col-2 text-weight-bold text-grey-7">
+            {{ pos }}{{ getOrdinal(pos) }}
+          </div>
           <div class="col">
             <q-linear-progress
-              :value="(overallStats.positions[pos] || 0) / (overallStats.total_games || 1)"
+              :value="
+                (overallStats.positions[pos] || 0) /
+                (overallStats.total_games || 1)
+              "
               size="8px"
               :color="getPosColor(pos)"
               track-color="grey-2"
@@ -82,11 +125,16 @@ function getOrdinal(n: number) {
 
 function getPosColor(pos: number) {
   switch (pos) {
-    case 1: return 'amber-8';
-    case 2: return 'blue-grey-4';
-    case 3: return 'orange-9';
-    case 4: return 'brown-5';
-    default: return 'grey-6';
+    case 1:
+      return 'amber-8';
+    case 2:
+      return 'blue-grey-4';
+    case 3:
+      return 'orange-9';
+    case 4:
+      return 'brown-5';
+    default:
+      return 'grey-6';
   }
 }
 
@@ -123,5 +171,7 @@ function getPosColorClass(pos: number) {
   }
 }
 
-.letter-spacing-1 { letter-spacing: 1px; }
+.letter-spacing-1 {
+  letter-spacing: 1px;
+}
 </style>

@@ -6,7 +6,9 @@
           <q-icon name="leaderboard" color="primary" size="22px" />
         </div>
         <div class="column">
-          <div class="text-subtitle1 text-weight-bolder text-dark line-height-1">
+          <div
+            class="text-subtitle1 text-weight-bolder text-dark line-height-1"
+          >
             Picks &amp; Bans
           </div>
           <div class="text-caption text-grey-6">
@@ -21,12 +23,21 @@
     <q-card-section class="row q-col-gutter-md">
       <div class="col-12 col-sm-6">
         <div class="podium-title row items-center q-mb-sm">
-          <q-icon name="check_circle" size="16px" class="text-positive q-mr-xs" />
-          <span class="text-caption text-weight-bolder text-uppercase text-grey-8">
+          <q-icon
+            name="check_circle"
+            size="16px"
+            class="text-positive q-mr-xs"
+          />
+          <span
+            class="text-caption text-weight-bolder text-uppercase text-grey-8"
+          >
             Most Picked
           </span>
         </div>
-        <div v-if="mostPicked.length === 0" class="text-caption text-grey-6 q-py-sm">
+        <div
+          v-if="mostPicked.length === 0"
+          class="text-caption text-grey-6 q-py-sm"
+        >
           No picks recorded yet.
         </div>
         <div
@@ -35,20 +46,29 @@
           class="popular-row row items-center no-wrap"
           @click="$emit('select', game.game_id)"
         >
-          <span class="rank-badge" :class="`rank-badge--${idx}`">{{ idx + 1 }}</span>
+          <span class="rank-badge" :class="`rank-badge--${idx}`">{{
+            idx + 1
+          }}</span>
           <span class="popular-row__name ellipsis">{{ game.name }}</span>
-          <span class="popular-row__count text-positive">{{ game.count }}&times;</span>
+          <span class="popular-row__count text-positive"
+            >{{ game.count }}&times;</span
+          >
         </div>
       </div>
 
       <div class="col-12 col-sm-6">
         <div class="podium-title row items-center q-mb-sm">
           <q-icon name="block" size="16px" class="text-negative q-mr-xs" />
-          <span class="text-caption text-weight-bolder text-uppercase text-grey-8">
+          <span
+            class="text-caption text-weight-bolder text-uppercase text-grey-8"
+          >
             Most Banned
           </span>
         </div>
-        <div v-if="mostBanned.length === 0" class="text-caption text-grey-6 q-py-sm">
+        <div
+          v-if="mostBanned.length === 0"
+          class="text-caption text-grey-6 q-py-sm"
+        >
           No bans recorded yet.
         </div>
         <div
@@ -57,9 +77,13 @@
           class="popular-row row items-center no-wrap"
           @click="$emit('select', game.game_id)"
         >
-          <span class="rank-badge" :class="`rank-badge--${idx}`">{{ idx + 1 }}</span>
+          <span class="rank-badge" :class="`rank-badge--${idx}`">{{
+            idx + 1
+          }}</span>
           <span class="popular-row__name ellipsis">{{ game.name }}</span>
-          <span class="popular-row__count text-negative">{{ game.count }}&times;</span>
+          <span class="popular-row__count text-negative"
+            >{{ game.count }}&times;</span
+          >
         </div>
       </div>
     </q-card-section>
