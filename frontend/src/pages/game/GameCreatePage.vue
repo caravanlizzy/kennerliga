@@ -64,7 +64,7 @@
 
             <!-- Game options -->
             <section>
-              <div class="row items-center justify-between q-mb-md">
+              <div class="row items-center justify-between q-mb-md sticky-options-header">
                 <div class="text-h6 text-grey-8">Game Options</div>
                 <KennerButton
                   color="primary"
@@ -393,6 +393,16 @@
                     </q-card-section>
                   </q-card>
                 </div>
+
+                <div class="row justify-center q-pt-sm">
+                  <KennerButton
+                    outline
+                    color="primary"
+                    label="Add option"
+                    icon="add"
+                    @click="onAddOption"
+                  />
+                </div>
               </div>
             </section>
 
@@ -538,6 +548,13 @@ const onSubmit = async () => {
 </script>
 
 <style scoped>
+.sticky-options-header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: var(--kenner-card-bg, #ffffff);
+  padding: 8px 0;
+}
 .border-dashed {
   border: 2px dashed var(--kenner-surface-strong);
 }
