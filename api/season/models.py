@@ -57,8 +57,6 @@ class Season(models.Model):
         if not self.participants.exists() or not self.results.exists():
             return False
 
-        if self.status == self.SeasonStatus.DONE:
-            return True
         leagues = list(self.leagues.all())
         if not leagues:
             return False

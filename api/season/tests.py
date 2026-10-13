@@ -81,6 +81,27 @@ class SeasonLogicTests(TestCase):
         )
         self.assertTrue(empty_done_season.is_completed)
 
+        # 4. Season with status DONE, participants and some results, but unfinished games -> False
+        incomplete_done_season = Season.objects.create(
+            year=2025, month=11, status=Season.SeasonStatus.DONE
+        )
+        p_a = PlayerProfile.objects.create(profile_name="P_A")
+        p_b = PlayerProfile.objects.create(profile_name="P_B")
+        sp_a = SeasonParticipant.objects.create(season=incomplete_done_season, profile=p_a)
+        sp_b = SeasonParticipant.objects.create(season=incomplete_done_season, profile=p_b)
+        league_2p = League.objects.create(season=incomplete_done_season, level=1)
+        league_2p.members.add(sp_a, sp_b)
+        sg_a = SelectedGame.objects.create(league=league_2p, profile=p_a, game=game)
+        Result.objects.create(
+            season=incomplete_done_season,
+            league=league_2p,
+            selected_game=sg_a,
+            player_profile=p_a,
+            points=10,
+            position=1,
+        )
+        self.assertFalse(incomplete_done_season.is_completed)
+
     def test_season_lifecycle(self):
         # Create a running season
         season = Season.objects.create(
@@ -153,6 +174,34 @@ class SeasonAPITests(TestCase):
         p = PlayerProfile.objects.create(profile_name="Participant_Only")
         SeasonParticipant.objects.create(season=incomplete_season, profile=p)
         resp = self.client.get(f"/api/season/seasons/{incomplete_season.id}/")
+        self.assertEqual(resp.status_code, 200)
+        self.assertFalse(resp.data["is_completed"])
+        self.assertFalse(resp.data["is_empty"])
+        self.assertTrue(resp.data["is_incomplete"])
+
+        # 3. Incomplete DONE season: participants and partial results exist
+        partial_season = Season.objects.create(
+            year=2025, month=7, status=Season.SeasonStatus.DONE
+        )
+        p_p1 = PlayerProfile.objects.create(profile_name="P_P1")
+        p_p2 = PlayerProfile.objects.create(profile_name="P_P2")
+        sp_p1 = SeasonParticipant.objects.create(season=partial_season, profile=p_p1)
+        sp_p2 = SeasonParticipant.objects.create(season=partial_season, profile=p_p2)
+        l_partial = League.objects.create(season=partial_season, level=1)
+        l_partial.members.add(sp_p1, sp_p2)
+        platform_p = Platform.objects.create(name="BGA_Part")
+        game_p = Game.objects.create(name="GamePart", platform=platform_p)
+        sg_part = SelectedGame.objects.create(league=l_partial, profile=p_p1, game=game_p)
+        from result.models import Result
+        Result.objects.create(
+            season=partial_season,
+            league=l_partial,
+            selected_game=sg_part,
+            player_profile=p_p1,
+            points=10,
+            position=1,
+        )
+        resp = self.client.get(f"/api/season/seasons/{partial_season.id}/")
         self.assertEqual(resp.status_code, 200)
         self.assertFalse(resp.data["is_completed"])
         self.assertFalse(resp.data["is_empty"])
