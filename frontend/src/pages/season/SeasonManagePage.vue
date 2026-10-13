@@ -346,7 +346,7 @@
             <template #no-option>
               <q-item>
                 <q-item-section class="text-grey">
-                  No participants registered for this season yet
+                  No unassigned participants available
                 </q-item-section>
               </q-item>
             </template>
@@ -434,8 +434,22 @@ const newLeagueMemberIds = ref<number[]>([]);
 const addingLeague = ref(false);
 const addLeagueError = ref<string | null>(null);
 
+const assignedParticipantIds = computed(() => {
+  const ids = new Set<number>();
+  leagues.value.forEach((l) => {
+    (l.members || []).forEach((m) => ids.add(m.id));
+  });
+  return ids;
+});
+
+const availableParticipantsForLeague = computed(() => {
+  return participants.value.filter(
+    (p) => !assignedParticipantIds.value.has(p.id)
+  );
+});
+
 const participantOptions = computed(() => {
-  return participants.value.map((p) => ({
+  return availableParticipantsForLeague.value.map((p) => ({
     label:
       p.username && p.username !== p.profile_name
         ? `${p.profile_name} (@${p.username})`

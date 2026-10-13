@@ -231,6 +231,7 @@ import { useRoute } from 'vue-router';
 import { useQuasar } from 'quasar';
 import {
   fetchLeagueDetails,
+  fetchLeaguesForSeason,
   setLeagueActivePlayer,
   setLeagueStatus,
   updateLeague,
@@ -293,11 +294,28 @@ const activeForm = ref<TActiveForm | null>(null);
 const showManageMembersDialog = ref(false);
 const selectedLeagueMemberIds = ref<number[]>([]);
 const seasonParticipants = ref<TSeasonParticipantDto[]>([]);
+const seasonLeagues = ref<TLeagueDto[]>([]);
 const savingMembers = ref(false);
 const manageMembersError = ref<string | null>(null);
 
+const assignedToOtherLeaguesIds = computed(() => {
+  const ids = new Set<number>();
+  seasonLeagues.value.forEach((l) => {
+    if (!league.value || l.id !== league.value.id) {
+      (l.members || []).forEach((m) => ids.add(m.id));
+    }
+  });
+  return ids;
+});
+
+const availableSeasonParticipants = computed(() => {
+  return seasonParticipants.value.filter(
+    (p) => !assignedToOtherLeaguesIds.value.has(p.id)
+  );
+});
+
 const seasonParticipantOptions = computed(() => {
-  return seasonParticipants.value.map((p) => ({
+  return availableSeasonParticipants.value.map((p) => ({
     label:
       p.username && p.username !== p.profile_name
         ? `${p.profile_name} (@${p.username})`
@@ -312,9 +330,12 @@ async function openManageMembersDialog() {
   selectedLeagueMemberIds.value = (league.value.members || []).map((m) => m.id);
   showManageMembersDialog.value = true;
   try {
-    seasonParticipants.value = await fetchSeasonParticipants(
-      league.value.season
-    );
+    const [parts, allLeagues] = await Promise.all([
+      fetchSeasonParticipants(league.value.season),
+      fetchLeaguesForSeason(league.value.season),
+    ]);
+    seasonParticipants.value = parts;
+    seasonLeagues.value = allLeagues;
   } catch (e: any) {
     manageMembersError.value =
       e?.message || 'Failed to load season participants.';

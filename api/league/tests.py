@@ -219,3 +219,22 @@ class LeagueServiceTests(TestCase):
         )
         self.assertEqual(response.status_code, 400)
         self.assertIn("member_ids", response.data)
+
+    def test_cannot_add_participant_already_assigned_to_another_league(self):
+        client = APIClient()
+        admin_user = User.objects.create_superuser(username="admin_dup", password="pw")
+        client.force_authenticate(user=admin_user)
+
+        # self.participants are already in self.league (level 1)
+        # Creating a new league (level 2) with participant[0] should fail
+        response = client.post(
+            "/api/league/leagues/",
+            {
+                "season": self.season.id,
+                "level": 2,
+                "member_ids": [self.participants[0].id],
+            },
+            format="json",
+        )
+        self.assertEqual(response.status_code, 400)
+        self.assertIn("member_ids", response.data)

@@ -68,6 +68,23 @@ class LeagueSerializer(serializers.ModelSerializer):
                         "member_ids": f"All members must belong to season {season.id}. Offenders: {invalid}"
                     }
                 )
+
+            # Ensure members are not already assigned to another league in this season
+            other_leagues = season.leagues.all()
+            if self.instance and self.instance.pk:
+                other_leagues = other_leagues.exclude(pk=self.instance.pk)
+
+            already_assigned = SeasonParticipant.objects.filter(
+                id__in=[sp.id for sp in members],
+                leagues_member__in=other_leagues,
+            ).distinct()
+            if already_assigned.exists():
+                names = [sp.profile.profile_name for sp in already_assigned]
+                raise serializers.ValidationError(
+                    {
+                        "member_ids": f"Player(s) already assigned to another league: {', '.join(names)}"
+                    }
+                )
         if self.instance and "member_ids" in attrs:
             from result.models import Result
 
