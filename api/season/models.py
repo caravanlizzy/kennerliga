@@ -54,6 +54,9 @@ class Season(models.Model):
     def is_completed(self) -> bool:
         from league.queries import are_leagues_finished
 
+        if not self.participants.exists() or not self.results.exists():
+            return False
+
         if self.status == self.SeasonStatus.DONE:
             return True
         leagues = list(self.leagues.all())

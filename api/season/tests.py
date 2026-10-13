@@ -52,6 +52,35 @@ class SeasonLogicTests(TestCase):
         self.user = User.objects.create_superuser(username="admin", password="password")
         self.client.force_authenticate(user=self.user)
 
+    def test_season_is_completed_requires_participants_and_results(self):
+        # 1. Season with status DONE but no participants and no results -> False
+        empty_done_season = Season.objects.create(
+            year=2025, month=10, status=Season.SeasonStatus.DONE
+        )
+        self.assertFalse(empty_done_season.is_completed)
+
+        # 2. Season with participants, but no results, status DONE -> False
+        p1 = PlayerProfile.objects.create(profile_name="P1")
+        sp1 = SeasonParticipant.objects.create(season=empty_done_season, profile=p1)
+        self.assertFalse(empty_done_season.is_completed)
+
+        # 3. Season with participants and results, status DONE -> True
+        platform = Platform.objects.create(name="BGA_Test")
+        game = Game.objects.create(name="Game1", platform=platform)
+        league = League.objects.create(season=empty_done_season, level=1)
+        league.members.add(sp1)
+        sg = SelectedGame.objects.create(league=league, profile=p1, game=game)
+        from result.models import Result
+        Result.objects.create(
+            season=empty_done_season,
+            league=league,
+            selected_game=sg,
+            player_profile=p1,
+            points=10,
+            position=1,
+        )
+        self.assertTrue(empty_done_season.is_completed)
+
     def test_season_lifecycle(self):
         # Create a running season
         season = Season.objects.create(
@@ -105,6 +134,29 @@ class SeasonAPITests(TestCase):
         response = self.client.get("/api/season/seasons/current-champion/")
         self.assertEqual(response.status_code, 200)
         self.assertIsNone(response.data)
+
+    def test_season_serializer_flags_for_empty_and_done_seasons(self):
+        # 1. Empty DONE season: no participants, no results
+        empty_season = Season.objects.create(
+            year=2025, month=9, status=Season.SeasonStatus.DONE
+        )
+        resp = self.client.get(f"/api/season/seasons/{empty_season.id}/")
+        self.assertEqual(resp.status_code, 200)
+        self.assertFalse(resp.data["is_completed"])
+        self.assertTrue(resp.data["is_empty"])
+        self.assertFalse(resp.data["is_incomplete"])
+
+        # 2. Incomplete DONE season: participants exist, but no results
+        incomplete_season = Season.objects.create(
+            year=2025, month=8, status=Season.SeasonStatus.DONE
+        )
+        p = PlayerProfile.objects.create(profile_name="Participant_Only")
+        SeasonParticipant.objects.create(season=incomplete_season, profile=p)
+        resp = self.client.get(f"/api/season/seasons/{incomplete_season.id}/")
+        self.assertEqual(resp.status_code, 200)
+        self.assertFalse(resp.data["is_completed"])
+        self.assertFalse(resp.data["is_empty"])
+        self.assertTrue(resp.data["is_incomplete"])
 
     def test_season_participant_has_results_and_deletion(self):
         admin = User.objects.create_superuser(username="admin_p", password="pw")
@@ -217,6 +269,20 @@ class SeasonAPITests(TestCase):
             avatar_color="#dc2626",
         )
         p1 = PlayerProfile.objects.create(user=user, profile_name="Winner Profile")
+        sp1 = SeasonParticipant.objects.create(season=s_done, profile=p1)
+        l1.members.add(sp1)
+        platform = Platform.objects.create(name="BGA_Winner_Test")
+        game = Game.objects.create(name="GameW", platform=platform)
+        sg = SelectedGame.objects.create(league=l1, profile=p1, game=game)
+        from result.models import Result
+        Result.objects.create(
+            season=s_done,
+            league=l1,
+            selected_game=sg,
+            player_profile=p1,
+            points=30,
+            position=1,
+        )
         LeagueStanding.objects.create(league=l1, player_profile=p1, league_points=30)
 
         response = self.client.get(f"/api/season/seasons/{s_done.id}/league-winners/")
