@@ -31,11 +31,95 @@
       </div>
     </div>
 
-    <div>
-      <div class="text-subtitle1 text-weight-bold">Leagues (Optional)</div>
-      <div class="text-caption text-grey-7">
-        Assign players to specific leagues and order their positions. You can
-        also create the season without leagues and manage them later.
+    <!-- Selected Season Participants Order -->
+    <div
+      v-if="memberList.length > 0"
+      class="column q-gutter-xs q-pa-md"
+      style="border: 1px solid var(--kenner-border-strong); border-radius: 8px"
+    >
+      <div class="row items-center justify-between">
+        <div>
+          <div class="text-subtitle2 text-weight-bold">
+            Season Participants ({{ memberList.length }} selected)
+          </div>
+          <div class="text-caption text-grey-7">
+            Order defines participant rank and initial league seeding.
+          </div>
+        </div>
+        <KennerButton
+          outline
+          color="primary"
+          icon="tune"
+          label="Distribute to Leagues"
+          @click="distributePlayers"
+        />
+      </div>
+
+      <div class="column q-gutter-xs q-mt-sm">
+        <div
+          v-for="(pid, pIdx) in memberList"
+          :key="pid"
+          class="row items-center q-py-xs q-px-sm bg-grey-2 text-dark rounded-borders"
+        >
+          <div class="text-weight-bold q-mr-sm" style="min-width: 28px">
+            #{{ pIdx + 1 }}
+          </div>
+          <div class="col ellipsis">{{ getProfileName(pid) }}</div>
+          <div class="row q-gutter-xs items-center">
+            <q-btn
+              flat
+              dense
+              round
+              size="sm"
+              icon="arrow_upward"
+              :disable="pIdx === 0"
+              @click="moveParticipantUp(pIdx)"
+            >
+              <q-tooltip>Move Up</q-tooltip>
+            </q-btn>
+            <q-btn
+              flat
+              dense
+              round
+              size="sm"
+              icon="arrow_downward"
+              :disable="pIdx === memberList.length - 1"
+              @click="moveParticipantDown(pIdx)"
+            >
+              <q-tooltip>Move Down</q-tooltip>
+            </q-btn>
+            <q-btn
+              flat
+              dense
+              round
+              size="sm"
+              icon="close"
+              color="negative"
+              @click="removeParticipant(pIdx)"
+            >
+              <q-tooltip>Remove Participant</q-tooltip>
+            </q-btn>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row items-center justify-between">
+      <div>
+        <div class="text-subtitle1 text-weight-bold">Leagues (Optional)</div>
+        <div class="text-caption text-grey-7">
+          Assign players to specific leagues and order their positions. You can
+          also create the season without leagues and manage them later.
+        </div>
+      </div>
+      <div v-if="memberList.length > 0" class="row q-gutter-sm items-center">
+        <KennerButton
+          flat
+          color="primary"
+          icon="tune"
+          label="Distribute to Leagues"
+          @click="distributePlayers"
+        />
       </div>
     </div>
 
@@ -309,6 +393,60 @@ function dedupeAcrossLeagues() {
   });
 }
 
+/* -------------------- Participant list actions -------------------- */
+function moveParticipantUp(idx: number) {
+  if (idx <= 0) return;
+  const temp = memberList.value[idx];
+  memberList.value[idx] = memberList.value[idx - 1];
+  memberList.value[idx - 1] = temp;
+}
+
+function moveParticipantDown(idx: number) {
+  if (idx >= memberList.value.length - 1) return;
+  const temp = memberList.value[idx];
+  memberList.value[idx] = memberList.value[idx + 1];
+  memberList.value[idx + 1] = temp;
+}
+
+function removeParticipant(idx: number) {
+  memberList.value.splice(idx, 1);
+  onMemberListChange(memberList.value);
+}
+
+/* -------------------- Auto-distribute to leagues -------------------- */
+function calculateLeagueSizes(count: number): number[] {
+  if (count <= 0) return [];
+  if (count === 1) return [1];
+  const leagueCount = Math.floor(count / 4);
+  const rest = count % 4;
+  const players = Array(leagueCount).fill(4);
+  if (rest === 1) {
+    if (leagueCount > 0) {
+      players[players.length - 1] = 3;
+    }
+    players.push(2);
+  } else if (rest === 2) {
+    players.push(2);
+  } else if (rest === 3) {
+    players.push(3);
+  }
+  return players;
+}
+
+function distributePlayers() {
+  if (memberList.value.length === 0) return;
+  const sizes = calculateLeagueSizes(memberList.value.length);
+  let offset = 0;
+  preparedLeagues.value = sizes.map((size, idx) => {
+    const members = memberList.value.slice(offset, offset + size);
+    offset += size;
+    return {
+      level: idx + 1,
+      memberProfileIds: members,
+    };
+  });
+}
+
 /* -------------------- League list actions -------------------- */
 function addLeague() {
   preparedLeagues.value.push({
@@ -349,7 +487,11 @@ async function createAll() {
     const orderedProfileIds: number[] = [];
     const addedSet = new Set<number>();
 
-    for (const lg of preparedLeagues.value) {
+    const sortedLeagues = [...preparedLeagues.value].sort(
+      (a, b) => (Number(a.level) || 0) - (Number(b.level) || 0)
+    );
+
+    for (const lg of sortedLeagues) {
       for (const pid of lg.memberProfileIds) {
         const numId = Number(pid);
         if (!addedSet.has(numId)) {
@@ -375,7 +517,7 @@ async function createAll() {
       );
     }
 
-    for (const lg of preparedLeagues.value) {
+    for (const lg of sortedLeagues) {
       if (lg.level == null) continue;
       await createLeagueForSeason(
         seasonId,
