@@ -120,6 +120,7 @@
           @edit-result="selGameId => (activeForm = { type: 'post-result', selGame: findSelGame(selGameId) })"
           @delete-result="selGame => onDeleteResult(selGame)"
           @delete-game="data => onDeleteSelectedGame(data.selGame)"
+          @delete-ban="member => onDeleteBan(member)"
         />
       </div>
     </ContentSection>
@@ -194,7 +195,7 @@ import {
   setLeagueStatus,
   updateLeague,
 } from 'src/services/leagueService';
-import { deleteSelectedGame } from 'src/services/gameService';
+import { deleteSelectedGame, deleteBanDecision } from 'src/services/gameService';
 import { deleteMatchResults } from 'src/services/resultService';
 import { fetchSeason, fetchSeasonParticipants } from 'src/services/seasonService';
 import ContentSection from 'components/base/ContentSection.vue';
@@ -351,6 +352,32 @@ async function onDeleteSelectedGame(selGame: TSelectedGameDto) {
     },
     undefined,
     'Delete'
+  );
+}
+
+async function onDeleteBan(member: TSeasonParticipantDto) {
+  if (!member.ban_decision_id) {
+    $q.notify({ type: 'negative', message: 'No ban decision found to remove' });
+    return;
+  }
+  const label = member.my_banned_game?.game_name
+    ? `ban for "${member.my_banned_game.game_name}"`
+    : 'skipped ban';
+  setDialog(
+    'Remove Ban Decision',
+    `Are you sure you want to remove the ${label} for ${member.profile_name}?`,
+    'warning',
+    async () => {
+      try {
+        await deleteBanDecision(member.ban_decision_id!);
+        await load();
+        $q.notify({ type: 'positive', message: 'Ban decision removed' });
+      } catch (err) {
+        $q.notify({ type: 'negative', message: 'Failed to remove ban decision' });
+      }
+    },
+    undefined,
+    'Remove'
   );
 }
 

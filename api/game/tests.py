@@ -114,6 +114,17 @@ class GameAPITests(TestCase):
         self.assertEqual(response.status_code, 201)
         self.assertEqual(BanDecision.objects.count(), 1)
 
+    def test_delete_ban_decision(self):
+        ban_decision = BanDecision.objects.create(
+            player_banning=self.profile,
+            league=self.league,
+            skipped_ban=True,
+        )
+        self.assertEqual(BanDecision.objects.count(), 1)
+        response = self.client.delete(f"/api/game/ban-decisions/{ban_decision.id}/")
+        self.assertEqual(response.status_code, 204)
+        self.assertEqual(BanDecision.objects.count(), 0)
+
     def test_create_result_config_nested(self):
         new_game = Game.objects.create(
             name="Terraforming Mars", min_players=1, max_players=5, platform=self.platform

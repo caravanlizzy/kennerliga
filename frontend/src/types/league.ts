@@ -19,6 +19,7 @@ export type TSeasonParticipantDto = {
   profile: number; // player_profile id
   selected_games: TSelectedGameDto[] | null;
   my_banned_game: TBannedGame;
+  ban_decision_id?: number | null;
   has_banned: boolean;
   is_active_player: boolean;
   is_prev_unregistered?: boolean;

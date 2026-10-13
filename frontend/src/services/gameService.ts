@@ -501,6 +501,11 @@ export async function deleteSelectedGame(selectedGameId: number): Promise<void> 
   await api.delete(`game/selected-games/${selectedGameId}/`);
 }
 
+/** Deletes a ban decision (admin only). */
+export async function deleteBanDecision(banDecisionId: number): Promise<void> {
+  await api.delete(`game/ban-decisions/${banDecisionId}/`);
+}
+
 /**
  * Games for the admin management list. `manage_only` bypasses the
  * league-availability filtering that `GameViewSet.get_queryset` otherwise

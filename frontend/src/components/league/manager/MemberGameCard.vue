@@ -28,6 +28,7 @@
             size="xs"
             icon="close"
             class="q-ml-xs"
+            @click="$emit('delete-ban', member)"
           >
             <KennerTooltip>Remove Skip</KennerTooltip>
           </KennerButton>
@@ -290,6 +291,17 @@
           >
             (by {{ getOwnerName(member.my_banned_game.profile) }})
           </span>
+          <KennerButton
+            flat
+            round
+            dense
+            size="xs"
+            icon="close"
+            class="q-ml-xs"
+            @click="$emit('delete-ban', member)"
+          >
+            <KennerTooltip>Remove Ban</KennerTooltip>
+          </KennerButton>
         </q-chip>
         <q-chip
           square
@@ -405,6 +417,7 @@ function isReportingDone(member: any): boolean {
 defineEmits([
   'add-game',
   'ban-game',
+  'delete-ban',
   'set-active',
   'edit-game',
   'edit-result',

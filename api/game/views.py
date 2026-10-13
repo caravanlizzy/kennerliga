@@ -252,7 +252,7 @@ class BanDecisionViewSet(ModelViewSet):
     """
     queryset = BanDecision.objects.all()
     serializer_class = BanDecisionSerializer
-    filterset_fields = ["league"]
+    filterset_fields = ["league", "player_banning"]
     permission_classes = [IsAuthenticated]
 
 
