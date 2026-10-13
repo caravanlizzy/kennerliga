@@ -162,6 +162,7 @@
 
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue';
+import { useRouter } from 'vue-router';
 import { fetchProfiles } from 'src/services/userService';
 import KennerInput from 'components/base/KennerInput.vue';
 import KennerButton from 'components/base/KennerButton.vue';
@@ -174,6 +175,7 @@ import {
 import type { TSeasonParticipantDto } from 'src/types';
 
 /* -------------------- State -------------------- */
+const router = useRouter();
 const year = ref<number | null>(null);
 const month = ref<number | null>(null);
 const memberList = ref<number[]>([]); // PlayerProfile IDs as numbers
@@ -384,6 +386,7 @@ async function createAll() {
     }
 
     resetForm();
+    await router.push({ name: 'season-manage', params: { id: seasonId } });
   } catch (e) {
     console.error('Failed to create season & leagues:', e);
   } finally {
