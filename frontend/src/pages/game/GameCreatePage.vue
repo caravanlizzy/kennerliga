@@ -232,7 +232,7 @@
                             flat
                             dense
                             size="sm"
-                            icon="add_rule"
+                            icon="add"
                             label="Add condition group"
                             color="secondary"
                             @click="addAvailabilityGroup(opt.ref)"
@@ -396,10 +396,10 @@
 
                 <div class="row justify-center q-pt-sm">
                   <KennerButton
-                    outline
                     color="primary"
                     label="Add option"
                     icon="add"
+                    unelevated
                     @click="onAddOption"
                   />
                 </div>
