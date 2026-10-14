@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 import { Dark } from 'quasar';
 
 export type ThemeMode = 'auto' | 'dark' | 'light';
@@ -35,6 +35,13 @@ export const useThemeStore = defineStore(
     function initTheme() {
       syncQuasarDark(mode.value);
     }
+
+    watch(
+      () => Dark.isActive,
+      (active) => {
+        isDark.value = active;
+      }
+    );
 
     return {
       mode,
