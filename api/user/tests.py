@@ -22,6 +22,33 @@ class UserAPITests(TestCase):
         response = self.client.get("/api/user/me/current-league/")
         self.assertEqual(response.status_code, 404)
 
+    def test_current_league_is_my_turn_status_bound(self):
+        season = Season.objects.create(year=2026, month=1, status=Season.SeasonStatus.RUNNING)
+        participant = SeasonParticipant.objects.create(season=season, profile=self.profile)
+        league = League.objects.create(season=season, level=1, status=LeagueStatus.PICKING)
+        league.members.add(participant)
+        league.active_player = participant
+        league.save()
+
+        # In PICKING state and active player -> is_my_turn is True
+        res = self.client.get("/api/user/me/current-league/")
+        self.assertEqual(res.status_code, 200)
+        self.assertTrue(res.data["is_my_turn"])
+
+        # In PLAYING state, even if active_player was not cleared -> is_my_turn is False
+        league.status = LeagueStatus.PLAYING
+        league.save()
+        res = self.client.get("/api/user/me/current-league/")
+        self.assertEqual(res.status_code, 200)
+        self.assertFalse(res.data["is_my_turn"])
+
+        # In DONE state -> is_my_turn is False
+        league.status = LeagueStatus.DONE
+        league.save()
+        res = self.client.get("/api/user/me/current-league/")
+        self.assertEqual(res.status_code, 200)
+        self.assertFalse(res.data["is_my_turn"])
+
     def test_get_profiles(self):
         response = self.client.get("/api/user/profiles/")
         self.assertEqual(response.status_code, 200)

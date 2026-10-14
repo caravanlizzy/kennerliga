@@ -91,7 +91,8 @@ def finalize_results(
 
             if all_games_have_results:
                 league.status = LeagueStatus.DONE
-                league.save(update_fields=["status", "updated_at"])
+                league.active_player = None
+                league.save(update_fields=["status", "active_player", "updated_at"])
 
     return saved
 

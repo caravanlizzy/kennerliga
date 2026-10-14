@@ -394,7 +394,11 @@ class LeagueViewSet(ModelViewSet):
             )
 
         league.status = new_status
-        league.save(update_fields=["status", "updated_at"])
+        if new_status in (LeagueStatus.PLAYING, LeagueStatus.DONE):
+            league.active_player = None
+            league.save(update_fields=["status", "active_player", "updated_at"])
+        else:
+            league.save(update_fields=["status", "updated_at"])
 
         return Response(
             {"id": league.id, "status": league.status},

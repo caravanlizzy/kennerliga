@@ -66,6 +66,22 @@ def notify_all_users(title, body, url="/"):
 
 
 def notify_turn(league, participant):
+    if not league or not participant:
+        return
+    from league.models import LeagueStatus
+    from season.models import Season
+
+    if league.status not in (
+        LeagueStatus.PICKING,
+        LeagueStatus.BANNING,
+        LeagueStatus.REPICKING,
+    ):
+        return
+    if league.season and league.season.status != Season.SeasonStatus.RUNNING:
+        return
+    if league.active_player_id != participant.id:
+        return
+
     user_id = participant.profile.user_id
     if user_id is None:
         return

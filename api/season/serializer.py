@@ -297,6 +297,14 @@ class SeasonParticipantSerializer(ModelSerializer):
         league = self._get_league_for_obj(obj)
         if not league:
             return False
+        from league.models import LeagueStatus
+
+        if league.status not in (
+            LeagueStatus.PICKING,
+            LeagueStatus.BANNING,
+            LeagueStatus.REPICKING,
+        ):
+            return False
         # Prefer cached active_player_id (attached by attach_league_lookups)
         active_id = getattr(league, "_active_player_id", None)
         if active_id is None:

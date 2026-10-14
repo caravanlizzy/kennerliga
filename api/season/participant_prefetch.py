@@ -94,8 +94,17 @@ def attach_league_lookups(league: League) -> League:
         )
         .values_list("player_profile_id", flat=True)
     )
-    # ``active_player_id`` is a plain FK column -> no extra query.
-    league._active_player_id = league.active_player_id
+    # ``active_player_id`` is only valid when league is in an active turn state.
+    from league.models import LeagueStatus
+
+    if league.status in (
+        LeagueStatus.PICKING,
+        LeagueStatus.BANNING,
+        LeagueStatus.REPICKING,
+    ):
+        league._active_player_id = league.active_player_id
+    else:
+        league._active_player_id = None
     return league
 
 

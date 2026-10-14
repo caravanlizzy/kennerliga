@@ -474,8 +474,18 @@ class MeViewSet(ViewSet):
                 {"detail": "No league found for current season."}, status=404
             )
 
+        from league.models import LeagueStatus
+
         data = LeagueMinimalSerializer(league).data
-        data["is_my_turn"] = league.active_player == participant
+        data["is_my_turn"] = (
+            league.status
+            in (
+                LeagueStatus.PICKING,
+                LeagueStatus.BANNING,
+                LeagueStatus.REPICKING,
+            )
+            and league.active_player_id == participant.id
+        )
         return Response(data)
 
     @action(detail=False, methods=["get"], url_path="results")

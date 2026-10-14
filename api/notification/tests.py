@@ -137,3 +137,60 @@ def services_webpush_exception(response):
     error = WebPushException("gone")
     error.response = response
     return error
+
+
+class NotifyTurnTests(TestCase):
+    def setUp(self):
+        from league.models import League, LeagueStatus
+        from season.models import Season, SeasonParticipant
+        from user.models import PlayerProfile
+
+        self.user = User.objects.create_user(username="player", password="password")
+        self.profile = PlayerProfile.objects.create(user=self.user, profile_name="player")
+        self.season = Season.objects.create(year=2026, month=1, status=Season.SeasonStatus.RUNNING)
+        self.participant = SeasonParticipant.objects.create(season=self.season, profile=self.profile)
+        self.league = League.objects.create(season=self.season, level=1, status=LeagueStatus.PICKING)
+        self.league.members.add(self.participant)
+        self.league.active_player = self.participant
+        self.league.save()
+
+    def test_notify_turn_when_active_and_picking(self):
+        with mock.patch("notification.services.notify_users") as mock_notify:
+            services.notify_turn(self.league, self.participant)
+            mock_notify.assert_called_once_with(
+                [self.user.id],
+                "Your turn in Kennerliga",
+                f"It is your turn in {self.league}.",
+                "/#/my",
+            )
+
+    def test_no_notify_turn_when_league_playing_or_done(self):
+        from league.models import LeagueStatus
+
+        for status in (LeagueStatus.PLAYING, LeagueStatus.DONE):
+            self.league.status = status
+            self.league.save()
+            with mock.patch("notification.services.notify_users") as mock_notify:
+                services.notify_turn(self.league, self.participant)
+                mock_notify.assert_not_called()
+
+    def test_no_notify_turn_when_season_not_running(self):
+        from season.models import Season
+
+        self.season.status = Season.SeasonStatus.DONE
+        self.season.save()
+        with mock.patch("notification.services.notify_users") as mock_notify:
+            services.notify_turn(self.league, self.participant)
+            mock_notify.assert_not_called()
+
+    def test_no_notify_turn_when_not_active_player(self):
+        from season.models import SeasonParticipant
+        from user.models import PlayerProfile
+
+        other_user = User.objects.create_user(username="other", password="password")
+        other_profile = PlayerProfile.objects.create(user=other_user, profile_name="other")
+        other_participant = SeasonParticipant.objects.create(season=self.season, profile=other_profile)
+
+        with mock.patch("notification.services.notify_users") as mock_notify:
+            services.notify_turn(self.league, other_participant)
+            mock_notify.assert_not_called()
