@@ -237,7 +237,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted } from 'vue';
+import { ref, computed, onMounted, onUnmounted, watch } from 'vue';
 import { storeToRefs } from 'pinia';
 import LoadingSpinner from 'components/base/LoadingSpinner.vue';
 import KennerButton from 'components/base/KennerButton.vue';
@@ -253,9 +253,31 @@ import { useUserStore } from 'stores/userStore';
 import { useUpdateStore } from 'stores/updateStore';
 import { useMyLeagueStore } from 'src/composables/myLeague';
 
+const ACTION_SUMMARY_STORAGE_KEY = 'my_league_action_summary_expanded';
+
+function getInitialActionSummaryExpanded(): boolean {
+  try {
+    const saved = localStorage.getItem(ACTION_SUMMARY_STORAGE_KEY);
+    if (saved !== null) {
+      return saved === 'true';
+    }
+  } catch {
+    // Ignore localStorage errors
+  }
+  return true;
+}
+
 const { user } = storeToRefs(useUserStore());
 const myLeagueStore = useMyLeagueStore();
-const isActionSummaryExpanded = ref(true);
+const isActionSummaryExpanded = ref(getInitialActionSummaryExpanded());
+
+watch(isActionSummaryExpanded, (expanded) => {
+  try {
+    localStorage.setItem(ACTION_SUMMARY_STORAGE_KEY, String(expanded));
+  } catch {
+    // Ignore localStorage errors
+  }
+});
 const {
   loading,
   leagueStatus,

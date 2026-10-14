@@ -15,10 +15,10 @@ import type { TSeasonDto } from 'src/types';
  * Design goals (mirrors the stale-while-revalidate pattern already used by
  * `leagueStore`):
  *
- * - Persist the user's selection (`selectedSeasonYear`, `selectedSeasonMonth`)
- *   and the fetched reference data (`availableYears`, `seasonsByYear`,
- *   `currentSeasonId`) across component unmounts, so navigating away from and
- *   back to the home page renders instantly from cache.
+ * - Cache reference data (`availableYears`, `seasonsByYear`, `currentSeasonId`)
+ *   in memory across component unmounts, so navigating away from and back to
+ *   the home page renders instantly from cache.
+ * - By default, opens the current season when initialized.
  * - Distinguish a blocking `loading` state (only true on the very first init,
  *   when there is nothing to show yet) from a non-blocking `refreshing` state
  *   (background refresh while cached data is still visible).
@@ -30,9 +30,7 @@ import type { TSeasonDto } from 'src/types';
  * composable did, so its consumers (`AuthenticatedHomeDashboard`,
  * `HomeSeasonSection`) can be migrated with minimal churn.
  */
-export const useHomeSeasonStore = defineStore(
-  'homeSeason',
-  () => {
+export const useHomeSeasonStore = defineStore('homeSeason', () => {
     // --- Selection state (persisted across mounts) ---
     const selectedYear = ref<number>(new Date().getFullYear());
     const selectedSeasonYear = ref<number | null>(null);
@@ -293,18 +291,5 @@ export const useHomeSeasonStore = defineStore(
       reset,
       selectCurrentSeason,
     };
-  },
-  {
-    persist: {
-      paths: [
-        'selectedYear',
-        'selectedSeasonYear',
-        'selectedSeasonMonth',
-        'availableYears',
-        'seasonsByYear',
-        'currentSeasonId',
-        'initialized',
-      ],
-    },
   }
 );
