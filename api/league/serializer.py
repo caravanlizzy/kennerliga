@@ -20,6 +20,7 @@ class LeagueSerializer(serializers.ModelSerializer):
     members = SerializerMethodField()
     is_completed = SerializerMethodField()
     has_results = SerializerMethodField()
+    progress = SerializerMethodField()
 
     class Meta:
         model = League
@@ -33,7 +34,13 @@ class LeagueSerializer(serializers.ModelSerializer):
             "member_ids",
             "is_completed",
             "has_results",
+            "progress",
         ]
+
+    def get_progress(self, obj):
+        from league.queries import get_league_progress
+
+        return get_league_progress(obj)
 
     def get_has_results(self, obj):
         from result.models import Result
@@ -123,6 +130,7 @@ class LeagueListSerializer(serializers.ModelSerializer):
     is_completed = SerializerMethodField()
     has_results = SerializerMethodField()
     members = SerializerMethodField()
+    progress = SerializerMethodField()
 
     class Meta:
         model = League
@@ -135,6 +143,7 @@ class LeagueListSerializer(serializers.ModelSerializer):
             "is_completed",
             "has_results",
             "members",
+            "progress",
         ]
 
     def get_has_results(self, obj):
@@ -151,6 +160,20 @@ class LeagueListSerializer(serializers.ModelSerializer):
         from season.serializer import SeasonParticipantMiniSerializer
 
         return SeasonParticipantMiniSerializer(obj.members.all(), many=True).data
+
+    def get_progress(self, obj):
+        if self.context and "leagues_progress" in self.context:
+            return self.context["leagues_progress"].get(
+                obj.id,
+                {
+                    "picks": {"current": 0, "total": 0, "missing": 0},
+                    "bans": {"current": 0, "total": 0, "missing": 0},
+                    "reports": {"current": 0, "total": 0, "missing": 0},
+                },
+            )
+        from league.queries import get_league_progress
+
+        return get_league_progress(obj)
 
 
 class LeagueStandingSerializer(serializers.ModelSerializer):

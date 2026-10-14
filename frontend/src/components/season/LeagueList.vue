@@ -36,6 +36,87 @@
         </template>
         <span v-else class="text-caption text-grey-5 italic">None</span>
       </div>
+
+      <div
+        v-if="league.progress"
+        class="row items-center q-gutter-xs q-mt-xs wrap league-progress-row"
+      >
+        <div
+          class="progress-pill"
+          :class="{
+            'progress-pill--done': league.progress.picks.missing === 0,
+          }"
+        >
+          <q-icon name="touch_app" size="13px" class="q-mr-xs" />
+          <span class="text-weight-medium">Picks:</span>
+          <span class="q-ml-xs text-weight-bold"
+            >{{ league.progress.picks.current }}/{{
+              league.progress.picks.total
+            }}</span
+          >
+          <span
+            v-if="league.progress.picks.missing > 0"
+            class="missing-count q-ml-xs"
+            >({{ league.progress.picks.missing }} missing)</span
+          >
+          <q-icon
+            v-else
+            name="check"
+            size="13px"
+            class="q-ml-xs text-positive"
+          />
+        </div>
+
+        <div
+          class="progress-pill"
+          :class="{ 'progress-pill--done': league.progress.bans.missing === 0 }"
+        >
+          <q-icon name="block" size="13px" class="q-mr-xs" />
+          <span class="text-weight-medium">Bans:</span>
+          <span class="q-ml-xs text-weight-bold"
+            >{{ league.progress.bans.current }}/{{
+              league.progress.bans.total
+            }}</span
+          >
+          <span
+            v-if="league.progress.bans.missing > 0"
+            class="missing-count q-ml-xs"
+            >({{ league.progress.bans.missing }} missing)</span
+          >
+          <q-icon
+            v-else
+            name="check"
+            size="13px"
+            class="q-ml-xs text-positive"
+          />
+        </div>
+
+        <div
+          class="progress-pill"
+          :class="{
+            'progress-pill--done': league.progress.reports.missing === 0,
+          }"
+        >
+          <q-icon name="emoji_events" size="13px" class="q-mr-xs" />
+          <span class="text-weight-medium">Reports:</span>
+          <span class="q-ml-xs text-weight-bold"
+            >{{ league.progress.reports.current }}/{{
+              league.progress.reports.total
+            }}</span
+          >
+          <span
+            v-if="league.progress.reports.missing > 0"
+            class="missing-count q-ml-xs"
+            >({{ league.progress.reports.missing }} missing)</span
+          >
+          <q-icon
+            v-else
+            name="check"
+            size="13px"
+            class="q-ml-xs text-positive"
+          />
+        </div>
+      </div>
     </q-item-section>
 
     <q-item-section side>
@@ -123,5 +204,32 @@ function onDelete() {
   border-radius: 50%;
   background: var(--q-primary);
   opacity: 0.6;
+}
+
+.league-progress-row {
+  margin-top: 6px;
+  gap: 6px;
+}
+
+.progress-pill {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.72rem;
+  padding: 2px 8px;
+  border-radius: 12px;
+  background: var(--kenner-surface-subtle, #f5f5f5);
+  border: 1px solid var(--kenner-border-subtle, #e0e0e0);
+  color: var(--kenner-text-secondary, #616161);
+
+  .missing-count {
+    color: var(--q-warning, #f57c00);
+    font-weight: 500;
+  }
+
+  &--done {
+    border-color: rgba(46, 125, 50, 0.25);
+    background: rgba(46, 125, 50, 0.08);
+    color: var(--q-positive, #2e7d32);
+  }
 }
 </style>

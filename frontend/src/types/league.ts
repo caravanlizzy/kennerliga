@@ -31,6 +31,18 @@ export type TSeasonParticipantDto = {
   has_results?: boolean;
 };
 
+export type TProgressItem = {
+  current: number;
+  total: number;
+  missing: number;
+};
+
+export type TLeagueProgress = {
+  picks: TProgressItem;
+  bans: TProgressItem;
+  reports: TProgressItem;
+};
+
 export type TLeagueDto = {
   id: number;
   level: number | string;
@@ -39,6 +51,7 @@ export type TLeagueDto = {
   status?: TLeagueStatus;
   is_completed?: boolean;
   has_results?: boolean;
+  progress?: TLeagueProgress;
 };
 
 export type TBannedGameFull = {

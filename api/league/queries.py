@@ -143,6 +143,159 @@ def is_league_finished(league: League) -> bool:
     return are_leagues_finished([league]).get(league.id, False)
 
 
+def get_league_progress(league: League) -> Dict[str, Any]:
+    """
+    Returns progress of picks, bans, and reports for a single league.
+    """
+    return get_leagues_progress([league]).get(
+        league.id,
+        {
+            "picks": {"current": 0, "total": 0, "missing": 0},
+            "bans": {"current": 0, "total": 0, "missing": 0},
+            "reports": {"current": 0, "total": 0, "missing": 0},
+        },
+    )
+
+
+def get_leagues_progress(leagues: List[League]) -> Dict[int, Dict[str, Any]]:
+    """
+    Calculates progress of picks, bans, and reports for a list of leagues in bulk.
+    """
+    from result.models import Result
+
+    league_ids = [lg.id for lg in leagues]
+    if not league_ids:
+        return {}
+
+    # 1. Member count and member profiles per league
+    member_counts: Dict[int, int] = {lid: 0 for lid in league_ids}
+    members_by_league: Dict[int, List[int]] = defaultdict(list)
+    for row in (
+        League.members.through.objects.filter(league_id__in=league_ids)
+        .values("league_id", "seasonparticipant__profile_id")
+    ):
+        lid = row["league_id"]
+        pid = row["seasonparticipant__profile_id"]
+        member_counts[lid] = member_counts.get(lid, 0) + 1
+        if pid is not None:
+            members_by_league[lid].append(pid)
+
+    # 2. Ban decisions count per league and per (league, selected_game)
+    bans_per_league: Dict[int, int] = defaultdict(int)
+    ban_counts_per_game: Dict[int, Dict[int, int]] = defaultdict(dict)
+    for row in (
+        BanDecision.objects.filter(league_id__in=league_ids)
+        .values("league_id", "selected_game_id")
+        .annotate(c=Count("id"))
+    ):
+        lid = row["league_id"]
+        sg_id = row["selected_game_id"]
+        c = row["c"]
+        bans_per_league[lid] += c
+        if sg_id is not None:
+            ban_counts_per_game[lid][sg_id] = c
+
+    # 3. SelectedGames per league and per profile
+    picks_per_league: Dict[int, int] = defaultdict(int)
+    games_by_league: Dict[int, List[int]] = defaultdict(list)
+    picks_by_profile_per_league: Dict[int, Dict[int, List[int]]] = defaultdict(
+        lambda: defaultdict(list)
+    )
+    for sg_id, lid, profile_id in (
+        SelectedGame.objects.filter(league_id__in=league_ids)
+        .order_by("id")
+        .values_list("id", "league_id", "profile_id")
+    ):
+        picks_per_league[lid] += 1
+        games_by_league[lid].append(sg_id)
+        if profile_id is not None:
+            picks_by_profile_per_league[lid][profile_id].append(sg_id)
+
+    # 4. Result count per selected game
+    result_counts: Dict[int, int] = {}
+    for row in (
+        Result.objects.filter(league_id__in=league_ids)
+        .values("selected_game_id")
+        .annotate(c=Count("id"))
+    ):
+        result_counts[row["selected_game_id"]] = row["c"]
+
+    progress: Dict[int, Dict[str, Any]] = {}
+
+    for lid in league_ids:
+        member_count = member_counts.get(lid, 0)
+        if member_count == 0:
+            progress[lid] = {
+                "picks": {"current": 0, "total": 0, "missing": 0},
+                "bans": {"current": 0, "total": 0, "missing": 0},
+                "reports": {"current": 0, "total": 0, "missing": 0},
+            }
+            continue
+
+        base_picks_per_player = get_game_picks_per_player(member_count)
+        base_expected_picks = member_count * base_picks_per_player
+        required_bans = get_ban_amount_for_success(member_count)
+
+        league_ban_counts = ban_counts_per_game.get(lid, {})
+        banned_game_ids = {
+            sg_id
+            for sg_id, c in league_ban_counts.items()
+            if c >= required_bans
+        }
+
+        # Check repicks needed
+        repicks_needed = 0
+        if banned_game_ids:
+            profile_picks = picks_by_profile_per_league.get(lid, {})
+            league_profiles = members_by_league.get(lid, [])
+            for pid in league_profiles:
+                first_picks = profile_picks.get(pid, [])[:2]
+                if any(sg_id in banned_game_ids for sg_id in first_picks):
+                    repicks_needed += 1
+
+        picks_total = base_expected_picks + repicks_needed
+        picks_current = picks_per_league.get(lid, 0)
+        picks_missing = max(0, picks_total - picks_current)
+
+        bans_total = member_count
+        bans_current = bans_per_league.get(lid, 0)
+        bans_missing = max(0, bans_total - bans_current)
+
+        reports_total = base_expected_picks
+        # Playable games are selected games that are NOT banned
+        active_game_ids = [
+            sg_id
+            for sg_id in games_by_league.get(lid, [])
+            if sg_id not in banned_game_ids
+        ]
+        reports_current = sum(
+            1
+            for sg_id in active_game_ids
+            if result_counts.get(sg_id, 0) >= member_count
+        )
+        reports_missing = max(0, reports_total - reports_current)
+
+        progress[lid] = {
+            "picks": {
+                "current": picks_current,
+                "total": picks_total,
+                "missing": picks_missing,
+            },
+            "bans": {
+                "current": bans_current,
+                "total": bans_total,
+                "missing": bans_missing,
+            },
+            "reports": {
+                "current": reports_current,
+                "total": reports_total,
+                "missing": reports_missing,
+            },
+        }
+
+    return progress
+
+
 def are_leagues_finished(leagues: List[League]) -> Dict[int, bool]:
     """
     Bulk variant of :func:`is_league_finished`.

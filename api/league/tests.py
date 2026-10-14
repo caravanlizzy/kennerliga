@@ -238,3 +238,103 @@ class LeagueServiceTests(TestCase):
         )
         self.assertEqual(response.status_code, 400)
         self.assertIn("member_ids", response.data)
+
+    def test_league_progress_tracking(self):
+        from league.queries import get_league_progress
+        from game.models import BanDecision
+        from result.models import Result
+
+        # 1. Initial state (4 players, 0 picks, 0 bans, 0 reports)
+        prog = get_league_progress(self.league)
+        self.assertEqual(prog["picks"], {"current": 0, "total": 4, "missing": 4})
+        self.assertEqual(prog["bans"], {"current": 0, "total": 4, "missing": 4})
+        self.assertEqual(prog["reports"], {"current": 0, "total": 4, "missing": 4})
+
+        # 2. Add 2 picks
+        sg1 = SelectedGame.objects.create(
+            league=self.league, profile=self.profiles[0], game=self.games[0]
+        )
+        sg2 = SelectedGame.objects.create(
+            league=self.league, profile=self.profiles[1], game=self.games[1]
+        )
+        prog = get_league_progress(self.league)
+        self.assertEqual(prog["picks"], {"current": 2, "total": 4, "missing": 2})
+
+        # 3. Complete initial 4 picks
+        sg3 = SelectedGame.objects.create(
+            league=self.league, profile=self.profiles[2], game=self.games[2]
+        )
+        sg4 = SelectedGame.objects.create(
+            league=self.league, profile=self.profiles[3], game=self.games[3]
+        )
+        prog = get_league_progress(self.league)
+        self.assertEqual(prog["picks"], {"current": 4, "total": 4, "missing": 0})
+        self.assertEqual(prog["bans"], {"current": 0, "total": 4, "missing": 4})
+
+        # 4. Add bans: 2 players ban sg1 (in 4-player league, 2 bans = success)
+        BanDecision.objects.create(
+            league=self.league,
+            player_banning=self.profiles[0],
+            selected_game=sg1,
+        )
+        BanDecision.objects.create(
+            league=self.league,
+            player_banning=self.profiles[1],
+            selected_game=sg1,
+        )
+        # 2 more players ban nothing (pass/dummy ban or other)
+        BanDecision.objects.create(
+            league=self.league,
+            player_banning=self.profiles[2],
+            selected_game=None,
+        )
+        BanDecision.objects.create(
+            league=self.league,
+            player_banning=self.profiles[3],
+            selected_game=None,
+        )
+
+        prog = get_league_progress(self.league)
+        # All 4 players banned -> bans complete
+        self.assertEqual(prog["bans"], {"current": 4, "total": 4, "missing": 0})
+        # sg1 was profile 0's first pick and is banned -> profile 0 needs 1 repick -> total picks = 5
+        self.assertEqual(prog["picks"], {"current": 4, "total": 5, "missing": 1})
+
+        # 5. Add repick for profile 0
+        extra_game = Game.objects.create(
+            name="Extra Game", min_players=2, max_players=4, platform=self.platform
+        )
+        sg5 = SelectedGame.objects.create(
+            league=self.league, profile=self.profiles[0], game=extra_game
+        )
+        prog = get_league_progress(self.league)
+        self.assertEqual(prog["picks"], {"current": 5, "total": 5, "missing": 0})
+        self.assertEqual(prog["reports"], {"current": 0, "total": 4, "missing": 4})
+
+        # 6. Report results for sg2 (playable game) for all 4 players
+        for prof in self.profiles:
+            Result.objects.create(
+                season=self.season,
+                league=self.league,
+                selected_game=sg2,
+                player_profile=prof,
+                points=10,
+                position=1,
+            )
+
+        prog = get_league_progress(self.league)
+        self.assertEqual(prog["reports"], {"current": 1, "total": 4, "missing": 3})
+
+        # 7. Test via API client list endpoint
+        client = APIClient()
+        client.force_authenticate(user=self.users[0])
+        response = client.get(f"/api/league/leagues/?season={self.season.id}")
+        self.assertEqual(response.status_code, 200)
+        league_data = next(
+            item for item in response.data if item["id"] == self.league.id
+        )
+        self.assertIn("progress", league_data)
+        self.assertEqual(league_data["progress"]["picks"]["missing"], 0)
+        self.assertEqual(league_data["progress"]["bans"]["missing"], 0)
+        self.assertEqual(league_data["progress"]["reports"]["current"], 1)
+        self.assertEqual(league_data["progress"]["reports"]["missing"], 3)

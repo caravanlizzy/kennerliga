@@ -78,6 +78,27 @@ class LeagueViewSet(ModelViewSet):
             return LeagueListSerializer
         return super().get_serializer_class()
 
+    def list(self, request, *args, **kwargs):
+        """
+        Lists leagues with bulk-computed progress for picks, bans, and reports.
+        """
+        queryset = self.filter_queryset(self.get_queryset())
+        page = self.paginate_queryset(queryset)
+        leagues = list(page) if page is not None else list(queryset)
+
+        from league.queries import get_leagues_progress
+
+        leagues_progress = get_leagues_progress(leagues)
+        context = self.get_serializer_context()
+        context["leagues_progress"] = leagues_progress
+
+        if page is not None:
+            serializer = self.get_serializer(page, many=True, context=context)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(leagues, many=True, context=context)
+        return Response(serializer.data)
+
     def destroy(self, request, *args, **kwargs):
         """
         Deletes a league only if no match results exist for it.
