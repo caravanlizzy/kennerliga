@@ -54,13 +54,8 @@
               league.progress.picks.total
             }}</span
           >
-          <span
-            v-if="league.progress.picks.missing > 0"
-            class="missing-count q-ml-xs"
-            >({{ league.progress.picks.missing }} missing)</span
-          >
           <q-icon
-            v-else
+            v-if="league.progress.picks.missing === 0"
             name="check"
             size="13px"
             class="q-ml-xs text-positive"
@@ -78,13 +73,8 @@
               league.progress.bans.total
             }}</span
           >
-          <span
-            v-if="league.progress.bans.missing > 0"
-            class="missing-count q-ml-xs"
-            >({{ league.progress.bans.missing }} missing)</span
-          >
           <q-icon
-            v-else
+            v-if="league.progress.bans.missing === 0"
             name="check"
             size="13px"
             class="q-ml-xs text-positive"
@@ -104,13 +94,8 @@
               league.progress.reports.total
             }}</span
           >
-          <span
-            v-if="league.progress.reports.missing > 0"
-            class="missing-count q-ml-xs"
-            >({{ league.progress.reports.missing }} missing)</span
-          >
           <q-icon
-            v-else
+            v-if="league.progress.reports.missing === 0"
             name="check"
             size="13px"
             class="q-ml-xs text-positive"
