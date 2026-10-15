@@ -88,6 +88,108 @@
           @click="$emit('ban-game', member)"
         />
         <KennerButton
+          v-if="unbannedGames.length === 1"
+          outline
+          no-caps
+          color="primary"
+          icon="tune"
+          label="Edit Settings"
+          size="sm"
+          class="text-weight-bold"
+          @click="$emit('edit-game', { member, selGame: unbannedGames[0] })"
+        />
+        <KennerButton
+          v-else-if="unbannedGames.length > 1"
+          outline
+          no-caps
+          color="primary"
+          icon="tune"
+          :icon-right="'arrow_drop_down'"
+          label="Edit Settings"
+          size="sm"
+          class="text-weight-bold"
+        >
+          <q-menu auto-close>
+            <q-list dense style="min-width: 180px">
+              <q-item
+                v-for="sg in unbannedGames"
+                :key="sg.id"
+                clickable
+                @click="$emit('edit-game', { member, selGame: sg })"
+              >
+                <q-item-section avatar style="min-width: 28px">
+                  <q-icon name="tune" color="primary" size="xs" />
+                </q-item-section>
+                <q-item-section>
+                  <q-item-label class="text-weight-medium">{{
+                    sg.game_name
+                  }}</q-item-label>
+                  <q-item-label caption class="text-grey-7">
+                    Edit Settings
+                  </q-item-label>
+                </q-item-section>
+              </q-item>
+            </q-list>
+          </q-menu>
+        </KennerButton>
+        <KennerButton
+          v-if="unbannedGames.length === 1"
+          outline
+          no-caps
+          :color="hasResult(unbannedGames[0]) ? 'secondary' : 'accent'"
+          :icon="hasResult(unbannedGames[0]) ? 'edit_note' : 'post_add'"
+          :label="hasResult(unbannedGames[0]) ? 'Edit Result' : 'Post Result'"
+          size="sm"
+          class="text-weight-bold"
+          @click="
+            hasResult(unbannedGames[0])
+              ? $emit('edit-result', unbannedGames[0].id)
+              : $emit('post-result', unbannedGames[0])
+          "
+        />
+        <KennerButton
+          v-else-if="unbannedGames.length > 1"
+          outline
+          no-caps
+          :color="unpostedGames.length > 0 ? 'accent' : 'secondary'"
+          :icon="unpostedGames.length > 0 ? 'post_add' : 'edit_note'"
+          :icon-right="'arrow_drop_down'"
+          :label="unpostedGames.length > 0 ? 'Post Result' : 'Edit Result'"
+          size="sm"
+          class="text-weight-bold"
+        >
+          <q-menu auto-close>
+            <q-list dense style="min-width: 180px">
+              <q-item
+                v-for="sg in unbannedGames"
+                :key="sg.id"
+                clickable
+                @click="
+                  hasResult(sg)
+                    ? $emit('edit-result', sg.id)
+                    : $emit('post-result', sg)
+                "
+              >
+                <q-item-section avatar style="min-width: 28px">
+                  <q-icon
+                    :name="hasResult(sg) ? 'edit_note' : 'post_add'"
+                    :color="hasResult(sg) ? 'secondary' : 'accent'"
+                    size="xs"
+                  />
+                </q-item-section>
+                <q-item-section>
+                  <q-item-label class="text-weight-medium">{{
+                    sg.game_name
+                  }}</q-item-label>
+                  <q-item-label caption class="text-grey-7">
+                    {{ hasResult(sg) ? 'Edit Result' : 'Post Result' }}
+                  </q-item-label>
+                </q-item-section>
+              </q-item>
+            </q-list>
+          </q-menu>
+        </KennerButton>
+        <KennerButton
           v-if="
             member.id !== league.active_player &&
             ['PICKING', 'REPICKING', 'BANNING'].includes(league.status) &&
@@ -193,23 +295,49 @@
                 </q-item-section>
                 <q-space />
                 <q-item-section side>
-                  <KennerButton
-                    flat
-                    dense
-                    round
-                    color="grey-7"
-                    icon="settings"
-                    size="xs"
-                    @click.stop="$emit('edit-game', { member, selGame })"
-                  >
-                    <KennerTooltip>Edit Settings</KennerTooltip>
-                  </KennerButton>
+                  <div class="row q-gutter-x-xs no-wrap" @click.stop>
+                    <KennerButton
+                      outline
+                      dense
+                      no-caps
+                      color="primary"
+                      icon="tune"
+                      label="Edit Settings"
+                      size="xs"
+                      class="text-weight-bold q-px-xs"
+                      @click="$emit('edit-game', { member, selGame })"
+                    >
+                      <KennerTooltip>Edit Settings</KennerTooltip>
+                    </KennerButton>
+                  </div>
                 </q-item-section>
               </template>
               <div class="bg-white q-pa-sm border-top">
                 <GameSettingsDisplay
+                  v-if="
+                    selGame.selected_options &&
+                    selGame.selected_options.length > 0
+                  "
                   :selectedOptions="selGame.selected_options"
                 />
+                <div
+                  v-else
+                  class="column items-center q-py-md text-center q-gutter-y-sm"
+                >
+                  <div class="text-grey-6 text-caption">
+                    No custom settings configured
+                  </div>
+                  <KennerButton
+                    unelevated
+                    no-caps
+                    color="primary"
+                    icon="tune"
+                    label="Edit Settings"
+                    size="sm"
+                    class="text-weight-bold"
+                    @click="$emit('edit-game', { member, selGame })"
+                  />
+                </div>
               </div>
             </q-expansion-item>
 
@@ -273,22 +401,30 @@
                       <KennerTooltip>Delete Result</KennerTooltip>
                     </KennerButton>
                     <KennerButton
+                      v-if="!hasResult(selGame)"
+                      outline
+                      dense
+                      no-caps
+                      color="primary"
+                      icon="post_add"
+                      label="Post Result"
+                      size="xs"
+                      class="text-weight-bold q-px-xs"
+                      @click="$emit('post-result', selGame)"
+                    >
+                      <KennerTooltip>Post Result</KennerTooltip>
+                    </KennerButton>
+                    <KennerButton
+                      v-else
                       flat
                       dense
                       round
-                      :color="hasResult(selGame) ? 'secondary' : 'primary'"
-                      :icon="hasResult(selGame) ? 'edit_note' : 'post_add'"
+                      color="secondary"
+                      icon="edit_note"
                       size="xs"
-                      @click="
-                        () =>
-                          hasResult(selGame)
-                            ? $emit('edit-result', selGame.id)
-                            : $emit('post-result', selGame)
-                      "
+                      @click="$emit('edit-result', selGame.id)"
                     >
-                      <KennerTooltip>{{
-                        hasResult(selGame) ? 'Edit Result' : 'Post Result'
-                      }}</KennerTooltip>
+                      <KennerTooltip>Edit Result</KennerTooltip>
                     </KennerButton>
                   </div>
                 </q-item-section>
@@ -302,9 +438,21 @@
                 />
                 <div
                   v-else
-                  class="text-grey-5 text-center q-py-sm text-caption"
+                  class="column items-center q-py-md text-center q-gutter-y-sm"
                 >
-                  No results posted
+                  <div class="text-grey-6 text-caption">
+                    No results posted yet
+                  </div>
+                  <KennerButton
+                    unelevated
+                    no-caps
+                    color="primary"
+                    icon="post_add"
+                    label="Post Result"
+                    size="sm"
+                    class="text-weight-bold"
+                    @click="$emit('post-result', selGame)"
+                  />
                 </div>
               </div>
             </q-expansion-item>
@@ -466,6 +614,21 @@ function isBanningDone(member: any): boolean {
   return member.has_banned || !!member.my_banned_game?.game;
 }
 
+function hasResult(selGame: any) {
+  const results = props.matchResultsBySelectedGameId[selGame.id];
+  return Array.isArray(results) && results.length > 0;
+}
+
+const unbannedGames = computed(() =>
+  (props.member.selected_games || []).filter(
+    (sg: any) => !sg.successfully_banned
+  )
+);
+
+const unpostedGames = computed(() =>
+  unbannedGames.value.filter((sg: any) => !hasResult(sg))
+);
+
 function isReportingDone(member: any): boolean {
   const reportableGames = (member.selected_games || []).filter(
     (sg: any) => !sg.successfully_banned
@@ -485,11 +648,6 @@ defineEmits([
   'post-result',
   'delete-game',
 ]);
-
-function hasResult(selGame: any) {
-  const results = props.matchResultsBySelectedGameId[selGame.id];
-  return Array.isArray(results) && results.length > 0;
-}
 
 function getWinConditionName(selectedGameId: number): string | null {
   const results = props.matchResultsBySelectedGameId[selectedGameId];
