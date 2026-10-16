@@ -852,3 +852,75 @@ class UserPasswordResetTests(TestCase):
         res_del_reset = self.client.delete(f"/api/user/invitations/{reset_link.id}/")
         self.assertEqual(res_del_reset.status_code, 204)
         self.assertFalse(UserInviteLink.objects.filter(id=reset_link.id).exists())
+
+    def test_admin_toggle_and_set_admin_status(self):
+        # 1. Unauthenticated cannot toggle admin
+        self.client.logout()
+        res_anon = self.client.post(f"/api/user/users/{self.user.id}/toggle-admin/")
+        self.assertEqual(res_anon.status_code, 401)
+
+        # 2. Non-admin user cannot toggle admin
+        self.client.force_authenticate(user=self.user)
+        res_user = self.client.post(f"/api/user/users/{self.user.id}/toggle-admin/")
+        self.assertEqual(res_user.status_code, 403)
+
+        # 3. Admin can toggle admin status (False -> True)
+        self.client.force_authenticate(user=self.admin)
+        self.assertFalse(self.user.is_staff)
+        self.assertFalse(self.user.is_superuser)
+
+        res_toggle_on = self.client.post(f"/api/user/users/{self.user.id}/toggle-admin/")
+        self.assertEqual(res_toggle_on.status_code, 200)
+        self.assertTrue(res_toggle_on.data["admin"])
+        self.assertTrue(res_toggle_on.data["is_staff"])
+        self.assertTrue(res_toggle_on.data["is_superuser"])
+
+        self.user.refresh_from_db()
+        self.assertTrue(self.user.is_staff)
+        self.assertTrue(self.user.is_superuser)
+
+        # 4. Admin can toggle admin status (True -> False)
+        res_toggle_off = self.client.post(f"/api/user/users/{self.user.id}/toggle-admin/")
+        self.assertEqual(res_toggle_off.status_code, 200)
+        self.assertFalse(res_toggle_off.data["admin"])
+        self.assertFalse(res_toggle_off.data["is_staff"])
+        self.assertFalse(res_toggle_off.data["is_superuser"])
+
+        self.user.refresh_from_db()
+        self.assertFalse(self.user.is_staff)
+        self.assertFalse(self.user.is_superuser)
+
+        # 5. Admin can explicitly set admin=True via toggle-admin
+        res_set_true = self.client.post(
+            f"/api/user/users/{self.user.id}/toggle-admin/",
+            {"admin": True},
+            format="json",
+        )
+        self.assertEqual(res_set_true.status_code, 200)
+        self.assertTrue(res_set_true.data["admin"])
+
+        self.user.refresh_from_db()
+        self.assertTrue(self.user.is_staff)
+
+        # 6. Admin can explicitly set admin=False via toggle-admin
+        res_set_false = self.client.post(
+            f"/api/user/users/{self.user.id}/toggle-admin/",
+            {"admin": False},
+            format="json",
+        )
+        self.assertEqual(res_set_false.status_code, 200)
+        self.assertFalse(res_set_false.data["admin"])
+
+        self.user.refresh_from_db()
+        self.assertFalse(self.user.is_staff)
+
+        # 7. Admin can also update via PATCH on user detail
+        res_patch = self.client.patch(
+            f"/api/user/users/{self.user.id}/",
+            {"admin": True},
+            format="json",
+        )
+        self.assertEqual(res_patch.status_code, 200)
+        self.assertTrue(res_patch.data["admin"])
+        self.user.refresh_from_db()
+        self.assertTrue(self.user.is_staff)

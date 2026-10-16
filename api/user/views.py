@@ -167,6 +167,43 @@ class UserViewSet(ModelViewSet):
         user.save(update_fields=["avatar_color"])
         return Response(UserSerializer(user, context={"request": request}).data)
 
+    @action(detail=True, methods=["post", "patch"], url_path="toggle-admin")
+    def toggle_admin(self, request, pk=None):
+        """
+        POST/PATCH /user/users/{id|username}/toggle-admin/
+        Toggles or sets the user's admin status. Admin only.
+        Optional payload: {"admin": true/false}
+        """
+        user = self.get_object()
+        if "admin" in request.data:
+            make_admin = bool(request.data.get("admin"))
+        elif "is_admin" in request.data:
+            make_admin = bool(request.data.get("is_admin"))
+        elif "is_staff" in request.data:
+            make_admin = bool(request.data.get("is_staff"))
+        else:
+            make_admin = not (user.is_staff or user.is_superuser)
+
+        user.is_staff = make_admin
+        user.is_superuser = make_admin
+        user.save(update_fields=["is_staff", "is_superuser"])
+        return Response(UserSerializer(user, context={"request": request}).data)
+
+    def perform_update(self, serializer):
+        if "admin" in self.request.data:
+            make_admin = bool(self.request.data.get("admin"))
+            serializer.instance.is_staff = make_admin
+            serializer.instance.is_superuser = make_admin
+        elif "is_admin" in self.request.data:
+            make_admin = bool(self.request.data.get("is_admin"))
+            serializer.instance.is_staff = make_admin
+            serializer.instance.is_superuser = make_admin
+        elif "is_staff" in self.request.data:
+            make_admin = bool(self.request.data.get("is_staff"))
+            serializer.instance.is_staff = make_admin
+            serializer.instance.is_superuser = make_admin
+        serializer.save()
+
     @action(detail=False, methods=["get"], url_path="available-years")
     def available_years(self, request):
         """

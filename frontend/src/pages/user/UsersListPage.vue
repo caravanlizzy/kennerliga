@@ -100,6 +100,13 @@
             size="28px"
           />
           <span class="text-weight-medium">{{ props.row.username }}</span>
+          <q-badge
+            v-if="isAdminUser(props.row)"
+            color="amber-8"
+            class="text-weight-bolder q-px-xs"
+            label="ADMIN"
+            style="font-size: 0.65rem; border-radius: 4px"
+          />
         </div>
       </q-td>
     </template>
@@ -159,10 +166,23 @@
       </q-td>
     </template>
     <template v-if="isAdmin" v-slot:body-cell-actions="props">
-      <q-td :props="props" auto-width>
+      <q-td :props="props" auto-width class="q-gutter-x-xs">
         <KennerButton
           flat
-          round
+          shape="circle"
+          dense
+          icon="shield"
+          :color="isAdminUser(props.row) ? 'amber-8' : 'grey-5'"
+          :loading="togglingAdminUserId === props.row.id"
+          @click.stop="promptToggleAdmin(props.row)"
+        >
+          <q-tooltip>{{
+            isAdminUser(props.row) ? 'Remove Admin' : 'Make Admin'
+          }}</q-tooltip>
+        </KennerButton>
+        <KennerButton
+          flat
+          shape="circle"
           dense
           icon="lock_reset"
           color="primary"
@@ -276,12 +296,17 @@ import { useUserStore } from 'stores/userStore';
 import { storeToRefs } from 'pinia';
 import { copyToClipboard, useQuasar } from 'quasar';
 import axios from 'axios';
-import { createPasswordResetLink } from 'src/services/userService';
+import {
+  createPasswordResetLink,
+  toggleUserAdmin,
+} from 'src/services/userService';
+import { useDialog } from 'src/composables/dialog';
 
 const $q = useQuasar();
 const userStore = useUserStore();
 const { listUsers, getAvailableYears } = userStore;
 const { isAdmin } = storeToRefs(userStore);
+const { setDialog } = useDialog();
 
 const users = ref<TUserDto[]>([]);
 const availablePlayerCounts = ['2p', '3p', '4p'];
@@ -293,11 +318,80 @@ const selectedYears = ref<number[]>([]);
 const availableYears = ref<number[]>([]);
 const loading = ref(false);
 
+const togglingAdminUserId = ref<number | null>(null);
 const showResetDialog = ref(false);
 const targetUser = ref<TUserDto | null>(null);
 const resetLabel = ref('');
 const generatedResetUrl = ref('');
 const isGeneratingReset = ref(false);
+
+function isAdminUser(row: TUserDto): boolean {
+  return Boolean(row.admin || row.is_staff || row.is_superuser);
+}
+
+function promptToggleAdmin(row: TUserDto) {
+  const isCurrentlyAdmin = isAdminUser(row);
+  const actionTitle = isCurrentlyAdmin
+    ? 'Remove Admin Rights'
+    : 'Grant Admin Rights';
+  const actionMessage = isCurrentlyAdmin
+    ? `Are you sure you want to remove admin privileges from "${row.username}"?`
+    : `Are you sure you want to make "${row.username}" an admin?`;
+  const confirmBtnLabel = isCurrentlyAdmin ? 'Remove Admin' : 'Make Admin';
+  const dialogType = isCurrentlyAdmin ? 'warning' : 'primary';
+
+  setDialog(
+    actionTitle,
+    actionMessage,
+    dialogType,
+    async () => {
+      togglingAdminUserId.value = row.id;
+      try {
+        const updated = await toggleUserAdmin(row.id, !isCurrentlyAdmin);
+        const idx = users.value.findIndex((u) => u.id === row.id);
+        if (idx !== -1) {
+          users.value[idx] = {
+            ...users.value[idx],
+            ...updated,
+            admin: !isCurrentlyAdmin,
+            is_staff: !isCurrentlyAdmin,
+            is_superuser: !isCurrentlyAdmin,
+          };
+        }
+        if (userStore.user && userStore.user.id === row.id) {
+          userStore.user.admin = !isCurrentlyAdmin;
+          userStore.user.is_staff = !isCurrentlyAdmin;
+          userStore.user.is_superuser = !isCurrentlyAdmin;
+          userStore.isAdmin = !isCurrentlyAdmin;
+        }
+        $q.notify({
+          type: 'positive',
+          message: isCurrentlyAdmin
+            ? `Removed admin privileges from ${row.username}.`
+            : `Granted admin privileges to ${row.username}.`,
+        });
+      } catch (err: unknown) {
+        let message = 'Failed to update admin privileges.';
+        if (axios.isAxiosError(err)) {
+          message =
+            (err.response?.data as { detail?: string })?.detail ||
+            err.message ||
+            message;
+        } else if (err instanceof Error) {
+          message = err.message;
+        }
+        $q.notify({
+          type: 'negative',
+          message,
+        });
+      } finally {
+        togglingAdminUserId.value = null;
+      }
+    },
+    undefined,
+    confirmBtnLabel
+  );
+}
 
 function openResetDialog(user: TUserDto) {
   targetUser.value = user;

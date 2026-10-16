@@ -20,6 +20,9 @@ class UserSerializer(ModelSerializer):
     most_participated_league_level = serializers.SerializerMethodField(read_only=True)
     elo_rating = serializers.SerializerMethodField(read_only=True)
     elo_rank = serializers.SerializerMethodField(read_only=True)
+    admin = serializers.SerializerMethodField(read_only=True)
+    is_staff = serializers.BooleanField(read_only=True)
+    is_superuser = serializers.BooleanField(read_only=True)
 
     class Meta:
         model = User
@@ -35,7 +38,13 @@ class UserSerializer(ModelSerializer):
             "most_participated_league_level",
             "elo_rating",
             "elo_rank",
+            "admin",
+            "is_staff",
+            "is_superuser",
         ]
+
+    def get_admin(self, obj):
+        return bool(obj.is_staff or obj.is_superuser)
 
     def get_elo_rating(self, obj):
         profile = getattr(obj, "profile", None)

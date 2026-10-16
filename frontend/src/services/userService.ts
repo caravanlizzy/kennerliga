@@ -142,3 +142,15 @@ export async function updateAvatarColor(color: string): Promise<TUserDto> {
   });
   return data;
 }
+
+/** Sets or toggles a user's admin status (admin only). */
+export async function toggleUserAdmin(
+  userIdOrUsername: number | string,
+  admin?: boolean
+): Promise<TUserDto> {
+  const { data } = await api.post<TUserDto>(
+    `/user/users/${encodeURIComponent(userIdOrUsername)}/toggle-admin/`,
+    admin !== undefined ? { admin } : {}
+  );
+  return data;
+}

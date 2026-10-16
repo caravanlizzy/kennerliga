@@ -382,7 +382,7 @@ def get_user_information(user):
     user_dict = {
         "id": user.id,
         "username": user.username,
-        "admin": user.is_superuser,
+        "admin": bool(user.is_staff or user.is_superuser),
         "avatar_shape": getattr(user, "avatar_shape", "squircle"),
         "avatar_color": getattr(user, "avatar_color", ""),
         "token": token,
