@@ -216,3 +216,21 @@ class GameAPITests(TestCase):
         self.assertEqual(len(response.data["win_conditions"]), 1)
         self.assertEqual(response.data["win_conditions"][0]["name"], "Points")
         self.assertEqual(response.data["win_conditions"][0]["condition_type"], "POINTS")
+
+    def test_get_and_create_platforms(self):
+        # Fetch platforms
+        res = self.client.get("/api/game/platforms/")
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(len(res.data), 1)
+
+        # Create new platform as admin
+        create_res = self.client.post(
+            "/api/game/platforms/", {"name": "Steam"}, format="json"
+        )
+        self.assertEqual(create_res.status_code, 201)
+        self.assertEqual(create_res.data["name"], "Steam")
+
+        # Verify list contains new platform
+        res = self.client.get("/api/game/platforms/")
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(len(res.data), 2)

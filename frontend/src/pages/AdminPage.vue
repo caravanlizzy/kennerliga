@@ -73,25 +73,110 @@
           </div>
         </div>
       </div>
+
+      <!-- Platform Management Dialog -->
+      <q-dialog v-model="platformDialogOpen" position="standard">
+        <q-card style="width: 500px; max-width: 95vw" class="q-pa-sm">
+          <q-card-section class="row items-center justify-between q-pb-none">
+            <div class="row items-center q-gutter-x-sm">
+              <q-icon name="devices" color="primary" size="24px" />
+              <div class="text-h6 text-weight-bold">Manage Platforms</div>
+            </div>
+            <q-btn flat round dense icon="close" v-close-popup />
+          </q-card-section>
+
+          <q-card-section class="q-pt-sm">
+            <div class="text-caption text-grey-7 q-mb-md">
+              Add new gaming platforms (e.g. Board Game Arena, Steam) to use in game definitions.
+            </div>
+
+            <q-form @submit.prevent="handleAddPlatform" class="q-gutter-y-sm q-mb-lg">
+              <div class="row q-col-gutter-sm items-center">
+                <div class="col">
+                  <KennerInput
+                    v-model="newPlatformName"
+                    label="Platform Name"
+                    dense
+                    :rules="[(val: string) => !!val?.trim() || 'Platform name is required']"
+                  />
+                </div>
+                <div class="col-auto">
+                  <KennerButton
+                    type="submit"
+                    color="primary"
+                    icon="add"
+                    label="Add"
+                    :loading="submittingPlatform"
+                  />
+                </div>
+              </div>
+            </q-form>
+
+            <q-separator class="q-my-md" />
+
+            <div class="row items-center justify-between q-mb-sm">
+              <div class="text-subtitle2 text-weight-bold text-dark">
+                Existing Platforms
+              </div>
+              <q-badge color="primary" rounded class="q-px-sm">
+                {{ platforms.length }}
+              </q-badge>
+            </div>
+
+            <LoadingSpinner v-if="loadingPlatforms" />
+
+            <div
+              v-else-if="platforms.length === 0"
+              class="text-caption text-grey-6 q-py-md text-center"
+            >
+              No platforms registered yet.
+            </div>
+
+            <div v-else class="row q-gutter-xs q-py-xs">
+              <q-chip
+                v-for="p in platforms"
+                :key="p.id"
+                outline
+                color="primary"
+                text-color="primary"
+                icon="videogame_asset"
+              >
+                {{ p.name }}
+              </q-chip>
+            </div>
+          </q-card-section>
+
+          <q-card-actions align="right" class="q-pt-none">
+            <KennerButton flat label="Close" v-close-popup />
+          </q-card-actions>
+        </q-card>
+      </q-dialog>
     </div>
   </q-page>
 </template>
 
 <script setup lang="ts">
 defineOptions({ name: 'AdminPage' });
-import { computed, onMounted } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 import { storeToRefs } from 'pinia';
 import { useRouter } from 'vue-router';
+import { Notify } from 'quasar';
 import { useHomeSeasonStore } from 'stores/homeSeasonStore';
+import KennerButton from 'components/base/KennerButton.vue';
+import KennerInput from 'components/base/KennerInput.vue';
+import LoadingSpinner from 'components/base/LoadingSpinner.vue';
+import { TPlatform } from 'src/types';
+import { createPlatform, fetchPlatforms } from 'src/services/gameService';
 
 type AdminLink = {
   label: string;
   description: string;
   icon: string;
-  name: string;
+  name?: string;
   color?: string;
   params?: Record<string, unknown>;
   disabled?: boolean;
+  action?: () => void;
 };
 
 type AdminGroup = {
@@ -103,6 +188,63 @@ type AdminGroup = {
 const router = useRouter();
 const homeSeasonStore = useHomeSeasonStore();
 const { currentSeasonId } = storeToRefs(homeSeasonStore);
+
+const platformDialogOpen = ref(false);
+const platforms = ref<TPlatform[]>([]);
+const loadingPlatforms = ref(false);
+const submittingPlatform = ref(false);
+const newPlatformName = ref('');
+
+async function loadPlatforms(): Promise<void> {
+  loadingPlatforms.value = true;
+  try {
+    platforms.value = await fetchPlatforms();
+  } catch {
+    Notify.create({
+      type: 'negative',
+      message: 'Failed to load platforms',
+    });
+  } finally {
+    loadingPlatforms.value = false;
+  }
+}
+
+function openPlatformDialog(): void {
+  platformDialogOpen.value = true;
+  void loadPlatforms();
+}
+
+async function handleAddPlatform(): Promise<void> {
+  const trimmed = newPlatformName.value.trim();
+  if (!trimmed) return;
+
+  submittingPlatform.value = true;
+  try {
+    await createPlatform(trimmed);
+    Notify.create({
+      type: 'positive',
+      message: `Platform "${trimmed}" added successfully`,
+    });
+    newPlatformName.value = '';
+    await loadPlatforms();
+  } catch (error: unknown) {
+    const err = error as {
+      response?: { data?: { name?: string[]; detail?: string } };
+      message?: string;
+    };
+    const errorMsg =
+      err?.response?.data?.name?.[0] ||
+      err?.response?.data?.detail ||
+      err?.message ||
+      'Failed to create platform';
+    Notify.create({
+      type: 'negative',
+      message: errorMsg,
+    });
+  } finally {
+    submittingPlatform.value = false;
+  }
+}
 
 // The current season is required to reach the season/league management screens,
 // so those cards are disabled until it is known.
@@ -156,6 +298,13 @@ const groups = computed<AdminGroup[]>(() => [
         color: 'primary',
         name: 'games',
       },
+      {
+        label: 'Platforms',
+        description: 'Add and manage gaming platforms for games.',
+        icon: 'devices',
+        color: 'secondary',
+        action: openPlatformDialog,
+      },
     ],
   },
   {
@@ -194,7 +343,11 @@ const groups = computed<AdminGroup[]>(() => [
 ]);
 
 function go(item: AdminLink): void {
-  void router.push({ name: item.name, params: item.params });
+  if (item.action) {
+    item.action();
+  } else if (item.name) {
+    void router.push({ name: item.name, params: item.params });
+  }
 }
 
 onMounted(() => {

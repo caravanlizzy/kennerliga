@@ -362,6 +362,15 @@ export async function fetchPlatform(platformId: number): Promise<TPlatform> {
   return data;
 }
 
+export async function createPlatform(name: string): Promise<TPlatform> {
+  const { data } = await api.post<TPlatform>('/game/platforms/', { name });
+  return data;
+}
+
+export async function deletePlatform(platformId: number): Promise<void> {
+  await api.delete(`/game/platforms/${platformId}/`);
+}
+
 export async function fetchFullGame(gameId: number): Promise<TFullGameDto> {
   try {
     const { data } = await api.get<TFullGameDto>(
