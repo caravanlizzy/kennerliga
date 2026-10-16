@@ -91,51 +91,6 @@
           v-if="unbannedGames.length === 1"
           outline
           no-caps
-          color="primary"
-          icon="tune"
-          label="Edit Settings"
-          size="sm"
-          class="text-weight-bold"
-          @click="$emit('edit-game', { member, selGame: unbannedGames[0] })"
-        />
-        <KennerButton
-          v-else-if="unbannedGames.length > 1"
-          outline
-          no-caps
-          color="primary"
-          icon="tune"
-          :icon-right="'arrow_drop_down'"
-          label="Edit Settings"
-          size="sm"
-          class="text-weight-bold"
-        >
-          <q-menu auto-close>
-            <q-list dense style="min-width: 180px">
-              <q-item
-                v-for="sg in unbannedGames"
-                :key="sg.id"
-                clickable
-                @click="$emit('edit-game', { member, selGame: sg })"
-              >
-                <q-item-section avatar style="min-width: 28px">
-                  <q-icon name="tune" color="primary" size="xs" />
-                </q-item-section>
-                <q-item-section>
-                  <q-item-label class="text-weight-medium">{{
-                    sg.game_name
-                  }}</q-item-label>
-                  <q-item-label caption class="text-grey-7">
-                    Edit Settings
-                  </q-item-label>
-                </q-item-section>
-              </q-item>
-            </q-list>
-          </q-menu>
-        </KennerButton>
-        <KennerButton
-          v-if="unbannedGames.length === 1"
-          outline
-          no-caps
           :color="hasResult(unbannedGames[0]) ? 'secondary' : 'accent'"
           :icon="hasResult(unbannedGames[0]) ? 'edit_note' : 'post_add'"
           :label="hasResult(unbannedGames[0]) ? 'Edit Result' : 'Post Result'"
@@ -302,12 +257,12 @@
                       no-caps
                       color="primary"
                       icon="tune"
-                      label="Edit Settings"
+                      label="Edit"
                       size="xs"
                       class="text-weight-bold q-px-xs"
                       @click="$emit('edit-game', { member, selGame })"
                     >
-                      <KennerTooltip>Edit Settings</KennerTooltip>
+                      <KennerTooltip>Edit</KennerTooltip>
                     </KennerButton>
                   </div>
                 </q-item-section>
@@ -332,7 +287,7 @@
                     no-caps
                     color="primary"
                     icon="tune"
-                    label="Edit Settings"
+                    label="Edit"
                     size="sm"
                     class="text-weight-bold"
                     @click="$emit('edit-game', { member, selGame })"
@@ -407,12 +362,12 @@
                       no-caps
                       color="primary"
                       icon="post_add"
-                      label="Post Result"
+                      label="Post"
                       size="xs"
                       class="text-weight-bold q-px-xs"
                       @click="$emit('post-result', selGame)"
                     >
-                      <KennerTooltip>Post Result</KennerTooltip>
+                      <KennerTooltip>Post</KennerTooltip>
                     </KennerButton>
                     <KennerButton
                       v-else
@@ -424,7 +379,7 @@
                       size="xs"
                       @click="$emit('edit-result', selGame.id)"
                     >
-                      <KennerTooltip>Edit Result</KennerTooltip>
+                      <KennerTooltip>Edit</KennerTooltip>
                     </KennerButton>
                   </div>
                 </q-item-section>
@@ -448,7 +403,7 @@
                     no-caps
                     color="primary"
                     icon="post_add"
-                    label="Post Result"
+                    label="Post"
                     size="sm"
                     class="text-weight-bold"
                     @click="$emit('post-result', selGame)"
