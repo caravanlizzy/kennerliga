@@ -237,7 +237,7 @@
           label="Password Reset Link"
         >
           <template v-slot:append>
-            <q-btn
+            <KennerButton
               flat
               round
               dense
@@ -246,7 +246,7 @@
               @click="copyGeneratedLink"
             >
               <q-tooltip>Copy link</q-tooltip>
-            </q-btn>
+            </KennerButton>
           </template>
         </KennerInput>
       </q-card-section>
@@ -273,7 +273,7 @@
           <KennerButton flat label="Close" color="grey-7" v-close-popup />
           <KennerButton
             label="Copy Link"
-            color="primary"
+            color="positive"
             icon="content_copy"
             @click="copyGeneratedLink"
           />

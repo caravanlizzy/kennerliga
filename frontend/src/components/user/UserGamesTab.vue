@@ -145,7 +145,7 @@
           <div class="text-caption text-grey-6">
             Try adjusting your search terms
           </div>
-          <q-btn
+          <KennerButton
             v-if="gameSearch"
             flat
             color="primary"
@@ -170,6 +170,7 @@
 </template>
 
 <script setup lang="ts">
+import KennerButton from 'components/base/KennerButton.vue';
 import UserGameCard from 'components/user/UserGameCard.vue';
 import type { TPlayerGameStat } from 'src/types';
 

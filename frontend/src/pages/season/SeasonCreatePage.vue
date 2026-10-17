@@ -66,7 +66,7 @@
           </div>
           <div class="col ellipsis">{{ getProfileName(pid) }}</div>
           <div class="row q-gutter-xs items-center">
-            <q-btn
+            <KennerButton
               flat
               dense
               round
@@ -76,8 +76,8 @@
               @click="moveParticipantUp(pIdx)"
             >
               <q-tooltip>Move Up</q-tooltip>
-            </q-btn>
-            <q-btn
+            </KennerButton>
+            <KennerButton
               flat
               dense
               round
@@ -87,8 +87,8 @@
               @click="moveParticipantDown(pIdx)"
             >
               <q-tooltip>Move Down</q-tooltip>
-            </q-btn>
-            <q-btn
+            </KennerButton>
+            <KennerButton
               flat
               dense
               round
@@ -98,7 +98,7 @@
               @click="removeParticipant(pIdx)"
             >
               <q-tooltip>Remove Participant</q-tooltip>
-            </q-btn>
+            </KennerButton>
           </div>
         </div>
       </div>
@@ -181,7 +181,7 @@
           </div>
           <div class="col ellipsis">{{ getProfileName(pid) }}</div>
           <div class="row q-gutter-xs items-center">
-            <q-btn
+            <KennerButton
               flat
               dense
               round
@@ -191,8 +191,8 @@
               @click="movePlayerUp(idx, mIdx)"
             >
               <q-tooltip>Move Up</q-tooltip>
-            </q-btn>
-            <q-btn
+            </KennerButton>
+            <KennerButton
               flat
               dense
               round
@@ -202,8 +202,8 @@
               @click="movePlayerDown(idx, mIdx)"
             >
               <q-tooltip>Move Down</q-tooltip>
-            </q-btn>
-            <q-btn
+            </KennerButton>
+            <KennerButton
               flat
               dense
               round
@@ -213,20 +213,20 @@
               @click="removePlayerFromLeague(idx, mIdx)"
             >
               <q-tooltip>Remove from League</q-tooltip>
-            </q-btn>
+            </KennerButton>
           </div>
         </div>
       </div>
     </div>
 
     <div>
-      <KennerButton flat color="dark" label="+ Add League" @click="addLeague" />
+      <KennerButton flat color="primary" icon="add" label="Add League" @click="addLeague" />
     </div>
 
     <div class="row q-col-gutter-sm q-mt-md">
       <div class="col-auto">
         <KennerButton
-          color="dark"
+          color="primary"
           :label="
             preparedLeagues.length > 0
               ? 'Create Season & Leagues'
@@ -238,7 +238,7 @@
         />
       </div>
       <div class="col-auto">
-        <KennerButton flat label="Clear" @click="resetForm" />
+        <KennerButton flat color="grey-7" label="Clear" @click="resetForm" />
       </div>
     </div>
   </div>

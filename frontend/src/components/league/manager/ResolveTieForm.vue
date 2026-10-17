@@ -17,7 +17,7 @@
           </q-item-section>
           <q-item-section side>
             <div class="row q-gutter-xs">
-              <q-btn
+              <KennerButton
                 flat
                 round
                 dense
@@ -25,7 +25,7 @@
                 :disable="index === 0"
                 @click="move(index, -1)"
               />
-              <q-btn
+              <KennerButton
                 flat
                 round
                 dense
@@ -60,8 +60,8 @@
       />
 
       <div class="row justify-end q-gutter-sm">
-        <q-btn label="Cancel" flat color="grey-7" v-close-popup />
-        <q-btn
+        <KennerButton label="Cancel" flat color="grey-7" v-close-popup />
+        <KennerButton
           label="Resolve Tie"
           color="primary"
           type="submit"
@@ -74,6 +74,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
+import KennerButton from 'components/base/KennerButton.vue';
 import {
   fetchTieResolutionReasons,
   resolveTie,

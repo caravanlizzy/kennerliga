@@ -147,7 +147,7 @@
                     >
                       {{ col.gameName || col.label }}
                     </div>
-                    <q-btn
+                    <KennerButton
                       flat
                       round
                       dense
@@ -500,6 +500,7 @@ import { useRouter } from 'vue-router';
 import { fetchLeagueFullStandings } from 'src/services/standingsService';
 import type { TFullStandings, TGameStandingCell } from 'src/types';
 import LoadingSpinner from 'components/base/LoadingSpinner.vue';
+import KennerButton from 'components/base/KennerButton.vue';
 import UserAvatar from 'components/ui/UserAvatar.vue';
 import type { QTableColumn } from 'quasar';
 import { useResponsive } from 'src/composables/responsive';

@@ -118,7 +118,7 @@
               <div class="text-weight-bolder text-dark ellipsis">
                 {{ selectedGame?.name }}
               </div>
-              <q-btn
+              <KennerButton
                 flat
                 round
                 dense
@@ -163,7 +163,7 @@
             {{ selectedGame?.name ?? 'Leaderboard' }}
           </div>
           <q-space />
-          <q-btn flat round dense icon="close" color="white" v-close-popup />
+          <KennerButton flat round dense icon="close" color="white" v-close-popup />
         </div>
         <q-card-section class="mobile-leaderboard-body">
           <GameLeaderboardPanel
@@ -182,6 +182,7 @@
 defineOptions({ name: 'GameStatistics' });
 
 import { computed, onMounted, ref, watch } from 'vue';
+import KennerButton from 'components/base/KennerButton.vue';
 import GameLeaderboardPanel from 'components/statistics/GameLeaderboardPanel.vue';
 import PopularGamesCard from 'components/statistics/PopularGamesCard.vue';
 import { useResponsive } from 'src/composables/responsive';

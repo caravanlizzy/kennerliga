@@ -97,7 +97,13 @@
         @keydown.enter.prevent="send"
       >
         <template #prepend>
-          <q-btn flat round dense icon="sentiment_satisfied_alt" color="grey-7">
+          <KennerButton
+            flat
+            round
+            dense
+            icon="sentiment_satisfied_alt"
+            color="grey-7"
+          >
             <q-menu
               anchor="top left"
               self="bottom left"
@@ -108,7 +114,7 @@
                 class="row q-gutter-xs justify-center"
                 style="width: 360px; max-height: 300px; overflow-y: auto"
               >
-                <q-btn
+                <KennerButton
                   v-for="emoji in emojiList"
                   :key="emoji"
                   flat
@@ -122,7 +128,7 @@
                 />
               </div>
             </q-menu>
-          </q-btn>
+          </KennerButton>
         </template>
         <template #append>
           <KennerButton
@@ -130,7 +136,7 @@
             round
             dense
             icon="send"
-            color="grey-8"
+            color="primary"
             :loading="sending"
             @click="send"
           />

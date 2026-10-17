@@ -1,5 +1,5 @@
 <template>
-  <q-btn
+  <KennerButton
     :color="color"
     :flat="flat"
     :outline="outline"
@@ -17,6 +17,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
 import { Notify } from 'quasar';
+import KennerButton from 'components/base/KennerButton.vue';
 import {
   isPushNotificationSupported,
   isPushNotificationSubscribed,

@@ -6,7 +6,7 @@
     >
       <q-icon name="img:icons/favicon.svg" size="36px" class="q-mr-sm" />
       <q-space />
-      <q-btn
+      <KennerButton
         flat
         round
         dense
@@ -196,6 +196,7 @@
 
 <script setup lang="ts">
 import { Notify } from 'quasar';
+import KennerButton from 'components/base/KennerButton.vue';
 import DrawerItem from 'components/base/DrawerItem.vue';
 import DrawerSubGroup from 'components/base/DrawerSubGroup.vue';
 import KennerTooltip from 'components/base/KennerTooltip.vue';

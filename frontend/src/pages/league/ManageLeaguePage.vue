@@ -169,7 +169,7 @@
           <div class="text-subtitle1 text-weight-bold">
             Manage League Members
           </div>
-          <q-btn v-close-popup icon="close" flat round dense color="grey-6" />
+          <KennerButton v-close-popup icon="close" flat round dense color="grey-6" />
         </q-card-section>
 
         <q-card-section class="q-pt-sm">

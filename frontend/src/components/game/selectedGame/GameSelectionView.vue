@@ -90,7 +90,7 @@
                 </div>
               </div>
 
-              <q-btn
+              <KennerButton
                 dense
                 unelevated
                 no-caps
@@ -119,7 +119,7 @@
                 <q-tooltip v-else>
                   Chooses a random game from the currently available list.
                 </q-tooltip>
-              </q-btn>
+              </KennerButton>
             </div>
 
             <!-- Best odds: games where the picker stands the best chance vs. current league members -->
@@ -145,7 +145,7 @@
                 </q-icon>
               </div>
               <div class="row q-gutter-sm">
-                <q-btn
+                <KennerButton
                   v-for="(suggestion, idx) in winSuggestions"
                   :key="suggestion.game_id"
                   dense
@@ -185,7 +185,7 @@
                       >
                     </div>
                   </q-tooltip>
-                </q-btn>
+                </KennerButton>
               </div>
             </div>
 
@@ -260,6 +260,7 @@
 import { computed, onMounted, provide, ref, watch } from 'vue';
 import { useGameSelection } from 'src/composables/gameSelection';
 import { useResponsive } from 'src/composables/responsive';
+import KennerButton from 'components/base/KennerButton.vue';
 import GameFilter from 'components/game/selectedGame/GameFilter.vue';
 import PlatformMultiSelect from 'components/game/selectedGame/PlatformMultiSelect.vue';
 import NoGamesFound from 'components/game/selectedGame/NoGamesFound.vue';

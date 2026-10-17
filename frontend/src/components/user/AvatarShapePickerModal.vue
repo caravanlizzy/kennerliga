@@ -12,7 +12,7 @@
           </div>
         </div>
         <q-space />
-        <q-btn v-close-popup icon="close" flat round dense color="grey-7" />
+        <KennerButton v-close-popup icon="close" flat round dense color="grey-7" />
       </q-card-section>
 
       <!-- Live Preview Banner -->
@@ -117,7 +117,7 @@
               Color Palette
             </div>
             <div class="row items-center q-gutter-x-sm">
-              <q-btn
+              <KennerButton
                 flat
                 dense
                 no-caps
@@ -139,7 +139,7 @@
                     @change="selectColor"
                   />
                 </q-popup-proxy>
-              </q-btn>
+              </KennerButton>
             </div>
           </div>
 
@@ -197,9 +197,8 @@
       <q-separator />
 
       <q-card-actions align="right" class="q-pa-sm q-px-md">
-        <q-btn
+        <KennerButton
           v-close-popup
-          flat
           color="primary"
           label="Done"
           class="text-weight-bold"
@@ -212,6 +211,7 @@
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue';
 import { Notify } from 'quasar';
+import KennerButton from 'components/base/KennerButton.vue';
 import { useUserStore } from 'stores/userStore';
 import UserAvatar from 'components/ui/UserAvatar.vue';
 import {

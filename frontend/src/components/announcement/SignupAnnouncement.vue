@@ -41,7 +41,7 @@
           <q-icon name="radio_button_unchecked" size="14px" />
           <span class="gt-xs">Not signed up</span>
         </div>
-        <q-btn
+        <KennerButton
           flat
           dense
           round
@@ -52,7 +52,7 @@
           @click.stop="toggleMinimized"
         >
           <q-tooltip>Expand</q-tooltip>
-        </q-btn>
+        </KennerButton>
       </div>
     </q-card-section>
 
@@ -129,7 +129,7 @@
             <span class="gt-xs">Signed up</span>
           </div>
 
-          <q-btn
+          <KennerButton
             flat
             dense
             round
@@ -141,7 +141,7 @@
             @click="toggleMinimized"
           >
             <q-tooltip>Minimize</q-tooltip>
-          </q-btn>
+          </KennerButton>
         </div>
       </div>
 

@@ -30,7 +30,7 @@
             :disable="loading && !selectedSeasonId"
           />
         </div>
-        <q-btn
+        <KennerButton
           v-if="currentSeasonId && selectedSeasonId !== currentSeasonId"
           flat
           round
@@ -40,8 +40,8 @@
           @click="homeSeasonStore.selectCurrentSeason"
         >
           <q-tooltip>Current Season</q-tooltip>
-        </q-btn>
-        <q-btn
+        </KennerButton>
+        <KennerButton
           v-if="selectedSeasonId"
           flat
           round
@@ -51,7 +51,7 @@
           :to="{ name: 'season-overview', params: { id: selectedSeasonId } }"
         >
           <q-tooltip>Season Overview</q-tooltip>
-        </q-btn>
+        </KennerButton>
       </div>
     </div>
     <SeasonStandings v-if="selectedSeasonId" :seasonId="selectedSeasonId" />
@@ -67,6 +67,7 @@ defineOptions({ name: 'SeasonsMobilePage' });
 import { onMounted } from 'vue';
 import { storeToRefs } from 'pinia';
 import LoadingSpinner from 'components/base/LoadingSpinner.vue';
+import KennerButton from 'components/base/KennerButton.vue';
 import SeasonStandings from 'components/season/SeasonStandings.vue';
 import KennerSelect from 'components/base/KennerSelect.vue';
 import { useHomeSeasonStore } from 'stores/homeSeasonStore';

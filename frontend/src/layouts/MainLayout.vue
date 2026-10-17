@@ -34,7 +34,7 @@
             <span class="text-h6 text-weight-medium text-grey-9">Chat</span>
           </div>
           <q-space />
-          <q-btn
+          <KennerButton
             flat
             round
             dense
@@ -44,7 +44,7 @@
             @click="toggleChat"
           >
             <q-tooltip>Close Chat</q-tooltip>
-          </q-btn>
+          </KennerButton>
         </div>
         <KennerChat class="col bg-transparent" />
       </div>
@@ -73,6 +73,7 @@
 import MobileBottomNav from 'components/layout/MobileBottomNav.vue';
 import BreadcrumbBar from 'components/layout/BreadcrumbBar.vue';
 import NavBar from 'components/layout/NavBar.vue';
+import KennerButton from 'components/base/KennerButton.vue';
 import { ref, Ref, onMounted } from 'vue';
 import KennerDrawer from 'components/layout/KennerDrawer.vue';
 import ConfirmDialog from 'components/ui/ConfirmDialog.vue';

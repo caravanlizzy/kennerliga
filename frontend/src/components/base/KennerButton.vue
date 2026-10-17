@@ -2,17 +2,18 @@
   <q-btn
     unelevated
     no-caps
-    :rounded="shape === 'rounded'"
-    :round="shape === 'circle'"
-    :dense="isMobile"
+    :to="computedTo"
+    :rounded="isRounded"
+    :round="isCircle"
+    :dense="computedDense"
     class="q-mx-xs"
     :class="{
-      'squircle-shape': shape === 'squircle',
-      'square-shape': shape === 'square' || !shape,
+      'squircle-shape': isSquircle,
+      'square-shape': isSquare,
     }"
     :color="color"
     :icon="icon"
-    size="md"
+    :size="size"
     :label="label"
     v-bind="$attrs"
   >
@@ -21,19 +22,41 @@
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue';
 import { useResponsive } from 'src/composables/responsive';
 import { TKennerButton } from 'src/types';
 
-withDefaults(defineProps<TKennerButton>(), {
+const props = withDefaults(defineProps<TKennerButton>(), {
   color: 'dark',
   shape: 'squircle',
+  size: 'md',
 });
 const { isMobile } = useResponsive();
+
+const computedTo = computed(() => {
+  if (props.to) return props.to;
+  if (props.forwardName) {
+    return { name: props.forwardName, params: props.forwardParams };
+  }
+  return undefined;
+});
+
+const isCircle = computed(() => props.shape === 'circle' || props.round);
+const isRounded = computed(() => props.shape === 'rounded' || props.rounded);
+const isSquare = computed(() => props.shape === 'square');
+const isSquircle = computed(() => {
+  if (isCircle.value || isRounded.value || isSquare.value) return false;
+  return props.shape === 'squircle' || !props.shape;
+});
+
+const computedDense = computed(() =>
+  props.dense !== undefined ? props.dense : isMobile.value
+);
 </script>
 
 <style scoped>
 .squircle-shape {
-  border-radius: var(--kenner-card-radius, 0px) !important;
+  border-radius: var(--kenner-card-radius, 12px) !important;
 }
 .square-shape {
   border-radius: 0px !important;

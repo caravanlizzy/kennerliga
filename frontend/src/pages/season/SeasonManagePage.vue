@@ -243,7 +243,7 @@
       >
         <q-card-section class="row items-center justify-between q-pb-none">
           <div class="text-subtitle1 text-weight-bold">Add Participant</div>
-          <q-btn v-close-popup icon="close" flat round dense color="grey-6" />
+          <KennerButton v-close-popup icon="close" flat round dense color="grey-6" />
         </q-card-section>
 
         <q-card-section class="q-pt-sm">
@@ -312,7 +312,7 @@
       >
         <q-card-section class="row items-center justify-between q-pb-none">
           <div class="text-subtitle1 text-weight-bold">Add League</div>
-          <q-btn v-close-popup icon="close" flat round dense color="grey-6" />
+          <KennerButton v-close-popup icon="close" flat round dense color="grey-6" />
         </q-card-section>
 
         <q-card-section class="q-pt-sm column q-gutter-y-sm">
