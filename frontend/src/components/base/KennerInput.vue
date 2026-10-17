@@ -38,6 +38,7 @@ const modelValue = defineModel();
   display: flex;
   align-items: center;
   border: 1px solid transparent;
+  margin-top: 6px;
 
   &:hover {
     background: var(--kenner-input-bg-hover);

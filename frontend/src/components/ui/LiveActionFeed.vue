@@ -78,10 +78,11 @@
                     color: getColorHex(event),
                     backgroundColor: `color-mix(in srgb, ${getColorHex(
                       event
-                    )} 12%, transparent)`,
+                    )} ${$q.dark.isActive ? '22%' : '14%'}, transparent)`,
                     fontSize: compact ? '0.6rem' : '0.65rem',
                     letterSpacing: '0.08em',
                     borderRadius: '4px',
+                    fontWeight: '700',
                   }"
                   class="text-bold text-uppercase"
                   :class="compact ? 'q-px-xs q-py-none' : 'q-px-sm q-py-xs'"
@@ -403,14 +404,14 @@ onUnmounted(() => {
   if (unsubscribe) unsubscribe();
 });
 
-// Lighter variants so the tinted badge text stays readable on dark surfaces
+// High-contrast variants so tinted badge text stays crisp and readable on dark surfaces
 const darkColorHex: Partial<Record<TLiveEventType, string>> = {
-  PICK: '#b0bec5',
+  PICK: '#93c5fd',
   BAN: '#f87171',
   LEAGUE_RUNNING: '#60a5fa',
   GAME_FINISHED: '#4ade80',
   LEAGUE_FINISHED: '#fb923c',
-  SEASON_FINISHED: '#4dd0e1',
+  SEASON_FINISHED: '#38bdf8',
 };
 
 function getColorHex(event: TLiveEvent) {
@@ -421,19 +422,19 @@ function getColorHex(event: TLiveEvent) {
   if (isDark) return darkColorHex[event.type] ?? '#bdbdbd';
   switch (event.type) {
     case 'PICK':
-      return '#37474f'; // primary (from quasar.variables.scss)
+      return '#334155';
     case 'BAN':
-      return '#d63a38'; // negative
+      return '#dc2626';
     case 'LEAGUE_RUNNING':
-      return '#1976d2'; // info / blue
+      return '#1d4ed8';
     case 'GAME_FINISHED':
-      return '#4bb26a'; // positive
+      return '#15803d';
     case 'LEAGUE_FINISHED':
-      return '#e67e22'; // warning
+      return '#d97706';
     case 'SEASON_FINISHED':
-      return '#26c6da'; // secondary
+      return '#0284c7';
     default:
-      return '#9e9e9e';
+      return '#64748b';
   }
 }
 

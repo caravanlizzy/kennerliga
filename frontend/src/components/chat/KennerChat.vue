@@ -2,7 +2,7 @@
   <LoadingSpinner v-if="loading" />
   <q-card
     v-else
-    flatU
+    flat
     class="column col bg-transparent"
     style="min-width: 250px; min-height: 400px"
   >

@@ -82,7 +82,15 @@
               <q-icon name="devices" color="primary" size="24px" />
               <div class="text-h6 text-weight-bold">Manage Platforms</div>
             </div>
-            <KennerButton flat round dense icon="close" color="grey-7" v-close-popup />
+            <KennerButton
+              flat
+              round
+              dense
+              icon="close"
+              color="grey-7"
+              aria-label="Close"
+              v-close-popup
+            />
           </q-card-section>
 
           <q-card-section class="q-pt-sm">

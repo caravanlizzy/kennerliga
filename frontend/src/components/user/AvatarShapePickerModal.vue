@@ -12,7 +12,15 @@
           </div>
         </div>
         <q-space />
-        <KennerButton v-close-popup icon="close" flat round dense color="grey-7" />
+        <KennerButton
+          v-close-popup
+          icon="close"
+          flat
+          round
+          dense
+          color="grey-7"
+          aria-label="Close"
+        />
       </q-card-section>
 
       <!-- Live Preview Banner -->

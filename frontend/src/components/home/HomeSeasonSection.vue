@@ -21,9 +21,9 @@
 
     <template #header-extra>
       <div
-        class="row items-center justify-end no-wrap q-gutter-x-sm q-ml-md col"
+        class="row items-center justify-end q-gutter-x-sm q-gutter-y-xs q-ml-sm col flex-wrap"
       >
-        <div style="min-width: 110px">
+        <div :style="{ minWidth: isMobile ? '80px' : '110px' }">
           <KennerSelect
             :model-value="selectedSeasonYear"
             :options="seasonYearOptions"
@@ -34,7 +34,7 @@
             @update:model-value="$emit('update:selectedSeasonYear', $event)"
           />
         </div>
-        <div style="min-width: 110px">
+        <div :style="{ minWidth: isMobile ? '80px' : '110px' }">
           <KennerSelect
             :model-value="selectedSeasonMonth"
             :options="seasonMonthOptions"
@@ -52,7 +52,8 @@
           icon="today"
           :label="isMobile ? '' : 'Current'"
           :round="isMobile"
-          class="q-ml-md"
+          :class="isMobile ? 'q-ml-xs' : 'q-ml-md'"
+          aria-label="Jump to current season"
           @click="$emit('selectCurrentSeason')"
         >
           <KennerTooltip>Jump to current season</KennerTooltip>
@@ -65,7 +66,8 @@
           :label="isMobile ? '' : 'Overview'"
           :round="isMobile"
           :to="{ name: 'season-overview', params: { id: selectedSeasonId } }"
-          class="q-ml-md"
+          :class="isMobile ? 'q-ml-xs' : 'q-ml-md'"
+          aria-label="Season Overview"
         >
           <KennerTooltip v-if="isMobile">Season Overview</KennerTooltip>
         </KennerButton>

@@ -163,7 +163,15 @@
             {{ selectedGame?.name ?? 'Leaderboard' }}
           </div>
           <q-space />
-          <KennerButton flat round dense icon="close" color="white" v-close-popup />
+          <KennerButton
+            flat
+            round
+            dense
+            icon="close"
+            color="white"
+            aria-label="Close"
+            v-close-popup
+          />
         </div>
         <q-card-section class="mobile-leaderboard-body">
           <GameLeaderboardPanel

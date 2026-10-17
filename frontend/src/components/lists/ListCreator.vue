@@ -8,7 +8,14 @@
       @keyup.enter="addItem"
     >
       <template v-slot:append>
-        <KennerButton round dense flat icon="add" @click="addItem" />
+        <KennerButton
+          round
+          dense
+          flat
+          icon="add"
+          aria-label="Add item"
+          @click="addItem"
+        />
       </template>
     </KennerInput>
     <div v-for="(item, index) of listItems" :key="item.itemId">

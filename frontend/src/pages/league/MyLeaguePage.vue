@@ -75,6 +75,7 @@
               icon="arrow_back"
               color="grey-8"
               class="q-mr-xs"
+              aria-label="Back"
               @click="$router.back()"
             />
             <div class="row items-center q-gutter-x-sm">

@@ -16,6 +16,7 @@
           round
           color="secondary"
           size="sm"
+          aria-label="View Public Overview"
           :to="{ name: 'season-overview', params: { id: seasonId } }"
         >
           <KennerTooltip>View Public Overview</KennerTooltip>
@@ -28,6 +29,7 @@
           round
           color="secondary"
           size="sm"
+          aria-label="Fill Leagues from current participants"
           :loading="filling"
           :disable="seasonHasResults"
           @click="onFillLeagues"
@@ -48,6 +50,7 @@
           round
           color="positive"
           size="sm"
+          aria-label="Start Season Manually"
           :loading="starting"
           @click="onStartSeason"
         >
@@ -94,21 +97,60 @@
             expand-icon-class="text-grey-7"
           >
             <div class="q-px-md q-pt-sm q-pb-md">
-              <div v-if="isAdmin" class="row justify-end q-mb-sm">
-                <KennerButton
-                  outline
-                  no-caps
-                  size="sm"
-                  color="primary"
-                  icon="person_add"
-                  label="Add Participant"
-                  @click="openAddParticipantDialog"
-                />
+              <div
+                class="row items-center justify-between q-mb-sm q-col-gutter-sm"
+              >
+                <div v-if="participants.length > 4" class="col-12 col-sm-6">
+                  <KennerInput
+                    v-model="participantSearch"
+                    placeholder="Search participants..."
+                    dense
+                    class="full-width"
+                  >
+                    <template #prepend>
+                      <q-icon name="search" size="18px" color="grey-6" />
+                    </template>
+                    <template #append v-if="participantSearch">
+                      <q-icon
+                        name="clear"
+                        size="18px"
+                        class="cursor-pointer"
+                        @click="participantSearch = ''"
+                      />
+                    </template>
+                  </KennerInput>
+                </div>
+                <div
+                  v-if="isAdmin"
+                  :class="[
+                    'row justify-end',
+                    participants.length > 4 ? 'col-12 col-sm-6' : 'col-12',
+                  ]"
+                >
+                  <KennerButton
+                    outline
+                    no-caps
+                    size="sm"
+                    color="primary"
+                    icon="person_add"
+                    label="Add Participant"
+                    @click="openAddParticipantDialog"
+                  />
+                </div>
               </div>
 
               <div v-if="participants.length > 0">
                 <div
-                  v-for="group in participantsByLeague"
+                  v-if="
+                    filteredParticipantsByLeague.length === 0 &&
+                    participantSearch
+                  "
+                  class="text-caption text-grey-6 italic q-py-sm"
+                >
+                  No participants matching "{{ participantSearch }}"
+                </div>
+                <div
+                  v-for="group in filteredParticipantsByLeague"
                   :key="group.league?.id || 'unassigned'"
                   class="q-mb-md"
                 >
@@ -156,6 +198,7 @@
                         size="xs"
                         color="negative"
                         icon="delete"
+                        aria-label="Remove participant"
                         :disable="p.has_results"
                         :loading="removingParticipantId === p.id"
                         @click="onRemoveParticipant(p)"
@@ -243,7 +286,15 @@
       >
         <q-card-section class="row items-center justify-between q-pb-none">
           <div class="text-subtitle1 text-weight-bold">Add Participant</div>
-          <KennerButton v-close-popup icon="close" flat round dense color="grey-6" />
+          <KennerButton
+            v-close-popup
+            icon="close"
+            flat
+            round
+            dense
+            color="grey-6"
+            aria-label="Close"
+          />
         </q-card-section>
 
         <q-card-section class="q-pt-sm">
@@ -312,7 +363,15 @@
       >
         <q-card-section class="row items-center justify-between q-pb-none">
           <div class="text-subtitle1 text-weight-bold">Add League</div>
-          <KennerButton v-close-popup icon="close" flat round dense color="grey-6" />
+          <KennerButton
+            v-close-popup
+            icon="close"
+            flat
+            round
+            dense
+            color="grey-6"
+            aria-label="Close"
+          />
         </q-card-section>
 
         <q-card-section class="q-pt-sm column q-gutter-y-sm">
@@ -650,6 +709,22 @@ const participantsByLeague = computed(() => {
   }
 
   return groups;
+});
+
+const participantSearch = ref('');
+
+const filteredParticipantsByLeague = computed(() => {
+  const term = participantSearch.value.trim().toLowerCase();
+  if (!term) return participantsByLeague.value;
+
+  return participantsByLeague.value
+    .map((group) => ({
+      ...group,
+      members: group.members.filter((m) =>
+        m.profile_name.toLowerCase().includes(term)
+      ),
+    }))
+    .filter((group) => group.members.length > 0);
 });
 
 const statusColor = computed(() => {

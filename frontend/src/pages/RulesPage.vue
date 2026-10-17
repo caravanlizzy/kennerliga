@@ -6,7 +6,7 @@
     >
       <!-- Header / Hero -->
       <div
-        class="rules-hero-card q-pa-lg q-mb-lg row items-center justify-between"
+        class="rules-hero-card q-pa-lg q-mb-md row items-center justify-between"
       >
         <div class="column">
           <div class="row items-center q-gutter-x-sm q-mb-xs">
@@ -21,9 +21,29 @@
         </div>
       </div>
 
+      <!-- Quick Jump Table of Contents -->
+      <div class="rules-toc-bar q-mb-lg row items-center q-gutter-xs q-pa-sm">
+        <span class="text-caption text-weight-bold text-grey-7 q-mr-xs">
+          Jump to:
+        </span>
+        <q-chip
+          v-for="sec in sections"
+          :key="sec.id"
+          clickable
+          dense
+          outline
+          color="primary"
+          :icon="sec.icon"
+          class="text-weight-medium"
+          @click="scrollToSection(sec.id)"
+        >
+          {{ sec.label }}
+        </q-chip>
+      </div>
+
       <div class="row q-col-gutter-lg">
         <!-- Purpose -->
-        <div class="col-12">
+        <div id="purpose" class="col-12">
           <q-card flat class="rules-card q-pa-md">
             <q-card-section>
               <div
@@ -42,7 +62,7 @@
         </div>
 
         <!-- Tournament Structure -->
-        <div class="col-12 col-md-6">
+        <div id="structure" class="col-12 col-md-6">
           <ContentSection
             title="Structure"
             icon="account_tree"
@@ -80,7 +100,7 @@
         </div>
 
         <!-- League System -->
-        <div class="col-12 col-md-6">
+        <div id="league-system" class="col-12 col-md-6">
           <ContentSection
             title="League System"
             icon="reorder"
@@ -120,7 +140,7 @@
         </div>
 
         <!-- Timeline & Selection -->
-        <div class="col-12">
+        <div id="schedule" class="col-12">
           <ContentSection
             title="Monthly Timeline & Game Selection"
             icon="schedule"
@@ -165,7 +185,7 @@
         </div>
 
         <!-- Execution & Reporting -->
-        <div class="col-12 col-md-6">
+        <div id="execution" class="col-12 col-md-6">
           <ContentSection
             title="Execution"
             icon="play_circle"
@@ -200,7 +220,7 @@
         </div>
 
         <!-- Scoring -->
-        <div class="col-12 col-md-6">
+        <div id="scoring" class="col-12 col-md-6">
           <ContentSection
             title="Scoring"
             icon="score"
@@ -253,7 +273,7 @@
         </div>
 
         <!-- Hall of Fame -->
-        <div class="col-12">
+        <div id="hall-of-fame" class="col-12">
           <ContentSection
             title="Hall of Fame & Cup"
             icon="emoji_events"
@@ -289,6 +309,23 @@
 
 <script setup lang="ts">
 import ContentSection from 'src/components/base/ContentSection.vue';
+
+const sections = [
+  { id: 'purpose', label: 'Purpose', icon: 'emoji_objects' },
+  { id: 'structure', label: 'Structure', icon: 'account_tree' },
+  { id: 'league-system', label: 'Leagues', icon: 'reorder' },
+  { id: 'schedule', label: 'Schedule', icon: 'schedule' },
+  { id: 'execution', label: 'Execution', icon: 'play_circle' },
+  { id: 'scoring', label: 'Scoring', icon: 'score' },
+  { id: 'hall-of-fame', label: 'Hall of Fame', icon: 'emoji_events' },
+];
+
+function scrollToSection(id: string) {
+  const el = document.getElementById(id);
+  if (el) {
+    el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+}
 </script>
 
 <style scoped lang="scss">
@@ -298,6 +335,17 @@ import ContentSection from 'src/components/base/ContentSection.vue';
   -webkit-backdrop-filter: blur(8px);
   border: 1px solid var(--kenner-border-color);
   border-radius: var(--kenner-card-radius, 16px);
+}
+
+.rules-toc-bar {
+  background: var(--kenner-surface-overlay);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid var(--kenner-border-subtle);
+  border-radius: var(--kenner-card-radius, 12px);
+  position: sticky;
+  top: 10px;
+  z-index: 5;
 }
 
 .rules-card {
