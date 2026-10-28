@@ -33,6 +33,20 @@
     <template v-slot:body-cell-actions="props">
       <q-td :props="props" class="q-gutter-x-sm">
         <KennerButton
+          v-if="isAdmin && props.row.status === 'NEXT'"
+          dense
+          outline
+          no-caps
+          color="positive"
+          icon="campaign"
+          :label="isMobile ? undefined : 'Open'"
+          :loading="openingId === props.row.id"
+          aria-label="Open Season for Registration"
+          @click.stop="onOpenSeason(props.row)"
+        >
+          <KennerTooltip>Open Season for Registration</KennerTooltip>
+        </KennerButton>
+        <KennerButton
           dense
           outline
           no-caps
@@ -69,15 +83,17 @@
 <script setup lang="ts">
 import KennerTable from 'components/tables/KennerTable.vue';
 import { useAsyncData } from 'src/composables/asyncData';
-import { fetchSeasons } from 'src/services/seasonService';
+import { fetchSeasons, openSeason } from 'src/services/seasonService';
 import { useRouter } from 'vue-router';
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 import { storeToRefs } from 'pinia';
 import { useUserStore } from 'stores/userStore';
 import type { QTableProps } from 'quasar';
 import type { TKennerButton, TSeasonDto } from 'src/types';
 import KennerButton from 'src/components/base/KennerButton.vue';
+import KennerTooltip from 'src/components/base/KennerTooltip.vue';
 import { useResponsive } from 'src/composables/responsive';
+import { useDialog } from 'src/composables/dialog';
 
 type SeasonExtra = TSeasonDto & {
   is_empty?: boolean;
@@ -87,12 +103,14 @@ type SeasonExtra = TSeasonDto & {
 const userStore = useUserStore();
 const { isAdmin } = storeToRefs(userStore);
 const { isMobile } = useResponsive();
+const { setDialog } = useDialog();
 
 // fetch seasons
 const {
   data: seasons,
   isFinished,
   error: fetchError,
+  reload,
 } = useAsyncData<SeasonExtra[]>(
   () => fetchSeasons() as Promise<SeasonExtra[]>,
   []
@@ -100,6 +118,26 @@ const {
 
 const loading = computed(() => !isFinished.value);
 const error = computed(() => fetchError.value?.message || null);
+const openingId = ref<number | null>(null);
+
+function onOpenSeason(row: SeasonExtra) {
+  setDialog(
+    'Confirm Open Season for Registration',
+    `Are you sure you want to open ${displayName(row)} for registration? This will announce registration to all users.`,
+    'warning',
+    async () => {
+      try {
+        openingId.value = row.id;
+        await openSeason(row.id);
+        await reload();
+      } finally {
+        openingId.value = null;
+      }
+    },
+    undefined,
+    'Open Season'
+  );
+}
 
 // status determination
 const getSeasonStats = (s: SeasonExtra) => {

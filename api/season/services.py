@@ -46,14 +46,65 @@ def create_next_season(current_season: Season) -> Season:
     return new
 
 
-def open_registration(season: Season):
+def open_registration(season: Season) -> Season:
     """
-    Changes the status of a season to OPEN, allowing players to register.
+    Changes the status of a season to OPEN, allowing players to register,
+    creates the registration announcement, sends push notifications, and posts
+    a chat announcement.
     """
     if not season:
-        raise ValueError("No current season")
+        raise ValueError("No season provided")
+    if season.status not in (Season.SeasonStatus.NEXT, Season.SeasonStatus.OPEN):
+        raise ValueError(
+            f"Season with status '{season.status}' cannot be opened for registration."
+        )
+
     season.status = Season.SeasonStatus.OPEN
     season.save()
+
+    # Create announcement if not exists
+    from announcement.models import Announcement
+    from datetime import timedelta
+
+    next_month_start = season.season_start_time
+    visible_from = next_month_start - timedelta(days=7)
+    visible_until = next_month_start
+    title = f"Sign Up Season {season.month}"
+
+    exists = Announcement.objects.filter(
+        type=Announcement.AnnouncementType.REGISTER,
+        title=title,
+        visible_until=visible_until,
+    ).exists()
+
+    if not exists:
+        Announcement.objects.create(
+            type=Announcement.AnnouncementType.REGISTER,
+            title=title,
+            content="",
+            visible_from=visible_from,
+            visible_until=visible_until,
+        )
+
+    try:
+        from notification.services import notify_all_users
+
+        notify_all_users(
+            "Season registration is open",
+            f"Registration for {season.name} is now open.",
+            "/#/register",
+        )
+    except Exception as e:
+        logging.warning(f"Failed to send push notification on open registration: {e}")
+
+    try:
+        from chat.service import create_chat_announcement
+
+        create_chat_announcement(f"Season {season.name} is open for registration")
+    except Exception as e:
+        logging.warning(f"Failed to create chat announcement on open registration: {e}")
+
+    return season
 
 
 def create_leagues(season: Season, participants: List) -> List[League]:

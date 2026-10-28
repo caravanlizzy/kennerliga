@@ -85,6 +85,10 @@ export async function fetchSeason(
   }
 }
 
+export async function openSeason(seasonId: number): Promise<void> {
+  await api.post(`/season/seasons/${seasonId}/open-registration/`);
+}
+
 export async function startSeason(seasonId: number): Promise<void> {
   await api.post(`/season/seasons/${seasonId}/start-season/`);
 }

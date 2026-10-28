@@ -1,24 +1,29 @@
 #!/bin/bash
 set -e
 
-# Path to your project and virtualenv
-PROJECT_DIR="/home/haligh/kennerliga/api"
-VENV_PYTHON="/home/haligh/.virtualenvs/kennerliga-venv/bin/python"
+# Resolve script directory and project root
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+API_DIR="$PROJECT_ROOT/api"
 
-# Calculate the first day of the next month
-FIRST_DAY_NEXT_MONTH=$(date -d "$(date +%Y-%m-01) +1 month" +%s)
-# Calculate today's date in seconds
-TODAY=$(date +%s)
-
-# Calculate difference in days
-DIFF_DAYS=$(( (FIRST_DAY_NEXT_MONTH - TODAY) / 86400 ))
-
-# Only run if we are 7 days before the next month
-if [ "$DIFF_DAYS" -eq 7 ]; then
-    echo "Running open_next_season, 7 days before next month..."
-    export DJANGO_SETTINGS_MODULE="django_rest.settings_production"
-    "$VENV_PYTHON" "$PROJECT_DIR/prod_manage.py" open_next_season
+# Determine python executable
+if [ -n "$VENV_PYTHON" ] && [ -x "$VENV_PYTHON" ]; then
+    PYTHON_CMD="$VENV_PYTHON"
+elif [ -x "$API_DIR/.venv/bin/python" ]; then
+    PYTHON_CMD="$API_DIR/.venv/bin/python"
+elif [ -x "$HOME/.virtualenvs/kennerliga-venv/bin/python" ]; then
+    PYTHON_CMD="$HOME/.virtualenvs/kennerliga-venv/bin/python"
 else
-    echo "Not 7 days before the next month (today is $DIFF_DAYS days away). Skipping."
+    PYTHON_CMD="python3"
+fi
+
+export DJANGO_SETTINGS_MODULE="${DJANGO_SETTINGS_MODULE:-django_rest.settings_production}"
+cd "$API_DIR"
+
+# If arguments are passed, forward them; otherwise run with 7-day check
+if [ "$#" -gt 0 ]; then
+    "$PYTHON_CMD" prod_manage.py open_next_season "$@"
+else
+    "$PYTHON_CMD" prod_manage.py open_next_season --check-7-days
 fi
 

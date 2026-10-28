@@ -22,6 +22,20 @@
           <KennerTooltip>View Public Overview</KennerTooltip>
         </KennerButton>
         <KennerButton
+          v-if="isAdmin && season?.status === 'NEXT'"
+          outline
+          no-caps
+          icon="campaign"
+          round
+          color="positive"
+          size="sm"
+          aria-label="Open Season for Registration"
+          :loading="opening"
+          @click="onOpenSeason"
+        >
+          <KennerTooltip>Open Season for Registration</KennerTooltip>
+        </KennerButton>
+        <KennerButton
           v-if="isAdmin && season?.status === 'OPEN'"
           outline
           no-caps
@@ -443,6 +457,7 @@ import {
   fetchSeasonParticipants,
   fillLeagues,
   startSeason,
+  openSeason,
   addSeasonParticipant,
   removeSeasonParticipant,
 } from 'src/services/seasonService';
@@ -477,6 +492,7 @@ const season = ref<TSeasonDto | null>(null);
 const participants = ref<TSeasonParticipantDto[]>([]);
 const loading = ref(true);
 const starting = ref(false);
+const opening = ref(false);
 const filling = ref(false);
 const error = ref<string | null>(null);
 
@@ -788,6 +804,32 @@ async function onFillLeagues() {
     },
     undefined,
     'Fill Leagues'
+  );
+}
+
+async function onOpenSeason() {
+  if (!season.value) return;
+
+  setDialog(
+    'Confirm Open Season for Registration',
+    `Are you sure you want to open ${season.value.name} for registration? This will announce registration to all users.`,
+    'warning',
+    async () => {
+      try {
+        opening.value = true;
+        await openSeason(seasonId);
+        await load();
+      } catch (e: any) {
+        error.value =
+          e?.response?.data?.detail ||
+          e?.message ||
+          'Failed to open season for registration.';
+      } finally {
+        opening.value = false;
+      }
+    },
+    undefined,
+    'Open Season'
   );
 }
 

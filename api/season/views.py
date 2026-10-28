@@ -331,6 +331,26 @@ class SeasonViewSet(ModelViewSet):
             status=status.HTTP_200_OK,
         )
 
+    @action(detail=True, methods=["post"], url_path="open-registration")
+    def open_registration(self, request, pk=None):
+        season = self.get_object()
+        if season.status != Season.SeasonStatus.NEXT:
+            return Response(
+                {"detail": "Only seasons with status NEXT can be opened for registration."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        from season.services import open_registration
+
+        try:
+            open_registration(season)
+            return Response(
+                {"detail": "Season opened for registration successfully."},
+                status=status.HTTP_200_OK,
+            )
+        except Exception as e:
+            return Response({"detail": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
     @action(detail=True, methods=["post"], url_path="start-season")
     def start_season(self, request, pk=None):
         season = self.get_object()

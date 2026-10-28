@@ -849,3 +849,101 @@ class LiveEventsAPITests(TestCase):
         self.assertEqual(len(ban_events), 1)
         self.assertTrue(ban_events[0]["data"]["skippedBan"])
         self.assertEqual(ban_events[0]["data"]["playerName"], "Player 2")
+
+
+class OpenRegistrationTests(TestCase):
+    def setUp(self):
+        self.client = APIClient()
+        self.admin = User.objects.create_superuser(
+            username="adminuser", password="password"
+        )
+        self.regular_user = User.objects.create_user(
+            username="regularuser", password="password"
+        )
+
+    def test_admin_can_open_next_season(self):
+        season = Season.objects.create(
+            year=2026, month=5, status=Season.SeasonStatus.NEXT
+        )
+        self.client.force_authenticate(user=self.admin)
+        response = self.client.post(
+            f"/api/season/seasons/{season.id}/open-registration/"
+        )
+        self.assertEqual(response.status_code, 200)
+        season.refresh_from_db()
+        self.assertEqual(season.status, Season.SeasonStatus.OPEN)
+
+    def test_cannot_open_running_or_done_season(self):
+        season = Season.objects.create(
+            year=2026, month=5, status=Season.SeasonStatus.RUNNING
+        )
+        self.client.force_authenticate(user=self.admin)
+        response = self.client.post(
+            f"/api/season/seasons/{season.id}/open-registration/"
+        )
+        self.assertEqual(response.status_code, 400)
+
+    def test_regular_user_cannot_open_season(self):
+        season = Season.objects.create(
+            year=2026, month=5, status=Season.SeasonStatus.NEXT
+        )
+        self.client.force_authenticate(user=self.regular_user)
+        response = self.client.post(
+            f"/api/season/seasons/{season.id}/open-registration/"
+        )
+        self.assertEqual(response.status_code, 403)
+
+    def test_open_next_season_management_command(self):
+        from django.core.management import call_command
+        from io import StringIO
+
+        season = Season.objects.create(
+            year=2026, month=6, status=Season.SeasonStatus.NEXT
+        )
+        out = StringIO()
+        call_command("open_next_season", stdout=out)
+        season.refresh_from_db()
+        self.assertEqual(season.status, Season.SeasonStatus.OPEN)
+        self.assertIn("open for registration", out.getvalue())
+
+    def test_open_next_season_does_nothing_when_no_next_season(self):
+        from season_manager import open_next_season
+        from django.core.management import call_command
+        from io import StringIO
+
+        # Only a running season exists, no NEXT season
+        running_season = Season.objects.create(
+            year=2026, month=5, status=Season.SeasonStatus.RUNNING
+        )
+        initial_count = Season.objects.count()
+
+        result = open_next_season()
+        self.assertIsNone(result)
+        self.assertEqual(Season.objects.count(), initial_count)
+        running_season.refresh_from_db()
+        self.assertEqual(running_season.status, Season.SeasonStatus.RUNNING)
+
+        # Also test management command does not fail and warns
+        out = StringIO()
+        call_command("open_next_season", stdout=out)
+        self.assertIn("No season in NEXT status found", out.getvalue())
+        self.assertEqual(Season.objects.count(), initial_count)
+
+    def test_open_next_season_check_7_days_skips_when_not_seven_days_before(self):
+        from django.core.management import call_command
+        from io import StringIO
+        from unittest.mock import patch
+        from datetime import datetime, timezone as dt_timezone
+
+        season = Season.objects.create(
+            year=2026, month=6, status=Season.SeasonStatus.NEXT
+        )
+        out = StringIO()
+        # Mock date to mid-month (e.g. 15th of 30-day or 31-day month)
+        mock_now = datetime(2026, 5, 15, 12, 0, 0, tzinfo=dt_timezone.utc)
+        with patch("django.utils.timezone.now", return_value=mock_now):
+            call_command("open_next_season", check_7_days=True, stdout=out)
+
+        season.refresh_from_db()
+        self.assertEqual(season.status, Season.SeasonStatus.NEXT)
+        self.assertIn("is not 7 days before the end of the month", out.getvalue())

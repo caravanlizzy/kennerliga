@@ -1,76 +1,44 @@
-from django.core.management.base import BaseCommand
-from announcement.models import Announcement
-from season.models import Season
-from season.queries import get_open_season
-from chat.service import create_chat_announcement
-from notification.services import notify_all_users
+import calendar
 from datetime import timedelta
+from django.core.management.base import BaseCommand
+from django.utils import timezone
+
+from season_manager import open_next_season
 
 
 class Command(BaseCommand):
-    help = "Open the next season and create a registration announcement"
+    help = "Open the next season for registration and create registration announcements"
+
+    def add_arguments(self, parser):
+        parser.add_argument(
+            "--check-7-days",
+            action="store_true",
+            help="Only open if today is 7 days before the end of the month",
+        )
 
     def handle(self, *args, **options):
-        # Find the next season and make it open
-        next_season = (
-            Season.objects.filter(status=Season.SeasonStatus.NEXT)
-            .order_by("year", "month")
-            .first()
-        )
-        if next_season:
-            next_season.status = Season.SeasonStatus.OPEN
-            next_season.save()
-            notify_all_users(
-                "Season registration is open",
-                f"Registration for {next_season.name} is now open.",
-                "/#/register",
+        if options.get("check_7_days"):
+            today = timezone.now().date()
+            _, last_day = calendar.monthrange(today.year, today.month)
+            days_until_end = last_day - today.day
+            is_seven_days_before = (
+                days_until_end == 7 or (today + timedelta(days=7)).day == 1
             )
-            self.stdout.write(
-                self.style.SUCCESS(f"Season {next_season.name} is now OPEN.")
-            )
+            if not is_seven_days_before:
+                self.stdout.write(
+                    self.style.WARNING(
+                        f"Today ({today}) is not 7 days before the end of the month (day {today.day} of {last_day}). Skipping."
+                    )
+                )
+                return
 
-        open_season = get_open_season()
-        if not open_season:
+        season = open_next_season()
+        if not season:
             self.stdout.write(
-                self.style.WARNING("No open season found. Cannot create announcement.")
+                self.style.WARNING("No season in NEXT status found to open for registration.")
             )
             return
 
-        # Start of the next month (when the open season should start)
-        next_month_start = open_season.season_start_time
-
-        # Registration announcement should be visible from 1 week before
-        visible_from = next_month_start - timedelta(days=7)
-        # It should be visible until the season starts
-        visible_until = next_month_start
-
-        title = f"Sign Up Season {open_season.month}"
-
-        # Check if announcement already exists
-        exists = Announcement.objects.filter(
-            type=Announcement.AnnouncementType.REGISTER,
-            title=title,
-            visible_until=visible_until,
-        ).exists()
-
-        if exists:
-            self.stdout.write(
-                self.style.SUCCESS(f"Announcement '{title}' already exists.")
-            )
-            return
-
-        Announcement.objects.create(
-            type=Announcement.AnnouncementType.REGISTER,
-            title=title,
-            content="",  # Based on screenshot, content was empty
-            visible_from=visible_from,
-            visible_until=visible_until,
-        )
-
-        # --- Add chat announcement ---
-        create_chat_announcement(f"Season {open_season.name} is open for registration")
         self.stdout.write(
-            self.style.SUCCESS(
-                f"Created registration announcement for {open_season.name}"
-            )
+            self.style.SUCCESS(f"Season {season.name} is now open for registration.")
         )
