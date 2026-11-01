@@ -152,6 +152,7 @@ onMounted(() => {
   if (!eloStore.initialized && !eloStore.loading) {
     eloStore.fetchProfiles();
   }
+  championStore.initUpdateSubscription();
   eloStore.initUpdateSubscription();
 });
 

@@ -4,6 +4,7 @@ import {
   fetchCurrentChampion,
   type TCurrentChampionResponse,
 } from 'src/services/seasonService';
+import { useUpdateStore } from 'src/stores/updateStore';
 
 export const useChampionStore = defineStore(
   'champion',
@@ -12,6 +13,7 @@ export const useChampionStore = defineStore(
     const loading = ref(false);
     const initialized = ref(false);
     let inFlight: Promise<TCurrentChampionResponse | null> | null = null;
+    let subscribed = false;
 
     const championUsername = computed(
       () => champion.value?.username?.trim() ?? null
@@ -57,6 +59,15 @@ export const useChampionStore = defineStore(
       return inFlight;
     }
 
+    function initUpdateSubscription() {
+      if (subscribed) return;
+      subscribed = true;
+      const updateStore = useUpdateStore();
+      updateStore.subscribe('/season/', () => {
+        void fetchChampion(true);
+      });
+    }
+
     return {
       champion,
       loading,
@@ -64,11 +75,15 @@ export const useChampionStore = defineStore(
       championUsername,
       isChampion,
       fetchChampion,
+      initUpdateSubscription,
     };
   },
   {
     persist: {
-      paths: ['champion', 'initialized'],
+      paths: ['champion'],
+      afterRestore: (ctx) => {
+        ctx.store.initialized = false;
+      },
     },
   }
 );

@@ -87,6 +87,7 @@ function navigateToSeason() {
 }
 
 onMounted(() => {
+  championStore.initUpdateSubscription();
   championStore.fetchChampion();
 });
 </script>
