@@ -213,6 +213,8 @@
             :is-valid="isValid"
             :on-submit="onSubmit"
             :visible-options="visibleOptions"
+            :league-id="props.leagueId"
+            :profile-id="props.profileId"
           >
             <template #header>
               <div class="row items-center q-gutter-x-sm">

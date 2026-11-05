@@ -397,3 +397,40 @@ class WinSuggestionsTests(StatisticsServiceTestBase):
         self.add_match(self.chess, self.new_league(), [(self.rival, 1), (self.make_profile("X"), 2)])
 
         self.assertEqual(get_win_suggestions(self.hero, [self.rival]), [])
+
+    def test_single_game_when_hero_never_played(self):
+        self.add_match(self.chess, self.new_league(), [(self.rival, 1), (self.make_profile("X"), 2)])
+
+        suggestions = get_win_suggestions(self.hero, [self.rival], game=self.chess)
+        self.assertEqual(len(suggestions), 1)
+        stat = suggestions[0]
+        self.assertEqual(stat["game_id"], self.chess.id)
+        self.assertEqual(stat["games_played"], 0)
+        self.assertEqual(stat["wins"], 0)
+        self.assertEqual(len(stat["opponents"]), 1)
+        self.assertEqual(stat["opponents"][0]["profile_id"], self.rival.id)
+        self.assertEqual(stat["opponents"][0]["opponent_games"], 1)
+        self.assertLess(stat["win_chance"], 50)
+
+    def test_win_suggestions_view_with_game_param(self):
+        league = self.new_league()
+        other = self.make_profile("Other")
+        # Enroll rival and other into the league's season
+        self.season.participants.create(profile=self.hero)
+        self.season.participants.create(profile=self.rival)
+        self.season.participants.create(profile=other)
+        league.members.add(self.hero.season_participants.get(season=self.season))
+        league.members.add(self.rival.season_participants.get(season=self.season))
+        league.members.add(other.season_participants.get(season=self.season))
+
+        self.add_match(self.catan, self.new_league(), [(self.hero, 1), (self.rival, 2)])
+
+        from rest_framework.test import APIClient
+        client = APIClient()
+        client.force_authenticate(user=self.hero.user)
+
+        response = client.get(f"/api/statistics/leagues/{league.id}/win-suggestions/?game={self.catan.id}")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data["game_id"], self.catan.id)
+        self.assertEqual(response.data["wins"], 1)
+        self.assertEqual(len(response.data["opponents"]), 2)

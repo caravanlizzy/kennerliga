@@ -114,16 +114,20 @@ class GameLeaderboardView(APIView):
 
 class WinSuggestionsView(APIView):
     """
-    GET /api/statistics/leagues/<league_id>/win-suggestions/?profile=<id>
+    GET /api/statistics/leagues/<league_id>/win-suggestions/?profile=<id>&game=<game_id>
 
     Ranks the games `profile` (default: the requesting player) has played by
     their estimated chance to beat the other members of the league, best
     first, so the game picker can see where they stand the best chance.
+
+    If `game` is supplied, returns the matchup stats for that single game
+    against the league.
     """
 
     def get(self, request, league_id):
         league = get_object_or_404(League, pk=league_id)
         profile_id = _int_param(request, "profile", None)
+        game_id = _int_param(request, "game", None) or _int_param(request, "game_id", None)
         hero = (
             get_object_or_404(PlayerProfile, pk=profile_id)
             if profile_id
@@ -132,4 +136,10 @@ class WinSuggestionsView(APIView):
         opponents = PlayerProfile.objects.filter(
             season_participants__leagues_member=league
         ).exclude(pk=hero.pk)
+
+        if game_id:
+            game = get_object_or_404(Game, pk=game_id)
+            suggestions = get_win_suggestions(hero, opponents, game=game)
+            return Response(suggestions[0] if suggestions else None)
+
         return Response(get_win_suggestions(hero, opponents))

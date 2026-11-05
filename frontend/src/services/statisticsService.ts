@@ -147,6 +147,30 @@ export async function fetchWinSuggestions(
   }
 }
 
+/**
+ * Matchup stats for a single game against the members of `leagueId`.
+ */
+export async function fetchGameWinStats(
+  leagueId: number,
+  gameId: number,
+  profileId?: number
+): Promise<TWinSuggestion | null> {
+  try {
+    const params: Record<string, number> = { game: gameId };
+    if (profileId) {
+      params.profile = profileId;
+    }
+    const { data } = await api.get<TWinSuggestion>(
+      `statistics/leagues/${leagueId}/win-suggestions/`,
+      { params }
+    );
+    return data;
+  } catch (e) {
+    console.log(e);
+    return null;
+  }
+}
+
 /** Hall-of-fame style placement tallies for a whole year. */
 export async function fetchYearLeaderboard(
   year: number

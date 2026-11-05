@@ -849,11 +849,14 @@ WIN_SUGGESTION_SKILL_PRIOR = 2
 WIN_SUGGESTION_H2H_PRIOR = 2
 
 
-def get_win_suggestions(hero, opponents):
+def get_win_suggestions(hero, opponents, game=None):
     """
     Ranks every game `hero` has played by their estimated chance to beat
     `opponents` (typically the other members of the current league), best
     first, so a picker can see where they stand the best chance.
+
+    If `game` is supplied, calculates matchup stats specifically for that
+    game, including games `hero` has not played yet.
 
     Per game and opponent, the chance is built in two steps:
       1. Skill prior: each player's average normalized finish on the game
@@ -870,10 +873,14 @@ def get_win_suggestions(hero, opponents):
 
     relevant_matches = Result.objects.filter(
         player_profile_id__in=player_ids, position__isnull=False
-    ).values("selected_game_id")
+    )
+    if game is not None:
+        relevant_matches = relevant_matches.filter(selected_game__game=game)
+
+    relevant_match_ids = relevant_matches.values("selected_game_id")
     rows = list(
         Result.objects.filter(
-            selected_game_id__in=relevant_matches, position__isnull=False
+            selected_game_id__in=relevant_match_ids, position__isnull=False
         ).values(
             "selected_game_id",
             "selected_game__game_id",
@@ -926,26 +933,33 @@ def get_win_suggestions(hero, opponents):
             len(values) + WIN_SUGGESTION_SKILL_PRIOR
         )
 
-    game_ids = [gid for gid, by_player in finishes.items() if by_player.get(hero.id)]
-    games = {
-        g.id: g
-        for g in Game.objects.filter(id__in=game_ids).select_related("platform")
-    }
+    if game is not None:
+        game_ids = [game.id]
+        games = {game.id: game}
+    else:
+        game_ids = [gid for gid, by_player in finishes.items() if by_player.get(hero.id)]
+        games = {
+            g.id: g
+            for g in Game.objects.filter(id__in=game_ids).select_related("platform")
+        }
+
     opponent_map = {
         p.id: p for p in PlayerProfile.objects.filter(id__in=opponent_ids)
     }
 
     suggestions = []
     for game_id in game_ids:
-        game = games.get(game_id)
-        if not game:
+        game_obj = games.get(game_id)
+        if not game_obj:
             continue
         by_player = finishes[game_id]
-        hero_skill = skill(by_player[hero.id])
+        hero_finishes = by_player.get(hero.id, [])
+        hero_skill = skill(hero_finishes)
 
         breakdown = []
         for opp_id in opponent_ids:
-            prior = max(0.05, min(0.95, 0.5 + hero_skill - skill(by_player.get(opp_id, []))))
+            opp_finishes = by_player.get(opp_id, [])
+            prior = max(0.05, min(0.95, 0.5 + hero_skill - skill(opp_finishes)))
             score_sum, shared = h2h[game_id].get(opp_id, (0.0, 0))
             chance = (score_sum + prior * WIN_SUGGESTION_H2H_PRIOR) / (
                 shared + WIN_SUGGESTION_H2H_PRIOR
@@ -957,7 +971,7 @@ def get_win_suggestions(hero, opponents):
                     "profile_name": opp.profile_name if opp else None,
                     "chance": round(chance * 100, 1),
                     "shared_matches": shared,
-                    "opponent_games": len(by_player.get(opp_id, [])),
+                    "opponent_games": len(opp_finishes),
                 }
             )
 
@@ -968,12 +982,12 @@ def get_win_suggestions(hero, opponents):
         )
         suggestions.append(
             {
-                "game_id": game.id,
-                "name": game.name,
-                "short_name": game.short_name,
-                "platform": game.platform.name,
+                "game_id": game_obj.id,
+                "name": game_obj.name,
+                "short_name": game_obj.short_name,
+                "platform": game_obj.platform.name,
                 "win_chance": round(win_chance, 1),
-                "games_played": len(by_player[hero.id]),
+                "games_played": len(hero_finishes),
                 "wins": hero_wins[game_id],
                 "shared_matches": sum(b["shared_matches"] for b in breakdown),
                 "opponents": breakdown,

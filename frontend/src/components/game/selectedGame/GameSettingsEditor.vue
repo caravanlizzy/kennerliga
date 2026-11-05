@@ -8,6 +8,8 @@
     :isLoading="isLoading"
     :isValid="isValid"
     :onSubmit="onSubmit"
+    :league-id="props.leagueId"
+    :profile-id="props.profileId"
   />
 </template>
 

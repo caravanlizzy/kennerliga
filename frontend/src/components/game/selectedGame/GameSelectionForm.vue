@@ -68,6 +68,133 @@
 
         <q-separator class="q-mb-md opacity-10" />
 
+        <!-- League Matchup Stats Section (on-demand after selecting game) -->
+        <div v-if="leagueId" class="matchup-section q-mb-md">
+          <div class="row items-center justify-between q-mb-xs">
+            <div class="row items-center q-gutter-x-xs">
+              <q-icon name="insights" size="18px" color="primary" />
+              <div
+                class="text-caption text-weight-bold text-uppercase letter-spacing-1 text-grey-8"
+              >
+                Matchup vs. this league
+              </div>
+              <q-icon
+                name="info_outline"
+                size="14px"
+                color="grey-5"
+                class="cursor-pointer"
+              >
+                <q-tooltip max-width="260px">
+                  Estimated chance to finish ahead of current league members,
+                  based on past performance and direct head-to-head matches.
+                </q-tooltip>
+              </q-icon>
+            </div>
+
+            <q-btn
+              v-if="stats && stats.opponents && stats.opponents.length > 0"
+              flat
+              dense
+              no-caps
+              size="xs"
+              color="grey-7"
+              :icon-right="showOpponentBreakdown ? 'expand_less' : 'expand_more'"
+              :label="showOpponentBreakdown ? 'Hide details' : 'Opponent breakdown'"
+              @click="showOpponentBreakdown = !showOpponentBreakdown"
+            />
+          </div>
+
+          <!-- Loading state -->
+          <div
+            v-if="isLoadingStats"
+            class="q-pa-sm bg-blue-grey-1 rounded-borders border-subtle row items-center q-gutter-x-sm"
+          >
+            <q-spinner-dots size="18px" color="primary" />
+            <span class="text-caption text-grey-7 font-weight-500">
+              Calculating stats vs. league members…
+            </span>
+          </div>
+
+          <!-- Loaded stats card -->
+          <div
+            v-else-if="stats"
+            class="matchup-card bg-blue-grey-1 q-pa-sm rounded-borders border-subtle"
+          >
+            <div class="row items-center justify-between no-wrap q-gutter-x-sm">
+              <div class="row items-center q-gutter-x-sm">
+                <q-badge
+                  :color="getWinChanceColor(stats.win_chance)"
+                  class="text-weight-bolder q-px-sm q-py-xs text-body2"
+                >
+                  {{ Math.round(stats.win_chance) }}% Win Chance
+                </q-badge>
+                <div class="text-caption text-grey-8 font-weight-500">
+                  <span v-if="stats.games_played > 0">
+                    You: {{ stats.wins }} win{{ stats.wins === 1 ? '' : 's' }} in
+                    {{ stats.games_played }} game{{
+                      stats.games_played === 1 ? '' : 's'
+                    }}
+                  </span>
+                  <span v-else class="text-grey-6">
+                    You: First time playing
+                  </span>
+                </div>
+              </div>
+
+              <div
+                v-if="stats.shared_matches > 0"
+                class="text-caption text-grey-6 text-right flex-shrink-0"
+              >
+                {{ stats.shared_matches }} shared match{{
+                  stats.shared_matches === 1 ? '' : 'es'
+                }}
+              </div>
+            </div>
+
+            <!-- Opponents breakdown -->
+            <q-slide-transition>
+              <div
+                v-if="showOpponentBreakdown && stats.opponents && stats.opponents.length > 0"
+                class="q-pt-sm q-mt-xs border-top-subtle"
+              >
+                <div class="row q-col-gutter-xs">
+                  <div
+                    v-for="opp in stats.opponents"
+                    :key="opp.profile_id"
+                    class="col-12 col-sm-6"
+                  >
+                    <div class="opponent-chip row items-center justify-between q-px-sm q-py-xs rounded-borders bg-white border-subtle">
+                      <span class="ellipsis text-caption font-weight-600 text-dark">
+                        {{ opp.profile_name || 'Opponent' }}
+                      </span>
+                      <div class="row items-center q-gutter-x-xs flex-shrink-0">
+                        <span
+                          class="text-caption text-weight-bold"
+                          :class="getOpponentChanceClass(opp.chance)"
+                        >
+                          {{ Math.round(opp.chance) }}%
+                        </span>
+                        <q-tooltip>
+                          <div><strong>{{ opp.profile_name || 'Opponent' }}</strong>: {{ Math.round(opp.chance) }}% estimated win chance</div>
+                          <div v-if="opp.shared_matches > 0">
+                            {{ opp.shared_matches }} direct head-to-head match{{ opp.shared_matches === 1 ? '' : 'es' }}
+                          </div>
+                          <div v-else-if="opp.opponent_games > 0">
+                            {{ opp.opponent_games }} match{{ opp.opponent_games === 1 ? '' : 'es' }} played (0 direct)
+                          </div>
+                          <div v-else>
+                            0 matches played
+                          </div>
+                        </q-tooltip>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </q-slide-transition>
+          </div>
+        </div>
+
         <!-- No settings (use conditional visibility) -->
         <div
           v-if="!visibleOptionsSafe.length"
@@ -223,6 +350,14 @@
 .border-bottom-subtle {
   border-bottom: 1px solid var(--kenner-border-subtle);
 }
+
+.border-top-subtle {
+  border-top: 1px solid var(--kenner-border-subtle);
+}
+
+.opponent-chip {
+  min-height: 32px;
+}
 </style>
 
 <script setup lang="ts">
@@ -233,13 +368,15 @@ import {
   getPlatformColor,
   getPlatformName,
 } from 'src/composables/gameSelection';
+import { fetchGameWinStats } from 'src/services/statisticsService';
 import {
   TPlatform,
   TGameInformation,
   TGameSelection,
   TGameOptionDto,
+  TWinSuggestion,
 } from 'src/types';
-import { computed, inject } from 'vue';
+import { computed, inject, ref, watch } from 'vue';
 
 const platforms = inject<TPlatform[]>('platforms', []);
 const { isMobile } = useResponsive();
@@ -254,6 +391,8 @@ const props = withDefaults(
 
     // comes from useGameSelection(...).visibleOptions
     visibleOptions?: TGameOptionDto[];
+    leagueId?: number;
+    profileId?: number;
   }>(),
   {
     visibleOptions: () => [],
@@ -261,6 +400,61 @@ const props = withDefaults(
 );
 
 const visibleOptionsSafe = computed(() => props.visibleOptions ?? []);
+
+const stats = ref<TWinSuggestion | null>(null);
+const isLoadingStats = ref(false);
+const showOpponentBreakdown = ref(false);
+let latestFetchGameId = 0;
+
+async function loadGameStats(gameId?: number) {
+  if (!props.leagueId || !gameId || gameId <= 0) {
+    stats.value = null;
+    isLoadingStats.value = false;
+    return;
+  }
+
+  const reqGameId = gameId;
+  latestFetchGameId = reqGameId;
+  isLoadingStats.value = true;
+  stats.value = null;
+
+  try {
+    const res = await fetchGameWinStats(
+      props.leagueId,
+      reqGameId,
+      props.profileId
+    );
+    if (latestFetchGameId === reqGameId) {
+      stats.value = res;
+    }
+  } catch (e) {
+    console.error('Failed to fetch game matchup stats:', e);
+  } finally {
+    if (latestFetchGameId === reqGameId) {
+      isLoadingStats.value = false;
+    }
+  }
+}
+
+watch(
+  () => props.gameInformation?.game?.id,
+  (newGameId) => {
+    loadGameStats(newGameId);
+  },
+  { immediate: true }
+);
+
+function getWinChanceColor(chance: number) {
+  if (chance >= 55) return 'positive';
+  if (chance >= 45) return 'amber-9';
+  return 'grey-7';
+}
+
+function getOpponentChanceClass(chance: number) {
+  if (chance >= 55) return 'text-positive';
+  if (chance >= 45) return 'text-amber-9';
+  return 'text-grey-7';
+}
 
 function findSelectedOption(optionId: number) {
   // find selected option by game option id
