@@ -141,10 +141,10 @@ class NeedsUpdateView(APIView):
 # no better place to put currently, maybe lateron in a statistic module
 class LeaderboardViewSet(APIView):
     """
-    Returns a yearly matrix of league positions per player.
+    Returns a yearly or all-time matrix of league positions per player.
 
     Query params:
-      - year (int, required): e.g. ?year=2025
+      - year (int | 'all', optional): e.g. ?year=2025 or ?year=all. If omitted or 'all', aggregates across all years.
 
     Assumptions:
       - League has: season (FK) and level (int; 1 = best league)
@@ -152,8 +152,8 @@ class LeaderboardViewSet(APIView):
 
     Response shape:
     {
-      "year": 2025,
-      "levels": [1, 2, 3],   # distinct league levels used that year (sorted)
+      "year": 2025 | "all",
+      "levels": [1, 2, 3],   # distinct league levels used (sorted)
       "standings": [
         {
           "player_profile_id": 5,
@@ -170,28 +170,26 @@ class LeaderboardViewSet(APIView):
 
     def get(self, request, *args, **kwargs):
         year_param = request.query_params.get("year")
-        if not year_param:
-            return Response(
-                {"detail": "Query parameter 'year' is required."},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
+        year_value = None
+        if year_param is not None and year_param.strip().lower() not in ("", "all"):
+            try:
+                year_value = int(year_param)
+            except ValueError:
+                return Response(
+                    {"detail": "Query parameter 'year' must be an integer or 'all'."},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
 
-        try:
-            year = int(year_param)
-        except ValueError:
-            return Response(
-                {"detail": "Query parameter 'year' must be an integer."},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
+        standings_qs = LeagueStanding.objects.filter(
+            # Use only completed leagues for leaderboard aggregation
+            league__status=LeagueStatus.DONE,
+        )
 
-        # Get all league standings for leagues whose season is in that year
+        if year_value is not None:
+            standings_qs = standings_qs.filter(league__season__year=year_value)
+
         standings_qs = (
-            LeagueStanding.objects.filter(
-                league__season__year=year,
-                # Use only completed leagues for leaderboard aggregation
-                league__status=LeagueStatus.DONE,
-            )
-            .select_related(
+            standings_qs.select_related(
                 "league", "league__season", "player_profile", "player_profile__user"
             )
             .order_by(
@@ -202,9 +200,11 @@ class LeaderboardViewSet(APIView):
             )
         )
 
+        resp_year = year_value if year_value is not None else "all"
+
         if not standings_qs.exists():
             return Response(
-                {"year": year, "levels": [], "standings": []},
+                {"year": resp_year, "levels": [], "standings": []},
                 status=status.HTTP_200_OK,
             )
 
@@ -335,7 +335,7 @@ class LeaderboardViewSet(APIView):
 
         return Response(
             {
-                "year": year,
+                "year": resp_year,
                 "levels": levels,
                 "standings": standings_list,
             },

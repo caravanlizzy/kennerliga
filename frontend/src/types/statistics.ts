@@ -114,7 +114,7 @@ export type TPlayerYearStanding = {
 
 /** Mirrors the `/leaderboard/` endpoint (`api.views.LeaderboardViewSet`). */
 export type TYearLeaderboard = {
-  year: number;
+  year: number | 'all';
   levels: number[];
   standings: TPlayerYearStanding[];
 };

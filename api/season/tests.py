@@ -363,6 +363,34 @@ class SeasonAPITests(TestCase):
         self.assertEqual(standing["avatar_shape"], "crown")
         self.assertEqual(standing["avatar_color"], "#eab308")
 
+    def test_leaderboard_all_time(self):
+        s1 = Season.objects.create(year=2025, month=4, status=Season.SeasonStatus.DONE)
+        s2 = Season.objects.create(year=2026, month=4, status=Season.SeasonStatus.DONE)
+        l1 = League.objects.create(season=s1, level=1, status=LeagueStatus.DONE)
+        l2 = League.objects.create(season=s2, level=1, status=LeagueStatus.DONE)
+
+        p1 = PlayerProfile.objects.create(profile_name="P1")
+        p2 = PlayerProfile.objects.create(profile_name="P2")
+
+        LeagueStanding.objects.create(league=l1, player_profile=p1, league_points=30)
+        LeagueStanding.objects.create(league=l1, player_profile=p2, league_points=20)
+        LeagueStanding.objects.create(league=l2, player_profile=p1, league_points=30)
+
+        # year=all query param
+        response_all = self.client.get("/api/leaderboard/?year=all")
+        self.assertEqual(response_all.status_code, 200)
+        self.assertEqual(response_all.data["year"], "all")
+        self.assertEqual(len(response_all.data["standings"]), 2)
+        p1_stats = next(s for s in response_all.data["standings"] if s["player_profile_id"] == p1.id)
+        # P1 came 1st in both leagues
+        self.assertEqual(p1_stats["per_level"]["1"]["first"], 2)
+
+        # omitted year query param
+        response_none = self.client.get("/api/leaderboard/")
+        self.assertEqual(response_none.status_code, 200)
+        self.assertEqual(response_none.data["year"], "all")
+        self.assertEqual(len(response_none.data["standings"]), 2)
+
     def test_admin_can_add_and_remove_participant(self):
         admin = User.objects.create_superuser(username="superadmin", password="password")
         self.client.force_authenticate(user=admin)

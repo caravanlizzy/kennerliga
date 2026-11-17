@@ -326,7 +326,7 @@ import LeagueLevel from 'components/season/LeagueLevel.vue';
 import UserAvatar from 'components/ui/UserAvatar.vue';
 import { useUserStore } from 'stores/userStore';
 
-const props = defineProps<{ year: number }>();
+const props = defineProps<{ year: number | 'all' }>();
 const { getHexLeagueColor } = leagueColors();
 const userStore = useUserStore();
 
@@ -365,7 +365,7 @@ const {
   data: standings,
   loading,
   load: loadStandings,
-} = useCachedResource<number, TYearLeaderboard>(
+} = useCachedResource<number | 'all', TYearLeaderboard>(
   async (year) => {
     error.value = false;
     try {

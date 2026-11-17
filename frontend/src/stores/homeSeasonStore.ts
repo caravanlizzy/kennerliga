@@ -32,7 +32,7 @@ import type { TSeasonDto } from 'src/types';
  */
 export const useHomeSeasonStore = defineStore('homeSeason', () => {
     // --- Selection state (persisted across mounts) ---
-    const selectedYear = ref<number>(new Date().getFullYear());
+    const selectedYear = ref<number | 'all'>(new Date().getFullYear());
     const selectedSeasonYear = ref<number | null>(null);
     const selectedSeasonMonth = ref<number | null>(null);
 

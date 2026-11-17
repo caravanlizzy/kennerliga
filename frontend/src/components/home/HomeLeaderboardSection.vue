@@ -20,7 +20,7 @@
         <div style="min-width: 120px">
           <KennerSelect
             :model-value="year"
-            :options="years"
+            :options="yearOptions"
             emit-value
             map-options
             @update:model-value="$emit('update:year', $event)"
@@ -34,20 +34,27 @@
 
 <script setup lang="ts">
 defineOptions({ name: 'HomeLeaderboardSection' });
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 import ContentSection from 'components/base/ContentSection.vue';
 import KennerSelect from 'components/base/KennerSelect.vue';
 import SmoothSwitch from 'components/base/SmoothSwitch.vue';
 import LeaderBoard from 'components/season/LeaderBoard.vue';
 
-defineProps<{
-  year: number;
+const props = defineProps<{
+  year: number | 'all';
   years: number[];
 }>();
 
 const showAllLeagues = ref(false);
 
+const yearOptions = computed(() => [
+  { label: 'All-time', value: 'all' as const },
+  ...[...props.years]
+    .sort((a, b) => b - a)
+    .map((y) => ({ label: String(y), value: y })),
+]);
+
 defineEmits<{
-  (e: 'update:year', value: number): void;
+  (e: 'update:year', value: number | 'all'): void;
 }>();
 </script>

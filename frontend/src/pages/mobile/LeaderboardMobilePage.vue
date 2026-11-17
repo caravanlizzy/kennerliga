@@ -14,10 +14,10 @@
         />
       </div>
       <div class="row items-center no-wrap q-gutter-x-sm">
-        <div style="min-width: 80px">
+        <div style="min-width: 90px">
           <KennerSelect
             v-model="selectedYear"
-            :options="availableYears"
+            :options="yearOptions"
             class="full-width"
             label="Year"
             emit-value
@@ -36,7 +36,7 @@
 
 <script setup lang="ts">
 defineOptions({ name: 'LeaderboardMobilePage' });
-import { ref, onMounted } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import LeaderBoard from 'components/season/LeaderBoard.vue';
 import KennerSelect from 'components/base/KennerSelect.vue';
 import SmoothSwitch from 'components/base/SmoothSwitch.vue';
@@ -46,9 +46,16 @@ import {
   fetchSeason,
 } from 'src/services/seasonService';
 
-const selectedYear = ref(new Date().getFullYear());
+const selectedYear = ref<number | 'all'>(new Date().getFullYear());
 const showAllLeagues = ref(false);
 const availableYears = ref<number[]>([]);
+
+const yearOptions = computed(() => [
+  { label: 'All-time', value: 'all' as const },
+  ...[...availableYears.value]
+    .sort((a, b) => b - a)
+    .map((y) => ({ label: String(y), value: y })),
+]);
 
 onMounted(async () => {
   const [years, currentSeasonId] = await Promise.all([

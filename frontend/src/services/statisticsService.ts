@@ -171,9 +171,9 @@ export async function fetchGameWinStats(
   }
 }
 
-/** Hall-of-fame style placement tallies for a whole year. */
+/** Hall-of-fame style placement tallies for a whole year or all-time. */
 export async function fetchYearLeaderboard(
-  year: number
+  year: number | 'all'
 ): Promise<TYearLeaderboard> {
   const { data } = await api.get<TYearLeaderboard>('leaderboard/', {
     params: { year },
