@@ -412,52 +412,7 @@
         "
         class="q-mt-md q-mb-md"
       >
-        <q-card
-          flat
-          bordered
-          class="unresolved-tie-card bg-orange-1 text-orange-9 q-pa-md relative-position overflow-hidden"
-        >
-          <div class="absolute-left bg-orange-8" style="width: 4px"></div>
-          <div class="row items-center q-gutter-x-sm q-mb-sm">
-            <q-icon name="emoji_events" size="18px" color="orange-8" />
-            <div
-              class="text-subtitle2 text-weight-bold text-uppercase"
-              style="letter-spacing: 0.3px"
-            >
-              Unresolved tie
-            </div>
-            <q-badge color="orange-8">
-              {{ standings.tie_groups.filter((g) => g.unresolved).length }}
-            </q-badge>
-          </div>
-          <div class="row wrap q-gutter-sm">
-            <q-chip
-              v-for="grp in standings.tie_groups.filter((g) => g.unresolved)"
-              :key="grp.group_key"
-              color="orange-2"
-              text-color="orange-10"
-              class="q-ma-none"
-            >
-              <template
-                v-for="(m, idx) in grp.members"
-                :key="m.player_profile_id"
-              >
-                <span class="text-weight-bold">{{ m.profile_name }}</span>
-                <span
-                  v-if="idx < grp.members.length - 1"
-                  class="q-mx-xs text-weight-light opacity-70"
-                  >vs</span
-                >
-              </template>
-            </q-chip>
-          </div>
-          <div
-            class="text-orange-9 q-mt-sm text-italic opacity-80"
-            style="font-size: 0.7rem"
-          >
-            Awaiting tie-break decision.
-          </div>
-        </q-card>
+        <UnresolvedTieBanner :tie-groups="standings.tie_groups" />
       </div>
 
       <!-- Footer Actions -->
@@ -506,6 +461,7 @@ import type { QTableColumn } from 'quasar';
 import { useResponsive } from 'src/composables/responsive';
 import KennerTooltip from 'components/base/KennerTooltip.vue';
 import LeagueLevel from 'components/season/LeagueLevel.vue';
+import UnresolvedTieBanner from 'components/league/UnresolvedTieBanner.vue';
 import { useUpdateStore } from 'stores/updateStore';
 import { useUserStore } from 'stores/userStore';
 
@@ -751,13 +707,5 @@ function getRankBgClass(rank: number | undefined) {
 }
 .hover-settings-icon:hover {
   color: var(--q-primary) !important;
-}
-
-.unresolved-tie-card {
-  border-color: #fcd9a8;
-
-  .body--dark & {
-    border-color: rgba(245, 158, 11, 0.4);
-  }
 }
 </style>
