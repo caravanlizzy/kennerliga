@@ -20,6 +20,7 @@ from django.db.models import (
 )
 
 from game.models import BanDecision, Game, SelectedGame
+from game.queries import get_successfully_banned_game_ids
 from league.models import LeagueStanding
 from result.models import Result
 from user.models import PlayerProfile
@@ -469,13 +470,12 @@ def get_awards(
 ):
     """
     Builds the fun "superlative" awards: the Hater (most games banned, where
-    skipping a ban doesn't count), the Inspirer (most `SelectedGame` picks
-    made across leagues -- picking the same game again in a different
-    league still counts), and the Spammer (the most times any single player
-    has picked the *same* game across leagues). Ranked the same way as the
-    categories in `get_statistics_overview` -- dense rank, top N plus a
-    window around the requesting player -- so they render through the same
-    card.
+    skipping a ban doesn't count), the Inspirer (most different games picked
+    across leagues -- only non-banned picks count, with at most 1 game per
+    league), and the Spammer (the most times any single player has picked
+    the *same* game across leagues). Ranked the same way as the categories in
+    `get_statistics_overview` -- dense rank, top N plus a window around the
+    requesting player -- so they render through the same card.
     """
     ban_qs = BanDecision.objects.filter(skipped_ban=False, selected_game__isnull=False)
     if years:
@@ -485,12 +485,13 @@ def get_awards(
         ban_qs.values("player_banning_id").annotate(value=Count("id")).order_by()
     )
 
-    pick_qs = SelectedGame.objects.all()
+    banned_sg_ids = get_successfully_banned_game_ids(years=years)
+    pick_qs = SelectedGame.objects.exclude(id__in=banned_sg_ids)
     if years:
         pick_qs = pick_qs.filter(league__season__year__in=years)
     pick_qs = _filter_standings_by_player_count(pick_qs, player_counts)
     pick_rows = list(
-        pick_qs.values("profile_id").annotate(value=Count("id")).order_by()
+        pick_qs.values("profile_id").annotate(value=Count("game_id", distinct=True)).order_by()
     )
 
     # Per player, per game, how many times that game was picked -- the

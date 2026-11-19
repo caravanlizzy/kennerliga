@@ -164,7 +164,9 @@ def get_banned_selected_game_ids(league: League) -> List[int]:
     )
 
 
-def get_successfully_banned_game_ids(year: int = None) -> List[int]:
+def get_successfully_banned_game_ids(
+    year: int = None, years: Optional[List[int]] = None
+) -> List[int]:
     """
     Returns a list of SelectedGame IDs that were successfully banned.
     A game is successfully banned if the number of BanDecisions for it
@@ -173,10 +175,14 @@ def get_successfully_banned_game_ids(year: int = None) -> List[int]:
     qs = BanDecision.objects.filter(selected_game__isnull=False)
     if year:
         qs = qs.filter(league__season__year=year)
+    elif years:
+        qs = qs.filter(league__season__year__in=years)
 
     selected_games = SelectedGame.objects.filter(id__in=qs.values("selected_game_id"))
     if year:
         selected_games = selected_games.filter(league__season__year=year)
+    elif years:
+        selected_games = selected_games.filter(league__season__year__in=years)
 
     # The ban threshold depends on the league's member count, so load the
     # member count for every league involved in one grouped query over the

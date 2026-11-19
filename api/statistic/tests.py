@@ -328,8 +328,8 @@ class AwardTests(StatisticsServiceTestBase):
         leagues = [self.make_league(level) for level in range(1, 5)]
 
         # A picks Catan three times (across three leagues) and Chess once --
-        # A's Spammer value is 3 (their most-repeated game), not 4 (their
-        # total picks, which would be the Inspirer value instead).
+        # A's Spammer value is 3 (their most-repeated game), while their
+        # Inspirer value is 2 (2 distinct games picked).
         self.make_pick(leagues[0], a, catan)
         self.make_pick(leagues[1], a, catan)
         self.make_pick(leagues[2], a, catan)
@@ -351,7 +351,69 @@ class AwardTests(StatisticsServiceTestBase):
         # Sanity check that Spammer and Inspirer measure different things.
         self.assertEqual(
             [(entry["profile_id"], entry["value"]) for entry in inspirer["top"]],
-            [(a.id, 4), (b.id, 1)],
+            [(a.id, 2), (b.id, 1)],
+        )
+
+    def test_inspirer_award_ranks_by_distinct_picks(self):
+        a = self.make_profile("A")
+        b = self.make_profile("B")
+        c = self.make_profile("C")
+        catan = Game.objects.create(name="Catan", platform=self.platform)
+        chess = Game.objects.create(name="Chess", platform=self.platform)
+        carcassonne = Game.objects.create(name="Carcassonne", platform=self.platform)
+
+        # A picks 3 distinct games across 3 leagues
+        self.make_pick(self.make_league(1), a, catan)
+        self.make_pick(self.make_league(2), a, chess)
+        self.make_pick(self.make_league(3), a, carcassonne)
+
+        # B picks Catan 3 times across 3 different leagues (1 distinct game)
+        self.make_pick(self.make_league(4), b, catan)
+        self.make_pick(self.make_league(5), b, catan)
+        self.make_pick(self.make_league(6), b, catan)
+
+        # C picks 2 distinct games across 2 different leagues
+        self.make_pick(self.make_league(7), c, catan)
+        self.make_pick(self.make_league(8), c, chess)
+
+        awards = get_awards(a, top_n=5, window=1)
+        inspirer = next(award for award in awards if award["key"] == "inspirer")
+
+        self.assertEqual(
+            [(entry["profile_id"], entry["value"]) for entry in inspirer["top"]],
+            [(a.id, 3), (c.id, 2), (b.id, 1)],
+        )
+
+    def test_inspirer_award_excludes_banned_picks(self):
+        a = self.make_profile("A")
+        b = self.make_profile("B")
+        catan = Game.objects.create(name="Catan", platform=self.platform)
+        chess = Game.objects.create(name="Chess", platform=self.platform)
+        mars = Game.objects.create(name="Terraforming Mars", platform=self.platform)
+
+        l1 = self.make_league(1)
+        part_a = self.season.participants.create(profile=a)
+        part_b = self.season.participants.create(profile=b)
+        l1.members.add(part_a, part_b)
+
+        # In l1 (2 players -> 1 ban needed): A picks Catan, which B successfully bans.
+        catan_pick = self.make_pick(l1, a, catan)
+        BanDecision.objects.create(league=l1, player_banning=b, selected_game=catan_pick)
+
+        # A repicks Chess in l1 (not banned).
+        self.make_pick(l1, a, chess)
+
+        # In l2: A picks Terraforming Mars.
+        l2 = self.make_league(2)
+        self.make_pick(l2, a, mars)
+
+        awards = get_awards(a, top_n=5, window=1)
+        inspirer = next(award for award in awards if award["key"] == "inspirer")
+
+        # A should have 2 distinct picks (Chess and Mars), Catan does not count since it was banned.
+        self.assertEqual(
+            [(entry["profile_id"], entry["value"]) for entry in inspirer["top"]],
+            [(a.id, 2)],
         )
 
 
