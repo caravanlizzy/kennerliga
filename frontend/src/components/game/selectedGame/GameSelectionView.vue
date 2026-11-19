@@ -144,26 +144,30 @@
                   </q-tooltip>
                 </q-icon>
               </div>
-              <div class="row q-gutter-sm">
-                <KennerButton
+              <div class="best-odds-list">
+                <div
                   v-for="(suggestion, idx) in winSuggestions"
                   :key="suggestion.game_id"
-                  dense
-                  no-caps
-                  outline
-                  class="best-odds-chip"
+                  class="best-odds-item row items-center justify-between no-wrap"
                   :class="{
-                    'best-odds-chip--selected':
+                    'best-odds-item--selected':
                       suggestion.game_id === gameSelection.game.id,
                   }"
                   @click="pickSuggestion(suggestion.game_id)"
                 >
-                  <span class="best-odds-rank q-mr-xs">{{ idx + 1 }}</span>
-                  <span class="ellipsis best-odds-name">{{
-                    suggestion.name
-                  }}</span>
-                  <q-badge color="positive" class="q-ml-xs"
-                    >{{ Math.round(suggestion.win_chance) }}%</q-badge
+                  <div
+                    class="row items-center q-gutter-x-sm no-wrap ellipsis q-pr-sm"
+                  >
+                    <span class="best-odds-rank text-caption text-grey-6"
+                      >{{ idx + 1 }}.</span
+                    >
+                    <span class="ellipsis best-odds-name">{{
+                      suggestion.name
+                    }}</span>
+                  </div>
+                  <span
+                    class="best-odds-chance text-weight-bold text-positive text-caption"
+                    >{{ Math.round(suggestion.win_chance) }}%</span
                   >
                   <q-tooltip>
                     <div class="text-weight-bold">{{ suggestion.name }}</div>
@@ -185,7 +189,7 @@
                       >
                     </div>
                   </q-tooltip>
-                </KennerButton>
+                </div>
               </div>
             </div>
 
@@ -581,24 +585,46 @@ async function randomizeGame() {
   border: 1px solid var(--kenner-border-subtle);
 }
 
-.best-odds-chip {
-  border-radius: 999px;
-  max-width: 100%;
-  font-weight: 600;
+.best-odds-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.best-odds-item {
+  padding: 4px 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease;
+
+  &:hover {
+    background: var(--kenner-surface-subtle);
+  }
 
   &--selected {
-    border-color: $kenner-red;
+    background: rgba(var(--q-primary-rgb, 227, 85, 63), 0.1);
     color: $kenner-red;
+
+    .best-odds-rank {
+      color: $kenner-red !important;
+    }
   }
 }
 
 .best-odds-rank {
-  font-size: 11px;
-  opacity: 0.6;
+  font-size: 12px;
+  min-width: 14px;
 }
 
 .best-odds-name {
-  max-width: 160px;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.best-odds-chance {
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  flex-shrink: 0;
 }
 
 .random-btn {
