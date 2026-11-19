@@ -274,7 +274,7 @@ class LeagueStandingAdmin(admin.ModelAdmin):
     list_filter = ("league", "updated_at", "unresolved_tie_group")
     search_fields = ("league__season__year", "player_profile__profile_name")
     raw_id_fields = ("league", "player_profile")
-    ordering = ("-league_points", "-wins", "-tie_break_priority")
+    ordering = ("-league_points", "-wins", "-second_places", "-third_places", "-tie_break_priority")
     actions = ["rebuild_league_standings"]
     readonly_fields = ("recalculate_button",)
 

@@ -63,6 +63,8 @@ class LeagueStanding(models.Model):
     wins = models.DecimalField(
         max_digits=10, decimal_places=2, default=0
     )  # per your win_mode
+    second_places = models.PositiveIntegerField(default=0)
+    third_places = models.PositiveIntegerField(default=0)
     league_points = models.DecimalField(
         max_digits=10, decimal_places=2, default=0
     )  # 6/3/1/0 with tie-sharing

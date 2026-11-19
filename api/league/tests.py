@@ -12,6 +12,36 @@ from league.services import (
 )
 from game.models import Game, SelectedGame, ResultConfig, StartingPointSystem
 from api.constants import get_game_picks_per_player
+from services.scoring import Row, compute_league_table
+from unittest.mock import patch
+
+
+class LeaguePlacementScoringTests(TestCase):
+    def test_second_and_third_places_break_ties_before_raw_points(self):
+        rows = [
+            Row(1, 1, "A", 100, 2), Row(1, 2, "B", 1, 3),
+            Row(2, 1, "A", 100, 4), Row(2, 2, "B", 1, 2),
+            Row(3, 1, "A", 100, 3), Row(3, 2, "B", 1, 4),
+            Row(4, 1, "A", 100, 4), Row(4, 2, "B", 1, 3),
+            Row(5, 1, "A", 100, 4), Row(5, 2, "B", 1, 3),
+        ]
+        for game_id in range(1, 6):
+            occupied = {r.position for r in rows if r.selected_game_id == game_id}
+            for position in set(range(1, 5)) - occupied:
+                rows.append(Row(game_id, 10 + game_id * 4 + position, "X", 0, position))
+        table = compute_league_table(rows, place_points={})
+        players = [r for r in table if r["player_id"] in (1, 2)]
+        self.assertEqual([r["player_id"] for r in players], [2, 1])
+        self.assertEqual([(r["second_places"], r["third_places"]) for r in players], [(1, 3), (1, 1)])
+
+    def test_tied_placements_count_for_each_player(self):
+        rows = [Row(1, 1, "A", 0, 1), Row(1, 2, "B", 0, 2),
+                Row(1, 3, "C", 0, 2), Row(1, 4, "D", 0, 4)]
+        table = compute_league_table(rows)
+        by_player = {row["player_id"]: row for row in table}
+        self.assertEqual(by_player[2]["second_places"], 1)
+        self.assertEqual(by_player[3]["second_places"], 1)
+        self.assertEqual(by_player[2]["third_places"], 0)
 
 
 class LeagueServiceTests(TestCase):
@@ -49,6 +79,30 @@ class LeagueServiceTests(TestCase):
             )
             for i in range(4)
         ]
+
+    def test_snapshot_and_display_use_all_tie_break_criteria(self):
+        from league.models import LeagueStanding
+        from league.services import get_full_standings_data
+        from services.standings_snapshot import rebuild_league_snapshot
+
+        table = [
+            {"player_id": profile.id, "league_points": Decimal("10"),
+             "wins": Decimal("1"), "second_places": seconds, "third_places": thirds}
+            for profile, seconds, thirds in zip(self.profiles, [0, 1, 1, 1], [0, 0, 1, 1])
+        ]
+        with patch("services.standings_snapshot.compute_league_table", return_value=table):
+            rebuild_league_snapshot(self.league)
+
+        standings = {s.player_profile_id: s for s in LeagueStanding.objects.filter(league=self.league)}
+        self.assertIsNone(standings[self.profiles[0].id].unresolved_tie_group)
+        self.assertIsNone(standings[self.profiles[1].id].unresolved_tie_group)
+        self.assertEqual(standings[self.profiles[2].id].unresolved_tie_group,
+                         standings[self.profiles[3].id].unresolved_tie_group)
+        self.assertIsNotNone(standings[self.profiles[2].id].unresolved_tie_group)
+        data = get_full_standings_data(self.league)
+        self.assertEqual([row["player_profile_id"] for row in data["standings"]],
+                         [self.profiles[i].id for i in [2, 3, 1, 0]])
+        self.assertEqual(len(data["tie_groups"]), 1)
 
     def test_rotate_active_player(self):
         self.assertEqual(self.league.active_player, self.participants[0])

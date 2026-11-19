@@ -197,6 +197,10 @@ class LeaderboardViewSet(APIView):
                 "league_id",  # then by league to ensure ranks reset per league
                 "-league_points",  # then intra-league ordering for podium
                 "-wins",
+                "-second_places",
+                "-third_places",
+                "-tie_break_priority",
+                "player_profile__profile_name",
             )
         )
 

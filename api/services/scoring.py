@@ -39,8 +39,7 @@ def compute_league_table(
           - "fractional": top block shares 1.0 wins evenly.
           - "single": exactly one win (first within the top block in sorted order).
 
-    Returns a list of dicts sorted by (-league_points, -wins, -points, player).
-      Dict keys: player, player_id, points, wins, league_points
+    League ties are ordered by wins, second places, then third places.
     """
     by_game: Dict[int, List[Row]] = defaultdict(list)
     for r in rows:
@@ -55,6 +54,8 @@ def compute_league_table(
                 "player_id": pid,
                 "points": Decimal("0"),
                 "wins": Decimal("0"),
+                "second_places": 0,
+                "third_places": 0,
                 "league_points": Decimal("0"),
             }
 
@@ -70,9 +71,11 @@ def compute_league_table(
             totals[entry["player_id"]]["points"] += entry["points"]
             totals[entry["player_id"]]["league_points"] += entry["league_points"]
             totals[entry["player_id"]]["wins"] += entry["wins"]
+            totals[entry["player_id"]]["second_places"] += entry["rank"] == 2
+            totals[entry["player_id"]]["third_places"] += entry["rank"] == 3
 
     out = list(totals.values())
-    out.sort(key=lambda r: (-r["league_points"], -r["wins"], -r["points"], r["player"]))
+    out.sort(key=lambda r: (-r["league_points"], -r["wins"], -r["second_places"], -r["third_places"], r["player"]))
 
     if not return_decimals:
         for r in out:

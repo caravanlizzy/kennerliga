@@ -235,7 +235,7 @@ class SeasonViewSet(ModelViewSet):
         standings = (
             LeagueStanding.objects.filter(league__in=leagues)
             .select_related("league", "player_profile", "player_profile__user")
-            .order_by("league_id", "-league_points", "-wins", "-tie_break_priority", "id")
+            .order_by("league_id", "-league_points", "-wins", "-second_places", "-third_places", "-tie_break_priority", "id")
         )
 
         winner_by_league_id = {}
@@ -309,7 +309,7 @@ class SeasonViewSet(ModelViewSet):
         winner_standing = (
             LeagueStanding.objects.filter(league=level_1_league)
             .select_related("player_profile", "player_profile__user")
-            .order_by("-league_points", "-wins", "-tie_break_priority", "id")
+            .order_by("-league_points", "-wins", "-second_places", "-third_places", "-tie_break_priority", "id")
             .first()
         )
         if not winner_standing or not winner_standing.player_profile:
@@ -1008,7 +1008,7 @@ class LiveEventViewSet(ViewSet):
         for ls in (
             LeagueStanding.objects.filter(league_id__in=[l.id for l in leagues])
             .select_related("player_profile")
-            .order_by("-league_points", "-wins", "-tie_break_priority")
+            .order_by("-league_points", "-wins", "-second_places", "-third_places", "-tie_break_priority")
         ):
             standings_by_league[ls.league_id].append(ls)
 

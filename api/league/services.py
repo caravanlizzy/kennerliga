@@ -175,6 +175,9 @@ def build_full_standings_payload(
             key=lambda x: (
                 -float(x["total_league_points"]),
                 -float(x["total_wins"]),
+                -league_standing_dict[x["player_profile_id"]].second_places if x["player_profile_id"] in league_standing_dict else 0,
+                -league_standing_dict[x["player_profile_id"]].third_places if x["player_profile_id"] in league_standing_dict else 0,
+                -league_standing_dict[x["player_profile_id"]].tie_break_priority if x["player_profile_id"] in league_standing_dict else 0,
                 x["profile_name"],
             )
         )
@@ -214,6 +217,21 @@ def build_full_standings_payload(
     for res in tie_resolutions:
         # Members ordered by order_index for display
         ordered_entries = sorted(res.entries.all(), key=lambda e: e.order_index)
+        tied_standings = [league_standing_dict.get(e.player_profile_id) for e in ordered_entries]
+        if len(tied_standings) < 2 or any(ls is None for ls in tied_standings):
+            continue
+        first = tied_standings[0]
+        current_key = (f"lp:{first.league_points:.2f}|w:{first.wins:.2f}"
+                       f"|s:{first.second_places}|t:{first.third_places}")
+        same_standings = [ls for ls in league_standing_list if
+                          (ls.league_points, ls.wins, ls.second_places, ls.third_places)
+                          == (first.league_points, first.wins, first.second_places, first.third_places)]
+        if {ls.player_profile_id for ls in same_standings} != {e.player_profile_id for e in ordered_entries} or res.group_key != current_key or any(
+            (ls.league_points, ls.wins, ls.second_places, ls.third_places)
+            != (first.league_points, first.wins, first.second_places, first.third_places)
+            for ls in tied_standings
+        ):
+            continue
         members = []
         for e in ordered_entries:
             user = e.player_profile.user if hasattr(e.player_profile, "user") else None

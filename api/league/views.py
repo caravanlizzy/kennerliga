@@ -134,6 +134,8 @@ class LeagueViewSet(ModelViewSet):
             .order_by(
                 "-league_points",
                 "-wins",
+                "-second_places",
+                "-third_places",
                 "-tie_break_priority",
                 "player_profile__profile_name",
             )
@@ -201,6 +203,8 @@ class LeagueViewSet(ModelViewSet):
             .order_by(
                 "-league_points",
                 "-wins",
+                "-second_places",
+                "-third_places",
                 "-tie_break_priority",
                 "player_profile__profile_name",
             )
@@ -337,6 +341,8 @@ class LeagueViewSet(ModelViewSet):
             .order_by(
                 "-league_points",
                 "-wins",
+                "-second_places",
+                "-third_places",
                 "-tie_break_priority",
                 "player_profile__profile_name",
             )

@@ -6,7 +6,7 @@ from django.db import transaction
 from result.models import Result
 from api.constants import get_league_points
 from services.scoring import Row, compute_league_table
-from league.models import LeagueStanding, GameStanding, League
+from league.models import LeagueStanding, GameStanding, League, LeagueTieResolution
 from game.models import ResultConfig
 
 
@@ -173,6 +173,7 @@ def rebuild_league_snapshot(league: League, *, win_mode: str = "fractional"):
             "player_profile",
             "player_profile__profile_name",
             "points",
+            "position",
         )
     )
 
@@ -196,10 +197,8 @@ def rebuild_league_snapshot(league: League, *, win_mode: str = "fractional"):
 
     table = compute_league_table(rows, win_mode=win_mode, return_decimals=True)
 
-    # Sort table by (league_points, wins) to find groups
-    # Important: we only group by (league_points, wins) to IDENTIFY the tie group.
     sorted_table = sorted(
-        table, key=lambda r: (r["league_points"], r["wins"]), reverse=True
+        table, key=lambda r: (r["league_points"], r["wins"], r["second_places"], r["third_places"]), reverse=True
     )
 
     # upsert LeagueStanding (NO raw points)
@@ -207,19 +206,19 @@ def rebuild_league_snapshot(league: League, *, win_mode: str = "fractional"):
         ls.player_profile_id: ls for ls in LeagueStanding.objects.filter(league=league)
     }
 
-    # Build contiguous groups of equal (league_points, wins)
+    # Build contiguous groups equal on every automatic tie-break criterion.
     groups: list[tuple[str, list[dict]]] = []
     current_group: list[dict] = []
     current_key: str | None = None
 
-    def make_key(lp, wins) -> str:
+    def make_key(lp, wins, seconds, thirds) -> str:
         # Use quantized strings to ensure stable keys
         lp_s = f"{lp:.2f}" if hasattr(lp, "quantize") else str(lp)
         wins_s = f"{wins:.2f}" if hasattr(wins, "quantize") else str(wins)
-        return f"lp:{lp_s}|w:{wins_s}"
+        return f"lp:{lp_s}|w:{wins_s}|s:{seconds}|t:{thirds}"
 
     for row in sorted_table:
-        key = make_key(row["league_points"], row["wins"])
+        key = make_key(row["league_points"], row["wins"], row["second_places"], row["third_places"])
         if current_key is None:
             current_key = key
             current_group = [row]
@@ -239,6 +238,20 @@ def rebuild_league_snapshot(league: League, *, win_mode: str = "fractional"):
         for m in members:
             player_id = m["player_id"]
             player_to_group[player_id] = gkey
+
+    # Retain manual decisions only when the exact same players remain tied.
+    group_members = {key: {row["player_id"] for row in members} for key, members in groups}
+    priorities = {}
+    for resolution in LeagueTieResolution.objects.filter(league=league).prefetch_related("entries"):
+        member_ids = {entry.player_profile_id for entry in resolution.entries.all()}
+        new_key = next((key for key, ids in group_members.items() if ids == member_ids), None)
+        if new_key and resolution.group_key != new_key:
+            if not LeagueTieResolution.objects.filter(league=league, group_key=new_key).exists():
+                resolution.group_key = new_key
+                resolution.save(update_fields=["group_key"])
+        if new_key and resolution.group_key == new_key and resolution.is_resolved:
+            entries = sorted(resolution.entries.all(), key=lambda entry: entry.order_index)
+            priorities.update({entry.player_profile_id: len(entries) - i for i, entry in enumerate(entries)})
 
     # ------------------------------------------------------------------
     # upsert LeagueStanding (NO raw points)
@@ -261,12 +274,18 @@ def rebuild_league_snapshot(league: League, *, win_mode: str = "fractional"):
                     league=league,
                     player_profile_id=r["player_id"],
                     wins=r["wins"],
+                    second_places=r["second_places"],
+                    third_places=r["third_places"],
+                    tie_break_priority=priorities.get(player_id, 0),
                     league_points=r["league_points"],
                     unresolved_tie_group=group_key,
                 )
             )
         else:
             obj.wins = r["wins"]
+            obj.second_places = r["second_places"]
+            obj.third_places = r["third_places"]
+            obj.tie_break_priority = priorities.get(player_id, 0)
             obj.league_points = r["league_points"]
             obj.unresolved_tie_group = group_key
             to_update.append(obj)
@@ -275,5 +294,5 @@ def rebuild_league_snapshot(league: League, *, win_mode: str = "fractional"):
         LeagueStanding.objects.bulk_create(to_create)
     if to_update:
         LeagueStanding.objects.bulk_update(
-            to_update, ["wins", "league_points", "unresolved_tie_group"]
+            to_update, ["wins", "second_places", "third_places", "tie_break_priority", "league_points", "unresolved_tie_group"]
         )

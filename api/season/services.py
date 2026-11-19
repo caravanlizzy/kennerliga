@@ -248,7 +248,7 @@ def _result_for_season(profile: PlayerProfile, season: Season) -> Optional[dict]
     # Get standings for this league ordered by performance (descending)
     standings = list(
         LeagueStanding.objects.filter(league=league).order_by(
-            "-league_points", "-wins", "player_profile__profile_name"
+            "-league_points", "-wins", "-second_places", "-third_places", "-tie_break_priority", "player_profile__profile_name"
         )
     )
 
@@ -300,7 +300,7 @@ def results_for_season_bulk(
 
     standings_by_league: dict = {}
     for ls in LeagueStanding.objects.filter(league_id__in=leagues.keys()).order_by(
-        "-league_points", "-wins", "player_profile__profile_name"
+        "-league_points", "-wins", "-second_places", "-third_places", "-tie_break_priority", "player_profile__profile_name"
     ):
         standings_by_league.setdefault(ls.league_id, []).append(ls)
 

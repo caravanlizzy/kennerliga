@@ -89,6 +89,8 @@ def attach_league_lookups(league: League) -> League:
         .order_by(
             "-league_points",
             "-wins",
+            "-second_places",
+            "-third_places",
             "-tie_break_priority",
             "player_profile__profile_name",
         )
