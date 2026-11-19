@@ -267,7 +267,7 @@
               </tbody>
             </q-markup-table>
             <div class="text-caption text-grey-7 italic">
-              Ties split points evenly. Victory point % used as tiebreaker.
+              Ties split points evenly.
             </div>
           </ContentSection>
         </div>
