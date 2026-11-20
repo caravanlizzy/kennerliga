@@ -6,6 +6,7 @@
     row-key="id"
     :rows="data"
     :columns="columns"
+    :pagination="pagination"
     @row-click="onRowClick"
     class="cursor-pointer"
   >
@@ -95,7 +96,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import type { QTableProps } from 'quasar';
 import KennerTable from 'components/tables/KennerTable.vue';
@@ -107,6 +108,10 @@ import type { TSelectedGameDto } from 'src/types';
 
 const router = useRouter();
 const { isMobile } = useResponsive();
+
+const pagination = ref({
+  rowsPerPage: 20,
+});
 
 const {
   data,

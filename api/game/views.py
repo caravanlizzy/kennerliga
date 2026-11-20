@@ -233,6 +233,11 @@ class SelectedGameViewSet(ModelViewSet):
             "selected_options__game_option",
             "selected_options__choice",
             "result_set",
+            "result_set__player_profile",
+            "result_set__factions",
+            "result_set__decisive_tie_breaker",
+            "result_set__win_condition",
+            "result_set__win_condition_option",
         )
         .annotate(
             result_count=Coalesce(_RESULT_COUNT_SQ, 0),

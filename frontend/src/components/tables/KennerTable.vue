@@ -2,8 +2,8 @@
   <q-table
     flat
     :filter="filter"
-    :rows-per-page-options="[20, 50, 0]"
-    v-model:pagination="pagination"
+    :rows-per-page-options="rowsPerPageOptions || [10, 20, 50, 0]"
+    v-model:pagination="paginationModel"
     table-header-class="kenner-table__header-row"
     class="kenner-table"
     table-class="kenner-table__body"
@@ -73,21 +73,52 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
+import type { QTableProps } from 'quasar';
 import { TKennerButton } from 'src/types';
 import KennerButton from 'components/base/KennerButton.vue';
 import KennerInput from 'components/base/KennerInput.vue';
 import BrandLogo from 'components/base/BrandLogo.vue';
 
-defineProps<{
-  title?: string;
-  createButton?: TKennerButton;
+const props = withDefaults(
+  defineProps<{
+    title?: string;
+    createButton?: TKennerButton;
+    pagination?: QTableProps['pagination'];
+    rowsPerPageOptions?: number[];
+  }>(),
+  {
+    rowsPerPageOptions: () => [10, 20, 50, 0],
+  }
+);
+
+const emit = defineEmits<{
+  (e: 'update:pagination', value: QTableProps['pagination']): void;
 }>();
 
 const filter = ref('');
-const pagination = ref({
-  rowsPerPage: 0,
+const paginationModel = ref<NonNullable<QTableProps['pagination']>>({
+  rowsPerPage: 20,
+  ...(props.pagination || {}),
 });
+
+watch(
+  () => props.pagination,
+  (newVal) => {
+    if (newVal) {
+      paginationModel.value = { ...paginationModel.value, ...newVal };
+    }
+  },
+  { deep: true }
+);
+
+watch(
+  paginationModel,
+  (newVal) => {
+    emit('update:pagination', newVal);
+  },
+  { deep: true }
+);
 </script>
 
 <style scoped lang="scss">
