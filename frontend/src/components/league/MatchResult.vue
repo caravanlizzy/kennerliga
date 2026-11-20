@@ -218,6 +218,11 @@ const rawResults = computed(() => {
     src = Object.values(props.matchResults)
       .flat()
       .filter((r) => r.selected_game === props.selectedGame.id);
+  } else if (
+    props.selectedGame.results &&
+    props.selectedGame.results.length > 0
+  ) {
+    src = props.selectedGame.results;
   } else {
     src =
       (leagueStore.value?.matchResultsBySelectedGame?.[
@@ -237,9 +242,14 @@ const rawResults = computed(() => {
     decisive_tie_breaker: r.decisive_tie_breaker?.name ?? null,
     win_condition_name: r.win_condition?.name ?? null,
     win_condition_option_name: r.win_condition_option?.name ?? null,
-    // The API now returns 'factions' as a list of objects with id, faction_name, level
+    // The API returns 'factions' as a list of objects with id, name/faction_name, level
     factions: (r.factions ?? [])
       .slice()
+      .map((f: { id?: number; name?: string; faction_name?: string; level?: number }) => ({
+        id: f.id ?? 0,
+        name: f.name || f.faction_name || '',
+        level: f.level ?? 0,
+      }))
       .sort((a, b) => (a.level ?? 0) - (b.level ?? 0)),
   }));
 });

@@ -228,7 +228,7 @@ class SelectedGameViewSet(ModelViewSet):
     """
     queryset = (
         SelectedGame.objects.all()
-        .select_related("game", "game__platform", "league", "profile")
+        .select_related("game", "game__platform", "league", "league__season", "profile")
         .prefetch_related(
             "selected_options__game_option",
             "selected_options__choice",
@@ -242,8 +242,21 @@ class SelectedGameViewSet(ModelViewSet):
         )
     )
     serializer_class = SelectedGameSerializer
-    filterset_fields = ["league", "profile"]
+    filterset_fields = ["league", "profile", "game"]
     permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        season = self.request.query_params.get("season")
+        if season:
+            queryset = queryset.filter(league__season_id=season)
+        has_results = self.request.query_params.get("has_results")
+        if has_results is not None:
+            if has_results.lower() == "true":
+                queryset = queryset.filter(result_count__gt=0)
+            elif has_results.lower() == "false":
+                queryset = queryset.filter(result_count=0)
+        return queryset
 
 
 class BanDecisionViewSet(ModelViewSet):

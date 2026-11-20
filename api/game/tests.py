@@ -234,3 +234,42 @@ class GameAPITests(TestCase):
         res = self.client.get("/api/game/platforms/")
         self.assertEqual(res.status_code, 200)
         self.assertEqual(len(res.data), 2)
+
+    def test_selected_game_serialization_and_has_results_filter(self):
+        from result.models import Result
+        selected_game = SelectedGame.objects.create(
+            game=self.game,
+            league=self.league,
+            profile=self.profile,
+        )
+
+        # Initially selected_game has no results
+        res = self.client.get("/api/game/selected-games/?has_results=true")
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(len(res.data), 0)
+
+        # Create a result for selected_game
+        Result.objects.create(
+            season=self.season,
+            league=self.league,
+            selected_game=selected_game,
+            player_profile=self.profile,
+            points=100,
+            position=1,
+        )
+
+        res = self.client.get("/api/game/selected-games/?has_results=true")
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(len(res.data), 1)
+        item = res.data[0]
+        self.assertEqual(item["id"], selected_game.id)
+        self.assertEqual(item["season_id"], self.season.id)
+        self.assertEqual(item["season_name"], self.season.name)
+        self.assertEqual(item["league_level"], self.league.level)
+        self.assertEqual(item["league"], self.league.id)
+        self.assertEqual(len(item["results"]), 1)
+
+        # Test season filter
+        res_season = self.client.get(f"/api/game/selected-games/?season={self.season.id}")
+        self.assertEqual(res_season.status_code, 200)
+        self.assertEqual(len(res_season.data), 1)

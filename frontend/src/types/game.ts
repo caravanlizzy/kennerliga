@@ -105,6 +105,10 @@ export type TSelectedGameDto = {
   game_name?: string;
   platform_name?: string;
   league: number;
+  league_id?: number;
+  league_level?: number;
+  season_id?: number;
+  season_name?: string;
   selected_options: TSelectedGameOptionDto[];
   created_at?: string;
   successfully_banned?: boolean;

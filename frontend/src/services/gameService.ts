@@ -512,6 +512,18 @@ export async function fetchGame(gameId: number): Promise<TGameDto> {
   return data;
 }
 
+export async function fetchSelectedGames(params?: {
+  league?: number;
+  profile?: number;
+  season?: number;
+  has_results?: boolean;
+}): Promise<TSelectedGameDto[]> {
+  const { data } = await api.get('game/selected-games/', {
+    params,
+  });
+  return unwrapList<TSelectedGameDto>(data);
+}
+
 export async function fetchSelectedGameById(
   selectedGameId: number
 ): Promise<TSelectedGameDto> {

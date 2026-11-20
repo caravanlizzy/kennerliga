@@ -7,6 +7,7 @@ import statisticsRoutes from 'src/router/statisticsRoutes';
 // project's tsconfig.json "files"
 import 'vue-router';
 import seasonRoutes from 'src/router/seasonRoutes';
+import matchResultRoutes from 'src/router/matchResultRoutes';
 import ResponsivePage from 'src/components/layout/ResponsivePage.vue';
 
 const LiveMobile = () => import('src/pages/mobile/LiveActionMobilePage.vue');
@@ -138,6 +139,15 @@ const routes: RouteRecordRaw[] = [
       },
       gameRoutes,
       seasonRoutes,
+      matchResultRoutes,
+      {
+        path: 'matchresults',
+        redirect: '/match-results',
+      },
+      {
+        path: 'results',
+        redirect: '/match-results',
+      },
       {
         path: 'my',
         name: 'my-league',

@@ -339,6 +339,17 @@ class SelectedGameSerializer(serializers.ModelSerializer):
         results = obj.result_set.all()
         return ResultSerializer(results, many=True).data
 
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        data["league"] = instance.league_id
+        data["league_id"] = instance.league_id
+        if instance.league:
+            data["league_level"] = instance.league.level
+            if instance.league.season:
+                data["season_id"] = instance.league.season_id
+                data["season_name"] = instance.league.season.name
+        return data
+
     def validate(self, attrs):
         game = attrs.get("game") or getattr(self.instance, "game", None)
         league = attrs.get("league") or getattr(self.instance, "league", None)

@@ -27,6 +27,12 @@
           forward-name="seasons"
         />
         <DrawerItem
+          icon="emoji_events"
+          icon-color="primary"
+          label="Match Results"
+          forward-name="match-results"
+        />
+        <DrawerItem
           icon="people_alt"
           icon-color="primary"
           label="Players"

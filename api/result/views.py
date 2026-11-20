@@ -381,13 +381,22 @@ class MatchResultViewSet(ViewSet):
                 {"detail": "Invalid parameters."}, status=status.HTTP_400_BAD_REQUEST
             )
 
-        if not all([season_id, league, selected_game_id]):
-            return Response(
-                {"detail": "Parameters required."}, status=status.HTTP_400_BAD_REQUEST
-            )
-        qs = Result.objects.filter(
-            season_id=season_id, league=league, selected_game_id=selected_game_id
-        )
+        qs = Result.objects.all().select_related(
+            "player_profile",
+            "selected_game",
+            "selected_game__game",
+            "win_condition",
+            "win_condition_option",
+            "decisive_tie_breaker",
+        ).prefetch_related("factions")
+
+        if season_id:
+            qs = qs.filter(season_id=season_id)
+        if league:
+            qs = qs.filter(league=league)
+        if selected_game_id:
+            qs = qs.filter(selected_game_id=selected_game_id)
+
         return Response(ResultSerializer(qs, many=True).data)
 
     def retrieve(self, request, pk=None):
