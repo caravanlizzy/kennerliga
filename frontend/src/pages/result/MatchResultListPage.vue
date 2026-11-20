@@ -13,13 +13,26 @@
     <template v-slot:body-cell-game="props">
       <q-td :props="props">
         <div class="row items-center no-wrap">
-          <q-icon name="sports_esports" color="primary" size="20px" class="q-mr-sm" />
-          <span class="text-weight-bold text-subtitle2">{{ props.row.game_name || `Game #${props.row.game}` }}</span>
+          <q-icon
+            name="sports_esports"
+            color="primary"
+            size="20px"
+            class="q-mr-sm shrink-0"
+          />
+          <span
+            class="text-weight-bold text-subtitle2 ellipsis"
+            style="max-width: 200px"
+          >
+            {{ truncateString(props.row.game_name || `Game #${props.row.game}`, 24) }}
+            <KennerTooltip v-if="(props.row.game_name || '').length > 24">
+              {{ props.row.game_name }}
+            </KennerTooltip>
+          </span>
           <q-badge
             v-if="props.row.platform_name"
             color="grey-3"
             text-color="grey-8"
-            class="q-ml-sm"
+            class="q-ml-sm shrink-0"
           >
             {{ props.row.platform_name }}
           </q-badge>
@@ -101,6 +114,8 @@ import { useRouter } from 'vue-router';
 import type { QTableProps } from 'quasar';
 import KennerTable from 'components/tables/KennerTable.vue';
 import KennerButton from 'components/base/KennerButton.vue';
+import KennerTooltip from 'components/base/KennerTooltip.vue';
+import { truncateString } from 'src/helpers';
 import { useAsyncData } from 'src/composables/asyncData';
 import { fetchSelectedGames } from 'src/services/gameService';
 import { useResponsive } from 'src/composables/responsive';
