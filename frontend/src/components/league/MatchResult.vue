@@ -35,7 +35,7 @@
         v-for="result in results"
         :key="result.id"
         class="match-result-item"
-        :class="rowClass(result.position)"
+        :class="rowClass(result)"
       >
         <!-- Rank / Position -->
         <q-item-section side class="q-pr-sm">
@@ -328,10 +328,11 @@ function rankClass(position: number | null) {
   return '';
 }
 
-function rowClass(position: number | null) {
+function rowClass(result: ResultRow) {
   return {
-    'is-first': position === 1,
-    'is-podium': position != null && position <= 3,
+    'is-first': result.position === 1,
+    'is-podium': result.position != null && result.position <= 3,
+    'is-record': result.is_record,
   };
 }
 </script>
@@ -382,6 +383,29 @@ function rowClass(position: number | null) {
       border-color: rgba(255, 193, 7, 0.3);
     }
   }
+
+  &.is-record {
+    background: linear-gradient(
+      to right,
+      rgba(249, 115, 22, 0.08),
+      rgba(249, 115, 22, 0.02)
+    );
+    border-color: rgba(249, 115, 22, 0.28);
+
+    &:hover {
+      background: linear-gradient(
+        to right,
+        rgba(249, 115, 22, 0.12),
+        rgba(249, 115, 22, 0.04)
+      );
+      border-color: rgba(249, 115, 22, 0.4);
+    }
+  }
+}
+
+.record-badge-glow {
+  border: 1px solid rgba(249, 115, 22, 0.4) !important;
+  box-shadow: 0 0 8px rgba(249, 115, 22, 0.15);
 }
 
 .rank-display {

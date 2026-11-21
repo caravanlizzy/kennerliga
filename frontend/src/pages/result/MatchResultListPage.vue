@@ -29,6 +29,22 @@
             </KennerTooltip>
           </span>
           <q-badge
+            v-if="hasRecord(props.row)"
+            color="deep-orange-1"
+            text-color="deep-orange-9"
+            class="q-ml-sm shrink-0 stat-badge text-weight-bolder"
+          >
+            <q-icon
+              name="local_fire_department"
+              size="12px"
+              class="q-mr-xs text-deep-orange-6"
+            />
+            RECORD
+            <KennerTooltip>
+              This match contains an all-time record score!
+            </KennerTooltip>
+          </q-badge>
+          <q-badge
             v-if="props.row.platform_name"
             color="grey-3"
             text-color="grey-8"
@@ -57,17 +73,33 @@
           <q-badge
             v-for="(player, idx) in getPlayers(props.row)"
             :key="idx"
-            :color="player.position === 1 ? 'amber-2' : 'grey-2'"
-            :text-color="player.position === 1 ? 'amber-10' : 'grey-9'"
+            :color="player.is_record ? 'deep-orange-1' : (player.position === 1 ? 'amber-2' : 'grey-2')"
+            :text-color="player.is_record ? 'deep-orange-9' : (player.position === 1 ? 'amber-10' : 'grey-9')"
             class="q-pa-xs text-weight-medium"
+            :class="{ 'record-badge-glow': player.is_record }"
           >
             <q-icon
-              v-if="player.position === 1"
+              v-if="player.is_record"
+              name="local_fire_department"
+              size="12px"
+              class="q-mr-xs text-deep-orange-6"
+            />
+            <q-icon
+              v-else-if="player.position === 1"
               name="emoji_events"
               size="12px"
               class="q-mr-xs text-amber-9"
             />
             {{ player.name }}
+            <span
+              v-if="player.points != null && props.row.has_points !== false"
+              class="q-ml-xs text-weight-bold"
+            >
+              ({{ player.points }})
+            </span>
+            <KennerTooltip v-if="player.is_record">
+              All-time record score: {{ player.points }} VP!
+            </KennerTooltip>
           </q-badge>
         </div>
         <div v-else class="text-grey-5">-</div>
@@ -76,9 +108,38 @@
 
     <template v-slot:body-cell-winner="props">
       <q-td :props="props">
-        <div v-if="getWinner(props.row)" class="row items-center no-wrap text-amber-9">
-          <q-icon name="emoji_events" size="18px" class="q-mr-xs" />
-          <span class="text-weight-bold">{{ getWinner(props.row) }}</span>
+        <div v-if="getWinners(props.row).length > 0" class="row items-center q-gutter-x-sm wrap">
+          <div
+            v-for="(winner, idx) in getWinners(props.row)"
+            :key="idx"
+            class="row items-center no-wrap"
+          >
+            <q-icon
+              :name="winner.is_record ? 'local_fire_department' : 'emoji_events'"
+              :color="winner.is_record ? 'deep-orange-6' : 'amber-9'"
+              size="18px"
+              class="q-mr-xs shrink-0"
+            />
+            <span
+              class="text-weight-bold"
+              :class="winner.is_record ? 'text-deep-orange-9' : 'text-amber-9'"
+            >
+              {{ winner.name }}
+            </span>
+            <q-badge
+              v-if="winner.points != null && props.row.has_points !== false"
+              :color="winner.is_record ? 'deep-orange-1' : 'amber-1'"
+              :text-color="winner.is_record ? 'deep-orange-9' : 'amber-9'"
+              class="q-ml-xs text-weight-bold stat-badge"
+              :class="{ 'record-badge-glow': winner.is_record }"
+            >
+              {{ winner.points }} VP
+              <span v-if="winner.is_record" class="q-ml-xs text-weight-bolder">RECORD</span>
+              <KennerTooltip v-if="winner.is_record">
+                All-time record score for {{ props.row.game_name }}!
+              </KennerTooltip>
+            </q-badge>
+          </div>
         </div>
         <div v-else class="text-grey-5">-</div>
       </q-td>
@@ -137,21 +198,46 @@ const {
 const loading = computed(() => !isFinished.value);
 const error = computed(() => fetchError?.value?.message || null);
 
-function getWinner(row: TSelectedGameDto): string | null {
-  if (!row.results || row.results.length === 0) return null;
-  const winner = row.results.find((r) => r.position === 1);
-  return winner?.player_profile_name || null;
+interface WinnerInfo {
+  name: string;
+  points?: number | null;
+  is_record?: boolean;
+}
+
+function getWinners(row: TSelectedGameDto): WinnerInfo[] {
+  if (!row.results || row.results.length === 0) return [];
+  const winners = row.results.filter((r) => r.position === 1);
+  return winners.map((w) => ({
+    name:
+      w.player_profile_name ||
+      (w.player_profile ? `Player #${w.player_profile}` : 'Unknown'),
+    points: w.points,
+    is_record: w.is_record,
+  }));
+}
+
+function hasRecord(row: TSelectedGameDto): boolean {
+  return row.results?.some((r) => r.is_record) ?? false;
 }
 
 function getPlayers(
   row: TSelectedGameDto
-): { name: string; position?: number | null }[] {
+): {
+  name: string;
+  position?: number | null;
+  points?: number | null;
+  is_record?: boolean;
+}[] {
   if (!row.results || row.results.length === 0) return [];
   return [...row.results]
     .sort((a, b) => (a.position ?? 999) - (b.position ?? 999))
     .map((r) => ({
-      name: r.player_profile_name || `Player #${r.player_profile}`,
+      name:
+        r.player_profile_name ||
+        (r.player_profile ? `Player #${r.player_profile}` : 'Unknown'),
       position: r.position,
+      points: r.points,
+      is_record: r.is_record,
     }));
 }
 
@@ -196,7 +282,14 @@ const columns = computed<QTableProps['columns']>(() => [
   {
     name: 'winner',
     label: 'Winner',
-    field: (r: TSelectedGameDto) => getWinner(r) || '-',
+    field: (r: TSelectedGameDto) =>
+      getWinners(r)
+        .map((w) =>
+          w.points != null && r.has_points !== false
+            ? `${w.name} (${w.points} VP)`
+            : w.name
+        )
+        .join(', ') || '-',
     align: 'left',
     sortable: true,
   },
@@ -210,6 +303,17 @@ const columns = computed<QTableProps['columns']>(() => [
 </script>
 
 <style scoped lang="scss">
+.stat-badge {
+  padding: 2px 6px;
+  font-size: 11px;
+  border-radius: 4px;
+}
+
+.record-badge-glow {
+  border: 1px solid rgba(249, 115, 22, 0.4) !important;
+  box-shadow: 0 0 6px rgba(249, 115, 22, 0.15);
+}
+
 .cursor-pointer :deep(tbody tr) {
   cursor: pointer;
 }

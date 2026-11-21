@@ -68,6 +68,22 @@
                     </div>
                   </div>
                   <q-badge
+                    v-if="hasRecord(game.id)"
+                    color="deep-orange-1"
+                    text-color="deep-orange-9"
+                    class="stat-badge elegant-badge q-ml-sm text-weight-bolder"
+                  >
+                    <q-icon
+                      name="local_fire_department"
+                      size="14px"
+                      class="q-mr-xs shrink-0 text-deep-orange-6"
+                    />
+                    <span>RECORD</span>
+                    <KennerTooltip>
+                      This match contains an all-time record score!
+                    </KennerTooltip>
+                  </q-badge>
+                  <q-badge
                     v-if="getWinConditionName(game.id)"
                     color="indigo-1"
                     text-color="indigo-8"
@@ -129,6 +145,11 @@ const {
 function getWinConditionName(selectedGameId: number): string | null {
   const results = matchResultsBySelectedGame.value?.[selectedGameId];
   return results?.[0]?.win_condition?.name ?? null;
+}
+
+function hasRecord(selectedGameId: number): boolean {
+  const results = matchResultsBySelectedGame.value?.[selectedGameId];
+  return results?.some((r) => r.is_record) ?? false;
 }
 
 onMounted(async () => {

@@ -30,6 +30,19 @@
                   League {{ selectedGame.league_level }}
                 </q-badge>
                 <q-badge
+                  v-if="hasRecord"
+                  color="deep-orange-1"
+                  text-color="deep-orange-9"
+                  class="q-px-sm text-weight-bolder"
+                >
+                  <q-icon
+                    name="local_fire_department"
+                    size="14px"
+                    class="q-mr-xs text-deep-orange-6"
+                  />
+                  RECORD SCORE
+                </q-badge>
+                <q-badge
                   v-if="selectedGame.platform_name"
                   color="grey-3"
                   text-color="grey-8"
@@ -134,6 +147,9 @@ const error = ref<string | null>(null);
 const activeForm = ref<TActiveForm | null>(null);
 
 const gameId = computed(() => Number(route.params.id));
+const hasRecord = computed(
+  () => selectedGame.value?.results?.some((r) => r.is_record) ?? false
+);
 
 async function loadData() {
   if (isNaN(gameId.value)) {
