@@ -38,11 +38,18 @@ export async function fetchUser(username: string): Promise<TUserDto> {
 
 /**
  * Aggregated per-player statistics. `year` narrows the result to one season
- * year; the payload shape is defined by `UserViewSet.user_statistics`.
+ * year (or 'all' for all-time picks); the payload shape is defined by
+ * `UserViewSet.user_statistics`.
  */
 export async function fetchUserStatistics(
   userId: number,
-  params?: { year?: number }
+  params?: {
+    year?: number | string;
+    exclude_2p_only?: boolean;
+    exclude_3p_only?: boolean;
+    player_count?: string;
+    years?: number[];
+  }
 ): Promise<TUserStatistics> {
   const { data } = await api.get<TUserStatistics>(
     `user/users/${userId}/statistics/`,

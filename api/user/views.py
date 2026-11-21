@@ -237,10 +237,13 @@ class UserViewSet(ModelViewSet):
 
         # 0. Get year from query params
         year_param = request.query_params.get("year")
-        try:
-            selected_year = int(year_param) if year_param else timezone.now().year
-        except ValueError:
-            selected_year = timezone.now().year
+        if year_param and str(year_param).lower() in ["all", "none", ""]:
+            selected_year = None
+        else:
+            try:
+                selected_year = int(year_param) if year_param else timezone.now().year
+            except ValueError:
+                selected_year = timezone.now().year
 
         player_count = request.query_params.get("player_count")
         if player_count and player_count.lower() == "all":
@@ -364,7 +367,7 @@ class UserViewSet(ModelViewSet):
         # Sort by count descending for the default list
         game_stats.sort(key=lambda x: x["count"], reverse=True)
 
-        # 1b. Picked Games for the selected year
+        # 1b. Picked Games for the selected year (or all time)
         # We only count games that were NOT banned.
         from game.queries import get_successfully_banned_game_ids
 
@@ -372,14 +375,17 @@ class UserViewSet(ModelViewSet):
 
         max_game_limit = get_max_same_game_per_year()
 
-        picked_games_qs = (
-            SelectedGame.objects.filter(
-                profile=profile, league__season__year=selected_year
+        picked_games_base = SelectedGame.objects.filter(profile=profile)
+        if selected_year is not None:
+            picked_games_base = picked_games_base.filter(
+                league__season__year=selected_year
             )
-            .exclude(id__in=banned_game_ids)
+
+        picked_games_qs = (
+            picked_games_base.exclude(id__in=banned_game_ids)
             .values("game_id", "game__name", "game__platform__name")
             .annotate(count=Count("id"))
-            .order_by("game__name")
+            .order_by("-count" if selected_year is None else "game__name", "game__name")
         )
 
         picked_games = [
@@ -388,7 +394,9 @@ class UserViewSet(ModelViewSet):
                 "name": item["game__name"],
                 "platform": item["game__platform__name"],
                 "count": item["count"],
-                "limit_exceeded": item["count"] >= max_game_limit,
+                "limit_exceeded": (
+                    item["count"] >= max_game_limit if selected_year is not None else False
+                ),
             }
             for item in picked_games_qs
         ]

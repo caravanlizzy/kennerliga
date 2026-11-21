@@ -58,46 +58,36 @@
         <!-- Left Column: User Summary & Actions -->
         <div class="col-12 col-md-4">
           <div class="sticky-top">
-            <!-- Pick Limit Status -->
-            <div v-if="loadingStats" class="q-mb-lg">
-              <q-skeleton type="rect" height="200px" class="rounded-borders" />
-            </div>
-            <UserPicks
-              v-else
-              v-model:selected-year="selectedYear"
-              :picked-games="pickedGames"
-              :max-game-limit="maxGameLimit"
-              :available-years="availableYears"
-              @update:selected-year="fetchStatistics(user.id)"
-            />
-
             <!-- Overall Performance Summary -->
             <div v-if="loadingStats" class="q-mb-lg">
               <q-skeleton type="rect" height="350px" class="rounded-borders" />
             </div>
             <UserPerformance
               v-else
+              class="q-mb-lg"
               :overall-stats="overallStats"
               :elo="eloData"
             />
+
+            <!-- User Settings for logged-in user -->
+            <UserSettingsCard v-if="isMe" />
           </div>
         </div>
 
         <!-- Right Column: Tabs for detailed view & Settings -->
         <div class="col-12 col-md-8">
-          <UserSettingsCard v-if="isMe" />
-
           <q-tabs
             v-model="tab"
             dense
-            class="text-grey-7 surface-card q-mb-lg"
+            class="text-grey-7 surface-card q-mb-lg user-profile-tabs"
             active-color="primary"
             indicator-color="primary"
             align="justify"
             narrow-indicator
           >
-            <q-tab name="games" icon="videogame_asset" label="Games" />
-            <q-tab name="seasons" icon="event" label="Seasons" />
+            <q-tab name="games" icon="sports_esports" label="Games" />
+            <q-tab name="picks" icon="push_pin" label="Picks" />
+            <q-tab name="seasons" icon="emoji_events" label="Seasons" />
           </q-tabs>
 
           <q-tab-panels v-model="tab" animated class="bg-transparent">
@@ -120,6 +110,21 @@
                 :top-games="topGames"
                 :records="records"
                 :filtered-game-stats="filteredGameStats"
+              />
+            </q-tab-panel>
+
+            <!-- Picks Tab -->
+            <q-tab-panel name="picks" class="q-pa-none">
+              <div v-if="loadingStats">
+                <q-skeleton type="rect" height="200px" class="rounded-borders" />
+              </div>
+              <UserPicks
+                v-else
+                v-model:selected-year="selectedYear"
+                :picked-games="pickedGames"
+                :max-game-limit="maxGameLimit"
+                :available-years="availableYears"
+                @update:selected-year="fetchStatistics(user.id)"
               />
             </q-tab-panel>
 
@@ -214,7 +219,7 @@ const topGames = ref<TPlayerGameStat[]>([]);
 const records = ref<TPlayerGameRecord[]>([]);
 const pickedGames = ref<TPlayerPickedGame[]>([]);
 const maxGameLimit = ref(2);
-const selectedYear = ref(new Date().getFullYear());
+const selectedYear = ref<number | string>(new Date().getFullYear());
 const availableYears = ref<number[]>([new Date().getFullYear()]);
 
 async function load() {

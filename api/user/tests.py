@@ -359,6 +359,53 @@ class UserAPITests(TestCase):
         self.assertEqual(res_stats_no_2p.data["overall_stats"]["wins"], 0)
         self.assertEqual(res_stats_no_2p.data["overall_stats"]["avg_pos"], 2.5)
 
+    def test_user_statistics_all_time_and_yearly_picks(self):
+        platform = Platform.objects.create(name="BGA_picks_test")
+        season_2025 = Season.objects.create(year=2025, month=10)
+        season_2026_m1 = Season.objects.create(year=2026, month=1)
+        season_2026_m2 = Season.objects.create(year=2026, month=2)
+
+        p_2025 = SeasonParticipant.objects.create(season=season_2025, profile=self.profile)
+        p_2026_m1 = SeasonParticipant.objects.create(season=season_2026_m1, profile=self.profile)
+        p_2026_m2 = SeasonParticipant.objects.create(season=season_2026_m2, profile=self.profile)
+
+        league_2025 = League.objects.create(season=season_2025, level=1, status=LeagueStatus.PLAYING)
+        league_2025.members.add(p_2025)
+
+        league_2026_m1 = League.objects.create(season=season_2026_m1, level=1, status=LeagueStatus.PLAYING)
+        league_2026_m1.members.add(p_2026_m1)
+
+        league_2026_m2 = League.objects.create(season=season_2026_m2, level=1, status=LeagueStatus.PLAYING)
+        league_2026_m2.members.add(p_2026_m2)
+
+        game_a = Game.objects.create(name="Game Alpha", min_players=2, max_players=4, platform=platform)
+        game_b = Game.objects.create(name="Game Beta", min_players=2, max_players=4, platform=platform)
+
+        # 2025: Picked Game A once
+        SelectedGame.objects.create(game=game_a, league=league_2025, profile=self.profile)
+
+        # 2026: Picked Game A twice (in m1 and m2), Game B once (in m1)
+        SelectedGame.objects.create(game=game_a, league=league_2026_m1, profile=self.profile)
+        SelectedGame.objects.create(game=game_a, league=league_2026_m2, profile=self.profile)
+        SelectedGame.objects.create(game=game_b, league=league_2026_m1, profile=self.profile)
+
+        # Test 2026 picks
+        res_2026 = self.client.get(f"/api/user/users/{self.user.id}/statistics/?year=2026")
+        self.assertEqual(res_2026.status_code, 200)
+        picked_2026 = {p["name"]: p for p in res_2026.data["picked_games"]}
+        self.assertEqual(picked_2026["Game Alpha"]["count"], 2)
+        self.assertTrue(picked_2026["Game Alpha"]["limit_exceeded"])
+        self.assertEqual(picked_2026["Game Beta"]["count"], 1)
+        self.assertFalse(picked_2026["Game Beta"]["limit_exceeded"])
+
+        # Test All-Time picks (year=all)
+        res_all = self.client.get(f"/api/user/users/{self.user.id}/statistics/?year=all")
+        self.assertEqual(res_all.status_code, 200)
+        picked_all = {p["name"]: p for p in res_all.data["picked_games"]}
+        self.assertEqual(picked_all["Game Alpha"]["count"], 3)
+        self.assertFalse(picked_all["Game Alpha"]["limit_exceeded"]) # No yearly limit in all-time mode
+        self.assertEqual(picked_all["Game Beta"]["count"], 1)
+
     def test_user_summary_stats_player_count_and_year_filters(self):
         platform = Platform.objects.create(name="BGA_pc_year_test")
         season_2025 = Season.objects.create(year=2025, month=12)

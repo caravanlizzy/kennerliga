@@ -85,8 +85,7 @@
               "
               size="8px"
               :color="getPosColor(pos)"
-              track-color="grey-2"
-              class="rounded-borders"
+              class="rounded-borders rank-progress-bar"
             />
           </div>
           <div class="col-3 text-right">
@@ -101,6 +100,8 @@
 </template>
 
 <script setup lang="ts">
+import type { TUserEloData } from 'src/types';
+
 defineProps<{
   overallStats: {
     total_games: number;
@@ -109,12 +110,7 @@ defineProps<{
     avg_pos: number;
     positions: Record<number, number>;
   };
-  elo?: {
-    rating: number;
-    rank: number | null;
-    history?: any[];
-    recent_deltas?: number[];
-  };
+  elo?: TUserEloData;
 }>();
 
 function getOrdinal(n: number) {
@@ -168,6 +164,13 @@ function getPosColorClass(pos: number) {
   padding: 2px 4px;
   &:hover {
     background: var(--divider);
+  }
+}
+
+.rank-progress-bar {
+  :deep(.q-linear-progress__track) {
+    background: var(--divider) !important;
+    opacity: 1;
   }
 }
 
