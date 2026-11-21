@@ -1,18 +1,5 @@
 <template>
   <div class="q-pa-md max-width-container">
-    <!-- Back button & navigation -->
-    <div class="row items-center q-mb-md">
-      <KennerButton
-        flat
-        no-caps
-        dense
-        icon="arrow_back"
-        label="Back to Match Results"
-        color="grey-8"
-        :to="{ name: 'match-results' }"
-      />
-    </div>
-
     <div v-if="loading" class="q-py-xl text-center">
       <q-spinner-dots color="primary" size="40px" />
     </div>
