@@ -1,5 +1,73 @@
 <template>
   <div class="user-games-tab">
+    <!-- Game Records Highlight -->
+    <div v-if="records && records.length > 0" class="q-mb-xl">
+      <div class="row items-center q-mb-md">
+        <q-icon
+          name="local_fire_department"
+          color="deep-orange-6"
+          size="24px"
+          class="q-mr-sm"
+        />
+        <div class="text-h5 text-weight-bolder text-heading tracking-tighter">
+          Game Records
+        </div>
+        <q-space />
+        <div
+          class="text-caption text-grey-6 text-uppercase text-weight-bold letter-spacing-1"
+        >
+          All-time High Scores
+        </div>
+      </div>
+      <div class="row q-col-gutter-md">
+        <div
+          v-for="record in records"
+          :key="'record-' + record.game_id"
+          class="col-12 col-sm-6 col-md-4"
+        >
+          <q-card
+            flat
+            class="record-game-card relative-position overflow-hidden"
+          >
+            <div
+              class="record-badge absolute-top-left q-pa-sm text-weight-bolder shadow-2 row items-center"
+            >
+              <q-icon
+                name="local_fire_department"
+                size="14px"
+                class="q-mr-xs"
+              />
+              RECORD
+            </div>
+            <q-card-section class="q-pt-xl q-pb-md text-center">
+              <div
+                class="text-subtitle1 text-weight-bolder text-heading ellipsis q-mb-xs"
+              >
+                {{ record.game_name }}
+              </div>
+              <div
+                v-if="record.platform"
+                class="text-caption text-grey-6 q-mb-xs"
+              >
+                {{ record.platform }}
+              </div>
+              <div class="row justify-center items-baseline q-mt-sm">
+                <div class="text-h4 text-weight-bolder text-deep-orange-7">
+                  {{ record.record_score }}
+                </div>
+                <div
+                  class="text-caption text-grey-6 text-weight-bolder q-ml-xs"
+                >
+                  VP
+                </div>
+              </div>
+            </q-card-section>
+            <div class="card-footer-accent bg-deep-orange-6" />
+          </q-card>
+        </div>
+      </div>
+    </div>
+
     <!-- Top Games Highlight -->
     <div v-if="topGames.length > 0" class="q-mb-xl">
       <div class="row items-center q-mb-md">
@@ -162,7 +230,10 @@
           :key="game.name"
           class="col-12 col-sm-6 col-md-4"
         >
-          <UserGameCard :game="game" />
+          <UserGameCard
+            :game="game"
+            :record-score="recordsMap[game.name]"
+          />
         </div>
       </div>
     </div>
@@ -170,19 +241,31 @@
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue';
 import KennerButton from 'components/base/KennerButton.vue';
 import UserGameCard from 'components/user/UserGameCard.vue';
-import type { TPlayerGameStat } from 'src/types';
+import type { TPlayerGameStat, TPlayerGameRecord } from 'src/types';
 
-defineProps<{
+const props = defineProps<{
   topGames: TPlayerGameStat[];
   filteredGameStats: TPlayerGameStat[];
   gameSearch: string;
+  records?: TPlayerGameRecord[];
 }>();
 
 defineEmits<{
   (e: 'update:gameSearch', value: string): void;
 }>();
+
+const recordsMap = computed(() => {
+  const map: Record<string, number> = {};
+  if (props.records) {
+    for (const r of props.records) {
+      map[r.game_name] = r.record_score;
+    }
+  }
+  return map;
+});
 </script>
 
 <style scoped lang="scss">
@@ -191,6 +274,28 @@ defineEmits<{
 }
 .letter-spacing-1 {
   letter-spacing: 1px;
+}
+
+.record-game-card {
+  border-radius: 12px;
+  background: var(--kenner-card-bg);
+  border: 1px solid var(--surface-border);
+
+  .record-badge {
+    border-bottom-right-radius: 12px;
+    font-size: 0.75rem;
+    padding: 6px 12px;
+    z-index: 2;
+    background: #ffedd5;
+    color: #c2410c;
+  }
+
+  .body--dark & {
+    .record-badge {
+      background: rgba(234, 88, 12, 0.25);
+      color: #fb923c;
+    }
+  }
 }
 
 .top-game-card {

@@ -28,6 +28,7 @@ class ResultSerializer(serializers.ModelSerializer):
         allow_null=True,
     )
     game_name = serializers.CharField(source="selected_game.game.name", read_only=True)
+    is_record = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = Result
@@ -38,6 +39,7 @@ class ResultSerializer(serializers.ModelSerializer):
             'selected_game',
             'game_name',
             'points',
+            'is_record',
             'starting_points',
             'starting_position',
             'position',
@@ -49,6 +51,20 @@ class ResultSerializer(serializers.ModelSerializer):
             'faction_ids',
             'factions',
         ]
+
+    def get_is_record(self, obj):
+        if obj.points is None or obj.points < 2:
+            return False
+        game_records = self.context.get("game_records") if self.context else None
+        if game_records is None:
+            from result.queries import get_game_records_map
+
+            game_records = get_game_records_map()
+        sg = getattr(obj, "selected_game", None)
+        game_id = getattr(sg, "game_id", None)
+        if not game_id:
+            return False
+        return game_records.get(game_id) == obj.points
 
     def get_factions(self, obj):
         """

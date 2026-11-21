@@ -28,6 +28,7 @@ export type TMatchResultDto = {
   selected_game: number;
   game_name?: string;
   points: number | null;
+  is_record?: boolean;
   position: number | null;
   notes: string | null;
   starting_position: number | null;

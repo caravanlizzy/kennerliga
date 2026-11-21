@@ -134,12 +134,23 @@
                 v-if="
                   result.points != null && selectedGame.has_points !== false
                 "
-                :color="result.position === 1 ? 'amber-1' : 'grey-2'"
-                :text-color="result.position === 1 ? 'amber-9' : 'grey-8'"
+                :color="result.is_record ? 'deep-orange-1' : (result.position === 1 ? 'amber-1' : 'grey-2')"
+                :text-color="result.is_record ? 'deep-orange-9' : (result.position === 1 ? 'amber-9' : 'grey-8')"
                 class="stat-badge elegant-badge"
+                :class="{ 'record-badge-glow': result.is_record }"
               >
-                <q-icon name="stars" size="14px" class="q-mr-xs" />
+                <q-icon :name="result.is_record ? 'local_fire_department' : 'stars'" size="14px" class="q-mr-xs" />
                 <span class="text-weight-bold">{{ result.points }}</span>
+                <span
+                  v-if="result.is_record"
+                  class="text-weight-bolder q-ml-xs text-uppercase"
+                  style="font-size: 0.65rem"
+                >
+                  Record
+                </span>
+                <KennerTooltip v-if="result.is_record">
+                  All-time record score for {{ selectedGame.game_name }}
+                </KennerTooltip>
               </q-badge>
 
               <q-badge
@@ -234,6 +245,7 @@ const rawResults = computed(() => {
     id: r.id,
     profile_name: r.player_profile_name,
     points: r.points ?? null,
+    is_record: r.is_record ?? false,
     position: r.position ?? null,
     notes: r.notes ?? null,
     starting_position: r.starting_position ?? null,

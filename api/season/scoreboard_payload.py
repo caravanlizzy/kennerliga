@@ -90,24 +90,39 @@ def build_league_scoreboard_payload(
         player_names.get(pid, f"Player {pid}") for pid in player_order
     ]
 
+    from result.queries import get_game_records_map
+
+    game_records = get_game_records_map()
+
     rows: List[dict] = []
     for selected_game_id, standings in by_game.items():
+        game_id = standings[0].selected_game.game_id if standings else None
+        rec_score = game_records.get(game_id)
         points_by_player = {
-            s.player_profile_id: getattr(s, "ingame_points", None) for s in standings
+            s.player_profile_id: getattr(s, "ingame_points", getattr(s, "points", None)) for s in standings
         }
-        cells = [
-            {
-                "player_id": pid,
-                "profile_name": player_names.get(pid, f"Player {pid}"),
-                "value": points_by_player.get(pid),
-                "display": (
-                    f"{points_by_player.get(pid)} pts"
-                    if points_by_player.get(pid) is not None
-                    else "—"
-                ),
-            }
-            for pid in player_order
-        ]
+        cells = []
+        for pid in player_order:
+            val = points_by_player.get(pid)
+            is_rec = False
+            if val is not None and rec_score is not None:
+                try:
+                    is_rec = int(val) >= 2 and int(val) == rec_score
+                except (ValueError, TypeError):
+                    is_rec = False
+            cells.append(
+                {
+                    "player_id": pid,
+                    "profile_name": player_names.get(pid, f"Player {pid}"),
+                    "value": val,
+                    "display": (
+                        f"{val} pts"
+                        if val is not None
+                        else "—"
+                    ),
+                    "is_record": is_rec,
+                }
+            )
         rows.append(
             {
                 "type": "game",

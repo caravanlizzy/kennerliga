@@ -8,13 +8,25 @@
         >
           {{ game.name }}
         </div>
-        <q-badge
-          color="grey-2"
-          text-color="grey-7"
-          class="text-weight-bolder plays-badge px-sm"
-        >
-          {{ game.count }} plays
-        </q-badge>
+        <div class="row items-center q-gutter-x-xs no-wrap">
+          <q-badge
+            v-if="recordScore != null"
+            color="deep-orange-1"
+            text-color="deep-orange-9"
+            class="text-weight-bolder plays-badge"
+          >
+            <q-icon name="local_fire_department" size="10px" class="q-mr-xs" />
+            {{ recordScore }} VP
+            <KennerTooltip>Player holds record ({{ recordScore }} VP)</KennerTooltip>
+          </q-badge>
+          <q-badge
+            color="grey-2"
+            text-color="grey-7"
+            class="text-weight-bolder plays-badge px-sm"
+          >
+            {{ game.count }} plays
+          </q-badge>
+        </div>
       </div>
 
       <!-- Metrics & Recent results row -->
@@ -69,6 +81,8 @@
 </template>
 
 <script setup lang="ts">
+import KennerTooltip from 'components/base/KennerTooltip.vue';
+
 defineProps<{
   game: {
     name: string;
@@ -77,6 +91,7 @@ defineProps<{
     count: number;
     positions: number[];
   };
+  recordScore?: number;
 }>();
 
 function getPosColor(pos: number) {

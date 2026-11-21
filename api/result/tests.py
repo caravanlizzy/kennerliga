@@ -180,3 +180,72 @@ class ResultAPITests(TestCase):
 
         self.assertEqual(float(ls1.wins), 0.5)
         self.assertEqual(float(ls2.wins), 0.5)
+
+    def test_game_records_detection_and_user_profile(self):
+        user2 = User.objects.create(username="user2")
+        profile2 = PlayerProfile.objects.create(user=user2, profile_name="Profile 2")
+        participant2 = SeasonParticipant.objects.create(
+            season=self.season, profile=profile2, rank=2
+        )
+        self.league.members.add(participant2)
+
+        # Game with points: profile scores 10 (record), profile2 scores 8
+        r1 = Result.objects.create(
+            selected_game=self.selected_game,
+            player_profile=self.profile,
+            points=10,
+            position=1,
+            league=self.league,
+            season=self.season,
+        )
+        r2 = Result.objects.create(
+            selected_game=self.selected_game,
+            player_profile=profile2,
+            points=8,
+            position=2,
+            league=self.league,
+            season=self.season,
+        )
+
+        # Test queries
+        from result.queries import get_game_records_map
+        records = get_game_records_map()
+        self.assertEqual(records.get(self.game.id), 10)
+
+        # Test ResultSerializer
+        from result.serializers import ResultSerializer
+        s1 = ResultSerializer(r1).data
+        s2 = ResultSerializer(r2).data
+        self.assertTrue(s1["is_record"])
+        self.assertFalse(s2["is_record"])
+
+        # Test a 1-point score is not considered a record (min 2 points)
+        game2 = Game.objects.create(name="GameNoPoints", min_players=1, max_players=4, platform=self.platform)
+        ResultConfig.objects.create(game=game2, has_points=False)
+        sg2 = SelectedGame.objects.create(game=game2, league=self.league, profile=self.profile)
+        r3 = Result.objects.create(
+            selected_game=sg2,
+            player_profile=self.profile,
+            points=1,
+            position=1,
+            league=self.league,
+            season=self.season,
+        )
+        records_after = get_game_records_map()
+        self.assertNotIn(game2.id, records_after)
+        self.assertFalse(ResultSerializer(r3).data["is_record"])
+
+        # Test user statistics returns held records
+        stats_resp = self.client.get(f"/api/user/users/{self.user.id}/statistics/")
+        self.assertEqual(stats_resp.status_code, 200)
+        self.assertIn("records", stats_resp.data)
+        held_records = stats_resp.data["records"]
+        self.assertEqual(len(held_records), 1)
+        self.assertEqual(held_records[0]["game_id"], self.game.id)
+        self.assertEqual(held_records[0]["game_name"], "Catan")
+        self.assertEqual(held_records[0]["record_score"], 10)
+
+        # User 2 shouldn't have any records
+        stats_resp2 = self.client.get(f"/api/user/users/{user2.id}/statistics/")
+        self.assertEqual(stats_resp2.status_code, 200)
+        self.assertEqual(len(stats_resp2.data["records"]), 0)

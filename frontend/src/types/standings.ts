@@ -21,6 +21,7 @@ export type TGameStandingCell = {
   display_value?: string | null;
   decisive_tie_breaker_name?: string | null;
   tie_breaker_value?: string | null;
+  is_record?: boolean;
 };
 
 /** One row of the standings matrix: a player and their per-game cells. */

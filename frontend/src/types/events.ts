@@ -16,6 +16,10 @@ export interface TLiveEvent {
     playerName?: string;
     gameName?: string;
     summary?: string; // For GAME_FINISHED (standings summary)
+    winner?: string; // For GAME_FINISHED
+    points?: number; // For GAME_FINISHED
+    is_record?: boolean; // For GAME_FINISHED winner
+    has_record?: boolean; // For GAME_FINISHED
     winners?: string[]; // For LEAGUE_FINISHED/SEASON_FINISHED
     seasonWinner?: string; // For SEASON_FINISHED
     leagueLevel?: number | string; // For LEAGUE_RUNNING/LEAGUE_FINISHED
@@ -27,6 +31,7 @@ export interface TLiveEvent {
       playerName: string;
       position?: number;
       points?: number;
+      is_record?: boolean;
     }>;
   };
 }

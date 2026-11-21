@@ -118,6 +118,7 @@
                 v-else
                 v-model:game-search="gameSearch"
                 :top-games="topGames"
+                :records="records"
                 :filtered-game-stats="filteredGameStats"
               />
             </q-tab-panel>
@@ -176,6 +177,7 @@ import type {
   TSeasonDto,
   TPlayerGameStat,
   TPlayerPickedGame,
+  TPlayerGameRecord,
   TUserEloData,
 } from 'src/types';
 
@@ -209,6 +211,7 @@ const overallStats = ref({
 const eloData = ref<TUserEloData | undefined>(undefined);
 const gameStats = ref<TPlayerGameStat[]>([]);
 const topGames = ref<TPlayerGameStat[]>([]);
+const records = ref<TPlayerGameRecord[]>([]);
 const pickedGames = ref<TPlayerPickedGame[]>([]);
 const maxGameLimit = ref(2);
 const selectedYear = ref(new Date().getFullYear());
@@ -266,6 +269,7 @@ async function fetchStatistics(userId: number) {
     }
     gameStats.value = data.game_stats;
     topGames.value = data.top_games || [];
+    records.value = data.records || [];
     pickedGames.value = data.picked_games || [];
     maxGameLimit.value = data.max_game_limit || 2;
     availableYears.value = data.available_years || [new Date().getFullYear()];

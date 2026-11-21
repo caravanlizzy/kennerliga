@@ -71,7 +71,7 @@ def _serialize_selected_game(sg) -> Dict:
     }
 
 
-def _gs_row(gs, has_points: bool = True) -> Dict:
+def _gs_row(gs, has_points: bool = True, is_record: bool = False) -> Dict:
     """
     Serializes a GameStanding object into a dictionary row for API payloads.
     """
@@ -91,6 +91,7 @@ def _gs_row(gs, has_points: bool = True) -> Dict:
         if gs.decisive_tie_breaker
         else None,
         "tie_breaker_value": gs.tie_breaker_value,
+        "is_record": is_record,
     }
 
 
@@ -117,6 +118,7 @@ def build_full_standings_payload(
     """
     selected_game_list = [_serialize_selected_game(sg) for sg in selected_games]
     selected_game_ids = [sg.id for sg in selected_games]
+    game_id_by_sg = {sg.id: sg.game_id for sg in selected_games}
     has_points_by_sg = {
         sg.id: sg.game.resultconfig_set.all()[0].has_points
         if sg.game.resultconfig_set.all()
@@ -124,14 +126,26 @@ def build_full_standings_payload(
         for sg in selected_games
     }
 
+    from result.queries import get_game_records_map
+
+    game_records = get_game_records_map()
+
     league_standing_dict = {ls.player_profile_id: ls for ls in league_standing_list}
 
     # Build a lookup: {player_profile_id: {selected_game_id: {...}}}
     game_data_by_player: Dict[int, Dict[int, Dict]] = {}
     for gs in game_standings:
+        has_pts = has_points_by_sg.get(gs.selected_game_id, True)
+        g_id = game_id_by_sg.get(gs.selected_game_id)
+        is_rec = False
+        if has_pts and gs.points is not None and g_id in game_records:
+            try:
+                is_rec = int(gs.points) >= 2 and int(gs.points) == game_records[g_id]
+            except (ValueError, TypeError):
+                is_rec = False
         game_data_by_player.setdefault(gs.player_profile_id, {})[
             gs.selected_game_id
-        ] = _gs_row(gs, has_points=has_points_by_sg.get(gs.selected_game_id, True))
+        ] = _gs_row(gs, has_points=has_pts, is_record=is_rec)
 
     # 5. Build the response rows
     standings_list = []
@@ -151,6 +165,7 @@ def build_full_standings_payload(
                     "rank": None,
                     "display_rank": None,
                     "display_value": None,
+                    "is_record": False,
                 }
 
         user = member.profile.user if hasattr(member.profile, "user") else None

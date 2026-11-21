@@ -991,6 +991,10 @@ class LiveEventViewSet(ViewSet):
 
         # 4. GAME_FINISHED events
         # Get all results for these leagues
+        from result.queries import get_game_records_map
+
+        game_records = get_game_records_map()
+
         results = Result.objects.filter(league__in=leagues).select_related(
             "player_profile", "selected_game__game", "league"
         )
@@ -1074,14 +1078,32 @@ class LiveEventViewSet(ViewSet):
                         else [primary_winner.player_profile.profile_name]
                     )
                 )
+                game_id = res_list[0].selected_game.game_id
+                rec_score = game_records.get(game_id)
                 results_payload = [
                     {
                         "playerName": r.player_profile.profile_name,
                         "position": r.position,
                         "points": r.points,
+                        "is_record": (
+                            r.points is not None
+                            and rec_score is not None
+                            and r.points >= 2
+                            and r.points == rec_score
+                        ),
                     }
                     for r in full_results
                 ]
+
+                has_record = any(r["is_record"] for r in results_payload)
+                is_winner_record = (
+                    primary_winner.points is not None
+                    and rec_score is not None
+                    and primary_winner.points >= 2
+                    and primary_winner.points == rec_score
+                    if primary_winner
+                    else False
+                )
 
                 events.append(
                     {
@@ -1097,6 +1119,8 @@ class LiveEventViewSet(ViewSet):
                             else None,
                             "winners": winners_names,
                             "points": primary_winner.points if primary_winner else None,
+                            "is_record": is_winner_record,
+                            "has_record": has_record,
                             "results": results_payload,
                         },
                     }

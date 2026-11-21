@@ -98,6 +98,14 @@ export type TPlayerPickedGame = {
   limit_exceeded: boolean;
 };
 
+/** A game where the player holds the high-score record. */
+export type TPlayerGameRecord = {
+  game_id: number;
+  game_name: string;
+  record_score: number;
+  platform?: string | null;
+};
+
 /** Mirrors the payload of `UserViewSet.user_statistics`. */
 export type TUserStatistics = {
   overall_stats: {
@@ -114,6 +122,7 @@ export type TUserStatistics = {
   game_stats: TPlayerGameStat[];
   top_games: TPlayerGameStat[];
   picked_games: TPlayerPickedGame[];
+  records?: TPlayerGameRecord[];
   /** Comes from the App Configuration (`max_same_game_per_year`). */
   max_game_limit: number;
   available_years: number[];

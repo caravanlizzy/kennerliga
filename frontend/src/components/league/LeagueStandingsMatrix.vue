@@ -356,6 +356,7 @@
                 "
                 class="text-weight-bold row items-baseline"
                 style="font-size: 0.9rem"
+                :class="{ 'text-deep-orange-9 text-weight-bolder': props.value?.is_record }"
               >
                 <span>{{ displayPointsValue(props.value) }}</span>
                 <span
@@ -364,6 +365,15 @@
                   style="font-size: 0.6rem; opacity: 0.7"
                   >VP</span
                 >
+                <q-icon
+                  v-if="props.value?.is_record"
+                  name="local_fire_department"
+                  color="deep-orange-6"
+                  size="14px"
+                  class="q-ml-xs cursor-pointer"
+                >
+                  <KennerTooltip>All-time record score: {{ props.value.points }} VP</KennerTooltip>
+                </q-icon>
               </div>
               <div
                 v-if="props.value.league_points"

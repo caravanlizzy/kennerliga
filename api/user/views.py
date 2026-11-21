@@ -432,6 +432,30 @@ class UserViewSet(ModelViewSet):
             "recent_deltas": recent_deltas,
         }
 
+        from result.queries import get_game_records_map
+
+        game_records = get_game_records_map()
+
+        player_record_results = (
+            Result.objects.filter(player_profile=profile, points__gte=2)
+            .select_related("selected_game__game__platform")
+            .order_by("selected_game__game__name")
+        )
+        held_records_map = {}
+        for r in player_record_results:
+            if not r.selected_game or not r.selected_game.game:
+                continue
+            g = r.selected_game.game
+            if g.id in game_records and r.points == game_records[g.id]:
+                if g.id not in held_records_map:
+                    held_records_map[g.id] = {
+                        "game_id": g.id,
+                        "game_name": g.name,
+                        "record_score": r.points,
+                        "platform": g.platform.name if g.platform else None,
+                    }
+        records = sorted(held_records_map.values(), key=lambda x: x["game_name"])
+
         return Response(
             {
                 "overall_stats": overall_stats,
@@ -441,6 +465,7 @@ class UserViewSet(ModelViewSet):
                 "game_stats": game_stats,
                 "top_games": top_games,
                 "picked_games": picked_games,
+                "records": records,
                 "max_game_limit": max_game_limit,
                 "available_years": available_years,
                 "elo": elo_data,
