@@ -975,3 +975,82 @@ class OpenRegistrationTests(TestCase):
         season.refresh_from_db()
         self.assertEqual(season.status, Season.SeasonStatus.NEXT)
         self.assertIn("is not 7 days before the end of the month", out.getvalue())
+
+
+class CronSeasonJobTests(TestCase):
+    def test_cron_season_job_opens_season_seven_days_before_31_day_month(self):
+        from django.core.management import call_command
+        from io import StringIO
+
+        season = Season.objects.create(
+            year=2026, month=6, status=Season.SeasonStatus.NEXT
+        )
+        out = StringIO()
+        # May has 31 days. 7 days before June 1 is May 25.
+        call_command("cron_season_job", date="2026-05-25", stdout=out)
+        season.refresh_from_db()
+        self.assertEqual(season.status, Season.SeasonStatus.OPEN)
+        self.assertIn("7 days before the new month", out.getvalue())
+        self.assertIn("Running open_next_season", out.getvalue())
+
+    def test_cron_season_job_opens_season_seven_days_before_30_day_month(self):
+        from django.core.management import call_command
+        from io import StringIO
+
+        season = Season.objects.create(
+            year=2026, month=5, status=Season.SeasonStatus.NEXT
+        )
+        out = StringIO()
+        # April has 30 days. 7 days before May 1 is April 24.
+        call_command("cron_season_job", date="2026-04-24", stdout=out)
+        season.refresh_from_db()
+        self.assertEqual(season.status, Season.SeasonStatus.OPEN)
+        self.assertIn("7 days before the new month", out.getvalue())
+
+    def test_cron_season_job_starts_season_on_first_day_of_month(self):
+        from django.core.management import call_command
+        from io import StringIO
+
+        open_season = Season.objects.create(
+            year=2026, month=6, status=Season.SeasonStatus.OPEN
+        )
+        out = StringIO()
+        call_command("cron_season_job", date="2026-06-01", stdout=out)
+        open_season.refresh_from_db()
+        self.assertEqual(open_season.status, Season.SeasonStatus.RUNNING)
+        self.assertIn("1st day of the month", out.getvalue())
+        self.assertIn("Running start_new_season", out.getvalue())
+
+    def test_cron_season_job_does_nothing_on_regular_day(self):
+        from django.core.management import call_command
+        from io import StringIO
+
+        next_season = Season.objects.create(
+            year=2026, month=6, status=Season.SeasonStatus.NEXT
+        )
+        out = StringIO()
+        call_command("cron_season_job", date="2026-05-15", stdout=out)
+        next_season.refresh_from_db()
+        self.assertEqual(next_season.status, Season.SeasonStatus.NEXT)
+        self.assertIn("No action required", out.getvalue())
+
+    def test_cron_season_job_evaluates_berlin_timezone(self):
+        from django.core.management import call_command
+        from io import StringIO
+        from unittest.mock import patch
+        from datetime import datetime, timezone as dt_timezone
+
+        next_season = Season.objects.create(
+            year=2026, month=6, status=Season.SeasonStatus.NEXT
+        )
+        out = StringIO()
+        # At 22:30 UTC on May 24th, Berlin (UTC+2 in DST) is 00:30 on May 25th (7 days before June 1st)
+        mock_now = datetime(2026, 5, 24, 22, 30, 0, tzinfo=dt_timezone.utc)
+        with patch("season.management.commands.cron_season_job.datetime") as mock_dt:
+            mock_dt.now.return_value = mock_now
+            mock_dt.strptime = datetime.strptime
+            call_command("cron_season_job", stdout=out)
+
+        next_season.refresh_from_db()
+        self.assertEqual(next_season.status, Season.SeasonStatus.OPEN)
+        self.assertIn("2026-05-25", out.getvalue())
