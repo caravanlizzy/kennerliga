@@ -106,45 +106,6 @@
       </q-td>
     </template>
 
-    <template v-slot:body-cell-winner="props">
-      <q-td :props="props">
-        <div v-if="getWinners(props.row).length > 0" class="row items-center q-gutter-x-sm wrap">
-          <div
-            v-for="(winner, idx) in getWinners(props.row)"
-            :key="idx"
-            class="row items-center no-wrap"
-          >
-            <q-icon
-              :name="winner.is_record ? 'local_fire_department' : 'emoji_events'"
-              :color="winner.is_record ? 'deep-orange-6' : 'amber-9'"
-              size="18px"
-              class="q-mr-xs shrink-0"
-            />
-            <span
-              class="text-weight-bold"
-              :class="winner.is_record ? 'text-deep-orange-9' : 'text-amber-9'"
-            >
-              {{ winner.name }}
-            </span>
-            <q-badge
-              v-if="winner.points != null && props.row.has_points !== false"
-              :color="winner.is_record ? 'deep-orange-1' : 'amber-1'"
-              :text-color="winner.is_record ? 'deep-orange-9' : 'amber-9'"
-              class="q-ml-xs text-weight-bold stat-badge"
-              :class="{ 'record-badge-glow': winner.is_record }"
-            >
-              {{ winner.points }} VP
-              <span v-if="winner.is_record" class="q-ml-xs text-weight-bolder">RECORD</span>
-              <KennerTooltip v-if="winner.is_record">
-                All-time record score for {{ props.row.game_name }}!
-              </KennerTooltip>
-            </q-badge>
-          </div>
-        </div>
-        <div v-else class="text-grey-5">-</div>
-      </q-td>
-    </template>
-
     <template v-slot:body-cell-actions="props">
       <q-td :props="props" class="q-gutter-x-sm" @click.stop>
         <KennerButton
@@ -197,24 +158,6 @@ const {
 
 const loading = computed(() => !isFinished.value);
 const error = computed(() => fetchError?.value?.message || null);
-
-interface WinnerInfo {
-  name: string;
-  points?: number | null;
-  is_record?: boolean;
-}
-
-function getWinners(row: TSelectedGameDto): WinnerInfo[] {
-  if (!row.results || row.results.length === 0) return [];
-  const winners = row.results.filter((r) => r.position === 1);
-  return winners.map((w) => ({
-    name:
-      w.player_profile_name ||
-      (w.player_profile ? `Player #${w.player_profile}` : 'Unknown'),
-    points: w.points,
-    is_record: w.is_record,
-  }));
-}
 
 function hasRecord(row: TSelectedGameDto): boolean {
   return row.results?.some((r) => r.is_record) ?? false;
@@ -278,20 +221,6 @@ const columns = computed<QTableProps['columns']>(() => [
         .join(', ') || '-',
     align: 'left',
     sortable: false,
-  },
-  {
-    name: 'winner',
-    label: 'Winner',
-    field: (r: TSelectedGameDto) =>
-      getWinners(r)
-        .map((w) =>
-          w.points != null && r.has_points !== false
-            ? `${w.name} (${w.points} VP)`
-            : w.name
-        )
-        .join(', ') || '-',
-    align: 'left',
-    sortable: true,
   },
   {
     name: 'actions',
