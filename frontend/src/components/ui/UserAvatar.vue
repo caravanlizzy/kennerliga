@@ -161,6 +161,9 @@ const profileElo = computed(() =>
 );
 
 const effectiveElo = computed(() => {
+  if (eloStore.initialized && profileElo.value) {
+    return profileElo.value.eloRating;
+  }
   if (props.eloRating !== undefined && props.eloRating !== null) {
     return props.eloRating;
   }
@@ -171,6 +174,9 @@ const effectiveElo = computed(() => {
 });
 
 const effectiveEloRank = computed(() => {
+  if (eloStore.initialized && profileElo.value) {
+    return profileElo.value.eloRank;
+  }
   if (props.eloRank !== undefined && props.eloRank !== null) {
     return props.eloRank;
   }

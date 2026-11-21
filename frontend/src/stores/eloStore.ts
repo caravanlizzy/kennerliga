@@ -26,14 +26,13 @@ export const useEloStore = defineStore(
       const n = navigationName?.trim().toLowerCase();
       if (!u && !n) return null;
 
-      const matched = profiles.value.find((p) => {
-        const pUser = p.username?.trim().toLowerCase();
-        const pName = p.profile_name?.trim().toLowerCase();
-        return (
-          (u && (pUser === u || pName === u)) ||
-          (n && (pUser === n || pName === n))
-        );
-      });
+      const matched =
+        profiles.value.find((p) => p.username?.trim().toLowerCase() === n && n) ||
+        profiles.value.find((p) => p.username?.trim().toLowerCase() === u && u) ||
+        profiles.value.find((p) => {
+          const name = p.profile_name?.trim().toLowerCase();
+          return (u && name === u) || (n && name === n);
+        });
 
       if (!matched) return null;
 
@@ -49,7 +48,11 @@ export const useEloStore = defineStore(
       if (!force && initialized.value && profiles.value.length > 0) {
         return profiles.value;
       }
-      if (inFlight) return inFlight;
+      if (inFlight) {
+        if (!force) return inFlight;
+        await inFlight;
+        return fetchProfilesList(true);
+      }
 
       loading.value = true;
       inFlight = (async () => {
@@ -74,11 +77,11 @@ export const useEloStore = defineStore(
       if (subscribed) return;
       subscribed = true;
       const updateStore = useUpdateStore();
-      updateStore.subscribe('/result/', () => {
-        void fetchProfilesList(true);
+      updateStore.subscribe('/result/', async () => {
+        await fetchProfilesList(true);
       });
-      updateStore.subscribe('/user/', () => {
-        void fetchProfilesList(true);
+      updateStore.subscribe('/user/', async () => {
+        await fetchProfilesList(true);
       });
     }
 
@@ -94,6 +97,9 @@ export const useEloStore = defineStore(
   {
     persist: {
       paths: ['profiles', 'initialized'],
+      afterRestore: (ctx) => {
+        ctx.store.initialized = false;
+      },
     },
   }
 );
