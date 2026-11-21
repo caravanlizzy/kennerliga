@@ -7,36 +7,23 @@
     <div
       class="breadcrumb-bar__inner q-mx-auto q-px-md row items-center no-wrap"
     >
-      <div class="row items-center no-wrap history-nav">
-        <KennerButton
-          flat
-          icon="arrow_back"
-          shape="circle"
-          color="grey-7"
-          size="sm"
-          @click="router.back()"
-        >
-          <KennerTooltip>Back</KennerTooltip>
-        </KennerButton>
-        <KennerButton
-          flat
-          icon="arrow_forward"
-          shape="circle"
-          color="grey-7"
-          size="sm"
-          @click="router.forward()"
-        >
-          <KennerTooltip>Forward</KennerTooltip>
-        </KennerButton>
-      </div>
-      <q-breadcrumbs gutter="xs" class="text-grey-6 text-weight-medium">
-        <q-breadcrumbs-el icon="home" to="/" />
+      <q-breadcrumbs
+        role="navigation"
+        aria-label="Breadcrumb"
+        gutter="sm"
+        class="breadcrumb-trail text-weight-medium"
+      >
+        <template #separator>
+          <q-icon name="chevron_right" size="18px" aria-hidden="true" />
+        </template>
+        <q-breadcrumbs-el label="Home" to="/" />
         <q-breadcrumbs-el
-          v-for="crumb in crumbs"
+          v-for="(crumb, index) in crumbs"
           :key="crumb.path"
           :label="crumb.label"
-          :icon="crumb.icon"
-          :to="crumb.path"
+          :to="index === crumbs.length - 1 ? undefined : crumb.path"
+          :aria-current="index === crumbs.length - 1 ? 'page' : undefined"
+          :class="{ 'breadcrumb-current': index === crumbs.length - 1 }"
         />
       </q-breadcrumbs>
     </div>
@@ -45,16 +32,13 @@
 
 <script setup lang="ts">
 import { computed } from 'vue';
-import { useRoute, useRouter } from 'vue-router';
+import { useRoute } from 'vue-router';
 import { useResponsive } from 'src/composables/responsive';
 import { useUserStore } from 'stores/userStore';
 import { useAnnouncementStore } from 'stores/announcementStore';
 import { storeToRefs } from 'pinia';
-import KennerButton from 'components/base/KennerButton.vue';
-import KennerTooltip from 'components/base/KennerTooltip.vue';
 
 const route = useRoute();
-const router = useRouter();
 const { isMobile } = useResponsive();
 const { isAuthenticated } = storeToRefs(useUserStore());
 const { announcements } = storeToRefs(useAnnouncementStore());
@@ -79,7 +63,7 @@ const show = computed(() => {
 });
 
 const crumbs = computed(() => {
-  const result: { label: string; icon?: string; path: string }[] = [];
+  const result: { label: string; path: string }[] = [];
 
   route.matched.forEach((record) => {
     if (record.meta && record.meta.label && record.path !== '/') {
@@ -106,7 +90,6 @@ const crumbs = computed(() => {
 
       result.push({
         label: record.meta.label as string,
-        icon: record.meta.icon as string | undefined,
         path: path || '/',
       });
     }
@@ -135,33 +118,27 @@ const crumbs = computed(() => {
 
 .breadcrumb-bar__inner {
   max-width: var(--kenner-max-width);
-  padding-top: 6px;
-  padding-bottom: 6px;
-  font-size: 11px;
-  gap: 2px;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  font-size: 13px;
 }
 
-.history-nav {
-  gap: 2px;
-  margin-right: 4px;
+.breadcrumb-trail {
+  min-width: 0;
+  overflow-x: auto;
+  color: var(--kenner-text-muted, #718096);
+}
 
-  :deep(.q-btn) {
-    width: 22px;
-    height: 22px;
-    min-height: 22px;
-    margin: 0;
-  }
-
-  :deep(.q-icon) {
-    font-size: 16px;
-  }
+:deep(.q-breadcrumbs__content) {
+  flex-wrap: nowrap;
 }
 
 :deep(.q-breadcrumbs__el) {
   white-space: nowrap;
 }
 
-:deep(.q-breadcrumbs__el-icon) {
-  font-size: 14px;
+:deep(.breadcrumb-current) {
+  color: var(--kenner-text-color, #333);
+  font-weight: 600;
 }
 </style>
