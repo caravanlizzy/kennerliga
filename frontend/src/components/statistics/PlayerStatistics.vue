@@ -1,39 +1,84 @@
 <template>
   <div class="player-statistics">
-    <div class="section-header row items-center no-wrap q-mb-md">
-      <div class="section-header__icon">
-        <q-icon name="groups" color="primary" size="20px" />
-      </div>
-      <div class="column">
-        <div class="text-h6 text-weight-bolder text-dark line-height-1">
-          Players
+    <div v-if="loadingOverview">
+      <div class="section-header row items-center no-wrap q-mb-md">
+        <div class="section-header__icon">
+          <q-icon name="military_tech" color="primary" size="20px" />
         </div>
-        <div class="text-caption text-grey-6">
-          Rankings, records &amp; superlatives across every player.
+        <div class="column">
+          <div class="text-h6 text-weight-bolder text-dark line-height-1">
+            Performance Leaderboards
+          </div>
+          <div class="text-caption text-grey-6">
+            Rankings across core competitive metrics
+          </div>
+        </div>
+      </div>
+      <div class="row q-col-gutter-lg q-mb-xl">
+        <div
+          v-for="i in 6"
+          :key="`sk-cat-${i}`"
+          class="col-12 col-sm-6 col-lg-4"
+        >
+          <q-skeleton type="rect" height="240px" class="rounded-borders" />
         </div>
       </div>
     </div>
 
-    <div v-if="loadingOverview" class="row q-col-gutter-lg">
-      <div v-for="i in 6" :key="i" class="col-12 col-lg-6">
-        <q-skeleton type="rect" height="240px" class="rounded-borders" />
-      </div>
-    </div>
+    <div v-else>
+      <!-- Core Categories Section -->
+      <div v-if="(overview?.categories ?? []).length > 0" class="q-mb-xl">
+        <div class="section-header row items-center no-wrap q-mb-md">
+          <div class="section-header__icon">
+            <q-icon name="military_tech" color="primary" size="20px" />
+          </div>
+          <div class="column">
+            <div class="text-h6 text-weight-bolder text-dark line-height-1">
+              Performance Leaderboards
+            </div>
+            <div class="text-caption text-grey-6">
+              Rankings across win rate, average position, games played, and
+              career score
+            </div>
+          </div>
+        </div>
 
-    <div v-else class="row q-col-gutter-lg">
-      <div
-        v-for="award in overview?.awards ?? []"
-        :key="award.key"
-        class="col-12 col-lg-6"
-      >
-        <StatCategoryCard :category="award" />
+        <div class="row q-col-gutter-lg">
+          <div
+            v-for="category in overview?.categories ?? []"
+            :key="category.key"
+            class="col-12 col-sm-6 col-lg-4"
+          >
+            <StatCategoryCard :category="category" />
+          </div>
+        </div>
       </div>
-      <div
-        v-for="category in overview?.categories ?? []"
-        :key="category.key"
-        class="col-12 col-lg-6"
-      >
-        <StatCategoryCard :category="category" />
+
+      <!-- Awards Section -->
+      <div v-if="(overview?.awards ?? []).length > 0" class="q-mb-lg">
+        <div class="section-header row items-center no-wrap q-mb-md">
+          <div class="section-header__icon awards-header-icon">
+            <q-icon name="emoji_events" color="amber-9" size="20px" />
+          </div>
+          <div class="column">
+            <div class="text-h6 text-weight-bolder text-dark line-height-1">
+              Awards &amp; Superlatives
+            </div>
+            <div class="text-caption text-grey-6">
+              Playstyle achievements, ban habits, and game choices
+            </div>
+          </div>
+        </div>
+
+        <div class="row q-col-gutter-lg">
+          <div
+            v-for="award in overview?.awards ?? []"
+            :key="award.key"
+            class="col-12 col-sm-6 col-lg-4"
+          >
+            <StatCategoryCard :category="award" />
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -84,7 +129,6 @@ onMounted(() => {
 </script>
 
 <style scoped lang="scss">
-// Section header that labels the "Players" side of the split stats layout.
 .section-header {
   gap: 10px;
 
@@ -97,6 +141,10 @@ onMounted(() => {
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
+
+    &.awards-header-icon {
+      background: rgba(245, 158, 11, 0.15);
+    }
   }
 }
 </style>
