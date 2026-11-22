@@ -24,7 +24,6 @@ urlpatterns = [
     path("user/", include("user.urls")),
     path("announcement/", include("announcement.urls")),
     path("release-note/", include("release_note.urls")),
-    path("chat/", include("chat.urls")),
     path("result/", include("result.urls")),
     path("taskboard/", include("taskboard.urls")),
     path("statistics/", include("statistic.urls")),

@@ -1,47 +1,33 @@
-import logging
-
-logger = logging.getLogger(__name__)
-
-from django.db import transaction
+import re
 from django.db.models import Count, IntegerField, OuterRef, Subquery
 from django.db.models.functions import Lower
 from django.utils import timezone
-from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.exceptions import NotFound
-from rest_framework.permissions import IsAuthenticated, IsAdminUser, AllowAny
+from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework.response import Response
-from rest_framework.throttling import SimpleRateThrottle
-from rest_framework.viewsets import ModelViewSet, ViewSet
-from api.permissions import IsAdminOrReadOnly
+from rest_framework.viewsets import ModelViewSet
 
-from chat.service import create_chat_announcement
+from api.permissions import IsAdminOrReadOnly
+from configuration.services import get_max_same_game_per_year
+from game.models import SelectedGame
 from league.models import League, LeagueStanding
 from league.serializer import LeagueSerializer
 from result.models import Result
 from result.serializers import ResultSerializer
-from season.models import Season, SeasonParticipant
+from season.models import Season
 from season.serializer import SeasonSerializer
 from user.models import (
-    User,
-    PlayerProfile,
-    UserInviteLink,
-    Feedback,
     AVATAR_SHAPE_CHOICES,
+    PlayerProfile,
+    User,
 )
 from user.serializers import (
-    UserSerializer,
-    UserInviteLinkSerializer,
-    UserRegistrationSerializer,
-    PasswordResetConfirmSerializer,
     PlayerProfileSerializer,
-    FeedbackSerializer,
+    UserSerializer,
 )
-from configuration.services import get_max_same_game_per_year
-from game.models import SelectedGame
 
 
-# Create your views here.
 class UserViewSet(ModelViewSet):
     """
     API viewset for viewing and managing users.
@@ -64,6 +50,7 @@ class UserViewSet(ModelViewSet):
             "available_years",
             "update_avatar_shape",
             "update_avatar_color",
+            "elo",
         ]:
             permission_classes = [IsAuthenticated]
         else:
@@ -116,38 +103,34 @@ class UserViewSet(ModelViewSet):
     @action(detail=True, methods=["get"], url_path="results")
     def user_results(self, request, pk=None):
         """
-        Custom action to return the leagues for a specific user.
+        Custom action to return the results for a specific user.
         """
-        user = self.get_object()  # Fetch the user by the ID from the URL (pk)
+        user = self.get_object()
         results = Result.objects.filter(player_profile=user.profile)
         serializer = ResultSerializer(results, many=True)
         return Response(serializer.data)
 
-    @action(detail=False, methods=["patch", "put"], url_path="avatar-shape")
+    @action(detail=False, methods=["patch"], url_path="avatar-shape")
     def update_avatar_shape(self, request):
-        """
-        PATCH/PUT /user/users/avatar-shape/
-        Updates the authenticated user's avatar shape.
-        """
-        shape = request.data.get("avatar_shape") or request.data.get("shape")
-        valid_shapes = [c[0] for c in AVATAR_SHAPE_CHOICES]
-        if not shape or shape not in valid_shapes:
+        shape = request.data.get("avatar_shape")
+        if shape is None and "shape" in request.data:
+            shape = request.data.get("shape")
+        shape = str(shape).strip() if shape is not None else ""
+
+        valid_shapes = [choice[0] for choice in AVATAR_SHAPE_CHOICES]
+        if shape not in valid_shapes:
             return Response(
-                {"detail": f"Invalid shape '{shape}'. Valid shapes are: {', '.join(valid_shapes)}."},
+                {"detail": f"Invalid avatar shape '{shape}'. Choose from: {', '.join(valid_shapes)}."},
                 status=400,
             )
+
         user = request.user
         user.avatar_shape = shape
         user.save(update_fields=["avatar_shape"])
         return Response(UserSerializer(user, context={"request": request}).data)
 
-    @action(detail=False, methods=["patch", "put"], url_path="avatar-color")
+    @action(detail=False, methods=["patch"], url_path="avatar-color")
     def update_avatar_color(self, request):
-        """
-        PATCH/PUT /user/users/avatar-color/
-        Updates the authenticated user's avatar color (hex or empty string for auto).
-        """
-        import re
         color = request.data.get("avatar_color")
         if color is None and "color" in request.data:
             color = request.data.get("color")
@@ -325,7 +308,7 @@ class UserViewSet(ModelViewSet):
                 positioned_games += 1
                 pos_sum += r.position
                 overall_stats["positions"][r.position] = (
-                        overall_stats["positions"].get(r.position, 0) + 1
+                    overall_stats["positions"].get(r.position, 0) + 1
                 )
                 if r.position == 1:
                     overall_stats["wins"] += 1
@@ -507,189 +490,6 @@ class UserViewSet(ModelViewSet):
         )
 
 
-class MeViewSet(ViewSet):
-    """
-    API viewset for the current authenticated user's context.
-    """
-    permission_classes = [IsAuthenticated]
-
-    @action(detail=False, methods=["get"], url_path="current-league")
-    def current_league(self, request):
-        """
-        Returns the current running league for the authenticated user.
-        """
-        from league.serializer import LeagueMinimalSerializer
-
-        profile = request.user.profile
-
-        participant = (
-            SeasonParticipant.objects.filter(
-                profile=profile, season__status=Season.SeasonStatus.RUNNING
-            )
-            .select_related("season")
-            .first()
-        )
-
-        if not participant:
-            return Response(
-                {"detail": "No running season participation found."}, status=404
-            )
-
-        league = League.objects.filter(
-            members=participant, season=participant.season
-        ).first()
-
-        if not league:
-            return Response(
-                {"detail": "No league found for current season."}, status=404
-            )
-
-        from league.models import LeagueStatus
-
-        data = LeagueMinimalSerializer(league).data
-        data["is_my_turn"] = (
-            league.status
-            in (
-                LeagueStatus.PICKING,
-                LeagueStatus.BANNING,
-                LeagueStatus.REPICKING,
-            )
-            and league.active_player_id == participant.id
-        )
-        return Response(data)
-
-    @action(detail=False, methods=["get"], url_path="results")
-    def results(self, request):
-        """
-        Returns all game results for the authenticated user.
-        """
-        results = Result.objects.filter(player_profile=request.user.profile)
-        return Response(ResultSerializer(results, many=True).data)
-
-
-class UserInviteLinkViewSet(ModelViewSet):
-    """
-    API viewset for managing user invite links and password restoration links.
-    Restricted to admin users.
-    """
-    queryset = UserInviteLink.objects.select_related("created_by", "user", "player_profile").all()
-    serializer_class = UserInviteLinkSerializer
-    permission_classes = [IsAdminUser]
-    http_method_names = ["get", "post", "delete", "head", "options"]
-
-    def perform_create(self, serializer):
-        user = serializer.validated_data.get("user")
-        link_type = serializer.validated_data.get("type", UserInviteLink.TYPE_INVITATION)
-        if link_type == UserInviteLink.TYPE_PASSWORD and user:
-            UserInviteLink.objects.filter(
-                user=user, type=UserInviteLink.TYPE_PASSWORD
-            ).delete()
-            if not serializer.validated_data.get("label"):
-                serializer.validated_data["label"] = f"Password reset for {user.username}"
-        serializer.save(created_by=self.request.user)
-
-
-class UserRegistrationViewSet(ViewSet):
-    """
-    API viewset for public user registration using an invite link.
-    """
-    permission_classes = [AllowAny]
-
-    def create(self, request):
-        serializer = UserRegistrationSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-
-        username = serializer.validated_data["username"]
-        password = serializer.validated_data["password"]
-        invite_key = serializer.validated_data["invite_key"]
-
-        try:
-            with transaction.atomic():
-                invite = UserInviteLink.objects.select_for_update().get(
-                    key=invite_key, type=UserInviteLink.TYPE_INVITATION
-                )
-
-                if invite.is_expired():
-                    invite.delete()
-                    return Response({"detail": "Invite expired."}, status=400)
-
-                user = User.objects.create_user(username=username, password=password)
-
-                # Check if invite has an existing PlayerProfile
-                if invite.player_profile:
-                    # Link user to existing profile
-                    player_profile = invite.player_profile
-                    player_profile.user = user
-                    player_profile.save()
-                else:
-                    # Create a new PlayerProfile
-                    PlayerProfile.objects.create(
-                        user=user, profile_name=username
-                    )
-
-                # Delete invite after success
-                invite.delete()
-
-            create_chat_announcement(f"Welcome {username} to kennerliga")
-            return Response(
-                {"detail": f"User {username} created successfully."}, status=201
-            )
-
-        except UserInviteLink.DoesNotExist:
-            return Response({"detail": "Invalid invite key."}, status=400)
-        except Exception as e:
-            logger.exception("User registration failed.")
-            return Response({"detail": str(e)}, status=400)
-
-
-class UserPasswordResetViewSet(ViewSet):
-    """
-    API viewset for confirming password resets using one-time token keys.
-    """
-    permission_classes = [AllowAny]
-
-    @action(detail=False, methods=["post"], url_path="confirm")
-    def confirm(self, request):
-        """
-        Set a new password using the one-time token key.
-        """
-        serializer = PasswordResetConfirmSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-
-        key = serializer.validated_data["key"].strip()
-        password = serializer.validated_data["password"]
-
-        try:
-            with transaction.atomic():
-                reset_link = UserInviteLink.objects.select_for_update().get(
-                    key=key, type=UserInviteLink.TYPE_PASSWORD
-                )
-
-                if reset_link.is_expired():
-                    reset_link.delete()
-                    return Response({"detail": "Reset link expired."}, status=400)
-
-                user = reset_link.user
-                if not user:
-                    reset_link.delete()
-                    return Response({"detail": "Invalid reset link."}, status=400)
-
-                user.set_password(password)
-                user.save()
-
-                reset_link.delete()
-
-            return Response(
-                {"detail": "Password has been reset successfully."},
-                status=200,
-            )
-        except UserInviteLink.DoesNotExist:
-            return Response({"detail": "Invalid reset key."}, status=400)
-        except Exception as e:
-            logger.exception("Password reset failed.")
-            return Response({"detail": str(e)}, status=400)
-
-
 class PlayerProfileViewSet(ModelViewSet):
     """
     API viewset for viewing and managing player profiles.
@@ -717,20 +517,3 @@ class PlayerProfileViewSet(ModelViewSet):
                 queryset = queryset.filter(user__isnull=False)
 
         return queryset.order_by(Lower("profile_name"))
-
-
-class FeedbackViewSet(ModelViewSet):
-    """
-    API viewset for submitting and viewing user feedback.
-    """
-    queryset = Feedback.objects.all()
-    serializer_class = FeedbackSerializer
-    http_method_names = ["get", "post", "head", "options"]
-
-    def get_permissions(self):
-        if self.action == "create":
-            return [IsAuthenticated()]
-        return [IsAdminUser()]
-
-    def perform_create(self, serializer):
-        serializer.save(user=self.request.user)

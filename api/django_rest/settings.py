@@ -49,7 +49,6 @@ DJANGO_APPS = [
 
 MY_APPS = [
     "game",
-    "chat",
     "league",
     "season",
     "announcement",

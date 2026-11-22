@@ -4,15 +4,27 @@ from rest_framework.serializers import ModelSerializer
 
 from api.constants import get_ban_amount_for_success
 from configuration.services import get_max_same_game_per_year
+from game.models import (
+    BanDecision,
+    Game,
+    GameOption,
+    GameOptionAvailabilityCondition,
+    GameOptionAvailabilityGroup,
+    GameOptionChoice,
+    SelectedGame,
+    SelectedOption,
+)
+from league.models import League
 from result.models import Result
 from result.serializers import ResultSerializer
-from .services import create_selected_game, create_ban_decision
-from . import queries as game_q
-from game.models import Game, GameOption, GameOptionChoice, Faction, TieBreaker, ResultConfig, StartingPointSystem, \
-    Platform, SelectedGame, SelectedOption, BanDecision, GameOptionAvailabilityGroup, GameOptionAvailabilityCondition, \
-    WinCondition, WinConditionOption
-from league.models import League
 from user.models import PlayerProfile
+
+from .. import queries as game_q
+from ..services import create_ban_decision, create_selected_game
+from .config_serializers import (
+    FullGameOptionSerializer,
+    SelectedOptionSerializer,
+)
 
 
 class GameSerializer(ModelSerializer):
@@ -22,257 +34,6 @@ class GameSerializer(ModelSerializer):
     class Meta:
         model = Game
         fields = "__all__"
-
-
-class GameOptionSerializer(ModelSerializer):
-    """
-    Serializer for the GameOption model.
-    """
-    class Meta:
-        model = GameOption
-        fields = "__all__"
-
-
-class GameOptionChoiceSerializer(ModelSerializer):
-    """
-    Serializer for the GameOptionChoice model.
-    """
-    class Meta:
-        model = GameOptionChoice
-        fields = "__all__"
-
-
-class FactionSerializer(ModelSerializer):
-    """
-    Serializer for the Faction model.
-    """
-    class Meta:
-        model = Faction
-        fields = "__all__"
-
-
-class TieBreakerSerializer(ModelSerializer):
-    """
-    Serializer for the TieBreaker model.
-    """
-    class Meta:
-        model = TieBreaker
-        fields = '__all__'
-
-
-class WinConditionOptionSerializer(ModelSerializer):
-    """
-    Serializer for the WinConditionOption model.
-    """
-    class Meta:
-        model = WinConditionOption
-        fields = '__all__'
-
-
-class WinConditionSerializer(ModelSerializer):
-    """
-    Serializer for the WinCondition model, including its options and tie-breakers.
-    """
-    options = WinConditionOptionSerializer(many=True, read_only=True)
-    tie_breakers = TieBreakerSerializer(many=True, read_only=True)
-
-    class Meta:
-        model = WinCondition
-        fields = '__all__'
-
-
-class ResultConfigSerializer(ModelSerializer):
-    """
-    Serializer for the ResultConfig model, including win conditions, factions, and starting point system info.
-    Supports atomic nested creation and update of factions, win conditions, options, and tie-breakers.
-    """
-    starting_points_system_code = serializers.SerializerMethodField(read_only=True)
-    starting_points_system_description = serializers.SerializerMethodField(
-        read_only=True
-    )
-    starting_points_system = serializers.PrimaryKeyRelatedField(
-        queryset=StartingPointSystem.objects.all(), required=False, allow_null=True
-    )
-    win_conditions = WinConditionSerializer(many=True, read_only=True)
-    factions = serializers.SerializerMethodField(read_only=True)
-
-    class Meta:
-        model = ResultConfig
-        fields = "__all__"
-
-    def get_starting_points_system_code(self, obj):
-        return obj.starting_points_system.code if obj.starting_points_system else None
-
-    def get_starting_points_system_description(self, obj):
-        return (
-            obj.starting_points_system.description
-            if obj.starting_points_system
-            else None
-        )
-
-    def get_factions(self, obj):
-        factions = Faction.objects.filter(game=obj.game).order_by("level", "name")
-        return FactionSerializer(factions, many=True).data
-
-    def _sync_factions(self, game, factions_data):
-        if factions_data is None:
-            return
-        Faction.objects.filter(game=game).delete()
-        for f in factions_data:
-            name = f.get("name", "")
-            if name:
-                Faction.objects.create(
-                    game=game,
-                    name=name,
-                    level=f.get("level", 0),
-                )
-
-    def _sync_win_conditions(self, result_config, win_conditions_data):
-        if win_conditions_data is None:
-            return
-        WinCondition.objects.filter(result_config=result_config).delete()
-        for wc_idx, wc_data in enumerate(win_conditions_data):
-            name = wc_data.get("name", "")
-            if not name:
-                continue
-            wc = WinCondition.objects.create(
-                result_config=result_config,
-                name=name,
-                condition_type=wc_data.get(
-                    "condition_type", WinCondition.WinConditionType.POINTS
-                ),
-                order=wc_data.get("order", wc_idx * 10),
-            )
-            for opt_idx, opt_data in enumerate(wc_data.get("options", [])):
-                opt_name = opt_data.get("name", "")
-                if opt_name:
-                    WinConditionOption.objects.create(
-                        win_condition=wc,
-                        name=opt_name,
-                        order=opt_data.get("order", opt_idx * 10),
-                    )
-            tie_breakers = wc_data.get("tie_breakers", []) or wc_data.get(
-                "tieBreakers", []
-            )
-            for tb_idx, tb_data in enumerate(tie_breakers):
-                tb_name = tb_data.get("name", "")
-                if tb_name:
-                    TieBreaker.objects.create(
-                        win_condition=wc,
-                        name=tb_name,
-                        higher_wins=tb_data.get("higher_wins", True),
-                        order=tb_data.get(
-                            "order", (len(tie_breakers) - tb_idx) * 10
-                        ),
-                    )
-
-    @transaction.atomic
-    def create(self, validated_data):
-        factions_data = self.initial_data.get("factions", None)
-        win_conditions_data = self.initial_data.get(
-            "win_conditions", self.initial_data.get("winConditions", None)
-        )
-
-        result_config = ResultConfig.objects.create(**validated_data)
-        if factions_data is not None:
-            self._sync_factions(result_config.game, factions_data)
-        if win_conditions_data is not None:
-            self._sync_win_conditions(result_config, win_conditions_data)
-        if not result_config.win_conditions.exists():
-            WinCondition.objects.create(
-                result_config=result_config,
-                name="Win" if not result_config.has_points else "Points",
-                condition_type=WinCondition.WinConditionType.POINTS,
-                order=0,
-            )
-
-        return result_config
-
-    @transaction.atomic
-    def update(self, instance, validated_data):
-        factions_data = self.initial_data.get("factions", None)
-        win_conditions_data = self.initial_data.get(
-            "win_conditions", self.initial_data.get("winConditions", None)
-        )
-
-        for attr, value in validated_data.items():
-            setattr(instance, attr, value)
-        instance.save()
-
-        if factions_data is not None:
-            self._sync_factions(instance.game, factions_data)
-        if win_conditions_data is not None:
-            self._sync_win_conditions(instance, win_conditions_data)
-        if not instance.win_conditions.exists():
-            WinCondition.objects.create(
-                result_config=instance,
-                name="Win" if not instance.has_points else "Points",
-                condition_type=WinCondition.WinConditionType.POINTS,
-                order=0,
-            )
-
-        return instance
-
-
-class StartingPointSystemSerializer(ModelSerializer):
-    """
-    Serializer for the StartingPointSystem model.
-    """
-    class Meta:
-        model = StartingPointSystem
-        fields = "__all__"
-
-
-class PlatformSerializer(ModelSerializer):
-    """
-    Serializer for the Platform model.
-    """
-    class Meta:
-        model = Platform
-        fields = "__all__"
-
-
-class SelectedOptionSerializer(serializers.ModelSerializer):
-    """
-    Serializer for the SelectedOption model.
-    Includes validation to ensure choices belong to the correct options.
-    """
-    game_option = GameOptionSerializer(read_only=True)
-    choice = GameOptionChoiceSerializer(read_only=True)
-
-    # Accept IDs for write
-    game_option_id = serializers.PrimaryKeyRelatedField(
-        queryset=GameOption.objects.all(), source="game_option", write_only=True
-    )
-    choice_id = serializers.PrimaryKeyRelatedField(
-        queryset=GameOptionChoice.objects.all(),
-        source="choice",
-        write_only=True,
-        required=False,
-        allow_null=True,
-    )
-
-    class Meta:
-        model = SelectedOption
-        fields = [
-            "id",
-            "game_option",
-            "choice",
-            "value",
-            "game_option_id",
-            "choice_id",
-        ]
-
-    def validate(self, attrs):
-        game_option = attrs.get("game_option")
-        choice = attrs.get("choice")
-
-        if choice and game_option and choice.option_id != game_option.id:
-            raise serializers.ValidationError(
-                {"choice_id": "Choice must belong to the selected game option."}
-            )
-
-        return attrs
 
 
 class SelectedGameSerializer(serializers.ModelSerializer):
@@ -411,11 +172,6 @@ class SelectedGameSerializer(serializers.ModelSerializer):
         return result_config.has_points if result_config else True
 
     def get_results_uploaded(self, obj):
-
-        # A game is considered to have results uploaded if there are results for it in its league
-        # Usually, a game is finished when all members of the league have a result for it.
-        # However, for the purpose of "is it complete", we check if results exist at all,
-        # or better, if the number of results matches the number of league members.
         league = obj.league
         if not league:
             return False
@@ -432,8 +188,6 @@ class SelectedGameSerializer(serializers.ModelSerializer):
         return result_count >= member_count and member_count > 0
 
     def get_successfully_banned(self, obj):
-        # Prefer the annotations set by the viewset; falling back to the
-        # query helper costs two queries per serialized row.
         ban_count = getattr(obj, "ban_count", None)
         member_count = getattr(obj, "league_member_count", None)
         if ban_count is None or member_count is None:
@@ -470,10 +224,8 @@ class SelectedGameSerializer(serializers.ModelSerializer):
             for option_data in selected_options_data:
                 game_option = option_data.get("game_option")
                 if not game_option:
-                    # optionally raise ValidationError here instead of skipping
                     continue
 
-                # assuming one SelectedOption per (selected_game, game_option)
                 option_instance, _ = SelectedOption.objects.get_or_create(
                     selected_game=instance,
                     game_option=game_option,
@@ -488,118 +240,6 @@ class SelectedGameSerializer(serializers.ModelSerializer):
         return instance
 
 
-class FullGameOptionChoiceSerializer(serializers.ModelSerializer):
-    id = serializers.IntegerField(required=False)
-    ref = serializers.CharField(write_only=True, required=False)
-    order = serializers.IntegerField(required=False, default=0)
-
-    class Meta:
-        model = GameOptionChoice
-        fields = ["id", "ref", "name", "order"]
-
-
-class FullGameOptionAvailabilityConditionWriteSerializer(serializers.Serializer):
-    depends_on_option_ref = serializers.CharField()
-    expected_value = serializers.BooleanField(required=False, allow_null=True)
-    expected_choice_ref = serializers.CharField(required=False, allow_null=True)
-    negate = serializers.BooleanField(required=False, default=False)
-
-    def validate(self, attrs):
-        expected_value = attrs.get("expected_value", None)
-        expected_choice_ref = attrs.get("expected_choice_ref", None)
-
-        # Exactly one of expected_value / expected_choice_ref must be provided
-        if (expected_value is None) == (expected_choice_ref is None):
-            raise serializers.ValidationError(
-                "Provide exactly one of expected_value or expected_choice_ref."
-            )
-        return attrs
-
-
-class FullGameOptionAvailabilityGroupWriteSerializer(serializers.Serializer):
-    conditions = FullGameOptionAvailabilityConditionWriteSerializer(many=True)
-
-
-class FullGameOptionAvailabilityConditionReadSerializer(serializers.ModelSerializer):
-    """
-    Read format uses real DB ids (because refs are not stored).
-    """
-
-    depends_on_option_id = serializers.IntegerField()
-    expected_choice_id = serializers.IntegerField(allow_null=True)
-
-    depends_on_option_name = serializers.CharField(
-        source="depends_on_option.name", read_only=True
-    )
-    expected_choice_name = serializers.CharField(
-        source="expected_choice.name", allow_null=True, read_only=True
-    )
-
-    class Meta:
-        model = GameOptionAvailabilityCondition
-        fields = [
-            "id",
-            "depends_on_option_id",
-            "depends_on_option_name",
-            "expected_value",
-            "expected_choice_id",
-            "expected_choice_name",
-            "negate",
-        ]
-
-
-class FullGameOptionAvailabilityGroupReadSerializer(serializers.ModelSerializer):
-    conditions = FullGameOptionAvailabilityConditionReadSerializer(
-        many=True, read_only=True
-    )
-
-    class Meta:
-        model = GameOptionAvailabilityGroup
-        fields = ["id", "conditions"]
-
-
-class AvailabilityGroupsField(serializers.Field):
-    """
-    Single JSON key `availability_groups` that supports:
-      - write: ref-based format (validated by *Write* serializers)
-      - read: DB-backed format (serialized by *Read* serializers)
-    """
-
-    def to_internal_value(self, data):
-        s = FullGameOptionAvailabilityGroupWriteSerializer(data=data, many=True)
-        s.is_valid(raise_exception=True)
-        return s.validated_data
-
-    def to_representation(self, value):
-        # `value` will be a RelatedManager (option.availability_groups) or iterable
-        qs = value.all() if hasattr(value, "all") else value
-        return FullGameOptionAvailabilityGroupReadSerializer(qs, many=True).data
-
-
-class FullGameOptionSerializer(serializers.ModelSerializer):
-    id = serializers.IntegerField(required=False)
-    # Client-only reference used for linking conditions during create/update
-    ref = serializers.CharField(write_only=True, required=False)
-
-    order = serializers.IntegerField(required=False, default=0)
-    choices = FullGameOptionChoiceSerializer(many=True, required=False)
-
-    # IMPORTANT: same field name for read + write
-    availability_groups = AvailabilityGroupsField(required=False)
-
-    class Meta:
-        model = GameOption
-        fields = [
-            "id",
-            "ref",
-            "name",
-            "has_choices",
-            "choices",
-            "availability_groups",
-            "order",
-        ]
-
-
 class FullGameSerializer(serializers.ModelSerializer):
     """
     Comprehensive serializer for the Game model, including all its options, choices, and rules.
@@ -609,7 +249,16 @@ class FullGameSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Game
-        fields = ["id", "name", "short_name", "platform", "selectable", "min_players", "max_players", "options"]
+        fields = [
+            "id",
+            "name",
+            "short_name",
+            "platform",
+            "selectable",
+            "min_players",
+            "max_players",
+            "options",
+        ]
 
     @transaction.atomic
     def create(self, validated_data):
@@ -618,7 +267,7 @@ class FullGameSerializer(serializers.ModelSerializer):
 
         option_by_ref = {}
         choice_by_ref = {}
-        deferred_groups = []  # list[(option_obj, availability_groups_data)]
+        deferred_groups = []
 
         # Pass 1: create options + choices, build ref maps
         for option_payload in options_data:

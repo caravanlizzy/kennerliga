@@ -1,0 +1,497 @@
+from random import shuffle
+from typing import List, Optional, Tuple
+
+from django.db.models import Min, Q
+
+from league.models import League, LeagueStanding
+from season.models import Season, SeasonParticipant
+from user.models import PlayerProfile
+
+from .lifecycle import _players_per_league
+
+
+def rank_participants(
+    season: Season, participants: List[SeasonParticipant]
+) -> List[SeasonParticipant]:
+    """
+    This function should order the participants and give them a rank. all participants that have participated in the previous season get rank according how they performed. winner of L1 gets rank1, second in l1 gets #2 etc. first 4 ranks go to L1, then rank 5 is winner of L2 etc. after all participants of the previous seasons have been ranked, the remaining participants get their rank randomly (but increase by one for each nexct participant. the so the last players rank is the amount of players this season
+    """
+    profiles = [p.profile for p in participants]
+    prev_participants_profiles = get_previous_participants_list(profiles)
+    new_participants_profiles = [
+        p for p in profiles if p not in prev_participants_profiles
+    ]
+
+    new_league_sizes = _players_per_league(len(profiles))
+    ordered_prev_profiles = order_previous(
+        prev_participants_profiles, new_league_sizes
+    )
+
+    shuffle(new_participants_profiles)
+
+    final_ordered_profiles = ordered_prev_profiles + new_participants_profiles
+
+    # Map back to SeasonParticipant and set rank
+    profile_to_participant = {p.profile_id: p for p in participants}
+    ranked_participants = []
+    for i, profile in enumerate(final_ordered_profiles, start=1):
+        participant = profile_to_participant[profile.id]
+        participant.rank = i
+        ranked_participants.append(participant)
+
+    # One UPDATE instead of one per participant.
+    SeasonParticipant.objects.bulk_update(ranked_participants, ["rank"])
+
+    return ranked_participants
+
+
+def get_previous_participants_list(participants) -> List:
+    """
+    Filters a given list of participants to obtain those who participated in the
+    previous season.
+    """
+    prev_season = (
+        Season.objects.filter(status=Season.SeasonStatus.DONE)
+        .order_by("-year", "-month")
+        .first()
+    )
+    if not prev_season:
+        return []
+    prev_participants_profiles = SeasonParticipant.objects.filter(
+        season=prev_season
+    ).values_list("profile", flat=True)
+    return [p for p in participants if p.id in prev_participants_profiles]
+
+
+def get_previous_result(profile: PlayerProfile) -> Optional[dict]:
+    """
+    Retrieves the performance result (league and position) of a profile in the most recent DONE season.
+    """
+    prev_season = (
+        Season.objects.filter(status=Season.SeasonStatus.DONE)
+        .order_by("-year", "-month")
+        .first()
+    )
+    if not prev_season:
+        return None
+
+    return _result_for_season(profile, prev_season)
+
+
+def _result_for_season(profile: PlayerProfile, season: Season) -> Optional[dict]:
+    """
+    Calculates the league level, rank, and 'last position' status for a profile in a specific season.
+    """
+    try:
+        standing = LeagueStanding.objects.get(
+            player_profile=profile, league__season=season
+        )
+    except LeagueStanding.DoesNotExist:
+        return None
+
+    league = standing.league
+    all_standings = list(
+        LeagueStanding.objects.filter(league=league).order_by(
+            "-league_points",
+            "-wins",
+            "-second_places",
+            "-third_places",
+            "-tie_break_priority",
+        )
+    )
+
+    try:
+        rank = all_standings.index(standing) + 1
+    except ValueError:
+        return None
+
+    is_last = rank == len(all_standings)
+
+    return {"league": league.level, "position": rank, "is_last": is_last}
+
+
+def results_for_season_bulk(
+    profile_ids: List[int], season: Optional[Season]
+) -> dict:
+    """Bulk equivalent of :func:`_result_for_season`.
+
+    Loads all standings for `season` in one query, computes the dense-style
+    rank of each standing in its league, and returns a mapping
+    ``{profile_id: {"league": int, "position": int, "is_last": bool}}``.
+    Profiles without a standing in the given season are omitted from the map.
+    """
+    if not season or not profile_ids:
+        return {}
+
+    standings = (
+        LeagueStanding.objects.filter(
+            league__season=season, player_profile_id__in=profile_ids
+        )
+        .select_related("league")
+        .order_by(
+            "league_id",
+            "-league_points",
+            "-wins",
+            "-second_places",
+            "-third_places",
+            "-tie_break_priority",
+        )
+    )
+
+    # We need the full league memberships to accurately determine position
+    # and whether the player was last, so load every standing in the leagues
+    # that any of the target profiles played in.
+    target_league_ids = {s.league_id for s in standings}
+    if not target_league_ids:
+        return {}
+
+    all_league_standings = (
+        LeagueStanding.objects.filter(league_id__in=target_league_ids)
+        .select_related("league")
+        .order_by(
+            "league_id",
+            "-league_points",
+            "-wins",
+            "-second_places",
+            "-third_places",
+            "-tie_break_priority",
+        )
+    )
+
+    by_league: dict = {}
+    for s in all_league_standings:
+        by_league.setdefault(s.league_id, []).append(s)
+
+    results: dict = {}
+    for league_id, members in by_league.items():
+        total = len(members)
+        for idx, s in enumerate(members, start=1):
+            if s.player_profile_id in profile_ids:
+                results[s.player_profile_id] = {
+                    "league": s.league.level,
+                    "position": idx,
+                    "is_last": idx == total,
+                }
+    return results
+
+
+def projection_results_bulk(profiles: List[PlayerProfile]) -> dict:
+    """Bulk equivalent of :func:`get_projection_result`.
+
+    Loads the latest completed season, plus the running season if any,
+    and returns a mapping ``{profile.id: dict}`` using only 1–2 SQL queries
+    instead of running 3 queries per player.
+    """
+    if not profiles:
+        return {}
+
+    profile_ids = [p.id for p in profiles]
+    done_season = (
+        Season.objects.filter(status=Season.SeasonStatus.DONE)
+        .order_by("-year", "-month")
+        .first()
+    )
+    running_season = (
+        Season.objects.filter(status=Season.SeasonStatus.RUNNING)
+        .order_by("-year", "-month")
+        .first()
+    )
+
+    done_results = results_for_season_bulk(profile_ids, done_season)
+    running_results = results_for_season_bulk(profile_ids, running_season)
+
+    out = {}
+    for pid in profile_ids:
+        out[pid] = done_results.get(pid) or running_results.get(pid)
+    return out
+
+
+def get_projection_result(profile: PlayerProfile) -> Optional[dict]:
+    """Return a 'previous result' for projection purposes.
+
+    Falls back from the most recent DONE season to the RUNNING season so
+    that before the current season closes we can still project where
+    players will land based on current league standings.
+    """
+    res = get_previous_result(profile)
+    if res:
+        return res
+    running_season = (
+        Season.objects.filter(status=Season.SeasonStatus.RUNNING)
+        .order_by("-year", "-month")
+        .first()
+    )
+    if running_season:
+        return _result_for_season(profile, running_season)
+    return None
+
+
+def build_league_projection(profiles: List[PlayerProfile]) -> dict:
+    """
+    Pure (read-only) projection of how a given list of player profiles would
+    be distributed across leagues if the season were created right now,
+    applying promotion/relegation rules to previous participants and grouping
+    newcomers separately.
+    """
+    if not profiles:
+        return {"leagues": [], "newcomers": []}
+
+    # Bulk-load projection results for all profiles (1-2 queries instead of 3*N).
+    results_by_profile_id = projection_results_bulk(profiles)
+
+    prev_rows = []
+    newcomers = []
+    for p in profiles:
+        info = results_by_profile_id.get(p.id)
+        if info:
+            prev_rows.append(
+                {
+                    "profile": p,
+                    "league": info["league"],
+                    "position": info["position"],
+                    "is_last": info["is_last"],
+                }
+            )
+        else:
+            newcomers.append(
+                {
+                    "profile": p.id,
+                    "profile_name": p.profile_name,
+                    "username": getattr(
+                        getattr(p, "user", None), "username", None
+                    ),
+                }
+            )
+
+    league_sizes = _players_per_league(len(profiles))
+    promoted_rows = apply_promotion(prev_rows, league_sizes)
+
+    # Assign promoted rows into leagues matching league_sizes
+    leagues = []
+    idx = 0
+    for level, size in enumerate(league_sizes, start=1):
+        chunk = promoted_rows[idx : idx + size]
+        idx += len(chunk)
+        members = [
+            {
+                "profile": row["profile"].id,
+                "profile_name": row["profile"].profile_name,
+                "username": getattr(
+                    getattr(row["profile"], "user", None), "username", None
+                ),
+                "prev_league": row["league"],
+                "prev_position": row["position"],
+            }
+            for row in chunk
+        ]
+        leagues.append({"level": level, "size": size, "members": members})
+
+    return {"leagues": leagues, "newcomers": newcomers}
+
+
+def order_previous(
+    participants: List[PlayerProfile],
+    new_league_sizes: Optional[List[int]] = None,
+) -> List[PlayerProfile]:
+    """
+    Receives a list of PlayerProfiles who participated in the previous season,
+    and returns them ordered by their seed for the next season using promotion
+    and relegation rules.
+    """
+    if not participants:
+        return []
+
+    # Bulk-load results for all previous participants in 1 query instead of 3*N.
+    prev_season = (
+        Season.objects.filter(status=Season.SeasonStatus.DONE)
+        .order_by("-year", "-month")
+        .first()
+    )
+    results_by_id = results_for_season_bulk(
+        [p.id for p in participants], prev_season
+    )
+
+    data = []
+    for p in participants:
+        info = results_by_id.get(p.id)
+        if info:
+            data.append(
+                {
+                    "profile": p,
+                    "league": info["league"],
+                    "position": info["position"],
+                    "is_last": info["is_last"],
+                }
+            )
+
+    promoted = apply_promotion(data, new_league_sizes)
+    return [row["profile"] for row in promoted]
+
+
+def _target_league(row: dict, num_new_leagues: Optional[int] = None) -> int:
+    """Determine the new league level a previous-season player aims for.
+
+    The previous league index is first clamped to the new structure size so
+    that — when the new season has fewer leagues than the previous one
+    (e.g. due to non-registration of whole leagues) — the pyramid is
+    compressed proportionally. Promotion/relegation offsets are then
+    applied on top of the clamped value.
+
+    - Winner (position 1) of a non-top league is guaranteed a promotion.
+    - Last position in a league forces a relegation.
+    - Otherwise, stay in (the clamped) league.
+    """
+    league = row["league"]
+    if num_new_leagues is None or num_new_leagues <= 0:
+        clamped = league
+        cap = league + 1
+    else:
+        clamped = min(league, num_new_leagues)
+        cap = num_new_leagues
+    if row["position"] == 1 and league > 1:
+        return max(1, clamped - 1)
+    if row["is_last"]:
+        return min(cap, clamped + 1)
+    return clamped
+
+
+def _sort_key(row: dict, num_new_leagues: Optional[int] = None):
+    return (_target_league(row, num_new_leagues), row["league"], row["position"])
+
+
+def apply_promotion(
+    participants: List[dict],
+    new_league_sizes: Optional[List[int]] = None,
+) -> List[dict]:
+    """Order previous-season registered players for the next season,
+    enforcing two rules:
+
+    1. A player who won their league (position 1, league > 1) is guaranteed
+       to be promoted: they must end up in a strictly higher league than
+       before. If capacity in the target league is full, the lowest-ranked
+       non-guaranteed player of that league is relegated to make room
+       (e.g. the 3rd of the higher league).
+    2. A player who finished last in their league is guaranteed to be
+       relegated: they must end up in a strictly lower league than before.
+       If that means another player has to be promoted from below to fill
+       the gap, that promotion happens.
+    """
+    if not participants:
+        return []
+
+    num_new = len(new_league_sizes) if new_league_sizes else 0
+
+    def _key(row: dict):
+        return _sort_key(row, num_new if num_new > 0 else None)
+
+    # Sort by (target_league, prev_league, prev_position) as the baseline.
+    ordered = sorted(participants, key=_key)
+
+    # Without explicit league sizes, fall back to the baseline order.
+    if not new_league_sizes:
+        return ordered
+
+    # Assign rows to new leagues by capacity. Only the prefix of new
+    # leagues that this group of previous players occupies is relevant.
+    league_assignment: List[List[dict]] = []
+    idx = 0
+    for size in new_league_sizes:
+        if idx >= len(ordered):
+            break
+        chunk = ordered[idx : idx + size]
+        league_assignment.append(chunk)
+        idx += size
+        if idx >= len(ordered):
+            break
+
+    def _is_guaranteed_promotion(row: dict) -> bool:
+        return row["position"] == 1 and row["league"] > 1
+
+    def _is_guaranteed_relegation(row: dict) -> bool:
+        return row["is_last"]
+
+    # Iteratively fix violations until stable. Each pass either resolves a
+    # violation by swapping a guaranteed-move player with a non-guaranteed
+    # one in the adjacent league, or stops.
+    changed = True
+    safety = 0
+    while changed and safety < 100:
+        changed = False
+        safety += 1
+
+        # Rule 1: every guaranteed-promotion player must be in a new league
+        # strictly above their (clamped) previous league.
+        for new_level_idx, league in enumerate(league_assignment):
+            new_level = new_level_idx + 1
+            for row in list(league):
+                prev_clamped = (
+                    min(row["league"], num_new) if num_new > 0 else row["league"]
+                )
+                if (
+                    _is_guaranteed_promotion(row)
+                    and new_level >= prev_clamped
+                    and new_level_idx > 0
+                ):
+                    # Find a non-guaranteed swap candidate in the league above
+                    # (lowest-ranked one) to relegate.
+                    above = league_assignment[new_level_idx - 1]
+                    candidates = [
+                        r
+                        for r in above
+                        if not _is_guaranteed_promotion(r)
+                        and not _is_guaranteed_relegation(r)
+                    ]
+                    if not candidates:
+                        continue
+                    victim = max(candidates, key=_key)
+                    above.remove(victim)
+                    above.append(row)
+                    league.remove(row)
+                    league.append(victim)
+                    above.sort(key=_key)
+                    league.sort(key=_key)
+                    changed = True
+                    break
+            if changed:
+                break
+        if changed:
+            continue
+
+        # Rule 2: every guaranteed-relegation player must be in a new league
+        # strictly below their (clamped) previous league.
+        for new_level_idx, league in enumerate(league_assignment):
+            new_level = new_level_idx + 1
+            for row in list(league):
+                prev_clamped = (
+                    min(row["league"], num_new) if num_new > 0 else row["league"]
+                )
+                if (
+                    _is_guaranteed_relegation(row)
+                    and new_level <= prev_clamped
+                    and new_level_idx + 1 < len(league_assignment)
+                ):
+                    below = league_assignment[new_level_idx + 1]
+                    candidates = [
+                        r
+                        for r in below
+                        if not _is_guaranteed_promotion(r)
+                        and not _is_guaranteed_relegation(r)
+                    ]
+                    if not candidates:
+                        continue
+                    victim = min(candidates, key=_key)
+                    below.remove(victim)
+                    below.append(row)
+                    league.remove(row)
+                    league.append(victim)
+                    below.sort(key=_key)
+                    league.sort(key=_key)
+                    changed = True
+                    break
+            if changed:
+                break
+
+    result: List[dict] = []
+    for league in league_assignment:
+        result.extend(league)
+    return result

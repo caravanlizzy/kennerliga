@@ -81,7 +81,6 @@ class LogoutApiView(APIView):
 
 from django.utils import timezone
 from datetime import timedelta
-from chat.models import Chat
 from league.models import League, LeagueTieResolution
 from game.models import SelectedGame, BanDecision
 from result.models import Result
@@ -111,10 +110,6 @@ class NeedsUpdateView(APIView):
         if not since_dt:
             # Fallback: check last 30 seconds
             since_dt = timezone.now() - timedelta(seconds=30)
-
-        # Check for chat updates
-        if Chat.objects.filter(datetime__gt=since_dt).exists():
-            updates.append("/chat/")
 
         # Check for league updates
         # For simplicity, we check if ANY league relevant to the current user (if any) or ANY league at all changed.
