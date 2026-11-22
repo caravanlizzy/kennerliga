@@ -356,7 +356,10 @@
                 "
                 class="text-weight-bold row items-baseline"
                 style="font-size: 0.9rem"
-                :class="{ 'text-deep-orange-9 text-weight-bolder': props.value?.is_record }"
+                :class="{
+                  'text-deep-orange-9 text-weight-bolder':
+                    props.value?.is_record,
+                }"
               >
                 <span>{{ displayPointsValue(props.value) }}</span>
                 <span
@@ -372,7 +375,10 @@
                   size="14px"
                   class="q-ml-xs cursor-pointer"
                 >
-                  <KennerTooltip>All-time record score: {{ props.value.points }} VP</KennerTooltip>
+                  <KennerTooltip
+                    >All-time record score:
+                    {{ props.value.points }} VP</KennerTooltip
+                  >
                 </q-icon>
               </div>
               <div

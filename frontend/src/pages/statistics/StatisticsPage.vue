@@ -24,9 +24,17 @@
         <div class="col-12 col-md-auto">
           <div class="row items-center q-col-gutter-sm">
             <div class="col-12 col-sm-auto">
-              <div class="filter-box row items-center q-gutter-x-xs q-px-sm q-py-xs">
-                <q-icon name="groups" size="18px" class="q-mr-xs text-primary" />
-                <span class="text-caption text-weight-bold text-grey-8 q-mr-xs">Players:</span>
+              <div
+                class="filter-box row items-center q-gutter-x-xs q-px-sm q-py-xs"
+              >
+                <q-icon
+                  name="groups"
+                  size="18px"
+                  class="q-mr-xs text-primary"
+                />
+                <span class="text-caption text-weight-bold text-grey-8 q-mr-xs"
+                  >Players:</span
+                >
                 <q-chip
                   clickable
                   dense
@@ -60,7 +68,10 @@
               </div>
             </div>
 
-            <div class="col-12 col-sm-auto years-filter" style="min-width: 170px">
+            <div
+              class="col-12 col-sm-auto years-filter"
+              style="min-width: 170px"
+            >
               <KennerSelect
                 v-model="selectedYears"
                 :options="yearOptions"

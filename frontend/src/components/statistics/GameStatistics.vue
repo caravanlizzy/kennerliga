@@ -22,11 +22,7 @@
         height="180px"
         class="rounded-borders"
       />
-      <PopularGamesCard
-        v-else
-        :popular="popular"
-        @select="navigateToGame"
-      />
+      <PopularGamesCard v-else :popular="popular" @select="navigateToGame" />
     </div>
 
     <!-- Games Directory & Leaderboards Explorer -->
@@ -40,7 +36,8 @@
             Game Directory &amp; Stats
           </div>
           <div class="text-caption text-grey-6">
-            Click any game to open its dedicated page with high scores, masteries, full player rankings, and match history.
+            Click any game to open its dedicated page with high scores,
+            masteries, full player rankings, and match history.
           </div>
         </div>
       </div>
@@ -82,7 +79,11 @@
               >
                 <div>
                   <div class="row items-center justify-between no-wrap q-mb-xs">
-                    <q-badge color="grey-3" text-color="grey-8" class="text-weight-bold">
+                    <q-badge
+                      color="grey-3"
+                      text-color="grey-8"
+                      class="text-weight-bold"
+                    >
                       {{ game.platform || 'Board Game' }}
                     </q-badge>
                     <span class="text-caption text-grey-6 text-weight-medium">
@@ -90,20 +91,32 @@
                     </span>
                   </div>
 
-                  <div class="text-subtitle1 text-weight-bolder text-grey-9 ellipsis-2-lines q-mb-sm">
+                  <div
+                    class="text-subtitle1 text-weight-bolder text-grey-9 ellipsis-2-lines q-mb-sm"
+                  >
                     {{ game.name }}
                   </div>
                 </div>
 
-                <div class="border-top-subtle q-pt-sm row items-center justify-between no-wrap">
-                  <div v-if="game.best_player" class="text-caption ellipsis text-grey-8">
+                <div
+                  class="border-top-subtle q-pt-sm row items-center justify-between no-wrap"
+                >
+                  <div
+                    v-if="game.best_player"
+                    class="text-caption ellipsis text-grey-8"
+                  >
                     <q-icon
                       name="emoji_events"
                       size="14px"
                       class="text-amber-8 q-mr-xs"
                     />
-                    <span class="text-weight-bold">{{ game.best_player.profile_name }}</span>
-                    <span v-if="game.best_player.win_rate !== null" class="text-grey-6">
+                    <span class="text-weight-bold">{{
+                      game.best_player.profile_name
+                    }}</span>
+                    <span
+                      v-if="game.best_player.win_rate !== null"
+                      class="text-grey-6"
+                    >
                       ({{ game.best_player.win_rate }}%)
                     </span>
                   </div>
@@ -120,7 +133,11 @@
               v-if="filteredGames.length === 0"
               class="col-12 text-center q-py-xl text-grey-6"
             >
-              <q-icon name="search_off" size="36px" class="q-mb-sm text-grey-4" />
+              <q-icon
+                name="search_off"
+                size="36px"
+                class="q-mb-sm text-grey-4"
+              />
               <div>No games match "{{ gameSearch }}".</div>
             </div>
           </div>
@@ -223,7 +240,8 @@ onMounted(() => {
   background: var(--kenner-bg-glass-card, #ffffff);
   border: 1px solid var(--kenner-border-color, rgba(0, 0, 0, 0.08));
   cursor: pointer;
-  transition: transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+  transition: transform 0.15s ease, border-color 0.15s ease,
+    box-shadow 0.15s ease;
 
   &:hover {
     transform: translateY(-2px);

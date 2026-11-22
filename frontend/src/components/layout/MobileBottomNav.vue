@@ -14,8 +14,6 @@
     >
       <q-tab name="seasons" icon="military_tech" label="Seasons" />
       <q-tab name="live" icon="bolt" label="Live" />
-      <!-- Chat feature temporarily disabled -->
-      <!-- <q-tab name="chat" icon="chat" label="Chat" /> -->
       <q-tab name="leaderboard" icon="stars" label="Rank" />
       <q-tab name="stats" icon="query_stats" label="Stats" />
     </q-tabs>
@@ -40,8 +38,6 @@ const activeTab = computed(() => {
       return 'seasons';
     case 'live':
       return 'live';
-    case 'chat':
-      return 'chat';
     case 'leaderboard':
       return 'leaderboard';
     case 'statistics':
@@ -54,7 +50,6 @@ const activeTab = computed(() => {
 const tabToRoute = {
   seasons: 'season-standings',
   live: 'live',
-  chat: 'chat',
   leaderboard: 'leaderboard',
   stats: 'statistics',
 } as const;

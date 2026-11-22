@@ -4,71 +4,17 @@
     :class="isMobile ? 'q-pa-none' : 'q-pa-md-lg q-pa-sm-md'"
   >
     <!-- Top Bar / Breadcrumb Navigation -->
-    <div
-      class="row items-center justify-between"
-      :class="isMobile ? 'q-pa-md border-bottom-subtle' : 'q-mb-md q-mb-sm-lg'"
-    >
-      <div class="row items-center q-gutter-x-sm no-wrap col ellipsis">
-        <KennerButton
-          flat
-          round
-          dense
-          icon="arrow_back"
-          color="grey-7"
-          :to="{ name: 'seasons' }"
-        >
-          <KennerTooltip>Back to Seasons</KennerTooltip>
-        </KennerButton>
-        <div class="column col ellipsis">
-          <div class="row items-center q-gutter-x-sm no-wrap">
-            <h1
-              class="text-h6 text-sm-h5 text-weight-bolder text-dark tracking-tight q-my-none ellipsis"
-            >
-              {{ seasonTitle }}
-            </h1>
-            <q-badge
-              v-if="seasonStatusLabel"
-              :color="statusColor"
-              class="q-px-sm q-py-xs text-weight-bold text-caption text-uppercase shrink-0"
-              rounded
-            >
-              {{ seasonStatusLabel }}
-            </q-badge>
-          </div>
-          <div
-            class="row items-center q-gutter-x-xs text-caption text-grey-6 ellipsis wrap q-mt-xs"
-          >
-            <span v-if="seasonSubtitle">{{ seasonSubtitle }}</span>
-            <span v-if="seasonSubtitle && sortedLeagues.length > 0">·</span>
-            <span v-if="sortedLeagues.length > 0">
-              {{ sortedLeagues.length }}
-              {{ sortedLeagues.length === 1 ? 'League' : 'Leagues' }}
-            </span>
-            <span v-if="sortedLeagues.length > 0 && participants.length > 0"
-              >·</span
-            >
-            <span v-if="participants.length > 0">
-              {{ participants.length }}
-              {{ participants.length === 1 ? 'Participant' : 'Participants' }}
-            </span>
-          </div>
-        </div>
-      </div>
-
-      <!-- Action buttons -->
-      <div class="row items-center q-gutter-x-sm shrink-0">
-        <KennerButton
-          v-if="isAdmin"
-          outline
-          color="secondary"
-          icon="settings"
-          :label="isMobile ? undefined : 'Manage Season'"
-          :round="isMobile"
-          :dense="isMobile"
-          :to="{ name: 'season-manage', params: { id: seasonId } }"
-        />
-      </div>
-    </div>
+    <SeasonHeroHeader
+      :season-id="seasonId"
+      :season-title="seasonTitle"
+      :season-status-label="seasonStatusLabel"
+      :status-color="statusColor"
+      :season-subtitle="seasonSubtitle"
+      :leagues-count="sortedLeagues.length"
+      :participants-count="participants.length"
+      :is-admin="isAdmin"
+      :is-mobile="isMobile"
+    />
 
     <!-- Error State -->
     <ErrorDisplay
@@ -89,26 +35,11 @@
       :class="isMobile ? 'q-pt-sm' : ''"
     >
       <!-- Champions Podium Section (Completed Seasons) -->
-      <div
+      <SeasonOverviewPodium
         v-if="isSeasonCompleted"
-        class="champions-card"
-        :class="isMobile ? 'q-mx-md q-pa-md' : 'q-pa-md q-pa-sm-lg'"
-      >
-        <div class="row items-center q-gutter-x-sm q-mb-md">
-          <div class="champions-icon-wrap">
-            <q-icon name="emoji_events" color="amber-8" size="24px" />
-          </div>
-          <div>
-            <div class="text-subtitle1 text-weight-bold text-dark">
-              Season Champions
-            </div>
-            <div class="text-caption text-grey-6">
-              Podium winners and league champions
-            </div>
-          </div>
-        </div>
-        <SeasonWinners :season-id="seasonId" />
-      </div>
+        :season-id="seasonId"
+        :is-mobile="isMobile"
+      />
 
       <!-- Compact League & View Controls Toolbar -->
       <div
@@ -364,308 +295,34 @@
       <!-- VIEW B: ALL LEAGUES (OVERVIEW) -->
       <div v-else class="all-leagues-view column q-gutter-y-md">
         <!-- 1. League Cards Grid / List Overview -->
-        <div
+        <SeasonLeagueCardsGrid
           v-if="activeAllView === 'cards'"
-          :class="isMobile ? 'column' : 'league-cards-grid'"
-        >
-          <div
-            v-for="(league, idx) in sortedLeagues"
-            :key="league.id"
-            :class="{
-              'league-overview-card': !isMobile,
-              'league-overview-card--user':
-                !isMobile && isUserInLeague(league.id),
-              'league-overview-mobile-item--user':
-                isMobile && isUserInLeague(league.id),
-              'q-px-md q-py-sm': isMobile,
-            }"
-          >
-            <!-- Card Header -->
-            <div class="row items-center justify-between no-wrap q-gutter-x-sm">
-              <div class="row items-center q-gutter-x-xs no-wrap ellipsis col">
-                <LeagueLevel :level="league.level" badge />
-                <span
-                  class="text-subtitle1 text-weight-bold text-dark ellipsis"
-                >
-                  {{ leagueDisplayName(league) }}
-                </span>
-                <div
-                  v-if="isUserInLeague(league.id)"
-                  class="user-league-pill row items-center no-wrap shrink-0"
-                >
-                  <q-icon name="person" size="13px" class="q-mr-xs" />
-                  <span>Your League</span>
-                </div>
-                <q-badge
-                  v-if="league.status"
-                  :color="leagueStatusColor(league.status)"
-                  class="text-weight-bold text-caption text-uppercase q-px-xs shrink-0"
-                  rounded
-                >
-                  {{ league.status }}
-                </q-badge>
-              </div>
-              <KennerButton
-                outline
-                dense
-                no-caps
-                size="sm"
-                color="primary"
-                icon-right="arrow_forward"
-                label="View"
-                class="q-px-sm shrink-0"
-                @click="selectLeague(league.id)"
-              />
-            </div>
+          :sorted-leagues="sortedLeagues"
+          :standings-map="standingsMap"
+          :is-mobile="isMobile"
+          :is-user-in-league="isUserInLeague"
+          :league-display-name="leagueDisplayName"
+          :league-status-color="leagueStatusColor"
+          :get-members-for-league="getMembersForLeague"
+          :get-member-shape="getMemberShape"
+          :get-member-color="getMemberColor"
+          :is-current-user="isCurrentUser"
+          :format-points="formatPoints"
+          @select-league="selectLeague"
+        />
 
-            <!-- League Meta -->
-            <div
-              class="row items-center q-gutter-x-md text-caption text-grey-7 q-py-xs"
-            >
-              <div class="row items-center q-gutter-x-xs">
-                <q-icon name="groups" size="17px" color="grey-6" />
-                <span>{{ getMembersForLeague(league.id).length }} players</span>
-              </div>
-            </div>
-
-            <!-- Standings Table -->
-            <div
-              v-if="standingsMap[league.id]?.standings?.length"
-              class="column q-gutter-y-xs q-mt-xs"
-            >
-              <div
-                v-for="(row, rIdx) in standingsMap[league.id].standings"
-                :key="row.player_profile_id"
-                class="standings-mini-row row items-center justify-between no-wrap q-py-xs q-px-sm rounded-borders"
-                :class="{
-                  'standings-mini-row--leader': rIdx === 0,
-                  'standings-mini-row--user': isCurrentUser(
-                    row.player_profile_id,
-                    row.username
-                  ),
-                }"
-              >
-                <div
-                  class="row items-center q-gutter-x-xs no-wrap ellipsis col q-mr-xs"
-                >
-                  <span
-                    class="rank-badge text-caption text-weight-bold shrink-0"
-                    :class="rIdx === 0 ? 'text-amber-9' : 'text-grey-7'"
-                  >
-                    {{ rIdx + 1 }}.
-                  </span>
-                  <UserAvatar
-                    :display-username="row.username"
-                    :subtitle="row.profile_name"
-                    :shape="
-                      getMemberShape(
-                        league.id,
-                        row.player_profile_id,
-                        row.username
-                      )
-                    "
-                    :color="
-                      getMemberColor(
-                        league.id,
-                        row.player_profile_id,
-                        row.username
-                      )
-                    "
-                    size="22px"
-                  />
-                  <span class="ellipsis text-caption text-weight-medium">
-                    {{ row.profile_name || row.username }}
-                  </span>
-                </div>
-                <div
-                  class="text-caption text-weight-bold shrink-0"
-                  :class="rIdx === 0 ? 'text-amber-10' : 'text-primary'"
-                >
-                  {{ formatPoints(row.total_league_points) }} pts
-                </div>
-              </div>
-            </div>
-
-            <!-- Fallback: Participants preview -->
-            <div v-else class="column q-gutter-y-xs q-mt-xs">
-              <div class="text-caption text-grey-6">Participants</div>
-              <div class="row items-center wrap q-gutter-xs">
-                <div
-                  v-for="m in getMembersForLeague(league.id)"
-                  :key="m.id"
-                  class="row items-center q-gutter-x-xs bg-grey-1 rounded-borders q-px-sm q-py-xs text-caption"
-                >
-                  <UserAvatar
-                    :display-username="m.username"
-                    :subtitle="m.profile_name"
-                    :shape="getMemberShape(league.id, m.profile, m.username)"
-                    :color="getMemberColor(league.id, m.profile, m.username)"
-                    size="22px"
-                  />
-                  <span
-                    class="text-weight-medium text-grey-8 ellipsis"
-                    style="max-width: 90px"
-                  >
-                    {{ m.profile_name || m.username }}
-                  </span>
-                </div>
-              </div>
-            </div>
-
-            <q-separator
-              v-if="isMobile && idx < sortedLeagues.length - 1"
-              class="q-mt-md"
-            />
-          </div>
-        </div>
-
-        <!-- 2. Standings Matrix for All Leagues -->
-        <div v-else-if="activeAllView === 'standings'" class="column">
-          <div
-            v-for="(league, index) in sortedLeagues"
-            :key="league.id"
-            class="league-standings-section"
-            :class="{ 'league-section--user': isUserInLeague(league.id) }"
-          >
-            <q-separator v-if="index > 0" class="q-my-lg" />
-            <div
-              class="row items-center justify-between q-py-sm"
-              :class="isMobile ? 'q-px-md' : 'q-px-xs'"
-            >
-              <div class="row items-center q-gutter-x-sm ellipsis col">
-                <LeagueLevel :level="league.level" badge />
-                <span
-                  class="text-subtitle1 text-weight-bold text-dark ellipsis"
-                >
-                  {{ leagueDisplayName(league) }} Standings Matrix
-                </span>
-                <div
-                  v-if="isUserInLeague(league.id)"
-                  class="user-league-pill row items-center no-wrap shrink-0"
-                >
-                  <q-icon name="person" size="13px" class="q-mr-xs" />
-                  <span>Your League</span>
-                </div>
-              </div>
-              <KennerButton
-                flat
-                dense
-                no-caps
-                color="primary"
-                icon-right="chevron_right"
-                label="Focus League"
-                class="shrink-0"
-                @click="selectLeague(league.id)"
-              />
-            </div>
-            <div :class="isMobile ? 'q-px-none' : 'q-px-xs'">
-              <LeagueStandingsMatrix
-                :leagueId="league.id"
-                :prefetchedData="standingsMap[league.id]"
-                :level="league.level"
-              />
-            </div>
-          </div>
-        </div>
-
-        <!-- 3. Picks & Bans for All Leagues -->
-        <div v-else-if="activeAllView === 'picks'" class="column">
-          <div
-            v-for="(league, index) in sortedLeagues"
-            :key="league.id"
-            class="league-picks-section"
-            :class="{ 'league-section--user': isUserInLeague(league.id) }"
-          >
-            <q-separator v-if="index > 0" class="q-my-lg" />
-            <div
-              class="row items-center justify-between q-py-sm"
-              :class="isMobile ? 'q-px-md' : 'q-px-xs'"
-            >
-              <div class="row items-center q-gutter-x-sm ellipsis col">
-                <LeagueLevel :level="league.level" badge />
-                <span
-                  class="text-subtitle1 text-weight-bold text-dark ellipsis"
-                >
-                  {{ leagueDisplayName(league) }} Picks &amp; Bans
-                </span>
-                <div
-                  v-if="isUserInLeague(league.id)"
-                  class="user-league-pill row items-center no-wrap shrink-0"
-                >
-                  <q-icon name="person" size="13px" class="q-mr-xs" />
-                  <span>Your League</span>
-                </div>
-              </div>
-              <KennerButton
-                flat
-                dense
-                no-caps
-                color="primary"
-                icon-right="chevron_right"
-                label="Focus League"
-                class="shrink-0"
-                @click="selectLeague(league.id)"
-              />
-            </div>
-            <div :class="isMobile ? 'q-px-none' : 'q-px-xs'">
-              <PlayerCard
-                v-if="getMembersForLeague(league.id).length > 0"
-                :all-members="getMembersForLeague(league.id)"
-              />
-              <div v-else class="q-pa-md text-grey-6 italic text-center">
-                No participant picks recorded for this league.
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- 4. Match Results for All Leagues -->
-        <div v-else-if="activeAllView === 'results'" class="column">
-          <div
-            v-for="(league, index) in sortedLeagues"
-            :key="league.id"
-            class="league-results-section"
-            :class="{ 'league-section--user': isUserInLeague(league.id) }"
-          >
-            <q-separator v-if="index > 0" class="q-my-lg" />
-            <div
-              class="row items-center justify-between q-py-sm"
-              :class="isMobile ? 'q-px-md' : 'q-px-xs'"
-            >
-              <div class="row items-center q-gutter-x-sm ellipsis col">
-                <LeagueLevel :level="league.level" badge />
-                <span
-                  class="text-subtitle1 text-weight-bold text-dark ellipsis"
-                >
-                  {{ leagueDisplayName(league) }} Match Results
-                </span>
-                <div
-                  v-if="isUserInLeague(league.id)"
-                  class="user-league-pill row items-center no-wrap shrink-0"
-                >
-                  <q-icon name="person" size="13px" class="q-mr-xs" />
-                  <span>Your League</span>
-                </div>
-              </div>
-              <KennerButton
-                flat
-                dense
-                no-caps
-                color="primary"
-                icon-right="chevron_right"
-                label="Focus League"
-                class="shrink-0"
-                @click="selectLeague(league.id)"
-              />
-            </div>
-            <div :class="isMobile ? 'q-px-none' : 'q-px-xs'">
-              <LeagueMatchResults
-                :leagueId="league.id"
-                :show-standings="false"
-              />
-            </div>
-          </div>
-        </div>
+        <!-- 2, 3, 4. All Leagues Sections (Standings, Picks, Results) -->
+        <SeasonAllLeaguesSection
+          v-else
+          :active-all-view="activeAllView"
+          :sorted-leagues="sortedLeagues"
+          :standings-map="standingsMap"
+          :is-mobile="isMobile"
+          :is-user-in-league="isUserInLeague"
+          :league-display-name="leagueDisplayName"
+          :get-members-for-league="getMembersForLeague"
+          @select-league="selectLeague"
+        />
       </div>
     </div>
   </q-page>
@@ -683,15 +340,16 @@ import {
 import { fetchSeasonFullStandings } from 'src/services/standingsService';
 import ErrorDisplay from 'components/base/ErrorDisplay.vue';
 import LoadingSpinner from 'components/base/LoadingSpinner.vue';
-import KennerButton from 'components/base/KennerButton.vue';
 import KennerSelect from 'components/base/KennerSelect.vue';
-import KennerTooltip from 'components/base/KennerTooltip.vue';
 import LeagueLevel from 'components/season/LeagueLevel.vue';
 import LeagueStandingsMatrix from 'components/league/LeagueStandingsMatrix.vue';
 import LeagueMatchResults from 'components/league/LeagueMatchResults.vue';
 import PlayerCard from 'components/league/PlayerCard.vue';
-import SeasonWinners from 'components/season/SeasonWinners.vue';
 import UserAvatar from 'components/ui/UserAvatar.vue';
+import SeasonHeroHeader from 'components/season/overview/SeasonHeroHeader.vue';
+import SeasonOverviewPodium from 'components/season/overview/SeasonOverviewPodium.vue';
+import SeasonLeagueCardsGrid from 'components/season/overview/SeasonLeagueCardsGrid.vue';
+import SeasonAllLeaguesSection from 'components/season/overview/SeasonAllLeaguesSection.vue';
 import { useUserStore } from 'stores/userStore';
 import { useUpdateStore } from 'stores/updateStore';
 import { useResponsive } from 'src/composables/responsive';

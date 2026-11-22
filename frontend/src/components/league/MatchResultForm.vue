@@ -35,26 +35,11 @@
     </div>
 
     <!-- Tie-breaker banner -->
-    <q-banner
-      v-if="tieBreakerRequired"
-      class="q-mb-md bg-warning text-dark"
-      rounded
-      dense
-    >
-      <template #avatar>
-        <q-icon name="toll" />
-      </template>
-      <div class="text-body2">
-        <template v-if="requiredTieBreaker?.name">
-          <b>{{ requiredTieBreaker.name }}</b> needed for:
-        </template>
-        <template v-else> <b>Tie-breaker</b> needed for: </template>
-        <span v-for="(grp, idx) in tieGroupDisplay" :key="grp.key">
-          {{ grp.names.join(', ')
-          }}<span v-if="idx < tieGroupDisplay.length - 1">; </span>
-        </span>
-      </div>
-    </q-banner>
+    <TieBreakerBanner
+      :tie-breaker-required="tieBreakerRequired"
+      :required-tie-breaker="requiredTieBreaker"
+      :tie-group-display="tieGroupDisplay"
+    />
 
     <div class="q-pa-sm">
       <q-form
@@ -67,196 +52,22 @@
             :key="member.id"
             class="col-12 col-sm-6"
           >
-            <q-card flat bordered class="member-card shadow-1">
-              <q-card-section class="q-pa-md">
-                <div class="row items-center q-mb-md">
-                  <q-avatar
-                    size="sm"
-                    color="primary"
-                    text-color="white"
-                    class="q-mr-sm"
-                  >
-                    {{ member.profile_name.charAt(0).toUpperCase() }}
-                  </q-avatar>
-                  <div class="text-subtitle1 text-weight-bold ellipsis">
-                    {{ member.profile_name }}
-                  </div>
-                </div>
-
-                <div class="column q-gutter-sm">
-                  <!-- Points (for points-based games) -->
-                  <KennerInput
-                    v-if="winConditionIsPoints"
-                    v-model.number="getEntry(member.profile).points"
-                    type="number"
-                    inputmode="numeric"
-                    label="Points"
-                    class="points-input"
-                    :rules="[(v: number | null) => v !== null && v !== '' || 'Required']"
-                  />
-
-                  <!-- Position (for non-points games) -->
-                  <div
-                    v-else-if="!winConditionIsOption && !winConditionIsPoints"
-                  >
-                    <div class="text-caption text-grey-7 q-mb-xs">
-                      Final Position
-                    </div>
-                    <div class="row q-gutter-xs justify-center">
-                      <KennerButton
-                        v-for="pos in members.length"
-                        :key="pos"
-                        size="sm"
-                        round
-                        unelevated
-                        :color="
-                          getEntry(member.profile).position === pos
-                            ? 'primary'
-                            : 'grey-2'
-                        "
-                        :text-color="
-                          getEntry(member.profile).position === pos
-                            ? 'white'
-                            : 'grey-9'
-                        "
-                        :label="String(pos)"
-                        class="position-btn shadow-1"
-                        @click="setPosition(member.id, pos)"
-                      />
-                    </div>
-                    <!-- Notes for position -->
-                    <KennerInput
-                      v-model="getEntry(member.profile).notes"
-                      label="Position Note"
-                      placeholder="Explain position reason..."
-                      class="q-mt-sm"
-                      type="textarea"
-                      autogrow
-                      :input-style="{ minHeight: '40px' }"
-                    />
-                  </div>
-
-                  <!-- Factions by Level -->
-                  <div v-if="resultConfig?.is_asymmetric">
-                    <KennerSelect
-                      v-for="level in sortedFactionLevels"
-                      :key="level"
-                      v-model="getEntry(member.profile).faction_ids[level]"
-                      :options="factionsByLevel[level]"
-                      option-label="name"
-                      option-value="id"
-                      emit-value
-                      map-options
-                      :label="
-                        level === 0 ? 'Faction' : `Level ${level} Faction`
-                      "
-                      clearable
-                      options-dense
-                      class="q-mb-xs"
-                    />
-                  </div>
-
-                  <!-- Starting position -->
-                  <div v-if="resultConfig?.has_starting_player_order">
-                    <div
-                      class="text-caption text-grey-7 q-mb-xs"
-                      style="font-size: 11px"
-                    >
-                      Starting Position
-                    </div>
-                    <div class="row q-gutter-xs justify-center">
-                      <KennerButton
-                        v-for="pos in members.length"
-                        :key="pos"
-                        size="sm"
-                        round
-                        :outline="
-                          getEntry(member.profile).starting_position !== pos
-                        "
-                        :unelevated="
-                          getEntry(member.profile).starting_position === pos
-                        "
-                        :color="
-                          getEntry(member.profile).starting_position === pos
-                            ? 'secondary'
-                            : 'grey-5'
-                        "
-                        :text-color="
-                          getEntry(member.profile).starting_position === pos
-                            ? 'white'
-                            : 'grey-7'
-                        "
-                        :label="String(pos)"
-                        class="starting-position-btn"
-                        @click="swapStartingPosition(member.id, pos)"
-                      />
-                    </div>
-                  </div>
-
-                  <!-- Starting Points -->
-                  <KennerInput
-                    v-if="
-                      resultConfig?.starting_points_system_code &&
-                      resultConfig.starting_points_system_code === 'DYNAMIC'
-                    "
-                    v-model.number="getEntry(member.profile).starting_points"
-                    type="number"
-                    inputmode="numeric"
-                    label="Starting Points"
-                    class="q-mt-xs"
-                    :rules="[
-                      (v: number | null) => (v !== null && v !== '') || 'Required'
-                    ]"
-                  />
-
-                  <!-- Win Condition Option (only for OPTION-type WCs) -->
-                  <div
-                    v-if="
-                      winConditionIsOption &&
-                      selectedWinCondition?.options?.length
-                    "
-                    class="q-mt-xs"
-                  >
-                    <div class="text-caption text-grey-7 q-mb-xs">
-                      {{ selectedWinCondition?.name || 'Outcome' }}
-                    </div>
-                    <q-option-group
-                      v-model="getEntry(member.profile).win_condition_option"
-                      :options="
-                        (selectedWinCondition?.options ?? [])
-                          .slice()
-                          .sort((a, b) => a.order - b.order)
-                          .map((o) => ({ label: o.name, value: o.id }))
-                      "
-                      color="primary"
-                      type="radio"
-                      inline
-                    />
-                  </div>
-
-                  <!-- Tie-Breaker (Appears only when a tie needs resolving) -->
-                  <div
-                    v-if="tieBreakerRequired && needsTieBreaker(member.profile)"
-                    class="q-mt-sm"
-                  >
-                    <KennerInput
-                      v-model.number="
-                        getEntry(member.profile).tie_breaker_value
-                      "
-                      :label="requiredTieBreaker?.name || 'Tie-breaker Value'"
-                      type="number"
-                      inputmode="decimal"
-                      color="orange-8"
-                      :rules="[(v: number | null) => v !== null && v !== '' || 'Tie-breaker value required']"
-                    >
-                      <template #prepend>
-                        <q-icon name="balance" size="xs" color="orange-9" />
-                      </template>
-                    </KennerInput>
-                  </div>
-                </div>
-              </q-card-section>
-            </q-card>
+            <GameResultFields
+              :member="member"
+              :entry="getEntry(member.profile)"
+              :members-count="members.length"
+              :win-condition-is-points="winConditionIsPoints"
+              :win-condition-is-option="winConditionIsOption"
+              :selected-win-condition="selectedWinCondition"
+              :result-config="resultConfig"
+              :sorted-faction-levels="sortedFactionLevels"
+              :factions-by-level="factionsByLevel"
+              :tie-breaker-required="tieBreakerRequired"
+              :needs-tie-breaker="needsTieBreaker(member.profile)"
+              :required-tie-breaker="requiredTieBreaker"
+              @set-position="setPosition"
+              @swap-starting-position="swapStartingPosition"
+            />
           </div>
         </div>
 
@@ -287,7 +98,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch, computed, onMounted } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import {
   fetchMatchResults,
   fetchOrderedWinConditions,
@@ -301,17 +112,16 @@ import {
 import { useQuasar } from 'quasar';
 import { storeToRefs } from 'pinia';
 import { useLeagueStore } from 'stores/leagueStore';
-import KennerSelect from 'components/base/KennerSelect.vue';
-import KennerInput from 'components/base/KennerInput.vue';
 import KennerButton from 'components/base/KennerButton.vue';
 import LoadingSpinner from 'components/base/LoadingSpinner.vue';
+import TieBreakerBanner from 'components/league/TieBreakerBanner.vue';
+import GameResultFields from 'components/league/GameResultFields.vue';
 import {
   TLeagueDto,
   TResultConfigDto,
   TTieBreakerDto,
   TMatchResultPayload,
   TMatchResultSubmitPayload,
-  TMatchResult,
   TWinConditionDto,
 } from 'src/types';
 
@@ -754,21 +564,6 @@ async function submitResults() {
 </script>
 
 <style scoped>
-.member-card {
-  border-radius: 10px;
-  background: var(--kenner-card-bg);
-}
-.ellipsis {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-.position-btn {
-  min-width: 40px;
-  min-height: 40px;
-  font-weight: 500;
-  font-size: 15px;
-}
 .wc-card {
   background: var(--kenner-surface-subtle);
   border-radius: 10px;

@@ -134,7 +134,9 @@
                 <div class="row items-center no-wrap">
                   <strong class="text-primary">{{ event.data.winner }}</strong>
                   <span class="q-mx-xs">wins</span>
-                  <strong class="text-primary">{{ event.data.gameName }}</strong>
+                  <strong class="text-primary">{{
+                    event.data.gameName
+                  }}</strong>
                   <q-badge
                     v-if="event.data.has_record || event.data.is_record"
                     color="deep-orange-1"
@@ -142,7 +144,11 @@
                     class="q-ml-xs text-weight-bolder"
                     style="font-size: 0.65rem; padding: 2px 4px"
                   >
-                    <q-icon name="local_fire_department" size="11px" class="q-mr-xs" />
+                    <q-icon
+                      name="local_fire_department"
+                      size="11px"
+                      class="q-mr-xs"
+                    />
                     RECORD
                   </q-badge>
                 </div>
@@ -175,13 +181,22 @@
                           {{ res.position || idx + 1 }}.
                         </td>
                         <td class="ellipsis" style="max-width: 120px">
-                          <span :class="{ 'text-weight-bold text-deep-orange-9': res.is_record }">
+                          <span
+                            :class="{
+                              'text-weight-bold text-deep-orange-9':
+                                res.is_record,
+                            }"
+                          >
                             {{ res.playerName }}
                           </span>
                         </td>
                         <td
                           class="text-right q-pl-xs"
-                          :class="res.is_record ? 'text-deep-orange-8 text-weight-bolder' : 'text-grey-6'"
+                          :class="
+                            res.is_record
+                              ? 'text-deep-orange-8 text-weight-bolder'
+                              : 'text-grey-6'
+                          "
                           v-if="res.points"
                         >
                           {{ res.points }} VP

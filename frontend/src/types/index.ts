@@ -6,7 +6,6 @@ export * from './league';
 export * from './standings';
 export * from './game';
 export * from './result';
-export * from './chat';
 export * from './announcement';
 export * from './releaseNote';
 export * from './events';

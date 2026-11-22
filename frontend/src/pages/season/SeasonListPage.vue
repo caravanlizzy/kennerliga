@@ -123,7 +123,9 @@ const openingId = ref<number | null>(null);
 function onOpenSeason(row: SeasonExtra) {
   setDialog(
     'Confirm Open Season for Registration',
-    `Are you sure you want to open ${displayName(row)} for registration? This will announce registration to all users.`,
+    `Are you sure you want to open ${displayName(
+      row
+    )} for registration? This will announce registration to all users.`,
     'warning',
     async () => {
       try {

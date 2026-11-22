@@ -23,8 +23,15 @@
             class="text-weight-bold text-subtitle2 ellipsis"
             :style="{ maxWidth: isMobile ? '130px' : '200px' }"
           >
-            {{ truncateString(props.row.game_name || `Game #${props.row.game}`, isMobile ? 16 : 24) }}
-            <KennerTooltip v-if="(props.row.game_name || '').length > (isMobile ? 16 : 24)">
+            {{
+              truncateString(
+                props.row.game_name || `Game #${props.row.game}`,
+                isMobile ? 16 : 24
+              )
+            }}
+            <KennerTooltip
+              v-if="(props.row.game_name || '').length > (isMobile ? 16 : 24)"
+            >
               {{ props.row.game_name }}
             </KennerTooltip>
           </span>
@@ -61,7 +68,10 @@
         <div class="row items-center no-wrap">
           <q-icon name="event" color="secondary" size="18px" class="q-mr-xs" />
           <span class="text-weight-medium">
-            {{ props.row.season_name || (props.row.season_id ? `Season #${props.row.season_id}` : '-') }}
+            {{
+              props.row.season_name ||
+              (props.row.season_id ? `Season #${props.row.season_id}` : '-')
+            }}
           </span>
         </div>
       </q-td>
@@ -69,12 +79,27 @@
 
     <template v-slot:body-cell-players="props">
       <q-td :props="props">
-        <div v-if="getPlayers(props.row).length > 0" class="row items-center q-gutter-xs">
+        <div
+          v-if="getPlayers(props.row).length > 0"
+          class="row items-center q-gutter-xs"
+        >
           <q-badge
             v-for="(player, idx) in getPlayers(props.row)"
             :key="idx"
-            :color="player.is_record ? 'deep-orange-1' : (player.position === 1 ? 'amber-2' : 'grey-2')"
-            :text-color="player.is_record ? 'deep-orange-9' : (player.position === 1 ? 'amber-10' : 'grey-9')"
+            :color="
+              player.is_record
+                ? 'deep-orange-1'
+                : player.position === 1
+                ? 'amber-2'
+                : 'grey-2'
+            "
+            :text-color="
+              player.is_record
+                ? 'deep-orange-9'
+                : player.position === 1
+                ? 'amber-10'
+                : 'grey-9'
+            "
             class="q-pa-xs text-weight-medium"
             :class="{ 'record-badge-glow': player.is_record }"
           >
@@ -154,7 +179,10 @@ const {
   data,
   isFinished,
   error: fetchError,
-} = useAsyncData<TSelectedGameDto[]>(() => fetchSelectedGames({ has_results: true }), []);
+} = useAsyncData<TSelectedGameDto[]>(
+  () => fetchSelectedGames({ has_results: true }),
+  []
+);
 
 const loading = computed(() => !isFinished.value);
 const error = computed(() => fetchError?.value?.message || null);
@@ -163,9 +191,7 @@ function hasRecord(row: TSelectedGameDto): boolean {
   return row.results?.some((r) => r.is_record) ?? false;
 }
 
-function getPlayers(
-  row: TSelectedGameDto
-): {
+function getPlayers(row: TSelectedGameDto): {
   name: string;
   position?: number | null;
   points?: number | null;

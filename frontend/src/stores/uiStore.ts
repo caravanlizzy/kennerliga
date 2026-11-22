@@ -13,11 +13,6 @@ export interface NavSection {
 export const useUiStore = defineStore('ui', () => {
   const isDev = ref(false);
   const navSections = shallowRef<NavSection[]>([]);
-  const chatDrawerOpen = ref(false);
-
-  function toggleChat() {
-    chatDrawerOpen.value = !chatDrawerOpen.value;
-  }
 
   function registerSection(section: NavSection) {
     if (!navSections.value.find((s: NavSection) => s.id === section.id)) {
@@ -39,7 +34,5 @@ export const useUiStore = defineStore('ui', () => {
     registerSection,
     unregisterSection,
     clearSections,
-    chatDrawerOpen,
-    toggleChat,
   };
 });

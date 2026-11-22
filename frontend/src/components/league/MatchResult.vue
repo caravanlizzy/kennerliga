@@ -134,12 +134,28 @@
                 v-if="
                   result.points != null && selectedGame.has_points !== false
                 "
-                :color="result.is_record ? 'deep-orange-1' : (result.position === 1 ? 'amber-1' : 'grey-2')"
-                :text-color="result.is_record ? 'deep-orange-9' : (result.position === 1 ? 'amber-9' : 'grey-8')"
+                :color="
+                  result.is_record
+                    ? 'deep-orange-1'
+                    : result.position === 1
+                    ? 'amber-1'
+                    : 'grey-2'
+                "
+                :text-color="
+                  result.is_record
+                    ? 'deep-orange-9'
+                    : result.position === 1
+                    ? 'amber-9'
+                    : 'grey-8'
+                "
                 class="stat-badge elegant-badge"
                 :class="{ 'record-badge-glow': result.is_record }"
               >
-                <q-icon :name="result.is_record ? 'local_fire_department' : 'stars'" size="14px" class="q-mr-xs" />
+                <q-icon
+                  :name="result.is_record ? 'local_fire_department' : 'stars'"
+                  size="14px"
+                  class="q-mr-xs"
+                />
                 <span class="text-weight-bold">{{ result.points }}</span>
                 <span
                   v-if="result.is_record"
@@ -257,11 +273,18 @@ const rawResults = computed(() => {
     // The API returns 'factions' as a list of objects with id, name/faction_name, level
     factions: (r.factions ?? [])
       .slice()
-      .map((f: { id?: number; name?: string; faction_name?: string; level?: number }) => ({
-        id: f.id ?? 0,
-        name: f.name || f.faction_name || '',
-        level: f.level ?? 0,
-      }))
+      .map(
+        (f: {
+          id?: number;
+          name?: string;
+          faction_name?: string;
+          level?: number;
+        }) => ({
+          id: f.id ?? 0,
+          name: f.name || f.faction_name || '',
+          level: f.level ?? 0,
+        })
+      )
       .sort((a, b) => (a.level ?? 0) - (b.level ?? 0)),
   }));
 });

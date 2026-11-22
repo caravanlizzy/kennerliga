@@ -26,10 +26,6 @@
           <CurrentChampion />
         </div>
 
-        <!-- Chat feature temporarily disabled --><NavChat
-          v-if="false && isAuthenticated"
-        />
-
         <NavMyLeague v-if="user && user.myCurrentLeagueId" />
 
         <NavProfileMenu :onToggle="onToggle" class="q-ml-xs" />
@@ -43,7 +39,6 @@ import { computed } from 'vue';
 import { useRoute } from 'vue-router';
 import NavHome from 'components/nav/NavHome.vue';
 import NavMyLeague from 'components/nav/NavMyLeague.vue';
-import NavChat from 'components/nav/NavChat.vue';
 import NavProfileMenu from 'components/nav/NavProfileMenu.vue';
 import CurrentChampion from 'components/season/CurrentChampion.vue';
 import { useUserStore } from 'stores/userStore';

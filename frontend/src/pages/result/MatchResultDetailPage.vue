@@ -19,7 +19,12 @@
             <div>
               <div class="row items-center q-gutter-x-sm q-mb-xs">
                 <q-badge color="primary" text-color="white" class="q-px-sm">
-                  {{ selectedGame.season_name || (selectedGame.season_id ? `Season #${selectedGame.season_id}` : 'Season') }}
+                  {{
+                    selectedGame.season_name ||
+                    (selectedGame.season_id
+                      ? `Season #${selectedGame.season_id}`
+                      : 'Season')
+                  }}
                 </q-badge>
                 <q-badge
                   v-if="selectedGame.league_level != null"
@@ -89,10 +94,15 @@
 
           <!-- Selected Game Options -->
           <div
-            v-if="selectedGame.selected_options && selectedGame.selected_options.length > 0"
+            v-if="
+              selectedGame.selected_options &&
+              selectedGame.selected_options.length > 0
+            "
             class="row items-center q-gutter-xs q-mt-sm"
           >
-            <span class="text-caption text-grey-7 text-weight-medium q-mr-xs">Options:</span>
+            <span class="text-caption text-grey-7 text-weight-medium q-mr-xs"
+              >Options:</span
+            >
             <q-chip
               v-for="opt in selectedGame.selected_options"
               :key="opt.id"
@@ -101,7 +111,9 @@
               color="grey-2"
               text-color="grey-8"
             >
-              <span class="text-weight-bold q-mr-xs">{{ opt.game_option?.name }}:</span>
+              <span class="text-weight-bold q-mr-xs"
+                >{{ opt.game_option?.name }}:</span
+              >
               <span>{{ opt.choice?.name || (opt.value ? 'Yes' : 'No') }}</span>
             </q-chip>
           </div>
@@ -116,10 +128,7 @@
         flat
         no-margin
       >
-        <MatchResult
-          :selectedGame="selectedGame"
-          :displayGameName="false"
-        />
+        <MatchResult :selectedGame="selectedGame" :displayGameName="false" />
       </ContentSection>
     </div>
 

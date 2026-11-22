@@ -95,10 +95,14 @@
 
           <q-card-section class="q-pt-sm">
             <div class="text-caption text-grey-7 q-mb-md">
-              Add new gaming platforms (e.g. Board Game Arena, Steam) to use in game definitions.
+              Add new gaming platforms (e.g. Board Game Arena, Steam) to use in
+              game definitions.
             </div>
 
-            <q-form @submit.prevent="handleAddPlatform" class="q-gutter-y-sm q-mb-lg">
+            <q-form
+              @submit.prevent="handleAddPlatform"
+              class="q-gutter-y-sm q-mb-lg"
+            >
               <div class="row q-col-gutter-sm items-center">
                 <div class="col">
                   <KennerInput

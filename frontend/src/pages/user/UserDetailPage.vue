@@ -116,7 +116,11 @@
             <!-- Picks Tab -->
             <q-tab-panel name="picks" class="q-pa-none">
               <div v-if="loadingStats">
-                <q-skeleton type="rect" height="200px" class="rounded-borders" />
+                <q-skeleton
+                  type="rect"
+                  height="200px"
+                  class="rounded-borders"
+                />
               </div>
               <UserPicks
                 v-else

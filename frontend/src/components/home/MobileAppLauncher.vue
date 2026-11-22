@@ -55,13 +55,6 @@ const tiles = computed(() => [
     route: { name: 'live' },
     visible: true,
   },
-  {
-    title: 'Chat',
-    description: 'Connect with other league members',
-    icon: 'chat',
-    route: { name: 'chat' },
-    visible: true,
-  },
 ]);
 
 const visibleTiles = computed(() => tiles.value.filter((t) => t.visible));

@@ -10,7 +10,11 @@
             <div class="row items-center justify-between">
               <div>
                 <div class="row items-center q-gutter-x-sm q-mb-xs">
-                  <q-badge color="white" text-color="primary" class="text-weight-bold">
+                  <q-badge
+                    color="white"
+                    text-color="primary"
+                    class="text-weight-bold"
+                  >
                     Admin Configuration
                   </q-badge>
                 </div>
@@ -28,7 +32,10 @@
                   icon="analytics"
                   label="View Stats"
                   @click="
-                    router.push({ name: 'game-detail', params: { id: game.id } })
+                    router.push({
+                      name: 'game-detail',
+                      params: { id: game.id },
+                    })
                   "
                 />
                 <KennerButton
@@ -156,9 +163,7 @@
                             </div>
 
                             <div
-                              v-for="(
-                                grp, gIdx
-                              ) in option.availability_groups"
+                              v-for="(grp, gIdx) in option.availability_groups"
                               :key="grp.id"
                               class="q-mb-xs"
                             >
@@ -388,13 +393,13 @@ const winConditions = computed(() => gameData.value?.winConditions || []);
 const factions = computed(() => gameData.value?.factions || []);
 
 // Filter yesNoOptions (those without choices)
-const yesNoOptions = computed(() =>
-  game.value.options?.filter((option: any) => !option.has_choices) || []
+const yesNoOptions = computed(
+  () => game.value.options?.filter((option: any) => !option.has_choices) || []
 );
 
 // Filter the choiceOptions (those with existing choices)
-const choiceOptions = computed(() =>
-  game.value.options?.filter((option: any) => option.has_choices) || []
+const choiceOptions = computed(
+  () => game.value.options?.filter((option: any) => option.has_choices) || []
 );
 
 // Check if there are any options

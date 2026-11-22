@@ -17,7 +17,9 @@
           >
             <q-icon name="local_fire_department" size="10px" class="q-mr-xs" />
             {{ recordScore }} VP
-            <KennerTooltip>Player holds record ({{ recordScore }} VP)</KennerTooltip>
+            <KennerTooltip
+              >Player holds record ({{ recordScore }} VP)</KennerTooltip
+            >
           </q-badge>
           <q-badge
             color="grey-2"

@@ -16,42 +16,6 @@
       <KennerDrawer v-model="drawerState" />
     </q-drawer>
 
-    <!-- Chat feature temporarily disabled -->
-    <q-drawer
-      v-if="false && isAuthenticated"
-      side="left"
-      v-model="chatDrawerOpen"
-      :width="350"
-      :behavior="isMobile ? 'mobile' : 'desktop'"
-      class="chat-drawer glass-effect shadow-10"
-    >
-      <div class="column full-height kenner-drawer-container">
-        <div
-          class="q-pa-lg q-mb-sm row items-center border-bottom-subtle bg-chat-header"
-        >
-          <div class="row items-center">
-            <q-icon name="chat" color="grey-8" size="28px" class="q-mr-sm" />
-            <span class="text-h6 text-weight-medium text-grey-9">Chat</span>
-          </div>
-          <q-space />
-          <KennerButton
-            flat
-            round
-            dense
-            icon="close"
-            color="grey-7"
-            class="hover-scale"
-            @click="toggleChat"
-          >
-            <q-tooltip>Close Chat</q-tooltip>
-          </KennerButton>
-        </div>
-        <KennerChat class="col bg-transparent" />
-      </div>
-    </q-drawer>
-
-    <!-- Removed fixed chat toggle -->
-
     <q-page-container class="main-container">
       <div
         class="q-mx-auto"
@@ -73,27 +37,17 @@
 import MobileBottomNav from 'components/layout/MobileBottomNav.vue';
 import BreadcrumbBar from 'components/layout/BreadcrumbBar.vue';
 import NavBar from 'components/layout/NavBar.vue';
-import KennerButton from 'components/base/KennerButton.vue';
-import { ref, Ref, onMounted } from 'vue';
+import { ref, Ref } from 'vue';
 import KennerDrawer from 'components/layout/KennerDrawer.vue';
 import ConfirmDialog from 'components/ui/ConfirmDialog.vue';
 import AnnouncementDisplay from 'components/ui/AnnouncementDisplay.vue';
-import KennerChat from 'components/chat/KennerChat.vue';
 import { useUserStore } from 'stores/userStore';
-import { useUiStore } from 'stores/uiStore';
 import { useResponsive } from 'src/composables/responsive';
 import { storeToRefs } from 'pinia';
 
 const drawerState: Ref<boolean> = ref(false);
 const { isAuthenticated } = storeToRefs(useUserStore());
-const uiStore = useUiStore();
 const { isMobile } = useResponsive();
-const { chatDrawerOpen } = storeToRefs(uiStore);
-const { toggleChat } = uiStore;
-
-onMounted(() => {
-  chatDrawerOpen.value = false;
-});
 
 function toggleDrawer(): void {
   drawerState.value = !drawerState.value;
@@ -102,9 +56,6 @@ function toggleDrawer(): void {
 
 <style lang="scss">
 .main-container {
-}
-
-.bg-chat-header {
 }
 
 .border-bottom {
@@ -117,12 +68,7 @@ function toggleDrawer(): void {
     border-bottom-color: var(--kenner-border-subtle);
   }
 }
-.chat-drawer {
-  border-right: 1px solid var(--kenner-border-color) !important;
-}
 .kenner-drawer {
   border-left: 1px solid var(--kenner-border-color) !important;
 }
-
-// Removed unused styles: .chat-mini-toggle, .vertical-text
 </style>

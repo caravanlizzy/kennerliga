@@ -47,11 +47,7 @@
     </div>
 
     <!-- Info banner / limit status -->
-    <q-banner
-      dense
-      rounded
-      class="q-mb-md surface-banner text-body2"
-    >
+    <q-banner dense rounded class="q-mb-md surface-banner text-body2">
       <template #avatar>
         <q-icon
           :name="selectedYear === 'all' ? 'history' : 'info'"
@@ -68,7 +64,11 @@
             Season {{ selectedYear }} Picks:
           </span>
           <span class="text-grey-7 q-ml-xs">
-            {{ selectedYear === 'all' ? 'Showing all games picked by this player across all seasons.' : `Maximum ${maxGameLimit} picks per game allowed per season.` }}
+            {{
+              selectedYear === 'all'
+                ? 'Showing all games picked by this player across all seasons.'
+                : `Maximum ${maxGameLimit} picks per game allowed per season.`
+            }}
           </span>
         </div>
         <q-badge
@@ -98,7 +98,9 @@
               class="shadow-1 q-mr-md flex-shrink-0"
             />
             <div class="col ellipsis q-pr-sm">
-              <div class="text-subtitle1 text-weight-bold text-heading ellipsis">
+              <div
+                class="text-subtitle1 text-weight-bold text-heading ellipsis"
+              >
                 {{ game.name }}
               </div>
               <div class="row items-center q-gutter-x-xs q-mt-xs">
@@ -123,7 +125,8 @@
                 >
                   {{ game.count }} / {{ maxGameLimit }}
                   <KennerTooltip v-if="game.limit_exceeded">
-                    Annual pick limit reached ({{ game.count }} / {{ maxGameLimit }})
+                    Annual pick limit reached ({{ game.count }} /
+                    {{ maxGameLimit }})
                   </KennerTooltip>
                 </q-badge>
               </template>
@@ -144,7 +147,11 @@
 
     <!-- Empty State -->
     <q-card v-else flat bordered class="surface-card q-pa-xl text-center">
-      <q-icon name="history_toggle_off" size="56px" class="q-mb-md text-grey-5" />
+      <q-icon
+        name="history_toggle_off"
+        size="56px"
+        class="q-mb-md text-grey-5"
+      />
       <div class="text-h6 text-weight-bold text-heading q-mb-xs">
         No picks recorded
       </div>

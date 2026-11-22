@@ -220,7 +220,13 @@
     </div>
 
     <div>
-      <KennerButton flat color="primary" icon="add" label="Add League" @click="addLeague" />
+      <KennerButton
+        flat
+        color="primary"
+        icon="add"
+        label="Add League"
+        @click="addLeague"
+      />
     </div>
 
     <div class="row q-col-gutter-sm q-mt-md">

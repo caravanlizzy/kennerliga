@@ -35,10 +35,7 @@
         class="unresolved-tie-notice__group"
       >
         <div class="unresolved-tie-notice__matchup">
-          <template
-            v-for="(m, idx) in grp.members"
-            :key="m.player_profile_id"
-          >
+          <template v-for="(m, idx) in grp.members" :key="m.player_profile_id">
             <span class="unresolved-tie-notice__player">{{
               m.profile_name
             }}</span>

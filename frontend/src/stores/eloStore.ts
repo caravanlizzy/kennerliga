@@ -27,8 +27,12 @@ export const useEloStore = defineStore(
       if (!u && !n) return null;
 
       const matched =
-        profiles.value.find((p) => p.username?.trim().toLowerCase() === n && n) ||
-        profiles.value.find((p) => p.username?.trim().toLowerCase() === u && u) ||
+        profiles.value.find(
+          (p) => p.username?.trim().toLowerCase() === n && n
+        ) ||
+        profiles.value.find(
+          (p) => p.username?.trim().toLowerCase() === u && u
+        ) ||
         profiles.value.find((p) => {
           const name = p.profile_name?.trim().toLowerCase();
           return (u && name === u) || (n && name === n);

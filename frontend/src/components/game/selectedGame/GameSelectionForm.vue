@@ -98,8 +98,12 @@
               no-caps
               size="xs"
               color="grey-7"
-              :icon-right="showOpponentBreakdown ? 'expand_less' : 'expand_more'"
-              :label="showOpponentBreakdown ? 'Hide details' : 'Opponent breakdown'"
+              :icon-right="
+                showOpponentBreakdown ? 'expand_less' : 'expand_more'
+              "
+              :label="
+                showOpponentBreakdown ? 'Hide details' : 'Opponent breakdown'
+              "
               @click="showOpponentBreakdown = !showOpponentBreakdown"
             />
           </div>
@@ -130,8 +134,10 @@
                 </q-badge>
                 <div class="text-caption text-grey-8 font-weight-500">
                   <span v-if="stats.games_played > 0">
-                    You: {{ stats.wins }} win{{ stats.wins === 1 ? '' : 's' }} in
-                    {{ stats.games_played }} game{{
+                    You: {{ stats.wins }} win{{
+                      stats.wins === 1 ? '' : 's'
+                    }}
+                    in {{ stats.games_played }} game{{
                       stats.games_played === 1 ? '' : 's'
                     }}
                   </span>
@@ -154,7 +160,11 @@
             <!-- Opponents breakdown -->
             <q-slide-transition>
               <div
-                v-if="showOpponentBreakdown && stats.opponents && stats.opponents.length > 0"
+                v-if="
+                  showOpponentBreakdown &&
+                  stats.opponents &&
+                  stats.opponents.length > 0
+                "
                 class="q-pt-sm q-mt-xs border-top-subtle"
               >
                 <div class="row q-col-gutter-xs">
@@ -163,8 +173,12 @@
                     :key="opp.profile_id"
                     class="col-12 col-sm-6"
                   >
-                    <div class="opponent-chip row items-center justify-between q-px-sm q-py-xs rounded-borders bg-white border-subtle">
-                      <span class="ellipsis text-caption font-weight-600 text-dark">
+                    <div
+                      class="opponent-chip row items-center justify-between q-px-sm q-py-xs rounded-borders bg-white border-subtle"
+                    >
+                      <span
+                        class="ellipsis text-caption font-weight-600 text-dark"
+                      >
                         {{ opp.profile_name || 'Opponent' }}
                       </span>
                       <div class="row items-center q-gutter-x-xs flex-shrink-0">
@@ -175,16 +189,23 @@
                           {{ Math.round(opp.chance) }}%
                         </span>
                         <q-tooltip>
-                          <div><strong>{{ opp.profile_name || 'Opponent' }}</strong>: {{ Math.round(opp.chance) }}% estimated win chance</div>
+                          <div>
+                            <strong>{{ opp.profile_name || 'Opponent' }}</strong
+                            >: {{ Math.round(opp.chance) }}% estimated win
+                            chance
+                          </div>
                           <div v-if="opp.shared_matches > 0">
-                            {{ opp.shared_matches }} direct head-to-head match{{ opp.shared_matches === 1 ? '' : 'es' }}
+                            {{ opp.shared_matches }} direct head-to-head match{{
+                              opp.shared_matches === 1 ? '' : 'es'
+                            }}
                           </div>
                           <div v-else-if="opp.opponent_games > 0">
-                            {{ opp.opponent_games }} match{{ opp.opponent_games === 1 ? '' : 'es' }} played (0 direct)
+                            {{ opp.opponent_games }} match{{
+                              opp.opponent_games === 1 ? '' : 'es'
+                            }}
+                            played (0 direct)
                           </div>
-                          <div v-else>
-                            0 matches played
-                          </div>
+                          <div v-else>0 matches played</div>
                         </q-tooltip>
                       </div>
                     </div>

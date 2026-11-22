@@ -26,7 +26,11 @@ export default {
       path: ':id',
       name: 'game-detail',
       component: () => import('pages/game/GameDetailPage.vue'),
-      meta: { requiresAuth: true, icon: 'sports_esports', label: 'Game Details' },
+      meta: {
+        requiresAuth: true,
+        icon: 'sports_esports',
+        label: 'Game Details',
+      },
     },
     {
       path: ':id/config',

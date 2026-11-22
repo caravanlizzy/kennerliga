@@ -230,10 +230,7 @@
           :key="game.name"
           class="col-12 col-sm-6 col-md-4"
         >
-          <UserGameCard
-            :game="game"
-            :record-score="recordsMap[game.name]"
-          />
+          <UserGameCard :game="game" :record-score="recordsMap[game.name]" />
         </div>
       </div>
     </div>
