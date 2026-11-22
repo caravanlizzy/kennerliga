@@ -479,7 +479,7 @@ import KennerTooltip from 'components/base/KennerTooltip.vue';
 import LeagueLevel from 'components/season/LeagueLevel.vue';
 import UnresolvedTieBanner from 'components/league/UnresolvedTieBanner.vue';
 import { useUpdateStore } from 'stores/updateStore';
-import { useUserStore } from 'stores/userStore';
+import { useUserProfileDisplay } from 'src/composables/userProfileDisplay';
 
 const props = defineProps<{
   leagueId: number;
@@ -489,7 +489,7 @@ const props = defineProps<{
 
 const { isMobile } = useResponsive();
 const router = useRouter();
-const userStore = useUserStore();
+const { resolveAvatarShape, resolveAvatarColor } = useUserProfileDisplay();
 
 function goToPlayer(username?: string | null): void {
   if (!username) return;
@@ -610,20 +610,17 @@ const tableRows = computed(() => {
   if (!standings.value) return [];
 
   return standings.value.standings.map((standing) => {
-    const isCurrentUser =
-      (standing.username && userStore.isMe(standing.username)) ||
-      (standing.player_profile_id &&
-        userStore.user?.profile_id === standing.player_profile_id);
+    const shape = resolveAvatarShape(
+      standing.player_profile_id,
+      standing.username,
+      standing.avatar_shape
+    );
 
-    const shape =
-      isCurrentUser && userStore.user?.avatar_shape
-        ? userStore.user.avatar_shape
-        : standing.avatar_shape;
-
-    const color =
-      isCurrentUser && userStore.user?.avatar_color !== undefined
-        ? userStore.user.avatar_color
-        : standing.avatar_color;
+    const color = resolveAvatarColor(
+      standing.player_profile_id,
+      standing.username,
+      standing.avatar_color
+    );
 
     const row: Record<string, unknown> = {
       player_profile_id: standing.player_profile_id,

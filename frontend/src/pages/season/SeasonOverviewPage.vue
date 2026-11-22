@@ -42,255 +42,34 @@
       />
 
       <!-- Compact League & View Controls Toolbar -->
-      <div
-        class="controls-toolbar row items-center justify-between q-gutter-y-sm"
-        :class="isMobile ? 'q-px-md' : ''"
-      >
-        <!-- League Selector Dropdown -->
-        <div
-          class="league-select-container"
-          :class="isMobile ? 'full-width' : ''"
-        >
-          <KennerSelect
-            v-model="selectedLeagueId"
-            :options="leagueOptions"
-            emit-value
-            map-options
-            dense
-            label="League"
-            class="full-width"
-            @update:model-value="onLeagueSelected"
-          >
-            <template #selected-item="scope">
-              <div class="row items-center q-gutter-x-xs no-wrap ellipsis">
-                <LeagueLevel
-                  v-if="scope.opt.level !== undefined"
-                  :level="scope.opt.level"
-                  badge
-                  class="q-mr-xs"
-                />
-                <q-icon
-                  v-else
-                  name="grid_view"
-                  size="16px"
-                  color="primary"
-                  class="q-mr-xs"
-                />
-                <span class="ellipsis text-weight-bold">{{
-                  scope.opt.label
-                }}</span>
-              </div>
-            </template>
-            <template #option="scope">
-              <q-item v-bind="scope.itemProps">
-                <q-item-section avatar style="min-width: 32px">
-                  <LeagueLevel
-                    v-if="scope.opt.level !== undefined"
-                    :level="scope.opt.level"
-                    badge
-                  />
-                  <q-icon v-else name="grid_view" size="18px" color="primary" />
-                </q-item-section>
-                <q-item-section>
-                  <q-item-label class="row items-center q-gutter-x-xs">
-                    <span
-                      :class="
-                        scope.opt.isUser
-                          ? 'text-weight-bold text-primary'
-                          : 'text-weight-medium'
-                      "
-                      >{{ scope.opt.label }}</span
-                    >
-                    <span
-                      v-if="scope.opt.isUser"
-                      class="user-league-pill-sm row items-center no-wrap q-ml-xs"
-                    >
-                      <q-icon name="person" size="11px" class="q-mr-xs" />
-                      <span>You</span>
-                    </span>
-                  </q-item-label>
-                </q-item-section>
-                <q-item-section side>
-                  <span class="text-caption text-grey-6">
-                    {{
-                      scope.opt.value === 'all'
-                        ? `${scope.opt.memberCount} leagues`
-                        : `${scope.opt.memberCount} players`
-                    }}
-                  </span>
-                </q-item-section>
-              </q-item>
-            </template>
-          </KennerSelect>
-        </div>
-
-        <!-- View Switcher Toggle -->
-        <div
-          class="view-toggle-container"
-          :class="isMobile ? 'full-width' : ''"
-        >
-          <q-btn-toggle
-            v-if="selectedLeagueId === 'all'"
-            v-model="activeAllView"
-            no-caps
-            rounded
-            unelevated
-            :spread="isMobile"
-            class="season-view-toggle"
-            toggle-color="primary"
-            color="grey-2"
-            text-color="grey-8"
-            :options="allViewOptions"
-            @update:model-value="onViewChanged"
-          />
-          <q-btn-toggle
-            v-else
-            v-model="activeLeagueView"
-            no-caps
-            rounded
-            unelevated
-            :spread="isMobile"
-            class="season-view-toggle"
-            toggle-color="primary"
-            color="grey-2"
-            text-color="grey-8"
-            :options="leagueViewOptions"
-            @update:model-value="onViewChanged"
-          />
-        </div>
-      </div>
+      <SeasonControlsToolbar
+        :selected-league-id="selectedLeagueId"
+        :league-options="leagueOptions"
+        :active-all-view="activeAllView"
+        :active-league-view="activeLeagueView"
+        :all-view-options="allViewOptions"
+        :league-view-options="leagueViewOptions"
+        :is-mobile="isMobile"
+        @league-selected="onLeagueSelected"
+        @update:active-all-view="activeAllView = $event as AllViewMode"
+        @update:active-league-view="activeLeagueView = $event as LeagueViewMode"
+        @view-changed="onViewChanged"
+      />
 
       <!-- VIEW A: SPECIFIC LEAGUE VIEW -->
-      <div v-if="activeLeague" class="league-focused-view column q-gutter-y-md">
-        <!-- League Header Info -->
-        <div
-          class="row items-center justify-between wrap q-py-sm border-bottom-subtle"
-          :class="isMobile ? 'q-px-md' : 'q-px-xs'"
-        >
-          <div class="row items-center q-gutter-x-sm">
-            <LeagueLevel :level="activeLeague.level" />
-            <div>
-              <div class="row items-center q-gutter-xs wrap">
-                <span
-                  class="text-subtitle1 text-sm-h6 text-weight-bold text-dark"
-                >
-                  {{ leagueDisplayName(activeLeague) }}
-                </span>
-                <div
-                  v-if="isUserInLeague(activeLeague.id)"
-                  class="user-league-pill row items-center no-wrap shrink-0"
-                >
-                  <q-icon name="person" size="13px" class="q-mr-xs" />
-                  <span>Your League</span>
-                </div>
-                <q-badge
-                  v-if="activeLeague.status"
-                  :color="leagueStatusColor(activeLeague.status)"
-                  class="text-weight-bold text-caption text-uppercase q-px-xs q-px-sm-sm"
-                  rounded
-                >
-                  {{ activeLeague.status }}
-                </q-badge>
-              </div>
-              <div class="text-caption text-grey-7 q-mt-xs">
-                {{ activeLeagueMembers.length }} Participants
-              </div>
-            </div>
-          </div>
-
-          <!-- Member Avatars Preview -->
-          <div
-            class="row items-center wrap q-gutter-xs q-mt-xs-sm q-mt-sm-none"
-          >
-            <UserAvatar
-              v-for="m in activeLeagueMembers"
-              :key="m.id"
-              :display-username="m.username"
-              :subtitle="m.profile_name"
-              :shape="getMemberShape(activeLeague.id, m.profile, m.username)"
-              :color="getMemberColor(activeLeague.id, m.profile, m.username)"
-              :size="isMobile ? '28px' : '34px'"
-            />
-          </div>
-        </div>
-
-        <!-- Standings Matrix View -->
-        <div
-          v-if="activeLeagueView === 'standings' || activeLeagueView === 'all'"
-          class="league-section"
-        >
-          <div
-            v-if="activeLeagueView === 'all'"
-            class="row items-center q-gutter-x-sm q-py-xs"
-            :class="isMobile ? 'q-px-md' : 'q-px-xs'"
-          >
-            <q-icon name="grid_view" color="primary" size="20px" />
-            <span class="text-subtitle1 text-weight-bold text-dark"
-              >Standings Matrix</span
-            >
-          </div>
-          <div :class="isMobile ? 'q-px-none' : 'q-px-xs'">
-            <LeagueStandingsMatrix
-              :leagueId="activeLeague.id"
-              :prefetchedData="standingsMap[activeLeague.id]"
-              :level="activeLeague.level"
-            />
-          </div>
-        </div>
-
-        <q-separator v-if="activeLeagueView === 'all'" class="q-my-md" />
-
-        <!-- Picks & Bans View -->
-        <div
-          v-if="activeLeagueView === 'picks' || activeLeagueView === 'all'"
-          class="league-section"
-        >
-          <div
-            v-if="activeLeagueView === 'all'"
-            class="row items-center q-gutter-x-sm q-py-xs"
-            :class="isMobile ? 'q-px-md' : 'q-px-xs'"
-          >
-            <q-icon name="casino" color="amber-9" size="20px" />
-            <span class="text-subtitle1 text-weight-bold text-dark"
-              >Picks &amp; Bans</span
-            >
-          </div>
-          <div :class="isMobile ? 'q-px-none' : 'q-px-xs'">
-            <PlayerCard
-              v-if="activeLeagueMembers.length > 0"
-              :all-members="activeLeagueMembers"
-            />
-            <div v-else class="q-pa-lg text-grey-6 italic text-center">
-              No participant picks recorded for this league.
-            </div>
-          </div>
-        </div>
-
-        <q-separator v-if="activeLeagueView === 'all'" class="q-my-md" />
-
-        <!-- Match Results View -->
-        <div
-          v-if="activeLeagueView === 'results' || activeLeagueView === 'all'"
-          class="league-section"
-        >
-          <div
-            v-if="activeLeagueView === 'all'"
-            class="row items-center q-gutter-x-sm q-py-xs"
-            :class="isMobile ? 'q-px-md' : 'q-px-xs'"
-          >
-            <q-icon name="scoreboard" color="indigo-7" size="20px" />
-            <span class="text-subtitle1 text-weight-bold text-dark"
-              >Match Results</span
-            >
-          </div>
-          <div :class="isMobile ? 'q-px-none' : 'q-px-xs'">
-            <LeagueMatchResults
-              :leagueId="activeLeague.id"
-              :show-standings="false"
-            />
-          </div>
-        </div>
-      </div>
+      <SeasonSingleLeagueSection
+        v-if="activeLeague"
+        :active-league="activeLeague"
+        :active-league-members="activeLeagueMembers"
+        :active-league-view="activeLeagueView"
+        :standings-map="standingsMap"
+        :is-mobile="isMobile"
+        :is-user-in-league="isUserInLeague"
+        :league-display-name="leagueDisplayName"
+        :league-status-color="leagueStatusColor"
+        :get-member-shape="getMemberShape"
+        :get-member-color="getMemberColor"
+      />
 
       <!-- VIEW B: ALL LEAGUES (OVERVIEW) -->
       <div v-else class="all-leagues-view column q-gutter-y-md">
@@ -340,19 +119,16 @@ import {
 import { fetchSeasonFullStandings } from 'src/services/standingsService';
 import ErrorDisplay from 'components/base/ErrorDisplay.vue';
 import LoadingSpinner from 'components/base/LoadingSpinner.vue';
-import KennerSelect from 'components/base/KennerSelect.vue';
-import LeagueLevel from 'components/season/LeagueLevel.vue';
-import LeagueStandingsMatrix from 'components/league/LeagueStandingsMatrix.vue';
-import LeagueMatchResults from 'components/league/LeagueMatchResults.vue';
-import PlayerCard from 'components/league/PlayerCard.vue';
-import UserAvatar from 'components/ui/UserAvatar.vue';
 import SeasonHeroHeader from 'components/season/overview/SeasonHeroHeader.vue';
 import SeasonOverviewPodium from 'components/season/overview/SeasonOverviewPodium.vue';
+import SeasonControlsToolbar from 'components/season/overview/SeasonControlsToolbar.vue';
+import SeasonSingleLeagueSection from 'components/season/overview/SeasonSingleLeagueSection.vue';
 import SeasonLeagueCardsGrid from 'components/season/overview/SeasonLeagueCardsGrid.vue';
 import SeasonAllLeaguesSection from 'components/season/overview/SeasonAllLeaguesSection.vue';
 import { useUserStore } from 'stores/userStore';
 import { useUpdateStore } from 'stores/updateStore';
 import { useResponsive } from 'src/composables/responsive';
+import { useUserProfileDisplay } from 'src/composables/userProfileDisplay';
 import type {
   TSeasonDto,
   TLeagueDto,
@@ -366,6 +142,8 @@ const userStore = useUserStore();
 const updateStore = useUpdateStore();
 const { isMobile } = useResponsive();
 const { user, isAdmin } = storeToRefs(userStore);
+const { isCurrentUser, resolveAvatarShape, resolveAvatarColor, formatPoints } =
+  useUserProfileDisplay();
 
 const seasonId = Number(route.params.id);
 
@@ -548,11 +326,8 @@ function getMemberShape(
   playerProfileId?: number,
   username?: string
 ): string | undefined {
-  if (isCurrentUser(playerProfileId, username) && user.value?.avatar_shape) {
-    return user.value.avatar_shape;
-  }
   const p = findParticipant(leagueId, playerProfileId, username);
-  return p?.avatar_shape;
+  return resolveAvatarShape(playerProfileId, username, p?.avatar_shape);
 }
 
 function getMemberColor(
@@ -560,32 +335,8 @@ function getMemberColor(
   playerProfileId?: number,
   username?: string
 ): string | undefined {
-  if (
-    isCurrentUser(playerProfileId, username) &&
-    user.value?.avatar_color !== undefined
-  ) {
-    return user.value.avatar_color;
-  }
   const p = findParticipant(leagueId, playerProfileId, username);
-  return p?.avatar_color;
-}
-
-function isCurrentUser(playerProfileId?: number, username?: string): boolean {
-  if (!user.value) return false;
-  if (
-    playerProfileId !== undefined &&
-    user.value.profile_id === playerProfileId
-  )
-    return true;
-  if (username && user.value.username === username) return true;
-  return false;
-}
-
-function formatPoints(pts: number | string | undefined | null): string {
-  if (pts === undefined || pts === null) return '0';
-  const num = Number(pts);
-  if (isNaN(num)) return '0';
-  return num % 1 === 0 ? num.toFixed(0) : num.toFixed(2);
+  return resolveAvatarColor(playerProfileId, username, p?.avatar_color);
 }
 
 function isUserInLeague(leagueId: number): boolean {
@@ -733,205 +484,5 @@ onUnmounted(() => {
   width: 100%;
   box-sizing: border-box;
   overflow-x: hidden;
-}
-
-.champions-card {
-  background: linear-gradient(135deg, #fffbf0 0%, #ffffff 100%);
-  border: 1px solid rgba(255, 193, 7, 0.3);
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(255, 193, 7, 0.08);
-
-  @media (min-width: 600px) {
-    border-radius: 16px;
-  }
-
-  .body--dark & {
-    background: linear-gradient(
-      135deg,
-      rgba(255, 193, 7, 0.1) 0%,
-      var(--kenner-card-bg) 100%
-    );
-  }
-}
-
-.champions-icon-wrap {
-  width: 38px;
-  height: 38px;
-  border-radius: 8px;
-  background: rgba(255, 193, 7, 0.2);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.controls-toolbar {
-  @media (min-width: 600px) {
-    gap: 16px;
-  }
-}
-
-.league-select-container {
-  @media (min-width: 600px) {
-    min-width: 220px;
-    max-width: 320px;
-  }
-}
-
-.view-toggle-container {
-  @media (min-width: 600px) {
-    flex-shrink: 0;
-  }
-}
-
-.season-view-toggle {
-  padding: 2px;
-  max-width: 100%;
-
-  @media (max-width: 599px) {
-    width: 100%;
-
-    :deep(.q-btn) {
-      padding: 4px 6px;
-      font-size: 0.75rem;
-
-      .q-icon {
-        font-size: 15px;
-        margin-right: 4px;
-      }
-    }
-  }
-}
-
-/* League Cards Grid */
-.league-cards-grid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 14px;
-  align-content: start;
-  width: 100%;
-
-  @media (min-width: 768px) {
-    grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
-    gap: 20px;
-  }
-}
-
-.league-overview-card {
-  background: var(--kenner-card-bg);
-  border: 1px solid var(--kenner-border-color);
-  border-radius: 12px;
-  padding: 14px 16px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  height: 100%;
-  min-width: 0;
-  width: 100%;
-  box-sizing: border-box;
-  transition: all 0.2s ease;
-
-  @media (min-width: 600px) {
-    border-radius: 16px;
-    padding: 18px 20px;
-    gap: 14px;
-  }
-
-  &:hover {
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
-    border-color: rgba(var(--q-primary), 0.35);
-  }
-
-  &--user {
-    border-color: rgba(var(--q-primary), 0.35);
-    background: linear-gradient(
-      180deg,
-      rgba(var(--q-primary), 0.035) 0%,
-      #ffffff 100%
-    );
-    box-shadow: 0 3px 12px rgba(var(--q-primary), 0.08);
-  }
-}
-
-.league-overview-mobile-item--user {
-  background: rgba(var(--q-primary), 0.04);
-  border-radius: 6px;
-}
-
-.user-league-pill {
-  font-size: 0.7rem;
-  font-weight: 700;
-  color: var(--q-primary);
-  background: rgba(var(--q-primary), 0.1);
-  border: 1px solid rgba(var(--q-primary), 0.2);
-  padding: 2px 7px;
-  border-radius: 12px;
-  letter-spacing: 0.01em;
-  line-height: 1.2;
-
-  @media (min-width: 600px) {
-    font-size: 0.72rem;
-    padding: 2px 8px;
-  }
-}
-
-.user-league-pill-sm {
-  font-size: 0.68rem;
-  font-weight: 600;
-  color: var(--q-primary);
-  background: rgba(var(--q-primary), 0.09);
-  border: 1px solid rgba(var(--q-primary), 0.18);
-  padding: 1px 6px;
-  border-radius: 10px;
-  line-height: 1.2;
-}
-
-.league-section--user {
-  position: relative;
-  background: linear-gradient(
-    90deg,
-    rgba(var(--q-primary), 0.03) 0%,
-    transparent 100%
-  );
-  border-radius: 8px;
-  padding: 4px 8px;
-}
-
-.standings-mini-row {
-  background: var(--kenner-surface-subtle);
-  border: 1px solid var(--kenner-border-subtle);
-  min-height: 36px;
-  padding: 5px 10px;
-  border-radius: 8px;
-  transition: background-color 0.15s ease;
-
-  @media (min-width: 600px) {
-    min-height: 38px;
-    padding: 6px 12px;
-  }
-
-  &--leader {
-    background: rgba(255, 193, 7, 0.12);
-    border-color: rgba(255, 193, 7, 0.3);
-  }
-
-  &--user {
-    border-color: rgba(var(--q-primary), 0.35);
-    background: rgba(var(--q-primary), 0.08);
-  }
-}
-
-.rank-badge {
-  min-width: 20px;
-  font-size: 0.8rem;
-
-  @media (min-width: 600px) {
-    min-width: 22px;
-    font-size: 0.825rem;
-  }
-}
-
-.border-bottom-subtle {
-  border-bottom: 1px solid var(--kenner-border-subtle);
 }
 </style>

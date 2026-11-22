@@ -161,32 +161,17 @@ import UserAvatar from 'components/ui/UserAvatar.vue';
 import GameSettingsDisplay from 'components/game/selectedGame/GameSettingsDisplay.vue';
 import KennerButton from 'components/base/KennerButton.vue';
 import KennerTooltip from 'components/base/KennerTooltip.vue';
-import { useUserStore } from 'stores/userStore';
-
+import { useUserProfileDisplay } from 'src/composables/userProfileDisplay';
 import { TSeasonParticipantDto } from 'src/types';
 
-const userStore = useUserStore();
+const { resolveAvatarShape, resolveAvatarColor } = useUserProfileDisplay();
 
 function getMemberShape(m: TSeasonParticipantDto) {
-  if (
-    userStore.isMe(m.username) ||
-    (userStore.user?.profile_id && m.profile === userStore.user.profile_id)
-  ) {
-    return userStore.user?.avatar_shape || m.avatar_shape;
-  }
-  return m.avatar_shape;
+  return resolveAvatarShape(m.profile, m.username, m.avatar_shape);
 }
 
 function getMemberColor(m: TSeasonParticipantDto) {
-  if (
-    userStore.isMe(m.username) ||
-    (userStore.user?.profile_id && m.profile === userStore.user.profile_id)
-  ) {
-    return userStore.user?.avatar_color !== undefined
-      ? userStore.user.avatar_color
-      : m.avatar_color;
-  }
-  return m.avatar_color;
+  return resolveAvatarColor(m.profile, m.username, m.avatar_color);
 }
 
 const props = withDefaults(

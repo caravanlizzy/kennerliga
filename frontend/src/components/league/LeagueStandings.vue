@@ -149,6 +149,7 @@ import { fetchLeagueFullStandings } from 'src/services/standingsService';
 import type { TLeagueStandingRow, TTieGroup } from 'src/types';
 import { formatNumbers } from 'src/helpers';
 import { useResponsive } from 'src/composables/responsive';
+import { useUserProfileDisplay } from 'src/composables/userProfileDisplay';
 import KennerButton from 'components/base/KennerButton.vue';
 import UserAvatar from 'components/ui/UserAvatar.vue';
 import UnresolvedTieBanner from 'components/league/UnresolvedTieBanner.vue';
@@ -165,6 +166,7 @@ let unsubSeason: (() => void) | null = null;
 let unsubLeague: (() => void) | null = null;
 
 const { user } = storeToRefs(useUserStore());
+const { resolveAvatarShape, resolveAvatarColor } = useUserProfileDisplay();
 const myLeagueStore = computed(() => {
   const id = props.leagueId || user.value?.myCurrentLeagueId;
   return id ? useLeagueStore(id)() : null;
@@ -225,19 +227,18 @@ onUnmounted(() => {
 
 const rows = computed(() => {
   return standings.value.map((s) => {
-    const isCurrentUser =
-      (s.username && user.value?.username === s.username) ||
-      (s.player_profile && user.value?.profile_id === s.player_profile);
     return {
       ...s,
-      avatar_shape:
-        isCurrentUser && user.value?.avatar_shape
-          ? user.value.avatar_shape
-          : s.avatar_shape,
-      avatar_color:
-        isCurrentUser && user.value?.avatar_color !== undefined
-          ? user.value.avatar_color
-          : s.avatar_color,
+      avatar_shape: resolveAvatarShape(
+        s.player_profile,
+        s.username,
+        s.avatar_shape
+      ),
+      avatar_color: resolveAvatarColor(
+        s.player_profile,
+        s.username,
+        s.avatar_color
+      ),
     };
   });
 });

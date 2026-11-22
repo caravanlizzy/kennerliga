@@ -163,7 +163,7 @@ import { fetchSeasonLeagueWinners } from 'src/services/seasonService';
 import type { AvatarShape } from 'src/types';
 import LeagueLevel from 'components/season/LeagueLevel.vue';
 import UserAvatar from 'components/ui/UserAvatar.vue';
-import { useUserStore } from 'stores/userStore';
+import { useUserProfileDisplay } from 'src/composables/userProfileDisplay';
 
 interface WinnerEntry {
   profileId: number;
@@ -182,34 +182,25 @@ const props = defineProps<{
 
 const loading = ref<boolean>(false);
 const winners = ref<WinnerEntry[]>([]);
-const userStore = useUserStore();
+const { isCurrentUser, resolveAvatarShape, resolveAvatarColor } =
+  useUserProfileDisplay();
 
 function isMe(username: string): boolean {
-  return Boolean(username && userStore.isMe(username));
+  return isCurrentUser(undefined, username);
 }
 
 function getAvatarShape(item?: WinnerEntry | null): AvatarShape | undefined {
   if (!item) return undefined;
-  if (
-    item.username &&
-    userStore.user?.username === item.username &&
-    userStore.user?.avatar_shape
-  ) {
-    return userStore.user.avatar_shape;
-  }
-  return item.avatarShape;
+  return resolveAvatarShape(
+    item.profileId,
+    item.username,
+    item.avatarShape
+  ) as AvatarShape | undefined;
 }
 
 function getAvatarColor(item?: WinnerEntry | null): string | undefined {
   if (!item) return undefined;
-  if (
-    item.username &&
-    userStore.user?.username === item.username &&
-    userStore.user?.avatar_color !== undefined
-  ) {
-    return userStore.user.avatar_color;
-  }
-  return item.avatarColor;
+  return resolveAvatarColor(item.profileId, item.username, item.avatarColor);
 }
 
 async function loadWinners() {

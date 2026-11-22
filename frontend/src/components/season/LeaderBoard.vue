@@ -322,34 +322,20 @@ import LoadingSpinner from 'components/base/LoadingSpinner.vue';
 import ErrorDisplay from 'components/base/ErrorDisplay.vue';
 import { leagueColors } from 'src/composables/leagueColors';
 import { useCachedResource } from 'src/composables/cachedResource';
+import { useUserProfileDisplay } from 'src/composables/userProfileDisplay';
 import LeagueLevel from 'components/season/LeagueLevel.vue';
 import UserAvatar from 'components/ui/UserAvatar.vue';
-import { useUserStore } from 'stores/userStore';
 
 const props = defineProps<{ year: number | 'all' }>();
 const { getHexLeagueColor } = leagueColors();
-const userStore = useUserStore();
+const { resolveAvatarShape, resolveAvatarColor } = useUserProfileDisplay();
 
 function getAvatarShape(row: TPlayerYearStanding) {
-  if (
-    row.username &&
-    userStore.user?.username === row.username &&
-    userStore.user?.avatar_shape
-  ) {
-    return userStore.user.avatar_shape;
-  }
-  return row.avatar_shape;
+  return resolveAvatarShape(row.player_profile_id, row.username, row.avatar_shape);
 }
 
 function getAvatarColor(row: TPlayerYearStanding) {
-  if (
-    row.username &&
-    userStore.user?.username === row.username &&
-    userStore.user?.avatar_color !== undefined
-  ) {
-    return userStore.user.avatar_color;
-  }
-  return row.avatar_color;
+  return resolveAvatarColor(row.player_profile_id, row.username, row.avatar_color);
 }
 
 const error = ref(false);
