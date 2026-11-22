@@ -1,9 +1,9 @@
 from collections import defaultdict
-from django.db.models import Avg, Count, Max, Q, Sum
+from django.db.models import Avg, Count, Q, Sum
 
-from game.models import ResultConfig
 from league.models import LeagueStanding
 from result.models import Result
+from result.queries import get_game_records_map
 from user.models import PlayerProfile
 
 from .query_filters import (
@@ -85,28 +85,16 @@ def _build_player_pool(years=None, player_counts=None):
 
     profiles = PlayerProfile.objects.filter(id__in=pool.keys()).select_related("user")
 
-    no_points_game_ids = set(
-        ResultConfig.objects.filter(has_points=False).values_list("game_id", flat=True)
-    )
-    record_candidates = result_qs.filter(points__gte=2).exclude(
-        selected_game__game_id__in=no_points_game_ids
-    )
-    game_max_points = (
-        record_candidates.values("selected_game__game_id")
-        .annotate(max_points=Max("points"))
-    )
-    game_records_map = {
-        row["selected_game__game_id"]: row["max_points"]
-        for row in game_max_points
-        if row["selected_game__game_id"] is not None
-    }
+    game_records_map = get_game_records_map()
     player_game_records = defaultdict(set)
     if game_records_map:
-        for row in record_candidates.values(
-            "player_profile_id", "selected_game__game_id", "points"
-        ):
+        record_results = Result.objects.filter(
+            points__gte=2,
+            selected_game__game_id__in=game_records_map.keys(),
+        ).values("player_profile_id", "selected_game__game_id", "points")
+        for row in record_results:
             g_id = row["selected_game__game_id"]
-            if g_id in game_records_map and row["points"] == game_records_map[g_id]:
+            if row["points"] == game_records_map[g_id]:
                 player_game_records[row["player_profile_id"]].add(g_id)
 
     players = []

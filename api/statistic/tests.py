@@ -253,7 +253,7 @@ class RecordsPerformanceTests(StatisticsServiceTestBase):
         entry_a = next(e for e in records_cat["top"] if e["profile_id"] == p_a.id)
         self.assertEqual(entry_a["value"], 0)
 
-    def test_records_respect_year_filter(self):
+    def test_records_count_matches_all_time_game_records_across_filters(self):
         season_2025 = Season.objects.create(
             year=2025, month=1, status=Season.SeasonStatus.DONE
         )
@@ -265,20 +265,22 @@ class RecordsPerformanceTests(StatisticsServiceTestBase):
         l_2025 = League.objects.create(season=season_2025, level=1)
         l_2026 = self.make_league(1)
 
-        # In 2025, A sets record on G1
+        # In 2025, A sets all-time record on G1 (100 pts)
         self.add_match_with_points(g1, l_2025, [(p_a, 1, 100), (p_b, 2, 50)], season=season_2025)
-        # In 2026, B sets record on G2
-        self.add_match_with_points(g2, l_2026, [(p_b, 1, 100), (p_a, 2, 50)], season=self.season)
+        # In 2026, both play G1 (A scores 70, B scores 80) and G2 (B sets record with 90 pts)
+        self.add_match_with_points(g1, l_2026, [(p_b, 1, 80), (p_a, 2, 70)], season=self.season)
+        self.add_match_with_points(g2, l_2026, [(p_b, 1, 90), (p_a, 2, 60)], season=self.season)
 
+        # In 2026 overview: A holds 1 all-time record (G1), B holds 1 all-time record (G2)
         overview_2026 = get_statistics_overview(p_a, years=[2026])
         records_2026 = next(c for c in overview_2026["categories"] if c["key"] == "records")
 
-        entry_b = next(e for e in records_2026["top"] if e["profile_id"] == p_b.id)
         entry_a = next(e for e in records_2026["top"] if e["profile_id"] == p_a.id)
+        entry_b = next(e for e in records_2026["top"] if e["profile_id"] == p_b.id)
+        self.assertEqual(entry_a["value"], 1)
         self.assertEqual(entry_b["value"], 1)
-        self.assertEqual(entry_a["value"], 0)
 
-    def test_records_respect_player_count_filter(self):
+    def test_records_count_matches_across_player_counts(self):
         p_a = self.make_profile("A")
         p_b = self.make_profile("B")
         p_c = self.make_profile("C")
@@ -290,18 +292,37 @@ class RecordsPerformanceTests(StatisticsServiceTestBase):
         l1 = self.make_league(1)
         l2 = self.make_league(2)
 
-        # 4-player match on G1: A gets record (100)
-        self.add_match_with_points(g1, l1, [(p_a, 1, 100), (p_b, 2, 50), (p_c, 3, 40), (p_d, 4, 30)])
-        # 2-player match on G2: B gets record (100)
-        self.add_match_with_points(g2, l2, [(p_b, 1, 100), (p_a, 2, 50)])
+        # 2-player match on G1: A sets all-time record (100 pts)
+        self.add_match_with_points(g1, l1, [(p_a, 1, 100), (p_b, 2, 50)])
+        # 4-player match on G2: A scores 40 on G1 in 4P, but all 4 players are active in 4P
+        self.add_match_with_points(g2, l2, [(p_a, 1, 80), (p_b, 2, 50), (p_c, 3, 40), (p_d, 4, 30)])
 
-        pool_4p = _build_player_pool(player_counts=[4])
+        # When filtered to 4P: A still holds their 1 all-time game record (G1)
         overview_4p = get_statistics_overview(p_a, player_counts=[4])
         records_4p = next(c for c in overview_4p["categories"] if c["key"] == "records")
 
         entry_a = next(e for e in records_4p["top"] if e["profile_id"] == p_a.id)
-        self.assertEqual(entry_a["value"], 1)
-        self.assertNotIn(p_b.id, [e["profile_id"] for e in records_4p["top"] if e["value"] > 0])
+        self.assertEqual(entry_a["value"], 2)  # A holds record on G1 (100) and G2 (80)
+
+    def test_records_count_consistent_with_user_profile(self):
+        from rest_framework.test import APIClient
+
+        p_a = self.make_profile("A")
+        g1 = Game.objects.create(name="Game 1", platform=self.platform)
+        l1 = self.make_league(1)
+        self.add_match_with_points(g1, l1, [(p_a, 1, 100)])
+
+        client = APIClient()
+        client.force_authenticate(user=p_a.user)
+        response = client.get(f"/api/user/users/{p_a.user.id}/statistics/")
+        self.assertEqual(response.status_code, 200)
+        profile_records = response.data["records"]
+
+        overview = get_statistics_overview(p_a)
+        records_cat = next(c for c in overview["categories"] if c["key"] == "records")
+        entry_a = next(e for e in records_cat["top"] if e["profile_id"] == p_a.id)
+
+        self.assertEqual(len(profile_records), entry_a["value"])
 
 
 class IronWillTests(StatisticsServiceTestBase):
