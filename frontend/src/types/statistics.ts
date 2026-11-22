@@ -138,3 +138,140 @@ export type TWinSuggestion = {
   shared_matches: number;
   opponents: TWinSuggestionOpponent[];
 };
+
+export type TGameHighScore = {
+  points: number;
+  profile_id: number;
+  profile_name: string;
+  username: string | null;
+  match_id: number;
+  season_id: number | null;
+  season_name: string | null;
+  league_id: number | null;
+  league_level: number | null;
+  league_name: string | null;
+  date: string;
+};
+
+export type TGameRecords = {
+  high_score: TGameHighScore | null;
+  low_score: number | null;
+  avg_score: number | null;
+  avg_winning_score: number | null;
+};
+
+export type TGameOverviewStats = {
+  total_matches: number;
+  distinct_players: number;
+  distinct_seasons: number;
+  total_picks: number;
+  total_bans: number;
+};
+
+export type TGameSuperlativePlayer = {
+  profile_id: number;
+  profile_name: string;
+  username: string | null;
+  count: number;
+};
+
+export type TGameSuperlatives = {
+  most_picked_by: TGameSuperlativePlayer[];
+  most_banned_by: TGameSuperlativePlayer[];
+  most_wins_by: TGameSuperlativePlayer[];
+  most_played_by: TGameSuperlativePlayer[];
+};
+
+export type TGameLeaderboardPlayer = {
+  rank: number | null;
+  profile_id: number;
+  profile_name: string;
+  username: string | null;
+  games_played: number;
+  wins: number;
+  win_rate: number;
+  avg_position: number | null;
+  best_score: number | null;
+  avg_score: number | null;
+  is_me: boolean;
+  eligible: boolean;
+};
+
+export type TGameFactionStat = {
+  id: number;
+  name: string;
+  icon?: string | null;
+  games_played: number;
+  wins: number;
+  win_rate: number;
+  avg_position: number | null;
+  avg_points: number | null;
+  best_score: number | null;
+};
+
+export type TGameMatchParticipant = {
+  profile_id: number;
+  profile_name: string;
+  username: string | null;
+  position: number | null;
+  points: number | null;
+  faction_name: string | null;
+  win_condition_name: string | null;
+  is_winner: boolean;
+};
+
+export type TGameMatchOption = {
+  option_name: string;
+  choice_name: string;
+};
+
+export type TGameRecentMatch = {
+  id: number;
+  season_id: number | null;
+  season_name: string | null;
+  season_year: number | null;
+  league_id: number | null;
+  league_level: number | null;
+  league_name: string | null;
+  date: string;
+  participants: TGameMatchParticipant[];
+  selected_options: TGameMatchOption[];
+};
+
+export type TGameDetailInfo = {
+  id: number;
+  name: string;
+  short_name: string;
+  platform: {
+    id: number;
+    name: string;
+  };
+  min_players: number;
+  max_players: number;
+  selectable: boolean;
+  has_points: boolean;
+  is_asymmetric: boolean;
+  has_starting_player_order: boolean;
+  starting_points_system: string | null;
+  win_conditions: string[];
+  tie_breakers: string[];
+  options: {
+    id: number;
+    name: string;
+    choices: string[];
+  }[];
+  factions: {
+    id: number;
+    name: string;
+  }[];
+};
+
+export type TGameDetailedStatistics = {
+  game: TGameDetailInfo;
+  overview: TGameOverviewStats;
+  records: TGameRecords;
+  superlatives: TGameSuperlatives;
+  leaderboard: TGameLeaderboardPlayer[];
+  factions: TGameFactionStat[];
+  recent_matches: TGameRecentMatch[];
+};

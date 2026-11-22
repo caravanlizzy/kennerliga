@@ -12,6 +12,7 @@ from statistic.services import (
     _rank_career,
     _rank_iron_will,
     get_awards,
+    get_game_detailed_statistics,
     get_statistics_overview,
     get_win_suggestions,
 )
@@ -496,3 +497,131 @@ class WinSuggestionsTests(StatisticsServiceTestBase):
         self.assertEqual(response.data["game_id"], self.catan.id)
         self.assertEqual(response.data["wins"], 1)
         self.assertEqual(len(response.data["opponents"]), 2)
+
+
+class GameDetailedStatisticsTests(StatisticsServiceTestBase):
+    def setUp(self):
+        super().setUp()
+        self.alice = self.make_profile("Alice")
+        self.bob = self.make_profile("Bob")
+        self.charlie = self.make_profile("Charlie")
+        self.game = Game.objects.create(name="Terraforming Mars", platform=self.platform)
+        self.league = self.make_league(1)
+
+    def test_empty_game_stats(self):
+        stats = get_game_detailed_statistics(self.game, profile=self.alice)
+        self.assertEqual(stats["game"]["name"], "Terraforming Mars")
+        self.assertEqual(stats["overview"]["total_matches"], 0)
+        self.assertEqual(stats["overview"]["distinct_players"], 0)
+        self.assertIsNone(stats["records"]["high_score"])
+        self.assertEqual(stats["leaderboard"], [])
+        self.assertEqual(stats["recent_matches"], [])
+
+    def test_records_and_superlatives(self):
+        # Match 1: Alice (1st, 100 pts), Bob (2nd, 80 pts), Charlie (3rd, 60 pts)
+        selected_game1 = SelectedGame.objects.create(
+            profile=self.alice, game=self.game, league=self.league
+        )
+        Result.objects.create(
+            player_profile=self.alice,
+            selected_game=selected_game1,
+            league=self.league,
+            season=self.season,
+            position=1,
+            points=100,
+        )
+        Result.objects.create(
+            player_profile=self.bob,
+            selected_game=selected_game1,
+            league=self.league,
+            season=self.season,
+            position=2,
+            points=80,
+        )
+        Result.objects.create(
+            player_profile=self.charlie,
+            selected_game=selected_game1,
+            league=self.league,
+            season=self.season,
+            position=3,
+            points=60,
+        )
+
+        # Match 2: Bob (1st, 120 pts), Alice (2nd, 90 pts) in League 2
+        league2 = self.make_league(2)
+        selected_game2 = SelectedGame.objects.create(
+            profile=self.bob, game=self.game, league=league2
+        )
+        Result.objects.create(
+            player_profile=self.bob,
+            selected_game=selected_game2,
+            league=league2,
+            season=self.season,
+            position=1,
+            points=120,
+        )
+        Result.objects.create(
+            player_profile=self.alice,
+            selected_game=selected_game2,
+            league=league2,
+            season=self.season,
+            position=2,
+            points=90,
+        )
+
+        # Ban: Charlie bans this game in League 3
+        league3 = self.make_league(3)
+        selected_game3 = SelectedGame.objects.create(
+            profile=self.charlie, game=self.game, league=league3
+        )
+        BanDecision.objects.create(
+            league=league3,
+            player_banning=self.charlie,
+            selected_game=selected_game3,
+            skipped_ban=False,
+        )
+
+        stats = get_game_detailed_statistics(self.game, profile=self.alice)
+
+        # Overview
+        self.assertEqual(stats["overview"]["total_matches"], 2)
+        self.assertEqual(stats["overview"]["distinct_players"], 3)
+        self.assertEqual(stats["overview"]["total_picks"], 3)
+        self.assertEqual(stats["overview"]["total_bans"], 1)
+
+        # Records
+        self.assertIsNotNone(stats["records"]["high_score"])
+        self.assertEqual(stats["records"]["high_score"]["points"], 120)
+        self.assertEqual(stats["records"]["high_score"]["profile_name"], "Bob")
+        self.assertEqual(stats["records"]["low_score"], 60)
+        self.assertEqual(stats["records"]["avg_score"], 90.0) # (100+80+60+120+90)/5 = 90
+        self.assertEqual(stats["records"]["avg_winning_score"], 110.0) # (100+120)/2 = 110
+
+        # Superlatives
+        self.assertEqual(stats["superlatives"]["most_banned_by"][0]["profile_name"], "Charlie")
+        self.assertEqual(stats["superlatives"]["most_banned_by"][0]["count"], 1)
+
+        # Leaderboard
+        self.assertEqual(len(stats["leaderboard"]), 3)
+        alice_entry = next(p for p in stats["leaderboard"] if p["profile_name"] == "Alice")
+        self.assertTrue(alice_entry["is_me"])
+        self.assertEqual(alice_entry["games_played"], 2)
+        self.assertEqual(alice_entry["wins"], 1)
+        self.assertEqual(alice_entry["best_score"], 100)
+
+        # Recent matches
+        self.assertEqual(len(stats["recent_matches"]), 2)
+        self.assertEqual(len(stats["recent_matches"][0]["participants"]), 2)
+
+    def test_api_view_endpoint(self):
+        from rest_framework.test import APIClient
+        client = APIClient()
+        client.force_authenticate(user=self.alice.user)
+
+        response = client.get(f"/api/statistics/games/{self.game.id}/details/")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data["game"]["id"], self.game.id)
+        self.assertIn("records", response.data)
+        self.assertIn("superlatives", response.data)
+        self.assertIn("leaderboard", response.data)
+        self.assertIn("recent_matches", response.data)

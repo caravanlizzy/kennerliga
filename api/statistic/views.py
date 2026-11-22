@@ -11,6 +11,7 @@ from statistic.services import (
     DEFAULT_POPULAR_GAMES_N,
     DEFAULT_TOP_N,
     DEFAULT_WINDOW,
+    get_game_detailed_statistics,
     get_game_leaderboard,
     get_popular_games,
     get_statistics_overview,
@@ -101,13 +102,38 @@ class GameLeaderboardView(APIView):
 
     def get(self, request, game_id):
         game = get_object_or_404(Game, pk=game_id)
-        profile = request.user.profile
+        profile = getattr(request.user, "profile", None)
         years = parse_years(request.query_params.get("years"))
         player_counts = parse_player_counts(request.query_params.get("player_count"))
         min_games = max(0, _int_param(request, "min_games", DEFAULT_GAME_MIN_GAMES))
 
         data = get_game_leaderboard(
             game, profile, years=years, player_counts=player_counts, min_games=min_games
+        )
+        return Response(data)
+
+
+class GameDetailStatisticsView(APIView):
+    """
+    GET /api/statistics/games/<game_id>/details/?years=2025&player_count=4p
+
+    Returns comprehensive statistics and details for a game including overview,
+    records, superlatives, player leaderboards, factions, and recent match history.
+    """
+
+    def get(self, request, game_id):
+        game = get_object_or_404(Game, pk=game_id)
+        profile = getattr(request.user, "profile", None)
+        years = parse_years(request.query_params.get("years"))
+        player_counts = parse_player_counts(request.query_params.get("player_count"))
+        min_games = max(0, _int_param(request, "min_games", 0))
+
+        data = get_game_detailed_statistics(
+            game,
+            profile=profile,
+            years=years,
+            player_counts=player_counts,
+            min_games=min_games,
         )
         return Response(data)
 

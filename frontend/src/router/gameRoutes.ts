@@ -2,7 +2,6 @@ export default {
   path: 'games/',
   meta: {
     requiresAuth: true,
-    requiresAdmin: true,
     label: 'Games',
     icon: 'sports_esports',
   },
@@ -11,25 +10,39 @@ export default {
       path: '',
       name: 'games',
       component: () => import('pages/game/GamesListPage.vue'),
-      meta: { icon: 'sports_esports', label: 'Games' },
-    },
-    {
-      path: ':id',
-      name: 'game-detail',
-      component: () => import('pages/game/GameDetailPage.vue'),
-      meta: { icon: 'info', label: 'Game Details' },
+      meta: {
+        requiresAdmin: true,
+        icon: 'sports_esports',
+        label: 'Game Catalog',
+      },
     },
     {
       path: 'create',
       name: 'game-create',
       component: () => import('pages/game/GameCreatePage.vue'),
-      meta: { icon: 'add_circle', label: 'Create Game' },
+      meta: { requiresAdmin: true, icon: 'add_circle', label: 'Create Game' },
+    },
+    {
+      path: ':id',
+      name: 'game-detail',
+      component: () => import('pages/game/GameDetailPage.vue'),
+      meta: { requiresAuth: true, icon: 'sports_esports', label: 'Game Details' },
+    },
+    {
+      path: ':id/config',
+      name: 'game-config',
+      component: () => import('pages/game/GameConfigPage.vue'),
+      meta: {
+        requiresAdmin: true,
+        icon: 'settings',
+        label: 'Game Configuration',
+      },
     },
     {
       path: ':id/edit',
       name: 'game-edit',
       component: () => import('pages/game/EditGamePage.vue'),
-      meta: { icon: 'edit', label: 'Edit Game' },
+      meta: { requiresAdmin: true, icon: 'edit', label: 'Edit Game' },
     },
   ],
 };

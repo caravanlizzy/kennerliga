@@ -57,9 +57,25 @@
               </h1>
             </div>
 
-            <!-- Edit Button for Admins -->
-            <div v-if="isAdmin" class="row items-center">
+            <!-- Actions -->
+            <div class="row items-center q-gutter-sm">
               <KennerButton
+                v-if="selectedGame.game"
+                outline
+                no-caps
+                color="primary"
+                icon="sports_esports"
+                label="Game Stats"
+                @click="
+                  router.push({
+                    name: 'game-detail',
+                    params: { id: selectedGame.game },
+                  })
+                "
+              />
+              <!-- Edit Button for Admins -->
+              <KennerButton
+                v-if="isAdmin"
                 outline
                 no-caps
                 color="secondary"
@@ -120,7 +136,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import { useQuasar } from 'quasar';
 import { storeToRefs } from 'pinia';
 import { useUserStore } from 'stores/userStore';
@@ -135,6 +151,7 @@ import ManagerFormsDialog, {
 import type { TSelectedGameDto, TLeagueDto } from 'src/types';
 
 const route = useRoute();
+const router = useRouter();
 const $q = useQuasar();
 const userStore = useUserStore();
 const { isAdmin } = storeToRefs(userStore);

@@ -21,6 +21,47 @@
         </div>
       </q-td>
     </template>
+
+    <template v-slot:body-cell-actions="props">
+      <q-td :props="props" class="q-gutter-x-xs">
+        <q-btn
+          flat
+          round
+          dense
+          size="sm"
+          icon="query_stats"
+          color="primary"
+          title="View Statistics"
+          @click.stop="
+            router.push({ name: 'game-detail', params: { id: props.row.id } })
+          "
+        />
+        <q-btn
+          flat
+          round
+          dense
+          size="sm"
+          icon="settings"
+          color="secondary"
+          title="View Configuration"
+          @click.stop="
+            router.push({ name: 'game-config', params: { id: props.row.id } })
+          "
+        />
+        <q-btn
+          flat
+          round
+          dense
+          size="sm"
+          icon="edit"
+          color="grey-7"
+          title="Edit Game"
+          @click.stop="
+            router.push({ name: 'game-edit', params: { id: props.row.id } })
+          "
+        />
+      </q-td>
+    </template>
   </KennerTable>
 
   <div v-else class="q-py-md">
@@ -117,6 +158,13 @@ const columns = computed(() => [
     field: (x: GameRow) => x.selectable,
     align: 'left',
     sortable: true,
+  },
+  {
+    name: 'actions',
+    label: 'Actions',
+    field: () => '',
+    align: 'right',
+    sortable: false,
   },
 ]);
 </script>

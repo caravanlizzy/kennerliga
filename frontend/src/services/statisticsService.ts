@@ -1,5 +1,6 @@
 import { api } from 'boot/axios';
 import {
+  TGameDetailedStatistics,
   TGameLeaderboard,
   TGameStatSummary,
   TPopularGames,
@@ -118,6 +119,34 @@ export async function fetchGameLeaderboard(
     }
     const { data } = await api.get<TGameLeaderboard>(
       `statistics/games/${gameId}/leaderboard/`,
+      { params }
+    );
+    return data;
+  } catch (e) {
+    console.log(e);
+    return null;
+  }
+}
+
+export async function fetchGameDetailedStatistics(
+  gameId: number,
+  years?: number[],
+  playerCounts?: string[],
+  minGames?: number
+): Promise<TGameDetailedStatistics | null> {
+  try {
+    const params: Record<string, string | number> = {};
+    if (years && years.length > 0) {
+      params.years = years.join(',');
+    }
+    if (playerCounts && playerCounts.length > 0) {
+      params.player_count = playerCounts.join(',');
+    }
+    if (minGames !== undefined) {
+      params.min_games = minGames;
+    }
+    const { data } = await api.get<TGameDetailedStatistics>(
+      `statistics/games/${gameId}/details/`,
       { params }
     );
     return data;
