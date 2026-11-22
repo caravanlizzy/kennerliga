@@ -53,18 +53,28 @@
       </div>
     </div>
 
-    <div v-else-if="user" class="q-px-md q-py-lg max-width-container q-mx-auto">
-      <div class="row q-col-gutter-lg">
+    <div
+      v-else-if="user"
+      class="max-width-container q-mx-auto"
+      :class="isMobile ? 'q-px-sm q-py-sm' : 'q-px-md q-py-lg'"
+    >
+      <div
+        class="row"
+        :class="isMobile ? 'q-col-gutter-sm' : 'q-col-gutter-lg'"
+      >
         <!-- Left Column: User Summary & Actions -->
         <div class="col-12 col-md-4">
           <div class="sticky-top">
             <!-- Overall Performance Summary -->
-            <div v-if="loadingStats" class="q-mb-lg">
+            <div
+              v-if="loadingStats"
+              :class="isMobile ? 'q-mb-sm' : 'q-mb-lg'"
+            >
               <q-skeleton type="rect" height="350px" class="rounded-borders" />
             </div>
             <UserPerformance
               v-else
-              class="q-mb-lg"
+              :class="isMobile ? 'q-mb-sm' : 'q-mb-lg'"
               :overall-stats="overallStats"
               :elo="eloData"
             />
@@ -79,7 +89,8 @@
           <q-tabs
             v-model="tab"
             dense
-            class="text-grey-7 surface-card q-mb-lg user-profile-tabs"
+            class="text-grey-7 surface-card user-profile-tabs"
+            :class="isMobile ? 'q-mb-sm' : 'q-mb-lg'"
             active-color="primary"
             indicator-color="primary"
             align="justify"
@@ -180,6 +191,7 @@ import UserGamesTab from 'components/user/UserGamesTab.vue';
 import UserSeasonsTab from 'components/user/UserSeasonsTab.vue';
 import UserSettingsCard from 'components/user/UserSettingsCard.vue';
 import KennerButton from 'components/base/KennerButton.vue';
+import { useResponsive } from 'src/composables/responsive';
 import type {
   TUserDto,
   TSeasonParticipantDto,
@@ -190,6 +202,7 @@ import type {
   TUserEloData,
 } from 'src/types';
 
+const { isMobile } = useResponsive();
 const route = useRoute();
 const router = useRouter();
 const userStore = useUserStore();

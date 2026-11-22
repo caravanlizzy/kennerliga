@@ -6,7 +6,8 @@
     >
       <!-- Header / Hero -->
       <div
-        class="about-hero-card q-pa-lg q-mb-lg row items-center justify-between"
+        class="about-hero-card row items-center justify-between"
+        :class="isMobile ? 'q-pa-md q-mb-sm' : 'q-pa-lg q-mb-lg'"
       >
         <div class="column">
           <div class="row items-center q-gutter-x-sm q-mb-xs">
@@ -42,9 +43,11 @@
 <script setup lang="ts">
 import BrandLogo from 'components/base/BrandLogo.vue';
 import PurposeSection from 'components/home/PurposeSection.vue';
+import { useResponsive } from 'src/composables/responsive';
 
 defineOptions({ name: 'AboutPage' });
 
+const { isMobile } = useResponsive();
 const appVersion = '1.0.0';
 </script>
 

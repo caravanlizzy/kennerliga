@@ -1,13 +1,23 @@
 <template>
-  <div class="q-mb-md filter-toolbar">
-    <div class="filter-controls row items-center q-col-gutter-md">
+  <div
+    class="filter-toolbar"
+    :class="isMobile ? 'q-mb-xs filter-toolbar--mobile' : 'q-mb-md'"
+  >
+    <div
+      class="filter-controls row items-center"
+      :class="isMobile ? 'q-col-gutter-xs' : 'q-col-gutter-md'"
+    >
       <!-- Player Count Filter -->
-      <div class="filter-item row items-center q-gutter-x-sm">
+      <div class="filter-item row items-center q-gutter-x-xs">
         <div
           class="row items-center text-caption text-weight-bold text-grey-8 filter-label"
         >
-          <q-icon name="groups" size="18px" class="q-mr-xs text-primary" />
-          <span>Players:</span>
+          <q-icon
+            name="groups"
+            :size="isMobile ? '16px' : '18px'"
+            class="q-mr-xs text-primary"
+          />
+          <span v-if="!isMobile">Players:</span>
         </div>
         <div class="row q-gutter-xs items-center">
           <q-chip
@@ -42,16 +52,16 @@
       </div>
 
       <!-- Years Multi-select Filter -->
-      <div class="filter-item row items-center q-gutter-x-sm">
+      <div class="filter-item row items-center q-gutter-x-xs">
         <div
           class="row items-center text-caption text-weight-bold text-grey-8 filter-label"
         >
           <q-icon
             name="calendar_today"
-            size="16px"
+            :size="isMobile ? '14px' : '16px'"
             class="q-mr-xs text-primary"
           />
-          <span>Years:</span>
+          <span v-if="!isMobile">Years:</span>
         </div>
         <q-select
           v-model="selectedYears"
@@ -71,6 +81,7 @@
                   .join(', ')
           "
           class="bg-white rounded-borders years-select"
+          :class="isMobile ? 'years-select--mobile' : ''"
         >
           <template v-slot:prepend>
             <q-icon name="event" size="xs" color="grey-6" />
@@ -301,8 +312,10 @@ import {
   toggleUserAdmin,
 } from 'src/services/userService';
 import { useDialog } from 'src/composables/dialog';
+import { useResponsive } from 'src/composables/responsive';
 
 const $q = useQuasar();
+const { isMobile } = useResponsive();
 const userStore = useUserStore();
 const { listUsers, getAvailableYears } = userStore;
 const { isAdmin } = storeToRefs(userStore);
@@ -702,26 +715,29 @@ const columns = computed(() => {
 }
 
 @media (max-width: 599px) {
-  .filter-toolbar {
-    padding: 10px 12px;
+  .filter-toolbar--mobile {
+    padding: 6px 10px;
   }
 
   .filter-controls {
     display: flex;
-    flex-direction: column;
-    align-items: stretch;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
   }
 
   .filter-item {
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    width: 100%;
   }
 
-  .years-select {
-    min-width: 140px;
-    flex-grow: 1;
+  .years-select--mobile {
+    min-width: 120px;
+    :deep(.q-field__control) {
+      min-height: 32px;
+      height: 32px;
+    }
   }
 }
 </style>

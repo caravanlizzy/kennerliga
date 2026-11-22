@@ -1,5 +1,8 @@
 <template>
-  <q-page class="q-pa-md max-width-container q-mx-auto game-detail-page">
+  <q-page
+    class="max-width-container q-mx-auto game-detail-page"
+    :class="isMobile ? 'q-pa-sm' : 'q-pa-md'"
+  >
     <!-- Loading State -->
     <div v-if="loading" class="q-py-xl text-center">
       <LoadingSpinner />
@@ -21,7 +24,11 @@
     </div>
 
     <!-- Main Content -->
-    <div v-else class="column q-gutter-y-lg">
+    <div
+      v-else
+      class="column"
+      :class="isMobile ? 'q-gutter-y-sm' : 'q-gutter-y-lg'"
+    >
       <!-- Header & Hero Section Component -->
       <GameHeroHeader
         :game="stats.game"
@@ -68,7 +75,8 @@
           align="left"
           active-color="primary"
           indicator-color="primary"
-          class="text-grey-7 q-mb-md border-bottom"
+          class="text-grey-7 border-bottom"
+          :class="isMobile ? 'q-mb-sm' : 'q-mb-md'"
         >
           <q-tab
             name="leaderboard"
@@ -156,7 +164,9 @@ import GameKpiGrid from 'components/game/detail/GameKpiGrid.vue';
 import GameLeaderboardCard from 'components/game/detail/GameLeaderboardCard.vue';
 import GameMatchHistoryCard from 'components/game/detail/GameMatchHistoryCard.vue';
 import GameFactionStatsCard from 'components/game/detail/GameFactionStatsCard.vue';
+import { useResponsive } from 'src/composables/responsive';
 
+const { isMobile } = useResponsive();
 const route = useRoute();
 const router = useRouter();
 const userStore = useUserStore();

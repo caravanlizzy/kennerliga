@@ -6,12 +6,20 @@
     >
       <!-- Header / Hero -->
       <div
-        class="rules-hero-card q-pa-lg q-mb-md row items-center justify-between"
+        class="rules-hero-card row items-center justify-between"
+        :class="isMobile ? 'q-pa-md q-mb-sm' : 'q-pa-lg q-mb-md'"
       >
         <div class="column">
           <div class="row items-center q-gutter-x-sm q-mb-xs">
-            <q-icon name="gavel" color="primary" size="32px" />
-            <div class="text-h5 text-weight-bold text-dark tracking-tight">
+            <q-icon
+              name="gavel"
+              color="primary"
+              :size="isMobile ? '24px' : '32px'"
+            />
+            <div
+              class="text-weight-bold text-dark tracking-tight"
+              :class="isMobile ? 'text-h6' : 'text-h5'"
+            >
               Tournament Rules
             </div>
           </div>
@@ -22,7 +30,10 @@
       </div>
 
       <!-- Quick Jump Table of Contents -->
-      <div class="rules-toc-bar q-mb-lg row items-center q-gutter-xs q-pa-sm">
+      <div
+        class="rules-toc-bar row items-center q-gutter-xs q-pa-sm"
+        :class="isMobile ? 'q-mb-md' : 'q-mb-lg'"
+      >
         <span class="text-caption text-weight-bold text-grey-7 q-mr-xs">
           Jump to:
         </span>
@@ -309,6 +320,9 @@
 
 <script setup lang="ts">
 import ContentSection from 'src/components/base/ContentSection.vue';
+import { useResponsive } from 'src/composables/responsive';
+
+const { isMobile } = useResponsive();
 
 const sections = [
   { id: 'purpose', label: 'Purpose', icon: 'emoji_objects' },

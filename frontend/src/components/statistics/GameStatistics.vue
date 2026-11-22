@@ -1,16 +1,29 @@
 <template>
   <div class="game-statistics">
     <!-- Picks & Bans Section -->
-    <div class="q-mb-xl">
-      <div class="section-header row items-center no-wrap q-mb-md">
-        <div class="section-header__icon">
-          <q-icon name="leaderboard" color="primary" size="20px" />
+    <div :class="isMobile ? 'q-mb-md' : 'q-mb-xl'">
+      <div
+        class="section-header row items-center no-wrap"
+        :class="isMobile ? 'q-mb-xs' : 'q-mb-md'"
+      >
+        <div
+          class="section-header__icon"
+          :class="isMobile ? 'section-header__icon--mobile' : ''"
+        >
+          <q-icon
+            name="leaderboard"
+            color="primary"
+            :size="isMobile ? '16px' : '20px'"
+          />
         </div>
         <div class="column">
-          <div class="text-h6 text-weight-bolder text-dark line-height-1">
+          <div
+            class="text-weight-bolder text-dark line-height-1"
+            :class="isMobile ? 'text-subtitle1' : 'text-h6'"
+          >
             Picks &amp; Bans
           </div>
-          <div class="text-caption text-grey-6">
+          <div v-if="!isMobile" class="text-caption text-grey-6">
             The games players choose most &mdash; and veto most across seasons.
           </div>
         </div>
@@ -27,15 +40,28 @@
 
     <!-- Games Directory & Leaderboards Explorer -->
     <div>
-      <div class="section-header row items-center no-wrap q-mb-md">
-        <div class="section-header__icon">
-          <q-icon name="sports_esports" color="primary" size="20px" />
+      <div
+        class="section-header row items-center no-wrap"
+        :class="isMobile ? 'q-mb-xs' : 'q-mb-md'"
+      >
+        <div
+          class="section-header__icon"
+          :class="isMobile ? 'section-header__icon--mobile' : ''"
+        >
+          <q-icon
+            name="sports_esports"
+            color="primary"
+            :size="isMobile ? '16px' : '20px'"
+          />
         </div>
         <div class="column">
-          <div class="text-h6 text-weight-bolder text-dark line-height-1">
+          <div
+            class="text-weight-bolder text-dark line-height-1"
+            :class="isMobile ? 'text-subtitle1' : 'text-h6'"
+          >
             Game Directory &amp; Stats
           </div>
-          <div class="text-caption text-grey-6">
+          <div v-if="!isMobile" class="text-caption text-grey-6">
             Click any game to open its dedicated page with high scores,
             masteries, full player rankings, and match history.
           </div>
@@ -67,7 +93,10 @@
         <q-separator class="q-mx-md q-my-sm" />
 
         <q-card-section class="q-pt-none">
-          <div class="row q-col-gutter-md">
+          <div
+            class="row"
+            :class="isMobile ? 'q-col-gutter-sm' : 'q-col-gutter-md'"
+          >
             <div
               v-for="game in filteredGames"
               :key="game.game_id"
@@ -158,6 +187,9 @@ import {
   fetchPopularGames,
 } from 'src/services/statisticsService';
 import { TGameStatSummary, TPopularGames } from 'src/types';
+import { useResponsive } from 'src/composables/responsive';
+
+const { isMobile } = useResponsive();
 
 const props = defineProps<{
   years: number[];
@@ -226,6 +258,12 @@ onMounted(() => {
     justify-content: center;
     margin-right: 12px;
     flex-shrink: 0;
+
+    &--mobile {
+      width: 28px;
+      height: 28px;
+      margin-right: 8px;
+    }
   }
 }
 

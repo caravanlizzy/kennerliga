@@ -1,10 +1,16 @@
 <template>
   <q-card flat class="game-hero-card">
-    <q-card-section class="q-pa-lg">
-      <div class="row items-start justify-between q-col-gutter-md">
+    <q-card-section :class="isMobile ? 'q-pa-sm' : 'q-pa-lg'">
+      <div
+        class="row items-start justify-between"
+        :class="isMobile ? 'q-col-gutter-xs' : 'q-col-gutter-md'"
+      >
         <div>
           <!-- Badges Row -->
-          <div class="row items-center q-gutter-x-sm q-gutter-y-xs q-mb-sm">
+          <div
+            class="row items-center q-gutter-x-sm q-gutter-y-xs"
+            :class="isMobile ? 'q-mb-xs' : 'q-mb-sm'"
+          >
             <q-btn
               flat
               dense
@@ -47,7 +53,10 @@
           </div>
 
           <!-- Title -->
-          <h1 class="text-h4 text-weight-bolder text-grey-9 q-my-none">
+          <h1
+            class="text-weight-bolder text-grey-9 q-my-none"
+            :class="isMobile ? 'text-h5' : 'text-h4'"
+          >
             {{ game.name }}
           </h1>
           <div
@@ -59,9 +68,8 @@
         </div>
 
         <!-- Action Buttons for Admins -->
-        <div class="row items-center q-gutter-sm">
+        <div v-if="isAdmin" class="row items-center q-gutter-sm q-mt-xs">
           <KennerButton
-            v-if="isAdmin"
             outline
             no-caps
             size="sm"
@@ -71,7 +79,6 @@
             @click="$emit('viewConfig', game.id)"
           />
           <KennerButton
-            v-if="isAdmin"
             outline
             no-caps
             size="sm"
@@ -84,18 +91,29 @@
       </div>
 
       <!-- Filter Toolbar within Game Details -->
-      <q-separator class="q-my-md" />
+      <q-separator :class="isMobile ? 'q-my-sm' : 'q-my-md'" />
 
-      <div class="row items-center justify-between q-col-gutter-sm">
+      <div
+        class="row items-center justify-between"
+        :class="isMobile ? 'q-col-gutter-xs' : 'q-col-gutter-sm'"
+      >
         <!-- Player Count Chips -->
-        <div class="col-12 col-sm-auto">
+        <div :class="isMobile ? 'col-auto' : 'col-12 col-sm-auto'">
           <div
-            class="filter-box row items-center q-gutter-x-xs q-px-sm q-py-xs"
+            class="filter-box row items-center q-gutter-x-xs q-py-xs"
+            :class="isMobile ? 'q-px-xs filter-box--mobile' : 'q-px-sm'"
           >
-            <q-icon name="groups" size="18px" class="q-mr-xs text-primary" />
-            <span class="text-caption text-weight-bold text-grey-8 q-mr-xs"
-              >Player Count:</span
+            <q-icon
+              name="groups"
+              :size="isMobile ? '16px' : '18px'"
+              class="q-mr-xs text-primary"
+            />
+            <span
+              v-if="!isMobile"
+              class="text-caption text-weight-bold text-grey-8 q-mr-xs"
             >
+              Player Count:
+            </span>
             <q-chip
               clickable
               dense
@@ -128,7 +146,10 @@
         </div>
 
         <!-- Years Filter -->
-        <div class="col-12 col-sm-auto years-filter" style="min-width: 170px">
+        <div
+          :class="isMobile ? 'col years-filter--mobile' : 'col-12 col-sm-auto years-filter'"
+          :style="{ minWidth: isMobile ? '110px' : '170px' }"
+        >
           <KennerSelect
             :model-value="selectedYears"
             :options="yearOptions"
@@ -149,6 +170,9 @@
 import KennerButton from 'components/base/KennerButton.vue';
 import KennerSelect from 'components/base/KennerSelect.vue';
 import type { TGameDto } from 'src/types';
+import { useResponsive } from 'src/composables/responsive';
+
+const { isMobile } = useResponsive();
 
 defineProps<{
   game: TGameDto;
@@ -194,5 +218,19 @@ defineEmits<{
   background: rgba(0, 0, 0, 0.03);
   border-radius: 6px;
   border: 1px solid var(--kenner-border-subtle);
+
+  &--mobile {
+    min-height: 32px;
+    padding: 2px 4px;
+  }
+}
+
+@media (max-width: 599px) {
+  .years-filter--mobile {
+    :deep(.q-field__control) {
+      min-height: 34px;
+      height: 34px;
+    }
+  }
 }
 </style>

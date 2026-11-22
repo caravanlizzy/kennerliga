@@ -1,11 +1,13 @@
 <template>
   <div
     v-if="user"
-    class="profile-hero bg-primary text-white q-pa-md relative-position overflow-hidden"
+    class="profile-hero bg-primary text-white relative-position overflow-hidden"
+    :class="isMobile ? 'q-pa-sm' : 'q-pa-md'"
   >
     <div class="max-width-container q-mx-auto">
       <div
-        class="hero-content row items-center q-col-gutter-md relative-position z-index-1"
+        class="hero-content row items-center relative-position z-index-1"
+        :class="isMobile ? 'q-col-gutter-sm' : 'q-col-gutter-md'"
       >
         <div class="col-12 col-md-auto flex justify-center">
           <div
@@ -15,7 +17,7 @@
           >
             <UserAvatar
               :display-username="user.username"
-              size="100px"
+              :size="isMobile ? '60px' : '100px'"
               :shape="effectiveAvatarShape"
               :color="effectiveAvatarColor"
               :elo-rating="user.elo_rating ?? user.profile?.elo_rating"
@@ -31,7 +33,10 @@
           <div
             class="row items-center q-gutter-x-md justify-center justify-md-start"
           >
-            <h1 class="text-h3 text-weight-bolder q-ma-none tracking-tighter">
+            <h1
+              class="text-weight-bolder q-ma-none tracking-tighter"
+              :class="isMobile ? 'text-h5' : 'text-h3'"
+            >
               {{ user.username }}
             </h1>
             <q-badge
@@ -44,18 +49,28 @@
           </div>
           <div
             v-if="user.profile?.name"
-            class="text-subtitle1 text-white text-opacity-90 text-weight-light q-mt-xs"
+            class="text-subtitle1 text-white text-opacity-90 text-weight-light"
+            :class="isMobile ? 'q-mt-none text-caption' : 'q-mt-xs'"
           >
             {{ user.profile.name }}
           </div>
           <div
-            class="row q-gutter-x-xl q-mt-sm justify-center justify-md-start"
+            class="row justify-center justify-md-start"
+            :class="isMobile ? 'q-gutter-x-lg q-mt-xs' : 'q-gutter-x-xl q-mt-sm'"
           >
             <div class="column items-center items-md-start">
-              <div v-if="loading" class="text-h4 text-weight-bolder">
+              <div
+                v-if="loading"
+                class="text-weight-bolder"
+                :class="isMobile ? 'text-h6' : 'text-h4'"
+              >
                 <q-skeleton type="text" width="40px" dark />
               </div>
-              <div v-else class="text-h4 text-weight-bolder">
+              <div
+                v-else
+                class="text-weight-bolder"
+                :class="isMobile ? 'text-h6' : 'text-h4'"
+              >
                 {{ leagueStats.totalLeagues }}
               </div>
               <div
@@ -72,10 +87,18 @@
               style="height: 30px"
             />
             <div class="column items-center items-md-start">
-              <div v-if="loading" class="text-h4 text-weight-bolder">
+              <div
+                v-if="loading"
+                class="text-weight-bolder"
+                :class="isMobile ? 'text-h6' : 'text-h4'"
+              >
                 <q-skeleton type="text" width="40px" dark />
               </div>
-              <div v-else class="text-h4 text-weight-bolder">
+              <div
+                v-else
+                class="text-weight-bolder"
+                :class="isMobile ? 'text-h6' : 'text-h4'"
+              >
                 {{ gameStatsCount }}
               </div>
               <div
@@ -92,10 +115,18 @@
               style="height: 30px"
             />
             <div class="column items-center items-md-start">
-              <div v-if="loading" class="text-h4 text-weight-bolder">
+              <div
+                v-if="loading"
+                class="text-weight-bolder"
+                :class="isMobile ? 'text-h6' : 'text-h4'"
+              >
                 <q-skeleton type="text" width="40px" dark />
               </div>
-              <div v-else class="text-h4 text-weight-bolder">
+              <div
+                v-else
+                class="text-weight-bolder"
+                :class="isMobile ? 'text-h6' : 'text-h4'"
+              >
                 {{
                   user.elo_rating !== undefined && user.elo_rating !== null
                     ? Math.round(user.elo_rating)
@@ -148,6 +179,9 @@ import AvatarShapePickerModal from 'components/user/AvatarShapePickerModal.vue';
 import KennerTooltip from 'components/base/KennerTooltip.vue';
 import { useUserStore } from 'stores/userStore';
 import { AvatarShape, TUserDto } from 'src/types';
+import { useResponsive } from 'src/composables/responsive';
+
+const { isMobile } = useResponsive();
 
 const props = defineProps<{
   user: TUserDto;
@@ -290,14 +324,8 @@ function onAvatarUpdated(payload: { shape: AvatarShape; color: string }) {
 
 @media (max-width: 599px) {
   .profile-hero {
-    padding: 16px 16px !important;
-    min-height: 140px;
-  }
-  .text-h3 {
-    font-size: 2.2rem;
-  }
-  .text-h4 {
-    font-size: 1.6rem;
+    padding: 10px 12px !important;
+    min-height: auto;
   }
 }
 

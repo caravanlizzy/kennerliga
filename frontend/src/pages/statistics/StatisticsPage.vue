@@ -1,19 +1,38 @@
 <template>
-  <q-page class="q-pa-md max-width-container q-mx-auto statistics-page">
+  <q-page
+    class="max-width-container q-mx-auto statistics-page"
+    :class="isMobile ? 'q-pa-sm' : 'q-pa-md'"
+  >
     <!-- Header & Filter Bar -->
-    <div class="stats-header-bar q-mb-lg">
-      <div class="row items-center justify-between q-col-gutter-md">
+    <div
+      class="stats-header-bar"
+      :class="isMobile ? 'q-mb-sm' : 'q-mb-lg'"
+    >
+      <div
+        class="row items-center justify-between"
+        :class="isMobile ? 'q-col-gutter-xs' : 'q-col-gutter-md'"
+      >
         <!-- Title and description -->
-        <div class="col-12 col-md-auto">
+        <div class="col-12 col-md-auto" :class="isMobile ? 'q-mb-xs' : ''">
           <div class="row items-center no-wrap">
-            <div class="page-title-icon q-mr-sm">
-              <q-icon name="query_stats" color="primary" size="24px" />
+            <div
+              class="page-title-icon q-mr-sm"
+              :class="isMobile ? 'page-title-icon--mobile' : ''"
+            >
+              <q-icon
+                name="query_stats"
+                color="primary"
+                :size="isMobile ? '20px' : '24px'"
+              />
             </div>
             <div>
-              <div class="text-h5 text-weight-bolder text-dark line-height-1">
+              <div
+                class="text-weight-bolder text-dark line-height-1"
+                :class="isMobile ? 'text-subtitle1' : 'text-h5'"
+              >
                 Statistics
               </div>
-              <div class="text-caption text-grey-6 q-mt-xs">
+              <div v-if="!isMobile" class="text-caption text-grey-6 q-mt-xs">
                 Rankings, awards, records &amp; game masteries across seasons
               </div>
             </div>
@@ -22,19 +41,26 @@
 
         <!-- Filters: Player counts & Years -->
         <div class="col-12 col-md-auto">
-          <div class="row items-center q-col-gutter-sm">
-            <div class="col-12 col-sm-auto">
+          <div
+            class="row items-center"
+            :class="isMobile ? 'q-col-gutter-xs no-wrap' : 'q-col-gutter-sm'"
+          >
+            <div :class="isMobile ? 'col-auto' : 'col-12 col-sm-auto'">
               <div
-                class="filter-box row items-center q-gutter-x-xs q-px-sm q-py-xs"
+                class="filter-box row items-center q-gutter-x-xs q-py-xs"
+                :class="isMobile ? 'q-px-xs filter-box--mobile' : 'q-px-sm'"
               >
                 <q-icon
                   name="groups"
-                  size="18px"
+                  :size="isMobile ? '16px' : '18px'"
                   class="q-mr-xs text-primary"
                 />
-                <span class="text-caption text-weight-bold text-grey-8 q-mr-xs"
-                  >Players:</span
+                <span
+                  v-if="!isMobile"
+                  class="text-caption text-weight-bold text-grey-8 q-mr-xs"
                 >
+                  Players:
+                </span>
                 <q-chip
                   clickable
                   dense
@@ -69,8 +95,8 @@
             </div>
 
             <div
-              class="col-12 col-sm-auto years-filter"
-              style="min-width: 170px"
+              :class="isMobile ? 'col years-filter--mobile' : 'col-12 col-sm-auto years-filter'"
+              :style="{ minWidth: isMobile ? '110px' : '170px' }"
             >
               <KennerSelect
                 v-model="selectedYears"
@@ -91,10 +117,11 @@
     <q-tabs
       v-model="currentTab"
       dense
-      class="text-grey-7 stats-tabs q-mb-lg"
+      class="text-grey-7 stats-tabs"
+      :class="isMobile ? 'q-mb-sm stats-tabs--mobile' : 'q-mb-lg'"
       active-color="primary"
       indicator-color="primary"
-      align="left"
+      :align="isMobile ? 'justify' : 'left'"
       narrow-indicator
     >
       <q-tab name="players" icon="groups" label="Players & Awards" />
@@ -132,7 +159,9 @@ import KennerSelect from 'components/base/KennerSelect.vue';
 import GameStatistics from 'components/statistics/GameStatistics.vue';
 import PlayerStatistics from 'components/statistics/PlayerStatistics.vue';
 import { useUserStore } from 'stores/userStore';
+import { useResponsive } from 'src/composables/responsive';
 
+const { isMobile } = useResponsive();
 const { getAvailableYears } = useUserStore();
 
 const currentTab = ref<'players' | 'games'>('players');
@@ -192,6 +221,12 @@ onMounted(async () => {
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+
+  &--mobile {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+  }
 }
 
 .filter-box {
@@ -199,6 +234,11 @@ onMounted(async () => {
   border: 1px solid var(--kenner-border-color);
   border-radius: 8px;
   min-height: 40px;
+
+  &--mobile {
+    min-height: 32px;
+    padding: 2px 4px;
+  }
 }
 
 .stats-tabs {
@@ -206,11 +246,25 @@ onMounted(async () => {
   border: 1px solid var(--kenner-border-color);
   border-radius: 10px;
   padding: 4px;
+
+  &--mobile {
+    padding: 2px;
+    min-height: 36px;
+
+    :deep(.q-tab) {
+      min-height: 36px;
+      padding: 0 8px;
+      font-size: 12px;
+    }
+  }
 }
 
 @media (max-width: 599px) {
-  .years-filter {
-    margin-top: 8px;
+  .years-filter--mobile {
+    :deep(.q-field__control) {
+      min-height: 34px;
+      height: 34px;
+    }
   }
 }
 </style>
