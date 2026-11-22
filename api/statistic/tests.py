@@ -2,7 +2,13 @@ from decimal import Decimal
 
 from django.test import TestCase
 
-from game.models import BanDecision, Game, SelectedGame
+from game.models import (
+    BanDecision,
+    Game,
+    ResultConfig,
+    SelectedGame,
+    StartingPointSystem,
+)
 from league.models import League, LeagueStanding
 from result.models import Result
 from season.models import Season
@@ -21,6 +27,9 @@ from user.models import PlayerProfile, Platform, User
 
 class StatisticsServiceTestBase(TestCase):
     def setUp(self):
+        StartingPointSystem.objects.get_or_create(
+            id=1, defaults={"code": "STD", "description": "Standard"}
+        )
         self.season = Season.objects.create(
             year=2026, month=1, status=Season.SeasonStatus.RUNNING
         )
@@ -118,6 +127,7 @@ class CategorySetTests(StatisticsServiceTestBase):
                 "win_rate",
                 "avg_position",
                 "games_played",
+                "records",
                 "iron_will",
             },
         )
@@ -134,9 +144,164 @@ class CategorySetTests(StatisticsServiceTestBase):
                 "win_rate",
                 "avg_position",
                 "games_played",
+                "records",
                 "iron_will",
             },
         )
+
+
+class RecordsPerformanceTests(StatisticsServiceTestBase):
+    def add_match_with_points(self, game, league, placements_with_points, season=None):
+        season = season or self.season
+        picker = placements_with_points[0][0]
+        selected_game = SelectedGame.objects.create(
+            profile=picker, game=game, league=league
+        )
+        for profile, position, points in placements_with_points:
+            Result.objects.create(
+                player_profile=profile,
+                selected_game=selected_game,
+                league=league,
+                season=season,
+                position=position,
+                points=points,
+            )
+        return selected_game
+
+    def test_ranks_players_by_records_count(self):
+        p_a = self.make_profile("A")
+        p_b = self.make_profile("B")
+        p_c = self.make_profile("C")
+
+        g1 = Game.objects.create(name="Game 1", platform=self.platform)
+        g2 = Game.objects.create(name="Game 2", platform=self.platform)
+        g3 = Game.objects.create(name="Game 3", platform=self.platform)
+
+        l1 = self.make_league(1)
+        # G1: A gets 100 (record), B gets 80
+        self.add_match_with_points(g1, l1, [(p_a, 1, 100), (p_b, 2, 80)])
+        # G2: A gets 50 (record), C gets 30
+        self.add_match_with_points(g2, l1, [(p_a, 1, 50), (p_c, 2, 30)])
+        # G3: B gets 60 (record), C gets 40
+        self.add_match_with_points(g3, l1, [(p_b, 1, 60), (p_c, 2, 40)])
+
+        pool = _build_player_pool()
+        overview = get_statistics_overview(p_a)
+        records_cat = next(c for c in overview["categories"] if c["key"] == "records")
+
+        # A has 2 records (G1, G2), B has 1 record (G3), C has 0 records
+        self.assertEqual(
+            [(entry["profile_id"], entry["rank"], entry["value"]) for entry in records_cat["top"]],
+            [(p_a.id, 1, 2), (p_b.id, 2, 1), (p_c.id, 3, 0)],
+        )
+
+    def test_record_in_same_game_multiple_times_deduplicated(self):
+        p_a = self.make_profile("A")
+        p_b = self.make_profile("B")
+        g1 = Game.objects.create(name="Game 1", platform=self.platform)
+        l1 = self.make_league(1)
+        l2 = self.make_league(2)
+
+        # Match 1 in league 1: A scores 100, B scores 50
+        self.add_match_with_points(g1, l1, [(p_a, 1, 100), (p_b, 2, 50)])
+        # Match 2 in league 2: A scores 100 again (matches record)
+        self.add_match_with_points(g1, l2, [(p_a, 1, 100), (p_b, 2, 60)])
+
+        overview = get_statistics_overview(p_a)
+        records_cat = next(c for c in overview["categories"] if c["key"] == "records")
+        entry_a = next(e for e in records_cat["top"] if e["profile_id"] == p_a.id)
+
+        # A only holds 1 record (for Game 1)
+        self.assertEqual(entry_a["value"], 1)
+
+    def test_shared_record_tie(self):
+        p_a = self.make_profile("A")
+        p_b = self.make_profile("B")
+        g1 = Game.objects.create(name="Game 1", platform=self.platform)
+        l1 = self.make_league(1)
+
+        # Both A and B tie for the record score 100
+        self.add_match_with_points(g1, l1, [(p_a, 1, 100), (p_b, 1, 100)])
+
+        overview = get_statistics_overview(p_a)
+        records_cat = next(c for c in overview["categories"] if c["key"] == "records")
+
+        entry_a = next(e for e in records_cat["top"] if e["profile_id"] == p_a.id)
+        entry_b = next(e for e in records_cat["top"] if e["profile_id"] == p_b.id)
+
+        self.assertEqual(entry_a["value"], 1)
+        self.assertEqual(entry_b["value"], 1)
+        self.assertEqual(entry_a["rank"], 1)
+        self.assertEqual(entry_b["rank"], 1)
+
+    def test_no_points_game_and_below_2_points_excluded(self):
+        p_a = self.make_profile("A")
+        p_b = self.make_profile("B")
+        g_no_pts = Game.objects.create(name="No Pts Game", platform=self.platform)
+        ResultConfig.objects.create(game=g_no_pts, has_points=False)
+        g_low_pts = Game.objects.create(name="Low Pts Game", platform=self.platform)
+        l1 = self.make_league(1)
+
+        # Match in no-points game with points populated should be excluded
+        self.add_match_with_points(g_no_pts, l1, [(p_a, 1, 50), (p_b, 2, 20)])
+        # Match with 1 point (< 2) should be excluded
+        self.add_match_with_points(g_low_pts, l1, [(p_a, 1, 1), (p_b, 2, 0)])
+
+        overview = get_statistics_overview(p_a)
+        records_cat = next(c for c in overview["categories"] if c["key"] == "records")
+
+        entry_a = next(e for e in records_cat["top"] if e["profile_id"] == p_a.id)
+        self.assertEqual(entry_a["value"], 0)
+
+    def test_records_respect_year_filter(self):
+        season_2025 = Season.objects.create(
+            year=2025, month=1, status=Season.SeasonStatus.DONE
+        )
+        p_a = self.make_profile("A")
+        p_b = self.make_profile("B")
+        g1 = Game.objects.create(name="Game 1", platform=self.platform)
+        g2 = Game.objects.create(name="Game 2", platform=self.platform)
+
+        l_2025 = League.objects.create(season=season_2025, level=1)
+        l_2026 = self.make_league(1)
+
+        # In 2025, A sets record on G1
+        self.add_match_with_points(g1, l_2025, [(p_a, 1, 100), (p_b, 2, 50)], season=season_2025)
+        # In 2026, B sets record on G2
+        self.add_match_with_points(g2, l_2026, [(p_b, 1, 100), (p_a, 2, 50)], season=self.season)
+
+        overview_2026 = get_statistics_overview(p_a, years=[2026])
+        records_2026 = next(c for c in overview_2026["categories"] if c["key"] == "records")
+
+        entry_b = next(e for e in records_2026["top"] if e["profile_id"] == p_b.id)
+        entry_a = next(e for e in records_2026["top"] if e["profile_id"] == p_a.id)
+        self.assertEqual(entry_b["value"], 1)
+        self.assertEqual(entry_a["value"], 0)
+
+    def test_records_respect_player_count_filter(self):
+        p_a = self.make_profile("A")
+        p_b = self.make_profile("B")
+        p_c = self.make_profile("C")
+        p_d = self.make_profile("D")
+
+        g1 = Game.objects.create(name="Game 1", platform=self.platform)
+        g2 = Game.objects.create(name="Game 2", platform=self.platform)
+
+        l1 = self.make_league(1)
+        l2 = self.make_league(2)
+
+        # 4-player match on G1: A gets record (100)
+        self.add_match_with_points(g1, l1, [(p_a, 1, 100), (p_b, 2, 50), (p_c, 3, 40), (p_d, 4, 30)])
+        # 2-player match on G2: B gets record (100)
+        self.add_match_with_points(g2, l2, [(p_b, 1, 100), (p_a, 2, 50)])
+
+        pool_4p = _build_player_pool(player_counts=[4])
+        overview_4p = get_statistics_overview(p_a, player_counts=[4])
+        records_4p = next(c for c in overview_4p["categories"] if c["key"] == "records")
+
+        entry_a = next(e for e in records_4p["top"] if e["profile_id"] == p_a.id)
+        self.assertEqual(entry_a["value"], 1)
+        self.assertNotIn(p_b.id, [e["profile_id"] for e in records_4p["top"] if e["value"] > 0])
 
 
 class IronWillTests(StatisticsServiceTestBase):

@@ -79,6 +79,14 @@ CATEGORY_DEFS = [
         "rate_based": False,
     },
     {
+        "key": "records",
+        "label": "Most Records",
+        "description": "Most game high-score records held.",
+        "unit": "",
+        "better": "higher",
+        "rate_based": False,
+    },
+    {
         "key": "iron_will",
         "label": "Iron Will",
         "description": "Most games played among players below the median win rate -- keeps showing up, game after game.",

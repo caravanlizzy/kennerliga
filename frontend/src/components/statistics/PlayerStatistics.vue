@@ -37,8 +37,8 @@
               Performance Leaderboards
             </div>
             <div class="text-caption text-grey-6">
-              Rankings across win rate, average position, games played, and
-              career score
+              Rankings across win rate, average position, games played,
+              records, and career score
             </div>
           </div>
         </div>

@@ -1,5 +1,7 @@
-from django.db.models import Avg, Count, Q, Sum
+from collections import defaultdict
+from django.db.models import Avg, Count, Max, Q, Sum
 
+from game.models import ResultConfig
 from league.models import LeagueStanding
 from result.models import Result
 from user.models import PlayerProfile
@@ -83,6 +85,30 @@ def _build_player_pool(years=None, player_counts=None):
 
     profiles = PlayerProfile.objects.filter(id__in=pool.keys()).select_related("user")
 
+    no_points_game_ids = set(
+        ResultConfig.objects.filter(has_points=False).values_list("game_id", flat=True)
+    )
+    record_candidates = result_qs.filter(points__gte=2).exclude(
+        selected_game__game_id__in=no_points_game_ids
+    )
+    game_max_points = (
+        record_candidates.values("selected_game__game_id")
+        .annotate(max_points=Max("points"))
+    )
+    game_records_map = {
+        row["selected_game__game_id"]: row["max_points"]
+        for row in game_max_points
+        if row["selected_game__game_id"] is not None
+    }
+    player_game_records = defaultdict(set)
+    if game_records_map:
+        for row in record_candidates.values(
+            "player_profile_id", "selected_game__game_id", "points"
+        ):
+            g_id = row["selected_game__game_id"]
+            if g_id in game_records_map and row["points"] == game_records_map[g_id]:
+                player_game_records[row["player_profile_id"]].add(g_id)
+
     players = []
     for profile in profiles:
         entry = pool[profile.id]
@@ -104,6 +130,7 @@ def _build_player_pool(years=None, player_counts=None):
                 "leagues_played": entry["leagues_played"],
                 "level_points": entry["level_points"],
                 "reached_levels": entry["reached_levels"],
+                "records": len(player_game_records.get(profile.id, set())),
                 # Human-readable value shown on the career card; ordering is
                 # driven separately by the lexicographic key in _rank_career.
                 "career_performance": round(entry["league_points"], 2),
