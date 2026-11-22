@@ -458,6 +458,53 @@ watch(
   min-width: 60px;
 }
 
+@media (max-width: 599px) {
+  .rank-col {
+    width: 36px;
+    min-width: 32px;
+    padding: 6px 2px 6px 6px !important;
+  }
+
+  .player-col {
+    min-width: 110px;
+    padding: 6px 4px !important;
+  }
+
+  .stat-col {
+    width: 44px;
+    min-width: 36px;
+    padding: 6px 2px !important;
+  }
+
+  .pos-badge {
+    padding: 1px 4px !important;
+    font-size: 0.62rem !important;
+  }
+
+  .count-badge {
+    font-size: 0.78rem !important;
+
+    &--first {
+      font-size: 0.85rem !important;
+    }
+  }
+
+  .pos-mini-label {
+    font-size: 0.55rem !important;
+  }
+
+  .pos-sep {
+    margin: 0 1px !important;
+  }
+
+  .rank-badge {
+    min-width: 22px !important;
+    height: 20px !important;
+    font-size: 0.7rem !important;
+    padding: 0 4px !important;
+  }
+}
+
 .stat-col-multi {
   min-width: 110px;
 }

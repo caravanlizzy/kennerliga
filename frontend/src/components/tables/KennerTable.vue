@@ -46,13 +46,12 @@
     </template>
 
     <template v-slot:top-right>
-      <div class="row q-gutter-sm no-wrap items-center">
+      <div class="row q-gutter-sm items-center kenner-table__actions">
         <KennerInput
           v-model="filter"
           placeholder="Search..."
           debounce="300"
           class="kenner-table__search"
-          style="min-width: 240px"
         >
           <template v-slot:append>
             <q-icon name="search" />
@@ -66,6 +65,7 @@
           outline
           :label="createButton.label"
           :to="{ name: createButton.forwardName }"
+          class="kenner-table__create-btn"
         />
       </div>
     </template>
@@ -188,8 +188,53 @@ watch(
   min-height: 44px;
 }
 
+:deep(.q-table__middle) {
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-x pan-y;
+  overscroll-behavior-x: contain;
+}
+
+.kenner-table__actions {
+  width: auto;
+  flex-wrap: nowrap;
+}
+
+.kenner-table__search {
+  min-width: 240px;
+}
+
 .kenner-table__search :deep(.q-field__control) {
   border-radius: 999px;
+}
+
+@media (max-width: 599px) {
+  :deep(.q-table__top) {
+    padding: 10px 12px;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+  }
+
+  .kenner-table__title-wrap {
+    width: 100%;
+    margin-bottom: 2px;
+  }
+
+  .kenner-table__actions {
+    width: 100%;
+    flex-wrap: nowrap;
+    gap: 8px;
+  }
+
+  .kenner-table__search {
+    min-width: 0;
+    flex: 1 1 auto;
+    width: 100%;
+  }
+
+  .kenner-table__create-btn {
+    flex-shrink: 0;
+  }
 }
 
 // Dark: translucent white header wash and slate body text don't fit tokens

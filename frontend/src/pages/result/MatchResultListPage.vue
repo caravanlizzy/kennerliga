@@ -21,10 +21,10 @@
           />
           <span
             class="text-weight-bold text-subtitle2 ellipsis"
-            style="max-width: 200px"
+            :style="{ maxWidth: isMobile ? '130px' : '200px' }"
           >
-            {{ truncateString(props.row.game_name || `Game #${props.row.game}`, 24) }}
-            <KennerTooltip v-if="(props.row.game_name || '').length > 24">
+            {{ truncateString(props.row.game_name || `Game #${props.row.game}`, isMobile ? 16 : 24) }}
+            <KennerTooltip v-if="(props.row.game_name || '').length > (isMobile ? 16 : 24)">
               {{ props.row.game_name }}
             </KennerTooltip>
           </span>

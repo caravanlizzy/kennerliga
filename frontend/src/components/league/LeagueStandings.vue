@@ -242,7 +242,7 @@ const rows = computed(() => {
   });
 });
 
-const columns: QTableProps['columns'] = [
+const columns = computed<QTableProps['columns']>(() => [
   {
     name: 'profile_name',
     label: 'Player',
@@ -251,7 +251,7 @@ const columns: QTableProps['columns'] = [
   },
   {
     name: 'league_points',
-    label: 'League Points',
+    label: isMobile.value ? 'LP' : 'League Points',
     field: 'league_points',
     align: 'center',
     format: (val: number) => formatNumbers(val),
@@ -263,5 +263,5 @@ const columns: QTableProps['columns'] = [
     align: 'center',
     format: (val: number) => formatNumbers(val),
   },
-];
+]);
 </script>

@@ -705,6 +705,45 @@ function getRankBgClass(rank: number | undefined) {
   border: none !important;
 }
 
+:deep(.q-table__middle) {
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-x pan-y;
+  overscroll-behavior-x: contain;
+}
+
+:deep(table) {
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+:deep(th:first-child),
+:deep(td:first-child) {
+  position: sticky;
+  left: 0;
+  z-index: 2;
+  background: var(--kenner-bg-glass-card, #ffffff);
+  border-right: 1px solid var(--kenner-border-subtle);
+}
+
+:deep(th:first-child) {
+  z-index: 3;
+}
+
+:deep(tr.bg-orange-1 td:first-child) {
+  background: #fff3e0 !important;
+}
+
+.body--dark {
+  :deep(th:first-child),
+  :deep(td:first-child) {
+    background: var(--kenner-surface-card, #1e293b);
+  }
+
+  :deep(tr.bg-orange-1 td:first-child) {
+    background: rgba(245, 158, 11, 0.15) !important;
+  }
+}
+
 .username-link {
   transition: color 0.2s ease;
 }

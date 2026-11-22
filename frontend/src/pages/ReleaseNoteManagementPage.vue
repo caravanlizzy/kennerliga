@@ -178,7 +178,6 @@ const columns = [
     field: 'title',
     align: 'left' as const,
     classes: 'text-weight-bold',
-    style: 'min-width: 140px',
   },
   {
     name: 'created_at',
@@ -186,7 +185,6 @@ const columns = [
     field: 'created_at',
     align: 'left' as const,
     format: (v: string) => formatDate(v),
-    style: 'width: 110px',
   },
   { name: 'text', label: 'Text', field: 'text', align: 'left' as const },
   { name: 'actions', label: '', field: 'id', align: 'right' as const },
@@ -228,7 +226,7 @@ const { deleteDialogOpen, requestDelete, confirmDelete } = useDeleteConfirm(
 }
 
 .dialog-card {
-  min-width: 320px;
+  width: 100%;
   max-width: 440px;
   border-radius: var(--kenner-card-radius, 16px);
   border: 1px solid var(--kenner-border-color);

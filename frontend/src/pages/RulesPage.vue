@@ -348,6 +348,19 @@ function scrollToSection(id: string) {
   z-index: 5;
 }
 
+@media (max-width: 599px) {
+  .rules-toc-bar {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding: 6px 8px;
+
+    .row {
+      flex-wrap: nowrap;
+      min-width: max-content;
+    }
+  }
+}
+
 .rules-card {
   background: var(--kenner-surface-overlay);
   backdrop-filter: blur(8px);
