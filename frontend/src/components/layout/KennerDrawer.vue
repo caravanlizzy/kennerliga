@@ -39,6 +39,12 @@
           forward-name="players"
         />
         <DrawerItem
+          icon="sports_esports"
+          icon-color="primary"
+          label="Games"
+          forward-name="games"
+        />
+        <DrawerItem
           icon="query_stats"
           icon-color="primary"
           label="Statistics"
@@ -164,12 +170,6 @@
             label="Current Season"
             :forward-params="{ id: currentSeasonId }"
             forward-name="season-manage"
-          />
-          <DrawerItem
-            icon="sports_esports"
-            icon-color="primary"
-            label="Games"
-            forward-name="games"
           />
           <DrawerItem
             icon="mark_email_unread"

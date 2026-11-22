@@ -37,6 +37,7 @@
           "
         />
         <q-btn
+          v-if="isAdmin"
           flat
           round
           dense
@@ -49,6 +50,7 @@
           "
         />
         <q-btn
+          v-if="isAdmin"
           flat
           round
           dense
@@ -83,8 +85,12 @@ import {
 import { useRouter } from 'vue-router';
 import { TGameDto, TKennerButton, TPlatform } from 'src/types';
 import { computed } from 'vue';
+import { useUserStore } from 'stores/userStore';
+import { storeToRefs } from 'pinia';
 
 type GameRow = TGameDto;
+
+const { isAdmin } = storeToRefs(useUserStore());
 
 // Fetch games
 const {
@@ -129,12 +135,15 @@ function onRowClick(_evt: unknown, row: GameRow) {
 }
 
 // Create button
-const button: TKennerButton = {
-  color: 'secondary',
-  label: 'Game',
-  icon: 'add_circle',
-  forwardName: 'game-create',
-};
+const button = computed<TKennerButton | undefined>(() => {
+  if (!isAdmin.value) return undefined;
+  return {
+    color: 'secondary',
+    label: 'Game',
+    icon: 'add_circle',
+    forwardName: 'game-create',
+  };
+});
 
 // Reactive columns
 const columns = computed(() => [

@@ -65,7 +65,7 @@ class GameViewSet(ModelViewSet):
         )
         is_admin = self.request.user and self.request.user.is_staff
 
-        if manage_only and is_admin:
+        if manage_only:
             queryset = Game.objects.all()
 
         if league_id:

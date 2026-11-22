@@ -11,7 +11,7 @@ export default {
       name: 'games',
       component: () => import('pages/game/GamesListPage.vue'),
       meta: {
-        requiresAdmin: true,
+        requiresAuth: true,
         icon: 'sports_esports',
         label: 'Game Catalog',
       },
