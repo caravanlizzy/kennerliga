@@ -324,6 +324,30 @@ class RecordsPerformanceTests(StatisticsServiceTestBase):
 
         self.assertEqual(len(profile_records), entry_a["value"])
 
+    def test_player_with_seven_records_displays_seven_consistently(self):
+        from rest_framework.test import APIClient
+
+        p_a = self.make_profile("A")
+        p_b = self.make_profile("B")
+
+        # 7 games where player A sets the record
+        for i in range(1, 8):
+            g = Game.objects.create(name=f"Record Game {i}", platform=self.platform)
+            l = self.make_league(1)
+            self.add_match_with_points(g, l, [(p_a, 1, 100 + i), (p_b, 2, 50)])
+
+        client = APIClient()
+        client.force_authenticate(user=p_a.user)
+        response = client.get(f"/api/user/users/{p_a.user.id}/statistics/")
+        self.assertEqual(response.status_code, 200)
+        profile_records = response.data["records"]
+        self.assertEqual(len(profile_records), 7)
+
+        overview = get_statistics_overview(p_a)
+        records_cat = next(c for c in overview["categories"] if c["key"] == "records")
+        entry_a = next(e for e in records_cat["top"] if e["profile_id"] == p_a.id)
+        self.assertEqual(entry_a["value"], 7)
+
 
 class IronWillTests(StatisticsServiceTestBase):
     def test_ranks_below_median_win_rate_players_by_games_played(self):
