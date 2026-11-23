@@ -117,7 +117,7 @@ class ResultConfigSerializer(ModelSerializer):
     def get_factions(self, obj):
         if not obj.game:
             return []
-        factions = Faction.objects.filter(game=obj.game).order_by("id")
+        factions = Faction.objects.filter(game=obj.game).order_by("level", "name", "id")
         return FactionSerializer(factions, many=True).data
 
     def _sync_factions(self, game, factions_data):
@@ -131,23 +131,55 @@ class ResultConfigSerializer(ModelSerializer):
         for item in factions_data:
             if isinstance(item, str):
                 name = item.strip()
-                if not name:
-                    continue
-                faction = Faction.objects.create(name=name, game=game)
-                retained_ids.add(faction.id)
+                level = 0
+                faction_id = None
             elif isinstance(item, dict):
                 faction_id = item.get("id")
                 name = item.get("name", "").strip()
-                if not name:
-                    continue
-                if faction_id and faction_id in existing_factions:
-                    faction = existing_factions[faction_id]
-                    if faction.name != name:
-                        faction.name = name
-                        faction.save(update_fields=["name"])
-                    retained_ids.add(faction.id)
+                try:
+                    level = int(item.get("level", 0))
+                except (ValueError, TypeError):
+                    level = 0
+            else:
+                continue
+
+            if not name:
+                continue
+
+            if (
+                faction_id
+                and faction_id in existing_factions
+                and faction_id not in retained_ids
+            ):
+                faction = existing_factions[faction_id]
+                update_fields = []
+                if faction.name != name:
+                    faction.name = name
+                    update_fields.append("name")
+                if faction.level != level:
+                    faction.level = level
+                    update_fields.append("level")
+                if update_fields:
+                    faction.save(update_fields=update_fields)
+                retained_ids.add(faction.id)
+            else:
+                matched_existing = next(
+                    (
+                        f
+                        for fid, f in existing_factions.items()
+                        if fid not in retained_ids and f.name == name
+                    ),
+                    None,
+                )
+                if matched_existing:
+                    if matched_existing.level != level:
+                        matched_existing.level = level
+                        matched_existing.save(update_fields=["level"])
+                    retained_ids.add(matched_existing.id)
                 else:
-                    faction = Faction.objects.create(name=name, game=game)
+                    faction = Faction.objects.create(
+                        name=name, game=game, level=level
+                    )
                     retained_ids.add(faction.id)
 
         for fid, fobj in existing_factions.items():

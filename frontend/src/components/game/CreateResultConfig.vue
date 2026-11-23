@@ -460,14 +460,14 @@ const factionLevels = ref<UiFactionLevel[]>([]);
 // Initialize from props
 if (props.initialConfig?.factions && props.initialConfig.factions.length > 0) {
   const maxLevel = Math.max(
-    ...props.initialConfig.factions.map((f) => f.level),
+    ...props.initialConfig.factions.map((f) => f.level ?? 0),
     0
   );
   for (let i = 0; i <= maxLevel; i++) {
     factionLevels.value.push({
       id: newRef(),
       factions: props.initialConfig.factions
-        .filter((f) => f.level === i)
+        .filter((f) => (f.level ?? 0) === i)
         .map((f) => f.name),
     });
   }

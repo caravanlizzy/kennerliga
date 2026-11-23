@@ -138,6 +138,8 @@ class GameAPITests(TestCase):
             "factions": [
                 {"name": "Ecoline", "level": 0},
                 {"name": "Tharsis", "level": 0},
+                {"name": "Prelude Leader A", "level": 1},
+                {"name": "Colony Policy B", "level": 2},
             ],
             "win_conditions": [
                 {
@@ -162,14 +164,27 @@ class GameAPITests(TestCase):
         response = self.client.post("/api/game/result-configs/", payload, format="json")
         self.assertEqual(response.status_code, 201)
         self.assertIn("factions", response.data)
-        self.assertEqual(len(response.data["factions"]), 2)
+        self.assertEqual(len(response.data["factions"]), 4)
         self.assertEqual(len(response.data["win_conditions"]), 2)
 
-        # Retrieve and verify nested data
+        # Retrieve and verify nested data including faction levels
         config_id = response.data["id"]
         get_res = self.client.get(f"/api/game/result-configs/{config_id}/")
         self.assertEqual(get_res.status_code, 200)
-        self.assertEqual(len(get_res.data["factions"]), 2)
+        self.assertEqual(len(get_res.data["factions"]), 4)
+        levels_map = {f["name"]: f["level"] for f in get_res.data["factions"]}
+        self.assertEqual(levels_map["Ecoline"], 0)
+        self.assertEqual(levels_map["Tharsis"], 0)
+        self.assertEqual(levels_map["Prelude Leader A"], 1)
+        self.assertEqual(levels_map["Colony Policy B"], 2)
+
+        # Verify factions endpoint returns levels correctly
+        factions_res = self.client.get(f"/api/game/factions/?game={new_game.id}")
+        self.assertEqual(factions_res.status_code, 200)
+        f_levels_map = {f["name"]: f["level"] for f in factions_res.data}
+        self.assertEqual(f_levels_map["Prelude Leader A"], 1)
+        self.assertEqual(f_levels_map["Colony Policy B"], 2)
+
         self.assertEqual(len(get_res.data["win_conditions"]), 2)
         self.assertEqual(len(get_res.data["win_conditions"][0]["tie_breakers"]), 1)
         self.assertEqual(len(get_res.data["win_conditions"][1]["options"]), 2)
@@ -177,11 +192,11 @@ class GameAPITests(TestCase):
     def test_update_result_config_nested(self):
         existing_config = ResultConfig.objects.filter(game=self.game).first()
         payload = {
-            "is_asymmetric": False,
+            "is_asymmetric": True,
             "factions": [
                 {"name": "Red", "level": 0},
-                {"name": "Blue", "level": 0},
-                {"name": "Green", "level": 0},
+                {"name": "Blue", "level": 1},
+                {"name": "Green", "level": 2},
             ],
             "win_conditions": [
                 {
@@ -199,6 +214,10 @@ class GameAPITests(TestCase):
         )
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data["factions"]), 3)
+        levels_map = {f["name"]: f["level"] for f in response.data["factions"]}
+        self.assertEqual(levels_map["Red"], 0)
+        self.assertEqual(levels_map["Blue"], 1)
+        self.assertEqual(levels_map["Green"], 2)
         self.assertEqual(len(response.data["win_conditions"]), 1)
         self.assertEqual(len(response.data["win_conditions"][0]["tie_breakers"]), 1)
 
