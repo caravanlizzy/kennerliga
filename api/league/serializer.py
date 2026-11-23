@@ -316,6 +316,8 @@ class LeagueTieResolutionEntrySerializer(serializers.ModelSerializer):
     username = serializers.CharField(
         source="player_profile.user.username", read_only=True, allow_null=True
     )
+    avatar_shape = serializers.SerializerMethodField()
+    avatar_color = serializers.SerializerMethodField()
 
     class Meta:
         model = LeagueTieResolutionEntry
@@ -324,8 +326,18 @@ class LeagueTieResolutionEntrySerializer(serializers.ModelSerializer):
             "player_profile_id",
             "profile_name",
             "username",
+            "avatar_shape",
+            "avatar_color",
             "order_index",
         ]
+
+    def get_avatar_shape(self, obj):
+        user = getattr(obj.player_profile, "user", None)
+        return getattr(user, "avatar_shape", "squircle") if user else "squircle"
+
+    def get_avatar_color(self, obj):
+        user = getattr(obj.player_profile, "user", None)
+        return getattr(user, "avatar_color", "") if user else ""
 
 
 class LeagueTieResolutionSerializer(serializers.ModelSerializer):

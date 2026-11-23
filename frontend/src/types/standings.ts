@@ -63,6 +63,8 @@ export type TLeagueTieResolutionEntryDto = {
   player_profile_id: number;
   profile_name: string;
   username?: string | null;
+  avatar_shape?: AvatarShape;
+  avatar_color?: string;
   order_index: number;
 };
 

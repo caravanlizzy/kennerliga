@@ -553,6 +553,8 @@ class LeagueServiceTests(TestCase):
         self.assertEqual(res.data[0]["reason"], TieResolutionReason.WINNER_PERCENTAGE)
         self.assertEqual(len(res.data[0]["entries"]), 2)
         self.assertEqual(res.data[0]["entries"][0]["player_profile_id"], self.profiles[0].id)
+        self.assertIn("avatar_shape", res.data[0]["entries"][0])
+        self.assertIn("avatar_color", res.data[0]["entries"][0])
         self.assertEqual(res.data[0]["entries"][1]["player_profile_id"], self.profiles[1].id)
 
         # Admin edits resolution: reverse player order and change reason

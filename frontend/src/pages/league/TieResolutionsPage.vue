@@ -148,8 +148,15 @@
                   </q-item-section>
                   <q-item-section avatar style="min-width: 36px">
                     <UserAvatar
-                      :username="entry.username"
-                      :profile-name="entry.profile_name"
+                      :display-username="entry.username || entry.profile_name"
+                      :navigation-name="entry.username || undefined"
+                      :subtitle="
+                        entry.profile_name !== entry.username
+                          ? entry.profile_name
+                          : undefined
+                      "
+                      :shape="entry.avatar_shape"
+                      :color="entry.avatar_color"
                       size="28px"
                     />
                   </q-item-section>
