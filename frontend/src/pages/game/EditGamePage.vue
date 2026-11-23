@@ -614,7 +614,10 @@ const onSubmit = async () => {
       message: 'Game updated successfully',
     });
 
-    await router.push({ name: 'games' });
+    await router.push({
+      name: 'game-config',
+      params: { id: gameId },
+    });
   } catch (e) {
     console.error('Could not update game because', e);
     $q.notify({
