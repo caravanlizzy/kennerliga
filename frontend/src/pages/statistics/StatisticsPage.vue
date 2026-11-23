@@ -124,8 +124,8 @@
       :align="isMobile ? 'justify' : 'left'"
       narrow-indicator
     >
-      <q-tab name="players" icon="groups" label="Players & Awards" />
-      <q-tab name="games" icon="sports_esports" label="Games & Leaderboards" />
+      <q-tab name="players" icon="groups" label="Players" />
+      <q-tab name="games" icon="sports_esports" label="Games" />
     </q-tabs>
 
     <!-- Tab Panels -->
