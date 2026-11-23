@@ -115,6 +115,19 @@ const routes: RouteRecordRaw[] = [
     ],
   },
   {
+    path: '/tie-resolutions',
+    component: () => import('layouts/MainLayout.vue'),
+    meta: { requiresAuth: true, requiresAdmin: true },
+    children: [
+      {
+        path: '',
+        name: 'tie-resolutions',
+        component: () => import('pages/league/TieResolutionsPage.vue'),
+        meta: { label: 'Tie Resolutions', icon: 'balance' },
+      },
+    ],
+  },
+  {
     path: '/',
     component: () => import('layouts/MainLayout.vue'),
     children: [

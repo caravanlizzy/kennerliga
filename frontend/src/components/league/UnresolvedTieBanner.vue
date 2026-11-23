@@ -17,7 +17,7 @@
       </div>
 
       <KennerButton
-        v-if="adminMode"
+        v-if="unresolvedGroups.length === 1 && canResolveGroup(unresolvedGroups[0])"
         label="Resolve"
         size="xs"
         color="warning"
@@ -46,6 +46,16 @@
             >
           </template>
         </div>
+        <KennerButton
+          v-if="canResolveGroup(grp) && unresolvedGroups.length > 1"
+          label="Resolve"
+          size="xs"
+          color="warning"
+          outline
+          no-caps
+          class="q-ml-sm"
+          @click="emit('resolve-tie', grp)"
+        />
       </div>
     </div>
 
@@ -57,15 +67,19 @@
 import { computed } from 'vue';
 import type { TTieGroup } from 'src/types';
 import KennerButton from 'components/base/KennerButton.vue';
+import { useUserStore } from 'stores/userStore';
+import { storeToRefs } from 'pinia';
 
 const props = withDefaults(
   defineProps<{
     tieGroups: TTieGroup[];
     adminMode?: boolean;
+    canResolve?: boolean | ((group: TTieGroup) => boolean);
     compact?: boolean;
   }>(),
   {
     adminMode: false,
+    canResolve: undefined,
     compact: false,
   }
 );
@@ -74,9 +88,35 @@ const emit = defineEmits<{
   (e: 'resolve-tie', group?: TTieGroup): void;
 }>();
 
+const { user } = storeToRefs(useUserStore());
+
 const unresolvedGroups = computed(() =>
   props.tieGroups.filter((g) => g.unresolved)
 );
+
+const canResolveGroup = (group?: TTieGroup): boolean => {
+  if (!group) return false;
+  if (props.adminMode) return true;
+  if (typeof props.canResolve === 'function') {
+    return props.canResolve(group);
+  }
+  if (props.canResolve === false) return false;
+  if (!user.value) return false;
+  if (user.value.isAdmin) return true;
+  const profileId = user.value.profile?.id;
+  const username = user.value.username;
+  return (group.members || []).some((m) => {
+    const pId =
+      'player_profile_id' in m
+        ? m.player_profile_id
+        : 'profile' in m
+        ? (m as { profile?: number }).profile
+        : undefined;
+    return (
+      (profileId && pId === profileId) || (username && m.username === username)
+    );
+  });
+};
 </script>
 
 <style scoped lang="scss">

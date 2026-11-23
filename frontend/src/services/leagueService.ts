@@ -1,5 +1,5 @@
 import { api } from 'boot/axios';
-import { TLeagueDto, TLeagueStatus } from 'src/types';
+import { TLeagueDto, TLeagueStatus, TLeagueTieResolutionDto } from 'src/types';
 import { unwrapList } from 'src/services/httpTypes';
 
 export async function fetchLeagueDetails(
@@ -65,7 +65,7 @@ export async function fetchTieResolutionReasons(
   return unwrapList<TTieResolutionReason>(data);
 }
 
-/** Records an admin's tie resolution; `playerOrder` is best-placed first. */
+/** Records an admin's or player's tie resolution; `playerOrder` is best-placed first. */
 export async function resolveTie(
   leagueId: number,
   payload: {
@@ -76,6 +76,42 @@ export async function resolveTie(
   }
 ): Promise<void> {
   await api.post(`league/leagues/${leagueId}/resolve-tie/`, payload);
+}
+
+/** Admin-only: list all tie resolutions, optionally filtered by league or season. */
+export async function fetchTieResolutions(params?: {
+  league?: number;
+  season?: number;
+}): Promise<TLeagueTieResolutionDto[]> {
+  const { data } = await api.get('league/tie-resolutions/', { params });
+  return unwrapList<TLeagueTieResolutionDto>(data);
+}
+
+/** Admin-only: fetch a single tie resolution by id. */
+export async function fetchTieResolution(
+  id: number
+): Promise<TLeagueTieResolutionDto> {
+  const { data } = await api.get(`league/tie-resolutions/${id}/`);
+  return data;
+}
+
+/** Admin-only: update a tie resolution (reason, note, player_order, is_resolved). */
+export async function updateTieResolution(
+  id: number,
+  payload: {
+    reason?: string;
+    note?: string;
+    player_order?: number[];
+    is_resolved?: boolean;
+  }
+): Promise<TLeagueTieResolutionDto> {
+  const { data } = await api.patch(`league/tie-resolutions/${id}/`, payload);
+  return data;
+}
+
+/** Admin-only: delete a tie resolution and restore tie to unresolved. */
+export async function deleteTieResolution(id: number): Promise<void> {
+  await api.delete(`league/tie-resolutions/${id}/`);
 }
 
 /** Admin-only: force a league into a given `LeagueStatus`. */

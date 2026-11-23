@@ -392,3 +392,194 @@ class LeagueServiceTests(TestCase):
         self.assertEqual(league_data["progress"]["bans"]["missing"], 0)
         self.assertEqual(league_data["progress"]["reports"]["current"], 1)
         self.assertEqual(league_data["progress"]["reports"]["missing"], 3)
+
+    def test_resolve_tie_permissions_and_resolution(self):
+        from league.models import LeagueStanding, LeagueTieResolution, TieResolutionReason
+        from services.standings_snapshot import rebuild_league_snapshot
+
+        # Set up a tie between profiles[0] and profiles[1]
+        table = [
+            {
+                "player_id": self.profiles[0].id,
+                "league_points": Decimal("10"),
+                "wins": Decimal("2"),
+                "second_places": 1,
+                "third_places": 0,
+            },
+            {
+                "player_id": self.profiles[1].id,
+                "league_points": Decimal("10"),
+                "wins": Decimal("2"),
+                "second_places": 1,
+                "third_places": 0,
+            },
+            {
+                "player_id": self.profiles[2].id,
+                "league_points": Decimal("6"),
+                "wins": Decimal("1"),
+                "second_places": 0,
+                "third_places": 1,
+            },
+            {
+                "player_id": self.profiles[3].id,
+                "league_points": Decimal("2"),
+                "wins": Decimal("0"),
+                "second_places": 0,
+                "third_places": 0,
+            },
+        ]
+        with patch("services.standings_snapshot.compute_league_table", return_value=table):
+            rebuild_league_snapshot(self.league)
+
+        standings = {s.player_profile_id: s for s in LeagueStanding.objects.filter(league=self.league)}
+        group_key = standings[self.profiles[0].id].unresolved_tie_group
+        self.assertIsNotNone(group_key)
+        self.assertEqual(standings[self.profiles[1].id].unresolved_tie_group, group_key)
+
+        client = APIClient()
+
+        payload = {
+            "group_key": group_key,
+            "reason": TieResolutionReason.CANT_STOP,
+            "player_order": [self.profiles[1].id, self.profiles[0].id],
+            "note": "Played tie-breaker match",
+        }
+
+        # 1. Unauthenticated request -> 401
+        res = client.post(f"/api/league/leagues/{self.league.id}/resolve-tie/", payload, format="json")
+        self.assertEqual(res.status_code, 401)
+
+        # 2. Non-member user -> 403
+        outsider_user = User.objects.create(username="outsider")
+        client.force_authenticate(user=outsider_user)
+        res = client.post(f"/api/league/leagues/{self.league.id}/resolve-tie/", payload, format="json")
+        self.assertEqual(res.status_code, 403)
+
+        # 3. League member who is NOT in the tie group (e.g. users[2] / profiles[2]) -> 403
+        client.force_authenticate(user=self.users[2])
+        res = client.post(f"/api/league/leagues/{self.league.id}/resolve-tie/", payload, format="json")
+        self.assertEqual(res.status_code, 403)
+        self.assertIn("Only players who are part of this tie group", res.data["detail"])
+
+        # 4. League member player who IS in the tie group (e.g. users[0] / profiles[0]) -> 200 OK
+        client.force_authenticate(user=self.users[0])
+        res = client.post(f"/api/league/leagues/{self.league.id}/resolve-tie/", payload, format="json")
+        self.assertEqual(res.status_code, 200)
+
+        # Verify standings updated: unresolved_tie_group cleared, priorities assigned
+        s0 = LeagueStanding.objects.get(league=self.league, player_profile=self.profiles[0])
+        s1 = LeagueStanding.objects.get(league=self.league, player_profile=self.profiles[1])
+        self.assertIsNone(s0.unresolved_tie_group)
+        self.assertIsNone(s1.unresolved_tie_group)
+        self.assertGreater(s1.tie_break_priority, s0.tie_break_priority)
+
+        # Verify LeagueTieResolution recorded
+        resolution = LeagueTieResolution.objects.get(league=self.league, group_key=group_key)
+        self.assertTrue(resolution.is_resolved)
+        self.assertEqual(resolution.reason, TieResolutionReason.CANT_STOP)
+        self.assertEqual(resolution.note, "Played tie-breaker match")
+
+    def test_admin_tie_resolution_viewset_crud(self):
+        from league.models import LeagueStanding, LeagueTieResolution, TieResolutionReason
+        from services.standings_snapshot import rebuild_league_snapshot
+
+        # Create standings with a tie between profiles[0] and profiles[1]
+        table = [
+            {
+                "player_id": self.profiles[0].id,
+                "league_points": Decimal("10"),
+                "wins": Decimal("2"),
+                "second_places": 1,
+                "third_places": 0,
+            },
+            {
+                "player_id": self.profiles[1].id,
+                "league_points": Decimal("10"),
+                "wins": Decimal("2"),
+                "second_places": 1,
+                "third_places": 0,
+            },
+            {
+                "player_id": self.profiles[2].id,
+                "league_points": Decimal("6"),
+                "wins": Decimal("1"),
+                "second_places": 0,
+                "third_places": 1,
+            },
+            {
+                "player_id": self.profiles[3].id,
+                "league_points": Decimal("2"),
+                "wins": Decimal("0"),
+                "second_places": 0,
+                "third_places": 0,
+            },
+        ]
+        with patch("services.standings_snapshot.compute_league_table", return_value=table):
+            rebuild_league_snapshot(self.league)
+
+        standings = {s.player_profile_id: s for s in LeagueStanding.objects.filter(league=self.league)}
+        group_key = standings[self.profiles[0].id].unresolved_tie_group
+
+        # Create resolution
+        client = APIClient()
+        admin_user = User.objects.create(username="admin_user", is_staff=True)
+        regular_user = self.users[0]
+
+        # Non-admin cannot list tie-resolutions
+        client.force_authenticate(user=regular_user)
+        res = client.get("/api/league/tie-resolutions/")
+        self.assertEqual(res.status_code, 403)
+
+        # Admin creates resolution
+        client.force_authenticate(user=admin_user)
+        res = client.post(
+            f"/api/league/leagues/{self.league.id}/resolve-tie/",
+            {
+                "group_key": group_key,
+                "reason": TieResolutionReason.WINNER_PERCENTAGE,
+                "player_order": [self.profiles[0].id, self.profiles[1].id],
+                "note": "Initial head to head",
+            },
+            format="json",
+        )
+        self.assertEqual(res.status_code, 200)
+
+        # Admin lists tie-resolutions
+        res = client.get("/api/league/tie-resolutions/")
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(len(res.data), 1)
+        resolution_id = res.data[0]["id"]
+        self.assertEqual(res.data[0]["group_key"], group_key)
+        self.assertEqual(res.data[0]["reason"], TieResolutionReason.WINNER_PERCENTAGE)
+        self.assertEqual(len(res.data[0]["entries"]), 2)
+        self.assertEqual(res.data[0]["entries"][0]["player_profile_id"], self.profiles[0].id)
+        self.assertEqual(res.data[0]["entries"][1]["player_profile_id"], self.profiles[1].id)
+
+        # Admin edits resolution: reverse player order and change reason
+        with patch("services.standings_snapshot.compute_league_table", return_value=table):
+            res = client.patch(
+                f"/api/league/tie-resolutions/{resolution_id}/",
+                {
+                    "reason": TieResolutionReason.CANT_STOP,
+                    "player_order": [self.profiles[1].id, self.profiles[0].id],
+                    "note": "Correction: Cant stop played",
+                },
+                format="json",
+            )
+            self.assertEqual(res.status_code, 200)
+
+        s0 = LeagueStanding.objects.get(league=self.league, player_profile=self.profiles[0])
+        s1 = LeagueStanding.objects.get(league=self.league, player_profile=self.profiles[1])
+        self.assertGreater(s1.tie_break_priority, s0.tie_break_priority)
+
+        # Admin deletes resolution: tie group is restored and priorities reset
+        with patch("services.standings_snapshot.compute_league_table", return_value=table):
+            res = client.delete(f"/api/league/tie-resolutions/{resolution_id}/")
+            self.assertEqual(res.status_code, 204)
+
+        s0 = LeagueStanding.objects.get(league=self.league, player_profile=self.profiles[0])
+        s1 = LeagueStanding.objects.get(league=self.league, player_profile=self.profiles[1])
+        self.assertEqual(s0.tie_break_priority, 0)
+        self.assertEqual(s1.tie_break_priority, 0)
+        self.assertEqual(s0.unresolved_tie_group, group_key)
+        self.assertEqual(s1.unresolved_tie_group, group_key)

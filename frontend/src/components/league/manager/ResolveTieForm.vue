@@ -8,7 +8,10 @@
         Players in Tie Group (Order determines rank)
       </div>
       <q-list bordered separator class="rounded-borders q-mb-md bg-white">
-        <q-item v-for="(member, index) in sortedMembers" :key="member.profile">
+        <q-item
+          v-for="(member, index) in sortedMembers"
+          :key="getProfileId(member)"
+        >
           <q-item-section avatar>
             <q-badge color="primary" text-color="white" :label="index + 1" />
           </q-item-section>
@@ -62,7 +65,7 @@
       <div class="row justify-end q-gutter-sm">
         <KennerButton label="Cancel" flat color="grey-7" v-close-popup />
         <KennerButton
-          label="Resolve Tie"
+          :label="resolutionId ? 'Save Changes' : 'Resolve Tie'"
           color="primary"
           type="submit"
           :loading="submitting"
@@ -73,28 +76,62 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import { ref, watch, onMounted } from 'vue';
 import KennerButton from 'components/base/KennerButton.vue';
 import {
   fetchTieResolutionReasons,
   resolveTie,
+  updateTieResolution,
   type TTieResolutionReason,
 } from 'src/services/leagueService';
 import { useQuasar } from 'quasar';
-import type { TSeasonParticipantDto } from 'src/types';
+import type { TSeasonParticipantDto, TTieGroupMember } from 'src/types';
 
-const props = defineProps<{
-  leagueId: number;
-  groupKey: string;
-  members: TSeasonParticipantDto[];
-}>();
+export type TTieMemberLike =
+  | TSeasonParticipantDto
+  | TTieGroupMember
+  | { profile?: number; player_profile_id?: number; profile_name: string };
+
+const props = withDefaults(
+  defineProps<{
+    leagueId: number;
+    groupKey: string;
+    members: TTieMemberLike[];
+    initialReason?: string | null;
+    initialNote?: string | null;
+    resolutionId?: number | null;
+  }>(),
+  {
+    initialReason: null,
+    initialNote: null,
+    resolutionId: null,
+  }
+);
 
 const emit = defineEmits(['onSuccess']);
 
 const $q = useQuasar();
-const sortedMembers = ref<TSeasonParticipantDto[]>([...props.members]);
-const reason = ref<string | null>(null);
-const note = ref('');
+
+const getProfileId = (m: TTieMemberLike): number => {
+  if ('profile' in m && typeof m.profile === 'number') {
+    return m.profile;
+  }
+  if ('player_profile_id' in m && typeof m.player_profile_id === 'number') {
+    return m.player_profile_id;
+  }
+  return 0;
+};
+
+const sortedMembers = ref<TTieMemberLike[]>([...props.members]);
+watch(
+  () => props.members,
+  (newMembers) => {
+    sortedMembers.value = [...(newMembers || [])];
+  }
+);
+
+const reason = ref<string | null>(props.initialReason || null);
+const note = ref(props.initialNote || '');
 const reasons = ref<TTieResolutionReason[]>([]);
 const loadingReasons = ref(false);
 const submitting = ref(false);
@@ -103,7 +140,7 @@ const fetchReasons = async () => {
   loadingReasons.value = true;
   try {
     reasons.value = await fetchTieResolutionReasons(props.leagueId);
-    if (reasons.value.length > 0) {
+    if (!reason.value && reasons.value.length > 0) {
       reason.value = reasons.value[0].value;
     }
   } catch (e) {
@@ -129,19 +166,37 @@ const submit = async () => {
   if (!reason.value) return;
   submitting.value = true;
   try {
-    await resolveTie(props.leagueId, {
-      group_key: props.groupKey,
-      reason: reason.value,
-      player_order: sortedMembers.value.map((m) => m.profile),
-      note: note.value,
-    });
-    $q.notify({ type: 'positive', message: 'Tie group resolved successfully' });
+    const player_order = sortedMembers.value.map(getProfileId);
+    if (props.resolutionId) {
+      await updateTieResolution(props.resolutionId, {
+        reason: reason.value,
+        player_order,
+        note: note.value,
+      });
+      $q.notify({
+        type: 'positive',
+        message: 'Tie resolution updated successfully',
+      });
+    } else {
+      await resolveTie(props.leagueId, {
+        group_key: props.groupKey,
+        reason: reason.value,
+        player_order,
+        note: note.value,
+      });
+      $q.notify({
+        type: 'positive',
+        message: 'Tie group resolved successfully',
+      });
+    }
     emit('onSuccess');
   } catch (e: unknown) {
     console.error('Error resolving tie:', e);
-    let detail = 'Failed to resolve tie group';
+    let detail = props.resolutionId
+      ? 'Failed to update tie resolution'
+      : 'Failed to resolve tie group';
     if (e && typeof e === 'object' && 'response' in e) {
-      const resp = (e as any).response;
+      const resp = (e as { response?: { data?: { detail?: string } } }).response;
       if (resp?.data?.detail) detail = resp.data.detail;
     }
     $q.notify({ type: 'negative', message: detail });

@@ -428,8 +428,31 @@
         "
         class="q-mt-md q-mb-md"
       >
-        <UnresolvedTieBanner :tie-groups="standings.tie_groups" />
+        <UnresolvedTieBanner
+          :tie-groups="standings.tie_groups"
+          @resolve-tie="onResolveTie"
+        />
       </div>
+
+      <q-dialog v-model="showResolveDialog" persistent>
+        <q-card
+          style="min-width: 320px; max-width: 520px; width: 100%; border-radius: 16px"
+        >
+          <q-card-section class="row items-center justify-between q-pb-none">
+            <div class="text-subtitle1 text-weight-bold">Resolve Tie Group</div>
+            <q-btn icon="close" flat round dense v-close-popup />
+          </q-card-section>
+          <q-card-section>
+            <ResolveTieForm
+              v-if="selectedTieGroup && leagueId"
+              :league-id="leagueId"
+              :group-key="selectedTieGroup.group_key"
+              :members="selectedTieGroup.members"
+              @on-success="onTieResolved"
+            />
+          </q-card-section>
+        </q-card>
+      </q-dialog>
 
       <!-- Footer Actions -->
       <!--      <div v-if="standings && standings.season_id" class="row justify-end q-mt-md">-->
@@ -478,8 +501,10 @@ import { useResponsive } from 'src/composables/responsive';
 import KennerTooltip from 'components/base/KennerTooltip.vue';
 import LeagueLevel from 'components/season/LeagueLevel.vue';
 import UnresolvedTieBanner from 'components/league/UnresolvedTieBanner.vue';
+import ResolveTieForm from 'components/league/manager/ResolveTieForm.vue';
 import { useUpdateStore } from 'stores/updateStore';
 import { useUserProfileDisplay } from 'src/composables/userProfileDisplay';
+import type { TTieGroup } from 'src/types';
 
 const props = defineProps<{
   leagueId: number;
@@ -487,9 +512,35 @@ const props = defineProps<{
   level?: number | string;
 }>();
 
+const emit = defineEmits(['resolve-tie', 'updated']);
+
 const { isMobile } = useResponsive();
 const router = useRouter();
 const { resolveAvatarShape, resolveAvatarColor } = useUserProfileDisplay();
+
+const showResolveDialog = ref(false);
+const selectedTieGroup = ref<TTieGroup | null>(null);
+
+const onResolveTie = (group?: TTieGroup) => {
+  if (group) {
+    selectedTieGroup.value = group;
+    showResolveDialog.value = true;
+  }
+};
+
+const onTieResolved = async () => {
+  showResolveDialog.value = false;
+  selectedTieGroup.value = null;
+  loading.value = true;
+  try {
+    standings.value = await fetchLeagueFullStandings(props.leagueId);
+  } catch (e) {
+    console.error('Error fetching standings:', e);
+  } finally {
+    loading.value = false;
+  }
+  emit('updated');
+};
 
 function goToPlayer(username?: string | null): void {
   if (!username) return;

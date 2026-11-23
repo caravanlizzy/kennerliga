@@ -58,6 +58,30 @@ export type TTieResolution = {
   is_resolved: boolean;
 };
 
+export type TLeagueTieResolutionEntryDto = {
+  id: number;
+  player_profile_id: number;
+  profile_name: string;
+  username?: string | null;
+  order_index: number;
+};
+
+export type TLeagueTieResolutionDto = {
+  id: number;
+  league: number;
+  league_level: number;
+  season_id: number;
+  season_name?: string | null;
+  group_key: string;
+  reason: string;
+  reason_display: string;
+  note?: string | null;
+  is_resolved: boolean;
+  created_at: string;
+  updated_at: string;
+  entries: TLeagueTieResolutionEntryDto[];
+};
+
 export type TTieGroup = {
   group_key: string;
   unresolved: boolean;

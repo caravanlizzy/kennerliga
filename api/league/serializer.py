@@ -1,7 +1,7 @@
 from rest_framework.fields import SerializerMethodField
 from rest_framework import serializers
 
-from league.models import League, GameStanding, LeagueStanding
+from league.models import League, GameStanding, LeagueStanding, LeagueTieResolution, LeagueTieResolutionEntry
 from season.models import SeasonParticipant
 
 
@@ -301,3 +301,68 @@ class LeagueDetailSerializer(serializers.ModelSerializer):
             member["position"] = i
 
         return data
+
+
+class LeagueTieResolutionEntrySerializer(serializers.ModelSerializer):
+    """
+    Serializer for tie resolution player entries with profile details.
+    """
+    player_profile_id = serializers.IntegerField(
+        source="player_profile.id", read_only=True
+    )
+    profile_name = serializers.CharField(
+        source="player_profile.profile_name", read_only=True
+    )
+    username = serializers.CharField(
+        source="player_profile.user.username", read_only=True, allow_null=True
+    )
+
+    class Meta:
+        model = LeagueTieResolutionEntry
+        fields = [
+            "id",
+            "player_profile_id",
+            "profile_name",
+            "username",
+            "order_index",
+        ]
+
+
+class LeagueTieResolutionSerializer(serializers.ModelSerializer):
+    """
+    Serializer for LeagueTieResolution records with entries and league details.
+    """
+    entries = serializers.SerializerMethodField()
+    reason_display = serializers.CharField(source="get_reason_display", read_only=True)
+    league_level = serializers.IntegerField(source="league.level", read_only=True)
+    season_id = serializers.IntegerField(source="league.season_id", read_only=True)
+    season_name = serializers.CharField(
+        source="league.season.name", read_only=True, allow_null=True
+    )
+    player_order = serializers.ListField(
+        child=serializers.IntegerField(), write_only=True, required=False
+    )
+
+    class Meta:
+        model = LeagueTieResolution
+        fields = [
+            "id",
+            "league",
+            "league_level",
+            "season_id",
+            "season_name",
+            "group_key",
+            "reason",
+            "reason_display",
+            "note",
+            "is_resolved",
+            "created_at",
+            "updated_at",
+            "entries",
+            "player_order",
+        ]
+        read_only_fields = ["created_at", "updated_at"]
+
+    def get_entries(self, obj):
+        entries = sorted(obj.entries.all(), key=lambda e: e.order_index)
+        return LeagueTieResolutionEntrySerializer(entries, many=True).data

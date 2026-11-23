@@ -1,6 +1,6 @@
 from rest_framework import status
 from rest_framework.decorators import action
-from rest_framework.permissions import IsAdminUser
+from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import ReadOnlyModelViewSet, ModelViewSet
 from api.permissions import IsAdminOrReadOnly
@@ -21,6 +21,7 @@ from league.serializer import (
     GameStandingSerializer,
     LeagueSerializer,
     LeagueListSerializer,
+    LeagueTieResolutionSerializer,
 )
 from services.standings_snapshot import rebuild_league_snapshot, rebuild_game_snapshot
 from league.services import get_full_standings_data
@@ -117,10 +118,12 @@ class LeagueViewSet(ModelViewSet):
 
     def get_permissions(self):
         """
-        Ensures admin-only actions are protected.
+        Ensures admin-only actions are protected while allowing league members to resolve ties.
         """
-        if self.action in ["rebuild_standings", "resolve_tie", "set_status"]:
+        if self.action in ["rebuild_standings", "set_status"]:
             return [IsAdminUser()]
+        if self.action == "resolve_tie":
+            return [IsAuthenticated()]
         return super().get_permissions()
 
     @action(detail=True, methods=["get"], url_path="standings")
@@ -216,8 +219,9 @@ class LeagueViewSet(ModelViewSet):
     @action(detail=True, methods=["post"], url_path="resolve-tie")
     def resolve_tie(self, request, pk=None):
         """
-        Admin-only endpoint to resolve a general tie group by providing a
+        Endpoint to resolve a general tie group by providing a
         group_key, a reason, and the exact player order within the tied group.
+        Accessible by staff or players who are members of this league.
 
         Expected payload example:
         {
@@ -228,6 +232,24 @@ class LeagueViewSet(ModelViewSet):
         }
         """
         league = self.get_object()
+
+        is_staff = bool(request.user and request.user.is_staff)
+        user_profile = (
+            getattr(request.user, "profile", None)
+            if request.user and request.user.is_authenticated
+            else None
+        )
+        is_member = bool(
+            user_profile
+            and league.members.filter(profile=user_profile).exists()
+        )
+        if not (is_staff or is_member):
+            return Response(
+                {
+                    "detail": "You do not have permission to resolve ties for this league."
+                },
+                status=status.HTTP_403_FORBIDDEN,
+            )
 
         group_key = request.data.get("group_key")
         reason_raw = request.data.get("reason")
@@ -246,6 +268,31 @@ class LeagueViewSet(ModelViewSet):
                 },
                 status=status.HTTP_400_BAD_REQUEST,
             )
+
+        # If not staff, ensure current player is part of the tie group being resolved
+        if not is_staff:
+            tied_player_ids = set(
+                LeagueStanding.objects.filter(
+                    league=league, unresolved_tie_group=group_key
+                ).values_list("player_profile_id", flat=True)
+            )
+            if not tied_player_ids:
+                tied_player_ids = set(
+                    LeagueTieResolutionEntry.objects.filter(
+                        resolution__league=league, resolution__group_key=group_key
+                    ).values_list("player_profile_id", flat=True)
+                )
+            if (
+                not user_profile
+                or user_profile.id not in tied_player_ids
+                or user_profile.id not in player_order
+            ):
+                return Response(
+                    {
+                        "detail": "Only players who are part of this tie group can resolve it."
+                    },
+                    status=status.HTTP_403_FORBIDDEN,
+                )
 
         # Validate reason against enum
         if reason_raw not in dict(TieResolutionReason.choices):
@@ -444,3 +491,69 @@ class LeagueDetailViewSet(ReadOnlyModelViewSet):
         league = self.get_object()
         serializer = LeagueDetailSerializer(league, context={"league": league})
         return Response(serializer.data)
+
+
+class LeagueTieResolutionViewSet(ModelViewSet):
+    """
+    API viewset for viewing, updating, and deleting tie resolutions. Admin-only.
+    """
+    permission_classes = [IsAdminUser]
+    serializer_class = LeagueTieResolutionSerializer
+    queryset = LeagueTieResolution.objects.all()
+
+    def get_queryset(self):
+        qs = (
+            LeagueTieResolution.objects.all()
+            .select_related("league__season")
+            .prefetch_related("entries__player_profile__user")
+            .order_by("-updated_at", "-id")
+        )
+        league_id = self.request.query_params.get("league")
+        if league_id:
+            qs = qs.filter(league_id=league_id)
+        season_id = self.request.query_params.get("season")
+        if season_id:
+            qs = qs.filter(league__season_id=season_id)
+        return qs
+
+    def perform_create(self, serializer):
+        resolution = serializer.save()
+        player_order = self.request.data.get("player_order")
+        if player_order and isinstance(player_order, list):
+            resolution.entries.all().delete()
+            LeagueTieResolutionEntry.objects.bulk_create(
+                [
+                    LeagueTieResolutionEntry(
+                        resolution=resolution,
+                        player_profile_id=pp_id,
+                        order_index=index + 1,
+                    )
+                    for index, pp_id in enumerate(player_order)
+                ]
+            )
+        rebuild_league_snapshot(resolution.league)
+        resolution.league.save(update_fields=["updated_at"])
+
+    def perform_update(self, serializer):
+        resolution = serializer.save()
+        player_order = self.request.data.get("player_order")
+        if player_order is not None and isinstance(player_order, list):
+            resolution.entries.all().delete()
+            LeagueTieResolutionEntry.objects.bulk_create(
+                [
+                    LeagueTieResolutionEntry(
+                        resolution=resolution,
+                        player_profile_id=pp_id,
+                        order_index=index + 1,
+                    )
+                    for index, pp_id in enumerate(player_order)
+                ]
+            )
+        rebuild_league_snapshot(resolution.league)
+        resolution.league.save(update_fields=["updated_at"])
+
+    def perform_destroy(self, instance):
+        league = instance.league
+        instance.delete()
+        rebuild_league_snapshot(league)
+        league.save(update_fields=["updated_at"])

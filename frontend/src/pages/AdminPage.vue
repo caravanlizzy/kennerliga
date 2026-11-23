@@ -297,6 +297,13 @@ const groups = computed<AdminGroup[]>(() => [
         color: 'accent',
         name: 'invitations',
       },
+      {
+        label: 'Tie Resolutions',
+        description: 'View, edit, or remove resolved tie-breakers.',
+        icon: 'balance',
+        color: 'warning',
+        name: 'tie-resolutions',
+      },
     ],
   },
   {

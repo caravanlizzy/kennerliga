@@ -2,14 +2,14 @@
   <div>
     <!-- Unresolved Tie Info (only when all league games are finished) -->
     <div
-      v-if="leagueId && allGamesFinished && tieGroups.some((g) => g.unresolved)"
+      v-if="currentLeagueId && allGamesFinished && tieGroups.some((g) => g.unresolved)"
       class="q-mb-md"
     >
       <UnresolvedTieBanner
         :tie-groups="tieGroups"
         :admin-mode="adminMode"
         compact
-        @resolve-tie="(group) => emit('resolve-tie', group)"
+        @resolve-tie="onResolveTie"
       />
     </div>
 
@@ -84,7 +84,7 @@
 
     <!-- Tie Groups Info (Shown at bottom for resolved groups or standalone) -->
     <div
-      v-if="tieGroups.some((g) => !g.unresolved) || !leagueId"
+      v-if="tieGroups.some((g) => !g.unresolved) || !currentLeagueId"
       class="q-mt-md q-px-md"
     >
       <div
@@ -107,7 +107,7 @@
                 {{ group.members.map((m) => m.profile_name).join(' vs ') }}
               </div>
               <KennerButton
-                v-if="adminMode && group.unresolved"
+                v-if="canResolveGroup(group) && group.unresolved"
                 label="Resolve"
                 size="xs"
                 color="primary"
@@ -115,7 +115,7 @@
                 no-caps
                 dense
                 class="q-ml-auto"
-                @click="emit('resolve-tie', group)"
+                @click="onResolveTie(group)"
               />
             </div>
             <div
@@ -129,6 +129,26 @@
         </q-card>
       </div>
     </div>
+
+    <q-dialog v-model="showResolveDialog" persistent>
+      <q-card
+        style="min-width: 320px; max-width: 520px; width: 100%; border-radius: 16px"
+      >
+        <q-card-section class="row items-center justify-between q-pb-none">
+          <div class="text-subtitle1 text-weight-bold">Resolve Tie Group</div>
+          <q-btn icon="close" flat round dense v-close-popup />
+        </q-card-section>
+        <q-card-section>
+          <ResolveTieForm
+            v-if="selectedTieGroup && currentLeagueId"
+            :league-id="currentLeagueId"
+            :group-key="selectedTieGroup.group_key"
+            :members="selectedTieGroup.members"
+            @on-success="onTieResolved"
+          />
+        </q-card-section>
+      </q-card>
+    </q-dialog>
   </div>
 </template>
 
@@ -153,6 +173,7 @@ import { useUserProfileDisplay } from 'src/composables/userProfileDisplay';
 import KennerButton from 'components/base/KennerButton.vue';
 import UserAvatar from 'components/ui/UserAvatar.vue';
 import UnresolvedTieBanner from 'components/league/UnresolvedTieBanner.vue';
+import ResolveTieForm from 'components/league/manager/ResolveTieForm.vue';
 
 const props = defineProps<{
   leagueId?: number;
@@ -172,12 +193,52 @@ const myLeagueStore = computed(() => {
   return id ? useLeagueStore(id)() : null;
 });
 const storeLeagueId = computed(() => myLeagueStore.value?.leagueId);
+const currentLeagueId = computed(() => props.leagueId || storeLeagueId.value);
 const { isMobile } = useResponsive();
 
 const standings = ref<TLeagueStandingRow[]>([]);
 const tieGroups = ref<TTieGroup[]>([]);
 const allGamesFinished = ref(false);
 const loading = ref(false);
+const showResolveDialog = ref(false);
+const selectedTieGroup = ref<TTieGroup | null>(null);
+
+const canResolveGroup = (group?: TTieGroup): boolean => {
+  if (!group) return false;
+  if (props.adminMode) return true;
+  if (!user.value) return false;
+  if (user.value.isAdmin) return true;
+  const profileId = user.value.profile?.id;
+  const username = user.value.username;
+  return (group.members || []).some((m) => {
+    const pId =
+      'player_profile_id' in m
+        ? m.player_profile_id
+        : 'profile' in m
+        ? (m as { profile?: number }).profile
+        : undefined;
+    return (
+      (profileId && pId === profileId) || (username && m.username === username)
+    );
+  });
+};
+
+const onResolveTie = (group?: TTieGroup) => {
+  if (props.adminMode) {
+    emit('resolve-tie', group);
+    return;
+  }
+  if (group) {
+    selectedTieGroup.value = group;
+    showResolveDialog.value = true;
+  }
+};
+
+const onTieResolved = () => {
+  showResolveDialog.value = false;
+  selectedTieGroup.value = null;
+  void fetchStandings();
+};
 
 const fetchStandings = async () => {
   const idToUse = props.leagueId || storeLeagueId.value;
