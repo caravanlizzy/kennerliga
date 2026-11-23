@@ -108,7 +108,7 @@ def get_max_selected_game_ids_for_profile_in_year_including_related(
     for selected_game in selected_games:
         counted_game_ids = {
             selected_game.game_id,
-            *selected_game.game.related_games.values_list("id", flat=True),
+            *(rg.id for rg in selected_game.game.related_games.all()),
         }
 
         for game_id in counted_game_ids:

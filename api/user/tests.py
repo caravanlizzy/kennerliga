@@ -971,3 +971,30 @@ class UserPasswordResetTests(TestCase):
         self.assertTrue(res_patch.data["admin"])
         self.user.refresh_from_db()
         self.assertTrue(self.user.is_staff)
+
+    def test_bulk_elo_ranks_and_user_list_query_efficiency(self):
+        from services.elo import get_bulk_elo_ranks, get_elo_rank
+
+        u1 = User.objects.create_user(username="user1", password="pw")
+        u2 = User.objects.create_user(username="user2", password="pw")
+        u3 = User.objects.create_user(username="user3", password="pw")
+
+        p1 = PlayerProfile.objects.create(user=u1, profile_name="P1", elo_rating=1800.0)
+        p2 = PlayerProfile.objects.create(user=u2, profile_name="P2", elo_rating=1600.0)
+        p3 = PlayerProfile.objects.create(user=u3, profile_name="P3", elo_rating=1600.0)
+
+        bulk_ranks = get_bulk_elo_ranks()
+        self.assertEqual(bulk_ranks[p1.id], 1)
+        self.assertEqual(bulk_ranks[p2.id], 2)
+        self.assertEqual(bulk_ranks[p3.id], 2)
+
+        self.assertEqual(get_elo_rank(p1), 1)
+        self.assertEqual(get_elo_rank(p2), 2)
+        self.assertEqual(get_elo_rank(p3), 2)
+
+        # Test listing users endpoint uses cached bulk elo ranks
+        self.client.force_authenticate(user=u1)
+        res = self.client.get("/api/user/users/")
+        self.assertEqual(res.status_code, 200)
+        p1_res = next(u for u in res.data if u["username"] == "user1")
+        self.assertEqual(p1_res["elo_rank"], 1)

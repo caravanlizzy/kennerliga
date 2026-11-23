@@ -1,3 +1,4 @@
+from collections import defaultdict
 from django.db.models import Avg, Count, Max, Min, Q
 
 from game.models import BanDecision, Game, ResultConfig, SelectedGame
@@ -401,15 +402,14 @@ def get_game_detailed_statistics(
             "date": high_score_res.created_at,
         }
 
-    low_score_val = results_qs.filter(points__isnull=False).aggregate(
-        min_p=Min("points")
-    )["min_p"]
-    avg_score_val = results_qs.filter(points__isnull=False).aggregate(
-        avg_p=Avg("points")
-    )["avg_p"]
-    avg_win_val = results_qs.filter(position=1, points__isnull=False).aggregate(
-        avg_p=Avg("points")
-    )["avg_p"]
+    score_aggs = results_qs.filter(points__isnull=False).aggregate(
+        min_p=Min("points"),
+        avg_p=Avg("points"),
+        avg_win=Avg("points", filter=Q(position=1)),
+    )
+    low_score_val = score_aggs["min_p"]
+    avg_score_val = score_aggs["avg_p"]
+    avg_win_val = score_aggs["avg_win"]
 
     records = {
         "high_score": high_score,
@@ -584,20 +584,33 @@ def get_game_detailed_statistics(
     sorted_leaderboard = eligible_players + ineligible_players
 
     # 7. Faction stats
+    faction_res_data = results_qs.filter(
+        Q(faction__isnull=False) | Q(factions__isnull=False)
+    ).values("id", "position", "points", "faction_id", "factions")
+
+    faction_results_map = defaultdict(dict)
+    for row in faction_res_data:
+        r_id = row["id"]
+        pos = row["position"]
+        pts = row["points"]
+        item = (pos, pts)
+        if row["faction_id"]:
+            faction_results_map[row["faction_id"]][r_id] = item
+        if row["factions"]:
+            faction_results_map[row["factions"]][r_id] = item
+
     faction_stats = []
     for f in game_factions:
-        f_results = results_qs.filter(Q(faction=f) | Q(factions=f)).distinct()
-        f_played = f_results.count()
+        res_dict = faction_results_map.get(f.id, {})
+        f_played = len(res_dict)
         if f_played > 0:
-            f_wins = f_results.filter(position=1).count()
+            positions = [pos for pos, _ in res_dict.values() if pos is not None]
+            points_list = [pts for _, pts in res_dict.values() if pts is not None]
+            f_wins = sum(1 for pos, _ in res_dict.values() if pos == 1)
             f_win_rate = round(f_wins / f_played * 100, 1)
-            f_avg_pos = f_results.aggregate(avg=Avg("position"))["avg"]
-            f_avg_pts = f_results.filter(points__isnull=False).aggregate(
-                avg=Avg("points")
-            )["avg"]
-            f_best_pts = f_results.filter(points__isnull=False).aggregate(
-                max=Max("points")
-            )["max"]
+            f_avg_pos = sum(positions) / len(positions) if positions else None
+            f_avg_pts = sum(points_list) / len(points_list) if points_list else None
+            f_best_pts = max(points_list) if points_list else None
             faction_stats.append(
                 {
                     "id": f.id,
@@ -651,8 +664,9 @@ def get_game_detailed_statistics(
     )
     recent_matches = []
     for sg in selected_games:
-        sg_results = list(
-            sg.result_set.filter(position__isnull=False).order_by("position", "-points")
+        sg_results = [r for r in sg.result_set.all() if r.position is not None]
+        sg_results.sort(
+            key=lambda r: (r.position, -(r.points if r.points is not None else -999999))
         )
         participants = [
             {

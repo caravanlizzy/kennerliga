@@ -51,8 +51,24 @@ class UserSerializer(ModelSerializer):
         return getattr(profile, "elo_rating", 1500.0) if profile else 1500.0
 
     def get_elo_rank(self, obj):
-        from services.elo import get_elo_rank
         profile = getattr(obj, "profile", None)
+        if not profile:
+            return None
+        if self.context and "elo_ranks" in self.context:
+            return self.context["elo_ranks"].get(profile.id)
+        request = (
+            self.context.get("request")
+            if hasattr(self, "context") and self.context
+            else None
+        )
+        if request:
+            if not hasattr(request, "_cached_elo_ranks"):
+                from services.elo import get_bulk_elo_ranks
+
+                request._cached_elo_ranks = get_bulk_elo_ranks()
+            return request._cached_elo_ranks.get(profile.id)
+        from services.elo import get_elo_rank
+
         return get_elo_rank(profile)
 
     def _get_stats(self, obj):
@@ -126,7 +142,23 @@ class PlayerProfileSerializer(ModelSerializer):
         fields = ["id", "user", "username", "profile_name", "elo_rating", "elo_rank"]
 
     def get_elo_rank(self, obj):
+        if not obj:
+            return None
+        if self.context and "elo_ranks" in self.context:
+            return self.context["elo_ranks"].get(obj.id)
+        request = (
+            self.context.get("request")
+            if hasattr(self, "context") and self.context
+            else None
+        )
+        if request:
+            if not hasattr(request, "_cached_elo_ranks"):
+                from services.elo import get_bulk_elo_ranks
+
+                request._cached_elo_ranks = get_bulk_elo_ranks()
+            return request._cached_elo_ranks.get(obj.id)
         from services.elo import get_elo_rank
+
         return get_elo_rank(obj)
 
 

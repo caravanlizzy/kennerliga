@@ -1,5 +1,5 @@
 import re
-from django.db.models import Count, IntegerField, OuterRef, Subquery
+from django.db.models import Count
 from django.db.models.functions import Lower
 from django.utils import timezone
 from rest_framework.decorators import action
@@ -33,7 +33,7 @@ class UserViewSet(ModelViewSet):
     API viewset for viewing and managing users.
     Includes custom actions for retrieving user-specific leagues, seasons, results, and statistics.
     """
-    queryset = User.objects.all().order_by(Lower("username"))
+    queryset = User.objects.all().select_related("profile").order_by(Lower("username"))
     serializer_class = UserSerializer
 
     def get_permissions(self):
@@ -275,22 +275,14 @@ class UserViewSet(ModelViewSet):
                     parsed_pcs.append(int(t))
 
         if parsed_pcs or exclude_2p_only or exclude_3p_only:
-            player_count_subquery = (
-                Result.objects.filter(selected_game=OuterRef("selected_game"))
-                .order_by()
-                .values("selected_game")
-                .annotate(cnt=Count("id"))
-                .values("cnt")
-            )
-            results = results.annotate(
-                match_player_count=Subquery(player_count_subquery, output_field=IntegerField())
-            )
+            sg_counts = Result.objects.values("selected_game_id").annotate(cnt=Count("id"))
             if parsed_pcs:
-                results = results.filter(match_player_count__in=parsed_pcs)
+                sg_counts = sg_counts.filter(cnt__in=parsed_pcs)
             if exclude_2p_only:
-                results = results.exclude(match_player_count__lte=2)
+                sg_counts = sg_counts.filter(cnt__gt=2)
             if exclude_3p_only:
-                results = results.exclude(match_player_count=3)
+                sg_counts = sg_counts.exclude(cnt=3)
+            results = results.filter(selected_game_id__in=sg_counts.values("selected_game_id"))
 
         # Aggregated game metrics (overall)
         overall_stats = {

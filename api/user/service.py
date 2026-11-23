@@ -122,7 +122,7 @@ def get_user_summary_stats(
         }
 
     from result.models import Result
-    from django.db.models import Avg, Count, IntegerField, OuterRef, Q, Subquery
+    from django.db.models import Avg, Count, Q
 
     res_qs = Result.objects.filter(
         player_profile=profile, position__isnull=False
@@ -154,22 +154,14 @@ def get_user_summary_stats(
                 parsed_player_counts.append(int(t))
 
     if parsed_player_counts or exclude_2p_only or exclude_3p_only:
-        player_count_subquery = (
-            Result.objects.filter(selected_game=OuterRef("selected_game"))
-            .order_by()
-            .values("selected_game")
-            .annotate(cnt=Count("id"))
-            .values("cnt")
-        )
-        res_qs = res_qs.annotate(
-            match_player_count=Subquery(player_count_subquery, output_field=IntegerField())
-        )
+        sg_counts = Result.objects.values("selected_game_id").annotate(cnt=Count("id"))
         if parsed_player_counts:
-            res_qs = res_qs.filter(match_player_count__in=parsed_player_counts)
+            sg_counts = sg_counts.filter(cnt__in=parsed_player_counts)
         if exclude_2p_only:
-            res_qs = res_qs.exclude(match_player_count__lte=2)
+            sg_counts = sg_counts.filter(cnt__gt=2)
         if exclude_3p_only:
-            res_qs = res_qs.exclude(match_player_count=3)
+            sg_counts = sg_counts.exclude(cnt=3)
+        res_qs = res_qs.filter(selected_game_id__in=sg_counts.values("selected_game_id"))
 
     res_agg = res_qs.aggregate(
         avg_pos=Avg("position"),

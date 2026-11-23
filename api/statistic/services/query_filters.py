@@ -140,40 +140,31 @@ def parse_player_counts(raw):
 def _filter_results_by_player_count(qs, player_counts):
     """
     Restricts a `Result` queryset to matches whose participant count is one
-    of `player_counts`, using the same per-`selected_game` participant-count
-    subquery that `user.service.get_user_summary_stats` relies on.
+    of `player_counts`, using a grouped aggregation subquery.
     """
     if not player_counts:
         return qs
-    subquery = (
-        Result.objects.filter(selected_game=OuterRef("selected_game"))
-        .order_by()
-        .values("selected_game")
+    matching_sg_ids = (
+        Result.objects.values("selected_game_id")
         .annotate(cnt=Count("id"))
-        .values("cnt")
+        .filter(cnt__in=player_counts)
+        .values("selected_game_id")
     )
-    return qs.annotate(
-        match_player_count=Subquery(subquery, output_field=IntegerField())
-    ).filter(match_player_count__in=player_counts)
+    return qs.filter(selected_game_id__in=matching_sg_ids)
 
 
 def _filter_standings_by_player_count(qs, player_counts):
     """
     Restricts a queryset whose model has a direct `league` FK (e.g.
     `LeagueStanding`, `BanDecision`, `SelectedGame`) to leagues whose size
-    (number of standings) is one of `player_counts`, so career/ban/pick
-    metrics all respect the same player-count filter as the per-game
-    aggregates.
+    (number of standings) is one of `player_counts`, using a grouped aggregation subquery.
     """
     if not player_counts:
         return qs
-    subquery = (
-        LeagueStanding.objects.filter(league=OuterRef("league"))
-        .order_by()
-        .values("league")
+    matching_league_ids = (
+        LeagueStanding.objects.values("league_id")
         .annotate(cnt=Count("id"))
-        .values("cnt")
+        .filter(cnt__in=player_counts)
+        .values("league_id")
     )
-    return qs.annotate(
-        league_size=Subquery(subquery, output_field=IntegerField())
-    ).filter(league_size__in=player_counts)
+    return qs.filter(league_id__in=matching_league_ids)

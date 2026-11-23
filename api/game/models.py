@@ -201,6 +201,9 @@ class SelectedGame(models.Model):
                 fields=["league", "game"], name="unique_game_per_league"
             ),
         ]
+        indexes = [
+            models.Index(fields=["game", "league"]),
+        ]
 
     def __str__(self):
         return f"{self.profile}'s selection for {self.game.name}"
@@ -248,6 +251,9 @@ class BanDecision(models.Model):
 
     class Meta:
         unique_together = ("league", "player_banning")
+        indexes = [
+            models.Index(fields=["league", "skipped_ban"]),
+        ]
 
     def __str__(self):
         return f"{self.player_banning} {'banned ' + str(self.selected_game) if self.selected_game else 'skipped banning'} in {self.league}"

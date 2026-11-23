@@ -103,6 +103,12 @@ class PlayerProfile(models.Model):
     platforms = models.ManyToManyField(Platform, through="PlatformPlayer")
     elo_rating = models.FloatField(default=1500.0)
 
+    class Meta:
+        indexes = [
+            models.Index(fields=["elo_rating"]),
+            models.Index(fields=["-elo_rating"]),
+        ]
+
     def __str__(self):
         return self.profile_name
 

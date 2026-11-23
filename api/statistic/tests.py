@@ -4,6 +4,7 @@ from django.test import TestCase
 
 from game.models import (
     BanDecision,
+    Faction,
     Game,
     ResultConfig,
     SelectedGame,
@@ -835,3 +836,92 @@ class GameDetailedStatisticsTests(StatisticsServiceTestBase):
         self.assertIn("superlatives", response.data)
         self.assertIn("leaderboard", response.data)
         self.assertIn("recent_matches", response.data)
+
+    def test_faction_statistics_and_query_efficiency(self):
+        factions = [
+            Faction.objects.create(game=self.game, name=f"Faction {i}")
+            for i in range(1, 11)
+        ]
+
+        selected_game = SelectedGame.objects.create(
+            profile=self.alice, game=self.game, league=self.league
+        )
+        Result.objects.create(
+            player_profile=self.alice,
+            selected_game=selected_game,
+            league=self.league,
+            season=self.season,
+            position=1,
+            points=100,
+            faction=factions[0],
+        )
+        Result.objects.create(
+            player_profile=self.bob,
+            selected_game=selected_game,
+            league=self.league,
+            season=self.season,
+            position=2,
+            points=80,
+            faction=factions[1],
+        )
+
+        # Faction statistics must be fetched in a single consolidated query,
+        # so having 10 factions does not introduce an O(N) query loop.
+        with self.assertNumQueries(24):
+            stats = get_game_detailed_statistics(self.game, profile=self.alice)
+
+        self.assertEqual(len(stats["factions"]), 10)
+        f1_stat = next(f for f in stats["factions"] if f["name"] == "Faction 1")
+        self.assertEqual(f1_stat["games_played"], 1)
+        self.assertEqual(f1_stat["wins"], 1)
+        self.assertEqual(f1_stat["win_rate"], 100.0)
+        self.assertEqual(f1_stat["avg_position"], 1.0)
+        self.assertEqual(f1_stat["avg_points"], 100.0)
+        self.assertEqual(f1_stat["best_score"], 100)
+
+        f3_stat = next(f for f in stats["factions"] if f["name"] == "Faction 3")
+        self.assertEqual(f3_stat["games_played"], 0)
+        self.assertEqual(f3_stat["wins"], 0)
+        self.assertIsNone(f3_stat["avg_position"])
+
+    def test_player_count_filter_query_optimization(self):
+        from statistic.services.query_filters import (
+            _filter_results_by_player_count,
+            _filter_standings_by_player_count,
+        )
+
+        sg2 = SelectedGame.objects.create(
+            profile=self.alice, game=self.game, league=self.league
+        )
+        r1 = Result.objects.create(
+            player_profile=self.alice,
+            selected_game=sg2,
+            league=self.league,
+            season=self.season,
+            position=1,
+            points=100,
+        )
+        r2 = Result.objects.create(
+            player_profile=self.bob,
+            selected_game=sg2,
+            league=self.league,
+            season=self.season,
+            position=2,
+            points=80,
+        )
+
+        qs = _filter_results_by_player_count(Result.objects.all(), [2])
+        self.assertIn(r1, qs)
+        self.assertIn(r2, qs)
+
+        qs_3p = _filter_results_by_player_count(Result.objects.all(), [3])
+        self.assertNotIn(r1, qs_3p)
+        self.assertNotIn(r2, qs_3p)
+
+        LeagueStanding.objects.create(league=self.league, player_profile=self.alice, league_points=10)
+        LeagueStanding.objects.create(league=self.league, player_profile=self.bob, league_points=8)
+
+        standings_qs = _filter_standings_by_player_count(
+            LeagueStanding.objects.all(), [2]
+        )
+        self.assertTrue(standings_qs.filter(league=self.league).exists())

@@ -63,6 +63,9 @@ class Result(models.Model):
         indexes = [
             models.Index(fields=["selected_game", "player_profile"]),
             models.Index(fields=["league", "season"]),
+            models.Index(fields=["selected_game", "position"]),
+            models.Index(fields=["player_profile", "position"]),
+            models.Index(fields=["points"]),
         ]
 
     def __str__(self):

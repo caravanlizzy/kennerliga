@@ -242,6 +242,21 @@ def rebuild_all_elo() -> int:
         return processed_matches_count
 
 
+def get_bulk_elo_ranks() -> Dict[int, int]:
+    """
+    Returns a dict mapping player_profile_id -> 1-based Elo rank across all player profiles.
+    Ranks are computed in order of elo_rating descending using standard competition ranking.
+    """
+    ratings = list(PlayerProfile.objects.values_list("id", "elo_rating").order_by("-elo_rating"))
+    rank_map: Dict[int, int] = {}
+    for idx, (pid, rating) in enumerate(ratings, start=1):
+        if idx > 1 and rating == ratings[idx - 2][1]:
+            rank_map[pid] = rank_map[ratings[idx - 2][0]]
+        else:
+            rank_map[pid] = idx
+    return rank_map
+
+
 def get_elo_rank(profile: Optional[PlayerProfile]) -> Optional[int]:
     """
     Returns the 1-based Elo rank of the given player profile across all player profiles.

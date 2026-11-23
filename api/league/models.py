@@ -82,6 +82,7 @@ class LeagueStanding(models.Model):
         indexes = [
             models.Index(fields=["league", "-league_points", "-wins"]),
             models.Index(fields=["league", "unresolved_tie_group"]),
+            models.Index(fields=["player_profile"]),
         ]
 
     def __str__(self):

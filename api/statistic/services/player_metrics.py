@@ -89,6 +89,7 @@ def _build_player_pool(years=None, player_counts=None):
     player_game_records = defaultdict(set)
     if game_records_map:
         record_results = Result.objects.filter(
+            player_profile_id__in=pool.keys(),
             points__gte=2,
             selected_game__game_id__in=game_records_map.keys(),
         ).values("player_profile_id", "selected_game__game_id", "points")
