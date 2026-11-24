@@ -17,7 +17,7 @@
         <div
           class="minimized-icon-badge flex flex-center q-mr-sm flex-shrink-0"
         >
-          <q-icon name="campaign" size="16px" color="white" />
+          <q-icon name="campaign" size="16px" class="announcement-icon-color" />
         </div>
         <div
           class="text-subtitle2 text-weight-bolder announcement-title ellipsis"
@@ -64,11 +64,6 @@
         'relative-position signup-content',
       ]"
     >
-      <!-- Background Ornament -->
-      <div class="signup-ornament absolute-right overflow-hidden">
-        <q-icon name="campaign" size="200px" color="accent" />
-      </div>
-
       <!-- Top Row: Icon + Title & Actions -->
       <div class="row items-start no-wrap content-layer q-mb-md">
         <!-- Icon Circle -->
@@ -78,8 +73,8 @@
         >
           <q-icon
             name="campaign"
-            :size="isMobile ? '26px' : '32px'"
-            color="white"
+            :size="isMobile ? '22px' : '26px'"
+            class="announcement-icon-color"
           />
         </div>
 
@@ -112,7 +107,7 @@
             dense
             no-caps
             color="accent"
-            class="q-px-sm text-weight-bold signup-btn"
+            class="q-px-sm text-weight-bold"
             @click="signUp"
           >
             Sign up
@@ -149,7 +144,7 @@
       <div class="content-layer q-mt-md">
         <div class="row items-center q-gutter-x-sm q-mb-sm">
           <div
-            class="text-caption text-weight-bolder text-grey-8 uppercase tracking-widest section-title"
+            class="text-caption text-weight-bolder uppercase tracking-widest section-title"
           >
             Signed up
           </div>
@@ -192,7 +187,7 @@
                 :key="`L-${group.level}`"
                 class="league-box"
               >
-                <div class="league-box__label row items-center q-gutter-x-xs">
+                <div class="league-box__header row items-center justify-between q-mb-xs">
                   <LeagueLevel
                     badge
                     :level="group.level"
@@ -200,13 +195,9 @@
                       isMobile ? 'font-size: 0.6rem' : 'font-size: 0.65rem'
                     "
                   />
-                  <q-badge
-                    color="grey-5"
-                    :label="`${group.members.length}/${group.size}`"
-                    rounded
-                    class="text-weight-bold"
-                    style="font-size: 9px; padding: 1px 4px"
-                  />
+                  <span class="text-caption text-grey-6 text-weight-medium league-box__count">
+                    {{ group.members.length }}/{{ group.size }}
+                  </span>
                 </div>
                 <div class="row q-gutter-xs">
                   <div
@@ -232,7 +223,7 @@
             >
               <div class="row items-center q-gutter-x-xs q-mb-xs">
                 <div
-                  class="text-caption text-weight-bolder text-grey-7 uppercase tracking-widest section-title"
+                  class="text-caption text-weight-bolder uppercase tracking-widest section-title"
                 >
                   Newcomers
                 </div>
@@ -242,7 +233,7 @@
                   rounded
                   class="text-weight-bold count-badge"
                 />
-                <q-icon name="person_add" size="12px" class="text-grey-6" />
+                <q-icon name="person_add" size="13px" class="text-amber-8" />
               </div>
               <div class="row q-gutter-xs">
                 <div
@@ -297,7 +288,7 @@
           >
             <div class="row items-center q-gutter-x-xs q-mb-xs">
               <div
-                class="text-caption text-weight-bolder text-grey-6 uppercase tracking-widest section-title"
+                class="text-caption text-weight-bolder uppercase tracking-widest section-title"
               >
                 Missing from previous season
               </div>
@@ -471,20 +462,10 @@ onMounted(async () => {
 }
 
 .announcement-card--signup {
-  background: radial-gradient(
-      circle at 100% 0%,
-      rgba(94, 53, 177, 0.09) 0%,
-      transparent 50%
-    ),
-    radial-gradient(
-      circle at 0% 100%,
-      rgba(255, 122, 89, 0.06) 0%,
-      transparent 40%
-    ),
-    linear-gradient(135deg, #fbf7ff 0%, #f6f0fe 50%, #ffffff 100%);
-  border: 1px solid rgba(94, 53, 177, 0.22);
-  border-top: 4px solid var(--q-accent);
-  box-shadow: 0 4px 20px rgba(94, 53, 177, 0.08), 0 1px 3px rgba(0, 0, 0, 0.03);
+  background: var(--kenner-card-bg);
+  border: 1px solid var(--kenner-border-color);
+  border-top: 3px solid var(--q-accent);
+  box-shadow: none;
   position: relative;
 }
 
@@ -492,30 +473,27 @@ onMounted(async () => {
   display: inline-flex;
   align-items: center;
   font-size: 10px;
-  font-weight: 800;
-  letter-spacing: 0.08em;
+  font-weight: 700;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: var(--q-accent);
-  background: rgba(94, 53, 177, 0.1);
-  border: 1px solid rgba(94, 53, 177, 0.2);
+  color: var(--kenner-accent-text, #5e35b1);
+  background: var(--kenner-accent-bg, rgba(94, 53, 177, 0.08));
+  border: 1px solid rgba(94, 53, 177, 0.15);
   padding: 1px 7px;
-  border-radius: 10px;
+  border-radius: 6px;
   line-height: 1.4;
 }
 
 .announcement-title {
-  color: #2e1065;
+  color: var(--kenner-text-strong, #0f172a);
 }
 
 .announcement-desc {
-  color: var(--kenner-text-secondary);
+  color: var(--kenner-text-secondary, #475569);
 }
 
-.signup-ornament {
-  opacity: 0.06;
-  pointer-events: none;
-  transform: rotate(-12deg) translateY(5%);
-  z-index: 0;
+.announcement-icon-color {
+  color: var(--kenner-accent-text, #5e35b1);
 }
 
 .content-layer {
@@ -523,41 +501,33 @@ onMounted(async () => {
 }
 
 .announcement-card:hover:not(.no-border-radius-mobile) {
-  box-shadow: 0 8px 25px rgba(94, 53, 177, 0.12), 0 2px 6px rgba(0, 0, 0, 0.04);
+  box-shadow: none;
 }
 
 .icon-wrapper {
-  width: 52px;
-  height: 52px;
-  border-radius: 14px;
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
   flex-shrink: 0;
-  background: linear-gradient(135deg, #7e57c2 0%, #5e35b1 100%);
-  box-shadow: 0 4px 14px rgba(94, 53, 177, 0.35);
+  background: var(--kenner-accent-bg, rgba(94, 53, 177, 0.08));
+  border: 1px solid rgba(94, 53, 177, 0.15);
+  box-shadow: none;
 }
 
 .icon-wrapper--mobile {
-  width: 42px;
-  height: 42px;
-  border-radius: 10px;
-  margin-right: 12px !important;
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  margin-right: 10px !important;
 }
 
 .minimized-icon-badge {
-  width: 24px;
-  height: 24px;
+  width: 26px;
+  height: 26px;
   border-radius: 6px;
-  background: linear-gradient(135deg, #7e57c2 0%, #5e35b1 100%);
-  box-shadow: 0 2px 6px rgba(94, 53, 177, 0.25);
-}
-
-.signup-btn {
-  box-shadow: 0 3px 10px rgba(94, 53, 177, 0.3);
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
-}
-
-.signup-btn:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 14px rgba(94, 53, 177, 0.4);
+  background: var(--kenner-accent-bg, rgba(94, 53, 177, 0.08));
+  border: 1px solid rgba(94, 53, 177, 0.15);
+  box-shadow: none;
 }
 
 .lh-tight {
@@ -567,7 +537,7 @@ onMounted(async () => {
 .section-title {
   font-size: 0.65rem;
   letter-spacing: 0.08em;
-  color: #581c87;
+  color: var(--kenner-text-secondary, #475569);
 }
 
 .count-badge {
