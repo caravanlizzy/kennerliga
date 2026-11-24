@@ -19,7 +19,7 @@
     <q-linear-progress
       :value="progress.percentage / 100"
       rounded
-      size="8px"
+      size="6px"
       class="season-progress-track q-mb-xs"
     >
       <KennerTooltip anchor="top middle" self="bottom middle">
@@ -145,74 +145,81 @@ const phaseLabel = computed(() => {
 
 <style scoped>
 .season-progress-bar-container {
-  background: var(--kenner-bg-subtle, rgba(0, 0, 0, 0.02));
+  background: var(--kenner-surface-subtle, rgba(0, 0, 0, 0.02));
   border: 1px solid var(--kenner-border-subtle, rgba(0, 0, 0, 0.08));
 }
 
 .progress-header-icon {
-  color: var(--kenner-red, #ff7a59);
+  color: var(--kenner-info-text, #1d4ed8);
 }
 
 .progress-percentage-text {
-  color: var(--kenner-red, #ff7a59);
+  color: var(--kenner-text-strong, #0f172a);
 }
 
 .season-progress-track {
-  height: 8px;
-  border-radius: 4px;
+  height: 6px;
+  border-radius: 3px;
 }
 
 .season-progress-track :deep(.q-linear-progress__track) {
-  background: rgba(255, 122, 89, 0.14) !important;
+  background: var(--kenner-surface-strong, rgba(0, 0, 0, 0.08)) !important;
   opacity: 1 !important;
 }
 
 .season-progress-track :deep(.q-linear-progress__model) {
-  background: linear-gradient(90deg, #ff7a59 0%, #ec4899 100%) !important;
-  border-radius: 4px;
-  box-shadow: 0 1px 3px rgba(236, 72, 153, 0.25);
+  background: linear-gradient(90deg, #3b82f6 0%, #2563eb 100%) !important;
+  border-radius: 3px;
 }
 
 .metric-pill {
   font-size: 11px;
   line-height: 1.4;
-  padding: 2px 6px;
-  background: rgba(0, 0, 0, 0.04);
+  padding: 2px 7px;
+  border-radius: 4px;
+  background: rgba(0, 0, 0, 0.03);
+  border: 1px solid var(--kenner-border-subtle, rgba(0, 0, 0, 0.06));
 }
 
 .metric-pill--complete {
-  background: rgba(33, 186, 69, 0.08);
-  color: var(--q-positive, #21ba45);
+  background: rgba(34, 197, 94, 0.08);
+  border-color: rgba(34, 197, 94, 0.2);
+  color: var(--kenner-success-text, #15803d);
 }
 
 .metric-pill--pending {
-  color: var(--kenner-text-secondary, #555);
+  color: var(--kenner-text-secondary, #475569);
 }
 
 body.body--dark .season-progress-bar-container {
-  background: rgba(255, 255, 255, 0.03);
-  border-color: rgba(255, 255, 255, 0.1);
+  background: var(--kenner-surface-subtle, rgba(255, 255, 255, 0.03));
+  border-color: var(--kenner-border-subtle, rgba(255, 255, 255, 0.1));
 }
 
-body.body--dark .progress-header-icon,
+body.body--dark .progress-header-icon {
+  color: #60a5fa;
+}
+
 body.body--dark .progress-percentage-text {
-  color: #ff8c6f;
+  color: var(--kenner-text-strong, #f8fafc);
 }
 
 body.body--dark .season-progress-track :deep(.q-linear-progress__track) {
-  background: rgba(255, 122, 89, 0.18) !important;
+  background: rgba(255, 255, 255, 0.1) !important;
 }
 
 body.body--dark .season-progress-track :deep(.q-linear-progress__model) {
-  background: linear-gradient(90deg, #ff7a59 0%, #ec4899 100%) !important;
-  box-shadow: 0 1px 4px rgba(236, 72, 153, 0.4);
+  background: linear-gradient(90deg, #60a5fa 0%, #3b82f6 100%) !important;
 }
 
 body.body--dark .metric-pill {
-  background: rgba(255, 255, 255, 0.06);
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.08);
 }
 
 body.body--dark .metric-pill--complete {
-  background: rgba(33, 186, 69, 0.15);
+  background: rgba(34, 197, 94, 0.15);
+  border-color: rgba(34, 197, 94, 0.3);
+  color: #4ade80;
 }
 </style>
