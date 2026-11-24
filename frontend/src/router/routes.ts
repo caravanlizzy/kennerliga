@@ -191,7 +191,7 @@ const routes: RouteRecordRaw[] = [
         props: { desktop: LeaderboardMobile, mobile: LeaderboardMobile },
         meta: {
           icon: 'stars',
-          label: 'Hall of Fame & Records',
+          label: 'Hall of Fame',
           requiresAuth: true,
         },
       },

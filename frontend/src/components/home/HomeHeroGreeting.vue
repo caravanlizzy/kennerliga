@@ -48,7 +48,7 @@
           flat
           color="primary"
           icon="stars"
-          label="Hall of Fame & Records"
+          label="Hall of Fame"
           size="sm"
           :to="{ name: 'statistics' }"
         />

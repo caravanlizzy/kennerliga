@@ -3,7 +3,7 @@ export default {
   meta: {
     requiresAuth: true,
     requiresAdmin: false,
-    label: 'Hall of Fame & Records',
+    label: 'Hall of Fame',
     icon: 'stars',
   },
   children: [
@@ -11,7 +11,7 @@ export default {
       path: '',
       name: 'statistics',
       component: () => import('pages/statistics/StatisticsPage.vue'),
-      meta: { icon: 'stars', label: 'Hall of Fame & Records' },
+      meta: { icon: 'stars', label: 'Hall of Fame' },
     },
   ],
 };

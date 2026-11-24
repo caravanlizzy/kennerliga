@@ -41,7 +41,7 @@
         <DrawerItem
           icon="stars"
           icon-color="primary"
-          label="Hall of Fame & Records"
+          label="Hall of Fame"
           forward-name="statistics"
         />
         <DrawerItem
