@@ -4,7 +4,7 @@
     title="Live Action"
     icon="bolt"
     color="info"
-    class="col-12"
+    class="col-12 full-height"
     no-margin
   >
     <template #header-extra>

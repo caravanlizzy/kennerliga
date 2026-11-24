@@ -3,7 +3,7 @@
     id="seasons"
     icon="military_tech"
     title="Seasons"
-    class="col-12"
+    class="col-12 full-height"
     color="primary"
     no-margin
   >

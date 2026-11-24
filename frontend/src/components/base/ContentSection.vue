@@ -124,6 +124,8 @@ onUnmounted(() => {
   border: 1px solid var(--kenner-border-color);
   box-shadow: var(--kenner-card-shadow);
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
 
   &.content-section--flat {
     border: none !important;
@@ -204,6 +206,7 @@ onUnmounted(() => {
 .section-header {
   padding: 0 0 10px 0;
   border-bottom: 1px solid var(--kenner-border-subtle, rgba(0, 0, 0, 0.06));
+  flex-shrink: 0;
 
   :deep(.q-item) {
     padding: 0;
@@ -213,6 +216,7 @@ onUnmounted(() => {
 
 .section-content {
   z-index: 1;
+  flex: 1 1 auto;
 }
 
 .section-watermark {

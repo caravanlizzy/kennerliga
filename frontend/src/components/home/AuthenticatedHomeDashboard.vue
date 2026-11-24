@@ -3,9 +3,9 @@
     <!-- Hero Greeting & Quick Action Hub -->
     <HomeHeroGreeting />
 
-    <div class="row q-col-gutter-md">
+    <div class="row q-col-gutter-md items-stretch">
       <!-- Left Column: Primary Info -->
-      <div class="col-12 col-md-8">
+      <div class="col-12 col-md-8 column">
         <HomeSeasonSection
           v-model:selectedSeasonYear="selectedSeasonYear"
           v-model:selectedSeasonMonth="selectedSeasonMonth"
@@ -15,13 +15,14 @@
           :season-month-options="seasonMonthOptions"
           :loading="loading"
           :refreshing="refreshing"
+          class="col full-height"
           @select-current-season="homeSeasonStore.selectCurrentSeason"
         />
       </div>
 
       <!-- Right Column: Secondary Info -->
-      <div class="col-12 col-md-4">
-        <HomeLiveActionSection />
+      <div class="col-12 col-md-4 column">
+        <HomeLiveActionSection class="col full-height" />
       </div>
     </div>
   </div>
