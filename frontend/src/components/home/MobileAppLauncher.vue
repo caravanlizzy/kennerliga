@@ -67,15 +67,11 @@ function navigateTo(route: Record<string, unknown>) {
 <style scoped lang="scss">
 .launcher-container {
   width: 100%;
-  background: #faf8f5;
+  background: var(--kenner-bg-page);
   display: flex;
   flex-direction: column;
   min-height: 100%;
   flex: 1 1 auto;
-
-  .body--dark & {
-    background: var(--kenner-bg-page);
-  }
 }
 
 .launcher-row {

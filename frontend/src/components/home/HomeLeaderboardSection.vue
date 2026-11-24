@@ -5,6 +5,7 @@
     title="Hall of Fame"
     class="col-12"
     color="secondary"
+    no-margin
   >
     <template #header-extra>
       <div

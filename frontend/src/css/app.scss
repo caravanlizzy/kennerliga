@@ -1,32 +1,32 @@
 // app global css in SCSS form
 :root {
   --kenner-card-radius: 16px;
-  --kenner-card-shadow: none;
-  --kenner-card-shadow-hover: none;
-  --kenner-border-color: rgba(0, 0, 0, 0.08);
-  --kenner-border-subtle: rgba(0, 0, 0, 0.05);
+  --kenner-card-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.03), 0 1px 3px rgba(0, 0, 0, 0.02);
+  --kenner-card-shadow-hover: 0 8px 24px -4px rgba(0, 0, 0, 0.06);
+  --kenner-border-color: rgba(0, 0, 0, 0.06);
+  --kenner-border-subtle: rgba(0, 0, 0, 0.04);
   --kenner-bg-glass: rgba(255, 255, 255, 0.98);
   --kenner-bg-glass-card: rgba(255, 255, 255, 0.7);
   --kenner-card-bg: #ffffff;
   --kenner-max-width: 1440px;
   --kenner-max-width-text: 1100px;
-  --kenner-bg-page: #f8fafc;
-  --kenner-bg-page-accent: #f1f5f9;
+  --kenner-bg-page: #faf9f5;
+  --kenner-bg-page-accent: #f2f0eb;
   --kenner-input-bg: rgba(0, 0, 0, 0.03);
-  --kenner-input-bg-hover: rgba(0, 0, 0, 0.06);
+  --kenner-input-bg-hover: rgba(0, 0, 0, 0.05);
   --kenner-input-bg-focus: #ffffff;
   --kenner-input-label-bg: #ffffff;
   --kenner-brand-text: #1a2233;
   --kenner-text-color: #1e293b;
   --kenner-text-muted: #64748b;
-  --kenner-hover-bg: rgba(0, 0, 0, 0.04);
+  --kenner-hover-bg: rgba(0, 0, 0, 0.03);
 
   // Surfaces (layered from page → card → nested panels)
-  --kenner-surface-subtle: #f8fafc;
-  --kenner-surface-muted: #f1f5f9;
-  --kenner-surface-strong: #e2e8f0;
+  --kenner-surface-subtle: #f5f4ef;
+  --kenner-surface-muted: #eceae3;
+  --kenner-surface-strong: #dedbd2;
   --kenner-surface-overlay: rgba(255, 255, 255, 0.85);
-  --kenner-border-strong: rgba(0, 0, 0, 0.12);
+  --kenner-border-strong: rgba(0, 0, 0, 0.10);
 
   // Text scale
   --kenner-text-strong: #0f172a;
@@ -36,50 +36,52 @@
 
   // Medals
   --kenner-gold-text: #b45309;
-  --kenner-gold-bg: rgba(245, 158, 11, 0.12);
-  --kenner-gold-border: rgba(245, 158, 11, 0.3);
+  --kenner-gold-bg: rgba(245, 158, 11, 0.10);
+  --kenner-gold-border: rgba(245, 158, 11, 0.25);
   --kenner-silver-text: #475569;
-  --kenner-silver-bg: rgba(148, 163, 184, 0.15);
-  --kenner-silver-border: rgba(148, 163, 184, 0.3);
+  --kenner-silver-bg: rgba(148, 163, 184, 0.12);
+  --kenner-silver-border: rgba(148, 163, 184, 0.25);
   --kenner-bronze-text: #9a3412;
-  --kenner-bronze-bg: rgba(217, 119, 6, 0.12);
-  --kenner-bronze-border: rgba(249, 115, 22, 0.3);
+  --kenner-bronze-bg: rgba(217, 119, 6, 0.10);
+  --kenner-bronze-border: rgba(249, 115, 22, 0.25);
 
   // Status tints
   --kenner-success-text: #15803d;
-  --kenner-success-bg: rgba(34, 197, 94, 0.1);
+  --kenner-success-bg: rgba(34, 197, 94, 0.08);
   --kenner-danger-text: #b91c1c;
-  --kenner-danger-bg: rgba(239, 68, 68, 0.08);
+  --kenner-danger-bg: rgba(239, 68, 68, 0.06);
   --kenner-warning-text: #b45309;
-  --kenner-warning-bg: rgba(245, 158, 11, 0.1);
+  --kenner-warning-bg: rgba(245, 158, 11, 0.08);
   --kenner-info-text: #1d4ed8;
-  --kenner-info-bg: rgba(59, 130, 246, 0.08);
+  --kenner-info-bg: rgba(59, 130, 246, 0.06);
   --kenner-accent-text: #5e35b1;
-  --kenner-accent-bg: rgba(94, 53, 177, 0.08);
+  --kenner-accent-bg: rgba(94, 53, 177, 0.06);
 }
 
 body.body--dark {
-  --kenner-border-color: rgba(255, 255, 255, 0.1);
-  --kenner-border-subtle: rgba(255, 255, 255, 0.06);
-  --kenner-bg-glass: rgba(22, 22, 26, 0.95);
-  --kenner-bg-glass-card: rgba(28, 28, 34, 0.75);
-  --kenner-card-bg: #1a1a20;
-  --kenner-bg-page: #101014;
-  --kenner-bg-page-accent: #17171d;
-  --kenner-input-bg: rgba(255, 255, 255, 0.06);
-  --kenner-input-bg-hover: rgba(255, 255, 255, 0.1);
-  --kenner-input-bg-focus: #24242d;
-  --kenner-input-label-bg: #24242d;
+  --kenner-border-color: rgba(255, 255, 255, 0.08);
+  --kenner-border-subtle: rgba(255, 255, 255, 0.05);
+  --kenner-bg-glass: rgba(20, 20, 24, 0.95);
+  --kenner-bg-glass-card: rgba(28, 28, 36, 0.75);
+  --kenner-card-bg: #1c1c24;
+  --kenner-card-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.35);
+  --kenner-card-shadow-hover: 0 8px 24px -4px rgba(0, 0, 0, 0.45);
+  --kenner-bg-page: #141418;
+  --kenner-bg-page-accent: #191922;
+  --kenner-input-bg: rgba(255, 255, 255, 0.05);
+  --kenner-input-bg-hover: rgba(255, 255, 255, 0.08);
+  --kenner-input-bg-focus: #242430;
+  --kenner-input-label-bg: #242430;
   --kenner-brand-text: #f8fafc;
   --kenner-text-color: #f1f5f9;
   --kenner-text-muted: #94a3b8;
-  --kenner-hover-bg: rgba(255, 255, 255, 0.06);
+  --kenner-hover-bg: rgba(255, 255, 255, 0.05);
 
-  --kenner-surface-subtle: #202028;
-  --kenner-surface-muted: #26262f;
-  --kenner-surface-strong: #32323c;
-  --kenner-surface-overlay: rgba(26, 26, 32, 0.85);
-  --kenner-border-strong: rgba(255, 255, 255, 0.16);
+  --kenner-surface-subtle: #22222c;
+  --kenner-surface-muted: #282834;
+  --kenner-surface-strong: #343444;
+  --kenner-surface-overlay: rgba(28, 28, 36, 0.85);
+  --kenner-border-strong: rgba(255, 255, 255, 0.14);
 
   --kenner-text-strong: #f8fafc;
   --kenner-text-secondary: #cbd5e1;
@@ -87,28 +89,28 @@ body.body--dark {
   --kenner-primary-text: #e2dede;
 
   --kenner-gold-text: #fbbf24;
-  --kenner-gold-bg: rgba(245, 158, 11, 0.18);
-  --kenner-gold-border: rgba(245, 158, 11, 0.4);
+  --kenner-gold-bg: rgba(245, 158, 11, 0.15);
+  --kenner-gold-border: rgba(245, 158, 11, 0.35);
   --kenner-silver-text: #cbd5e1;
-  --kenner-silver-bg: rgba(148, 163, 184, 0.18);
-  --kenner-silver-border: rgba(148, 163, 184, 0.35);
+  --kenner-silver-bg: rgba(148, 163, 184, 0.15);
+  --kenner-silver-border: rgba(148, 163, 184, 0.3);
   --kenner-bronze-text: #fdba74;
-  --kenner-bronze-bg: rgba(234, 88, 12, 0.18);
-  --kenner-bronze-border: rgba(249, 115, 22, 0.4);
+  --kenner-bronze-bg: rgba(234, 88, 12, 0.15);
+  --kenner-bronze-border: rgba(249, 115, 22, 0.35);
 
   --kenner-success-text: #4ade80;
-  --kenner-success-bg: rgba(34, 197, 94, 0.15);
+  --kenner-success-bg: rgba(34, 197, 94, 0.12);
   --kenner-danger-text: #f87171;
-  --kenner-danger-bg: rgba(239, 68, 68, 0.15);
+  --kenner-danger-bg: rgba(239, 68, 68, 0.12);
   --kenner-warning-text: #fbbf24;
-  --kenner-warning-bg: rgba(245, 158, 11, 0.15);
+  --kenner-warning-bg: rgba(245, 158, 11, 0.12);
   --kenner-info-text: #60a5fa;
-  --kenner-info-bg: rgba(59, 130, 246, 0.15);
+  --kenner-info-bg: rgba(59, 130, 246, 0.12);
   --kenner-accent-text: #b39ddb;
-  --kenner-accent-bg: rgba(149, 117, 205, 0.18);
+  --kenner-accent-bg: rgba(149, 117, 205, 0.15);
 
   // Quasar's own dark surfaces follow our palette
-  --q-dark: #1a1a20;
+  --q-dark: #1c1c24;
   --q-dark-page: #101014;
 
   background-color: var(--kenner-bg-page);

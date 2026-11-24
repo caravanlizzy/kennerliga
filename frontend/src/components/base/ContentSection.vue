@@ -11,7 +11,7 @@
     <div
       class="section-watermark absolute-top-right q-ma-md"
       :class="`text-${color}`"
-      style="opacity: 0.03; pointer-events: none; transform: rotate(-15deg)"
+      style="opacity: 0.02; pointer-events: none; transform: rotate(-15deg)"
     >
       <q-icon :name="icon" size="120px" />
     </div>
@@ -149,15 +149,16 @@ onUnmounted(() => {
     }
   }
 
-  // Sharp accent top stripe
+  // Soft accent top border
   &::before {
     content: '';
     position: absolute;
     top: 0;
     left: 0;
     right: 0;
-    height: 3px;
+    height: 2px;
     background: var(--accent-color);
+    opacity: 0.8;
     pointer-events: none;
     z-index: 2;
   }

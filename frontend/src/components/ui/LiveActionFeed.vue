@@ -46,7 +46,7 @@
       </div>
 
       <div class="column">
-        <template v-for="(event, index) in filteredEvents" :key="event.id">
+        <template v-for="(event, index) in displayedEvents" :key="event.id">
           <div
             :class="
               compact
@@ -280,10 +280,30 @@
             </div>
           </div>
           <q-separator
-            v-if="index < filteredEvents.length - 1"
+            v-if="index < displayedEvents.length - 1"
             class="q-my-xs"
           />
         </template>
+
+        <!-- Progressive disclosure toggle -->
+        <div
+          v-if="maxItems && filteredEvents.length > maxItems"
+          class="text-center q-pt-sm"
+        >
+          <KennerButton
+            flat
+            dense
+            size="sm"
+            color="primary"
+            :icon="showAll ? 'expand_less' : 'expand_more'"
+            :label="
+              showAll
+                ? 'Show less'
+                : `Show more (${filteredEvents.length - maxItems})`
+            "
+            @click="showAll = !showAll"
+          />
+        </div>
       </div>
     </div>
   </div>
@@ -297,6 +317,7 @@ import { TLiveEvent, TLiveEventType } from 'src/types';
 import { fetchLiveActionEvents } from 'src/services/seasonService';
 import { useUpdateStore } from 'stores/updateStore';
 import { useCachedResource } from 'src/composables/cachedResource';
+import KennerButton from 'components/base/KennerButton.vue';
 
 interface Props {
   leagueId?: number;
@@ -304,6 +325,7 @@ interface Props {
   hideFilters?: boolean;
   hideTimestamp?: boolean;
   compact?: boolean;
+  maxItems?: number;
   emptyText?: string;
 }
 
@@ -313,12 +335,14 @@ const props = withDefaults(defineProps<Props>(), {
   hideFilters: false,
   hideTimestamp: false,
   compact: false,
+  maxItems: undefined,
   emptyText: 'No live actions yet.',
 });
 
 const $q = useQuasar();
 const updateStore = useUpdateStore();
 const { getLeagueColor } = leagueColors();
+const showAll = ref(false);
 
 const cacheKey = computed(() => {
   if (props.leagueId) return `live-action-league-${props.leagueId}`;
@@ -362,6 +386,11 @@ const filteredEvents = computed(() => {
     (e) =>
       e.leagueLevel !== undefined && selectedLeagues.value.has(e.leagueLevel)
   );
+});
+
+const displayedEvents = computed(() => {
+  if (!props.maxItems || showAll.value) return filteredEvents.value;
+  return filteredEvents.value.slice(0, props.maxItems);
 });
 
 function toggleLeagueFilter(lvl: number | string) {

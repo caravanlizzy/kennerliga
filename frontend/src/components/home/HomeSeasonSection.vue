@@ -5,6 +5,7 @@
     title="Seasons"
     class="col-12"
     color="primary"
+    no-margin
   >
     <template #title>
       <div class="row items-center no-wrap q-gutter-x-sm">

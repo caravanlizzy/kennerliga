@@ -1,9 +1,25 @@
 <template>
   <div class="column col q-pt-none">
+    <!-- Hero Greeting & Quick Action Hub -->
+    <HomeHeroGreeting
+      @select-current-season="homeSeasonStore.selectCurrentSeason"
+    />
+
     <div class="row q-col-gutter-md">
-      <!-- Left Column: Primary Info -->
+      <!-- Left Column: Primary Info with Segmented Toggle -->
       <div class="col-12 col-md-8">
+        <div class="row items-center justify-between q-mb-sm">
+          <SmoothSwitch
+            v-model="activeTab"
+            :options="[
+              { label: 'Current Season', value: 'season', icon: 'military_tech' },
+              { label: 'Hall of Fame', value: 'leaderboard', icon: 'stars' },
+            ]"
+          />
+        </div>
+
         <HomeSeasonSection
+          v-show="activeTab === 'season'"
           v-model:selectedSeasonYear="selectedSeasonYear"
           v-model:selectedSeasonMonth="selectedSeasonMonth"
           :selected-season-id="selectedSeasonId"
@@ -16,9 +32,9 @@
         />
 
         <HomeLeaderboardSection
+          v-show="activeTab === 'leaderboard'"
           v-model:year="selectedYear"
           :years="availableYears"
-          class="q-mt-md"
         />
       </div>
 
@@ -32,15 +48,19 @@
 
 <script setup lang="ts">
 defineOptions({ name: 'AuthenticatedHomeDashboard' });
-import { onMounted, watch } from 'vue';
+import { ref, onMounted, watch } from 'vue';
 import { storeToRefs } from 'pinia';
 import { useUserStore } from 'stores/userStore';
 import { useHomeSeasonStore } from 'stores/homeSeasonStore';
+import HomeHeroGreeting from 'components/home/HomeHeroGreeting.vue';
+import SmoothSwitch from 'components/base/SmoothSwitch.vue';
 import HomeSeasonSection from 'components/home/HomeSeasonSection.vue';
 import HomeLeaderboardSection from 'components/home/HomeLeaderboardSection.vue';
 import HomeLiveActionSection from 'components/home/HomeLiveActionSection.vue';
 
 const { isAuthenticated } = storeToRefs(useUserStore());
+
+const activeTab = ref<'season' | 'leaderboard'>('season');
 
 // Season selection state now lives in a Pinia store, so it persists across
 // navigation. Re-mounting this component reuses the cached data and only
