@@ -11,17 +11,6 @@
             class="row items-center q-gutter-x-sm q-gutter-y-xs"
             :class="isMobile ? 'q-mb-xs' : 'q-mb-sm'"
           >
-            <q-btn
-              flat
-              dense
-              no-caps
-              size="sm"
-              color="grey-7"
-              icon="arrow_back"
-              label="Statistics"
-              class="q-mr-xs"
-              @click="$emit('back')"
-            />
             <q-badge
               color="primary"
               text-color="white"
@@ -148,7 +137,6 @@ defineProps<{
 }>();
 
 defineEmits<{
-  (e: 'back'): void;
   (e: 'viewConfig', gameId: number): void;
   (e: 'editGame', gameId: number): void;
   (e: 'update:selectedPlayerCounts', counts: string[]): void;

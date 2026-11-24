@@ -38,7 +38,6 @@
         :selected-years="selectedYears"
         :year-options="yearOptions"
         :years-display-value="yearsDisplayValue"
-        @back="router.push({ name: 'statistics' })"
         @view-config="
           router.push({
             name: 'game-config',
