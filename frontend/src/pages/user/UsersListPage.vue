@@ -8,47 +8,12 @@
       :class="isMobile ? 'q-col-gutter-xs' : 'q-col-gutter-md'"
     >
       <!-- Player Count Filter -->
-      <div class="filter-item row items-center q-gutter-x-xs">
-        <div
-          class="row items-center text-caption text-weight-bold text-grey-8 filter-label"
-        >
-          <q-icon
-            name="groups"
-            :size="isMobile ? '16px' : '18px'"
-            class="q-mr-xs text-primary"
-          />
-          <span v-if="!isMobile">Players:</span>
-        </div>
-        <div class="row q-gutter-xs items-center">
-          <q-chip
-            clickable
-            dense
-            :outline="!isAllPlayerCountsSelected"
-            :color="isAllPlayerCountsSelected ? 'primary' : 'grey-7'"
-            text-color="white"
-            size="sm"
-            class="text-weight-bold"
-            style="border-radius: 4px"
-            @click="toggleAllPlayerCounts"
-          >
-            All
-          </q-chip>
-          <q-chip
-            v-for="pc in availablePlayerCounts"
-            :key="pc"
-            clickable
-            dense
-            :outline="!selectedPlayerCounts.includes(pc)"
-            :color="selectedPlayerCounts.includes(pc) ? 'primary' : 'grey-7'"
-            text-color="white"
-            size="sm"
-            class="text-weight-bold"
-            style="border-radius: 4px"
-            @click="togglePlayerCount(pc)"
-          >
-            {{ pc.toUpperCase() }}
-          </q-chip>
-        </div>
+      <div class="filter-item row items-center">
+        <KennerPlayerCountFilter
+          v-model="selectedPlayerCounts"
+          :available-counts="availablePlayerCounts"
+          label="Players:"
+        />
       </div>
 
       <!-- Years Multi-select Filter -->
@@ -298,6 +263,7 @@
 import KennerTable from 'components/tables/KennerTable.vue';
 import KennerButton from 'components/base/KennerButton.vue';
 import KennerInput from 'components/base/KennerInput.vue';
+import KennerPlayerCountFilter from 'components/base/KennerPlayerCountFilter.vue';
 import LeagueLevel from 'components/season/LeagueLevel.vue';
 import UserAvatar from 'components/ui/UserAvatar.vue';
 import { useRouter } from 'vue-router';
@@ -324,9 +290,6 @@ const { setDialog } = useDialog();
 const users = ref<TUserDto[]>([]);
 const availablePlayerCounts = ['2p', '3p', '4p'];
 const selectedPlayerCounts = ref<string[]>(['4p']);
-const isAllPlayerCountsSelected = computed(
-  () => selectedPlayerCounts.value.length === 0
-);
 const selectedYears = ref<number[]>([]);
 const availableYears = ref<number[]>([]);
 const loading = ref(false);
@@ -526,28 +489,6 @@ function isBestElo(row: TUserDto) {
     val !== undefined &&
     Math.round(val) === bestElo.value
   );
-}
-
-function togglePlayerCount(val: string) {
-  if (val === 'all') {
-    selectedPlayerCounts.value = [];
-    return;
-  }
-  const idx = selectedPlayerCounts.value.indexOf(val);
-  if (idx >= 0) {
-    selectedPlayerCounts.value.splice(idx, 1);
-  } else {
-    selectedPlayerCounts.value.push(val);
-  }
-
-  // If all individual player counts are selected, automatically switch to "All" (empty array)
-  if (selectedPlayerCounts.value.length === availablePlayerCounts.length) {
-    selectedPlayerCounts.value = [];
-  }
-}
-
-function toggleAllPlayerCounts() {
-  selectedPlayerCounts.value = [];
 }
 
 async function loadUsers() {

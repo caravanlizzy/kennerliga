@@ -46,52 +46,11 @@
             :class="isMobile ? 'q-col-gutter-xs no-wrap' : 'q-col-gutter-sm'"
           >
             <div :class="isMobile ? 'col-auto' : 'col-12 col-sm-auto'">
-              <div
-                class="filter-box row items-center q-gutter-x-xs q-py-xs"
-                :class="isMobile ? 'q-px-xs filter-box--mobile' : 'q-px-sm'"
-              >
-                <q-icon
-                  name="groups"
-                  :size="isMobile ? '16px' : '18px'"
-                  class="q-mr-xs text-primary"
-                />
-                <span
-                  v-if="!isMobile"
-                  class="text-caption text-weight-bold text-grey-8 q-mr-xs"
-                >
-                  Players:
-                </span>
-                <q-chip
-                  clickable
-                  dense
-                  :outline="!isAllPlayerCountsSelected"
-                  :color="isAllPlayerCountsSelected ? 'primary' : 'grey-7'"
-                  text-color="white"
-                  size="sm"
-                  class="text-weight-bold"
-                  style="border-radius: 4px"
-                  @click="toggleAllPlayerCounts"
-                >
-                  All
-                </q-chip>
-                <q-chip
-                  v-for="pc in availablePlayerCounts"
-                  :key="pc"
-                  clickable
-                  dense
-                  :outline="!selectedPlayerCounts.includes(pc)"
-                  :color="
-                    selectedPlayerCounts.includes(pc) ? 'primary' : 'grey-7'
-                  "
-                  text-color="white"
-                  size="sm"
-                  class="text-weight-bold"
-                  style="border-radius: 4px"
-                  @click="togglePlayerCount(pc)"
-                >
-                  {{ pc.toUpperCase() }}
-                </q-chip>
-              </div>
+              <KennerPlayerCountFilter
+                v-model="selectedPlayerCounts"
+                :available-counts="availablePlayerCounts"
+                label="Players:"
+              />
             </div>
 
             <div
@@ -156,6 +115,7 @@ defineOptions({ name: 'StatisticsPage' });
 
 import { computed, onMounted, ref } from 'vue';
 import KennerSelect from 'components/base/KennerSelect.vue';
+import KennerPlayerCountFilter from 'components/base/KennerPlayerCountFilter.vue';
 import GameStatistics from 'components/statistics/GameStatistics.vue';
 import PlayerStatistics from 'components/statistics/PlayerStatistics.vue';
 import { useUserStore } from 'stores/userStore';
@@ -181,29 +141,9 @@ const yearsDisplayValue = computed(() =>
 // "All". A backend-friendly value (undefined when All) is derived below.
 const availablePlayerCounts = ['2p', '3p', '4p'];
 const selectedPlayerCounts = ref<string[]>(['4p']);
-const isAllPlayerCountsSelected = computed(
-  () => selectedPlayerCounts.value.length === 0
-);
 const playerCountsParam = computed(() =>
   selectedPlayerCounts.value.length > 0 ? selectedPlayerCounts.value : undefined
 );
-
-function togglePlayerCount(val: string) {
-  const idx = selectedPlayerCounts.value.indexOf(val);
-  if (idx >= 0) {
-    selectedPlayerCounts.value.splice(idx, 1);
-  } else {
-    selectedPlayerCounts.value.push(val);
-  }
-  // If every individual count is selected, collapse to "All" (empty array).
-  if (selectedPlayerCounts.value.length === availablePlayerCounts.length) {
-    selectedPlayerCounts.value = [];
-  }
-}
-
-function toggleAllPlayerCounts() {
-  selectedPlayerCounts.value = [];
-}
 
 onMounted(async () => {
   const years = await getAvailableYears();
@@ -226,18 +166,6 @@ onMounted(async () => {
     width: 32px;
     height: 32px;
     border-radius: 8px;
-  }
-}
-
-.filter-box {
-  background: var(--kenner-card-bg);
-  border: 1px solid var(--kenner-border-color);
-  border-radius: 8px;
-  min-height: 40px;
-
-  &--mobile {
-    min-height: 32px;
-    padding: 2px 4px;
   }
 }
 

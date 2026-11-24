@@ -35,7 +35,6 @@
         :is-admin="isAdmin"
         :available-player-counts="availablePlayerCounts"
         :selected-player-counts="selectedPlayerCounts"
-        :is-all-player-counts-selected="isAllPlayerCountsSelected"
         :selected-years="selectedYears"
         :year-options="yearOptions"
         :years-display-value="yearsDisplayValue"
@@ -52,8 +51,7 @@
             params: { id: $event },
           })
         "
-        @toggle-player-count="togglePlayerCount"
-        @toggle-all-player-counts="toggleAllPlayerCounts"
+        @update:selected-player-counts="selectedPlayerCounts = $event"
         @update:selected-years="selectedYears = $event"
       />
 
@@ -189,29 +187,32 @@ const activeTab = ref<'leaderboard' | 'matches' | 'factions'>('leaderboard');
 // Filters
 const selectedYears = ref<number[]>([]);
 const selectedPlayerCounts = ref<string[]>([]);
-const availablePlayerCounts = ['2p', '3p', '4p', '5p', '6p'];
+const availablePlayerCounts = computed(() => {
+  const min = Math.max(2, stats.value?.game?.min_players ?? 2);
+  const max = Math.min(4, Math.max(min, stats.value?.game?.max_players ?? 4));
+  const counts: string[] = [];
+  for (let i = min; i <= max; i++) {
+    counts.push(`${i}p`);
+  }
+  return counts.length > 0 ? counts : ['2p', '3p', '4p'];
+});
 
 const yearOptions = [
   { label: '2026', value: 2026 },
   { label: '2025', value: 2025 },
 ];
 
-const isAllPlayerCountsSelected = computed(
-  () => selectedPlayerCounts.value.length === 0
-);
-
-function toggleAllPlayerCounts() {
-  selectedPlayerCounts.value = [];
-}
-
-function togglePlayerCount(count: string) {
-  const index = selectedPlayerCounts.value.indexOf(count);
-  if (index === -1) {
-    selectedPlayerCounts.value.push(count);
-  } else {
-    selectedPlayerCounts.value.splice(index, 1);
+watch(availablePlayerCounts, (validCounts) => {
+  if (selectedPlayerCounts.value.length > 0) {
+    const filtered = selectedPlayerCounts.value.filter((pc) =>
+      validCounts.includes(pc)
+    );
+    if (filtered.length !== selectedPlayerCounts.value.length) {
+      selectedPlayerCounts.value =
+        filtered.length === validCounts.length ? [] : filtered;
+    }
   }
-}
+});
 
 const yearsDisplayValue = computed(() => {
   if (selectedYears.value.length === 0) return 'All Years';

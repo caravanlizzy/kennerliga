@@ -97,52 +97,14 @@
         class="row items-center justify-between"
         :class="isMobile ? 'q-col-gutter-xs' : 'q-col-gutter-sm'"
       >
-        <!-- Player Count Chips -->
+        <!-- Player Count Filter -->
         <div :class="isMobile ? 'col-auto' : 'col-12 col-sm-auto'">
-          <div
-            class="filter-box row items-center q-gutter-x-xs q-py-xs"
-            :class="isMobile ? 'q-px-xs filter-box--mobile' : 'q-px-sm'"
-          >
-            <q-icon
-              name="groups"
-              :size="isMobile ? '16px' : '18px'"
-              class="q-mr-xs text-primary"
-            />
-            <span
-              v-if="!isMobile"
-              class="text-caption text-weight-bold text-grey-8 q-mr-xs"
-            >
-              Player Count:
-            </span>
-            <q-chip
-              clickable
-              dense
-              :outline="!isAllPlayerCountsSelected"
-              :color="isAllPlayerCountsSelected ? 'primary' : 'grey-7'"
-              text-color="white"
-              size="sm"
-              class="text-weight-bold"
-              style="border-radius: 4px"
-              @click="$emit('toggleAllPlayerCounts')"
-            >
-              All
-            </q-chip>
-            <q-chip
-              v-for="pc in availablePlayerCounts"
-              :key="pc"
-              clickable
-              dense
-              :outline="!selectedPlayerCounts.includes(pc)"
-              :color="selectedPlayerCounts.includes(pc) ? 'primary' : 'grey-7'"
-              text-color="white"
-              size="sm"
-              class="text-weight-bold"
-              style="border-radius: 4px"
-              @click="$emit('togglePlayerCount', pc)"
-            >
-              {{ pc.toUpperCase() }}
-            </q-chip>
-          </div>
+          <KennerPlayerCountFilter
+            :model-value="selectedPlayerCounts"
+            :available-counts="availablePlayerCounts"
+            label="Player Count:"
+            @update:model-value="$emit('update:selectedPlayerCounts', $event)"
+          />
         </div>
 
         <!-- Years Filter -->
@@ -169,6 +131,7 @@
 <script setup lang="ts">
 import KennerButton from 'components/base/KennerButton.vue';
 import KennerSelect from 'components/base/KennerSelect.vue';
+import KennerPlayerCountFilter from 'components/base/KennerPlayerCountFilter.vue';
 import type { TGameDto } from 'src/types';
 import { useResponsive } from 'src/composables/responsive';
 
@@ -179,7 +142,6 @@ defineProps<{
   isAdmin: boolean;
   availablePlayerCounts: string[];
   selectedPlayerCounts: string[];
-  isAllPlayerCountsSelected: boolean;
   selectedYears: number[];
   yearOptions: any[];
   yearsDisplayValue: string;
@@ -189,8 +151,7 @@ defineEmits<{
   (e: 'back'): void;
   (e: 'viewConfig', gameId: number): void;
   (e: 'editGame', gameId: number): void;
-  (e: 'toggleAllPlayerCounts'): void;
-  (e: 'togglePlayerCount', pc: string): void;
+  (e: 'update:selectedPlayerCounts', counts: string[]): void;
   (e: 'update:selectedYears', years: number[]): void;
 }>();
 </script>
@@ -212,17 +173,6 @@ defineEmits<{
     rgba(var(--q-primary-rgb, 25, 118, 210), 0.12) 0%,
     rgba(30, 30, 30, 0.9) 100%
   );
-}
-
-.filter-box {
-  background: rgba(0, 0, 0, 0.03);
-  border-radius: 6px;
-  border: 1px solid var(--kenner-border-subtle);
-
-  &--mobile {
-    min-height: 32px;
-    padding: 2px 4px;
-  }
 }
 
 @media (max-width: 599px) {
