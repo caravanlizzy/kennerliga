@@ -166,31 +166,45 @@
         <span v-else class="text-grey-5">-</span>
       </q-td>
     </template>
+    <template v-if="isAdmin" v-slot:header-cell-actions="props">
+      <q-th :props="props" class="actions-header-cell">
+        <div class="row items-center justify-center no-wrap q-gutter-x-xs">
+          <q-icon name="admin_panel_settings" size="14px" color="amber-8" />
+          <span class="actions-header-label">Admin</span>
+        </div>
+      </q-th>
+    </template>
     <template v-if="isAdmin" v-slot:body-cell-actions="props">
-      <q-td :props="props" auto-width class="q-gutter-x-xs">
-        <KennerButton
-          flat
-          shape="circle"
-          dense
-          icon="shield"
-          :color="isAdminUser(props.row) ? 'amber-8' : 'grey-5'"
-          :loading="togglingAdminUserId === props.row.id"
-          @click.stop="promptToggleAdmin(props.row)"
+      <q-td :props="props" auto-width class="actions-body-cell" @click.stop>
+        <div
+          class="admin-actions-pill row items-center justify-center no-wrap q-gutter-x-xs"
         >
-          <q-tooltip>{{
-            isAdminUser(props.row) ? 'Remove Admin' : 'Make Admin'
-          }}</q-tooltip>
-        </KennerButton>
-        <KennerButton
-          flat
-          shape="circle"
-          dense
-          icon="lock_reset"
-          color="primary"
-          @click.stop="openResetDialog(props.row)"
-        >
-          <q-tooltip>Reset Password</q-tooltip>
-        </KennerButton>
+          <KennerButton
+            flat
+            shape="circle"
+            dense
+            :icon="isAdminUser(props.row) ? 'shield' : 'shield_outlined'"
+            :color="isAdminUser(props.row) ? 'amber-8' : 'grey-5'"
+            :loading="togglingAdminUserId === props.row.id"
+            @click.stop="promptToggleAdmin(props.row)"
+          >
+            <q-tooltip>{{
+              isAdminUser(props.row)
+                ? 'Revoke Admin Privileges'
+                : 'Grant Admin Privileges'
+            }}</q-tooltip>
+          </KennerButton>
+          <KennerButton
+            flat
+            shape="circle"
+            dense
+            icon="lock_reset"
+            color="primary"
+            @click.stop="openResetDialog(props.row)"
+          >
+            <q-tooltip>Generate Password Reset Link</q-tooltip>
+          </KennerButton>
+        </div>
       </q-td>
     </template>
   </KennerTable>
@@ -655,7 +669,7 @@ const columns = computed(() => {
       {
         name: 'actions',
         align: 'center' as const,
-        label: 'Actions',
+        label: 'Admin',
         field: () => '',
         sortable: false,
       },
@@ -685,6 +699,50 @@ const columns = computed(() => {
 
 .years-select {
   min-width: 170px;
+}
+
+:deep(.actions-header-cell) {
+  border-left: 1px solid var(--kenner-border-color) !important;
+  background: rgba(245, 158, 11, 0.04);
+  text-align: center;
+}
+
+:deep(.actions-body-cell) {
+  border-left: 1px solid var(--kenner-border-color) !important;
+  background: rgba(245, 158, 11, 0.02);
+  text-align: center;
+}
+
+.actions-header-label {
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: var(--kenner-text-secondary);
+  font-size: 11px;
+}
+
+.admin-actions-pill {
+  display: inline-flex;
+  padding: 2px 6px;
+  border-radius: 999px;
+  background: var(--kenner-surface-subtle);
+  border: 1px solid var(--kenner-border-subtle);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+}
+
+.body--dark {
+  :deep(.actions-header-cell) {
+    background: rgba(245, 158, 11, 0.08);
+  }
+
+  :deep(.actions-body-cell) {
+    background: rgba(245, 158, 11, 0.04);
+  }
+
+  .admin-actions-pill {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.08);
+  }
 }
 
 @media (max-width: 599px) {
