@@ -491,9 +491,7 @@
                 class="q-pa-xs text-weight-medium"
               >
                 <q-icon name="shield" size="12px" class="q-mr-xs shrink-0" />
-                <span>{{
-                  part.faction_name || part.win_condition_name
-                }}</span>
+                <span>{{ part.faction_name }}</span>
                 <span class="text-caption text-grey-6 q-ml-xs">
                   ({{ part.profile_name }})
                 </span>
@@ -639,7 +637,6 @@ const factionOptions = computed(() => {
   (props.matches || []).forEach((m) => {
     (m.participants || []).forEach((p) => {
       if (p.faction_name) factionSet.add(p.faction_name);
-      else if (p.win_condition_name) factionSet.add(p.win_condition_name);
     });
   });
   const list = Array.from(factionSet).sort();
@@ -705,9 +702,7 @@ const filteredMatches = computed(() => {
       const matchParticipants = (m.participants || []).some(
         (p) =>
           p.profile_name.toLowerCase().includes(q) ||
-          (p.faction_name && p.faction_name.toLowerCase().includes(q)) ||
-          (p.win_condition_name &&
-            p.win_condition_name.toLowerCase().includes(q))
+          (p.faction_name && p.faction_name.toLowerCase().includes(q))
       );
       const matchOptions = (m.selected_options || []).some(
         (o) =>
@@ -727,9 +722,7 @@ const filteredMatches = computed(() => {
     // Faction filter
     if (selectedFaction.value) {
       const matchFaction = (m.participants || []).some((p) => {
-        const hasFaction =
-          p.faction_name === selectedFaction.value ||
-          p.win_condition_name === selectedFaction.value;
+        const hasFaction = p.faction_name === selectedFaction.value;
         return onlyWinnerMatches.value
           ? hasFaction && p.is_winner
           : hasFaction;
@@ -809,11 +802,11 @@ const topFactionInsight = computed(() => {
   const factionWins = new Map<string, number>();
   matchesList.forEach((m) => {
     const winner = (m.participants || []).find((p) => p.is_winner);
-    if (winner) {
-      const fName = winner.faction_name || winner.win_condition_name;
-      if (fName) {
-        factionWins.set(fName, (factionWins.get(fName) || 0) + 1);
-      }
+    if (winner && winner.faction_name) {
+      factionWins.set(
+        winner.faction_name,
+        (factionWins.get(winner.faction_name) || 0) + 1
+      );
     }
   });
 
@@ -876,15 +869,13 @@ function getSortedByStartingOrder(
 function hasFactions(match: TGameRecentMatch): boolean {
   return (
     Boolean(match.participants) &&
-    match.participants.some((p) =>
-      Boolean(p.faction_name || p.win_condition_name)
-    )
+    match.participants.some((p) => Boolean(p.faction_name))
   );
 }
 
 function getParticipantFactions(match: TGameRecentMatch) {
   return (match.participants || []).filter((p) =>
-    Boolean(p.faction_name || p.win_condition_name)
+    Boolean(p.faction_name)
   );
 }
 
@@ -935,7 +926,7 @@ const tableColumns = computed(() => [
     label: 'Factions',
     field: (r: TGameRecentMatch) =>
       r.participants
-        ?.map((p) => p.faction_name || p.win_condition_name)
+        ?.map((p) => p.faction_name)
         .filter(Boolean)
         .join(', ') || '-',
     align: 'left',
