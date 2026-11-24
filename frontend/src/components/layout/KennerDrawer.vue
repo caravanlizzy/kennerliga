@@ -154,6 +154,47 @@
           </q-item-section>
         </q-item>
 
+        <q-item
+          tag="a"
+          dense
+          class="drawer-item drawer-item--action q-mx-sm squircle-shape cursor-pointer"
+          @click="onCheckForUpdatesClick"
+        >
+          <q-item-section avatar class="drawer-item__icon-section">
+            <q-spinner
+              v-if="isCheckingForUpdates"
+              size="20px"
+              color="primary"
+            />
+            <q-icon
+              v-else
+              :name="
+                updateAvailable ? 'system_update' : 'published_with_changes'
+              "
+              size="20px"
+              :color="updateAvailable ? 'warning' : 'primary'"
+            />
+          </q-item-section>
+          <q-item-section class="drawer-item__text-section">
+            <q-item-label class="drawer-item__label text-weight-medium">
+              {{ updateAvailable ? 'Update Available' : 'Check for Updates' }}
+            </q-item-label>
+            <q-item-label caption class="text-caption text-grey-6">
+              v{{ appVersion }}
+            </q-item-label>
+          </q-item-section>
+          <q-item-section side v-if="updateAvailable">
+            <q-badge color="warning" text-color="dark" label="New" />
+          </q-item-section>
+          <KennerTooltip>
+            {{
+              updateAvailable
+                ? 'A new version is available. Click to update.'
+                : 'Check for new application updates'
+            }}
+          </KennerTooltip>
+        </q-item>
+
         <template v-if="isAdmin">
           <q-separator class="q-my-sm drawer-separator" />
           <DrawerSubGroup>Management</DrawerSubGroup>
@@ -213,6 +254,13 @@ import {
   subscribeToPushNotifications,
   unsubscribeFromPushNotifications,
 } from 'src/services/notificationService';
+import {
+  appVersion,
+  updateAvailable,
+  isCheckingForUpdates,
+  checkForUpdates,
+  showUpdatePrompt,
+} from 'src/services/appUpdateService';
 import { useUserStore } from 'stores/userStore';
 import { useHomeSeasonStore } from 'stores/homeSeasonStore';
 import { useThemeStore, ThemeMode } from 'stores/themeStore';
@@ -327,6 +375,14 @@ async function toggleNotifications(): Promise<void> {
   } finally {
     notificationsLoading.value = false;
   }
+}
+
+async function onCheckForUpdatesClick(): Promise<void> {
+  if (updateAvailable.value) {
+    showUpdatePrompt(null, true);
+    return;
+  }
+  await checkForUpdates(true);
 }
 
 async function doLogout(): Promise<void> {

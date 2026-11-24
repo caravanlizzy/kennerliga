@@ -9,6 +9,7 @@
 // https://v2.quasar.dev/quasar-cli-vite/quasar-config-js
 
 const { configure } = require('quasar/wrappers');
+const appPkg = require('./package.json');
 
 module.exports = configure(function (ctx) {
   return {
@@ -27,7 +28,7 @@ module.exports = configure(function (ctx) {
     // app boot file (/src/boot)
     // --> boot files are part of "main.js"
     // https://v2.quasar.dev/quasar-cli-vite/boot-files
-    boot: ['axios', 'init-user', 'notifications', 'dark'],
+    boot: ['axios', 'init-user', 'notifications', 'dark', 'app-update'],
 
     // https://v2.quasar.dev/quasar-cli-vite/quasar-config-js#css
     css: ['app.scss'],
@@ -55,6 +56,7 @@ module.exports = configure(function (ctx) {
           (ctx.dev
             ? 'http://localhost:8000/api'
             : 'https://www.kennerliga.de/api'),
+        APP_VERSION: appPkg.version || '1.0.0',
       },
       target: {
         browser: ['es2019', 'edge88', 'firefox78', 'chrome87', 'safari13.1'],
@@ -157,6 +159,7 @@ module.exports = configure(function (ctx) {
       // extendGenerateSWOptions (cfg) {}
       extendGenerateSWOptions(cfg) {
         cfg.importScripts = ['push-notifications.js'];
+        cfg.skipWaiting = false;
       },
       // extendInjectManifestOptions (cfg) {},
       // extendManifestJson (json) {}
