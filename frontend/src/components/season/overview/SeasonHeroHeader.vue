@@ -21,8 +21,15 @@
           >
             {{ seasonTitle }}
           </h1>
+          <div
+            v-if="seasonStatusLabel === 'RUNNING'"
+            class="season-live-badge row items-center no-wrap q-gutter-x-xs q-px-sm q-py-xs rounded-borders shrink-0"
+          >
+            <span class="pulse-dot" />
+            <span class="text-weight-bolder text-uppercase live-text">Running</span>
+          </div>
           <q-badge
-            v-if="seasonStatusLabel"
+            v-else-if="seasonStatusLabel"
             :color="statusColor"
             class="q-px-sm q-py-xs text-weight-bold text-caption text-uppercase shrink-0"
             rounded
@@ -87,5 +94,35 @@ defineProps<{
 }
 .shrink-0 {
   flex-shrink: 0;
+}
+.season-live-badge {
+  background: rgba(33, 186, 69, 0.12);
+  color: var(--q-positive, #21ba45);
+  font-size: 11px;
+  letter-spacing: 0.5px;
+  border: 1px solid rgba(33, 186, 69, 0.3);
+}
+.pulse-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background-color: var(--q-positive, #21ba45);
+  box-shadow: 0 0 0 0 rgba(33, 186, 69, 0.7);
+  animation: pulse-ring 1.8s cubic-bezier(0.455, 0.03, 0.515, 0.955) infinite;
+  display: inline-block;
+}
+@keyframes pulse-ring {
+  0% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(33, 186, 69, 0.7);
+  }
+  70% {
+    transform: scale(1);
+    box-shadow: 0 0 0 6px rgba(33, 186, 69, 0);
+  }
+  100% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(33, 186, 69, 0);
+  }
 }
 </style>

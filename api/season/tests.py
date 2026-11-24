@@ -1054,3 +1054,137 @@ class CronSeasonJobTests(TestCase):
         next_season.refresh_from_db()
         self.assertEqual(next_season.status, Season.SeasonStatus.OPEN)
         self.assertIn("2026-05-25", out.getvalue())
+
+
+class SeasonProgressTests(TestCase):
+    def setUp(self):
+        self.client = APIClient()
+        self.user = User.objects.create_superuser(username="admin_prog", password="password")
+        self.client.force_authenticate(user=self.user)
+
+    def test_season_progress_empty_and_done(self):
+        from season.queries import get_season_progress
+
+        # Empty season with no leagues
+        empty_season = Season.objects.create(
+            year=2026, month=7, status=Season.SeasonStatus.RUNNING
+        )
+        prog = get_season_progress(empty_season)
+        self.assertEqual(prog["percentage"], 0.0)
+        self.assertEqual(prog["picks"]["total"], 0)
+        self.assertEqual(prog["reports"]["total"], 0)
+
+        # Done season
+        done_season = Season.objects.create(
+            year=2026, month=8, status=Season.SeasonStatus.DONE
+        )
+        prog_done = get_season_progress(done_season)
+        self.assertEqual(prog_done["percentage"], 100.0)
+
+    def test_season_progress_weighting_calculation(self):
+        from season.queries import get_season_progress
+        from result.models import Result
+
+        season = Season.objects.create(
+            year=2026, month=9, status=Season.SeasonStatus.RUNNING
+        )
+        p1 = PlayerProfile.objects.create(profile_name="Prog_P1")
+        p2 = PlayerProfile.objects.create(profile_name="Prog_P2")
+        sp1 = SeasonParticipant.objects.create(season=season, profile=p1, rank=1)
+        sp2 = SeasonParticipant.objects.create(season=season, profile=p2, rank=2)
+
+        league = League.objects.create(season=season, level=1, status=LeagueStatus.PICKING)
+        league.members.add(sp1, sp2)
+
+        platform = Platform.objects.create(name="BGA_Prog")
+        g1 = Game.objects.create(name="Game Prog 1", platform=platform)
+        g2 = Game.objects.create(name="Game Prog 2", platform=platform)
+        g3 = Game.objects.create(name="Game Prog 3", platform=platform)
+        g4 = Game.objects.create(name="Game Prog 4", platform=platform)
+
+        # 1. Initially 0 picks done
+        prog = get_season_progress(season)
+        self.assertEqual(prog["percentage"], 0.0)
+        self.assertEqual(prog["picks"]["total"], 4)
+        self.assertEqual(prog["bans"]["total"], 2)
+        self.assertEqual(prog["reports"]["total"], 4)
+
+        # 2. Add all 4 picks (picks complete -> 7.5%)
+        sg1 = SelectedGame.objects.create(league=league, profile=p1, game=g1)
+        sg2 = SelectedGame.objects.create(league=league, profile=p1, game=g2)
+        sg3 = SelectedGame.objects.create(league=league, profile=p2, game=g3)
+        sg4 = SelectedGame.objects.create(league=league, profile=p2, game=g4)
+
+        prog = get_season_progress(season)
+        self.assertEqual(prog["picks"]["current"], 4)
+        self.assertEqual(prog["picks"]["missing"], 0)
+        self.assertEqual(prog["percentage"], 7.5)
+
+        # 3. Add all 2 bans (bans complete -> 2 games banned, which flags 2 repicks needed)
+        BanDecision.objects.create(league=league, player_banning=p1, selected_game=sg3)
+        BanDecision.objects.create(league=league, player_banning=p2, selected_game=sg1)
+
+        prog = get_season_progress(season)
+        self.assertEqual(prog["bans"]["current"], 2)
+        self.assertEqual(prog["bans"]["missing"], 0)
+        # Because 2 games were banned, repicks are needed (picks_total becomes 6, current is 4)
+        self.assertEqual(prog["picks"]["total"], 6)
+        self.assertEqual(prog["percentage"], 12.5)
+
+        # Repicks performed -> picks back to 100% -> 15.0%
+        g5 = Game.objects.create(name="Game Prog 5", platform=platform)
+        g6 = Game.objects.create(name="Game Prog 6", platform=platform)
+        sg5 = SelectedGame.objects.create(league=league, profile=p1, game=g5)
+        sg6 = SelectedGame.objects.create(league=league, profile=p2, game=g6)
+
+        prog = get_season_progress(season)
+        self.assertEqual(prog["picks"]["current"], 6)
+        self.assertEqual(prog["picks"]["total"], 6)
+        self.assertEqual(prog["percentage"], 15.0)
+
+        # 4. Report 1 game out of 4 (playable games are sg2, sg4, sg5, sg6; each needs 2 results)
+        # 1 complete game adds 85% * (1/4) = 21.25%, total reaches 36.2% or 36.3%
+        Result.objects.create(
+            season=season, league=league, selected_game=sg2, player_profile=p1, points=10, position=1
+        )
+        Result.objects.create(
+            season=season, league=league, selected_game=sg2, player_profile=p2, points=5, position=2
+        )
+
+        prog = get_season_progress(season)
+        self.assertEqual(prog["reports"]["current"], 1)
+        self.assertEqual(prog["reports"]["missing"], 3)
+        self.assertEqual(prog["percentage"], 36.2)
+
+        # 5. Report remaining games
+        for sg in [sg4, sg5, sg6]:
+            Result.objects.create(
+                season=season, league=league, selected_game=sg, player_profile=p1, points=8, position=2
+            )
+            Result.objects.create(
+                season=season, league=league, selected_game=sg, player_profile=p2, points=12, position=1
+            )
+        prog = get_season_progress(season)
+        # All playable games reported -> 100%
+        self.assertEqual(prog["percentage"], 100.0)
+
+    def test_season_progress_in_api_responses(self):
+        season = Season.objects.create(
+            year=2026, month=10, status=Season.SeasonStatus.RUNNING
+        )
+        # Current endpoint
+        res = self.client.get("/api/season/current/")
+        self.assertEqual(res.status_code, 200)
+        self.assertIn("progress", res.data)
+        self.assertEqual(res.data["progress"]["percentage"], 0.0)
+
+        # List endpoint
+        res_list = self.client.get(f"/api/season/seasons/?year={season.year}")
+        self.assertEqual(res_list.status_code, 200)
+        item = next(s for s in res_list.data if s["id"] == season.id)
+        self.assertIn("progress", item)
+
+        # Full standings endpoint
+        res_fs = self.client.get(f"/api/season/seasons/{season.id}/full-standings/")
+        self.assertEqual(res_fs.status_code, 200)
+        self.assertIn("progress", res_fs.data["season"])

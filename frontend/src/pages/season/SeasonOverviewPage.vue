@@ -41,6 +41,13 @@
         :is-mobile="isMobile"
       />
 
+      <!-- Season Progress Bar (Current Running Season only) -->
+      <SeasonProgressBar
+        v-if="isRunningSeason && season?.progress"
+        :progress="season.progress"
+        :status="season.status"
+      />
+
       <!-- Compact League & View Controls Toolbar -->
       <SeasonControlsToolbar
         :selected-league-id="selectedLeagueId"
@@ -120,6 +127,7 @@ import { fetchSeasonFullStandings } from 'src/services/standingsService';
 import ErrorDisplay from 'components/base/ErrorDisplay.vue';
 import LoadingSpinner from 'components/base/LoadingSpinner.vue';
 import SeasonHeroHeader from 'components/season/overview/SeasonHeroHeader.vue';
+import SeasonProgressBar from 'components/season/SeasonProgressBar.vue';
 import SeasonOverviewPodium from 'components/season/overview/SeasonOverviewPodium.vue';
 import SeasonControlsToolbar from 'components/season/overview/SeasonControlsToolbar.vue';
 import SeasonSingleLeagueSection from 'components/season/overview/SeasonSingleLeagueSection.vue';
@@ -243,6 +251,10 @@ const activeLeagueMembers = computed<TSeasonParticipantDto[]>(() => {
 });
 
 const isSeasonCompleted = computed(() => season.value?.is_completed ?? false);
+
+const isRunningSeason = computed(
+  () => season.value?.status === 'RUNNING' && !isSeasonCompleted.value
+);
 
 const seasonTitle = computed(() => {
   if (season.value?.name) return season.value.name;

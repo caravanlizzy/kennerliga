@@ -17,6 +17,8 @@ from season.queries import (
     get_open_season,
     get_registered_participants,
     get_running_season,
+    get_season_progress,
+    get_seasons_progress,
     is_profile_registered,
     register,
 )
@@ -74,7 +76,12 @@ class CurrentSeasonView(APIView):
             )
 
         return Response(
-            {"id": season.id, "name": season.name, "status": season.status},
+            {
+                "id": season.id,
+                "name": season.name,
+                "status": season.status,
+                "progress": get_season_progress(season),
+            },
             status=status.HTTP_200_OK,
         )
 
@@ -87,6 +94,20 @@ class SeasonViewSet(ModelViewSet):
     queryset = Season.objects.all().order_by("-year", "-month")
     serializer_class = SeasonSerializer
     filterset_fields = ["year", "month", "status"]
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.filter_queryset(self.get_queryset())
+        page = self.paginate_queryset(queryset)
+        seasons_list = list(page) if page is not None else list(queryset)
+        progress_map = get_seasons_progress(seasons_list)
+        serializer = self.get_serializer(
+            page if page is not None else queryset,
+            many=True,
+            context={"seasons_progress": progress_map, "request": request},
+        )
+        if page is not None:
+            return self.get_paginated_response(serializer.data)
+        return Response(serializer.data)
 
     def get_serializer_class(self):
         if (
@@ -141,6 +162,7 @@ class SeasonViewSet(ModelViewSet):
                     "id": season.id,
                     "name": season.name,
                     "status": season.status,
+                    "progress": get_season_progress(season),
                 },
                 "leagues": payloads,
             },
@@ -150,7 +172,13 @@ class SeasonViewSet(ModelViewSet):
     @action(detail=False, methods=["get"], url_path="seasons-with-leagues")
     def seasons_with_leagues(self, request):
         queryset = self.get_queryset().filter(leagues__isnull=False).distinct()
-        serializer = SeasonWithLeaguesSerializer(queryset, many=True)
+        seasons_list = list(queryset)
+        progress_map = get_seasons_progress(seasons_list)
+        serializer = SeasonWithLeaguesSerializer(
+            queryset,
+            many=True,
+            context={"seasons_progress": progress_map, "request": request},
+        )
         return Response(serializer.data)
 
     @action(detail=False, methods=["get"], url_path="registration-status")

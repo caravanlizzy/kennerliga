@@ -31,6 +31,7 @@ class SeasonSerializer(ModelSerializer):
     is_completed = serializers.SerializerMethodField(read_only=True)
     is_empty = serializers.SerializerMethodField(read_only=True)
     is_incomplete = serializers.SerializerMethodField(read_only=True)
+    progress = serializers.SerializerMethodField(read_only=True)
 
     @staticmethod
     def get_name(obj):
@@ -57,6 +58,12 @@ class SeasonSerializer(ModelSerializer):
         if is_empty:
             return False
         return not self.get_is_completed(obj)
+
+    def get_progress(self, obj):
+        if self.context and "seasons_progress" in self.context:
+            return self.context["seasons_progress"].get(obj.id, None)
+        from season.queries import get_season_progress
+        return get_season_progress(obj)
 
     class Meta:
         model = Season

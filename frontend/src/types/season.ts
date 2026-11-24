@@ -1,5 +1,18 @@
 import type { AvatarShape } from './avatar';
 
+export type TSeasonProgressMetric = {
+  current: number;
+  total: number;
+  missing: number;
+};
+
+export type TSeasonProgress = {
+  percentage: number;
+  picks: TSeasonProgressMetric;
+  bans: TSeasonProgressMetric;
+  reports: TSeasonProgressMetric;
+};
+
 export type TSeasonDto = {
   id: number;
   year: number;
@@ -7,6 +20,7 @@ export type TSeasonDto = {
   name?: string;
   status?: string;
   is_completed?: boolean;
+  progress?: TSeasonProgress;
 };
 
 /** Mirrors `SeasonViewSet.league_winners`. */

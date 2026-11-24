@@ -1,4 +1,5 @@
 import type { AvatarShape } from './avatar';
+import type { TSeasonProgress } from './season';
 
 /**
  * The `full-standings` contract.
@@ -127,7 +128,12 @@ export type TSeasonLeagueStandings = TFullStandings & {
 };
 
 export type TSeasonFullStandings = {
-  season: { id: number; name: string; status: string };
+  season: {
+    id: number;
+    name: string;
+    status: string;
+    progress?: TSeasonProgress;
+  };
   leagues: TSeasonLeagueStandings[];
 };
 

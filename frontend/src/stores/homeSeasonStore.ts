@@ -80,6 +80,30 @@ export const useHomeSeasonStore = defineStore('homeSeason', () => {
     return found ? found.id : null;
   });
 
+  const selectedSeason = computed<TSeasonDto | null>(() => {
+    const found = seasonsForYear.value.find(
+      (s) => s.month === selectedSeasonMonth.value
+    );
+    return found ?? null;
+  });
+
+  const selectedSeasonProgress = computed(() => {
+    return selectedSeason.value?.progress ?? null;
+  });
+
+  const isSelectedSeasonRunning = computed(() => {
+    return selectedSeason.value?.status === 'RUNNING';
+  });
+
+  const isCurrentSeasonRunning = computed(() => {
+    if (!currentSeasonId.value) return false;
+    for (const yearSeasons of Object.values(seasonsByYear.value)) {
+      const found = yearSeasons.find((s) => s.id === currentSeasonId.value);
+      if (found) return found.status === 'RUNNING';
+    }
+    return false;
+  });
+
   // --- Internal fetch helpers -----------------------------------------------
 
   /**
@@ -284,6 +308,10 @@ export const useHomeSeasonStore = defineStore('homeSeason', () => {
     seasonYearOptions,
     seasonMonthOptions,
     selectedSeasonId,
+    selectedSeason,
+    selectedSeasonProgress,
+    isSelectedSeasonRunning,
+    isCurrentSeasonRunning,
 
     // actions
     init,
