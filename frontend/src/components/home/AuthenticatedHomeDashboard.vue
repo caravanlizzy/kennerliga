@@ -1,23 +1,22 @@
 <template>
   <div class="column col q-pt-none">
     <!-- Hero Greeting & Quick Action Hub -->
-    <HomeHeroGreeting
-      @select-current-season="homeSeasonStore.selectCurrentSeason"
-    />
+    <HomeHeroGreeting />
+
+    <!-- Segmented Toggle across the section -->
+    <div class="row items-center justify-between q-mb-md">
+      <SmoothSwitch
+        v-model="activeTab"
+        :options="[
+          { label: 'Current Season', value: 'season', icon: 'military_tech' },
+          { label: 'Hall of Fame', value: 'leaderboard', icon: 'stars' },
+        ]"
+      />
+    </div>
 
     <div class="row q-col-gutter-md">
-      <!-- Left Column: Primary Info with Segmented Toggle -->
+      <!-- Left Column: Primary Info -->
       <div class="col-12 col-md-8">
-        <div class="row items-center justify-between q-mb-sm">
-          <SmoothSwitch
-            v-model="activeTab"
-            :options="[
-              { label: 'Current Season', value: 'season', icon: 'military_tech' },
-              { label: 'Hall of Fame', value: 'leaderboard', icon: 'stars' },
-            ]"
-          />
-        </div>
-
         <HomeSeasonSection
           v-show="activeTab === 'season'"
           v-model:selectedSeasonYear="selectedSeasonYear"

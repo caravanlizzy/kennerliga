@@ -39,27 +39,34 @@
           v-if="hasMyLeague"
           outline
           color="primary"
-          icon="sports_esports"
+          icon="emoji_events"
           label="My League"
           size="sm"
           :to="{ name: 'my-league' }"
         />
         <KennerButton
-          v-if="currentSeasonId"
-          outline
-          color="positive"
-          icon="today"
-          label="Current Season"
+          flat
+          color="primary"
+          icon="query_stats"
+          label="Statistics"
           size="sm"
-          @click="$emit('select-current-season')"
+          :to="{ name: 'statistics' }"
         />
         <KennerButton
           flat
-          color="secondary"
-          icon="gavel"
-          label="Rules"
+          color="primary"
+          icon="people_alt"
+          label="Players"
           size="sm"
-          :to="{ name: 'rules' }"
+          :to="{ name: 'players' }"
+        />
+        <KennerButton
+          flat
+          color="primary"
+          icon="sports_esports"
+          label="Games"
+          size="sm"
+          :to="{ name: 'games' }"
         />
       </div>
     </div>
@@ -75,15 +82,11 @@ import { useHomeSeasonStore } from 'stores/homeSeasonStore';
 import UserAvatar from 'components/ui/UserAvatar.vue';
 import KennerButton from 'components/base/KennerButton.vue';
 
-defineEmits<{
-  (e: 'select-current-season'): void;
-}>();
-
 const userStore = useUserStore();
 const homeSeasonStore = useHomeSeasonStore();
 
 const { user } = storeToRefs(userStore);
-const { selectedSeason, currentSeasonId } = storeToRefs(homeSeasonStore);
+const { selectedSeason } = storeToRefs(homeSeasonStore);
 
 const displayName = computed(() => user.value?.username ?? 'Player');
 const greetingName = computed(
