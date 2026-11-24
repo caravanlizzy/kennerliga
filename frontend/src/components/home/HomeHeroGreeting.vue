@@ -37,35 +37,35 @@
       >
         <KennerButton
           v-if="hasMyLeague"
-          outline
           color="primary"
           icon="emoji_events"
           label="My League"
           size="sm"
+          class="hero-nav-btn hero-nav-btn--primary"
           :to="{ name: 'my-league' }"
         />
         <KennerButton
-          flat
           color="primary"
           icon="stars"
           label="Hall of Fame"
           size="sm"
+          class="hero-nav-btn"
           :to="{ name: 'statistics' }"
         />
         <KennerButton
-          flat
           color="primary"
           icon="people_alt"
           label="Players"
           size="sm"
+          class="hero-nav-btn"
           :to="{ name: 'players' }"
         />
         <KennerButton
-          flat
           color="primary"
           icon="sports_esports"
           label="Games"
           size="sm"
+          class="hero-nav-btn"
           :to="{ name: 'games' }"
         />
       </div>
@@ -155,6 +155,64 @@ const seasonStatusText = computed(() => {
   background-color: #d97706;
   display: inline-block;
   animation: pulse-ring 1.8s cubic-bezier(0.455, 0.03, 0.515, 0.955) infinite;
+}
+
+.hero-nav-btn {
+  font-weight: 600;
+  letter-spacing: 0.2px;
+  background: var(--kenner-surface-subtle) !important;
+  color: var(--kenner-text-strong) !important;
+  border: 1px solid var(--kenner-border-color) !important;
+  border-radius: 9999px !important;
+  padding: 3px 12px !important;
+  transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
+
+  &:hover {
+    background: var(--kenner-surface-muted) !important;
+    border-color: var(--kenner-border-strong) !important;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+}
+
+.hero-nav-btn--primary {
+  background: rgba(245, 158, 11, 0.1) !important;
+  color: #b45309 !important;
+  border: 1px solid rgba(245, 158, 11, 0.3) !important;
+
+  &:hover {
+    background: rgba(245, 158, 11, 0.18) !important;
+    border-color: rgba(245, 158, 11, 0.5) !important;
+  }
+}
+
+.body--dark {
+  .hero-nav-btn {
+    background: rgba(255, 255, 255, 0.05) !important;
+    color: var(--kenner-text-strong) !important;
+    border-color: rgba(255, 255, 255, 0.08) !important;
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.1) !important;
+      border-color: rgba(255, 255, 255, 0.16) !important;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+    }
+  }
+
+  .hero-nav-btn--primary {
+    background: rgba(245, 158, 11, 0.15) !important;
+    color: #fbbf24 !important;
+    border-color: rgba(245, 158, 11, 0.35) !important;
+
+    &:hover {
+      background: rgba(245, 158, 11, 0.25) !important;
+      border-color: rgba(245, 158, 11, 0.55) !important;
+    }
+  }
 }
 
 @keyframes pulse-ring {
