@@ -4,7 +4,7 @@
       class="q-pa-md row items-center justify-between no-wrap border-bottom-subtle"
     >
       <div class="text-h5 text-weight-bold text-dark">Live Action</div>
-      <q-icon name="bolt" size="sm" color="accent" />
+      <q-icon name="bolt" size="sm" color="info" />
     </div>
     <div class="q-pa-md">
       <LiveActionFeed />

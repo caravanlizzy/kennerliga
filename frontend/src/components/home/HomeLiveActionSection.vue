@@ -3,7 +3,7 @@
     id="live-action"
     title="Live Action"
     icon="bolt"
-    color="accent"
+    color="info"
     class="col-12"
   >
     <LiveActionFeed />
