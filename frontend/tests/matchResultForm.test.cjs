@@ -6,7 +6,7 @@ const ts = require('typescript');
 const { parse, compileScript } = require('@vue/compiler-sfc');
 const vue = require('vue');
 
-function mountForm() {
+function mountForm(options = {}) {
   const source = fs.readFileSync('src/components/league/MatchResultForm.vue', 'utf8');
   const { descriptor } = parse(source, { filename: 'MatchResultForm.vue' });
   const compiled = compileScript(descriptor, { id: 'match-result-form' });
@@ -16,7 +16,10 @@ function mountForm() {
   const exports = {};
   const requests = [];
   const leagueStore = {
-    members: vue.ref([{ id: 1, profile: 101, profile_name: 'Alice' }]),
+    members: vue.ref([
+      { id: 1, profile: 101, profile_name: 'Alice' },
+      { id: 2, profile: 102, profile_name: 'Bob' },
+    ]),
     initialized: vue.ref(true),
     leagueData: { season: 7 },
     init() {},
@@ -32,12 +35,20 @@ function mountForm() {
             requests.push({ name: 'fetchMatchResults', params });
             return [];
           },
-          fetchOrderedWinConditions: async () => [],
+          fetchOrderedWinConditions: async () => [
+            { id: 1, name: 'Points', condition_type: 'POINTS' },
+          ],
           fetchSelectedGame: async (selectedGameId) => {
             requests.push({ name: 'fetchSelectedGame', selectedGameId });
             return { game: 20 };
           },
-          submitMatchResults: async () => {},
+          submitMatchResults: async (payload) => {
+            requests.push({ name: 'submitMatchResults', payload });
+            if (options.submitResponse) {
+              return options.submitResponse(payload);
+            }
+            return { status: 200 };
+          },
         };
       }
       if (name === 'src/services/gameService') {
@@ -65,16 +76,16 @@ function mountForm() {
     console,
   });
 
-  exports.default.setup(
+  const setupResult = exports.default.setup(
     { selectedGameId: 5, leagueId: 12, league: { season: 7 } },
     { expose() {}, emit() {} }
   );
 
-  return requests;
+  return { requests, setupResult, leagueStore };
 }
 
 test('match result form runs its immediate watchers when mounted', async () => {
-  const requests = mountForm();
+  const { requests } = mountForm();
   await new Promise((resolve) => setImmediate(resolve));
 
   assert.equal(
@@ -88,4 +99,57 @@ test('match result form runs its immediate watchers when mounted', async () => {
   assert.equal(resultRequest.params.seasonId, 7);
   assert.equal(resultRequest.params.leagueId, 12);
   assert.equal(resultRequest.params.selectedGameId, 5);
+});
+
+test('match result form resets tie breaker fields when a 202 tie breaker is received', async () => {
+  let submitCount = 0;
+  const { setupResult } = mountForm({
+    submitResponse: () => {
+      submitCount++;
+      if (submitCount === 1) {
+        return {
+          status: 202,
+          data: {
+            required_tie_breaker: { id: 1, name: 'First Tie Breaker' },
+            tied_players: [101, 102],
+          },
+        };
+      }
+      return {
+        status: 202,
+        data: {
+          required_tie_breaker: { id: 2, name: 'Second Tie Breaker' },
+          tied_players: [101, 102],
+        },
+      };
+    },
+  });
+
+  await new Promise((resolve) => setImmediate(resolve));
+
+  // Initialize points for both players
+  setupResult.formData.value.forEach((entry) => {
+    entry.points = 100;
+  });
+
+  // First submit -> triggers tie breaker 1
+  await setupResult.submitResults();
+
+  assert.equal(setupResult.tieBreakerRequired.value, true);
+  assert.equal(setupResult.requiredTieBreaker.value.id, 1);
+  assert.equal(setupResult.formData.value[0].tie_breaker_value, null);
+  assert.equal(setupResult.formData.value[1].tie_breaker_value, null);
+
+  // User enters values for first tie breaker
+  setupResult.formData.value[0].tie_breaker_value = 5;
+  setupResult.formData.value[1].tie_breaker_value = 5;
+
+  // Second submit -> triggers tie breaker 2 (still tied)
+  await setupResult.submitResults();
+
+  assert.equal(setupResult.tieBreakerRequired.value, true);
+  assert.equal(setupResult.requiredTieBreaker.value.id, 2);
+  // Values should be reset to null for the second tie breaker
+  assert.equal(setupResult.formData.value[0].tie_breaker_value, null);
+  assert.equal(setupResult.formData.value[1].tie_breaker_value, null);
 });

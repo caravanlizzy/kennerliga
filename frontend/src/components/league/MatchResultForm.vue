@@ -431,6 +431,10 @@ function handleTieBreaker202(data: {
   tieBreakerRequired.value = true;
   requiredTieBreaker.value = data?.required_tie_breaker ?? null;
 
+  formData.value.forEach((entry) => {
+    entry.tie_breaker_value = null;
+  });
+
   const nextPlayers = new Set<number>();
   if (Array.isArray(data?.tie_groups)) {
     tieGroups.value = data.tie_groups as Array<{
