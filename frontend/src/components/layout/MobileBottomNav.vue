@@ -14,8 +14,9 @@
     >
       <q-tab name="seasons" icon="military_tech" label="Seasons" />
       <q-tab name="live" icon="bolt" label="Live" />
-      <q-tab name="leaderboard" icon="stars" label="Rank" />
-      <q-tab name="stats" icon="query_stats" label="Stats" />
+      <q-tab name="players" icon="people_alt" label="Players" />
+      <q-tab name="games" icon="sports_esports" label="Games" />
+      <q-tab name="hall-of-fame" icon="stars" label="Hall of Fame" />
     </q-tabs>
   </q-footer>
 </template>
@@ -38,10 +39,15 @@ const activeTab = computed(() => {
       return 'seasons';
     case 'live':
       return 'live';
+    case 'players':
+    case 'user-detail':
+      return 'players';
+    case 'games':
+    case 'game-detail':
+      return 'games';
     case 'leaderboard':
-      return 'leaderboard';
     case 'statistics':
-      return 'stats';
+      return 'hall-of-fame';
     default:
       return null;
   }
@@ -50,8 +56,9 @@ const activeTab = computed(() => {
 const tabToRoute = {
   seasons: 'season-standings',
   live: 'live',
-  leaderboard: 'leaderboard',
-  stats: 'statistics',
+  players: 'players',
+  games: 'games',
+  'hall-of-fame': 'statistics',
 } as const;
 
 function handleTabChange(value: string) {

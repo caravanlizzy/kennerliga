@@ -1,6 +1,6 @@
 <template>
   <div
-    class="filter-toolbar"
+    class="filter-toolbar row items-center justify-between"
     :class="isMobile ? 'q-mb-xs filter-toolbar--mobile' : 'q-mb-md'"
   >
     <div
@@ -54,7 +54,32 @@
         </q-select>
       </div>
     </div>
+
+    <!-- Toggle Highlights Button -->
+    <div class="row items-center">
+      <KennerButton
+        flat
+        dense
+        size="sm"
+        color="primary"
+        :icon="showHighlights ? 'expand_less' : 'military_tech'"
+        :label="showHighlights ? 'Hide Awards' : 'Show Awards'"
+        @click="showHighlights = !showHighlights"
+      />
+    </div>
   </div>
+
+  <!-- Collapsible Highlights Section -->
+  <q-slide-transition>
+    <div v-show="showHighlights" class="q-mb-lg">
+      <q-card flat bordered class="q-pa-md bg-grey-1 rounded-borders">
+        <PlayerStatistics
+          :years="selectedYears"
+          :player-counts="playerCountsParam"
+        />
+      </q-card>
+    </div>
+  </q-slide-transition>
 
   <KennerTable
     :create-button="createButton"
@@ -266,6 +291,7 @@ import KennerInput from 'components/base/KennerInput.vue';
 import KennerPlayerCountFilter from 'components/base/KennerPlayerCountFilter.vue';
 import LeagueLevel from 'components/season/LeagueLevel.vue';
 import UserAvatar from 'components/ui/UserAvatar.vue';
+import PlayerStatistics from 'components/statistics/PlayerStatistics.vue';
 import { useRouter } from 'vue-router';
 import { TKennerButton, TUserDto } from 'src/types';
 import { computed, onMounted, ref, watch } from 'vue';
@@ -293,6 +319,12 @@ const selectedPlayerCounts = ref<string[]>(['4p']);
 const selectedYears = ref<number[]>([]);
 const availableYears = ref<number[]>([]);
 const loading = ref(false);
+const showHighlights = ref(false);
+
+const playerCountsParam = computed<string[] | undefined>(() => {
+  if (selectedPlayerCounts.value.length === 0) return undefined;
+  return selectedPlayerCounts.value;
+});
 
 const togglingAdminUserId = ref<number | null>(null);
 const showResetDialog = ref(false);

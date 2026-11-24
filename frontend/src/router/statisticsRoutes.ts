@@ -3,15 +3,15 @@ export default {
   meta: {
     requiresAuth: true,
     requiresAdmin: false,
-    label: 'Statistics',
-    icon: 'query_stats',
+    label: 'Hall of Fame & Records',
+    icon: 'stars',
   },
   children: [
     {
       path: '',
       name: 'statistics',
       component: () => import('pages/statistics/StatisticsPage.vue'),
-      meta: { icon: 'query_stats', label: 'Statistics' },
+      meta: { icon: 'stars', label: 'Hall of Fame & Records' },
     },
   ],
 };

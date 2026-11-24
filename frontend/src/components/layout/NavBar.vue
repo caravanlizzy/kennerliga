@@ -59,7 +59,14 @@ const showBreadcrumbs = computed(() => {
   if (alwaysExclude.includes(route.name as string)) return false;
 
   // Mobile top-level navigation items
-  const mobileTabs = ['season-standings', 'live', 'leaderboard'];
+  const mobileTabs = [
+    'season-standings',
+    'live',
+    'leaderboard',
+    'statistics',
+    'players',
+    'games',
+  ];
   if (isMobile.value && mobileTabs.includes(route.name as string)) return false;
 
   return true;

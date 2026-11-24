@@ -18,8 +18,8 @@
         outline
         no-caps
         icon="arrow_back"
-        label="Back to Statistics"
-        @click="router.push({ name: 'statistics' })"
+        label="Back to Games"
+        @click="router.push({ name: 'games' })"
       />
     </div>
 

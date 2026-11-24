@@ -27,18 +27,6 @@
           forward-name="seasons"
         />
         <DrawerItem
-          icon="stars"
-          icon-color="primary"
-          label="Hall of Fame"
-          forward-name="leaderboard"
-        />
-        <DrawerItem
-          icon="emoji_events"
-          icon-color="primary"
-          label="Match Results"
-          forward-name="match-results"
-        />
-        <DrawerItem
           icon="people_alt"
           icon-color="primary"
           label="Players"
@@ -51,10 +39,16 @@
           forward-name="games"
         />
         <DrawerItem
-          icon="query_stats"
+          icon="stars"
           icon-color="primary"
-          label="Statistics"
+          label="Hall of Fame & Records"
           forward-name="statistics"
+        />
+        <DrawerItem
+          icon="emoji_events"
+          icon-color="primary"
+          label="Match Results"
+          forward-name="match-results"
         />
 
         <q-separator class="q-my-sm drawer-separator" />

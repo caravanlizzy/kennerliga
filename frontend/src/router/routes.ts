@@ -189,7 +189,11 @@ const routes: RouteRecordRaw[] = [
         name: 'leaderboard',
         component: ResponsivePage,
         props: { desktop: LeaderboardMobile, mobile: LeaderboardMobile },
-        meta: { icon: 'stars', label: 'Leaderboard', requiresAuth: true },
+        meta: {
+          icon: 'stars',
+          label: 'Hall of Fame & Records',
+          requiresAuth: true,
+        },
       },
       {
         path: 'm/:rest(.*)*',

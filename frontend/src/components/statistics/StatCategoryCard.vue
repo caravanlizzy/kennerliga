@@ -39,14 +39,21 @@
           <div v-for="(entry, idx) in top3" :key="entry.profile_id" class="col">
             <div
               class="podium-player"
-              :class="{ 'podium-player--me': entry.is_me }"
+              :class="{
+                'podium-player--me': entry.is_me,
+                'cursor-pointer': Boolean(entry.username),
+              }"
+              @click="navigateToUser(entry.username)"
             >
               <span class="rank-badge" :class="`rank-badge--${idx}`">{{
                 idx + 1
               }}</span>
               <div
                 class="podium-player__name ellipsis"
-                :class="{ 'text-weight-bolder text-primary': entry.is_me }"
+                :class="{
+                  'text-weight-bolder text-primary': entry.is_me,
+                  'player-link': Boolean(entry.username),
+                }"
               >
                 {{ entry.profile_name }}
               </div>
@@ -89,11 +96,20 @@
             <template v-for="entry in displayedRows" :key="entry.profile_id">
               <div
                 class="rank-row row items-center justify-between"
-                :class="{ 'rank-row--me': entry.is_me }"
+                :class="{
+                  'rank-row--me': entry.is_me,
+                  'cursor-pointer': Boolean(entry.username),
+                }"
+                @click="navigateToUser(entry.username)"
               >
                 <div class="row items-center no-wrap q-gutter-x-sm">
                   <span class="rank-badge">{{ entry.rank }}</span>
-                  <span :class="{ 'text-weight-bolder': entry.is_me }">{{
+                  <span
+                    :class="{
+                      'text-weight-bolder': entry.is_me,
+                      'player-link': Boolean(entry.username),
+                    }"
+                  >{{
                     entry.profile_name
                   }}</span>
                 </div>
@@ -172,6 +188,7 @@
 
 <script setup lang="ts">
 import { computed, ref } from 'vue';
+import { useRouter } from 'vue-router';
 import { useQuasar } from 'quasar';
 import { TStatCategory } from 'src/types';
 import { formatStatValue } from 'src/composables/statFormat';
@@ -180,7 +197,14 @@ import KennerButton from 'components/base/KennerButton.vue';
 
 const props = defineProps<{ category: TStatCategory }>();
 
+const router = useRouter();
 const expanded = ref(false);
+
+function navigateToUser(username: string | null) {
+  if (username) {
+    void router.push({ name: 'user-detail', params: { username } });
+  }
+}
 
 const ICONS: Record<string, string> = {
   career_performance: 'military_tech',
@@ -338,6 +362,10 @@ const displayedRows = computed(() =>
     font-size: 11.5px;
     line-height: 1.2;
     margin-top: 5px;
+  }
+
+  .player-link:hover {
+    text-decoration: underline;
   }
 
   &__score {

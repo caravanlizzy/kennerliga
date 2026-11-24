@@ -3,70 +3,31 @@
     class="max-width-container q-mx-auto statistics-page"
     :class="isMobile ? 'q-pa-sm' : 'q-pa-md'"
   >
-    <!-- Header & Filter Bar -->
+    <!-- Header -->
     <div
-      class="stats-header-bar"
-      :class="isMobile ? 'q-mb-sm' : 'q-mb-lg'"
+      class="stats-header-bar row items-center justify-between"
+      :class="isMobile ? 'q-mb-sm' : 'q-mb-md'"
     >
-      <div
-        class="row items-center justify-between"
-        :class="isMobile ? 'q-col-gutter-xs' : 'q-col-gutter-md'"
-      >
-        <!-- Title and description -->
-        <div class="col-12 col-md-auto" :class="isMobile ? 'q-mb-xs' : ''">
-          <div class="row items-center no-wrap">
-            <div
-              class="page-title-icon q-mr-sm"
-              :class="isMobile ? 'page-title-icon--mobile' : ''"
-            >
-              <q-icon
-                name="query_stats"
-                color="primary"
-                :size="isMobile ? '20px' : '24px'"
-              />
-            </div>
-            <div>
-              <div
-                class="text-weight-bolder text-dark line-height-1"
-                :class="isMobile ? 'text-subtitle1' : 'text-h5'"
-              >
-                Statistics
-              </div>
-              <div v-if="!isMobile" class="text-caption text-grey-6 q-mt-xs">
-                Rankings, awards, records &amp; game masteries across seasons
-              </div>
-            </div>
-          </div>
+      <div class="row items-center no-wrap">
+        <div
+          class="page-title-icon q-mr-sm"
+          :class="isMobile ? 'page-title-icon--mobile' : ''"
+        >
+          <q-icon
+            name="stars"
+            color="primary"
+            :size="isMobile ? '20px' : '24px'"
+          />
         </div>
-
-        <!-- Filters: Player counts & Years -->
-        <div class="col-12 col-md-auto">
+        <div>
           <div
-            class="row items-center"
-            :class="isMobile ? 'q-col-gutter-xs no-wrap' : 'q-col-gutter-sm'"
+            class="text-weight-bolder text-dark line-height-1"
+            :class="isMobile ? 'text-subtitle1' : 'text-h5'"
           >
-            <div :class="isMobile ? 'col-auto' : 'col-12 col-sm-auto'">
-              <KennerPlayerCountFilter
-                v-model="selectedPlayerCounts"
-                :available-counts="availablePlayerCounts"
-                label="Players:"
-              />
-            </div>
-
-            <div
-              :class="isMobile ? 'col years-filter--mobile' : 'col-12 col-sm-auto years-filter'"
-              :style="{ minWidth: isMobile ? '110px' : '170px' }"
-            >
-              <KennerSelect
-                v-model="selectedYears"
-                :options="yearOptions"
-                label="Years"
-                multiple
-                clearable
-                dense
-                :display-value="yearsDisplayValue"
-              />
-            </div>
+            Hall of Fame &amp; Records
+          </div>
+          <div v-if="!isMobile" class="text-caption text-grey-6 q-mt-xs">
+            Historical season champions, league placements, and all-time records
           </div>
         </div>
       </div>
@@ -77,14 +38,23 @@
       v-model="currentTab"
       dense
       class="text-grey-7 stats-tabs"
-      :class="isMobile ? 'q-mb-sm stats-tabs--mobile' : 'q-mb-lg'"
+      :class="isMobile ? 'q-mb-sm stats-tabs--mobile' : 'q-mb-md'"
       active-color="primary"
       indicator-color="primary"
       :align="isMobile ? 'justify' : 'left'"
       narrow-indicator
+      @update:model-value="onTabChange"
     >
-      <q-tab name="players" icon="groups" label="Players" />
-      <q-tab name="games" icon="sports_esports" label="Games" />
+      <q-tab
+        name="hall-of-fame"
+        icon="emoji_events"
+        label="Hall of Fame &amp; Seasons"
+      />
+      <q-tab
+        name="records"
+        icon="military_tech"
+        label="Global Records &amp; Metagame"
+      />
     </q-tabs>
 
     <!-- Tab Panels -->
@@ -93,16 +63,103 @@
       animated
       class="bg-transparent stats-tab-panels"
     >
-      <q-tab-panel name="players" class="q-pa-none">
-        <PlayerStatistics
-          :years="selectedYears"
-          :player-counts="playerCountsParam"
+      <!-- Tab 1: Hall of Fame & Seasons -->
+      <q-tab-panel name="hall-of-fame" class="q-pa-none">
+        <div
+          class="filter-toolbar row items-center justify-between"
+          :class="isMobile ? 'q-mb-sm' : 'q-mb-md'"
+        >
+          <div class="row items-center no-wrap q-gutter-x-sm">
+            <SmoothSwitch
+              v-model="showAllLeagues"
+              :options="[
+                { label: 'Highest', value: false },
+                { label: 'All', value: true },
+              ]"
+            />
+          </div>
+          <div class="row items-center no-wrap q-gutter-x-sm">
+            <div style="min-width: 120px">
+              <KennerSelect
+                v-model="selectedSeasonYear"
+                :options="seasonYearOptions"
+                class="full-width"
+                label="Year"
+                emit-value
+                map-options
+                dense
+              />
+            </div>
+          </div>
+        </div>
+
+        <LeaderBoard
+          v-model:show-all-leagues="showAllLeagues"
+          :year="selectedSeasonYear"
         />
       </q-tab-panel>
 
-      <q-tab-panel name="games" class="q-pa-none">
-        <GameStatistics
-          :years="selectedYears"
+      <!-- Tab 2: Global Records & Metagame -->
+      <q-tab-panel name="records" class="q-pa-none">
+        <div
+          class="filter-toolbar row items-center justify-between"
+          :class="isMobile ? 'q-mb-sm' : 'q-mb-md'"
+        >
+          <div
+            class="filter-controls row items-center"
+            :class="isMobile ? 'q-col-gutter-xs' : 'q-col-gutter-md'"
+          >
+            <!-- Player Count Filter -->
+            <div class="filter-item row items-center">
+              <KennerPlayerCountFilter
+                v-model="selectedPlayerCounts"
+                :available-counts="availablePlayerCounts"
+                label="Players:"
+              />
+            </div>
+
+            <!-- Years Multi-select Filter -->
+            <div class="filter-item row items-center q-gutter-x-xs">
+              <div
+                class="row items-center text-caption text-weight-bold text-grey-8 filter-label"
+              >
+                <q-icon
+                  name="calendar_today"
+                  :size="isMobile ? '14px' : '16px'"
+                  class="q-mr-xs text-primary"
+                />
+                <span v-if="!isMobile">Years:</span>
+              </div>
+              <q-select
+                v-model="selectedOverviewYears"
+                :options="overviewYearOptions"
+                multiple
+                clearable
+                dense
+                outlined
+                options-dense
+                placeholder="All Years"
+                :display-value="
+                  !selectedOverviewYears || selectedOverviewYears.length === 0
+                    ? 'All Years'
+                    : selectedOverviewYears
+                        .slice()
+                        .sort((a, b) => b - a)
+                        .join(', ')
+                "
+                class="bg-white rounded-borders years-select"
+                :class="isMobile ? 'years-select--mobile' : ''"
+              >
+                <template v-slot:prepend>
+                  <q-icon name="event" size="xs" color="grey-6" />
+                </template>
+              </q-select>
+            </div>
+          </div>
+        </div>
+
+        <PlayerStatistics
+          :years="selectedOverviewYears"
           :player-counts="playerCountsParam"
         />
       </q-tab-panel>
@@ -113,41 +170,88 @@
 <script setup lang="ts">
 defineOptions({ name: 'StatisticsPage' });
 
-import { computed, onMounted, ref } from 'vue';
+import { computed, onMounted, ref, watch } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
 import KennerSelect from 'components/base/KennerSelect.vue';
 import KennerPlayerCountFilter from 'components/base/KennerPlayerCountFilter.vue';
-import GameStatistics from 'components/statistics/GameStatistics.vue';
+import SmoothSwitch from 'components/base/SmoothSwitch.vue';
+import LeaderBoard from 'components/season/LeaderBoard.vue';
 import PlayerStatistics from 'components/statistics/PlayerStatistics.vue';
 import { useUserStore } from 'stores/userStore';
 import { useResponsive } from 'src/composables/responsive';
+import {
+  fetchAvailableYears,
+  fetchCurrentSeasonId,
+  fetchSeason,
+} from 'src/services/seasonService';
 
+const route = useRoute();
+const router = useRouter();
 const { isMobile } = useResponsive();
 const { getAvailableYears } = useUserStore();
 
-const currentTab = ref<'players' | 'games'>('players');
-
-const selectedYears = ref<number[]>([]);
-const yearOptions = ref<number[]>([]);
-const yearsDisplayValue = computed(() =>
-  selectedYears.value.length === 0
-    ? 'All Time'
-    : selectedYears.value
-        .slice()
-        .sort((a, b) => b - a)
-        .join(', ')
+type TabType = 'hall-of-fame' | 'records';
+const currentTab = ref<TabType>(
+  route.query.tab === 'records' ? 'records' : 'hall-of-fame'
 );
 
-// Player-count filter, mirroring UsersListPage: default to 4P, empty means
-// "All". A backend-friendly value (undefined when All) is derived below.
+function onTabChange(newTab: TabType) {
+  if (route.query.tab !== newTab) {
+    void router.replace({
+      query: { ...route.query, tab: newTab },
+    });
+  }
+}
+
+watch(
+  () => route.query.tab,
+  (tab) => {
+    if (tab === 'records' || tab === 'hall-of-fame') {
+      currentTab.value = tab;
+    }
+  }
+);
+
+// Tab 1 (Hall of Fame) State
+const selectedSeasonYear = ref<number | 'all'>(new Date().getFullYear());
+const showAllLeagues = ref(false);
+const availableSeasonYears = ref<number[]>([]);
+
+const seasonYearOptions = computed(() => [
+  { label: 'All-time', value: 'all' as const },
+  ...[...availableSeasonYears.value]
+    .sort((a, b) => b - a)
+    .map((y) => ({ label: String(y), value: y })),
+]);
+
+// Tab 2 (Global Records) State
+const selectedOverviewYears = ref<number[]>([]);
+const overviewYearOptions = ref<number[]>([]);
 const availablePlayerCounts = ['2p', '3p', '4p'];
 const selectedPlayerCounts = ref<string[]>(['4p']);
+
 const playerCountsParam = computed(() =>
   selectedPlayerCounts.value.length > 0 ? selectedPlayerCounts.value : undefined
 );
 
 onMounted(async () => {
-  const years = await getAvailableYears();
-  yearOptions.value = years ?? [];
+  const [years, currentSeasonId, userYears] = await Promise.all([
+    fetchAvailableYears(),
+    fetchCurrentSeasonId(),
+    getAvailableYears(),
+  ]);
+
+  availableSeasonYears.value = years ?? [];
+  overviewYearOptions.value = userYears ?? [];
+
+  if (currentSeasonId) {
+    const season = await fetchSeason(currentSeasonId);
+    if (season) {
+      selectedSeasonYear.value = season.year;
+    }
+  } else if (availableSeasonYears.value.length > 0) {
+    selectedSeasonYear.value = availableSeasonYears.value[0];
+  }
 });
 </script>
 
@@ -187,12 +291,17 @@ onMounted(async () => {
   }
 }
 
-@media (max-width: 599px) {
-  .years-filter--mobile {
-    :deep(.q-field__control) {
-      min-height: 34px;
-      height: 34px;
-    }
+.years-select {
+  min-width: 160px;
+  max-width: 280px;
+
+  &--mobile {
+    min-width: 130px;
+    max-width: 180px;
   }
+}
+
+.filter-label {
+  white-space: nowrap;
 }
 </style>
