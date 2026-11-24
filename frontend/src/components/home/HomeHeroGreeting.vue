@@ -47,6 +47,14 @@
         <KennerButton
           flat
           color="primary"
+          icon="stars"
+          label="Hall of Fame"
+          size="sm"
+          :to="{ name: 'leaderboard' }"
+        />
+        <KennerButton
+          flat
+          color="primary"
           icon="query_stats"
           label="Statistics"
           size="sm"

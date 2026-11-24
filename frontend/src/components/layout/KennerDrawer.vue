@@ -27,6 +27,12 @@
           forward-name="seasons"
         />
         <DrawerItem
+          icon="stars"
+          icon-color="primary"
+          label="Hall of Fame"
+          forward-name="leaderboard"
+        />
+        <DrawerItem
           icon="emoji_events"
           icon-color="primary"
           label="Match Results"

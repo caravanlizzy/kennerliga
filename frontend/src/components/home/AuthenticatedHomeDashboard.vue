@@ -3,22 +3,10 @@
     <!-- Hero Greeting & Quick Action Hub -->
     <HomeHeroGreeting />
 
-    <!-- Segmented Toggle across the section -->
-    <div class="row items-center justify-between q-mb-md">
-      <SmoothSwitch
-        v-model="activeTab"
-        :options="[
-          { label: 'Current Season', value: 'season', icon: 'military_tech' },
-          { label: 'Hall of Fame', value: 'leaderboard', icon: 'stars' },
-        ]"
-      />
-    </div>
-
     <div class="row q-col-gutter-md">
       <!-- Left Column: Primary Info -->
       <div class="col-12 col-md-8">
         <HomeSeasonSection
-          v-show="activeTab === 'season'"
           v-model:selectedSeasonYear="selectedSeasonYear"
           v-model:selectedSeasonMonth="selectedSeasonMonth"
           :selected-season-id="selectedSeasonId"
@@ -28,12 +16,6 @@
           :loading="loading"
           :refreshing="refreshing"
           @select-current-season="homeSeasonStore.selectCurrentSeason"
-        />
-
-        <HomeLeaderboardSection
-          v-show="activeTab === 'leaderboard'"
-          v-model:year="selectedYear"
-          :years="availableYears"
         />
       </div>
 
@@ -47,27 +29,20 @@
 
 <script setup lang="ts">
 defineOptions({ name: 'AuthenticatedHomeDashboard' });
-import { ref, onMounted, watch } from 'vue';
+import { onMounted, watch } from 'vue';
 import { storeToRefs } from 'pinia';
 import { useUserStore } from 'stores/userStore';
 import { useHomeSeasonStore } from 'stores/homeSeasonStore';
 import HomeHeroGreeting from 'components/home/HomeHeroGreeting.vue';
-import SmoothSwitch from 'components/base/SmoothSwitch.vue';
 import HomeSeasonSection from 'components/home/HomeSeasonSection.vue';
-import HomeLeaderboardSection from 'components/home/HomeLeaderboardSection.vue';
 import HomeLiveActionSection from 'components/home/HomeLiveActionSection.vue';
 
 const { isAuthenticated } = storeToRefs(useUserStore());
 
-const activeTab = ref<'season' | 'leaderboard'>('season');
-
-// Season selection state now lives in a Pinia store, so it persists across
-// navigation. Re-mounting this component reuses the cached data and only
-// triggers a non-blocking background refresh — no more spinner on every visit.
+// Season selection state lives in a Pinia store, persisting across navigation.
+// Re-mounting this component reuses cached data with background refresh.
 const homeSeasonStore = useHomeSeasonStore();
 const {
-  selectedYear,
-  availableYears,
   loading,
   refreshing,
   selectedSeasonYear,
@@ -80,8 +55,6 @@ const {
 
 function ensureInitialized() {
   if (isAuthenticated.value) {
-    // `init` is stale-while-revalidate: blocking on first call, background
-    // refresh on subsequent ones.
     void homeSeasonStore.init();
   }
 }
