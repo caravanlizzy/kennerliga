@@ -8,20 +8,6 @@
     :rows="data"
     :columns="columns"
   >
-    <template v-slot:body-cell-selectable="props">
-      <q-td :props="props">
-        <div
-          v-if="!props.row.selectable"
-          class="row items-center text-negative"
-        >
-          <span class="text-caption text-weight-bold">NOT SELECTABLE</span>
-        </div>
-        <div v-else class="row items-center text-grey-6">
-          <span class="text-caption">Selectable</span>
-        </div>
-      </q-td>
-    </template>
-
     <template v-slot:body-cell-actions="props">
       <q-td :props="props" class="q-gutter-x-xs">
         <q-btn
@@ -158,13 +144,6 @@ const columns = computed(() => [
     name: 'platform',
     label: 'Platform',
     field: (x: GameRow) => lookupPlatform(x),
-    align: 'left',
-    sortable: true,
-  },
-  {
-    name: 'selectable',
-    label: 'Status',
-    field: (x: GameRow) => x.selectable,
     align: 'left',
     sortable: true,
   },
