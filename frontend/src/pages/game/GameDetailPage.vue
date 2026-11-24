@@ -85,9 +85,13 @@
           />
           <q-tab
             name="matches"
-            label="Match History"
+            label="Matches"
             icon="history"
-            :badge="stats.matches ? String(stats.matches.length) : undefined"
+            :badge="
+              stats.recent_matches
+                ? String(stats.recent_matches.length)
+                : undefined
+            "
           />
           <q-tab
             v-if="hasFactionsOrRules"
@@ -111,13 +115,17 @@
             />
           </q-tab-panel>
 
-          <!-- Match History Panel -->
+          <!-- Matches Panel -->
           <q-tab-panel name="matches" class="q-pa-none">
             <GameMatchHistoryCard
-              :matches="stats.matches"
+              :matches="stats.recent_matches"
+              :columns="matchColumns"
               :format-date="formatDate"
               @view-match="
-                router.push({ name: 'match-detail', params: { id: $event } })
+                router.push({
+                  name: 'match-result-detail',
+                  params: { id: $event },
+                })
               "
             />
           </q-tab-panel>
@@ -156,6 +164,7 @@ import {
   TGameDetailedStatistics,
   TGameFactionStat,
   TGameLeaderboardPlayer,
+  TGameRecentMatch,
 } from 'src/types';
 import KennerButton from 'components/base/KennerButton.vue';
 import LoadingSpinner from 'components/base/LoadingSpinner.vue';
@@ -392,6 +401,59 @@ const factionColumns = [
       r.best_score !== null ? r.best_score : '-',
     align: 'center',
     sortable: true,
+  },
+];
+
+// Columns definition for Matches
+const matchColumns = [
+  {
+    name: 'season',
+    label: 'Season',
+    field: (r: TGameRecentMatch) =>
+      r.season_name || (r.season_id ? `Season #${r.season_id}` : '-'),
+    align: 'left',
+    sortable: true,
+  },
+  {
+    name: 'league',
+    label: 'League',
+    field: (r: TGameRecentMatch) =>
+      r.league_name ||
+      (r.league_level != null ? `League ${r.league_level}` : '-'),
+    align: 'left',
+    sortable: true,
+  },
+  {
+    name: 'date',
+    label: 'Date',
+    field: (r: TGameRecentMatch) => r.date,
+    align: 'left',
+    sortable: true,
+  },
+  {
+    name: 'players',
+    label: 'Players',
+    field: (r: TGameRecentMatch) =>
+      r.participants?.map((p) => p.profile_name).join(', ') || '-',
+    align: 'left',
+    sortable: false,
+  },
+  {
+    name: 'factions',
+    label: 'Factions',
+    field: (r: TGameRecentMatch) =>
+      r.participants
+        ?.map((p) => p.faction_name || p.win_condition_name)
+        .filter(Boolean)
+        .join(', ') || '-',
+    align: 'left',
+    sortable: false,
+  },
+  {
+    name: 'actions',
+    label: '',
+    field: () => '',
+    align: 'right',
   },
 ];
 </script>

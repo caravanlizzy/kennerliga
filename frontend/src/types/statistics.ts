@@ -238,6 +238,8 @@ export type TGameRecentMatch = {
   selected_options: TGameMatchOption[];
 };
 
+export type TGameMatch = TGameRecentMatch;
+
 export type TGameDetailInfo = {
   id: number;
   name: string;

@@ -867,7 +867,7 @@ class GameDetailedStatisticsTests(StatisticsServiceTestBase):
 
         # Faction statistics must be fetched in a single consolidated query,
         # so having 10 factions does not introduce an O(N) query loop.
-        with self.assertNumQueries(24):
+        with self.assertNumQueries(25):
             stats = get_game_detailed_statistics(self.game, profile=self.alice)
 
         self.assertEqual(len(stats["factions"]), 10)

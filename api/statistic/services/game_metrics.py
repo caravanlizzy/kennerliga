@@ -656,6 +656,7 @@ def get_game_detailed_statistics(
         .prefetch_related(
             "result_set__player_profile__user",
             "result_set__faction",
+            "result_set__factions",
             "result_set__win_condition",
             "selected_options__game_option",
             "selected_options__choice",
@@ -679,7 +680,15 @@ def get_game_detailed_statistics(
                 ),
                 "position": r.position,
                 "points": r.points,
-                "faction_name": r.faction.name if r.faction else None,
+                "faction_name": (
+                    r.faction.name
+                    if r.faction
+                    else (
+                        ", ".join(f.name for f in r.factions.all())
+                        if r.factions.all()
+                        else None
+                    )
+                ),
                 "win_condition_name": (
                     r.win_condition.name if r.win_condition else None
                 ),
