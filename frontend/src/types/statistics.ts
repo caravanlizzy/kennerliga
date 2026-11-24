@@ -209,12 +209,35 @@ export type TGameFactionStat = {
   best_score: number | null;
 };
 
+export type TGameStartingPositionStat = {
+  starting_position: number;
+  games_played: number;
+  wins: number;
+  win_rate: number;
+  avg_position: number | null;
+  avg_points: number | null;
+  best_score: number | null;
+};
+
+export type TGameRuleVariantStat = {
+  option_id: number;
+  option_name: string;
+  choice_id: number | null;
+  choice_name: string;
+  matches_count: number;
+  avg_winning_score: number | null;
+  avg_score: number | null;
+  high_score: number | null;
+};
+
 export type TGameMatchParticipant = {
   profile_id: number;
   profile_name: string;
   username: string | null;
   position: number | null;
   points: number | null;
+  starting_position?: number | null;
+  starting_points?: number | null;
   faction_name: string | null;
   win_condition_name: string | null;
   is_winner: boolean;
@@ -275,5 +298,7 @@ export type TGameDetailedStatistics = {
   superlatives: TGameSuperlatives;
   leaderboard: TGameLeaderboardPlayer[];
   factions: TGameFactionStat[];
+  starting_positions?: TGameStartingPositionStat[];
+  rule_variants?: TGameRuleVariantStat[];
   recent_matches: TGameRecentMatch[];
 };

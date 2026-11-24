@@ -644,11 +644,130 @@ def get_game_detailed_statistics(
             )
     faction_stats.sort(key=lambda x: (-x["games_played"], -x["win_rate"], x["name"].lower()))
 
+    # 7b. Starting position / Turn order statistics
+    starting_pos_data = results_qs.filter(
+        starting_position__isnull=False
+    ).values("id", "starting_position", "position", "points")
+    starting_pos_map = defaultdict(list)
+    for row in starting_pos_data:
+        sp = row["starting_position"]
+        if sp is not None:
+            starting_pos_map[sp].append((row["position"], row["points"]))
+
+    starting_position_stats = []
+    for sp in sorted(starting_pos_map.keys()):
+        items = starting_pos_map[sp]
+        sp_played = len(items)
+        if sp_played > 0:
+            positions = [pos for pos, _ in items if pos is not None]
+            points_list = [pts for _, pts in items if pts is not None]
+            sp_wins = sum(1 for pos, _ in items if pos == 1)
+            sp_win_rate = round(sp_wins / sp_played * 100, 1)
+            sp_avg_pos = sum(positions) / len(positions) if positions else None
+            sp_avg_pts = sum(points_list) / len(points_list) if points_list else None
+            sp_best_pts = max(points_list) if points_list else None
+            starting_position_stats.append(
+                {
+                    "starting_position": sp,
+                    "games_played": sp_played,
+                    "wins": sp_wins,
+                    "win_rate": sp_win_rate,
+                    "avg_position": (
+                        round(float(sp_avg_pos), 2) if sp_avg_pos is not None else None
+                    ),
+                    "avg_points": (
+                        round(float(sp_avg_pts), 1) if sp_avg_pts is not None else None
+                    ),
+                    "best_score": sp_best_pts,
+                }
+            )
+
+    # 7c. Rule / Variant stats
+    rule_variant_stats = []
+    game_options = list(game.options.all().prefetch_related("choices"))
+    if game_options:
+        from game.models import SelectedOption
+
+        match_ids_set = set(
+            results_qs.values_list("selected_game_id", flat=True).distinct()
+        )
+        if match_ids_set:
+            selected_opts = SelectedOption.objects.filter(
+                selected_game_id__in=match_ids_set
+            ).select_related("game_option", "choice")
+
+            match_scores_map = defaultdict(list)
+            match_winning_score_map = {}
+            for r_row in results_qs.values("selected_game_id", "position", "points"):
+                sg_id = r_row["selected_game_id"]
+                pts = r_row["points"]
+                if pts is not None:
+                    match_scores_map[sg_id].append(pts)
+                    if r_row["position"] == 1:
+                        match_winning_score_map[sg_id] = pts
+
+            opt_groups = defaultdict(list)
+            for so in selected_opts:
+                opt_key = (
+                    so.game_option_id,
+                    so.game_option.name,
+                    so.choice_id,
+                    (
+                        so.choice.name
+                        if so.choice
+                        else (
+                            "Yes"
+                            if so.value
+                            else "No" if so.value is not None else "Enabled"
+                        )
+                    ),
+                )
+                opt_groups[opt_key].append(so.selected_game_id)
+
+            for (
+                opt_id,
+                opt_name,
+                choice_id,
+                choice_name,
+            ), sg_ids in opt_groups.items():
+                m_count = len(set(sg_ids))
+                all_pts = [
+                    pts for m_id in sg_ids for pts in match_scores_map.get(m_id, [])
+                ]
+                win_pts = [
+                    match_winning_score_map[m_id]
+                    for m_id in sg_ids
+                    if m_id in match_winning_score_map
+                ]
+                rule_variant_stats.append(
+                    {
+                        "option_id": opt_id,
+                        "option_name": opt_name,
+                        "choice_id": choice_id,
+                        "choice_name": choice_name,
+                        "matches_count": m_count,
+                        "avg_winning_score": (
+                            round(float(sum(win_pts) / len(win_pts)), 1)
+                            if win_pts
+                            else None
+                        ),
+                        "avg_score": (
+                            round(float(sum(all_pts) / len(all_pts)), 1)
+                            if all_pts
+                            else None
+                        ),
+                        "high_score": max(all_pts) if all_pts else None,
+                    }
+                )
+            rule_variant_stats.sort(
+                key=lambda x: (x["option_name"].lower(), x["choice_name"].lower())
+            )
+
     # 8. Recent matches
     match_ids = list(
         results_qs.values_list("selected_game_id", flat=True)
         .distinct()
-        .order_by("-selected_game__created_at")[:25]
+        .order_by("-selected_game__created_at")[:100]
     )
     selected_games = (
         SelectedGame.objects.filter(id__in=match_ids)
@@ -680,6 +799,8 @@ def get_game_detailed_statistics(
                 ),
                 "position": r.position,
                 "points": r.points,
+                "starting_position": r.starting_position,
+                "starting_points": r.starting_points,
                 "faction_name": (
                     r.faction.name
                     if r.faction
@@ -741,5 +862,7 @@ def get_game_detailed_statistics(
         "superlatives": superlatives,
         "leaderboard": sorted_leaderboard,
         "factions": faction_stats,
+        "starting_positions": starting_position_stats,
+        "rule_variants": rule_variant_stats,
         "recent_matches": recent_matches,
     }

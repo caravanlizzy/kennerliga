@@ -867,7 +867,7 @@ class GameDetailedStatisticsTests(StatisticsServiceTestBase):
 
         # Faction statistics must be fetched in a single consolidated query,
         # so having 10 factions does not introduce an O(N) query loop.
-        with self.assertNumQueries(25):
+        with self.assertNumQueries(27):
             stats = get_game_detailed_statistics(self.game, profile=self.alice)
 
         self.assertEqual(len(stats["factions"]), 10)
@@ -883,6 +883,52 @@ class GameDetailedStatisticsTests(StatisticsServiceTestBase):
         self.assertEqual(f3_stat["games_played"], 0)
         self.assertEqual(f3_stat["wins"], 0)
         self.assertIsNone(f3_stat["avg_position"])
+
+    def test_starting_position_statistics(self):
+        selected_game = SelectedGame.objects.create(
+            profile=self.alice, game=self.game, league=self.league
+        )
+        Result.objects.create(
+            player_profile=self.alice,
+            selected_game=selected_game,
+            league=self.league,
+            season=self.season,
+            position=1,
+            points=100,
+            starting_position=1,
+        )
+        Result.objects.create(
+            player_profile=self.bob,
+            selected_game=selected_game,
+            league=self.league,
+            season=self.season,
+            position=2,
+            points=80,
+            starting_position=2,
+        )
+
+        stats = get_game_detailed_statistics(self.game, profile=self.alice)
+        self.assertIn("starting_positions", stats)
+        self.assertEqual(len(stats["starting_positions"]), 2)
+        sp1 = next(s for s in stats["starting_positions"] if s["starting_position"] == 1)
+        self.assertEqual(sp1["games_played"], 1)
+        self.assertEqual(sp1["wins"], 1)
+        self.assertEqual(sp1["win_rate"], 100.0)
+        self.assertEqual(sp1["avg_position"], 1.0)
+        self.assertEqual(sp1["avg_points"], 100.0)
+        self.assertEqual(sp1["best_score"], 100)
+
+        sp2 = next(s for s in stats["starting_positions"] if s["starting_position"] == 2)
+        self.assertEqual(sp2["games_played"], 1)
+        self.assertEqual(sp2["wins"], 0)
+        self.assertEqual(sp2["win_rate"], 0.0)
+        self.assertEqual(sp2["avg_position"], 2.0)
+        self.assertEqual(sp2["avg_points"], 80.0)
+
+        # Verify participant starting position in recent matches
+        self.assertEqual(len(stats["recent_matches"]), 1)
+        p1 = stats["recent_matches"][0]["participants"][0]
+        self.assertEqual(p1["starting_position"], 1)
 
     def test_player_count_filter_query_optimization(self):
         from statistic.services.query_filters import (

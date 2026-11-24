@@ -94,10 +94,10 @@
             "
           />
           <q-tab
-            v-if="hasFactionsOrRules"
+            v-if="hasPropertiesOrAnalytics"
             name="factions"
-            label="Factions &amp; Rules"
-            icon="tune"
+            label="Properties &amp; Analytics"
+            icon="insights"
           />
         </q-tabs>
 
@@ -119,7 +119,6 @@
           <q-tab-panel name="matches" class="q-pa-none">
             <GameMatchHistoryCard
               :matches="stats.recent_matches"
-              :columns="matchColumns"
               :format-date="formatDate"
               @view-match="
                 router.push({
@@ -130,15 +129,16 @@
             />
           </q-tab-panel>
 
-          <!-- Factions & Rules Panel -->
+          <!-- Properties & Analytics Panel -->
           <q-tab-panel
-            v-if="hasFactionsOrRules"
+            v-if="hasPropertiesOrAnalytics"
             name="factions"
             class="q-pa-none"
           >
             <GameFactionStatsCard
               :factions="stats.factions"
-              :columns="factionColumns"
+              :starting-positions="stats.starting_positions"
+              :rule-variants="stats.rule_variants"
               :game="stats.game"
               :is-admin="isAdmin"
               @edit-config="
@@ -162,9 +162,7 @@ import { useUserStore } from 'src/stores/userStore';
 import { fetchGameDetailedStatistics } from 'src/services/statisticsService';
 import {
   TGameDetailedStatistics,
-  TGameFactionStat,
   TGameLeaderboardPlayer,
-  TGameRecentMatch,
 } from 'src/types';
 import KennerButton from 'components/base/KennerButton.vue';
 import LoadingSpinner from 'components/base/LoadingSpinner.vue';
@@ -227,10 +225,16 @@ const topPlayer = computed<TGameLeaderboardPlayer | null>(() => {
   return stats.value.leaderboard[0];
 });
 
-const hasFactionsOrRules = computed(() => {
+const hasPropertiesOrAnalytics = computed(() => {
   return (
     (stats.value?.factions && stats.value.factions.length > 0) ||
+    (stats.value?.starting_positions &&
+      stats.value.starting_positions.length > 0) ||
+    Boolean(
+      stats.value?.rule_variants && stats.value.rule_variants.length > 0
+    ) ||
     Boolean(stats.value?.game.options && stats.value.game.options.length > 0) ||
+    Boolean(stats.value?.game.has_starting_player_order) ||
     Boolean(stats.value?.game.is_asymmetric)
   );
 });
@@ -345,115 +349,6 @@ const leaderboardColumns = [
       r.avg_score !== null ? r.avg_score : '-',
     align: 'center',
     sortable: true,
-  },
-];
-
-// Columns definition for Factions
-const factionColumns = [
-  {
-    name: 'name',
-    label: 'Faction',
-    field: (r: TGameFactionStat) => r.name,
-    align: 'left',
-    sortable: true,
-  },
-  {
-    name: 'games_played',
-    label: 'Plays',
-    field: (r: TGameFactionStat) => r.games_played,
-    align: 'center',
-    sortable: true,
-  },
-  {
-    name: 'wins',
-    label: 'Wins',
-    field: (r: TGameFactionStat) => r.wins,
-    align: 'center',
-    sortable: true,
-  },
-  {
-    name: 'win_rate',
-    label: 'Win Rate',
-    field: (r: TGameFactionStat) => r.win_rate,
-    align: 'center',
-    sortable: true,
-  },
-  {
-    name: 'avg_position',
-    label: 'Avg Position',
-    field: (r: TGameFactionStat) =>
-      r.avg_position !== null ? r.avg_position : '-',
-    align: 'center',
-    sortable: true,
-  },
-  {
-    name: 'avg_points',
-    label: 'Avg Points',
-    field: (r: TGameFactionStat) =>
-      r.avg_points !== null ? r.avg_points : '-',
-    align: 'center',
-    sortable: true,
-  },
-  {
-    name: 'best_score',
-    label: 'Best Score',
-    field: (r: TGameFactionStat) =>
-      r.best_score !== null ? r.best_score : '-',
-    align: 'center',
-    sortable: true,
-  },
-];
-
-// Columns definition for Matches
-const matchColumns = [
-  {
-    name: 'season',
-    label: 'Season',
-    field: (r: TGameRecentMatch) =>
-      r.season_name || (r.season_id ? `Season #${r.season_id}` : '-'),
-    align: 'left',
-    sortable: true,
-  },
-  {
-    name: 'league',
-    label: 'League',
-    field: (r: TGameRecentMatch) =>
-      r.league_name ||
-      (r.league_level != null ? `League ${r.league_level}` : '-'),
-    align: 'left',
-    sortable: true,
-  },
-  {
-    name: 'date',
-    label: 'Date',
-    field: (r: TGameRecentMatch) => r.date,
-    align: 'left',
-    sortable: true,
-  },
-  {
-    name: 'players',
-    label: 'Players',
-    field: (r: TGameRecentMatch) =>
-      r.participants?.map((p) => p.profile_name).join(', ') || '-',
-    align: 'left',
-    sortable: false,
-  },
-  {
-    name: 'factions',
-    label: 'Factions',
-    field: (r: TGameRecentMatch) =>
-      r.participants
-        ?.map((p) => p.faction_name || p.win_condition_name)
-        .filter(Boolean)
-        .join(', ') || '-',
-    align: 'left',
-    sortable: false,
-  },
-  {
-    name: 'actions',
-    label: '',
-    field: () => '',
-    align: 'right',
   },
 ];
 </script>
