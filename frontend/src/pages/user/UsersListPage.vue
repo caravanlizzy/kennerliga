@@ -183,7 +183,7 @@
             flat
             shape="circle"
             dense
-            :icon="isAdminUser(props.row) ? 'shield' : 'shield_outlined'"
+            icon="shield"
             :color="isAdminUser(props.row) ? 'amber-8' : 'grey-5'"
             :loading="togglingAdminUserId === props.row.id"
             @click.stop="promptToggleAdmin(props.row)"
