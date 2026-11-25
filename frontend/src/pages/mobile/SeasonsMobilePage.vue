@@ -1,10 +1,10 @@
 <template>
   <q-page class="bg-white">
     <div
-      class="q-pa-md row items-center justify-between no-wrap border-bottom-subtle"
+      class="q-px-md q-py-sm row items-center justify-between no-wrap border-bottom-subtle"
     >
       <div class="row items-center no-wrap q-gutter-x-sm">
-        <div class="text-h5 text-weight-bold text-dark">Seasons</div>
+        <div class="text-h6 text-weight-bold text-dark">Seasons</div>
         <div
           v-if="isLiveSeason || isRunningSeason"
           class="season-live-badge row items-center no-wrap q-gutter-x-xs q-px-sm q-py-xs rounded-borders"
@@ -17,28 +17,28 @@
       </div>
       <div
         v-if="!loading || selectedSeasonId"
-        class="row no-wrap items-center q-gutter-x-sm"
+        class="row no-wrap items-center q-gutter-x-xs"
       >
-        <div style="min-width: 80px">
+        <div style="min-width: 76px">
           <KennerSelect
             v-model="selectedSeasonYear"
             :options="seasonYearOptions"
             dense
-            label="Year"
             emit-value
             map-options
             :disable="loading && !selectedSeasonId"
+            class="compact-select"
           />
         </div>
-        <div style="min-width: 100px">
+        <div style="min-width: 62px">
           <KennerSelect
             v-model="selectedSeasonMonth"
             :options="seasonMonthOptions"
             dense
-            label="Month"
             emit-value
             map-options
             :disable="loading && !selectedSeasonId"
+            class="compact-select"
           />
         </div>
         <KennerButton
@@ -72,12 +72,14 @@
         selectedSeasonId &&
         !loading
       "
-      class="q-px-md q-pt-sm"
+      class="q-px-md q-py-xs q-my-xs"
     >
-      <SeasonProgressBar
-        :progress="selectedSeasonProgress"
-        :status="selectedSeason?.status"
-      />
+      <div class="season-progress-card">
+        <SeasonProgressBar
+          :progress="selectedSeasonProgress"
+          :status="selectedSeason?.status"
+        />
+      </div>
     </div>
     <SeasonStandings v-if="selectedSeasonId" :seasonId="selectedSeasonId" />
     <div v-else-if="loading" class="flex flex-center q-pa-xl">
@@ -131,6 +133,35 @@ onMounted(() => {
 <style scoped>
 .border-bottom-subtle {
   border-bottom: 1px solid var(--kenner-border-subtle);
+}
+
+.compact-select {
+  padding: 0 8px;
+  min-height: 32px;
+  height: 32px;
+  border-radius: 8px;
+  font-size: 0.85rem;
+}
+
+.compact-select :deep(.q-field__control) {
+  min-height: 32px !important;
+  height: 32px !important;
+}
+
+.compact-select :deep(.q-field__native) {
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.season-progress-card {
+  background: var(--kenner-surface-subtle, #f8fafc);
+  border: 1px solid var(--kenner-border-subtle);
+  border-radius: 12px;
+  padding: 8px 12px;
+}
+
+.body--dark .season-progress-card {
+  background: var(--kenner-surface-card, #1e293b);
 }
 
 .season-live-badge {

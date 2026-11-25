@@ -126,26 +126,43 @@
       class="row items-center justify-between lt-sm q-mt-xs text-caption text-grey-7"
       style="font-size: 11px"
     >
-      <span :class="{ 'text-positive text-weight-medium': isPicksComplete }">
-        {{
-          isPicksComplete
-            ? 'Picks ✓'
-            : `Picks: ${progress.picks.current}/${progress.picks.total}`
-        }}
-      </span>
-      <span :class="{ 'text-positive text-weight-medium': isBansComplete }">
-        {{
-          isBansComplete
-            ? 'Bans ✓'
-            : `Bans: ${progress.bans.current}/${progress.bans.total}`
-        }}
-      </span>
-      <span :class="{ 'text-positive text-weight-medium': isGamesComplete }">
-        {{
-          isGamesComplete
-            ? 'Games ✓'
-            : `Games: ${progress.reports.current}/${progress.reports.total}`
-        }}
+      <div class="row items-center q-gutter-x-sm">
+        <span
+          class="row items-center no-wrap"
+          :class="{ 'text-positive text-weight-bold': isPicksComplete }"
+        >
+          <q-icon
+            :name="isPicksComplete ? 'check_circle' : 'radio_button_unchecked'"
+            size="11px"
+            class="q-mr-xs"
+          />
+          {{
+            isPicksComplete
+              ? 'Picks'
+              : `Picks: ${progress.picks.current}/${progress.picks.total}`
+          }}
+        </span>
+        <span
+          class="row items-center no-wrap"
+          :class="{ 'text-positive text-weight-bold': isBansComplete }"
+        >
+          <q-icon
+            :name="isBansComplete ? 'check_circle' : 'radio_button_unchecked'"
+            size="11px"
+            class="q-mr-xs"
+          />
+          {{
+            isBansComplete
+              ? 'Bans'
+              : `Bans: ${progress.bans.current}/${progress.bans.total}`
+          }}
+        </span>
+      </div>
+      <span
+        class="row items-center no-wrap text-weight-medium"
+        :class="isGamesComplete ? 'text-positive' : 'text-grey-7'"
+      >
+        Games: {{ progress.reports.current }}/{{ progress.reports.total }}
       </span>
     </div>
   </div>

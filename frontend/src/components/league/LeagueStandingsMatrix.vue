@@ -35,8 +35,10 @@
               :style="
                 col.name.startsWith('game_')
                   ? isMobile
-                    ? 'max-width: 68px; white-space: normal; line-height: 1.2; padding: 8px 4px;'
+                    ? 'max-width: 68px; white-space: normal; line-height: 1.15; padding: 6px 4px;'
                     : 'min-width: 80px; white-space: normal; line-height: 1.2; padding: 12px 8px;'
+                  : isMobile
+                  ? 'padding: 6px 8px;'
                   : 'padding: 12px 8px;'
               "
             >
@@ -44,8 +46,13 @@
                 v-if="col.name === 'total'"
                 class="row items-center justify-end q-gutter-x-xs"
               >
-                <q-icon name="stars" color="primary" size="14px" />
-                <span>{{ col.label }}</span>
+                <q-icon
+                  v-if="!isMobile"
+                  name="stars"
+                  color="primary"
+                  size="14px"
+                />
+                <span class="text-weight-bolder">{{ col.label }}</span>
               </div>
               <div
                 v-else-if="col.name.startsWith('game_')"
@@ -103,14 +110,14 @@
                   :style="{
                     fontSize: '0.55rem',
                     lineHeight: 1,
-                    marginTop: '1px',
+                    marginTop: '2px',
                     ...(isMobile ? { maxWidth: '56px' } : {}),
                   }"
                 >
                   {{ col.platformName }}
                 </div>
                 <div
-                  v-if="col.selectedByName"
+                  v-if="!isMobile && col.selectedByName"
                   class="text-grey-6"
                   :class="{ ellipsis: isMobile }"
                   :style="{
@@ -707,15 +714,12 @@ const tableRows = computed(() => {
 
 const rowClass = (_row: unknown, index: number) => {
   // Only highlight if there are actually points (total > 0) or if games have been played
-  // Actually, usually we only highlight if total_league_points is non-zero or if we want to show current leader even at 0-0.
-  // The user said "just headers with profile names", so maybe don't highlight yet?
-  // But if we use index === 0, it will highlight the first person.
-  // Let's check if there are any games.
+  // On mobile we omit full-row tint to keep rank colors distinct and clean
   const hasGames =
     standings.value?.selected_games &&
     standings.value.selected_games.length > 0;
   if (!hasGames) return '';
-  return index === 0 ? 'bg-orange-1' : '';
+  return !isMobile.value && index === 0 ? 'bg-orange-1' : '';
 };
 
 const formatNumber = (value: string | number): string => {
@@ -773,6 +777,15 @@ function getRankBgClass(rank: number | undefined) {
 :deep(table) {
   border-collapse: separate;
   border-spacing: 0;
+}
+
+:deep(th),
+:deep(td) {
+  border-bottom: 1px solid var(--kenner-border-subtle);
+}
+
+:deep(tbody tr:last-child td) {
+  border-bottom: none;
 }
 
 :deep(th:first-child),

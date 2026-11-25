@@ -43,13 +43,18 @@
 
     <div v-else class="column q-gutter-y-md">
       <!-- Standings mode (matrix) -->
-      <div v-if="!mode || mode === 'standings'" class="column">
+      <div
+        v-if="!mode || mode === 'standings'"
+        class="column"
+        :class="isMobile ? 'q-px-sm q-py-xs q-gutter-y-sm' : ''"
+      >
         <div
           v-for="(league, index) in leagues"
           :key="league.id"
           class="league-standings-matrix-item"
+          :class="isMobile ? 'league-standings-card' : ''"
         >
-          <q-separator v-if="index > 0" class="q-my-lg" />
+          <q-separator v-if="!isMobile && index > 0" class="q-my-lg" />
           <LeagueStandingsMatrix
             :leagueId="league.id"
             :prefetchedData="allStandingsData[league.id]"
@@ -306,6 +311,19 @@ void resetLeagues;
 </script>
 
 <style scoped lang="scss">
+.league-standings-card {
+  background: var(--kenner-card-bg, #ffffff);
+  border: 1px solid var(--kenner-border-subtle);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+}
+
+.body--dark .league-standings-card {
+  background: var(--kenner-surface-card, #1e293b);
+  border-color: var(--kenner-border-subtle);
+}
+
 .league-card {
   border: 1px solid var(--kenner-border-color);
   border-radius: 16px;
