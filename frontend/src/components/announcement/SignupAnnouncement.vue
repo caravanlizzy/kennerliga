@@ -29,17 +29,17 @@
       <div class="row items-center no-wrap q-gutter-x-sm flex-shrink-0">
         <div
           v-if="isSignedUpForOpenSeason"
-          class="row items-center q-gutter-x-xs text-positive text-weight-bold text-caption"
+          class="signup-status-badge signup-status-badge--registered row items-center no-wrap q-gutter-x-xs text-caption"
         >
           <q-icon name="check_circle" size="14px" />
-          <span class="gt-xs">Signed up</span>
+          <span>Signed up</span>
         </div>
         <div
           v-else
-          class="row items-center q-gutter-x-xs text-negative text-weight-bold text-caption"
+          class="signup-status-badge signup-status-badge--unregistered row items-center no-wrap q-gutter-x-xs text-caption"
         >
           <q-icon name="radio_button_unchecked" size="14px" />
-          <span class="gt-xs">Not signed up</span>
+          <span>Not signed up</span>
         </div>
         <KennerButton
           flat
@@ -106,10 +106,10 @@
             unelevated
             dense
             no-caps
-            color="accent"
-            class="q-px-sm text-weight-bold"
+            class="signup-action-btn q-px-sm text-weight-bold"
             @click="signUp"
           >
+            <q-icon name="how_to_reg" size="16px" class="q-mr-xs" />
             Sign up
             <KennerTooltip v-if="!isAuthenticated" class="bg-grey-9">
               Login to sign up for upcoming season
@@ -118,10 +118,10 @@
 
           <div
             v-else
-            class="row items-center q-gutter-x-xs text-positive text-weight-bold text-caption q-px-xs"
+            class="signup-status-badge signup-status-badge--registered row items-center no-wrap q-gutter-x-xs text-caption q-px-sm q-py-xs"
           >
             <q-icon name="check_circle" size="16px" />
-            <span class="gt-xs">Signed up</span>
+            <span>Signed up</span>
           </div>
 
           <KennerButton
@@ -172,9 +172,12 @@
             <!-- Preliminary leagues notice -->
             <div
               v-if="projectedLeagueGroups.length"
-              class="text-caption text-grey-6 italic q-mb-sm"
+              class="provisional-leagues-label row items-center q-gutter-x-xs q-mb-xs"
             >
-              Provisional Leagues
+              <q-icon name="auto_awesome" size="13px" />
+              <span class="text-caption text-weight-bold uppercase tracking-wider">
+                Provisional Leagues Preview
+              </span>
             </div>
 
             <!-- Grouped by projected league -->
