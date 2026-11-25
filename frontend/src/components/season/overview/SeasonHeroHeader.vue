@@ -4,16 +4,6 @@
     :class="isMobile ? 'q-px-md q-py-sm border-bottom-subtle' : 'q-mb-md q-mb-sm-lg'"
   >
     <div class="row items-center q-gutter-x-sm no-wrap col ellipsis">
-      <KennerButton
-        flat
-        round
-        dense
-        icon="arrow_back"
-        color="grey-7"
-        :to="{ name: 'seasons' }"
-      >
-        <KennerTooltip>Back to Seasons</KennerTooltip>
-      </KennerButton>
       <div class="column col ellipsis">
         <div class="row items-center q-gutter-x-sm no-wrap">
           <h1
@@ -75,7 +65,6 @@
 
 <script setup lang="ts">
 import KennerButton from 'components/base/KennerButton.vue';
-import KennerTooltip from 'components/base/KennerTooltip.vue';
 
 defineProps<{
   seasonId: number;

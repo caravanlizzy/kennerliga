@@ -68,16 +68,6 @@
       <div class="league-header-card q-pa-md">
         <div class="row items-center justify-between q-col-gutter-sm">
           <div class="row items-center q-gutter-x-sm">
-            <KennerButton
-              round
-              flat
-              dense
-              icon="arrow_back"
-              color="grey-8"
-              class="q-mr-xs"
-              aria-label="Back"
-              @click="$router.back()"
-            />
             <div class="row items-center q-gutter-x-sm">
               <span class="text-h5 text-weight-bold text-dark">My League</span>
               <LeagueLevel
