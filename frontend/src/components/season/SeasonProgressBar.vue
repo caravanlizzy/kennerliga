@@ -249,22 +249,27 @@ const phaseLabel = computed(() => {
 }
 
 .mini-metric {
-  font-size: 11px;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
   line-height: 1.3;
-  padding: 1px 6px;
+  padding: 2px 6px;
   border-radius: 4px;
-  background: rgba(0, 0, 0, 0.03);
-  border: 1px solid var(--kenner-border-subtle, rgba(0, 0, 0, 0.06));
+  border: none;
+  background: color-mix(in srgb, #64748b 14%, transparent);
+  color: #475569;
 }
 
 .mini-metric--complete {
-  background: rgba(34, 197, 94, 0.08);
-  border-color: rgba(34, 197, 94, 0.2);
-  color: var(--kenner-success-text, #15803d);
+  background: color-mix(in srgb, #15803d 14%, transparent);
+  color: #15803d;
+  border: none;
 }
 
 .mini-metric--pending {
-  color: var(--kenner-text-secondary, #475569);
+  background: color-mix(in srgb, #64748b 14%, transparent);
+  color: #475569;
+  border: none;
 }
 
 body.body--dark .progress-header-icon {
@@ -284,14 +289,20 @@ body.body--dark .season-progress-track :deep(.q-linear-progress__model) {
 }
 
 body.body--dark .mini-metric {
-  background: rgba(255, 255, 255, 0.05);
-  border-color: rgba(255, 255, 255, 0.08);
+  background: color-mix(in srgb, #94a3b8 18%, transparent);
+  border: none;
   color: #94a3b8;
 }
 
 body.body--dark .mini-metric--complete {
-  background: rgba(34, 197, 94, 0.15);
-  border-color: rgba(34, 197, 94, 0.3);
+  background: color-mix(in srgb, #4ade80 22%, transparent);
+  border: none;
   color: #4ade80;
+}
+
+body.body--dark .mini-metric--pending {
+  background: color-mix(in srgb, #94a3b8 18%, transparent);
+  border: none;
+  color: #94a3b8;
 }
 </style>

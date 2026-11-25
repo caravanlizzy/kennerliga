@@ -163,16 +163,16 @@ const isLiveSeason = computed(
 
 <style scoped>
 .season-live-badge {
-  background: var(--kenner-success-bg, rgba(34, 197, 94, 0.08));
-  color: var(--kenner-success-text, #15803d);
-  font-size: 10px;
-  font-weight: 600;
-  letter-spacing: 0.3px;
+  background: color-mix(in srgb, #15803d 14%, transparent);
+  color: #15803d;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
-  border-radius: 9999px;
-  padding: 1px 7px;
-  border: 1px solid rgba(34, 197, 94, 0.25);
-  line-height: 1.4;
+  border-radius: 4px;
+  padding: 2px 6px;
+  border: none;
+  line-height: 1.3;
 }
 
 .status-dot {
@@ -180,11 +180,14 @@ const isLiveSeason = computed(
   height: 5px;
   border-radius: 50%;
   background-color: currentColor;
-  opacity: 0.85;
+  opacity: 0.9;
   display: inline-block;
 }
 
+body.body--dark .season-live-badge,
 .body--dark .season-live-badge {
-  border-color: rgba(74, 222, 128, 0.3);
+  background: color-mix(in srgb, #4ade80 22%, transparent);
+  color: #4ade80;
+  border: none;
 }
 </style>
