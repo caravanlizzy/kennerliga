@@ -13,12 +13,10 @@
           </h1>
           <div
             v-if="seasonStatusLabel === 'RUNNING'"
-            class="season-live-badge row items-center no-wrap q-gutter-x-xs q-px-sm q-py-xs rounded-borders shrink-0"
+            class="season-live-badge row items-center no-wrap q-gutter-x-xs shrink-0"
           >
-            <span class="pulse-dot" />
-            <span class="text-weight-bolder text-uppercase live-text"
-              >Running</span
-            >
+            <span class="status-dot" />
+            <span class="live-text">Running</span>
           </div>
           <q-badge
             v-else-if="seasonStatusLabel"
@@ -87,33 +85,26 @@ defineProps<{
   flex-shrink: 0;
 }
 .season-live-badge {
-  background: rgba(33, 186, 69, 0.12);
-  color: var(--q-positive, #21ba45);
-  font-size: 11px;
-  letter-spacing: 0.5px;
-  border: 1px solid rgba(33, 186, 69, 0.3);
+  background: var(--kenner-success-bg, rgba(34, 197, 94, 0.08));
+  color: var(--kenner-success-text, #15803d);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+  border-radius: 9999px;
+  padding: 1px 7px;
+  border: 1px solid rgba(34, 197, 94, 0.25);
+  line-height: 1.4;
 }
-.pulse-dot {
-  width: 7px;
-  height: 7px;
+.status-dot {
+  width: 5px;
+  height: 5px;
   border-radius: 50%;
-  background-color: var(--q-positive, #21ba45);
-  box-shadow: 0 0 0 0 rgba(33, 186, 69, 0.7);
-  animation: pulse-ring 1.8s cubic-bezier(0.455, 0.03, 0.515, 0.955) infinite;
+  background-color: currentColor;
+  opacity: 0.85;
   display: inline-block;
 }
-@keyframes pulse-ring {
-  0% {
-    transform: scale(0.95);
-    box-shadow: 0 0 0 0 rgba(33, 186, 69, 0.7);
-  }
-  70% {
-    transform: scale(1);
-    box-shadow: 0 0 0 6px rgba(33, 186, 69, 0);
-  }
-  100% {
-    transform: scale(0.95);
-    box-shadow: 0 0 0 0 rgba(33, 186, 69, 0);
-  }
+.body--dark .season-live-badge {
+  border-color: rgba(74, 222, 128, 0.3);
 }
 </style>
