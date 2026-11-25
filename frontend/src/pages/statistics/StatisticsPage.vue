@@ -27,7 +27,7 @@
             Hall of Fame
           </div>
           <div v-if="!isMobile" class="text-caption text-grey-6 q-mt-xs">
-            Historical season champions, league placements, and awards
+            Historical season champions and player performance rankings
           </div>
         </div>
       </div>
@@ -46,7 +46,11 @@
       @update:model-value="onTabChange"
     >
       <q-tab name="hall-of-fame" icon="emoji_events" label="Hall of Fame" />
-      <q-tab name="awards" icon="military_tech" label="Awards" />
+      <q-tab
+        name="player-leaderboards"
+        icon="military_tech"
+        label="Player Leaderboards"
+      />
     </q-tabs>
 
     <!-- Tab Panels -->
@@ -91,8 +95,8 @@
         />
       </q-tab-panel>
 
-      <!-- Tab 2: Awards -->
-      <q-tab-panel name="awards" class="q-pa-none">
+      <!-- Tab 2: Player Leaderboards -->
+      <q-tab-panel name="player-leaderboards" class="q-pa-none">
         <div
           class="filter-toolbar row items-center justify-between"
           :class="isMobile ? 'q-mb-sm' : 'q-mb-md'"
@@ -150,50 +154,7 @@
           </div>
         </div>
 
-        <!-- Picks & Bans Showcase -->
-        <div :class="isMobile ? 'q-mb-md' : 'q-mb-xl'">
-          <div
-            class="section-header row items-center no-wrap"
-            :class="isMobile ? 'q-mb-xs' : 'q-mb-md'"
-          >
-            <div
-              class="section-header__icon"
-              :class="isMobile ? 'section-header__icon--mobile' : ''"
-            >
-              <q-icon
-                name="leaderboard"
-                color="primary"
-                :size="isMobile ? '16px' : '20px'"
-              />
-            </div>
-            <div class="column">
-              <div
-                class="text-weight-bolder text-dark line-height-1"
-                :class="isMobile ? 'text-subtitle1' : 'text-h6'"
-              >
-                Picks &amp; Bans
-              </div>
-              <div v-if="!isMobile" class="text-caption text-grey-6">
-                The games players choose most &mdash; and veto most across
-                seasons
-              </div>
-            </div>
-          </div>
-
-          <q-skeleton
-            v-if="loadingPopular"
-            type="rect"
-            height="180px"
-            class="rounded-borders"
-          />
-          <PopularGamesCard
-            v-else
-            :popular="popular"
-            @select="navigateToGame"
-          />
-        </div>
-
-        <!-- Performance Leaderboards & Superlative Awards -->
+        <!-- Player Leaderboards -->
         <PlayerStatistics
           :years="selectedOverviewYears"
           :player-counts="playerCountsParam"
@@ -213,7 +174,6 @@ import KennerPlayerCountFilter from 'components/base/KennerPlayerCountFilter.vue
 import SmoothSwitch from 'components/base/SmoothSwitch.vue';
 import LeaderBoard from 'components/season/LeaderBoard.vue';
 import PlayerStatistics from 'components/statistics/PlayerStatistics.vue';
-import PopularGamesCard from 'components/statistics/PopularGamesCard.vue';
 import { useUserStore } from 'stores/userStore';
 import { useResponsive } from 'src/composables/responsive';
 import {
@@ -221,18 +181,18 @@ import {
   fetchCurrentSeasonId,
   fetchSeason,
 } from 'src/services/seasonService';
-import { fetchPopularGames } from 'src/services/statisticsService';
-import { TPopularGames } from 'src/types';
 
 const route = useRoute();
 const router = useRouter();
 const { isMobile } = useResponsive();
 const { getAvailableYears } = useUserStore();
 
-type TabType = 'hall-of-fame' | 'awards';
+type TabType = 'hall-of-fame' | 'player-leaderboards';
 const currentTab = ref<TabType>(
-  route.query.tab === 'awards' || route.query.tab === 'records'
-    ? 'awards'
+  route.query.tab === 'player-leaderboards' ||
+    route.query.tab === 'awards' ||
+    route.query.tab === 'records'
+    ? 'player-leaderboards'
     : 'hall-of-fame'
 );
 
@@ -247,8 +207,12 @@ function onTabChange(newTab: TabType) {
 watch(
   () => route.query.tab,
   (tab) => {
-    if (tab === 'awards' || tab === 'records') {
-      currentTab.value = 'awards';
+    if (
+      tab === 'player-leaderboards' ||
+      tab === 'awards' ||
+      tab === 'records'
+    ) {
+      currentTab.value = 'player-leaderboards';
     } else if (tab === 'hall-of-fame') {
       currentTab.value = 'hall-of-fame';
     }
@@ -273,37 +237,8 @@ const overviewYearOptions = ref<number[]>([]);
 const availablePlayerCounts = ['2p', '3p', '4p'];
 const selectedPlayerCounts = ref<string[]>(['4p']);
 
-const popular = ref<TPopularGames | null>(null);
-const loadingPopular = ref(false);
-
 const playerCountsParam = computed(() =>
   selectedPlayerCounts.value.length > 0 ? selectedPlayerCounts.value : undefined
-);
-
-async function loadPopular() {
-  loadingPopular.value = true;
-  try {
-    popular.value = await fetchPopularGames({
-      years: selectedOverviewYears.value,
-      playerCounts: playerCountsParam.value,
-    });
-  } catch (err) {
-    console.error('Failed to load popular games for awards:', err);
-  } finally {
-    loadingPopular.value = false;
-  }
-}
-
-function navigateToGame(gameId: number) {
-  router.push({ name: 'game-detail', params: { id: gameId } });
-}
-
-watch(
-  () => [selectedOverviewYears.value, playerCountsParam.value],
-  () => {
-    void loadPopular();
-  },
-  { deep: true }
 );
 
 onMounted(async () => {
@@ -311,7 +246,6 @@ onMounted(async () => {
     fetchAvailableYears(),
     fetchCurrentSeasonId(),
     getAvailableYears(),
-    loadPopular(),
   ]);
 
   availableSeasonYears.value = years ?? [];
@@ -376,26 +310,5 @@ onMounted(async () => {
 
 .filter-label {
   white-space: nowrap;
-}
-
-.section-header {
-  gap: 10px;
-
-  &__icon {
-    width: 38px;
-    height: 38px;
-    border-radius: 9px;
-    background: rgba(99, 102, 241, 0.1);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-
-    &--mobile {
-      width: 28px;
-      height: 28px;
-      border-radius: 6px;
-    }
-  }
 }
 </style>

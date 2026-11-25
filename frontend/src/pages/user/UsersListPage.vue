@@ -63,7 +63,11 @@
         size="sm"
         color="primary"
         :icon="showHighlights ? 'expand_less' : 'military_tech'"
-        :label="showHighlights ? 'Hide Awards' : 'Show Awards'"
+        :label="
+          showHighlights
+            ? 'Hide Player Leaderboards'
+            : 'Show Player Leaderboards'
+        "
         @click="showHighlights = !showHighlights"
       />
     </div>

@@ -91,7 +91,7 @@
         </div>
       </div>
 
-      <!-- Awards Section -->
+      <!-- Playstyle Leaderboards Section -->
       <div
         v-if="(overview?.awards ?? []).length > 0"
         :class="isMobile ? 'q-mb-md' : 'q-mb-lg'"
@@ -101,7 +101,7 @@
           :class="isMobile ? 'q-mb-xs' : 'q-mb-md'"
         >
           <div
-            class="section-header__icon awards-header-icon"
+            class="section-header__icon playstyle-header-icon"
             :class="isMobile ? 'section-header__icon--mobile' : ''"
           >
             <q-icon
@@ -115,10 +115,10 @@
               class="text-weight-bolder text-dark line-height-1"
               :class="isMobile ? 'text-subtitle1' : 'text-h6'"
             >
-              Awards &amp; Superlatives
+              Playstyle Leaderboards
             </div>
             <div v-if="!isMobile" class="text-caption text-grey-6">
-              Playstyle achievements, ban habits, and game choices
+              Rankings for playstyle, ban habits, and game choices
             </div>
           </div>
         </div>
@@ -207,7 +207,7 @@ onMounted(() => {
       border-radius: 6px;
     }
 
-    &.awards-header-icon {
+    &.playstyle-header-icon {
       background: rgba(245, 158, 11, 0.15);
     }
   }
