@@ -33,39 +33,35 @@
 
       <!-- Right: Direct Utility Action Chips -->
       <div
-        class="col-12 col-md-5 row items-center justify-end q-gutter-xs flex-wrap"
+        class="col-12 col-md-5 row items-center justify-end q-gutter-xs flex-wrap hero-action-group"
       >
         <KennerButton
           v-if="hasMyLeague"
-          color="primary"
           icon="emoji_events"
           label="My League"
           size="sm"
-          class="hero-nav-btn hero-nav-btn--primary"
+          class="hero-fancy-btn hero-fancy-btn--league"
           :to="{ name: 'my-league' }"
         />
         <KennerButton
-          color="primary"
           icon="stars"
           label="Hall of Fame"
           size="sm"
-          class="hero-nav-btn"
+          class="hero-fancy-btn hero-fancy-btn--hof"
           :to="{ name: 'statistics' }"
         />
         <KennerButton
-          color="primary"
           icon="people_alt"
           label="Players"
           size="sm"
-          class="hero-nav-btn"
+          class="hero-fancy-btn hero-fancy-btn--players"
           :to="{ name: 'players' }"
         />
         <KennerButton
-          color="primary"
           icon="sports_esports"
           label="Games"
           size="sm"
-          class="hero-nav-btn"
+          class="hero-fancy-btn hero-fancy-btn--games"
           :to="{ name: 'games' }"
         />
       </div>
@@ -157,60 +153,326 @@ const seasonStatusText = computed(() => {
   animation: pulse-ring 1.8s cubic-bezier(0.455, 0.03, 0.515, 0.955) infinite;
 }
 
-.hero-nav-btn {
+.hero-fancy-btn {
+  position: relative;
+  overflow: hidden;
   font-weight: 600;
-  letter-spacing: 0.2px;
-  background: var(--kenner-surface-subtle) !important;
-  color: var(--kenner-text-strong) !important;
-  border: 1px solid var(--kenner-border-color) !important;
+  font-size: 12.5px;
+  letter-spacing: 0.25px;
   border-radius: 9999px !important;
-  padding: 3px 12px !important;
-  transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
+  padding: 4px 13px !important;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  :deep(.q-icon) {
+    font-size: 17px;
+    margin-right: 4px;
+    transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1),
+      color 0.2s ease;
+  }
+
+  &::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -120%;
+    width: 60%;
+    height: 100%;
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      rgba(255, 255, 255, 0.35) 50%,
+      transparent 100%
+    );
+    transform: skewX(-20deg);
+    pointer-events: none;
+    transition: none;
+  }
 
   &:hover {
-    background: var(--kenner-surface-muted) !important;
-    border-color: var(--kenner-border-strong) !important;
-    transform: translateY(-1px);
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+    transform: translateY(-2px) scale(1.02);
+
+    &::after {
+      left: 140%;
+      transition: left 0.65s ease-in-out;
+    }
   }
 
   &:active {
-    transform: translateY(0);
+    transform: translateY(0) scale(0.97);
   }
 }
 
-.hero-nav-btn--primary {
-  background: rgba(245, 158, 11, 0.1) !important;
-  color: #b45309 !important;
-  border: 1px solid rgba(245, 158, 11, 0.3) !important;
+.hero-fancy-btn--league {
+  background: linear-gradient(
+    135deg,
+    rgba(245, 158, 11, 0.14) 0%,
+    rgba(217, 119, 6, 0.08) 100%
+  ) !important;
+  color: #92400e !important;
+  border: 1px solid rgba(245, 158, 11, 0.35) !important;
+  box-shadow: 0 2px 6px rgba(245, 158, 11, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.6);
+
+  :deep(.q-icon) {
+    color: #d97706;
+  }
 
   &:hover {
-    background: rgba(245, 158, 11, 0.18) !important;
-    border-color: rgba(245, 158, 11, 0.5) !important;
+    background: linear-gradient(
+      135deg,
+      rgba(245, 158, 11, 0.25) 0%,
+      rgba(217, 119, 6, 0.16) 100%
+    ) !important;
+    border-color: rgba(245, 158, 11, 0.65) !important;
+    color: #78350f !important;
+    box-shadow: 0 4px 14px rgba(245, 158, 11, 0.28),
+      inset 0 1px 0 rgba(255, 255, 255, 0.9);
+
+    :deep(.q-icon) {
+      color: #b45309;
+      transform: scale(1.2) rotate(-8deg);
+    }
+  }
+}
+
+.hero-fancy-btn--hof {
+  background: linear-gradient(
+    135deg,
+    rgba(139, 92, 246, 0.12) 0%,
+    rgba(124, 58, 237, 0.06) 100%
+  ) !important;
+  color: #6d28d9 !important;
+  border: 1px solid rgba(139, 92, 246, 0.3) !important;
+  box-shadow: 0 2px 6px rgba(139, 92, 246, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.6);
+
+  :deep(.q-icon) {
+    color: #7c3aed;
+  }
+
+  &:hover {
+    background: linear-gradient(
+      135deg,
+      rgba(139, 92, 246, 0.22) 0%,
+      rgba(124, 58, 237, 0.14) 100%
+    ) !important;
+    border-color: rgba(139, 92, 246, 0.6) !important;
+    color: #5b21b6 !important;
+    box-shadow: 0 4px 14px rgba(139, 92, 246, 0.26),
+      inset 0 1px 0 rgba(255, 255, 255, 0.9);
+
+    :deep(.q-icon) {
+      color: #6d28d9;
+      transform: scale(1.22) rotate(12deg);
+    }
+  }
+}
+
+.hero-fancy-btn--players {
+  background: linear-gradient(
+    135deg,
+    rgba(2, 132, 199, 0.1) 0%,
+    rgba(3, 105, 161, 0.05) 100%
+  ) !important;
+  color: #0369a1 !important;
+  border: 1px solid rgba(2, 132, 199, 0.28) !important;
+  box-shadow: 0 2px 6px rgba(2, 132, 199, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.6);
+
+  :deep(.q-icon) {
+    color: #0284c7;
+  }
+
+  &:hover {
+    background: linear-gradient(
+      135deg,
+      rgba(2, 132, 199, 0.2) 0%,
+      rgba(3, 105, 161, 0.12) 100%
+    ) !important;
+    border-color: rgba(2, 132, 199, 0.55) !important;
+    color: #075985 !important;
+    box-shadow: 0 4px 14px rgba(2, 132, 199, 0.25),
+      inset 0 1px 0 rgba(255, 255, 255, 0.9);
+
+    :deep(.q-icon) {
+      color: #0369a1;
+      transform: scale(1.2) translateY(-1px);
+    }
+  }
+}
+
+.hero-fancy-btn--games {
+  background: linear-gradient(
+    135deg,
+    rgba(16, 185, 129, 0.1) 0%,
+    rgba(5, 150, 105, 0.05) 100%
+  ) !important;
+  color: #047857 !important;
+  border: 1px solid rgba(16, 185, 129, 0.28) !important;
+  box-shadow: 0 2px 6px rgba(16, 185, 129, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.6);
+
+  :deep(.q-icon) {
+    color: #059669;
+  }
+
+  &:hover {
+    background: linear-gradient(
+      135deg,
+      rgba(16, 185, 129, 0.2) 0%,
+      rgba(5, 150, 105, 0.12) 100%
+    ) !important;
+    border-color: rgba(16, 185, 129, 0.55) !important;
+    color: #065f46 !important;
+    box-shadow: 0 4px 14px rgba(16, 185, 129, 0.25),
+      inset 0 1px 0 rgba(255, 255, 255, 0.9);
+
+    :deep(.q-icon) {
+      color: #047857;
+      transform: scale(1.2) rotate(-8deg);
+    }
   }
 }
 
 .body--dark {
-  .hero-nav-btn {
-    background: rgba(255, 255, 255, 0.05) !important;
-    color: var(--kenner-text-strong) !important;
-    border-color: rgba(255, 255, 255, 0.08) !important;
-
-    &:hover {
-      background: rgba(255, 255, 255, 0.1) !important;
-      border-color: rgba(255, 255, 255, 0.16) !important;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+  .hero-fancy-btn {
+    &::after {
+      background: linear-gradient(
+        90deg,
+        transparent 0%,
+        rgba(255, 255, 255, 0.18) 50%,
+        transparent 100%
+      );
     }
   }
 
-  .hero-nav-btn--primary {
-    background: rgba(245, 158, 11, 0.15) !important;
-    color: #fbbf24 !important;
-    border-color: rgba(245, 158, 11, 0.35) !important;
+  .hero-fancy-btn--league {
+    background: linear-gradient(
+      135deg,
+      rgba(245, 158, 11, 0.22) 0%,
+      rgba(180, 83, 9, 0.12) 100%
+    ) !important;
+    color: #fde68a !important;
+    border-color: rgba(245, 158, 11, 0.45) !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35),
+      inset 0 1px 0 rgba(255, 255, 255, 0.15);
+
+    :deep(.q-icon) {
+      color: #fbbf24;
+    }
 
     &:hover {
-      background: rgba(245, 158, 11, 0.25) !important;
-      border-color: rgba(245, 158, 11, 0.55) !important;
+      background: linear-gradient(
+        135deg,
+        rgba(245, 158, 11, 0.35) 0%,
+        rgba(180, 83, 9, 0.22) 100%
+      ) !important;
+      border-color: rgba(245, 158, 11, 0.8) !important;
+      color: #ffffff !important;
+      box-shadow: 0 4px 18px rgba(245, 158, 11, 0.4),
+        inset 0 1px 0 rgba(255, 255, 255, 0.25);
+
+      :deep(.q-icon) {
+        color: #fef08a;
+      }
+    }
+  }
+
+  .hero-fancy-btn--hof {
+    background: linear-gradient(
+      135deg,
+      rgba(139, 92, 246, 0.2) 0%,
+      rgba(109, 40, 217, 0.12) 100%
+    ) !important;
+    color: #ddd6fe !important;
+    border-color: rgba(139, 92, 246, 0.4) !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35),
+      inset 0 1px 0 rgba(255, 255, 255, 0.15);
+
+    :deep(.q-icon) {
+      color: #c084fc;
+    }
+
+    &:hover {
+      background: linear-gradient(
+        135deg,
+        rgba(139, 92, 246, 0.32) 0%,
+        rgba(109, 40, 217, 0.2) 100%
+      ) !important;
+      border-color: rgba(139, 92, 246, 0.75) !important;
+      color: #ffffff !important;
+      box-shadow: 0 4px 18px rgba(139, 92, 246, 0.38),
+        inset 0 1px 0 rgba(255, 255, 255, 0.25);
+
+      :deep(.q-icon) {
+        color: #f3e8ff;
+      }
+    }
+  }
+
+  .hero-fancy-btn--players {
+    background: linear-gradient(
+      135deg,
+      rgba(2, 132, 199, 0.2) 0%,
+      rgba(3, 105, 161, 0.12) 100%
+    ) !important;
+    color: #bae6fd !important;
+    border-color: rgba(2, 132, 199, 0.4) !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35),
+      inset 0 1px 0 rgba(255, 255, 255, 0.15);
+
+    :deep(.q-icon) {
+      color: #38bdf8;
+    }
+
+    &:hover {
+      background: linear-gradient(
+        135deg,
+        rgba(2, 132, 199, 0.32) 0%,
+        rgba(3, 105, 161, 0.2) 100%
+      ) !important;
+      border-color: rgba(2, 132, 199, 0.75) !important;
+      color: #ffffff !important;
+      box-shadow: 0 4px 18px rgba(2, 132, 199, 0.38),
+        inset 0 1px 0 rgba(255, 255, 255, 0.25);
+
+      :deep(.q-icon) {
+        color: #e0f2fe;
+      }
+    }
+  }
+
+  .hero-fancy-btn--games {
+    background: linear-gradient(
+      135deg,
+      rgba(16, 185, 129, 0.2) 0%,
+      rgba(5, 150, 105, 0.12) 100%
+    ) !important;
+    color: #a7f3d0 !important;
+    border-color: rgba(16, 185, 129, 0.4) !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35),
+      inset 0 1px 0 rgba(255, 255, 255, 0.15);
+
+    :deep(.q-icon) {
+      color: #34d399;
+    }
+
+    &:hover {
+      background: linear-gradient(
+        135deg,
+        rgba(16, 185, 129, 0.32) 0%,
+        rgba(5, 150, 105, 0.2) 100%
+      ) !important;
+      border-color: rgba(16, 185, 129, 0.75) !important;
+      color: #ffffff !important;
+      box-shadow: 0 4px 18px rgba(16, 185, 129, 0.38),
+        inset 0 1px 0 rgba(255, 255, 255, 0.25);
+
+      :deep(.q-icon) {
+        color: #d1fae5;
+      }
     }
   }
 }
