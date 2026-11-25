@@ -1,14 +1,17 @@
 <template>
-  <div class="column">
+  <div class="column" :class="isMobile ? 'q-px-sm q-py-xs q-gutter-y-sm' : ''">
     <!-- Standings Matrix for All Leagues -->
     <template v-if="activeAllView === 'standings'">
       <div
         v-for="(league, index) in sortedLeagues"
         :key="league.id"
         class="league-standings-section"
-        :class="{ 'league-section--user': isUserInLeague(league.id) }"
+        :class="{
+          'league-section--user': isUserInLeague(league.id),
+          'league-standings-card': isMobile,
+        }"
       >
-        <q-separator v-if="index > 0" class="q-my-lg" />
+        <q-separator v-if="!isMobile && index > 0" class="q-my-lg" />
         <div
           class="row items-center justify-between q-py-sm"
           :class="isMobile ? 'q-px-md' : 'q-px-xs'"
@@ -53,9 +56,12 @@
         v-for="(league, index) in sortedLeagues"
         :key="league.id"
         class="league-picks-section"
-        :class="{ 'league-section--user': isUserInLeague(league.id) }"
+        :class="{
+          'league-section--user': isUserInLeague(league.id),
+          'league-standings-card': isMobile,
+        }"
       >
-        <q-separator v-if="index > 0" class="q-my-lg" />
+        <q-separator v-if="!isMobile && index > 0" class="q-my-lg" />
         <div
           class="row items-center justify-between q-py-sm"
           :class="isMobile ? 'q-px-md' : 'q-px-xs'"
@@ -102,9 +108,12 @@
         v-for="(league, index) in sortedLeagues"
         :key="league.id"
         class="league-results-section"
-        :class="{ 'league-section--user': isUserInLeague(league.id) }"
+        :class="{
+          'league-section--user': isUserInLeague(league.id),
+          'league-standings-card': isMobile,
+        }"
       >
-        <q-separator v-if="index > 0" class="q-my-lg" />
+        <q-separator v-if="!isMobile && index > 0" class="q-my-lg" />
         <div
           class="row items-center justify-between q-py-sm"
           :class="isMobile ? 'q-px-md' : 'q-px-xs'"
@@ -182,5 +191,16 @@ defineEmits<{
 }
 .league-section--user {
   position: relative;
+}
+.league-standings-card {
+  background: var(--kenner-card-bg, #ffffff);
+  border: 1px solid var(--kenner-border-subtle);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+}
+.body--dark .league-standings-card {
+  background: var(--kenner-surface-card, #1e293b);
+  border-color: var(--kenner-border-subtle);
 }
 </style>

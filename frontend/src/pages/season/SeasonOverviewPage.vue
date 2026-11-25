@@ -31,8 +31,10 @@
     <!-- Main Content -->
     <div
       v-else-if="!error && season"
-      class="overview-content column q-gutter-y-md q-gutter-y-sm-lg"
-      :class="isMobile ? 'q-pt-sm' : ''"
+      class="overview-content column"
+      :class="
+        isMobile ? 'q-gutter-y-sm q-pt-xs' : 'q-gutter-y-md q-gutter-y-sm-lg'
+      "
     >
       <!-- Champions Podium Section (Completed Seasons) -->
       <SeasonOverviewPodium
@@ -42,11 +44,17 @@
       />
 
       <!-- Season Progress Bar (Current Running Season only) -->
-      <SeasonProgressBar
+      <div
         v-if="isRunningSeason && season?.progress"
-        :progress="season.progress"
-        :status="season.status"
-      />
+        :class="isMobile ? 'q-px-md q-py-xs' : ''"
+      >
+        <div :class="isMobile ? 'season-progress-card' : ''">
+          <SeasonProgressBar
+            :progress="season.progress"
+            :status="season.status"
+          />
+        </div>
+      </div>
 
       <!-- Compact League & View Controls Toolbar -->
       <SeasonControlsToolbar
@@ -496,5 +504,16 @@ onUnmounted(() => {
   width: 100%;
   box-sizing: border-box;
   overflow-x: hidden;
+}
+
+.season-progress-card {
+  background: var(--kenner-surface-subtle, #f8fafc);
+  border: 1px solid var(--kenner-border-subtle);
+  border-radius: 12px;
+  padding: 8px 12px;
+}
+
+.body--dark .season-progress-card {
+  background: var(--kenner-surface-card, #1e293b);
 }
 </style>

@@ -1,7 +1,7 @@
 <template>
   <div
-    class="controls-toolbar row items-center justify-between q-gutter-y-sm"
-    :class="isMobile ? 'q-px-md' : ''"
+    class="controls-toolbar row items-center justify-between"
+    :class="isMobile ? 'q-px-md q-gutter-y-xs' : 'q-gutter-y-sm'"
   >
     <!-- League Selector Dropdown -->
     <div class="league-select-container" :class="isMobile ? 'full-width' : ''">
@@ -11,8 +11,9 @@
         emit-value
         map-options
         dense
-        label="League"
+        :label="isMobile ? undefined : 'League'"
         class="full-width"
+        :class="{ 'compact-select': isMobile }"
         @update:model-value="$emit('league-selected', $event)"
       >
         <template #selected-item="scope">
@@ -167,6 +168,24 @@ defineEmits<{
   }
 }
 
+.compact-select {
+  padding: 0 10px;
+  min-height: 34px;
+  height: 34px;
+  border-radius: 8px;
+  font-size: 0.85rem;
+
+  :deep(.q-field__control) {
+    min-height: 34px !important;
+    height: 34px !important;
+  }
+
+  :deep(.q-field__native) {
+    font-size: 0.85rem;
+    font-weight: 600;
+  }
+}
+
 .view-toggle-container {
   @media (min-width: 600px) {
     flex-shrink: 0;
@@ -176,6 +195,7 @@ defineEmits<{
 .season-view-toggle {
   padding: 2px;
   max-width: 100%;
+  border-radius: 10px;
 
   @media (max-width: 599px) {
     width: 100%;
@@ -183,9 +203,11 @@ defineEmits<{
     :deep(.q-btn) {
       padding: 4px 6px;
       font-size: 0.75rem;
+      min-height: 32px;
+      border-radius: 8px;
 
       .q-icon {
-        font-size: 15px;
+        font-size: 14px;
         margin-right: 4px;
       }
     }

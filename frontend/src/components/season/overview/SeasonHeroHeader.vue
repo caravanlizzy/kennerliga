@@ -1,7 +1,7 @@
 <template>
   <div
     class="row items-center justify-between"
-    :class="isMobile ? 'q-pa-md border-bottom-subtle' : 'q-mb-md q-mb-sm-lg'"
+    :class="isMobile ? 'q-px-md q-py-sm border-bottom-subtle' : 'q-mb-md q-mb-sm-lg'"
   >
     <div class="row items-center q-gutter-x-sm no-wrap col ellipsis">
       <KennerButton

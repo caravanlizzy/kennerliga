@@ -1,14 +1,12 @@
 <template>
-  <div :class="isMobile ? 'column' : 'league-cards-grid'">
+  <div :class="isMobile ? 'column q-px-md q-gutter-y-sm' : 'league-cards-grid'">
     <div
-      v-for="(league, idx) in sortedLeagues"
+      v-for="league in sortedLeagues"
       :key="league.id"
+      class="league-overview-card"
       :class="{
-        'league-overview-card': !isMobile,
-        'league-overview-card--user': !isMobile && isUserInLeague(league.id),
-        'league-overview-mobile-item--user':
-          isMobile && isUserInLeague(league.id),
-        'q-px-md q-py-sm': isMobile,
+        'league-overview-card--user': isUserInLeague(league.id),
+        'league-overview-card--mobile': isMobile,
       }"
     >
       <!-- Card Header -->
@@ -67,7 +65,7 @@
           :key="row.player_profile_id"
           class="standings-mini-row row items-center justify-between no-wrap q-py-xs q-px-sm rounded-borders"
           :class="{
-            'standings-mini-row--leader': rIdx === 0,
+            'standings-mini-row--leader': !isMobile && rIdx === 0,
             'standings-mini-row--user': isCurrentUser(
               row.player_profile_id,
               row.username
@@ -132,11 +130,6 @@
           </div>
         </div>
       </div>
-
-      <q-separator
-        v-if="isMobile && idx < sortedLeagues.length - 1"
-        class="q-mt-md"
-      />
     </div>
   </div>
 </template>
@@ -188,23 +181,31 @@ defineEmits<{
   gap: 16px;
 }
 .league-overview-card {
-  background: var(--kenner-card-bg);
+  background: var(--kenner-card-bg, #ffffff);
   border: 1px solid var(--kenner-border-subtle);
   border-radius: 12px;
   padding: 16px;
   display: flex;
   flex-direction: column;
   transition: all 0.2s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+}
+.league-overview-card--mobile {
+  padding: 12px 14px;
+}
+.body--dark .league-overview-card {
+  background: var(--kenner-surface-card, #1e293b);
+  border-color: var(--kenner-border-subtle);
 }
 .league-overview-card--user {
   border-color: rgba(var(--q-primary-rgb, 25, 118, 210), 0.4);
   box-shadow: 0 0 0 1px rgba(var(--q-primary-rgb, 25, 118, 210), 0.15);
 }
-.league-overview-mobile-item--user {
-  background: rgba(var(--q-primary-rgb, 25, 118, 210), 0.04);
-}
 .standings-mini-row {
-  background: var(--kenner-surface-subtle);
+  background: var(--kenner-surface-subtle, #f8fafc);
+}
+.body--dark .standings-mini-row {
+  background: rgba(255, 255, 255, 0.03);
 }
 .standings-mini-row--leader {
   background: rgba(255, 193, 7, 0.12);
