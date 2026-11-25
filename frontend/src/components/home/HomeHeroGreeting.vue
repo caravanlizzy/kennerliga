@@ -2,7 +2,7 @@
   <div class="home-hero-greeting q-pa-md q-mb-md">
     <div class="row items-center justify-between q-col-gutter-sm">
       <!-- Left: Player Identity & League Status -->
-      <div class="col-12 col-md-7 row items-center no-wrap">
+      <div class="col-12 col-md-6 row items-center no-wrap">
         <UserAvatar
           v-if="user"
           :display-username="displayName"
@@ -31,39 +31,46 @@
         </div>
       </div>
 
-      <!-- Right: Direct Utility Action Chips -->
+      <!-- Right: Direct Utility Action Chips & Subtitle -->
       <div
-        class="col-12 col-md-5 row items-center justify-end q-gutter-xs flex-wrap hero-action-group"
+        class="col-12 col-md-6 column items-start items-md-end justify-center hero-action-section q-mt-xs q-mt-md-none"
       >
-        <KennerButton
-          v-if="hasMyLeague"
-          icon="emoji_events"
-          label="My League"
-          size="sm"
-          class="hero-fancy-btn hero-fancy-btn--league"
-          :to="{ name: 'my-league' }"
-        />
-        <KennerButton
-          icon="stars"
-          label="Hall of Fame"
-          size="sm"
-          class="hero-fancy-btn hero-fancy-btn--hof"
-          :to="{ name: 'statistics' }"
-        />
-        <KennerButton
-          icon="people_alt"
-          label="Players"
-          size="sm"
-          class="hero-fancy-btn hero-fancy-btn--players"
-          :to="{ name: 'players' }"
-        />
-        <KennerButton
-          icon="sports_esports"
-          label="Games"
-          size="sm"
-          class="hero-fancy-btn hero-fancy-btn--games"
-          :to="{ name: 'games' }"
-        />
+        <div class="text-caption text-muted hero-action-subtitle q-mb-xs">
+          Statistics &amp; Quick Access
+        </div>
+        <div
+          class="row items-center justify-start justify-md-end q-gutter-xs flex-wrap hero-action-group"
+        >
+          <KennerButton
+            v-if="hasMyLeague"
+            icon="emoji_events"
+            label="My League"
+            size="sm"
+            class="hero-fancy-btn hero-fancy-btn--league"
+            :to="{ name: 'my-league' }"
+          />
+          <KennerButton
+            icon="stars"
+            label="Hall of Fame"
+            size="sm"
+            class="hero-fancy-btn hero-fancy-btn--hof"
+            :to="{ name: 'statistics' }"
+          />
+          <KennerButton
+            icon="people_alt"
+            label="Players"
+            size="sm"
+            class="hero-fancy-btn hero-fancy-btn--players"
+            :to="{ name: 'players' }"
+          />
+          <KennerButton
+            icon="sports_esports"
+            label="Games"
+            size="sm"
+            class="hero-fancy-btn hero-fancy-btn--games"
+            :to="{ name: 'games' }"
+          />
+        </div>
       </div>
     </div>
   </div>
@@ -153,23 +160,29 @@ const seasonStatusText = computed(() => {
   animation: pulse-ring 1.8s cubic-bezier(0.455, 0.03, 0.515, 0.955) infinite;
 }
 
+.hero-action-subtitle {
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  color: var(--kenner-text-muted);
+}
+
 .hero-fancy-btn {
   position: relative;
   overflow: hidden;
   font-weight: 600;
   font-size: 12.5px;
   letter-spacing: 0.25px;
-  border-radius: 9999px !important;
-  padding: 4px 13px !important;
+  border-radius: var(--kenner-card-radius, 12px) !important;
+  padding: 4px 12px !important;
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
-  transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+  transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
 
   :deep(.q-icon) {
-    font-size: 17px;
+    font-size: 16px;
     margin-right: 4px;
-    transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1),
-      color 0.2s ease;
+    transition: transform 0.2s ease, color 0.2s ease;
   }
 
   &::after {
@@ -182,7 +195,7 @@ const seasonStatusText = computed(() => {
     background: linear-gradient(
       90deg,
       transparent 0%,
-      rgba(255, 255, 255, 0.35) 50%,
+      rgba(255, 255, 255, 0.25) 50%,
       transparent 100%
     );
     transform: skewX(-20deg);
@@ -191,28 +204,32 @@ const seasonStatusText = computed(() => {
   }
 
   &:hover {
-    transform: translateY(-2px) scale(1.02);
+    transform: translateY(-1px);
 
     &::after {
       left: 140%;
       transition: left 0.65s ease-in-out;
     }
+
+    :deep(.q-icon) {
+      transform: scale(1.1);
+    }
   }
 
   &:active {
-    transform: translateY(0) scale(0.97);
+    transform: translateY(0);
   }
 }
 
 .hero-fancy-btn--league {
   background: linear-gradient(
     135deg,
-    rgba(245, 158, 11, 0.14) 0%,
-    rgba(217, 119, 6, 0.08) 100%
+    rgba(245, 158, 11, 0.12) 0%,
+    rgba(217, 119, 6, 0.06) 100%
   ) !important;
-  color: #92400e !important;
-  border: 1px solid rgba(245, 158, 11, 0.35) !important;
-  box-shadow: 0 2px 6px rgba(245, 158, 11, 0.12),
+  color: var(--kenner-gold-text, #b45309) !important;
+  border: 1px solid var(--kenner-gold-border, rgba(245, 158, 11, 0.3)) !important;
+  box-shadow: 0 1px 3px rgba(245, 158, 11, 0.08),
     inset 0 1px 0 rgba(255, 255, 255, 0.6);
 
   :deep(.q-icon) {
@@ -222,17 +239,16 @@ const seasonStatusText = computed(() => {
   &:hover {
     background: linear-gradient(
       135deg,
-      rgba(245, 158, 11, 0.25) 0%,
-      rgba(217, 119, 6, 0.16) 100%
+      rgba(245, 158, 11, 0.2) 0%,
+      rgba(217, 119, 6, 0.12) 100%
     ) !important;
-    border-color: rgba(245, 158, 11, 0.65) !important;
+    border-color: rgba(245, 158, 11, 0.55) !important;
     color: #78350f !important;
-    box-shadow: 0 4px 14px rgba(245, 158, 11, 0.28),
-      inset 0 1px 0 rgba(255, 255, 255, 0.9);
+    box-shadow: 0 3px 10px rgba(245, 158, 11, 0.2),
+      inset 0 1px 0 rgba(255, 255, 255, 0.8);
 
     :deep(.q-icon) {
       color: #b45309;
-      transform: scale(1.2) rotate(-8deg);
     }
   }
 }
@@ -240,12 +256,12 @@ const seasonStatusText = computed(() => {
 .hero-fancy-btn--hof {
   background: linear-gradient(
     135deg,
-    rgba(139, 92, 246, 0.12) 0%,
-    rgba(124, 58, 237, 0.06) 100%
+    rgba(139, 92, 246, 0.1) 0%,
+    rgba(124, 58, 237, 0.05) 100%
   ) !important;
-  color: #6d28d9 !important;
-  border: 1px solid rgba(139, 92, 246, 0.3) !important;
-  box-shadow: 0 2px 6px rgba(139, 92, 246, 0.1),
+  color: var(--kenner-accent-text, #5e35b1) !important;
+  border: 1px solid rgba(139, 92, 246, 0.28) !important;
+  box-shadow: 0 1px 3px rgba(139, 92, 246, 0.08),
     inset 0 1px 0 rgba(255, 255, 255, 0.6);
 
   :deep(.q-icon) {
@@ -255,17 +271,16 @@ const seasonStatusText = computed(() => {
   &:hover {
     background: linear-gradient(
       135deg,
-      rgba(139, 92, 246, 0.22) 0%,
-      rgba(124, 58, 237, 0.14) 100%
+      rgba(139, 92, 246, 0.18) 0%,
+      rgba(124, 58, 237, 0.1) 100%
     ) !important;
-    border-color: rgba(139, 92, 246, 0.6) !important;
+    border-color: rgba(139, 92, 246, 0.5) !important;
     color: #5b21b6 !important;
-    box-shadow: 0 4px 14px rgba(139, 92, 246, 0.26),
-      inset 0 1px 0 rgba(255, 255, 255, 0.9);
+    box-shadow: 0 3px 10px rgba(139, 92, 246, 0.2),
+      inset 0 1px 0 rgba(255, 255, 255, 0.8);
 
     :deep(.q-icon) {
       color: #6d28d9;
-      transform: scale(1.22) rotate(12deg);
     }
   }
 }
@@ -273,12 +288,12 @@ const seasonStatusText = computed(() => {
 .hero-fancy-btn--players {
   background: linear-gradient(
     135deg,
-    rgba(2, 132, 199, 0.1) 0%,
-    rgba(3, 105, 161, 0.05) 100%
+    rgba(2, 132, 199, 0.08) 0%,
+    rgba(3, 105, 161, 0.04) 100%
   ) !important;
   color: #0369a1 !important;
-  border: 1px solid rgba(2, 132, 199, 0.28) !important;
-  box-shadow: 0 2px 6px rgba(2, 132, 199, 0.1),
+  border: 1px solid rgba(2, 132, 199, 0.25) !important;
+  box-shadow: 0 1px 3px rgba(2, 132, 199, 0.08),
     inset 0 1px 0 rgba(255, 255, 255, 0.6);
 
   :deep(.q-icon) {
@@ -288,17 +303,16 @@ const seasonStatusText = computed(() => {
   &:hover {
     background: linear-gradient(
       135deg,
-      rgba(2, 132, 199, 0.2) 0%,
-      rgba(3, 105, 161, 0.12) 100%
+      rgba(2, 132, 199, 0.16) 0%,
+      rgba(3, 105, 161, 0.08) 100%
     ) !important;
-    border-color: rgba(2, 132, 199, 0.55) !important;
+    border-color: rgba(2, 132, 199, 0.45) !important;
     color: #075985 !important;
-    box-shadow: 0 4px 14px rgba(2, 132, 199, 0.25),
-      inset 0 1px 0 rgba(255, 255, 255, 0.9);
+    box-shadow: 0 3px 10px rgba(2, 132, 199, 0.18),
+      inset 0 1px 0 rgba(255, 255, 255, 0.8);
 
     :deep(.q-icon) {
       color: #0369a1;
-      transform: scale(1.2) translateY(-1px);
     }
   }
 }
@@ -306,12 +320,12 @@ const seasonStatusText = computed(() => {
 .hero-fancy-btn--games {
   background: linear-gradient(
     135deg,
-    rgba(16, 185, 129, 0.1) 0%,
-    rgba(5, 150, 105, 0.05) 100%
+    rgba(16, 185, 129, 0.08) 0%,
+    rgba(5, 150, 105, 0.04) 100%
   ) !important;
-  color: #047857 !important;
-  border: 1px solid rgba(16, 185, 129, 0.28) !important;
-  box-shadow: 0 2px 6px rgba(16, 185, 129, 0.1),
+  color: var(--kenner-success-text, #15803d) !important;
+  border: 1px solid rgba(16, 185, 129, 0.25) !important;
+  box-shadow: 0 1px 3px rgba(16, 185, 129, 0.08),
     inset 0 1px 0 rgba(255, 255, 255, 0.6);
 
   :deep(.q-icon) {
@@ -321,17 +335,16 @@ const seasonStatusText = computed(() => {
   &:hover {
     background: linear-gradient(
       135deg,
-      rgba(16, 185, 129, 0.2) 0%,
-      rgba(5, 150, 105, 0.12) 100%
+      rgba(16, 185, 129, 0.16) 0%,
+      rgba(5, 150, 105, 0.08) 100%
     ) !important;
-    border-color: rgba(16, 185, 129, 0.55) !important;
+    border-color: rgba(16, 185, 129, 0.45) !important;
     color: #065f46 !important;
-    box-shadow: 0 4px 14px rgba(16, 185, 129, 0.25),
-      inset 0 1px 0 rgba(255, 255, 255, 0.9);
+    box-shadow: 0 3px 10px rgba(16, 185, 129, 0.18),
+      inset 0 1px 0 rgba(255, 255, 255, 0.8);
 
     :deep(.q-icon) {
       color: #047857;
-      transform: scale(1.2) rotate(-8deg);
     }
   }
 }
@@ -342,7 +355,7 @@ const seasonStatusText = computed(() => {
       background: linear-gradient(
         90deg,
         transparent 0%,
-        rgba(255, 255, 255, 0.18) 50%,
+        rgba(255, 255, 255, 0.12) 50%,
         transparent 100%
       );
     }
@@ -351,13 +364,13 @@ const seasonStatusText = computed(() => {
   .hero-fancy-btn--league {
     background: linear-gradient(
       135deg,
-      rgba(245, 158, 11, 0.22) 0%,
-      rgba(180, 83, 9, 0.12) 100%
+      rgba(245, 158, 11, 0.18) 0%,
+      rgba(180, 83, 9, 0.1) 100%
     ) !important;
-    color: #fde68a !important;
-    border-color: rgba(245, 158, 11, 0.45) !important;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35),
-      inset 0 1px 0 rgba(255, 255, 255, 0.15);
+    color: var(--kenner-gold-text, #fbbf24) !important;
+    border-color: var(--kenner-gold-border, rgba(245, 158, 11, 0.35)) !important;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25),
+      inset 0 1px 0 rgba(255, 255, 255, 0.12);
 
     :deep(.q-icon) {
       color: #fbbf24;
@@ -366,13 +379,13 @@ const seasonStatusText = computed(() => {
     &:hover {
       background: linear-gradient(
         135deg,
-        rgba(245, 158, 11, 0.35) 0%,
-        rgba(180, 83, 9, 0.22) 100%
+        rgba(245, 158, 11, 0.28) 0%,
+        rgba(180, 83, 9, 0.18) 100%
       ) !important;
-      border-color: rgba(245, 158, 11, 0.8) !important;
+      border-color: rgba(245, 158, 11, 0.7) !important;
       color: #ffffff !important;
-      box-shadow: 0 4px 18px rgba(245, 158, 11, 0.4),
-        inset 0 1px 0 rgba(255, 255, 255, 0.25);
+      box-shadow: 0 4px 14px rgba(245, 158, 11, 0.35),
+        inset 0 1px 0 rgba(255, 255, 255, 0.2);
 
       :deep(.q-icon) {
         color: #fef08a;
@@ -383,13 +396,13 @@ const seasonStatusText = computed(() => {
   .hero-fancy-btn--hof {
     background: linear-gradient(
       135deg,
-      rgba(139, 92, 246, 0.2) 0%,
-      rgba(109, 40, 217, 0.12) 100%
+      rgba(139, 92, 246, 0.16) 0%,
+      rgba(109, 40, 217, 0.1) 100%
     ) !important;
-    color: #ddd6fe !important;
-    border-color: rgba(139, 92, 246, 0.4) !important;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35),
-      inset 0 1px 0 rgba(255, 255, 255, 0.15);
+    color: var(--kenner-accent-text, #b39ddb) !important;
+    border-color: rgba(139, 92, 246, 0.35) !important;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25),
+      inset 0 1px 0 rgba(255, 255, 255, 0.12);
 
     :deep(.q-icon) {
       color: #c084fc;
@@ -398,13 +411,13 @@ const seasonStatusText = computed(() => {
     &:hover {
       background: linear-gradient(
         135deg,
-        rgba(139, 92, 246, 0.32) 0%,
-        rgba(109, 40, 217, 0.2) 100%
+        rgba(139, 92, 246, 0.26) 0%,
+        rgba(109, 40, 217, 0.16) 100%
       ) !important;
-      border-color: rgba(139, 92, 246, 0.75) !important;
+      border-color: rgba(139, 92, 246, 0.65) !important;
       color: #ffffff !important;
-      box-shadow: 0 4px 18px rgba(139, 92, 246, 0.38),
-        inset 0 1px 0 rgba(255, 255, 255, 0.25);
+      box-shadow: 0 4px 14px rgba(139, 92, 246, 0.32),
+        inset 0 1px 0 rgba(255, 255, 255, 0.2);
 
       :deep(.q-icon) {
         color: #f3e8ff;
@@ -415,13 +428,13 @@ const seasonStatusText = computed(() => {
   .hero-fancy-btn--players {
     background: linear-gradient(
       135deg,
-      rgba(2, 132, 199, 0.2) 0%,
-      rgba(3, 105, 161, 0.12) 100%
+      rgba(2, 132, 199, 0.16) 0%,
+      rgba(3, 105, 161, 0.1) 100%
     ) !important;
-    color: #bae6fd !important;
-    border-color: rgba(2, 132, 199, 0.4) !important;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35),
-      inset 0 1px 0 rgba(255, 255, 255, 0.15);
+    color: var(--kenner-info-text, #60a5fa) !important;
+    border-color: rgba(2, 132, 199, 0.35) !important;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25),
+      inset 0 1px 0 rgba(255, 255, 255, 0.12);
 
     :deep(.q-icon) {
       color: #38bdf8;
@@ -430,13 +443,13 @@ const seasonStatusText = computed(() => {
     &:hover {
       background: linear-gradient(
         135deg,
-        rgba(2, 132, 199, 0.32) 0%,
-        rgba(3, 105, 161, 0.2) 100%
+        rgba(2, 132, 199, 0.26) 0%,
+        rgba(3, 105, 161, 0.16) 100%
       ) !important;
-      border-color: rgba(2, 132, 199, 0.75) !important;
+      border-color: rgba(2, 132, 199, 0.65) !important;
       color: #ffffff !important;
-      box-shadow: 0 4px 18px rgba(2, 132, 199, 0.38),
-        inset 0 1px 0 rgba(255, 255, 255, 0.25);
+      box-shadow: 0 4px 14px rgba(2, 132, 199, 0.32),
+        inset 0 1px 0 rgba(255, 255, 255, 0.2);
 
       :deep(.q-icon) {
         color: #e0f2fe;
@@ -447,13 +460,13 @@ const seasonStatusText = computed(() => {
   .hero-fancy-btn--games {
     background: linear-gradient(
       135deg,
-      rgba(16, 185, 129, 0.2) 0%,
-      rgba(5, 150, 105, 0.12) 100%
+      rgba(16, 185, 129, 0.16) 0%,
+      rgba(5, 150, 105, 0.1) 100%
     ) !important;
-    color: #a7f3d0 !important;
-    border-color: rgba(16, 185, 129, 0.4) !important;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35),
-      inset 0 1px 0 rgba(255, 255, 255, 0.15);
+    color: var(--kenner-success-text, #4ade80) !important;
+    border-color: rgba(16, 185, 129, 0.35) !important;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25),
+      inset 0 1px 0 rgba(255, 255, 255, 0.12);
 
     :deep(.q-icon) {
       color: #34d399;
@@ -462,13 +475,13 @@ const seasonStatusText = computed(() => {
     &:hover {
       background: linear-gradient(
         135deg,
-        rgba(16, 185, 129, 0.32) 0%,
-        rgba(5, 150, 105, 0.2) 100%
+        rgba(16, 185, 129, 0.26) 0%,
+        rgba(5, 150, 105, 0.16) 100%
       ) !important;
-      border-color: rgba(16, 185, 129, 0.75) !important;
+      border-color: rgba(16, 185, 129, 0.65) !important;
       color: #ffffff !important;
-      box-shadow: 0 4px 18px rgba(16, 185, 129, 0.38),
-        inset 0 1px 0 rgba(255, 255, 255, 0.25);
+      box-shadow: 0 4px 14px rgba(16, 185, 129, 0.32),
+        inset 0 1px 0 rgba(255, 255, 255, 0.2);
 
       :deep(.q-icon) {
         color: #d1fae5;
