@@ -59,7 +59,10 @@ export function useUserProfileDisplay() {
     return fallbackColor || undefined;
   }
 
-  function formatPlayerLabel(profileName?: string | null, username?: string | null): string {
+  function formatPlayerLabel(
+    profileName?: string | null,
+    username?: string | null
+  ): string {
     if (!profileName && !username) return '';
     if (!username || username === profileName) {
       return profileName || username || '';

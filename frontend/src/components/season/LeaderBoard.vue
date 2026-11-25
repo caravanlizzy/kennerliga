@@ -331,11 +331,19 @@ const { getHexLeagueColor } = leagueColors();
 const { resolveAvatarShape, resolveAvatarColor } = useUserProfileDisplay();
 
 function getAvatarShape(row: TPlayerYearStanding) {
-  return resolveAvatarShape(row.player_profile_id, row.username, row.avatar_shape);
+  return resolveAvatarShape(
+    row.player_profile_id,
+    row.username,
+    row.avatar_shape
+  );
 }
 
 function getAvatarColor(row: TPlayerYearStanding) {
-  return resolveAvatarColor(row.player_profile_id, row.username, row.avatar_color);
+  return resolveAvatarColor(
+    row.player_profile_id,
+    row.username,
+    row.avatar_color
+  );
 }
 
 const error = ref(false);

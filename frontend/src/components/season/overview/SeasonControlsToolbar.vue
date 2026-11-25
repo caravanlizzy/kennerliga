@@ -4,10 +4,7 @@
     :class="isMobile ? 'q-px-md' : ''"
   >
     <!-- League Selector Dropdown -->
-    <div
-      class="league-select-container"
-      :class="isMobile ? 'full-width' : ''"
-    >
+    <div class="league-select-container" :class="isMobile ? 'full-width' : ''">
       <KennerSelect
         :model-value="selectedLeagueId"
         :options="leagueOptions"
@@ -33,9 +30,7 @@
               color="primary"
               class="q-mr-xs"
             />
-            <span class="ellipsis text-weight-bold">{{
-              scope.opt.label
-            }}</span>
+            <span class="ellipsis text-weight-bold">{{ scope.opt.label }}</span>
           </div>
         </template>
         <template #option="scope">
@@ -83,10 +78,7 @@
     </div>
 
     <!-- View Switcher Toggle -->
-    <div
-      class="view-toggle-container"
-      :class="isMobile ? 'full-width' : ''"
-    >
+    <div class="view-toggle-container" :class="isMobile ? 'full-width' : ''">
       <q-btn-toggle
         v-if="selectedLeagueId === 'all'"
         :model-value="activeAllView"
@@ -99,7 +91,10 @@
         color="grey-2"
         text-color="grey-8"
         :options="allViewOptions"
-        @update:model-value="$emit('update:activeAllView', $event); $emit('view-changed')"
+        @update:model-value="
+          $emit('update:activeAllView', $event);
+          $emit('view-changed');
+        "
       />
       <q-btn-toggle
         v-else
@@ -113,7 +108,10 @@
         color="grey-2"
         text-color="grey-8"
         :options="leagueViewOptions"
-        @update:model-value="$emit('update:activeLeagueView', $event); $emit('view-changed')"
+        @update:model-value="
+          $emit('update:activeLeagueView', $event);
+          $emit('view-changed');
+        "
       />
     </div>
   </div>

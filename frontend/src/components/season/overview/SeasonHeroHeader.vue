@@ -26,7 +26,9 @@
             class="season-live-badge row items-center no-wrap q-gutter-x-xs q-px-sm q-py-xs rounded-borders shrink-0"
           >
             <span class="pulse-dot" />
-            <span class="text-weight-bolder text-uppercase live-text">Running</span>
+            <span class="text-weight-bolder text-uppercase live-text"
+              >Running</span
+            >
           </div>
           <q-badge
             v-else-if="seasonStatusLabel"

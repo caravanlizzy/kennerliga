@@ -187,7 +187,9 @@
                 :key="`L-${group.level}`"
                 class="league-box"
               >
-                <div class="league-box__header row items-center justify-between q-mb-xs">
+                <div
+                  class="league-box__header row items-center justify-between q-mb-xs"
+                >
                   <LeagueLevel
                     badge
                     :level="group.level"
@@ -195,7 +197,9 @@
                       isMobile ? 'font-size: 0.6rem' : 'font-size: 0.65rem'
                     "
                   />
-                  <span class="text-caption text-grey-6 text-weight-medium league-box__count">
+                  <span
+                    class="text-caption text-grey-6 text-weight-medium league-box__count"
+                  >
                     {{ group.members.length }}/{{ group.size }}
                   </span>
                 </div>

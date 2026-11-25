@@ -2,7 +2,11 @@
   <div>
     <!-- Unresolved Tie Info (only when all league games are finished) -->
     <div
-      v-if="currentLeagueId && allGamesFinished && tieGroups.some((g) => g.unresolved)"
+      v-if="
+        currentLeagueId &&
+        allGamesFinished &&
+        tieGroups.some((g) => g.unresolved)
+      "
       class="q-mb-md"
     >
       <UnresolvedTieBanner
@@ -132,7 +136,12 @@
 
     <q-dialog v-model="showResolveDialog" persistent>
       <q-card
-        style="min-width: 320px; max-width: 520px; width: 100%; border-radius: 16px"
+        style="
+          min-width: 320px;
+          max-width: 520px;
+          width: 100%;
+          border-radius: 16px;
+        "
       >
         <q-card-section class="row items-center justify-between q-pb-none">
           <div class="text-subtitle1 text-weight-bold">Resolve Tie Group</div>

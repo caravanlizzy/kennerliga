@@ -191,11 +191,9 @@ function isMe(username: string): boolean {
 
 function getAvatarShape(item?: WinnerEntry | null): AvatarShape | undefined {
   if (!item) return undefined;
-  return resolveAvatarShape(
-    item.profileId,
-    item.username,
-    item.avatarShape
-  ) as AvatarShape | undefined;
+  return resolveAvatarShape(item.profileId, item.username, item.avatarShape) as
+    | AvatarShape
+    | undefined;
 }
 
 function getAvatarColor(item?: WinnerEntry | null): string | undefined {

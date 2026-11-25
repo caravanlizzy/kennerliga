@@ -157,10 +157,7 @@ import { computed, ref, watch, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useUserStore } from 'src/stores/userStore';
 import { fetchGameDetailedStatistics } from 'src/services/statisticsService';
-import {
-  TGameDetailedStatistics,
-  TGameLeaderboardPlayer,
-} from 'src/types';
+import { TGameDetailedStatistics, TGameLeaderboardPlayer } from 'src/types';
 import KennerButton from 'components/base/KennerButton.vue';
 import LoadingSpinner from 'components/base/LoadingSpinner.vue';
 import GameHeroHeader from 'components/game/detail/GameHeroHeader.vue';

@@ -113,10 +113,7 @@ function toggleCount(pc: string) {
   }
 
   // If all available options are selected or none remain, collapse to "All" (empty array)
-  if (
-    current.length === 0 ||
-    current.length === props.availableCounts.length
-  ) {
+  if (current.length === 0 || current.length === props.availableCounts.length) {
     emit('update:modelValue', []);
     emit('change', []);
   } else {

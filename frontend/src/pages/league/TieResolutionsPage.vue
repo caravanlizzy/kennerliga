@@ -16,7 +16,8 @@
             </div>
           </div>
           <div class="text-caption text-grey-7">
-            Inspect, modify player orders, or remove tie-breaker decisions across leagues.
+            Inspect, modify player orders, or remove tie-breaker decisions
+            across leagues.
           </div>
         </div>
       </div>
@@ -48,7 +49,9 @@
                 </template>
               </KennerInput>
             </div>
-            <div class="col-12 col-md-3 row items-center justify-end q-gutter-x-sm">
+            <div
+              class="col-12 col-md-3 row items-center justify-end q-gutter-x-sm"
+            >
               <q-badge color="primary" rounded class="q-px-sm q-py-xs">
                 {{ filteredResolutions.length }} Resolved
               </q-badge>
@@ -77,7 +80,11 @@
         flat
         class="management-card q-pa-xl text-center column items-center"
       >
-        <q-icon name="balance" size="48px" class="opacity-30 q-mb-sm text-grey-6" />
+        <q-icon
+          name="balance"
+          size="48px"
+          class="opacity-30 q-mb-sm text-grey-6"
+        />
         <div class="text-subtitle1 text-weight-medium text-grey-8">
           No tie resolutions found
         </div>
@@ -108,11 +115,7 @@
                 >
                   {{ res.season_name || `Season #${res.season_id}` }}
                 </q-chip>
-                <LeagueLevel
-                  badge
-                  :level="res.league_level"
-                  class="q-pa-xs"
-                />
+                <LeagueLevel badge :level="res.league_level" class="q-pa-xs" />
                 <q-badge
                   color="positive"
                   outline
@@ -164,7 +167,11 @@
                     <q-item-label class="text-weight-medium">
                       {{ entry.profile_name }}
                     </q-item-label>
-                    <q-item-label v-if="entry.username" caption class="text-grey-6">
+                    <q-item-label
+                      v-if="entry.username"
+                      caption
+                      class="text-grey-6"
+                    >
                       @{{ entry.username }}
                     </q-item-label>
                   </q-item-section>
@@ -177,7 +184,12 @@
               v-if="res.note"
               class="q-mt-sm q-pa-sm bg-grey-1 rounded-borders row items-start q-gutter-x-xs"
             >
-              <q-icon name="sticky_note_2" color="grey-6" size="16px" class="q-mt-xs" />
+              <q-icon
+                name="sticky_note_2"
+                color="grey-6"
+                size="16px"
+                class="q-mt-xs"
+              />
               <div class="col text-caption text-grey-8">
                 <span class="text-weight-bold">Note:</span> {{ res.note }}
               </div>
@@ -211,10 +223,17 @@
       <!-- Edit Dialog -->
       <q-dialog v-model="showEditDialog" persistent>
         <q-card
-          style="min-width: 320px; max-width: 520px; width: 100%; border-radius: 16px"
+          style="
+            min-width: 320px;
+            max-width: 520px;
+            width: 100%;
+            border-radius: 16px;
+          "
         >
           <q-card-section class="row items-center justify-between q-pb-none">
-            <div class="text-subtitle1 text-weight-bold">Edit Tie Resolution</div>
+            <div class="text-subtitle1 text-weight-bold">
+              Edit Tie Resolution
+            </div>
             <q-btn icon="close" flat round dense v-close-popup />
           </q-card-section>
           <q-card-section>
@@ -244,8 +263,8 @@
             </div>
           </q-card-section>
           <q-card-section class="text-body2 text-grey-8">
-            Are you sure you want to delete this tie resolution?
-            The standings for this league will revert to an unresolved tie.
+            Are you sure you want to delete this tie resolution? The standings
+            for this league will revert to an unresolved tie.
           </q-card-section>
           <q-card-actions align="right" class="q-pa-md">
             <KennerButton label="Cancel" flat color="grey-7" v-close-popup />

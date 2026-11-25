@@ -13,11 +13,7 @@
       <q-card-section class="q-pa-md border-bottom bg-grey-1">
         <div class="row items-center justify-between">
           <div class="row items-center q-gutter-x-sm">
-            <q-icon
-              name="format_list_numbered"
-              size="20px"
-              color="secondary"
-            />
+            <q-icon name="format_list_numbered" size="20px" color="secondary" />
             <div class="text-subtitle1 text-weight-bold text-dark">
               Starting Player Order Impact
             </div>

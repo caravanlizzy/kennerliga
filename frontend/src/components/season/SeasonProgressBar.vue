@@ -7,7 +7,9 @@
         <q-icon name="insights" size="15px" class="progress-header-icon" />
         <span class="text-weight-bold text-dark">Season Progress</span>
         <span class="text-grey-5 gt-xs">•</span>
-        <span class="text-caption text-grey-7 gt-xs ellipsis">{{ phaseLabel }}</span>
+        <span class="text-caption text-grey-7 gt-xs ellipsis">{{
+          phaseLabel
+        }}</span>
       </div>
 
       <!-- Right side: Mini inline metrics & percentage -->
@@ -17,7 +19,9 @@
           <!-- Picks -->
           <div
             class="mini-metric row items-center no-wrap q-px-xs rounded-borders"
-            :class="isPicksComplete ? 'mini-metric--complete' : 'mini-metric--pending'"
+            :class="
+              isPicksComplete ? 'mini-metric--complete' : 'mini-metric--pending'
+            "
           >
             <q-icon
               :name="isPicksComplete ? 'check_circle' : 'sports_esports'"
@@ -25,17 +29,28 @@
               class="q-mr-xs"
             />
             <span v-if="isPicksComplete">Picks</span>
-            <span v-else>Picks: {{ progress.picks.current }}/{{ progress.picks.total }}</span>
+            <span v-else
+              >Picks: {{ progress.picks.current }}/{{
+                progress.picks.total
+              }}</span
+            >
             <KennerTooltip>
-              {{ progress.picks.current }} / {{ progress.picks.total }} picks completed
-              {{ isPicksComplete ? '(Complete)' : `(${progress.picks.missing} remaining)` }}
+              {{ progress.picks.current }} / {{ progress.picks.total }} picks
+              completed
+              {{
+                isPicksComplete
+                  ? '(Complete)'
+                  : `(${progress.picks.missing} remaining)`
+              }}
             </KennerTooltip>
           </div>
 
           <!-- Bans -->
           <div
             class="mini-metric row items-center no-wrap q-px-xs rounded-borders"
-            :class="isBansComplete ? 'mini-metric--complete' : 'mini-metric--pending'"
+            :class="
+              isBansComplete ? 'mini-metric--complete' : 'mini-metric--pending'
+            "
           >
             <q-icon
               :name="isBansComplete ? 'check_circle' : 'block'"
@@ -43,17 +58,26 @@
               class="q-mr-xs"
             />
             <span v-if="isBansComplete">Bans</span>
-            <span v-else>Bans: {{ progress.bans.current }}/{{ progress.bans.total }}</span>
+            <span v-else
+              >Bans: {{ progress.bans.current }}/{{ progress.bans.total }}</span
+            >
             <KennerTooltip>
-              {{ progress.bans.current }} / {{ progress.bans.total }} bans completed
-              {{ isBansComplete ? '(Complete)' : `(${progress.bans.missing} remaining)` }}
+              {{ progress.bans.current }} / {{ progress.bans.total }} bans
+              completed
+              {{
+                isBansComplete
+                  ? '(Complete)'
+                  : `(${progress.bans.missing} remaining)`
+              }}
             </KennerTooltip>
           </div>
 
           <!-- Games -->
           <div
             class="mini-metric row items-center no-wrap q-px-xs rounded-borders"
-            :class="isGamesComplete ? 'mini-metric--complete' : 'mini-metric--pending'"
+            :class="
+              isGamesComplete ? 'mini-metric--complete' : 'mini-metric--pending'
+            "
           >
             <q-icon
               :name="isGamesComplete ? 'check_circle' : 'emoji_events'"
@@ -61,10 +85,19 @@
               class="q-mr-xs"
             />
             <span v-if="isGamesComplete">Games</span>
-            <span v-else>Games: {{ progress.reports.current }}/{{ progress.reports.total }}</span>
+            <span v-else
+              >Games: {{ progress.reports.current }}/{{
+                progress.reports.total
+              }}</span
+            >
             <KennerTooltip>
-              {{ progress.reports.current }} / {{ progress.reports.total }} games reported
-              {{ isGamesComplete ? '(Complete)' : `(${progress.reports.missing} remaining)` }}
+              {{ progress.reports.current }} /
+              {{ progress.reports.total }} games reported
+              {{
+                isGamesComplete
+                  ? '(Complete)'
+                  : `(${progress.reports.missing} remaining)`
+              }}
             </KennerTooltip>
           </div>
         </div>
@@ -91,16 +124,28 @@
     <!-- Mobile-only compact metrics row (xs only) -->
     <div
       class="row items-center justify-between lt-sm q-mt-xs text-caption text-grey-7"
-      style="font-size: 11px;"
+      style="font-size: 11px"
     >
       <span :class="{ 'text-positive text-weight-medium': isPicksComplete }">
-        {{ isPicksComplete ? 'Picks ✓' : `Picks: ${progress.picks.current}/${progress.picks.total}` }}
+        {{
+          isPicksComplete
+            ? 'Picks ✓'
+            : `Picks: ${progress.picks.current}/${progress.picks.total}`
+        }}
       </span>
       <span :class="{ 'text-positive text-weight-medium': isBansComplete }">
-        {{ isBansComplete ? 'Bans ✓' : `Bans: ${progress.bans.current}/${progress.bans.total}` }}
+        {{
+          isBansComplete
+            ? 'Bans ✓'
+            : `Bans: ${progress.bans.current}/${progress.bans.total}`
+        }}
       </span>
       <span :class="{ 'text-positive text-weight-medium': isGamesComplete }">
-        {{ isGamesComplete ? 'Games ✓' : `Games: ${progress.reports.current}/${progress.reports.total}` }}
+        {{
+          isGamesComplete
+            ? 'Games ✓'
+            : `Games: ${progress.reports.current}/${progress.reports.total}`
+        }}
       </span>
     </div>
   </div>
@@ -126,25 +171,18 @@ const formattedPercentage = computed(() => {
 
 const isPicksComplete = computed(() => {
   if (!props.progress) return false;
-  return (
-    props.progress.picks.total > 0 &&
-    props.progress.picks.missing === 0
-  );
+  return props.progress.picks.total > 0 && props.progress.picks.missing === 0;
 });
 
 const isBansComplete = computed(() => {
   if (!props.progress) return false;
-  return (
-    props.progress.bans.total > 0 &&
-    props.progress.bans.missing === 0
-  );
+  return props.progress.bans.total > 0 && props.progress.bans.missing === 0;
 });
 
 const isGamesComplete = computed(() => {
   if (!props.progress) return false;
   return (
-    props.progress.reports.total > 0 &&
-    props.progress.reports.missing === 0
+    props.progress.reports.total > 0 && props.progress.reports.missing === 0
   );
 });
 

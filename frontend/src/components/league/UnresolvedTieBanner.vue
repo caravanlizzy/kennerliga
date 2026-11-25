@@ -17,7 +17,9 @@
       </div>
 
       <KennerButton
-        v-if="unresolvedGroups.length === 1 && canResolveGroup(unresolvedGroups[0])"
+        v-if="
+          unresolvedGroups.length === 1 && canResolveGroup(unresolvedGroups[0])
+        "
         label="Resolve"
         size="xs"
         color="warning"

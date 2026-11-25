@@ -1,7 +1,8 @@
 // app global css in SCSS form
 :root {
   --kenner-card-radius: 16px;
-  --kenner-card-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.03), 0 1px 3px rgba(0, 0, 0, 0.02);
+  --kenner-card-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.03),
+    0 1px 3px rgba(0, 0, 0, 0.02);
   --kenner-card-shadow-hover: 0 8px 24px -4px rgba(0, 0, 0, 0.06);
   --kenner-border-color: rgba(0, 0, 0, 0.06);
   --kenner-border-subtle: rgba(0, 0, 0, 0.04);
@@ -26,7 +27,7 @@
   --kenner-surface-muted: #eceae3;
   --kenner-surface-strong: #dedbd2;
   --kenner-surface-overlay: rgba(255, 255, 255, 0.85);
-  --kenner-border-strong: rgba(0, 0, 0, 0.10);
+  --kenner-border-strong: rgba(0, 0, 0, 0.1);
 
   // Text scale
   --kenner-text-strong: #0f172a;
@@ -36,13 +37,13 @@
 
   // Medals
   --kenner-gold-text: #b45309;
-  --kenner-gold-bg: rgba(245, 158, 11, 0.10);
+  --kenner-gold-bg: rgba(245, 158, 11, 0.1);
   --kenner-gold-border: rgba(245, 158, 11, 0.25);
   --kenner-silver-text: #475569;
   --kenner-silver-bg: rgba(148, 163, 184, 0.12);
   --kenner-silver-border: rgba(148, 163, 184, 0.25);
   --kenner-bronze-text: #9a3412;
-  --kenner-bronze-bg: rgba(217, 119, 6, 0.10);
+  --kenner-bronze-bg: rgba(217, 119, 6, 0.1);
   --kenner-bronze-border: rgba(249, 115, 22, 0.25);
 
   // Status tints

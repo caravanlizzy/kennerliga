@@ -56,7 +56,9 @@
           </div>
           <div
             class="row justify-center justify-md-start"
-            :class="isMobile ? 'q-gutter-x-lg q-mt-xs' : 'q-gutter-x-xl q-mt-sm'"
+            :class="
+              isMobile ? 'q-gutter-x-lg q-mt-xs' : 'q-gutter-x-xl q-mt-sm'
+            "
           >
             <div class="column items-center items-md-start">
               <div

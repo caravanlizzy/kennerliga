@@ -9,9 +9,7 @@
         <LeagueLevel :level="activeLeague.level" />
         <div>
           <div class="row items-center q-gutter-xs wrap">
-            <span
-              class="text-subtitle1 text-sm-h6 text-weight-bold text-dark"
-            >
+            <span class="text-subtitle1 text-sm-h6 text-weight-bold text-dark">
               {{ leagueDisplayName(activeLeague) }}
             </span>
             <div
@@ -37,9 +35,7 @@
       </div>
 
       <!-- Member Avatars Preview -->
-      <div
-        class="row items-center wrap q-gutter-xs q-mt-xs-sm q-mt-sm-none"
-      >
+      <div class="row items-center wrap q-gutter-xs q-mt-xs-sm q-mt-sm-none">
         <UserAvatar
           v-for="m in activeLeagueMembers"
           :key="m.id"

@@ -66,10 +66,7 @@
         <div class="col-12 col-md-4">
           <div class="sticky-top">
             <!-- Overall Performance Summary -->
-            <div
-              v-if="loadingStats"
-              :class="isMobile ? 'q-mb-sm' : 'q-mb-lg'"
-            >
+            <div v-if="loadingStats" :class="isMobile ? 'q-mb-sm' : 'q-mb-lg'">
               <q-skeleton type="rect" height="350px" class="rounded-borders" />
             </div>
             <UserPerformance

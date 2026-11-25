@@ -98,7 +98,11 @@
 
         <!-- Years Filter -->
         <div
-          :class="isMobile ? 'col years-filter--mobile' : 'col-12 col-sm-auto years-filter'"
+          :class="
+            isMobile
+              ? 'col years-filter--mobile'
+              : 'col-12 col-sm-auto years-filter'
+          "
           :style="{ minWidth: isMobile ? '110px' : '170px' }"
         >
           <KennerSelect

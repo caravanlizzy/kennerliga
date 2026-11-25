@@ -23,9 +23,7 @@
       expand-icon-class="text-grey-7"
     >
       <div class="q-px-md q-pt-sm q-pb-md">
-        <div
-          class="row items-center justify-between q-mb-sm q-col-gutter-sm"
-        >
+        <div class="row items-center justify-between q-mb-sm q-col-gutter-sm">
           <div v-if="participants.length > 4" class="col-12 col-sm-6">
             <KennerInput
               v-model="search"

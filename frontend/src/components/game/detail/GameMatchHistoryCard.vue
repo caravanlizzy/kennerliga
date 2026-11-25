@@ -109,10 +109,7 @@
             </div>
 
             <!-- Starting Seat Filter -->
-            <div
-              v-if="seatOptions.length > 1"
-              class="col-12 col-sm-6 col-md-2"
-            >
+            <div v-if="seatOptions.length > 1" class="col-12 col-sm-6 col-md-2">
               <q-select
                 v-model="selectedSeat"
                 dense
@@ -224,9 +221,8 @@
                 class="text-subtitle2 text-weight-bold text-secondary ellipsis"
               >
                 <template v-if="topSeatInsight">
-                  Seat {{ topSeatInsight.seat }} ({{
-                    topSeatInsight.winRate
-                  }}% wins)
+                  Seat {{ topSeatInsight.seat }} ({{ topSeatInsight.winRate }}%
+                  wins)
                 </template>
                 <template v-else> N/A </template>
               </div>
@@ -256,9 +252,7 @@
                 class="text-subtitle2 text-weight-bold text-deep-purple-9 ellipsis"
               >
                 <template v-if="topFactionInsight">
-                  {{ topFactionInsight.name }} ({{
-                    topFactionInsight.wins
-                  }}
+                  {{ topFactionInsight.name }} ({{ topFactionInsight.wins }}
                   wins)
                 </template>
                 <template v-else> N/A </template>
@@ -286,9 +280,7 @@
             <div>
               <div class="text-caption text-grey-6">Avg Winning Score</div>
               <div class="text-subtitle2 text-weight-bold text-amber-10">
-                {{
-                  avgWinningScore !== null ? `${avgWinningScore} pts` : '-'
-                }}
+                {{ avgWinningScore !== null ? `${avgWinningScore} pts` : '-' }}
               </div>
             </div>
           </div>
@@ -723,9 +715,7 @@ const filteredMatches = computed(() => {
     if (selectedFaction.value) {
       const matchFaction = (m.participants || []).some((p) => {
         const hasFaction = p.faction_name === selectedFaction.value;
-        return onlyWinnerMatches.value
-          ? hasFaction && p.is_winner
-          : hasFaction;
+        return onlyWinnerMatches.value ? hasFaction && p.is_winner : hasFaction;
       });
       if (!matchFaction) return false;
     }
@@ -845,9 +835,7 @@ const avgWinningScore = computed(() => {
 });
 
 // Helper functions for rows
-function getWinner(
-  match: TGameRecentMatch
-): TGameMatchParticipant | undefined {
+function getWinner(match: TGameRecentMatch): TGameMatchParticipant | undefined {
   return (match.participants || []).find((p) => p.is_winner);
 }
 
@@ -874,9 +862,7 @@ function hasFactions(match: TGameRecentMatch): boolean {
 }
 
 function getParticipantFactions(match: TGameRecentMatch) {
-  return (match.participants || []).filter((p) =>
-    Boolean(p.faction_name)
-  );
+  return (match.participants || []).filter((p) => Boolean(p.faction_name));
 }
 
 // Table columns

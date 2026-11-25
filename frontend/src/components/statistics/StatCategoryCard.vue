@@ -5,66 +5,99 @@
     class="stat-card full-height"
     :style="{ '--accent': accentColor }"
   >
+    <!-- Header -->
     <q-card-section class="stat-card__header">
-      <div class="row items-center no-wrap">
-        <div
-          class="stat-icon-box q-mr-sm"
-          :style="{
-            background: accentColor + ($q.dark.isActive ? '29' : '14'),
-          }"
-        >
-          <q-icon :name="icon" :style="{ color: accentColor }" size="19px" />
-        </div>
-        <div class="column">
+      <div class="row items-center justify-between no-wrap">
+        <div class="row items-center no-wrap min-width-0">
           <div
-            class="text-subtitle2 text-weight-bolder text-dark line-height-1"
+            class="stat-icon-box q-mr-sm"
+            :style="{
+              background: accentColor + ($q.dark.isActive ? '29' : '14'),
+            }"
           >
-            {{ category.label }}
+            <q-icon :name="icon" :style="{ color: accentColor }" size="18px" />
           </div>
-          <div class="text-caption text-grey-6">{{ category.description }}</div>
+          <div class="column min-width-0">
+            <div
+              class="text-subtitle2 text-weight-bolder text-dark line-height-1 ellipsis"
+            >
+              {{ category.label }}
+            </div>
+            <div
+              class="text-caption text-grey-6 text-ellipsis-2 line-height-1-2 q-mt-xs"
+            >
+              {{ category.description }}
+            </div>
+          </div>
+        </div>
+        <div v-if="category.total_ranked" class="q-ml-xs flex-shrink-0">
+          <span class="stat-count-badge">
+            {{ category.total_ranked }} ranked
+          </span>
         </div>
       </div>
     </q-card-section>
 
-    <q-separator class="q-mx-md" />
+    <q-separator class="stat-card__separator" />
 
+    <!-- Body -->
     <q-card-section class="stat-card__body">
-      <div v-if="top3.length === 0" class="text-caption text-grey-6 q-pa-sm">
+      <div
+        v-if="category.top.length === 0"
+        class="text-caption text-grey-6 q-pa-sm text-center"
+      >
         Not enough data to rank players yet.
       </div>
 
       <template v-else>
-        <!-- Top 3, as small boxes -- mirrors the award podium cards. -->
-        <div class="row q-col-gutter-sm">
-          <div v-for="(entry, idx) in top3" :key="entry.profile_id" class="col">
+        <!-- Unified Ranking List -->
+        <div
+          class="stat-rows-container"
+          :class="{ 'stat-rows-container--expanded': expanded }"
+        >
+          <!-- Expanded View: All Ranked Players -->
+          <template v-if="expanded">
             <div
-              class="podium-player"
+              v-for="entry in category.top"
+              :key="`exp-${entry.profile_id}`"
+              class="stat-rank-row row items-center justify-between no-wrap"
               :class="{
-                'podium-player--me': entry.is_me,
+                'stat-rank-row--me': entry.is_me,
+                'stat-rank-row--top1': entry.rank === 1,
                 'cursor-pointer': Boolean(entry.username),
               }"
               @click="navigateToUser(entry.username)"
             >
-              <span class="rank-badge" :class="`rank-badge--${idx}`">{{
-                idx + 1
-              }}</span>
-              <div
-                class="podium-player__name ellipsis"
-                :class="{
-                  'text-weight-bolder text-primary': entry.is_me,
-                  'player-link': Boolean(entry.username),
-                }"
-              >
-                {{ entry.profile_name }}
+              <div class="row items-center no-wrap q-gutter-x-sm min-width-0">
+                <span
+                  class="rank-badge"
+                  :class="
+                    entry.rank != null && entry.rank <= 3
+                      ? `rank-badge--${entry.rank - 1}`
+                      : ''
+                  "
+                >
+                  {{ entry.rank ?? '–' }}
+                </span>
+                <span
+                  class="stat-rank-row__name ellipsis"
+                  :class="{
+                    'text-weight-bolder': entry.is_me,
+                    'player-link': Boolean(entry.username),
+                  }"
+                >
+                  {{ entry.profile_name }}
+                </span>
+                <span v-if="entry.is_me" class="you-badge">You</span>
               </div>
-              <div class="podium-player__score text-primary">
+              <div
+                class="stat-rank-row__value row items-center no-wrap q-gutter-x-xs flex-shrink-0"
+              >
                 <template v-if="entry.best_level != null">
                   <LeagueLevel badge :level="entry.best_level" />
-                  <div>
-                    {{
-                      formatStatValue(category.key, category.unit, entry.value)
-                    }}
-                  </div>
+                  <span>{{
+                    formatStatValue(category.key, category.unit, entry.value)
+                  }}</span>
                 </template>
                 <template v-else>
                   {{
@@ -74,47 +107,105 @@
                 </template>
               </div>
             </div>
-          </div>
-        </div>
+          </template>
 
-        <!-- Collapsed: a short list around the requesting player (one rank
-             above/below). Expanded: every remaining ranked player. -->
-        <div v-if="displayedRows.length > 0" class="q-mt-md">
-          <div
-            v-if="!expanded && hasGap"
-            class="gap-separator row items-center q-mb-sm"
-          >
-            <q-separator class="col" />
-            <span class="gap-separator__label text-caption text-grey-6">
-              <q-icon name="more_vert" size="14px" />
-              {{ gapCount }} more
-            </span>
-            <q-separator class="col" />
-          </div>
-
-          <div :class="{ 'full-list': expanded }">
-            <template v-for="entry in displayedRows" :key="entry.profile_id">
+          <!-- Collapsed View: Top 3 + Window around user -->
+          <template v-else>
+            <!-- Top 3 -->
+            <div
+              v-for="entry in top3"
+              :key="`top-${entry.profile_id}`"
+              class="stat-rank-row row items-center justify-between no-wrap"
+              :class="{
+                'stat-rank-row--me': entry.is_me,
+                'stat-rank-row--top1': entry.rank === 1,
+                'cursor-pointer': Boolean(entry.username),
+              }"
+              @click="navigateToUser(entry.username)"
+            >
+              <div class="row items-center no-wrap q-gutter-x-sm min-width-0">
+                <span
+                  class="rank-badge"
+                  :class="
+                    entry.rank != null && entry.rank <= 3
+                      ? `rank-badge--${entry.rank - 1}`
+                      : ''
+                  "
+                >
+                  {{ entry.rank ?? '–' }}
+                </span>
+                <span
+                  class="stat-rank-row__name ellipsis"
+                  :class="{
+                    'text-weight-bolder': entry.is_me,
+                    'player-link': Boolean(entry.username),
+                  }"
+                >
+                  {{ entry.profile_name }}
+                </span>
+                <span v-if="entry.is_me" class="you-badge">You</span>
+              </div>
               <div
-                class="rank-row row items-center justify-between"
+                class="stat-rank-row__value row items-center no-wrap q-gutter-x-xs flex-shrink-0"
+              >
+                <template v-if="entry.best_level != null">
+                  <LeagueLevel badge :level="entry.best_level" />
+                  <span>{{
+                    formatStatValue(category.key, category.unit, entry.value)
+                  }}</span>
+                </template>
+                <template v-else>
+                  {{
+                    entry.display ??
+                    formatStatValue(category.key, category.unit, entry.value)
+                  }}
+                </template>
+              </div>
+            </div>
+
+            <!-- Gap Separator (if user's window is further down) -->
+            <div
+              v-if="!isMeInTop3 && visibleAroundMe.length > 0 && hasGap"
+              class="stat-gap-row row items-center justify-center q-my-xs"
+            >
+              <div class="stat-gap-line col" />
+              <span class="stat-gap-text text-caption text-grey-6 q-px-sm">
+                &middot;&middot;&middot; {{ gapCount }}
+                {{
+                  gapCount === 1 ? 'player' : 'players'
+                }}
+                &middot;&middot;&middot;
+              </span>
+              <div class="stat-gap-line col" />
+            </div>
+
+            <!-- Around Me Rows (if outside top 3) -->
+            <template v-if="!isMeInTop3 && visibleAroundMe.length > 0">
+              <div
+                v-for="entry in visibleAroundMe"
+                :key="`around-${entry.profile_id}`"
+                class="stat-rank-row row items-center justify-between no-wrap"
                 :class="{
-                  'rank-row--me': entry.is_me,
+                  'stat-rank-row--me': entry.is_me,
                   'cursor-pointer': Boolean(entry.username),
                 }"
                 @click="navigateToUser(entry.username)"
               >
-                <div class="row items-center no-wrap q-gutter-x-sm">
+                <div class="row items-center no-wrap q-gutter-x-sm min-width-0">
                   <span class="rank-badge">{{ entry.rank }}</span>
                   <span
+                    class="stat-rank-row__name ellipsis"
                     :class="{
                       'text-weight-bolder': entry.is_me,
                       'player-link': Boolean(entry.username),
                     }"
-                  >{{
-                    entry.profile_name
-                  }}</span>
+                  >
+                    {{ entry.profile_name }}
+                  </span>
+                  <span v-if="entry.is_me" class="you-badge">You</span>
                 </div>
-                <span
-                  class="row items-center no-wrap q-gutter-x-xs rank-row__value text-primary"
+                <div
+                  class="stat-rank-row__value row items-center no-wrap q-gutter-x-xs flex-shrink-0"
                 >
                   <template v-if="entry.best_level != null">
                     <LeagueLevel badge :level="entry.best_level" />
@@ -128,13 +219,55 @@
                       formatStatValue(category.key, category.unit, entry.value)
                     }}
                   </template>
-                </span>
+                </div>
               </div>
             </template>
+          </template>
+        </div>
+
+        <!-- Ineligible / Unranked Player Notice -->
+        <div
+          v-if="!category.me.eligible && category.me.profile_name"
+          class="stat-rank-row stat-rank-row--me stat-rank-row--unranked row items-center justify-between no-wrap q-mt-xs"
+        >
+          <div class="row items-center no-wrap q-gutter-x-sm min-width-0">
+            <span class="rank-badge rank-badge--unranked">&ndash;</span>
+            <span class="stat-rank-row__name ellipsis text-weight-bolder">
+              {{ category.me.profile_name }}
+            </span>
+            <span class="you-badge">You</span>
+          </div>
+          <div
+            class="stat-rank-row__value text-caption text-grey-6 text-right flex-shrink-0"
+          >
+            <template v-if="category.me.best_level != null">
+              <LeagueLevel badge :level="category.me.best_level" />
+              <span
+                >{{
+                  formatStatValue(
+                    category.key,
+                    category.unit,
+                    category.me.value
+                  )
+                }}
+                so far</span
+              >
+            </template>
+            <template v-else-if="category.me.display">
+              {{ category.me.display }} so far
+            </template>
+            <template v-else-if="category.me.value !== null">
+              {{
+                formatStatValue(category.key, category.unit, category.me.value)
+              }}
+              so far
+            </template>
+            <template v-else> No data yet </template>
           </div>
         </div>
 
-        <div v-if="canExpand" class="text-center q-mt-sm">
+        <!-- Show All Toggle Button -->
+        <div v-if="canExpand" class="text-center q-mt-xs">
           <KennerButton
             flat
             dense
@@ -142,46 +275,12 @@
             size="sm"
             color="primary"
             :icon="expanded ? 'expand_less' : 'expand_more'"
-            :label="expanded ? 'Show less' : `Show all ${totalRankedLabel}`"
+            :label="expanded ? 'Show top 3' : `Show all ${totalRankedLabel}`"
+            class="stat-expand-btn"
             @click="expanded = !expanded"
           />
         </div>
       </template>
-
-      <!-- The player has data but not enough to be formally ranked: show
-           their standing on its own highlighted row, without a heading. -->
-      <div
-        v-if="!category.me.eligible"
-        class="rank-row rank-row--me row items-center justify-between q-mt-sm"
-      >
-        <div class="row items-center no-wrap q-gutter-x-sm">
-          <span class="rank-badge">{{ category.me.rank ?? '–' }}</span>
-          <span class="text-weight-bolder">{{ category.me.profile_name }}</span>
-        </div>
-        <div
-          class="text-caption text-grey-6 text-right row items-center no-wrap q-gutter-x-xs justify-end"
-        >
-          <template v-if="category.me.best_level != null">
-            <LeagueLevel badge :level="category.me.best_level" />
-            <span
-              >{{
-                formatStatValue(category.key, category.unit, category.me.value)
-              }}
-              so far</span
-            >
-          </template>
-          <template v-else-if="category.me.display"
-            >{{ category.me.display }} so far</template
-          >
-          <template v-else-if="category.me.value !== null">
-            {{
-              formatStatValue(category.key, category.unit, category.me.value)
-            }}
-            so far
-          </template>
-          <template v-else>No data yet</template>
-        </div>
-      </div>
     </q-card-section>
   </q-card>
 </template>
@@ -218,24 +317,19 @@ const ICONS: Record<string, string> = {
   spammer: 'repeat',
 };
 
-// Each category gets its own accent so the page reads as varied rather than
-// a wall of the same purple; the "fun" superlative awards (Hater, Inspirer,
-// Spammer, Iron Will) keep colors matching the app's existing negative/accent
-// palette (quasar.variables.scss).
 const ACCENT_COLORS: Record<string, string> = {
   career_performance: '#b45309',
   win_rate: '#0f766e',
   avg_position: '#2563eb',
   games_played: '#059669',
   records: '#ea580c',
-  iron_will: '#52606d',
-  hater: '#d63a38',
-  inspirer: '#5e35b1',
-  spammer: '#e08a1e',
+  iron_will: '#475569',
+  hater: '#dc2626',
+  inspirer: '#7c3aed',
+  spammer: '#d97706',
 };
 const DEFAULT_ACCENT_COLOR = '#475569';
 
-// Lighter variants of the same hues, readable on dark surfaces.
 const ACCENT_COLORS_DARK: Record<string, string> = {
   career_performance: '#fbbf24',
   win_rate: '#2dd4bf',
@@ -244,8 +338,8 @@ const ACCENT_COLORS_DARK: Record<string, string> = {
   records: '#fb923c',
   iron_will: '#94a3b8',
   hater: '#f87171',
-  inspirer: '#b39ddb',
-  spammer: '#fb923c',
+  inspirer: '#a78bfa',
+  spammer: '#fbbf24',
 };
 const DEFAULT_ACCENT_COLOR_DARK = '#cbd5e1';
 
@@ -258,20 +352,14 @@ const accentColor = computed(() =>
     : ACCENT_COLORS[props.category.key] ?? DEFAULT_ACCENT_COLOR
 );
 
-// Only the top 3 are shown as boxes -- mirrors the award podium cards.
 const top3 = computed(() => props.category.top.slice(0, 3));
+const isMeInTop3 = computed(() => top3.value.some((entry) => entry.is_me));
 
-// The "around me" window (one rank above/below) can overlap the top 3
-// (e.g. the requesting player is already ranked 2nd) -- only show entries
-// that aren't already visible above.
 const visibleAroundMe = computed(() => {
   const topRanks = new Set(top3.value.map((entry) => entry.rank));
   return props.category.around_me.filter((entry) => !topRanks.has(entry.rank));
 });
 
-// A gap exists when the highest-ranked "around me" row does not directly
-// follow the top 3 -- i.e. there are players in between that neither
-// section displays.
 const topLastRank = computed(() => {
   const ranks = top3.value
     .map((entry) => entry.rank)
@@ -298,127 +386,129 @@ const gapCount = computed(() =>
     : 0
 );
 
-// Everyone below the top 3 -- the "show all" expansion just reveals the
-// rest of what the backend already returned (fetched with a generous
-// top_n), no extra request needed.
-const restOfList = computed(() => props.category.top.slice(3));
-const canExpand = computed(() => restOfList.value.length > 0);
+const canExpand = computed(() => props.category.top.length > 3);
 const totalRankedLabel = computed(
   () => props.category.total_ranked || props.category.top.length
-);
-
-const displayedRows = computed(() =>
-  expanded.value ? restOfList.value : visibleAroundMe.value
 );
 </script>
 
 <style scoped lang="scss">
 .stat-card {
   border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 
 .stat-card__header {
-  padding: 14px 16px 10px;
+  padding: 12px 14px 10px;
+}
+
+.stat-card__separator {
+  opacity: 0.6;
 }
 
 .stat-card__body {
-  padding: 10px 16px 14px;
+  padding: 8px 10px 10px;
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
 }
 
 .stat-icon-box {
   width: 32px;
   height: 32px;
-  border-radius: 7px;
-  background: rgba(100, 116, 139, 0.08);
+  border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
 }
 
-.podium-player {
-  height: 100%;
-  text-align: center;
-  padding: 8px 6px 6px;
-  border-radius: 8px;
-  background: rgba(0, 0, 0, 0.02);
+.stat-count-badge {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--kenner-text-secondary);
+  background: var(--kenner-surface-subtle);
   border: 1px solid var(--kenner-border-subtle);
+  padding: 2px 7px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
 
-  .body--dark & {
-    background: rgba(255, 255, 255, 0.02);
+.stat-rows-container {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+
+  &--expanded {
+    max-height: 280px;
+    overflow-y: auto;
+    padding-right: 2px;
+  }
+}
+
+.stat-rank-row {
+  padding: 5px 8px;
+  border-radius: 6px;
+  transition: background-color 0.15s ease;
+  min-height: 34px;
+
+  &:hover {
+    background: var(--kenner-hover-bg);
+  }
+
+  &--top1 {
+    background: rgba(245, 158, 11, 0.04);
+
+    .body--dark & {
+      background: rgba(245, 158, 11, 0.07);
+    }
   }
 
   &--me {
-    background: color-mix(in srgb, var(--accent) 8%, white);
-    border-color: color-mix(in srgb, var(--accent) 20%, transparent);
+    background: color-mix(in srgb, var(--accent) 10%, white);
+    border: 1px solid color-mix(in srgb, var(--accent) 25%, transparent);
+
+    &:hover {
+      background: color-mix(in srgb, var(--accent) 15%, white);
+    }
 
     .body--dark & {
       background: color-mix(in srgb, var(--accent) 14%, var(--kenner-card-bg));
       border-color: color-mix(in srgb, var(--accent) 35%, transparent);
+
+      &:hover {
+        background: color-mix(
+          in srgb,
+          var(--accent) 20%,
+          var(--kenner-card-bg)
+        );
+      }
     }
   }
 
+  &--unranked {
+    border-style: dashed;
+    margin-top: 4px;
+  }
+
   &__name {
-    font-size: 11.5px;
+    font-size: 13px;
+    font-weight: 600;
     line-height: 1.2;
-    margin-top: 5px;
   }
 
   .player-link:hover {
     text-decoration: underline;
   }
 
-  &__score {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 1px;
-    font-size: 13.5px;
+  &__value {
     font-weight: 700;
-    margin-top: 3px;
+    font-size: 13px;
     font-variant-numeric: tabular-nums;
+    color: var(--kenner-text-strong);
   }
-}
-
-.rank-row {
-  padding: 7px 6px;
-  border-radius: 6px;
-  transition: background-color 0.15s ease;
-
-  &:hover {
-    background: var(--kenner-hover-bg);
-  }
-}
-
-.rank-row + .rank-row {
-  border-top: 1px solid var(--kenner-border-subtle);
-}
-
-.full-list {
-  max-height: 280px;
-  overflow-y: auto;
-}
-
-.rank-row--me {
-  background: color-mix(in srgb, var(--accent) 8%, white);
-
-  &:hover {
-    background: color-mix(in srgb, var(--accent) 12%, white);
-  }
-
-  .body--dark & {
-    background: color-mix(in srgb, var(--accent) 14%, var(--kenner-card-bg));
-
-    &:hover {
-      background: color-mix(in srgb, var(--accent) 20%, var(--kenner-card-bg));
-    }
-  }
-}
-
-.rank-row__value {
-  font-weight: 700;
-  font-size: 13px;
-  font-variant-numeric: tabular-nums;
 }
 
 .rank-badge {
@@ -429,19 +519,18 @@ const displayedRows = computed(() =>
   height: 20px;
   border-radius: 50%;
   background: rgba(0, 0, 0, 0.06);
-  font-size: 10.5px;
+  font-size: 11px;
   font-weight: 700;
-  color: var(--kenner-text-muted);
+  color: var(--kenner-text-secondary);
   flex-shrink: 0;
 
   .body--dark & {
     background: rgba(255, 255, 255, 0.08);
   }
 
-  // Podium top 3 get medal colors instead of a flat grey circle.
   &--0 {
-    background: #f6d365;
-    color: #7a5b00;
+    background: #fef08a;
+    color: #854d0e;
 
     .body--dark & {
       background: var(--kenner-gold-bg);
@@ -450,8 +539,8 @@ const displayedRows = computed(() =>
   }
 
   &--1 {
-    background: #d7dde8;
-    color: #4b5563;
+    background: #e2e8f0;
+    color: #475569;
 
     .body--dark & {
       background: var(--kenner-silver-bg);
@@ -460,25 +549,67 @@ const displayedRows = computed(() =>
   }
 
   &--2 {
-    background: #d6a77a;
-    color: #6b3f16;
+    background: #fed7aa;
+    color: #9a3412;
 
     .body--dark & {
       background: var(--kenner-bronze-bg);
       color: var(--kenner-bronze-text);
     }
   }
+
+  &--unranked {
+    background: transparent;
+    color: var(--kenner-text-muted);
+  }
 }
 
-.gap-separator {
-  gap: 8px;
-}
-
-.gap-separator__label {
+.you-badge {
   display: inline-flex;
   align-items: center;
-  gap: 2px;
-  white-space: nowrap;
+  padding: 1px 5px;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  background: var(--accent);
+  color: #ffffff;
+  flex-shrink: 0;
+
+  .body--dark & {
+    color: #1e293b;
+  }
+}
+
+.stat-gap-row {
+  margin: 2px 0;
+}
+
+.stat-gap-line {
+  height: 1px;
+  background: var(--kenner-border-subtle);
+}
+
+.stat-gap-text {
+  font-size: 11px;
   font-style: italic;
+  white-space: nowrap;
+}
+
+.stat-expand-btn {
+  font-weight: 600;
+  letter-spacing: 0.1px;
+}
+
+.min-width-0 {
+  min-width: 0;
+}
+
+.text-ellipsis-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 </style>

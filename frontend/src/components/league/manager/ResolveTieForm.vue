@@ -196,7 +196,8 @@ const submit = async () => {
       ? 'Failed to update tie resolution'
       : 'Failed to resolve tie group';
     if (e && typeof e === 'object' && 'response' in e) {
-      const resp = (e as { response?: { data?: { detail?: string } } }).response;
+      const resp = (e as { response?: { data?: { detail?: string } } })
+        .response;
       if (resp?.data?.detail) detail = resp.data.detail;
     }
     $q.notify({ type: 'negative', message: detail });

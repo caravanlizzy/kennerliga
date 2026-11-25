@@ -71,8 +71,8 @@
               Performance Leaderboards
             </div>
             <div v-if="!isMobile" class="text-caption text-grey-6">
-              Rankings across win rate, average position, games played,
-              records, and career score
+              Rankings across win rate, average position, games played, records,
+              and career score
             </div>
           </div>
         </div>

@@ -10,7 +10,9 @@
           class="season-live-badge row items-center no-wrap q-gutter-x-xs q-px-sm q-py-xs rounded-borders"
         >
           <span class="pulse-dot" />
-          <span class="text-weight-bolder text-uppercase live-text">Running</span>
+          <span class="text-weight-bolder text-uppercase live-text"
+            >Running</span
+          >
         </div>
       </div>
       <div
@@ -64,7 +66,12 @@
       </div>
     </div>
     <div
-      v-if="(isLiveSeason || isRunningSeason) && selectedSeasonProgress && selectedSeasonId && !loading"
+      v-if="
+        (isLiveSeason || isRunningSeason) &&
+        selectedSeasonProgress &&
+        selectedSeasonId &&
+        !loading
+      "
       class="q-px-md q-pt-sm"
     >
       <SeasonProgressBar
