@@ -290,3 +290,21 @@ class ResultAPITests(TestCase):
         self.assertEqual(float(res2.points), -1.0)
         self.assertEqual(float(res2.starting_points), 0.0)
         self.assertEqual(res2.position, 2)
+
+        # Verify ResultSerializer serialization formats numbers without trailing .00 strings
+        from result.serializers import ResultSerializer
+        r_neg8 = Result.objects.create(
+            selected_game=self.selected_game,
+            player_profile=self.profile,
+            points=-8,
+            starting_points=-0.5,
+            position=1,
+            league=self.league,
+            season=self.season,
+        )
+        s_data = ResultSerializer(r_neg8).data
+        from rest_framework.renderers import JSONRenderer
+        import json
+        rendered = json.loads(JSONRenderer().render(s_data))
+        self.assertEqual(rendered["points"], -8.0)
+        self.assertEqual(rendered["starting_points"], -0.5)

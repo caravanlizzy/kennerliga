@@ -74,7 +74,7 @@ export function useUserProfileDisplay() {
     if (pts === undefined || pts === null) return '0';
     const num = Number(pts);
     if (isNaN(num)) return '0';
-    return num % 1 === 0 ? num.toFixed(0) : num.toFixed(2);
+    return num % 1 === 0 ? num.toFixed(0) : String(Number(num.toFixed(2)));
   }
 
   return {
