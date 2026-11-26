@@ -120,8 +120,13 @@ onUnmounted(() => {
 .content-section-container {
   position: relative;
   background: var(--kenner-card-bg, white);
-  border-radius: var(--kenner-card-radius, 0px);
-  border: 1px solid var(--kenner-border-color);
+  border-radius: var(--kenner-card-radius, 16px);
+  border: 1px solid
+    color-mix(
+      in srgb,
+      var(--accent-color, var(--kenner-border-color)) 22%,
+      var(--kenner-border-color)
+    );
   box-shadow: var(--kenner-card-shadow);
   overflow: hidden;
   display: flex;
