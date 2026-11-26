@@ -70,7 +70,7 @@
             />
             <span class="hero-navigation-copy">
               <span class="hero-navigation-title">Hall of Fame</span>
-              <span class="hero-navigation-description">Season leaders</span>
+              <span class="hero-navigation-description">All-time greats</span>
             </span>
             <q-icon
               name="arrow_forward"
@@ -89,7 +89,7 @@
             />
             <span class="hero-navigation-copy">
               <span class="hero-navigation-title">Players</span>
-              <span class="hero-navigation-description">Meet the league</span>
+              <span class="hero-navigation-description">Skill &amp; stats</span>
             </span>
             <q-icon
               name="arrow_forward"
@@ -109,7 +109,7 @@
             <span class="hero-navigation-copy">
               <span class="hero-navigation-title">Games</span>
               <span class="hero-navigation-description"
-                >Browse the matches</span
+                >Matches &amp; stats</span
               >
             </span>
             <q-icon
