@@ -36,9 +36,13 @@ class Result(models.Model):
         blank=True,
         related_name='results',
     )
-    points = models.IntegerField(blank=True, null=True)
+    points = models.DecimalField(
+        max_digits=10, decimal_places=2, blank=True, null=True
+    )
     position = models.PositiveIntegerField(blank=True, null=True)
-    starting_points = models.IntegerField(blank=True, null=True)
+    starting_points = models.DecimalField(
+        max_digits=10, decimal_places=2, blank=True, null=True
+    )
     starting_position = models.IntegerField(blank=True, null=True)
     notes = models.TextField(blank=True, null=True)
     decisive_tie_breaker = models.ForeignKey(

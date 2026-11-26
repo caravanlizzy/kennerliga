@@ -249,3 +249,44 @@ class ResultAPITests(TestCase):
         stats_resp2 = self.client.get(f"/api/user/users/{user2.id}/statistics/")
         self.assertEqual(stats_resp2.status_code, 200)
         self.assertEqual(len(stats_resp2.data["records"]), 0)
+
+    def test_submit_match_result_with_decimal_points(self):
+        user2 = User.objects.create(username="user2")
+        profile2 = PlayerProfile.objects.create(user=user2, profile_name="Profile 2")
+        participant2 = SeasonParticipant.objects.create(
+            season=self.season, profile=profile2, rank=2
+        )
+        self.league.members.add(participant2)
+
+        data = {
+            "selected_game": self.selected_game.id,
+            "win_condition": self.win_condition.id,
+            "results": [
+                {
+                    "player_profile": self.profile.id,
+                    "points": -0.5,
+                    "starting_position": 1,
+                    "starting_points": -0.5,
+                },
+                {
+                    "player_profile": profile2.id,
+                    "points": -1.0,
+                    "starting_position": 2,
+                    "starting_points": 0,
+                },
+            ],
+        }
+        response = self.client.post("/api/result/match-results/", data, format="json")
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(Result.objects.count(), 2)
+
+        res1 = Result.objects.get(player_profile=self.profile)
+        res2 = Result.objects.get(player_profile=profile2)
+
+        self.assertEqual(float(res1.points), -0.5)
+        self.assertEqual(float(res1.starting_points), -0.5)
+        self.assertEqual(res1.position, 1)
+
+        self.assertEqual(float(res2.points), -1.0)
+        self.assertEqual(float(res2.starting_points), 0.0)
+        self.assertEqual(res2.position, 2)
