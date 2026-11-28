@@ -59,7 +59,7 @@
         :stats="stats"
         :top-player="topPlayer"
         @view-match="
-          router.push({ name: 'match-detail', params: { id: $event } })
+          router.push({ name: 'match-result-detail', params: { id: $event } })
         "
       />
 
