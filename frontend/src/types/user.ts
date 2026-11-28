@@ -59,6 +59,8 @@ export type TUserInviteDto = {
 
 /** One game's aggregate row in the player statistics payload. */
 export type TPlayerGameStat = {
+  id?: number;
+  game_id?: number;
   name: string;
   winRate: number;
   avgPos: number;

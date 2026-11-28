@@ -359,6 +359,40 @@ class UserAPITests(TestCase):
         self.assertEqual(res_stats_no_2p.data["overall_stats"]["wins"], 0)
         self.assertEqual(res_stats_no_2p.data["overall_stats"]["avg_pos"], 2.5)
 
+    def test_user_statistics_includes_game_id(self):
+        platform = Platform.objects.create(name="BGA_game_id_test")
+        season = Season.objects.create(year=2026, month=1)
+        part = SeasonParticipant.objects.create(season=season, profile=self.profile)
+        league = League.objects.create(season=season, level=1, status=LeagueStatus.PLAYING)
+        league.members.add(part)
+        game = Game.objects.create(name="Test Game ID", min_players=2, max_players=4, platform=platform)
+        sg = SelectedGame.objects.create(game=game, league=league, profile=self.profile)
+        Result.objects.create(
+            player_profile=self.profile,
+            selected_game=sg,
+            season=season,
+            league=league,
+            position=1,
+            points=100,
+        )
+
+        res = self.client.get(f"/api/user/users/{self.user.id}/statistics/?year=all")
+        self.assertEqual(res.status_code, 200)
+        game_stats = res.data["game_stats"]
+        self.assertTrue(len(game_stats) > 0)
+        for stat in game_stats:
+            self.assertIn("game_id", stat)
+            self.assertIn("id", stat)
+            self.assertIsNotNone(stat["game_id"])
+            self.assertEqual(stat["game_id"], stat["id"])
+        top_games = res.data["top_games"]
+        self.assertTrue(len(top_games) > 0)
+        for stat in top_games:
+            self.assertIn("game_id", stat)
+            self.assertIn("id", stat)
+            self.assertIsNotNone(stat["game_id"])
+            self.assertEqual(stat["game_id"], stat["id"])
+
     def test_user_statistics_all_time_and_yearly_picks(self):
         platform = Platform.objects.create(name="BGA_picks_test")
         season_2025 = Season.objects.create(year=2025, month=10)

@@ -25,8 +25,13 @@
             color="grey-2"
             text-color="grey-7"
             class="text-weight-bolder plays-badge px-sm"
+            :class="{ 'cursor-pointer plays-badge--clickable': isClickable }"
+            @click="onPlaysClick"
           >
             {{ game.count }} plays
+            <KennerTooltip v-if="isClickable">
+              View {{ profileName ? `${profileName}'s` : 'all' }} plays
+            </KennerTooltip>
           </q-badge>
         </div>
       </div>
@@ -83,10 +88,16 @@
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue';
+import { useRouter } from 'vue-router';
 import KennerTooltip from 'components/base/KennerTooltip.vue';
 
-defineProps<{
+const router = useRouter();
+
+const props = defineProps<{
   game: {
+    id?: number;
+    game_id?: number;
     name: string;
     winRate: number;
     avgPos: number;
@@ -94,7 +105,32 @@ defineProps<{
     positions: number[];
   };
   recordScore?: number;
+  profileId?: number | null;
+  profileName?: string;
 }>();
+
+const targetGameId = computed(() => props.game.id ?? props.game.game_id);
+const isClickable = computed(() => targetGameId.value != null);
+
+function onPlaysClick(e: Event) {
+  if (!targetGameId.value) return;
+  e.stopPropagation();
+
+  const query: Record<string, string> = {
+    tab: 'matches',
+  };
+  if (props.profileId != null) {
+    query.player = String(props.profileId);
+  } else if (props.profileName) {
+    query.player = props.profileName;
+  }
+
+  void router.push({
+    name: 'game-detail',
+    params: { id: targetGameId.value },
+    query,
+  });
+}
 
 function getPosColor(pos: number) {
   switch (pos) {
@@ -125,6 +161,18 @@ function getPosColor(pos: number) {
   font-size: 0.65rem;
   padding: 2px 6px;
   border-radius: 4px;
+  transition: all 0.15s ease-in-out;
+
+  &--clickable {
+    cursor: pointer;
+    user-select: none;
+
+    &:hover {
+      background: var(--kenner-surface-subtle, #e2e8f0) !important;
+      color: var(--q-primary) !important;
+      transform: scale(1.05);
+    }
+  }
 }
 
 .metrics-container {

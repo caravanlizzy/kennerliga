@@ -118,6 +118,8 @@
                 :top-games="topGames"
                 :records="records"
                 :filtered-game-stats="filteredGameStats"
+                :profile-id="user?.profile?.id || user?.profile_id"
+                :profile-name="user?.profile?.name || user?.username"
               />
             </q-tab-panel>
 

@@ -546,7 +546,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue';
+import { ref, computed, watch } from 'vue';
 import KennerTable from 'components/tables/KennerTable.vue';
 import KennerButton from 'components/base/KennerButton.vue';
 import { useResponsive } from 'src/composables/responsive';
@@ -556,6 +556,7 @@ const { isMobile } = useResponsive();
 
 const props = defineProps<{
   matches: TGameRecentMatch[];
+  initialPlayer?: number | string | null;
 }>();
 
 defineEmits<{
@@ -569,6 +570,33 @@ const selectedFaction = ref<string | null>(null);
 const selectedPlayer = ref<number | null>(null);
 const selectedSeason = ref<string | null>(null);
 const onlyWinnerMatches = ref(false);
+
+function applyInitialPlayer() {
+  if (props.initialPlayer != null && props.initialPlayer !== '') {
+    const numericId = Number(props.initialPlayer);
+    if (!isNaN(numericId) && numericId > 0) {
+      selectedPlayer.value = numericId;
+    } else {
+      const found = playerOptions.value.find(
+        (opt) =>
+          opt.label.toLowerCase() === String(props.initialPlayer).toLowerCase()
+      );
+      if (found && found.value != null) {
+        selectedPlayer.value = found.value;
+      }
+    }
+  }
+}
+
+watch(
+  [() => props.initialPlayer, () => playerOptions.value],
+  () => {
+    if (props.initialPlayer != null && props.initialPlayer !== '') {
+      applyInitialPlayer();
+    }
+  },
+  { immediate: true }
+);
 
 const activeFilterCount = computed(() => {
   let count = 0;

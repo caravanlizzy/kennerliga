@@ -313,13 +313,24 @@ class UserViewSet(ModelViewSet):
         # Per-game statistics
         stats_map = {}
         for r in results:
+            game_id = (
+                r.selected_game.game.id
+                if r.selected_game and r.selected_game.game
+                else None
+            )
             game_name = (
                 r.selected_game.game.name
                 if r.selected_game and r.selected_game.game
                 else f"Game {r.selected_game_id}"
             )
             if game_name not in stats_map:
-                stats_map[game_name] = {"name": game_name, "positions": [], "wins": 0}
+                stats_map[game_name] = {
+                    "id": game_id,
+                    "game_id": game_id,
+                    "name": game_name,
+                    "positions": [],
+                    "wins": 0,
+                }
 
             if r.position is not None:
                 stats_map[game_name]["positions"].append(r.position)
@@ -331,6 +342,8 @@ class UserViewSet(ModelViewSet):
             count = len(g["positions"])
             game_stats.append(
                 {
+                    "id": g.get("id"),
+                    "game_id": g.get("game_id"),
                     "name": g["name"],
                     "winRate": (g["wins"] / count * 100) if count > 0 else 0,
                     "avgPos": (sum(g["positions"]) / count) if count > 0 else 0,

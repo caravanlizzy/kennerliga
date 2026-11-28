@@ -116,6 +116,7 @@
           <q-tab-panel name="matches" class="q-pa-none">
             <GameMatchHistoryCard
               :matches="stats.recent_matches"
+              :initial-player="initialPlayer"
               @view-match="
                 router.push({
                   name: 'match-result-detail',
@@ -177,7 +178,33 @@ const loading = ref(true);
 const error = ref<string | null>(null);
 const stats = ref<TGameDetailedStatistics | null>(null);
 
-const activeTab = ref<'leaderboard' | 'matches' | 'factions'>('leaderboard');
+const activeTab = ref<'leaderboard' | 'matches' | 'factions'>(
+  route.query.tab === 'matches' || route.query.tab === 'factions'
+    ? (route.query.tab as 'matches' | 'factions')
+    : 'leaderboard'
+);
+
+const initialPlayer = computed(() => {
+  return (
+    (route.query.player as string) ||
+    (route.query.player_id as string) ||
+    (route.query.profile_id as string) ||
+    null
+  );
+});
+
+watch(
+  () => route.query.tab,
+  (newTab) => {
+    if (
+      newTab === 'matches' ||
+      newTab === 'factions' ||
+      newTab === 'leaderboard'
+    ) {
+      activeTab.value = newTab;
+    }
+  }
+);
 
 // Filters
 const selectedYears = ref<number[]>([]);

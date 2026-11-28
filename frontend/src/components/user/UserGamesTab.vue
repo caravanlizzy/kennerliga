@@ -28,6 +28,8 @@
           <q-card
             flat
             class="record-game-card relative-position overflow-hidden"
+            :class="{ 'cursor-pointer': record.game_id }"
+            @click="onRecordClick(record)"
           >
             <div
               class="record-badge absolute-top-left q-pa-sm text-weight-bolder shadow-2 row items-center"
@@ -151,9 +153,14 @@
                 color="grey-4"
                 text-color="grey-7"
                 class="q-mt-md text-weight-bold"
+                :class="{ 'cursor-pointer hover-scale': game.id || game.game_id }"
                 style="font-size: 0.65rem"
+                @click="onTopGameClick(game)"
               >
                 {{ game.count }} {{ game.count === 1 ? 'PLAY' : 'TOTAL PLAYS' }}
+                <KennerTooltip v-if="game.id || game.game_id">
+                  View {{ profileName ? `${profileName}'s` : 'all' }} plays
+                </KennerTooltip>
               </q-chip>
             </q-card-section>
             <div class="card-footer-accent" :class="`bg-rank-${idx + 1}`" />
@@ -230,7 +237,12 @@
           :key="game.name"
           class="col-12 col-sm-6 col-md-4"
         >
-          <UserGameCard :game="game" :record-score="recordsMap[game.name]" />
+          <UserGameCard
+            :game="game"
+            :record-score="recordsMap[game.name]"
+            :profile-id="profileId"
+            :profile-name="profileName"
+          />
         </div>
       </div>
     </div>
@@ -239,15 +251,21 @@
 
 <script setup lang="ts">
 import { computed } from 'vue';
+import { useRouter } from 'vue-router';
 import KennerButton from 'components/base/KennerButton.vue';
+import KennerTooltip from 'components/base/KennerTooltip.vue';
 import UserGameCard from 'components/user/UserGameCard.vue';
 import type { TPlayerGameStat, TPlayerGameRecord } from 'src/types';
+
+const router = useRouter();
 
 const props = defineProps<{
   topGames: TPlayerGameStat[];
   filteredGameStats: TPlayerGameStat[];
   gameSearch: string;
   records?: TPlayerGameRecord[];
+  profileId?: number | null;
+  profileName?: string;
 }>();
 
 defineEmits<{
@@ -263,6 +281,37 @@ const recordsMap = computed(() => {
   }
   return map;
 });
+
+function onTopGameClick(game: TPlayerGameStat) {
+  const gId = game.id ?? game.game_id;
+  if (!gId) return;
+  const query: Record<string, string> = { tab: 'matches' };
+  if (props.profileId != null) {
+    query.player = String(props.profileId);
+  } else if (props.profileName) {
+    query.player = props.profileName;
+  }
+  void router.push({
+    name: 'game-detail',
+    params: { id: gId },
+    query,
+  });
+}
+
+function onRecordClick(record: TPlayerGameRecord) {
+  if (!record.game_id) return;
+  const query: Record<string, string> = { tab: 'matches' };
+  if (props.profileId != null) {
+    query.player = String(props.profileId);
+  } else if (props.profileName) {
+    query.player = props.profileName;
+  }
+  void router.push({
+    name: 'game-detail',
+    params: { id: record.game_id },
+    query,
+  });
+}
 </script>
 
 <style scoped lang="scss">
