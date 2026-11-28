@@ -63,3 +63,46 @@ test('related game choices exclude the current game and show platform names', ()
     [2]
   );
 });
+
+test('configuration displays related games, platform names, and reciprocal-link guidance', () => {
+  const { getRelatedGameDisplay } = loadTypeScriptModule(
+    'src/composables/relatedGames.ts'
+  );
+  const configPage = fs.readFileSync('src/pages/game/GameConfigPage.vue', 'utf8');
+  const games = [
+    { id: 2, name: 'Gaia Project', platform: 11 },
+    { id: 3, name: 'Gaia Project', platform: 12 },
+  ];
+  const platforms = [
+    { id: 11, name: 'Steam' },
+    { id: 12, name: 'Board Game Arena' },
+  ];
+
+  assert.deepEqual(
+    Array.from(getRelatedGameDisplay([2, 3], games, platforms).items, (item) =>
+      item.label
+    ),
+    ['Gaia Project (Steam)', 'Gaia Project (Board Game Arena)']
+  );
+  assert.deepEqual(
+    Array.from(getRelatedGameDisplay([], games, platforms).items),
+    []
+  );
+  assert.deepEqual(
+    Array.from(getRelatedGameDisplay([4], games, platforms).items, (item) => [
+      item.id,
+      item.label,
+    ]),
+    [[4, 'Game ID 4']]
+  );
+
+  const failedLookup = getRelatedGameDisplay([2], [], [], true);
+  assert.deepEqual(
+    Array.from(failedLookup.items, (item) => [item.id, item.label]),
+    [[2, 'Game ID 2']]
+  );
+  assert.equal(failedLookup.lookupFailed, true);
+  assert.match(configPage, /Relations are bidirectional, but not transitive/);
+  assert.match(configPage, /No related games configured\./);
+  assert.match(configPage, /Related game details could not be loaded/);
+});

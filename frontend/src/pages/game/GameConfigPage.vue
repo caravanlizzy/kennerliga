@@ -89,6 +89,49 @@
           </q-card-section>
 
           <q-card-section class="q-pa-lg">
+            <section class="q-mb-xl">
+              <h2 class="text-h6 q-my-none q-mb-md text-weight-bold">
+                Related Games
+              </h2>
+
+              <q-banner
+                v-if="relatedGameDisplay.lookupFailed"
+                rounded
+                class="bg-orange-1 text-orange-10 q-mb-md"
+              >
+                <template #avatar>
+                  <q-icon name="warning" />
+                </template>
+                Related game details could not be loaded. The linked game IDs
+                are shown below.
+              </q-banner>
+
+              <q-banner
+                v-if="!relatedGameDisplay.items.length"
+                rounded
+                class="bg-grey-2 text-grey-8"
+              >
+                No related games configured.
+              </q-banner>
+
+              <q-list v-else bordered separator class="rounded-borders">
+                <q-item
+                  v-for="relatedGame in relatedGameDisplay.items"
+                  :key="relatedGame.id"
+                >
+                  <q-item-section avatar>
+                    <q-icon name="link" color="primary" />
+                  </q-item-section>
+                  <q-item-section>{{ relatedGame.label }}</q-item-section>
+                </q-item>
+              </q-list>
+
+              <div class="text-caption text-grey-7 q-mt-sm">
+                Relations are bidirectional, but not transitive. Link every
+                equivalent game pair directly.
+              </div>
+            </section>
+
             <!-- Options Section -->
             <h2 class="text-h6 q-my-none q-mb-md text-weight-bold">
               Game Options
@@ -364,12 +407,21 @@ import ResultConfiguration from 'components/game/ResultConfiguration.vue';
 import KennerButton from 'components/base/KennerButton.vue';
 import LoadingSpinner from 'components/base/LoadingSpinner.vue';
 import { computed, ref, onMounted } from 'vue';
-import { fetchGameDetailBundle } from 'src/services/gameService';
+import {
+  fetchGameDetailBundle,
+  fetchGamesForManagement,
+  fetchPlatforms,
+} from 'src/services/gameService';
+import { getRelatedGameDisplay } from 'src/composables/relatedGames';
+import type { TGameDto, TPlatform } from 'src/types';
 
 const route = useRoute();
 const router = useRouter();
 const isLoading = ref(true);
 const expandedRules = ref<Record<number, boolean>>({});
+const relatedGames = ref<TGameDto[]>([]);
+const platforms = ref<TPlatform[]>([]);
+const relatedGamesLookupFailed = ref(false);
 
 function toggleRules(id: number) {
   expandedRules.value[id] = !expandedRules.value[id];
@@ -381,6 +433,17 @@ onMounted(async () => {
   try {
     const bundle = await fetchGameDetailBundle(Number(route.params.id));
     gameData.value = bundle;
+
+    if (bundle.game.related_games?.length) {
+      try {
+        [relatedGames.value, platforms.value] = await Promise.all([
+          fetchGamesForManagement(),
+          fetchPlatforms(),
+        ]);
+      } catch {
+        relatedGamesLookupFailed.value = true;
+      }
+    }
   } finally {
     isLoading.value = false;
   }
@@ -388,6 +451,14 @@ onMounted(async () => {
 
 const game = computed(() => gameData.value?.game || { options: [] });
 const platform = computed(() => gameData.value?.platform || {});
+const relatedGameDisplay = computed(() =>
+  getRelatedGameDisplay(
+    game.value.related_games,
+    relatedGames.value,
+    platforms.value,
+    relatedGamesLookupFailed.value
+  )
+);
 const resultConfig = computed(() => gameData.value?.resultConfig || {});
 const winConditions = computed(() => gameData.value?.winConditions || []);
 const factions = computed(() => gameData.value?.factions || []);

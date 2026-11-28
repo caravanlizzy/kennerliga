@@ -22,7 +22,7 @@
       </template>
     </KennerSelect>
     <div class="text-caption text-grey-7 q-mt-xs">
-      Relations are direct pairs. Link every equivalent platform version; linking
+      ct pairs. Link every equivalent platform version; linking
       two games to a third does not link them to each other.
     </div>
   </div>

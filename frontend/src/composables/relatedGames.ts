@@ -5,6 +5,11 @@ export type TRelatedGameOption = {
   label: string;
 };
 
+export type TRelatedGameDisplay = {
+  items: TRelatedGameOption[];
+  lookupFailed: boolean;
+};
+
 export function getRelatedGameOptions(
   games: TGameDto[],
   platforms: TPlatform[],
@@ -23,4 +28,23 @@ export function getRelatedGameOptions(
       label: `${game.name} (${platformNames.get(game.platform) || 'Unknown platform'})`,
     }))
     .filter((option) => option.label.toLocaleLowerCase().includes(search));
+}
+
+export function getRelatedGameDisplay(
+  relatedGameIds: number[] | undefined,
+  games: TGameDto[],
+  platforms: TPlatform[],
+  lookupFailed = false
+): TRelatedGameDisplay {
+  const ids = (relatedGameIds || []).map(Number);
+  const optionsById = new Map(
+    getRelatedGameOptions(games, platforms).map((option) => [option.id, option])
+  );
+
+  return {
+    items: ids.map((id) =>
+      optionsById.get(id) || { id, label: `Game ID ${id}` }
+    ),
+    lookupFailed: ids.length > 0 && lookupFailed,
+  };
 }
