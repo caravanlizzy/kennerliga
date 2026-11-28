@@ -25,6 +25,18 @@
         <q-badge rounded color="grey-3" text-color="grey-7" class="q-px-sm">
           {{ results.length }} players
         </q-badge>
+        <q-btn
+          v-if="selectedGame.game_link"
+          :href="selectedGame.game_link"
+          target="_blank"
+          rel="noopener noreferrer"
+          flat
+          dense
+          no-caps
+          color="primary"
+          icon="open_in_new"
+          label="Game link"
+        />
       </div>
     </q-card-section>
 

@@ -10,7 +10,7 @@ from services.standings_snapshot import rebuild_game_snapshot, rebuild_league_sn
 from season.models import Season
 from season.serializer import SeasonSerializer
 from .models import Result
-from .serializers import ResultSerializer
+from .serializers import MatchResultSubmissionSerializer, ResultSerializer
 from .services import finalize_results, get_game_standings_data, get_tie_groups
 
 
@@ -135,21 +135,28 @@ class MatchResultViewSet(ViewSet):
         league,
         decisive_tb=None,
         needing_pids=None,
+        game_link=None,
+        update_game_link=False,
     ):
         """
         Finalizes and saves the result set, and returns the serialized results and standings.
         """
-        saved = finalize_results(
-            serializers,
-            rows,
-            base_field,
-            use_points,
-            tbs,
-            selected_game,
-            league,
-            decisive_tb,
-            needing_pids,
-        )
+        with transaction.atomic():
+            saved = finalize_results(
+                serializers,
+                rows,
+                base_field,
+                use_points,
+                tbs,
+                selected_game,
+                league,
+                decisive_tb,
+                needing_pids,
+            )
+            if update_game_link:
+                selected_game.game_link = game_link or ""
+                selected_game.save(update_fields=["game_link", "updated_at"])
+
         game_standings = get_game_standings_data(league, selected_game.id)
         return Response(
             {
@@ -172,6 +179,14 @@ class MatchResultViewSet(ViewSet):
             return Response(
                 {"detail": "Invalid payload."}, status=status.HTTP_400_BAD_REQUEST
             )
+
+        submission_serializer = MatchResultSubmissionSerializer(data=request.data)
+        if not submission_serializer.is_valid():
+            return Response(
+                submission_serializer.errors, status=status.HTTP_400_BAD_REQUEST
+            )
+        game_link = submission_serializer.validated_data.get("game_link")
+        update_game_link = "game_link" in submission_serializer.validated_data
 
         try:
             selected_game = SelectedGame.objects.select_related(
@@ -285,6 +300,8 @@ class MatchResultViewSet(ViewSet):
                     tbs,
                     selected_game,
                     league,
+                    game_link=game_link,
+                    update_game_link=update_game_link,
                 )
 
             next_tb = tbs[0]
@@ -369,6 +386,8 @@ class MatchResultViewSet(ViewSet):
             league,
             decisive_tb=tbs[level],
             needing_pids=needing_pids,
+            game_link=game_link,
+            update_game_link=update_game_link,
         )
 
     def list(self, request):
@@ -422,6 +441,8 @@ class MatchResultViewSet(ViewSet):
             with transaction.atomic():
                 # Delete results
                 results.delete()
+                selected_game.game_link = ""
+                selected_game.save(update_fields=["game_link", "updated_at"])
                 # Delete game standings
                 GameStanding.objects.filter(selected_game=selected_game).delete()
 

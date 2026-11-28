@@ -78,6 +78,17 @@
                   })
                 "
               />
+              <q-btn
+                v-if="selectedGame.game_link"
+                :href="selectedGame.game_link"
+                target="_blank"
+                rel="noopener noreferrer"
+                outline
+                no-caps
+                color="primary"
+                icon="open_in_new"
+                label="Game link"
+              />
               <!-- Edit Button for Admins -->
               <KennerButton
                 v-if="isAdmin"

@@ -56,6 +56,29 @@ class ResultAPITests(TestCase):
             game=self.game, league=self.league, profile=self.profile
         )
 
+    def _add_second_member(self):
+        user = User.objects.create(username="user2")
+        profile = PlayerProfile.objects.create(user=user, profile_name="Profile 2")
+        participant = SeasonParticipant.objects.create(
+            season=self.season, profile=profile, rank=2
+        )
+        self.league.members.add(participant)
+        return profile
+
+    def _match_result_payload(self, profile2):
+        return {
+            "selected_game": self.selected_game.id,
+            "win_condition": self.win_condition.id,
+            "results": [
+                {
+                    "player_profile": self.profile.id,
+                    "points": 10,
+                    "starting_position": 1,
+                },
+                {"player_profile": profile2.id, "points": 8, "starting_position": 2},
+            ],
+        }
+
     def test_submit_match_result(self):
         # Create another player as MatchResultViewSet requires at least 2 results
         user2 = User.objects.create(username="user2")
@@ -99,6 +122,7 @@ class ResultAPITests(TestCase):
         data = {
             "selected_game": self.selected_game.id,
             "win_condition": self.win_condition.id,
+            "game_link": "https://example.com/match/123",
             "results": [
                 {
                     "player_profile": self.profile.id,
@@ -113,6 +137,8 @@ class ResultAPITests(TestCase):
         # Based on result/views.py:152, it returns 202 ACCEPTED for ties
         self.assertEqual(response.status_code, 202)
         self.assertIn("tie_groups", response.data)
+        self.selected_game.refresh_from_db()
+        self.assertEqual(self.selected_game.game_link, "")
 
         # Submit with tiebreaker
         data["tiebreaker"] = {"id": tb.id}
@@ -121,6 +147,10 @@ class ResultAPITests(TestCase):
 
         response = self.client.post("/api/result/match-results/", data, format="json")
         self.assertEqual(response.status_code, 201)
+        self.selected_game.refresh_from_db()
+        self.assertEqual(
+            self.selected_game.game_link, "https://example.com/match/123"
+        )
 
         res1 = Result.objects.get(player_profile=self.profile)
         res2 = Result.objects.get(player_profile=profile2)
@@ -128,6 +158,70 @@ class ResultAPITests(TestCase):
         self.assertEqual(res1.position, 1)
         self.assertEqual(res2.position, 2)
         self.assertEqual(res1.decisive_tie_breaker, tb)
+
+    def test_game_link_can_be_created_edited_omitted_and_cleared(self):
+        profile2 = self._add_second_member()
+        data = self._match_result_payload(profile2)
+        data["game_link"] = "https://example.com/match/123"
+
+        response = self.client.post("/api/result/match-results/", data, format="json")
+        self.assertEqual(response.status_code, 201)
+        self.selected_game.refresh_from_db()
+        self.assertEqual(self.selected_game.game_link, data["game_link"])
+
+        response = self.client.get(
+            f"/api/game/selected-games/{self.selected_game.id}/"
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data["game_link"], data["game_link"])
+
+        data.pop("game_link")
+        response = self.client.post("/api/result/match-results/", data, format="json")
+        self.assertEqual(response.status_code, 201)
+        self.selected_game.refresh_from_db()
+        self.assertEqual(self.selected_game.game_link, "https://example.com/match/123")
+
+        data["game_link"] = "https://example.com/match/456"
+        response = self.client.post("/api/result/match-results/", data, format="json")
+        self.assertEqual(response.status_code, 201)
+        self.selected_game.refresh_from_db()
+        self.assertEqual(self.selected_game.game_link, data["game_link"])
+
+        data["game_link"] = ""
+        response = self.client.post("/api/result/match-results/", data, format="json")
+        self.assertEqual(response.status_code, 201)
+        self.selected_game.refresh_from_db()
+        self.assertEqual(self.selected_game.game_link, "")
+
+    def test_invalid_game_links_are_rejected(self):
+        profile2 = self._add_second_member()
+        data = self._match_result_payload(profile2)
+
+        for game_link in ("ftp://example.com/match", "javascript:alert(1)"):
+            with self.subTest(game_link=game_link):
+                data["game_link"] = game_link
+                response = self.client.post(
+                    "/api/result/match-results/", data, format="json"
+                )
+                self.assertEqual(response.status_code, 400)
+                self.assertIn("game_link", response.data)
+                self.assertEqual(Result.objects.count(), 0)
+                self.selected_game.refresh_from_db()
+                self.assertEqual(self.selected_game.game_link, "")
+
+    def test_deleting_match_results_clears_game_link(self):
+        profile2 = self._add_second_member()
+        data = self._match_result_payload(profile2)
+        data["game_link"] = "https://example.com/match/123"
+        response = self.client.post("/api/result/match-results/", data, format="json")
+        self.assertEqual(response.status_code, 201)
+
+        response = self.client.delete(
+            f"/api/result/match-results/{self.selected_game.id}/"
+        )
+        self.assertEqual(response.status_code, 204)
+        self.selected_game.refresh_from_db()
+        self.assertEqual(self.selected_game.game_link, "")
 
     def test_fractional_wins_on_tie(self):
         # Create another player

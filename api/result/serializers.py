@@ -1,6 +1,17 @@
+from django.core.validators import URLValidator
 from rest_framework import serializers
 from game.models import ResultConfig, Faction, TieBreaker, WinCondition, WinConditionOption
 from .models import Result, EloChange
+
+
+class MatchResultSubmissionSerializer(serializers.Serializer):
+    game_link = serializers.URLField(
+        required=False,
+        allow_blank=True,
+        allow_null=True,
+        max_length=500,
+        validators=[URLValidator(schemes=["http", "https"])],
+    )
 
 
 class ResultSerializer(serializers.ModelSerializer):

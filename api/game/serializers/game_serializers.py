@@ -44,6 +44,7 @@ class SelectedGameSerializer(serializers.ModelSerializer):
     # game_name is read only
     game_name = serializers.SerializerMethodField()
     platform_name = serializers.SerializerMethodField()
+    game_link = serializers.URLField(read_only=True)
     selected_options = SelectedOptionSerializer(many=True)
     successfully_banned = serializers.SerializerMethodField()
     has_points = serializers.SerializerMethodField()
@@ -71,6 +72,7 @@ class SelectedGameSerializer(serializers.ModelSerializer):
             "game",
             "game_name",
             "platform_name",
+            "game_link",
             "selected_options",
             "league",
             "profile",

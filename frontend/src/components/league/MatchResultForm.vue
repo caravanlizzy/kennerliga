@@ -46,6 +46,23 @@
         v-if="!isLoading && formData.length"
         @submit.prevent="submitResults"
       >
+        <div class="row q-mb-md">
+          <q-input
+            v-model="gameLink"
+            class="col-12"
+            outlined
+            dense
+            type="url"
+            label="Game link"
+            hint="Optional link to the game session or recording."
+            :rules="[validateGameLink]"
+          >
+            <template #prepend>
+              <q-icon name="link" />
+            </template>
+          </q-input>
+        </div>
+
         <div class="row q-col-gutter-md q-mb-md">
           <div
             v-for="member in members"
@@ -160,6 +177,8 @@ onMounted(() => {
 const resultConfig = ref<TResultConfigDto | null>(null);
 const factions = ref<Faction[]>([]);
 const formData = ref<FormDataEntry[]>([]);
+const gameLink = ref('');
+const initialGameLink = ref('');
 const isLoading = ref(false);
 
 const winConditions = ref<TWinConditionDto[]>([]);
@@ -257,8 +276,28 @@ function setPosition(memberId: number, pos: number) {
 
 async function fetchResultConfig() {
   const selectedGame = await fetchSelectedGame(props.selectedGameId);
+  gameLink.value = selectedGame.game_link ?? '';
+  initialGameLink.value = gameLink.value;
   if (!selectedGame.game) return;
   resultConfig.value = await fetchResultConfigForGame(selectedGame.game);
+}
+
+function isValidGameLink(value: string) {
+  const link = value.trim();
+  if (!link) return true;
+
+  try {
+    const url = new URL(link);
+    return (
+      ['http:', 'https:'].includes(url.protocol) && Boolean(url.hostname)
+    );
+  } catch {
+    return false;
+  }
+}
+
+function validateGameLink(value: string) {
+  return isValidGameLink(value) || 'Enter a valid HTTP or HTTPS link.';
 }
 
 async function loadWinConditions() {
@@ -342,6 +381,7 @@ async function fetchExistingResults() {
 }
 
 function initFormData() {
+  gameLink.value = initialGameLink.value;
   if (!members.value || members.value.length === 0) {
     formData.value = [];
     return;
@@ -466,6 +506,14 @@ function handleTieBreaker202(data: {
 }
 
 async function submitResults() {
+  if (!isValidGameLink(gameLink.value)) {
+    $q.notify({
+      type: 'negative',
+      message: 'Enter a valid HTTP or HTTPS link.',
+    });
+    return;
+  }
+
   if (tieBreakerRequired.value) {
     const missing = [...tieBreakerPlayers.value].filter((pid) => {
       const v = getEntry(pid).tie_breaker_value;
@@ -536,6 +584,7 @@ async function submitResults() {
     selected_game: props.selectedGameId,
     results,
     win_condition: selectedWinConditionId.value,
+    game_link: gameLink.value.trim(),
   };
 
   if (tieBreakerRequired.value && requiredTieBreaker.value?.id) {

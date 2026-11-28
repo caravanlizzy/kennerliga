@@ -18,6 +18,7 @@ export type TMatchResultSubmitPayload = {
   selected_game: number;
   results: TMatchResultPayload[];
   win_condition: number;
+  game_link?: string;
   tiebreaker?: { id: number };
 };
 

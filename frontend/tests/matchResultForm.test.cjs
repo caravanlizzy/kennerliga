@@ -40,7 +40,7 @@ function mountForm(options = {}) {
           ],
           fetchSelectedGame: async (selectedGameId) => {
             requests.push({ name: 'fetchSelectedGame', selectedGameId });
-            return { game: 20 };
+            return { game: 20, game_link: options.gameLink ?? '' };
           },
           submitMatchResults: async (payload) => {
             requests.push({ name: 'submitMatchResults', payload });
@@ -74,6 +74,7 @@ function mountForm(options = {}) {
       throw new Error(`Unexpected import: ${name}`);
     },
     console,
+    URL,
   });
 
   const setupResult = exports.default.setup(
@@ -103,7 +104,8 @@ test('match result form runs its immediate watchers when mounted', async () => {
 
 test('match result form resets tie breaker fields when a 202 tie breaker is received', async () => {
   let submitCount = 0;
-  const { setupResult } = mountForm({
+  const { requests, setupResult } = mountForm({
+    gameLink: 'https://example.com/match/123',
     submitResponse: () => {
       submitCount++;
       if (submitCount === 1) {
@@ -135,6 +137,11 @@ test('match result form resets tie breaker fields when a 202 tie breaker is rece
   // First submit -> triggers tie breaker 1
   await setupResult.submitResults();
 
+  assert.equal(
+    requests.filter((request) => request.name === 'submitMatchResults')[0]
+      .payload.game_link,
+    'https://example.com/match/123'
+  );
   assert.equal(setupResult.tieBreakerRequired.value, true);
   assert.equal(setupResult.requiredTieBreaker.value.id, 1);
   assert.equal(setupResult.formData.value[0].tie_breaker_value, null);
@@ -147,9 +154,43 @@ test('match result form resets tie breaker fields when a 202 tie breaker is rece
   // Second submit -> triggers tie breaker 2 (still tied)
   await setupResult.submitResults();
 
+  assert.equal(
+    requests.filter((request) => request.name === 'submitMatchResults')[1]
+      .payload.game_link,
+    'https://example.com/match/123'
+  );
   assert.equal(setupResult.tieBreakerRequired.value, true);
   assert.equal(setupResult.requiredTieBreaker.value.id, 2);
   // Values should be reset to null for the second tie breaker
   assert.equal(setupResult.formData.value[0].tie_breaker_value, null);
   assert.equal(setupResult.formData.value[1].tie_breaker_value, null);
+});
+
+test('match result form loads, submits, validates, and resets the game link', async () => {
+  const { requests, setupResult } = mountForm({
+    gameLink: 'https://example.com/match/123',
+  });
+  await new Promise((resolve) => setImmediate(resolve));
+
+  assert.equal(setupResult.gameLink.value, 'https://example.com/match/123');
+  setupResult.formData.value.forEach((entry, index) => {
+    entry.points = index === 0 ? 10 : 8;
+  });
+  setupResult.gameLink.value = 'https://example.com/match/456';
+  await setupResult.submitResults();
+
+  const submission = requests.find(
+    (request) => request.name === 'submitMatchResults'
+  );
+  assert.equal(submission.payload.game_link, 'https://example.com/match/456');
+
+  setupResult.gameLink.value = 'javascript:alert(1)';
+  await setupResult.submitResults();
+  assert.equal(
+    requests.filter((request) => request.name === 'submitMatchResults').length,
+    1
+  );
+
+  setupResult.initFormData();
+  assert.equal(setupResult.gameLink.value, 'https://example.com/match/123');
 });

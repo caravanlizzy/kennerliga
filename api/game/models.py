@@ -194,6 +194,7 @@ class SelectedGame(models.Model):
     )
     created_at = models.DateTimeField(default=timezone.now)
     updated_at = models.DateTimeField(auto_now=True)
+    game_link = models.URLField(max_length=500, blank=True, default="")
 
     class Meta:
         constraints = [

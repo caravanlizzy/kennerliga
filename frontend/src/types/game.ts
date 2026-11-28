@@ -104,6 +104,7 @@ export type TSelectedGameDto = {
   game: number;
   game_name?: string;
   platform_name?: string;
+  game_link?: string;
   league: number;
   league_id?: number;
   league_level?: number;
