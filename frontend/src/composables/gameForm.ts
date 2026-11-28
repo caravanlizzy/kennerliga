@@ -60,6 +60,7 @@ export function useGameForm() {
   const minPlayers = ref(2);
   const maxPlayers = ref(4);
   const platforms = ref<TPlatform[]>([]);
+  const relatedGameIds = ref<number[]>([]);
 
   // In create mode the value is a full TPlatform object (matches KennerSelect
   // usage there); in edit mode it's the id (number). We keep the type wide
@@ -299,6 +300,7 @@ export function useGameForm() {
     minPlayers.value = (gameData as any).min_players ?? 2;
     maxPlayers.value = (gameData as any).max_players ?? 4;
     platform.value = gameData.platform as any;
+    relatedGameIds.value = (gameData.related_games || []).map(Number);
 
     const optionMap = new Map<number, string>();
     const choiceMap = new Map<number, string>();
@@ -389,6 +391,7 @@ export function useGameForm() {
       selectable: selectable.value,
       min_players: Number(minPlayers.value),
       max_players: Number(maxPlayers.value),
+      related_games: [...relatedGameIds.value],
       options: gameOptions.value.map((opt) => ({
         id: opt.id,
         ref: opt.ref,
@@ -423,6 +426,7 @@ export function useGameForm() {
     maxPlayers,
     platform,
     platforms,
+    relatedGameIds,
     gameOptions,
     // helpers
     newRef,

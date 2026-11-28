@@ -728,6 +728,42 @@ class GameDetailedStatisticsTests(StatisticsServiceTestBase):
         self.assertEqual(stats["leaderboard"], [])
         self.assertEqual(stats["recent_matches"], [])
 
+    def test_related_platform_scores_remain_separate(self):
+        steam = Platform.objects.create(name="Steam")
+        related_game = Game.objects.create(name=self.game.name, platform=steam)
+        self.game.related_games.add(related_game)
+
+        original_match = SelectedGame.objects.create(
+            profile=self.alice, game=self.game, league=self.league
+        )
+        Result.objects.create(
+            player_profile=self.alice,
+            selected_game=original_match,
+            league=self.league,
+            season=self.season,
+            position=1,
+            points=50,
+        )
+
+        related_league = self.make_league(2)
+        related_match = SelectedGame.objects.create(
+            profile=self.bob, game=related_game, league=related_league
+        )
+        Result.objects.create(
+            player_profile=self.bob,
+            selected_game=related_match,
+            league=related_league,
+            season=self.season,
+            position=1,
+            points=500,
+        )
+
+        original_stats = get_game_detailed_statistics(self.game)
+        related_stats = get_game_detailed_statistics(related_game)
+
+        self.assertEqual(original_stats["records"]["high_score"]["points"], 50)
+        self.assertEqual(related_stats["records"]["high_score"]["points"], 500)
+
     def test_records_and_superlatives(self):
         # Match 1: Alice (1st, 100 pts), Bob (2nd, 80 pts), Charlie (3rd, 60 pts)
         selected_game1 = SelectedGame.objects.create(

@@ -450,6 +450,7 @@ export async function fetchGameDetailBundle(
 
 export type TGameEditBundle = {
   platforms: TPlatform[];
+  gamesForManagement: TGameDto[];
   game: TFullGameDto;
   resultConfig: TResultConfigDto | null;
   winConditions: TWinConditionDto[];
@@ -463,8 +464,9 @@ export type TGameEditBundle = {
 export async function fetchGameEditBundle(
   gameId: number
 ): Promise<TGameEditBundle> {
-  const [platforms, game, resultConfig] = await Promise.all([
+  const [platforms, gamesForManagement, game, resultConfig] = await Promise.all([
     fetchPlatforms(),
+    fetchGamesForManagement(),
     fetchFullGame(gameId),
     fetchResultConfigForGame(gameId),
   ]);
@@ -478,7 +480,14 @@ export async function fetchGameEditBundle(
     ]);
   }
 
-  return { platforms, game, resultConfig, winConditions, factions };
+  return {
+    platforms,
+    gamesForManagement,
+    game,
+    resultConfig,
+    winConditions,
+    factions,
+  };
 }
 
 export async function updateResultConfigData(

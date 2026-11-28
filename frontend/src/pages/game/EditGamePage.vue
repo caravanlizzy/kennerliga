@@ -72,6 +72,16 @@
               </div>
             </section>
 
+            <section>
+              <div class="text-h6 q-mb-md text-grey-8">Related Games</div>
+              <RelatedGamesSelector
+                v-model="relatedGameIds"
+                :games="gamesForManagement"
+                :platforms="platforms"
+                :current-game-id="gameId"
+              />
+            </section>
+
             <q-separator />
 
             <!-- Game options -->
@@ -464,12 +474,14 @@ import KennerTooltip from 'components/base/KennerTooltip.vue';
 import LoadingSpinner from 'components/base/LoadingSpinner.vue';
 import { useRoute, useRouter } from 'vue-router';
 import { TResultConfig } from 'src/types';
+import type { TGameDto } from 'src/types';
 import {
   fetchGameEditBundle,
   updateGameFull,
   updateResultConfigData,
 } from 'src/services/gameService';
 import CreateResultConfig from 'components/game/CreateResultConfig.vue';
+import RelatedGamesSelector from 'components/game/RelatedGamesSelector.vue';
 import { useGameForm } from 'src/composables/gameForm';
 
 const route = useRoute();
@@ -478,6 +490,7 @@ const $q = useQuasar();
 
 const gameId = parseInt(route.params.id as string);
 const loading = ref(true);
+const gamesForManagement = ref<TGameDto[]>([]);
 
 const {
   name,
@@ -487,6 +500,7 @@ const {
   maxPlayers,
   platform,
   platforms,
+  relatedGameIds,
   gameOptions,
   addEmptyOption,
   moveOption,
@@ -529,6 +543,7 @@ onMounted(async () => {
   try {
     const {
       platforms: fetchedPlatforms,
+      gamesForManagement: fetchedGamesForManagement,
       game: gameData,
       resultConfig: rc,
       winConditions,
@@ -536,6 +551,7 @@ onMounted(async () => {
     } = await fetchGameEditBundle(gameId);
 
     platforms.value = fetchedPlatforms;
+    gamesForManagement.value = fetchedGamesForManagement;
 
     // Load Result Config
     if (rc) {

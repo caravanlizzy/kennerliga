@@ -5,6 +5,7 @@ from season.models import Season, SeasonParticipant
 from league.models import League, LeagueStatus
 from game.models import (
     Game,
+    GameOption,
     SelectedGame,
     ResultConfig,
     StartingPointSystem,
@@ -292,3 +293,164 @@ class GameAPITests(TestCase):
         res_season = self.client.get(f"/api/game/selected-games/?season={self.season.id}")
         self.assertEqual(res_season.status_code, 200)
         self.assertEqual(len(res_season.data), 1)
+
+    def test_full_game_create_related_games(self):
+        steam = Platform.objects.create(name="Steam")
+        related_game = Game.objects.create(name="Catan", platform=steam)
+
+        response = self.client.post(
+            "/api/game/games-full/",
+            {
+                "name": "Catan Online",
+                "platform": self.platform.id,
+                "related_games": [related_game.id],
+                "options": [],
+            },
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, 201)
+        created_game = Game.objects.get(id=response.data["id"])
+        self.assertEqual(
+            list(created_game.related_games.values_list("id", flat=True)),
+            [related_game.id],
+        )
+        self.assertEqual(response.data["related_games"], [related_game.id])
+        self.assertIn(created_game, related_game.related_games.all())
+
+    def test_full_game_related_games_can_be_read_updated_and_removed(self):
+        related_game = Game.objects.create(name="Catan Online", platform=self.platform)
+        self.game.related_games.add(related_game)
+        option = GameOption.objects.create(name="Map", game=self.game)
+
+        for game in (self.game, related_game):
+            response = self.client.get(
+                f"/api/game/games-full/{game.id}/?manage_only=true"
+            )
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(response.data["related_games"], [
+                related_game.id if game == self.game else self.game.id
+            ])
+
+        omitted_response = self.client.patch(
+            f"/api/game/games-full/{self.game.id}/",
+            {"name": "Catan Revised"},
+            format="json",
+        )
+        self.assertEqual(omitted_response.status_code, 200)
+        self.assertIn(related_game, self.game.related_games.all())
+        self.assertTrue(GameOption.objects.filter(id=option.id).exists())
+
+        clear_response = self.client.patch(
+            f"/api/game/games-full/{self.game.id}/",
+            {"related_games": []},
+            format="json",
+        )
+        self.assertEqual(clear_response.status_code, 200)
+        self.assertFalse(self.game.related_games.exists())
+        self.assertFalse(related_game.related_games.exists())
+        self.assertTrue(GameOption.objects.filter(id=option.id).exists())
+
+    def test_full_game_rejects_invalid_and_self_related_game_ids(self):
+        invalid_response = self.client.post(
+            "/api/game/games-full/",
+            {
+                "name": "Invalid Link",
+                "platform": self.platform.id,
+                "related_games": [999999],
+                "options": [],
+            },
+            format="json",
+        )
+        self.assertEqual(invalid_response.status_code, 400)
+
+        self_related_response = self.client.patch(
+            f"/api/game/games-full/{self.game.id}/",
+            {"related_games": [self.game.id]},
+            format="json",
+        )
+        self.assertEqual(self_related_response.status_code, 400)
+        self.assertFalse(self.game.related_games.exists())
+
+    def test_full_game_create_rolls_back_related_links_on_invalid_options(self):
+        initial_count = Game.objects.count()
+        response = self.client.post(
+            "/api/game/games-full/",
+            {
+                "name": "Invalid Options",
+                "platform": self.platform.id,
+                "related_games": [self.game.id],
+                "options": [
+                    {"name": "First", "ref": "duplicate"},
+                    {"name": "Second", "ref": "duplicate"},
+                ],
+            },
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(Game.objects.count(), initial_count)
+        self.assertFalse(self.game.related_games.exists())
+
+    def test_full_game_update_rolls_back_related_links_on_invalid_options(self):
+        steam = Platform.objects.create(name="Steam")
+        existing_related_game = Game.objects.create(name="Catan Online", platform=steam)
+        new_related_game = Game.objects.create(name="Catan Digital", platform=steam)
+        self.game.related_games.add(existing_related_game)
+
+        response = self.client.patch(
+            f"/api/game/games-full/{self.game.id}/",
+            {
+                "related_games": [new_related_game.id],
+                "options": [
+                    {"name": "First", "ref": "duplicate"},
+                    {"name": "Second", "ref": "duplicate"},
+                ],
+            },
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(
+            list(self.game.related_games.values_list("id", flat=True)),
+            [existing_related_game.id],
+        )
+        self.assertFalse(new_related_game.related_games.exists())
+        self.assertFalse(GameOption.objects.filter(game=self.game).exists())
+
+    def test_related_game_picks_share_the_per_year_limit(self):
+        steam = Platform.objects.create(name="Steam")
+        related_game = Game.objects.create(
+            name="Catan Online", platform=steam, min_players=1, max_players=4
+        )
+        self.game.related_games.add(related_game)
+
+        second_league = League.objects.create(
+            season=self.season, level=2, status=LeagueStatus.PICKING
+        )
+        third_league = League.objects.create(
+            season=self.season, level=3, status=LeagueStatus.PICKING
+        )
+        for league in (self.league, second_league, third_league):
+            league.members.add(self.participant)
+
+        SelectedGame.objects.create(
+            profile=self.profile, game=self.game, league=self.league
+        )
+        SelectedGame.objects.create(
+            profile=self.profile, game=self.game, league=second_league
+        )
+
+        response = self.client.post(
+            "/api/game/selected-games/",
+            {
+                "game": related_game.id,
+                "league": third_league.id,
+                "profile": self.profile.id,
+                "selected_options": [],
+            },
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(SelectedGame.objects.count(), 2)

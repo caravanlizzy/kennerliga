@@ -54,6 +54,7 @@ export type TFullGameDto = {
   selectable?: boolean;
   min_players?: number;
   max_players?: number;
+  related_games?: number[];
   options: TFullGameOptionDto[];
 };
 

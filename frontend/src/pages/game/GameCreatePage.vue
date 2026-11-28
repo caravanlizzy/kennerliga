@@ -73,6 +73,15 @@
               </div>
             </section>
 
+            <section>
+              <div class="text-h6 q-mb-md text-grey-8">Related Games</div>
+              <RelatedGamesSelector
+                v-model="relatedGameIds"
+                :games="gamesForManagement"
+                :platforms="platforms"
+              />
+            </section>
+
             <q-separator />
 
             <!-- Game options -->
@@ -457,7 +466,11 @@
 <script setup lang="ts">
 import { nextTick } from 'vue';
 import { useQuasar } from 'quasar';
-import { createFullGame, fetchPlatforms } from 'src/services/gameService';
+import {
+  createFullGame,
+  fetchGamesForManagement,
+  fetchPlatforms,
+} from 'src/services/gameService';
 import KennerInput from 'components/base/KennerInput.vue';
 import KennerSelect from 'components/base/KennerSelect.vue';
 import KennerButton from 'components/base/KennerButton.vue';
@@ -467,11 +480,15 @@ import CreateResultConfig from 'components/game/CreateResultConfig.vue';
 import { TPlatform, TResultConfig } from 'src/types';
 import { createResultConfigData } from 'src/services/gameService';
 import { useGameForm } from 'src/composables/gameForm';
+import RelatedGamesSelector from 'components/game/RelatedGamesSelector.vue';
 
 const router = useRouter();
 const $q = useQuasar();
 
-const platforms = await fetchPlatforms();
+const [platforms, gamesForManagement] = await Promise.all([
+  fetchPlatforms(),
+  fetchGamesForManagement(),
+]);
 
 const {
   name,
@@ -480,6 +497,7 @@ const {
   minPlayers,
   maxPlayers,
   platform,
+  relatedGameIds,
   gameOptions,
   addEmptyOption,
   moveOption,

@@ -248,6 +248,9 @@ class FullGameSerializer(serializers.ModelSerializer):
     Used for full game configuration and editing.
     """
     options = FullGameOptionSerializer(many=True)
+    related_games = serializers.PrimaryKeyRelatedField(
+        many=True, queryset=Game.objects.all(), required=False
+    )
 
     class Meta:
         model = Game
@@ -259,13 +262,21 @@ class FullGameSerializer(serializers.ModelSerializer):
             "selectable",
             "min_players",
             "max_players",
+            "related_games",
             "options",
         ]
+
+    def validate_related_games(self, value):
+        if self.instance and any(game.id == self.instance.id for game in value):
+            raise serializers.ValidationError("A game cannot be related to itself.")
+        return value
 
     @transaction.atomic
     def create(self, validated_data):
         options_data = validated_data.pop("options", [])
+        related_games = validated_data.pop("related_games", [])
         game = Game.objects.create(**validated_data)
+        game.related_games.set(related_games)
 
         option_by_ref = {}
         choice_by_ref = {}
@@ -310,7 +321,8 @@ class FullGameSerializer(serializers.ModelSerializer):
 
     @transaction.atomic
     def update(self, instance, validated_data):
-        options_data = validated_data.pop("options", [])
+        options_data = validated_data.pop("options", None)
+        related_games = validated_data.pop("related_games", None)
 
         instance.name = validated_data.get("name", instance.name)
         instance.short_name = validated_data.get("short_name", instance.short_name)
@@ -319,6 +331,9 @@ class FullGameSerializer(serializers.ModelSerializer):
         instance.min_players = validated_data.get("min_players", instance.min_players)
         instance.max_players = validated_data.get("max_players", instance.max_players)
         instance.save()
+
+        if related_games is not None:
+            instance.related_games.set(related_games)
 
         if options_data is None:
             return instance
