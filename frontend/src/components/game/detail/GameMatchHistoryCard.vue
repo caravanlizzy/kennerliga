@@ -108,28 +108,6 @@
               </q-select>
             </div>
 
-            <!-- Starting Seat Filter -->
-            <div v-if="seatOptions.length > 1" class="col-12 col-sm-6 col-md-2">
-              <q-select
-                v-model="selectedSeat"
-                dense
-                outlined
-                emit-value
-                map-options
-                :options="seatOptions"
-                label="Starting Order"
-                class="bg-white"
-              >
-                <template #prepend>
-                  <q-icon
-                    name="format_list_numbered"
-                    size="18px"
-                    color="secondary"
-                  />
-                </template>
-              </q-select>
-            </div>
-
             <!-- Season Filter -->
             <div
               v-if="seasonOptions.length > 1"
@@ -159,7 +137,7 @@
                 label="Only matches where selection won"
                 color="amber-9"
                 class="text-caption text-weight-medium"
-                :disable="!selectedPlayer && !selectedFaction && !selectedSeat"
+                :disable="!selectedPlayer && !selectedFaction"
               />
             </div>
           </div>
@@ -589,7 +567,6 @@ const showFilterPanel = ref(true);
 const searchQuery = ref('');
 const selectedFaction = ref<string | null>(null);
 const selectedPlayer = ref<number | null>(null);
-const selectedSeat = ref<number | null>(null);
 const selectedSeason = ref<string | null>(null);
 const onlyWinnerMatches = ref(false);
 
@@ -598,7 +575,6 @@ const activeFilterCount = computed(() => {
   if (searchQuery.value?.trim()) count++;
   if (selectedFaction.value) count++;
   if (selectedPlayer.value) count++;
-  if (selectedSeat.value) count++;
   if (selectedSeason.value) count++;
   if (onlyWinnerMatches.value) count++;
   return count;
@@ -608,7 +584,6 @@ function resetFilters() {
   searchQuery.value = '';
   selectedFaction.value = null;
   selectedPlayer.value = null;
-  selectedSeat.value = null;
   selectedSeason.value = null;
   onlyWinnerMatches.value = false;
 }
@@ -639,20 +614,6 @@ const playerOptions = computed(() => {
     .map(([id, name]) => ({ label: name, value: id }))
     .sort((a, b) => a.label.localeCompare(b.label));
   return [{ label: 'All Players', value: null }, ...list];
-});
-
-const seatOptions = computed(() => {
-  const seatSet = new Set<number>();
-  (props.matches || []).forEach((m) => {
-    (m.participants || []).forEach((p) => {
-      if (p.starting_position) seatSet.add(p.starting_position);
-    });
-  });
-  const list = Array.from(seatSet).sort((a, b) => a - b);
-  return [
-    { label: 'All Starting Seats', value: null },
-    ...list.map((s) => ({ label: `Seat #${s}`, value: s })),
-  ];
 });
 
 const seasonOptions = computed(() => {
@@ -717,15 +678,6 @@ const filteredMatches = computed(() => {
         return onlyWinnerMatches.value ? isPlayer && p.is_winner : isPlayer;
       });
       if (!matchPlayer) return false;
-    }
-
-    // Starting Seat filter
-    if (selectedSeat.value !== null) {
-      const matchSeat = (m.participants || []).some((p) => {
-        const isSeat = p.starting_position === selectedSeat.value;
-        return onlyWinnerMatches.value ? isSeat && p.is_winner : isSeat;
-      });
-      if (!matchSeat) return false;
     }
 
     // Season filter
