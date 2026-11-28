@@ -343,15 +343,6 @@
           </q-td>
         </template>
 
-        <!-- Date slot -->
-        <template v-slot:body-cell-date="props">
-          <q-td :props="props">
-            <span class="text-caption text-grey-7">
-              {{ formatDate(props.row.date) }}
-            </span>
-          </q-td>
-        </template>
-
         <!-- Winner slot -->
         <template v-slot:body-cell-winner="props">
           <q-td :props="props">
@@ -587,7 +578,6 @@ const { isMobile } = useResponsive();
 
 const props = defineProps<{
   matches: TGameRecentMatch[];
-  formatDate: (dateStr?: string) => string;
 }>();
 
 defineEmits<{
@@ -876,13 +866,6 @@ const tableColumns = computed(() => [
     sortable: true,
   },
   {
-    name: 'date',
-    label: 'Date',
-    field: (r: TGameRecentMatch) => r.date,
-    align: 'left',
-    sortable: true,
-  },
-  {
     name: 'winner',
     label: 'Winner',
     field: (r: TGameRecentMatch) => getWinner(r)?.profile_name || '-',
@@ -920,7 +903,7 @@ const tableColumns = computed(() => [
   },
   {
     name: 'rules',
-    label: 'Variants',
+    label: 'Options',
     field: (r: TGameRecentMatch) =>
       r.selected_options
         ?.map((o) => `${o.option_name}: ${o.choice_name}`)

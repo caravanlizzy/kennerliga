@@ -116,7 +116,6 @@
           <q-tab-panel name="matches" class="q-pa-none">
             <GameMatchHistoryCard
               :matches="stats.recent_matches"
-              :format-date="formatDate"
               @view-match="
                 router.push({
                   name: 'match-result-detail',
@@ -282,16 +281,6 @@ watch(
     if (newId) loadData();
   }
 );
-
-function formatDate(dateStr?: string) {
-  if (!dateStr) return '';
-  const d = new Date(dateStr);
-  return d.toLocaleDateString(undefined, {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-  });
-}
 
 // Columns definition for Leaderboard
 const leaderboardColumns = [
