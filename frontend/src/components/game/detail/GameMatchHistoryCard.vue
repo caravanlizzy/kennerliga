@@ -412,7 +412,7 @@
           <q-td :props="props">
             <div
               v-if="hasStartingPositions(props.row)"
-              class="row items-center q-gutter-xs no-wrap"
+              class="column items-start q-gutter-y-xs"
             >
               <q-badge
                 v-for="part in getSortedByStartingOrder(props.row)"
